@@ -1,12 +1,15 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import './index.css'
-import App from './App'
+import { Main } from './pages/main'
 import * as serviceWorker from './serviceWorker'
+import { Web3ContextWrapper } from './contexts/Web3Context'
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Web3ContextWrapper>
+      <Main />
+    </Web3ContextWrapper>
   </React.StrictMode>,
   document.getElementById('root')
 )
