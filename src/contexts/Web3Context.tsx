@@ -1,55 +1,89 @@
-import React, { createContext, useState, useEffect } from 'react'
+import React, { createContext, useState } from 'react'
 
 import { ethers } from 'ethers'
 import Web3Modal from 'web3modal'
 import { Web3Provider, JsonRpcSigner } from 'ethers/providers'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { INFURA_ID } from '../config/constants'
+import { NetworkConfig } from '../config/networkConfig'
 type Maybe<T> = T | null
 
-export const Web3Context: any = createContext({})
+type NotAsked = {
+  _type: 'notAsked'
+}
+
+type WaitingForUser = {
+  _type: 'waitingForUser'
+}
+
+type Connected = {
+  _type: 'connected'
+  provider: Web3Provider
+  address: Maybe<string>
+  signer: JsonRpcSigner
+  networkConfig: NetworkConfig
+}
+
+type ConnectedRO = {
+  _type: 'connected'
+  address: Maybe<string> // TODO
+  provider: Web3Provider
+  networkConfig: NetworkConfig
+}
+
+type ErrorWeb3 = {
+  _type: 'error'
+  error: Error
+}
+
+export type Web3Status = NotAsked | WaitingForUser | Connected | ErrorWeb3
+export const Web3Context = createContext(null as Maybe<{ status: Web3Status; connect: () => void }>)
 
 interface Props {
   children: JSX.Element
 }
-export const Web3ContextWrapper = ({ children }: Props) => {
-  const [web3Provider, setWeb3Provider] = useState<Maybe<Web3Provider>>(null)
-  const [provider, setProvider] = useState<Maybe<Web3Provider>>(null)
-  const [connected, setConnected] = useState(false)
-  const [signer, setSigner] = useState<Maybe<JsonRpcSigner>>(null)
 
-  const providerOptions = {
-    walletconnect: {
-      package: WalletConnectProvider,
-      options: {
-        infuraId: INFURA_ID,
-      },
-    },
-  }
-
-  const web3Modal = new Web3Modal({
-    providerOptions,
-  })
+export const Web3ContextProvider = ({ children }: Props) => {
+  const [web3Status, setWeb3Status] = useState<Web3Status>({ _type: 'notAsked' })
 
   const connect = async () => {
-    const provider = await web3Modal.connect()
-    setWeb3Provider(provider)
+    // TODO Check status de si ya esta conectado
+    const web3Modal = new Web3Modal({
+      providerOptions: {
+        walletconnect: {
+          package: WalletConnectProvider,
+          options: {
+            infuraId: INFURA_ID,
+          },
+        },
+      },
+    })
+
+    let web3Provider: Web3Provider
+    try {
+      web3Provider = await web3Modal.connect()
+    } catch (error) {
+      setWeb3Status({ _type: 'error', error })
+      return
+    }
+
+    try {
+      const provider = new ethers.providers.Web3Provider(web3Provider)
+      const signer = provider.getSigner()
+
+      const networkId = (await provider.getNetwork()).chainId
+      if (NetworkConfig.isKnownNetwork(networkId)) {
+        const networkConfig = new NetworkConfig(networkId)
+        setWeb3Status({ _type: 'connected', provider, signer, networkConfig, address: null })
+      } else {
+        setWeb3Status({ _type: 'error', error: new Error('Unknown network') })
+      }
+    } catch (error) {
+      setWeb3Status({ _type: 'error', error })
+    }
   }
 
-  useEffect(() => {
-    if (web3Provider) {
-      setConnected(true)
-      const provider = new ethers.providers.Web3Provider(web3Provider)
-      setProvider(provider)
-
-      const signer = provider.getSigner()
-      setSigner(signer)
-    }
-  }, [web3Provider])
-
   return (
-    <Web3Context.Provider value={{ connect, provider, connected, signer }}>
-      {children}
-    </Web3Context.Provider>
+    <Web3Context.Provider value={{ status: web3Status, connect }}>{children}</Web3Context.Provider>
   )
 }
