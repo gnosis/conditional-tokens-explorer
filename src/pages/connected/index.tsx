@@ -1,5 +1,6 @@
 import React from 'react'
 import { useWeb3Connected } from '../../hooks/useWeb3Context'
+import { PrepareConditionContainer } from '../prepare-condition'
 
 let renders = 0
 export const ConnectedContainer = () => {
@@ -12,7 +13,8 @@ export const ConnectedContainer = () => {
 
   return (
     <>
-      <p>{ctAddress} </p>
+      <p>{ctAddress}</p>
+      <PrepareConditionContainer></PrepareConditionContainer>
     </>
   )
 }
