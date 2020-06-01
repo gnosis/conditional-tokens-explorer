@@ -10,5 +10,9 @@ export const ConnectedContainer = () => {
 
   console.log('Render_ConnectedContainer', renders)
 
-  return <>{ctAddress && <p>{ctAddress} </p>}</>
+  return (
+    <>
+      <p>{ctAddress} </p>
+    </>
+  )
 }
