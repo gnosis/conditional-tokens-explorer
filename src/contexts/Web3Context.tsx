@@ -20,7 +20,7 @@ type WaitingForUser = {
 type Connected = {
   _type: 'connected'
   provider: Web3Provider
-  address: Maybe<string>
+  address: string
   signer: JsonRpcSigner
   networkConfig: NetworkConfig
   CTService: ConditionalTokensService

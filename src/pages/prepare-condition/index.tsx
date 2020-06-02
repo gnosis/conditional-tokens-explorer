@@ -13,7 +13,7 @@ export const PrepareConditionContainer = () => {
   const [oracleAddress, setOracleAddress] = useState('')
   const [questionId, setQuestionId] = useState('')
 
-  const { CTService } = useWeb3Connected()
+  const { CTService, address } = useWeb3Connected()
 
   return (
     <>
@@ -23,7 +23,7 @@ export const PrepareConditionContainer = () => {
 
       <p>{oracleAddress}</p>
       <h3>Oracle Address</h3>
-      <InputAddress callback={setOracleAddress} />
+      <InputAddress callback={setOracleAddress} defaultValue={address} />
 
       <p>{questionId}</p>
       <h3>Question Id</h3>
