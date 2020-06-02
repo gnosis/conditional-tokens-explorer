@@ -6,6 +6,7 @@ import { Web3Provider, JsonRpcSigner } from 'ethers/providers'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { INFURA_ID } from '../config/constants'
 import { NetworkConfig } from '../config/networkConfig'
+import { ConditionalTokensService } from '../services/conditionalTokens'
 type Maybe<T> = T | null
 
 type NotAsked = {
@@ -22,6 +23,7 @@ type Connected = {
   address: Maybe<string>
   signer: JsonRpcSigner
   networkConfig: NetworkConfig
+  CTService: ConditionalTokensService
 }
 
 type ConnectedRO = {
@@ -74,7 +76,9 @@ export const Web3ContextProvider = ({ children }: Props) => {
       const networkId = (await provider.getNetwork()).chainId
       if (NetworkConfig.isKnownNetwork(networkId)) {
         const networkConfig = new NetworkConfig(networkId)
-        setWeb3Status({ _type: 'connected', provider, signer, networkConfig, address: null })
+        const CTService = new ConditionalTokensService(networkConfig, provider, signer)
+        const address = await signer.getAddress()
+        setWeb3Status({ _type: 'connected', provider, signer, networkConfig, CTService, address })
       } else {
         setWeb3Status({ _type: 'error', error: new Error('Unknown network') })
       }

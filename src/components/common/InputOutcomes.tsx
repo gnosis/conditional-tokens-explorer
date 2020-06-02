@@ -12,7 +12,7 @@ interface Props {
 }
 
 export const InputOutcomes = ({ callback }: Props) => {
-  const { register, errors } = useForm({ mode: 'onChange' })
+  const { register, errors, reset } = useForm({ mode: 'onChange' })
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = Number(event.target.value)
@@ -27,6 +27,7 @@ export const InputOutcomes = ({ callback }: Props) => {
         type="number"
         ref={register({ required: true, min: MIN_OUTCOMES, max: MAX_OUTCOMES })}
       ></input>
+      <button onClick={() => reset({ outcomesNumber: 40 })}>Max</button>
       <div>
         {errors.outcomesNumber?.type === 'max' && maxOutcomesError}
         {errors.outcomesNumber?.type === 'min' && minOutcomesError}

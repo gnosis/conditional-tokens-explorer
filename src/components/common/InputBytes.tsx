@@ -10,7 +10,7 @@ export const InputBytes = ({ callback, bytes = 32 }: Props) => {
   const { register, errors } = useForm({ mode: 'onChange' })
 
   const bytesRegex = RegExp(`^0x[a-fA-F0-9]{${bytes * 2}}$`)
-  console.log(bytesRegex)
+
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
     callback(value)

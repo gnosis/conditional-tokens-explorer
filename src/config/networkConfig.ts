@@ -21,7 +21,6 @@ const networks: { [K in NetworkId]: Network } = {
 export class NetworkConfig {
   constructor(public networkId: NetworkId) {}
 
-  // TODO Refactor?
   static isKnownNetwork(networkId: number): networkId is NetworkId {
     return networkId === 1 || networkId === 4
   }
