@@ -48,23 +48,28 @@ interface Props {
 export const Web3ContextProvider = ({ children }: Props) => {
   const [web3Status, setWeb3Status] = useState<Web3Status>({ _type: 'notAsked' })
 
-  const connect = async () => {
-    // TODO Check status de si ya esta conectado
-    const web3Modal = new Web3Modal({
-      providerOptions: {
-        walletconnect: {
-          package: WalletConnectProvider,
-          options: {
-            infuraId: INFURA_ID,
-          },
+  const web3Modal = new Web3Modal({
+    cacheProvider: true,
+    providerOptions: {
+      walletconnect: {
+        package: WalletConnectProvider,
+        options: {
+          infuraId: INFURA_ID,
         },
       },
-    })
+    },
+  })
+
+  const connect = async () => {
+    if (web3Status._type === 'connected') {
+      return
+    }
 
     let web3Provider: Web3Provider
     try {
       web3Provider = await web3Modal.connect()
     } catch (error) {
+      web3Modal.clearCachedProvider()
       setWeb3Status({ _type: 'error', error })
       return
     }
@@ -85,6 +90,10 @@ export const Web3ContextProvider = ({ children }: Props) => {
     } catch (error) {
       setWeb3Status({ _type: 'error', error })
     }
+  }
+
+  if (web3Modal.cachedProvider) {
+    connect()
   }
 
   return (

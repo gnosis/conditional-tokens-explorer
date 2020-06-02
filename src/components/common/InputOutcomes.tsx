@@ -12,7 +12,7 @@ interface Props {
 }
 
 export const InputOutcomes = ({ callback }: Props) => {
-  const { register, errors, reset } = useForm({ mode: 'onChange' })
+  const { register, errors } = useForm({ mode: 'onChange' })
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = Number(event.target.value)
