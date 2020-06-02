@@ -41,7 +41,7 @@ export const InputAddress = ({ callback, defaultValue }: Props) => {
         ref={register({
           required: true,
           pattern: addressRegex,
-          validate: (value) => !errors.address || isAddress(value),
+          validate: (value) => isAddress(value),
         })}
       ></input>
       <button onClick={useDefaultValue}>Use MyWallet</button>
