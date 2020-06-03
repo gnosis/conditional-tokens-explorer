@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react'
+import React, { createContext, useState, useEffect, useCallback } from 'react'
 
 import { ethers } from 'ethers'
 import Web3Modal from 'web3modal'
@@ -89,7 +89,7 @@ export const Web3ContextProvider = ({ children }: Props) => {
     } catch (error) {
       setWeb3Status({ _type: 'error', error })
     }
-  })
+  }, [web3Status])
 
   useEffect(() => {
     if (web3Modal.cachedProvider) {
