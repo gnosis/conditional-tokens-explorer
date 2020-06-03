@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react'
+import React, { createContext, useState, useEffect } from 'react'
 
 import { ethers } from 'ethers'
 import Web3Modal from 'web3modal'
@@ -45,26 +45,25 @@ interface Props {
   children: JSX.Element
 }
 
+const web3Modal = new Web3Modal({
+  cacheProvider: true,
+  providerOptions: {
+    walletconnect: {
+      package: WalletConnectProvider,
+      options: {
+        infuraId: INFURA_ID,
+      },
+    },
+  },
+})
+
 export const Web3ContextProvider = ({ children }: Props) => {
   const [web3Status, setWeb3Status] = useState<Web3Status>({ _type: 'notAsked' })
 
-  const web3Modal = new Web3Modal({
-    cacheProvider: true,
-    providerOptions: {
-      walletconnect: {
-        package: WalletConnectProvider,
-        options: {
-          infuraId: INFURA_ID,
-        },
-      },
-    },
-  })
-
-  const connect = async () => {
+  const connect = useCallback(async () => {
     if (web3Status._type === 'connected') {
       return
     }
-
     let web3Provider: Web3Provider
     try {
       web3Provider = await web3Modal.connect()
@@ -90,11 +89,13 @@ export const Web3ContextProvider = ({ children }: Props) => {
     } catch (error) {
       setWeb3Status({ _type: 'error', error })
     }
-  }
+  })
 
-  if (web3Modal.cachedProvider) {
-    connect()
-  }
+  useEffect(() => {
+    if (web3Modal.cachedProvider) {
+      connect()
+    }
+  }, [connect])
 
   return (
     <Web3Context.Provider value={{ status: web3Status, connect }}>{children}</Web3Context.Provider>

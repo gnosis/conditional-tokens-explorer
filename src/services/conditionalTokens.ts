@@ -1,6 +1,5 @@
 import { Contract, ethers } from 'ethers'
 import { NetworkConfig } from '../config/networkConfig'
-import { BigNumber } from 'ethers/utils'
 
 const conditionalTokensAbi = [
   'function prepareCondition(address oracle, bytes32 questionId, uint outcomeSlotCount) external',
@@ -33,7 +32,7 @@ export class ConditionalTokensService {
     )
   }
 
-  static getConditionId(questionId: string, oracleAddress: string, outcomeSlotCount = 2) {
+  static getConditionId(questionId: string, oracleAddress: string, outcomeSlotCount: number) {
     const conditionId = ethers.utils.solidityKeccak256(
       ['address', 'bytes32', 'uint256'],
       [oracleAddress, questionId, outcomeSlotCount]
@@ -42,15 +41,11 @@ export class ConditionalTokensService {
     return conditionId
   }
 
-  async prepareCondition(questionId: string, oracleAddress: string, outcomeSlotCount = 2) {
+  async prepareCondition(questionId: string, oracleAddress: string, outcomeSlotCount: number) {
     const transactionObject = await this.contract.prepareCondition(
       oracleAddress,
       questionId,
-      new BigNumber(outcomeSlotCount),
-      {
-        value: '0x0',
-        gasLimit: 750000,
-      }
+      outcomeSlotCount
     )
     return this.provider.waitForTransaction(transactionObject.hash)
   }

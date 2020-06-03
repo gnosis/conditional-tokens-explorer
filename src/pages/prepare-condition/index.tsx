@@ -5,10 +5,7 @@ import { InputBytes } from '../../components/common/InputBytes'
 import { PreviewCondition } from './PreviewCondition'
 import { useWeb3Connected } from '../../hooks/useWeb3Context'
 
-let renders = 0
 export const PrepareConditionContainer = () => {
-  renders++
-  console.log('Render_PrepareCondition', renders)
   const [numOutcomes, setNumOutcomes] = useState(0)
   const [oracleAddress, setOracleAddress] = useState('')
   const [questionId, setQuestionId] = useState('')
