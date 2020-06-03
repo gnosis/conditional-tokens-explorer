@@ -1,5 +1,4 @@
 import React, { ChangeEvent } from 'react'
-import { useForm } from 'react-hook-form'
 import { ethers } from 'ethers'
 
 // TODO Move to utils?
@@ -14,39 +13,37 @@ const isAddress = (address: string) => {
 
 interface Props {
   callback: (n: string) => void
-  defaultValue: string
+  name: string
+  register: any
+  errors: any
 }
 
 const addressRegex = /^0x[a-fA-F0-9]{40}$/
 
-export const InputAddress = ({ callback, defaultValue }: Props) => {
-  const { register, errors, reset } = useForm({ mode: 'onChange' })
-
+export const InputAddress = ({ name, callback, register, errors }: Props) => {
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
     callback(value)
   }
 
-  const useDefaultValue = () => {
-    reset({ address: defaultValue })
-    callback(defaultValue)
-  }
-
   return (
     <>
       <input
-        name="address"
+        name={name}
         onChange={onChange}
         type="text"
         ref={register({
           required: true,
           pattern: addressRegex,
-          validate: (value) => isAddress(value),
+          validate: (value: string) => isAddress(value),
         })}
       ></input>
-      <button onClick={useDefaultValue}>Use MyWallet</button>
-      <div>{errors.address?.type === 'pattern' && 'Invalid address'}</div>
-      <div>{errors.address?.type === 'validate' && 'Address checksum failed'}</div>
+      {errors && (
+        <div>
+          {errors.type === 'pattern' && 'Invalid address'}
+          {errors.type === 'validate' && 'Address checksum failed'}
+        </div>
+      )}
     </>
   )
 }

@@ -1,5 +1,4 @@
 import React, { ChangeEvent } from 'react'
-import { useForm } from 'react-hook-form'
 
 const MIN_OUTCOMES = 2
 const MAX_OUTCOMES = 256
@@ -8,12 +7,13 @@ const maxOutcomesError = 'Too many outcome slots'
 const minOutcomesError = 'There should be more than one outcome slot'
 
 interface Props {
+  name: string
   callback: (n: number) => void
+  errors: any
+  register: any
 }
 
-export const InputOutcomes = ({ callback }: Props) => {
-  const { register, errors } = useForm({ mode: 'onChange' })
-
+export const InputOutcomes = ({ callback, register, errors, name }: Props) => {
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = Number(event.target.value)
     callback(value)
@@ -22,16 +22,18 @@ export const InputOutcomes = ({ callback }: Props) => {
   return (
     <>
       <input
-        name="outcomesNumber"
+        name={name}
         onChange={onChange}
         type="number"
         ref={register({ required: true, min: MIN_OUTCOMES, max: MAX_OUTCOMES })}
       ></input>
-      <div>
-        {errors.outcomesNumber?.type === 'max' && maxOutcomesError}
-        {errors.outcomesNumber?.type === 'min' && minOutcomesError}
-        {errors.outcomesNumber?.type === 'required' && 'Required field'}
-      </div>
+      {errors && (
+        <div>
+          {errors.type === 'max' && maxOutcomesError}
+          {errors.type === 'min' && minOutcomesError}
+          {errors.type === 'required' && 'Required field'}
+        </div>
+      )}
     </>
   )
 }

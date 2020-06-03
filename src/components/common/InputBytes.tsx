@@ -1,14 +1,14 @@
 import React, { ChangeEvent } from 'react'
-import { useForm } from 'react-hook-form'
 
 interface Props {
+  name: string
   bytes: number
   callback: (n: string) => void
+  register: any
+  errors: any
 }
 
-export const InputBytes = ({ callback, bytes = 32 }: Props) => {
-  const { register, errors } = useForm({ mode: 'onChange' })
-
+export const InputBytes = ({ callback, bytes = 32, register, errors, name }: Props) => {
   const bytesRegex = RegExp(`^0x[a-fA-F0-9]{${bytes * 2}}$`)
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -19,12 +19,12 @@ export const InputBytes = ({ callback, bytes = 32 }: Props) => {
   return (
     <>
       <input
-        name="address"
+        name={name}
         onChange={onChange}
         type="text"
         ref={register({ required: true, pattern: bytesRegex })}
       ></input>
-      <div>{errors.address?.type === 'pattern' && `Invalid bytes${bytes} string`}</div>
+      {errors && <div>{errors.type === 'pattern' && `Invalid bytes${bytes} string`}</div>}
     </>
   )
 }

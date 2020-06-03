@@ -22,5 +22,5 @@ export const PreviewCondition = ({ questionId, numOutcomes, oracle }: Props) => 
       setConditionId(null)
     }
   }, [questionId, numOutcomes, oracle])
-  return conditionId ? <h1>conditionId</h1> : null
+  return conditionId ? <h1>{conditionId}</h1> : null
 }
