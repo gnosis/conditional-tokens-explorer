@@ -17,37 +17,39 @@ export const PrepareConditionContainer = () => {
     errors,
     setValue,
     formState: { isValid },
-  } = useForm({ mode: 'onChange' })
+  } = useForm<{ outcomesSlotCount: number; oracle: string; questionId: string }>({
+    mode: 'onChange',
+  })
 
   return (
     <>
       <p>{numOutcomes}</p>
       <h3>Outcomes number</h3>
       <InputOutcomes
-        name="inputOutcomes"
+        name="outcomesSlotCount"
         callback={setNumOutcomes}
         register={register}
-        errors={errors.inputOutcomes}
+        errors={errors.outcomesSlotCount}
       />
 
       <p>{oracleAddress}</p>
       <h3>Oracle Address</h3>
       <InputAddress
-        name="address"
+        name="oracle"
         register={register}
-        errors={errors.address}
+        errors={errors.oracle}
         callback={setOracleAddress}
       />
-      <button onClick={() => setValue('address', address, true)}>Use MyWallet</button>
+      <button onClick={() => setValue('oracle', address, true)}>Use MyWallet</button>
 
       <p>{questionId}</p>
       <h3>Question Id</h3>
       <InputBytes
         bytes={32}
         callback={setQuestionId}
-        name="inputBytes"
+        name="questionId"
         register={register}
-        errors={errors.inputBytes}
+        errors={errors.questionId}
       />
 
       <PreviewCondition oracle={oracleAddress} questionId={questionId} numOutcomes={numOutcomes} />
