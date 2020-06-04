@@ -7,7 +7,7 @@ import WalletConnectProvider from '@walletconnect/web3-provider'
 import { INFURA_ID } from '../config/constants'
 import { NetworkConfig } from '../config/networkConfig'
 import { ConditionalTokensService } from '../services/conditionalTokens'
-export type Maybe<T> = T | null
+import { Maybe } from '../util/types'
 
 type NotAsked = {
   _type: 'notAsked'
@@ -24,13 +24,6 @@ type Connected = {
   signer: JsonRpcSigner
   networkConfig: NetworkConfig
   CTService: ConditionalTokensService
-}
-
-type ConnectedRO = {
-  _type: 'connected'
-  address: Maybe<string> // TODO
-  provider: Web3Provider
-  networkConfig: NetworkConfig
 }
 
 type ErrorWeb3 = {

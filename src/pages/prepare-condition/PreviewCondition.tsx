@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { ConditionalTokensService } from '../../services/conditionalTokens'
-import { Maybe } from '../../contexts/Web3Context'
+import { Maybe } from '../../util/types'
 
 interface Props {
   questionId: string
@@ -16,6 +16,7 @@ export const PreviewCondition = ({ questionId, numOutcomes, oracle }: Props) => 
         const id = ConditionalTokensService.getConditionId(questionId, oracle, numOutcomes)
         setConditionId(id)
       } catch (err) {
+        alert(err)
         setConditionId(null)
       }
     } else {
