@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
-import { PreviewCondition } from './PreviewCondition'
+import React, { useState, useEffect } from 'react'
 import { useWeb3Connected } from '../../hooks/useWeb3Context'
 import { useForm } from 'react-hook-form'
 import { isAddress } from '../../util/tools'
+import { ConditionalTokensService } from '../../services/conditionalTokens'
 
 const MIN_OUTCOMES = 2
 const MAX_OUTCOMES = 256
@@ -17,6 +17,7 @@ export const PrepareConditionContainer = () => {
   const [numOutcomes, setNumOutcomes] = useState(0)
   const [oracleAddress, setOracleAddress] = useState('')
   const [questionId, setQuestionId] = useState('')
+  const [conditionExists, setConditionExists] = useState(false)
 
   const { CTService, address } = useWeb3Connected()
   const {
@@ -27,6 +28,25 @@ export const PrepareConditionContainer = () => {
   } = useForm<{ outcomesSlotCount: number; oracle: string; questionId: string }>({
     mode: 'onChange',
   })
+
+  const conditionId = isValid
+    ? ConditionalTokensService.getConditionId(questionId, oracleAddress, numOutcomes)
+    : null
+  useEffect(() => {
+    let didCancel = false
+    const checkConditionExistence = async () => {
+      if (isValid && conditionId) {
+        const conditionExists = await CTService.conditionExists(conditionId)
+        if (!didCancel) {
+          setConditionExists(conditionExists)
+        }
+      }
+    }
+    checkConditionExistence()
+    return () => {
+      didCancel = true
+    }
+  }, [isValid, conditionId, CTService])
 
   return (
     <>
@@ -84,11 +104,10 @@ export const PrepareConditionContainer = () => {
       {errors.questionId && (
         <div>{errors.questionId.type === 'pattern' && 'Invalid bytes32 string'}</div>
       )}
-
-      <PreviewCondition oracle={oracleAddress} questionId={questionId} numOutcomes={numOutcomes} />
-
+      {conditionId ? <h1>{conditionId}</h1> : null}
       <button
-        disabled={!isValid}
+        title={conditionExists ? 'condition already exists' : ''}
+        disabled={!isValid || conditionExists}
         onClick={() => CTService.prepareCondition(questionId, oracleAddress, numOutcomes)}
       >
         Prepare Condition

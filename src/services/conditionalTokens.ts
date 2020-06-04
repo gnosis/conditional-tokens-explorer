@@ -1,5 +1,6 @@
 import { Contract, ethers } from 'ethers'
 import { NetworkConfig } from '../config/networkConfig'
+import { Maybe } from '../util/types'
 
 const conditionalTokensAbi = [
   'function prepareCondition(address oracle, bytes32 questionId, uint outcomeSlotCount) external',
@@ -32,21 +33,35 @@ export class ConditionalTokensService {
     )
   }
 
-  static getConditionId(questionId: string, oracleAddress: string, outcomeSlotCount: number) {
-    const conditionId = ethers.utils.solidityKeccak256(
-      ['address', 'bytes32', 'uint256'],
-      [oracleAddress, questionId, outcomeSlotCount]
-    )
-
-    return conditionId
+  static getConditionId(
+    questionId: string,
+    oracleAddress: string,
+    outcomeSlotCount: number
+  ): Maybe<string> {
+    try {
+      return ethers.utils.solidityKeccak256(
+        ['address', 'bytes32', 'uint256'],
+        [oracleAddress, questionId, outcomeSlotCount]
+      )
+    } catch (err) {
+      return null
+    }
   }
 
   async prepareCondition(questionId: string, oracleAddress: string, outcomeSlotCount: number) {
     const transactionObject = await this.contract.prepareCondition(
       oracleAddress,
       questionId,
-      outcomeSlotCount
+      outcomeSlotCount,
+      {
+        value: '0x0',
+        gasLimit: 750000,
+      }
     )
     return this.provider.waitForTransaction(transactionObject.hash)
+  }
+
+  async conditionExists(conditionId: string) {
+    return !(await this.contract.getOutcomeSlotCount(conditionId)).isZero()
   }
 }
