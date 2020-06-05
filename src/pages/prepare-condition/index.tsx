@@ -13,11 +13,17 @@ const minOutcomesError = 'There should be more than one outcome slot'
 const bytesRegex = /^0x[a-fA-F0-9]{64}$/
 const addressRegex = /^0x[a-fA-F0-9]{40}$/
 
+enum FormStates {
+  LOADING,
+  CONDITION_EXISTS,
+  INITIAL,
+}
+
 export const PrepareConditionContainer = () => {
   const [numOutcomes, setNumOutcomes] = useState(0)
   const [oracleAddress, setOracleAddress] = useState('')
   const [questionId, setQuestionId] = useState('')
-  const [conditionExists, setConditionExists] = useState(false)
+  const [formState, setFormState] = useState<FormStates>(FormStates.INITIAL)
 
   const { CTService, address } = useWeb3Connected()
   const {
@@ -32,22 +38,25 @@ export const PrepareConditionContainer = () => {
   const conditionId = isValid
     ? ConditionalTokensService.getConditionId(questionId, oracleAddress, numOutcomes)
     : null
-  useEffect(() => {
-    let didCancel = false
-    const checkConditionExistence = async () => {
-      if (isValid && conditionId) {
-        const conditionExists = await CTService.conditionExists(conditionId)
-        if (!didCancel) {
-          setConditionExists(conditionExists)
-        }
-      }
-    }
-    checkConditionExistence()
-    return () => {
-      didCancel = true
-    }
-  }, [isValid, conditionId, CTService])
 
+  const prepareCondition = () => {
+    setFormState(FormStates.LOADING)
+    CTService.prepareCondition(questionId, oracleAddress, numOutcomes)
+      .then(() => setFormState(FormStates.INITIAL))
+      .catch((e) => {
+        if (e === 'conditionExists') {
+          setFormState(FormStates.CONDITION_EXISTS)
+        }
+      })
+  }
+
+  useEffect(() => {
+    setFormState(FormStates.INITIAL)
+  }, [questionId, oracleAddress, numOutcomes])
+
+  const conditionExists = formState === FormStates.CONDITION_EXISTS
+  const isLoading = formState === FormStates.LOADING
+  const submitDisabled = !isValid || conditionExists || isLoading
   return (
     <>
       <p>{numOutcomes}</p>
@@ -107,8 +116,8 @@ export const PrepareConditionContainer = () => {
       {conditionId ? <h1>{conditionId}</h1> : null}
       <button
         title={conditionExists ? 'condition already exists' : ''}
-        disabled={!isValid || conditionExists}
-        onClick={() => CTService.prepareCondition(questionId, oracleAddress, numOutcomes)}
+        disabled={submitDisabled}
+        onClick={prepareCondition}
       >
         Prepare Condition
       </button>

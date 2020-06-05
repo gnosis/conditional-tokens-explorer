@@ -49,6 +49,13 @@ export class ConditionalTokensService {
   }
 
   async prepareCondition(questionId: string, oracleAddress: string, outcomeSlotCount: number) {
+    const id = ConditionalTokensService.getConditionId(questionId, oracleAddress, outcomeSlotCount)
+    let conditionExists = true
+    if (id) {
+      conditionExists = await this.conditionExists(id)
+    }
+
+    if (conditionExists) return Promise.reject('conditionExists')
     const transactionObject = await this.contract.prepareCondition(
       oracleAddress,
       questionId,
