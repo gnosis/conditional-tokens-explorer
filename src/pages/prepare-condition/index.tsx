@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { useWeb3Connected } from '../../hooks/useWeb3Context'
 import { useForm } from 'react-hook-form'
 import { isAddress } from '../../util/tools'
 import { ConditionalTokensService } from '../../services/conditionalTokens'
+import { useWeb3Connected } from '../../contexts/Web3Context'
 
 const MIN_OUTCOMES = 2
 const MAX_OUTCOMES = 256
