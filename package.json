@@ -12,17 +12,21 @@
     "@types/react-dom": "^16.9.8",
     "@typescript-eslint/eslint-plugin": "3.0.0",
     "@typescript-eslint/parser": "3.0.0",
+    "@walletconnect/web3-provider": "^1.0.0-beta.47",
     "eslint-config-prettier": "^6.11.0",
     "eslint-config-react-app": "^5.2.1",
     "eslint-plugin-prettier": "^3.1.3",
     "eslint-plugin-react": "^7.20.0",
+    "ethers": "^4.0.47",
     "husky": "^4.2.5",
     "lint-staged": "^10.2.6",
     "prettier": "^2.0.5",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-hook-form": "^5.7.2",
     "react-scripts": "^3.4.1",
-    "typescript": "^3.9.3"
+    "typescript": "^3.9.3",
+    "web3modal": "^1.6.3"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -40,7 +44,7 @@
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged",
-      "pre-push": "yarn lint && yarn test --watchAll=false"
+      "pre-push": "yarn lint && yarn test --watchAll=false --passWithNoTests"
     }
   },
   "eslintConfig": {
