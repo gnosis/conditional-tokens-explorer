@@ -1,7 +1,7 @@
 import React from 'react'
 import { useWeb3Disconnected } from '../../contexts/Web3Context'
 
-export const DisconnectedContainer = () => {
+export const Disconnected = () => {
   const { connect } = useWeb3Disconnected()
   return (
     <>

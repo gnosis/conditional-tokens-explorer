@@ -13,7 +13,7 @@ const minOutcomesError = 'There should be more than one outcome slot'
 const bytesRegex = /^0x[a-fA-F0-9]{64}$/
 const addressRegex = /^0x[a-fA-F0-9]{40}$/
 
-export const PrepareConditionContainer = () => {
+export const PrepareCondition = () => {
   const [numOutcomes, setNumOutcomes] = useState(0)
   const [oracleAddress, setOracleAddress] = useState('')
   const [questionId, setQuestionId] = useState('')

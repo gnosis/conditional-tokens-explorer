@@ -1,6 +1,6 @@
 import React from 'react'
-import { PrepareConditionContainer } from '../prepare-condition'
+import { PrepareCondition } from '../prepare-condition'
 
-export const ConnectedContainer = () => {
-  return <PrepareConditionContainer></PrepareConditionContainer>
+export const Connected = () => {
+  return <PrepareCondition></PrepareCondition>
 }
