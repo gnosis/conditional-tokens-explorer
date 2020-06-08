@@ -1,6 +1,5 @@
 import { Contract, ethers } from 'ethers'
 import { NetworkConfig } from '../config/networkConfig'
-import { Maybe } from '../util/types'
 
 const conditionalTokensAbi = [
   'function prepareCondition(address oracle, bytes32 questionId, uint outcomeSlotCount) external',
@@ -48,14 +47,11 @@ export class ConditionalTokensService {
     }
   }
 
-  async prepareCondition(questionId: string, oracleAddress: string, outcomeSlotCount: number) {
-    const id = ConditionalTokensService.getConditionId(questionId, oracleAddress, outcomeSlotCount)
-    let conditionExists = true
-    if (id) {
-      conditionExists = await this.conditionExists(id)
-    }
-
-    if (conditionExists) return Promise.reject('conditionExists')
+  async prepareCondition(
+    questionId: string,
+    oracleAddress: string,
+    outcomeSlotCount: number
+  ): Promise<string> {
     const transactionObject = await this.contract.prepareCondition(
       oracleAddress,
       questionId,
@@ -65,7 +61,7 @@ export class ConditionalTokensService {
         gasLimit: 750000,
       }
     )
-    return this.provider.waitForTransaction(transactionObject.hash)
+    return transactionObject.hash
   }
 
   async conditionExists(conditionId: string) {

@@ -13,19 +13,14 @@ const minOutcomesError = 'There should be more than one outcome slot'
 const bytesRegex = /^0x[a-fA-F0-9]{64}$/
 const addressRegex = /^0x[a-fA-F0-9]{40}$/
 
-enum FormStates {
-  LOADING,
-  CONDITION_EXISTS,
-  INITIAL,
-}
-
 export const PrepareConditionContainer = () => {
   const [numOutcomes, setNumOutcomes] = useState(0)
   const [oracleAddress, setOracleAddress] = useState('')
   const [questionId, setQuestionId] = useState('')
-  const [formState, setFormState] = useState<FormStates>(FormStates.INITIAL)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<Maybe<Error>>(null)
 
-  const { CTService, address } = useWeb3Connected()
+  const { CTService, address, provider } = useWeb3Connected()
   const {
     register,
     errors,
@@ -39,24 +34,30 @@ export const PrepareConditionContainer = () => {
     ? ConditionalTokensService.getConditionId(questionId, oracleAddress, numOutcomes)
     : null
 
-  const prepareCondition = () => {
-    setFormState(FormStates.LOADING)
-    CTService.prepareCondition(questionId, oracleAddress, numOutcomes)
-      .then(() => setFormState(FormStates.INITIAL))
-      .catch((e) => {
-        if (e === 'conditionExists') {
-          setFormState(FormStates.CONDITION_EXISTS)
-        }
-      })
+  const prepareCondition = async () => {
+    if (!conditionId) return
+    setError(null)
+    setIsLoading(true)
+    try {
+      const conditionExists = await CTService.conditionExists(conditionId)
+      if (!conditionExists) {
+        const tx = await CTService.prepareCondition(questionId, oracleAddress, numOutcomes)
+        await provider.waitForTransaction(tx)
+      } else {
+        setError(new Error('Condition already exists'))
+      }
+    } catch (e) {
+      setError(e)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   useEffect(() => {
-    setFormState(FormStates.INITIAL)
+    setError(null)
   }, [questionId, oracleAddress, numOutcomes])
 
-  const conditionExists = formState === FormStates.CONDITION_EXISTS
-  const isLoading = formState === FormStates.LOADING
-  const submitDisabled = !isValid || conditionExists || isLoading
+  const submitDisabled = !isValid || isLoading
   return (
     <>
       <p>{numOutcomes}</p>
@@ -114,13 +115,10 @@ export const PrepareConditionContainer = () => {
         <div>{errors.questionId.type === 'pattern' && 'Invalid bytes32 string'}</div>
       )}
       {conditionId ? <h1>{conditionId}</h1> : null}
-      <button
-        title={conditionExists ? 'condition already exists' : ''}
-        disabled={submitDisabled}
-        onClick={prepareCondition}
-      >
+      <button disabled={submitDisabled} onClick={prepareCondition}>
         Prepare Condition
       </button>
+      <p>{error && error.message}</p>
     </>
   )
 }

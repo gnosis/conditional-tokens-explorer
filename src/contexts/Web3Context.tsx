@@ -7,7 +7,6 @@ import WalletConnectProvider from '@walletconnect/web3-provider'
 import { INFURA_ID } from '../config/constants'
 import { NetworkConfig } from '../config/networkConfig'
 import { ConditionalTokensService } from '../services/conditionalTokens'
-import { Maybe } from '../util/types'
 
 type NotAsked = {
   _type: 'notAsked'
