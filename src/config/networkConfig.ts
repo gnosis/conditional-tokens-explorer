@@ -5,16 +5,47 @@ const networkIds = {
   RINKEBY: 4,
 } as const
 
+export type Token = {
+  symbol: string
+  address: string
+  decimals: number
+}
+
 interface Network {
   conditionalTokensContract: string
+  tokens: Token[]
 }
 
 const networks: { [K in NetworkId]: Network } = {
   [networkIds.MAINNET]: {
     conditionalTokensContract: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
+    tokens: [
+      {
+        symbol: 'DAI',
+        address: '0x6b175474e89094c44da98b954eedeac495271d0f',
+        decimals: 18,
+      },
+      {
+        symbol: 'USDC',
+        address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+        decimals: 6,
+      },
+    ],
   },
   [networkIds.RINKEBY]: {
     conditionalTokensContract: '0xe6Cdc22F99FD9ffdC03647C7fFF5bB753a4eBB21',
+    tokens: [
+      {
+        symbol: 'DAI',
+        address: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+        decimals: 18,
+      },
+      {
+        symbol: 'USDC',
+        address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+        decimals: 6,
+      },
+    ],
   },
 }
 
@@ -27,5 +58,9 @@ export class NetworkConfig {
 
   getConditionalTokenContract() {
     return networks[this.networkId].conditionalTokensContract
+  }
+
+  getTokens() {
+    return networks[this.networkId].tokens
   }
 }

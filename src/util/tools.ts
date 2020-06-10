@@ -1,4 +1,5 @@
 import { ethers } from 'ethers'
+import { Provider } from 'ethers/providers'
 
 export const isAddress = (address: string) => {
   try {
@@ -7,4 +8,9 @@ export const isAddress = (address: string) => {
     return false
   }
   return true
+}
+
+export const isContract = async (provider: Provider, address: string): Promise<boolean> => {
+  const code = await provider.getCode(address)
+  return !!code && code !== '0x'
 }
