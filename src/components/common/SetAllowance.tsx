@@ -30,13 +30,12 @@ interface Props {
   collateral: Token
   onUnlock: () => void
   loading: boolean
-  finished: boolean
 }
 
 export const SetAllowance = (props: Props) => {
-  const { collateral, onUnlock, loading, finished } = props
+  const { collateral, onUnlock, loading } = props
 
-  const btnText = loading ? 'loading' : finished ? 'finished' : 'unlock'
+  const btnText = loading ? 'loading' : 'unlock'
 
   return (
     <Wrapper>
@@ -46,7 +45,7 @@ export const SetAllowance = (props: Props) => {
           This permission allows the smart contracts to interact with your {collateral.symbol}. This
           has to be done for each new token.
         </Description>
-        <button onClick={onUnlock} disabled={loading || finished}>
+        <button onClick={onUnlock} disabled={loading}>
           {btnText}
         </button>
         {/* <ToggleTokenLock finished={finished} loading={loading} onUnlock={onUnlock} /> */}

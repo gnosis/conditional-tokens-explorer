@@ -27,20 +27,26 @@ export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
     errors,
     control,
     handleSubmit,
-    formState: { isValid },
+    setValue,
+    getValues,
+    formState: { isSubmitting },
   } = useForm<Form>()
 
-  const { CTService, signer, networkConfig } = useWeb3Connected()
+  const { CTService, networkConfig } = useWeb3Connected()
   const tokens = networkConfig.getTokens()
 
   const [conditionId, setConditionId] = useState<string>(props.match.params.condition || '')
-  const [collateral, setCollateral] = useState<Maybe<Token>>(null)
-  const [amount, setAmount] = useState<BigNumber>(ZERO_BN)
+  const [collateral, setCollateral] = useState<Token>(tokens[0])
   const [outcomeSlot, setOutcomeSlot] = useState(0)
-  const [allowanceFinished, setAllowanceFinished] = useState(false)
-  const { allowance, unlock } = useAllowance(signer, collateral)
+
+  // TODO Improve typing
+  const values = getValues() as { amount: BigNumber }
+  const amount = values.amount || ZERO_BN
+
+  const { allowance, unlock } = useAllowance(collateral)
 
   const onSubmit = async (data: any) => {
+    // TODO Move to range.
     const partition = Array.from({ length: outcomeSlot }, (_, i) => i).reduce(
       (acc: BigNumber[], _, index: number) => {
         const two = new BigNumber(2)
@@ -50,38 +56,39 @@ export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
       []
     )
 
-    if (collateral) {
-      await CTService.splitPosition(
-        collateral.address,
-        '0x0000000000000000000000000000000000000000000000000000000000000000',
-        conditionId,
-        partition,
-        data.amount
-      )
-    }
+    await CTService.splitPosition(
+      collateral.address,
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+      conditionId,
+      partition,
+      amount
+    )
   }
 
   const unlockCollateral = async () => {
     await unlock()
-    setAllowanceFinished(true)
   }
 
+  // TODO with condition id passed as argument, use try-catch and show error
   useEffect(() => {
     const getOutcomeSlot = async (conditionId: string) => {
       const outcomesSlot = await CTService.getOutcomeSlotCount(conditionId)
       setOutcomeSlot(outcomesSlot)
     }
-    // TODO add isValid again
     if (conditionId) {
       getOutcomeSlot(conditionId)
     }
-  }, [isValid, conditionId, CTService])
+  }, [CTService, conditionId])
+
+  useEffect(() => {
+    setValue('amount', ZERO_BN)
+  }, [collateral, setValue])
 
   const allowanceBN = allowance.get() || ZERO_BN
   const hasEnoughAllowance = allowanceBN && allowanceBN.gte(amount)
   const hasZeroAllowance = allowanceBN && allowanceBN.isZero()
 
-  const showAskAllowance = allowanceFinished && (hasEnoughAllowance === false || hasZeroAllowance)
+  const showAskAllowance = !allowance.hasData() || !hasEnoughAllowance || hasZeroAllowance
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <label htmlFor="conditionId">Condition Id</label>
@@ -111,9 +118,10 @@ export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
       <select
         ref={register({ required: true })}
         name="collateral"
-        onChange={(e) => setCollateral(tokens.find((t) => t.address === e.target.value) || null)}
+        onChange={(e) =>
+          setCollateral(tokens.find((t) => t.address === e.target.value) || tokens[0])
+        }
       >
-        <option value={undefined}></option>
         {tokens.map(({ symbol, address }) => {
           return (
             <option key={address} value={address}>
@@ -123,33 +131,25 @@ export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
         })}
       </select>
 
-      {showAskAllowance && collateral && (
+      {showAskAllowance && (
         <SetAllowance
           collateral={collateral}
           loading={allowance.isLoading()}
-          finished={allowanceFinished}
           onUnlock={unlockCollateral}
         />
       )}
 
       <label htmlFor="amount">Amount</label>
-      {collateral && (
-        <Controller
-          name="amount"
-          rules={{ required: true }}
-          control={control}
-          as={
-            <BigNumberInputWrapper
-              value={amount}
-              onChange={(e) => {
-                setAmount(e)
-              }}
-              decimals={collateral.decimals}
-            />
-          }
-        />
-      )}
-      <button type="submit">Split</button>
+      <Controller
+        name="amount"
+        rules={{ required: true }}
+        control={control}
+        decimals={collateral.decimals}
+        as={BigNumberInputWrapper}
+      />
+      <button type="submit" disabled={isSubmitting}>
+        Split
+      </button>
     </form>
   )
 }

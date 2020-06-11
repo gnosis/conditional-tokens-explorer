@@ -1,4 +1,4 @@
-import { Signer, constants } from 'ethers'
+import { constants } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import { useCallback, useEffect, useState } from 'react'
 import { ERC20Service } from '../services/erc20'
@@ -7,20 +7,20 @@ import { useWeb3Connected } from '../contexts/Web3Context'
 import { Remote } from '../util/remoteData'
 
 /**
- * Return the allowance of the given `signer`.
+ * Return the allowance of the given `signer` for the conditional tokens contract.
  *
  * It also returns two helper functions:
  * `updateAllowance` can be used to reload the value of the allowance
  * `unlock` can be used to set unlimited allowance
  */
-export const useAllowance = (signer: Signer, token: Maybe<Token>) => {
+export const useAllowance = (token: Token) => {
   const [allowance, setAllowance] = useState<Remote<BigNumber>>(Remote.notAsked<BigNumber>())
-  const { networkConfig } = useWeb3Connected()
+  const { networkConfig, signer } = useWeb3Connected()
   const conditionalTokensAddress = networkConfig.getConditionalTokenContract()
   const provider = signer.provider
 
   const updateAllowance = useCallback(async () => {
-    if (provider && conditionalTokensAddress && token) {
+    if (provider && conditionalTokensAddress) {
       const account = await signer.getAddress()
       const erc20Service = new ERC20Service(provider, signer, token)
       const allowance = await erc20Service.allowance(account, conditionalTokensAddress)
@@ -29,7 +29,7 @@ export const useAllowance = (signer: Signer, token: Maybe<Token>) => {
   }, [conditionalTokensAddress, provider, signer, token])
 
   const unlock = useCallback(async () => {
-    if (provider && conditionalTokensAddress && token) {
+    if (provider && conditionalTokensAddress) {
       setAllowance(Remote.loading())
 
       const erc20Service = new ERC20Service(provider, signer, token)

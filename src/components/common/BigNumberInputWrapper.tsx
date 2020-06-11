@@ -4,18 +4,29 @@ import { BigNumber } from 'ethers/utils'
 import { ZERO_BN } from '../../config/constants'
 
 interface Props {
-  value: BigNumber
-  onChange: (n: BigNumber) => void
-  decimals: number
+  value?: BigNumber
+  onChange?: (n: BigNumber) => void
+  decimals?: number
 }
 
 export const BigNumberInputWrapper = (props: Props) => {
-  const { value, onChange, decimals } = props
+  const { value, onChange, decimals = 0 } = props
+
+  const handleChange = (newValue: string) => {
+    if (onChange) {
+      if (newValue) {
+        onChange(new BigNumber(newValue))
+      } else {
+        onChange(ZERO_BN)
+      }
+    }
+  }
+
   return (
     <BigNumberInput
       autofocus={true}
       decimals={decimals}
-      onChange={(newValue) => (newValue ? onChange(new BigNumber(newValue)) : onChange(ZERO_BN))}
+      onChange={handleChange}
       value={value ? value.toString() : ''}
     />
   )
