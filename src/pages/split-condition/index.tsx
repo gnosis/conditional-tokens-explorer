@@ -8,6 +8,7 @@ import { useAllowance } from '../../hooks/useAllowance'
 import { SetAllowance } from '../../components/common/SetAllowance'
 import { BigNumberInputWrapper } from '../../components/common/BigNumberInputWrapper'
 import { ZERO_BN } from '../../config/constants'
+import { range } from '../../util/tools'
 
 interface RouteParams {
   condition: string
@@ -15,11 +16,12 @@ interface RouteParams {
 
 interface Form {
   conditionId: Maybe<string>
-  colateral: Maybe<Token>
+  collateral: Maybe<Token>
   amount: BigNumber
 }
 
 const bytesRegex = /^0x[a-fA-F0-9]{64}$/
+const NULL_PARENT_ID = '0x0000000000000000000000000000000000000000000000000000000000000000'
 
 export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
   const {
@@ -28,9 +30,10 @@ export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
     control,
     handleSubmit,
     setValue,
+    reset,
     getValues,
-    formState: { isSubmitting },
-  } = useForm<Form>()
+    formState: { isValid },
+  } = useForm<Form>({ mode: 'onChange' })
 
   const { CTService, networkConfig } = useWeb3Connected()
   const tokens = networkConfig.getTokens()
@@ -39,30 +42,26 @@ export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
   const [collateral, setCollateral] = useState<Token>(tokens[0])
   const [outcomeSlot, setOutcomeSlot] = useState(0)
 
-  // TODO Improve typing
-  const values = getValues() as { amount: BigNumber }
+  const values = getValues() as { amount?: BigNumber }
   const amount = values.amount || ZERO_BN
 
   const { allowance, unlock } = useAllowance(collateral)
 
-  const onSubmit = async (data: any) => {
-    // TODO Move to range.
-    const partition = Array.from({ length: outcomeSlot }, (_, i) => i).reduce(
-      (acc: BigNumber[], _, index: number) => {
-        const two = new BigNumber(2)
-        acc.push(two.pow(index))
-        return acc
-      },
-      []
-    )
+  const onSubmit = async () => {
+    const partition = range(outcomeSlot).reduce((acc: BigNumber[], _, index: number) => {
+      const two = new BigNumber(2)
+      acc.push(two.pow(index))
+      return acc
+    }, [])
 
     await CTService.splitPosition(
       collateral.address,
-      '0x0000000000000000000000000000000000000000000000000000000000000000',
       conditionId,
+      NULL_PARENT_ID,
       partition,
       amount
     )
+    reset({ amount: ZERO_BN, collateral: tokens[0], conditionId: '' })
   }
 
   const unlockCollateral = async () => {
@@ -75,20 +74,22 @@ export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
       const outcomesSlot = await CTService.getOutcomeSlotCount(conditionId)
       setOutcomeSlot(outcomesSlot)
     }
-    if (conditionId) {
+    if (conditionId && !errors.conditionId) {
       getOutcomeSlot(conditionId)
     }
-  }, [CTService, conditionId])
+  }, [CTService, conditionId, errors.conditionId])
 
   useEffect(() => {
     setValue('amount', ZERO_BN)
   }, [collateral, setValue])
 
-  const allowanceBN = allowance.get() || ZERO_BN
-  const hasEnoughAllowance = allowanceBN && allowanceBN.gte(amount)
-  const hasZeroAllowance = allowanceBN && allowanceBN.isZero()
+  const hasEnoughAllowance = allowance.map((allowance) => allowance.gte(amount), false)
+  const hasZeroAllowance = allowance.map((allowance) => allowance.isZero(), true)
 
-  const showAskAllowance = !allowance.hasData() || !hasEnoughAllowance || hasZeroAllowance
+  const showAskAllowance = !hasEnoughAllowance || hasZeroAllowance
+
+  console.log(errors, isValid)
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <label htmlFor="conditionId">Condition Id</label>
@@ -142,12 +143,13 @@ export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
       <label htmlFor="amount">Amount</label>
       <Controller
         name="amount"
-        rules={{ required: true }}
+        rules={{ required: true, validate: (amount) => amount.gte(ZERO_BN) }}
         control={control}
         decimals={collateral.decimals}
         as={BigNumberInputWrapper}
       />
-      <button type="submit" disabled={isSubmitting}>
+
+      <button type="submit" disabled={!isValid}>
         Split
       </button>
     </form>

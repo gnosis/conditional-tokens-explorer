@@ -14,3 +14,7 @@ export const isContract = async (provider: Provider, address: string): Promise<b
   const code = await provider.getCode(address)
   return !!code && code !== '0x'
 }
+
+export const range = (max: number): number[] => {
+  return Array.from(new Array(max), (_, i) => i)
+}
