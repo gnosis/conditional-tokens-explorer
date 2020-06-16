@@ -87,11 +87,11 @@ export class ConditionalTokensService {
     return transactionObject.hash
   }
 
-  async getOutcomeSlotCount(conditionId: string) {
+  async getOutcomeSlotCount(conditionId: string): Promise<BigNumber> {
     return await this.contract.getOutcomeSlotCount(conditionId)
   }
 
-  async conditionExists(conditionId: string) {
+  async conditionExists(conditionId: string): Promise<boolean> {
     return !(await this.getOutcomeSlotCount(conditionId)).isZero()
   }
 }

@@ -30,6 +30,7 @@ export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
     control,
     handleSubmit,
     setValue,
+    setError,
     reset,
     getValues,
     formState: { isValid },
@@ -38,12 +39,13 @@ export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
   const { CTService, networkConfig } = useWeb3Connected()
   const tokens = networkConfig.getTokens()
 
-  const [conditionId, setConditionId] = useState<string>(props.match.params.condition || '')
+  const defaultConditionId = props.match.params.condition || ''
   const [collateral, setCollateral] = useState<Token>(tokens[0])
   const [outcomeSlot, setOutcomeSlot] = useState(0)
 
-  const values = getValues() as { amount?: BigNumber }
+  const values = getValues() as { amount?: BigNumber; conditionId: string }
   const amount = values.amount || ZERO_BN
+  const conditionId = values.conditionId
 
   const { allowance, unlock } = useAllowance(collateral)
 
@@ -68,16 +70,22 @@ export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
     await unlock()
   }
 
-  // TODO with condition id passed as argument, use try-catch and show error
   useEffect(() => {
     const getOutcomeSlot = async (conditionId: string) => {
-      const outcomesSlot = await CTService.getOutcomeSlotCount(conditionId)
-      setOutcomeSlot(outcomesSlot)
+      try {
+        const outcomeSlot = await CTService.getOutcomeSlotCount(conditionId)
+        setOutcomeSlot(outcomeSlot.toNumber())
+        if (outcomeSlot.isZero()) {
+          setError('conditionId', 'validate', "Condition doesn't exists")
+        }
+      } catch ({ reason }) {
+        setError('conditionId', 'validate', reason)
+      }
     }
     if (conditionId && !errors.conditionId) {
       getOutcomeSlot(conditionId)
     }
-  }, [CTService, conditionId, errors.conditionId])
+  }, [CTService, conditionId, errors.conditionId, setError])
 
   useEffect(() => {
     setValue('amount', ZERO_BN)
@@ -96,8 +104,8 @@ export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
       {/* Select Condition */}
       <input
         name="conditionId"
-        value={conditionId}
-        onChange={(e) => setConditionId(e.target.value)}
+        defaultValue={defaultConditionId}
+        onChange={(e) => setValue('conditionId', e.target.value)}
         type="text"
         ref={register({
           required: true,
@@ -111,7 +119,7 @@ export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
       {errors.conditionId && (
         <div>
           <p>{errors.conditionId.type === 'pattern' && 'Invalid bytes32 string'}</p>
-          <p>{errors.conditionId.type === 'validate' && "Condition doesn't exists"}</p>
+          <p>{errors.conditionId.type === 'validate' && errors.conditionId.message}</p>
         </div>
       )}
 
@@ -143,7 +151,7 @@ export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
       <label htmlFor="amount">Amount</label>
       <Controller
         name="amount"
-        rules={{ required: true, validate: (amount) => amount.gte(ZERO_BN) }}
+        rules={{ required: true, validate: (amount) => amount.gt(ZERO_BN) }}
         control={control}
         decimals={collateral.decimals}
         as={BigNumberInputWrapper}
