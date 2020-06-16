@@ -30,12 +30,13 @@ interface Props {
   collateral: Token
   onUnlock: () => void
   loading: boolean
+  finished: boolean
 }
 
 export const SetAllowance = (props: Props) => {
-  const { collateral, onUnlock, loading } = props
+  const { collateral, onUnlock, loading, finished } = props
 
-  const btnText = loading ? 'loading' : 'unlock'
+  const btnText = loading ? 'loading' : finished ? 'finished' : 'unlock'
 
   return (
     <Wrapper>

@@ -12,13 +12,13 @@ export type Token = {
 }
 
 interface Network {
-  conditionalTokensContract: string
+  conditionalTokensAddress: string
   tokens: Token[]
 }
 
 const networks: { [K in NetworkId]: Network } = {
   [networkIds.MAINNET]: {
-    conditionalTokensContract: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
+    conditionalTokensAddress: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
     tokens: [
       {
         symbol: 'DAI',
@@ -33,7 +33,7 @@ const networks: { [K in NetworkId]: Network } = {
     ],
   },
   [networkIds.RINKEBY]: {
-    conditionalTokensContract: '0xe6Cdc22F99FD9ffdC03647C7fFF5bB753a4eBB21',
+    conditionalTokensAddress: '0xe6Cdc22F99FD9ffdC03647C7fFF5bB753a4eBB21',
     tokens: [
       {
         symbol: 'DAI',
@@ -56,8 +56,8 @@ export class NetworkConfig {
     return networkId === 1 || networkId === 4
   }
 
-  getConditionalTokenContract() {
-    return networks[this.networkId].conditionalTokensContract
+  getConditionalTokensAddress() {
+    return networks[this.networkId].conditionalTokensAddress
   }
 
   getTokens() {

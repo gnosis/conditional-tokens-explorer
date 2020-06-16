@@ -82,9 +82,13 @@ export class Remote<T> {
     return this.get() || defaultData
   }
 
-  public map<U>(mapFunction: (data: T) => U, fallbackValue: U) {
-    const data = this.get()
-    return data ? mapFunction(data) : fallbackValue
+  public map<U>(mapFunction: (data: T) => U): Remote<U> {
+    return this.match<Remote<U>>({
+      onSuccess: (x) => Remote.success(mapFunction(x)),
+      onNotAsked: () => Remote.notAsked(),
+      onFailure: (e) => Remote.failure(e),
+      onLoading: () => Remote.loading(),
+    })
   }
 
   static success<T>(data: T): Remote<T> {

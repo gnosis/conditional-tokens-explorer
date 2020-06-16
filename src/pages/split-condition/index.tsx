@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useWeb3Connected } from '../../contexts/Web3Context'
 import { RouteComponentProps } from 'react-router'
 import { BigNumber } from 'ethers/utils'
@@ -9,6 +9,8 @@ import { SetAllowance } from '../../components/common/SetAllowance'
 import { BigNumberInputWrapper } from '../../components/common/BigNumberInputWrapper'
 import { ZERO_BN } from '../../config/constants'
 import { range } from '../../util/tools'
+import { Remote } from '../../util/remoteData'
+import { constants } from 'ethers'
 
 interface RouteParams {
   condition: string
@@ -36,18 +38,21 @@ export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
     formState: { isValid },
   } = useForm<Form>({ mode: 'onChange' })
 
-  const { CTService, networkConfig } = useWeb3Connected()
+  const { CTService, networkConfig, provider } = useWeb3Connected()
   const tokens = networkConfig.getTokens()
 
-  const defaultConditionId = props.match.params.condition || ''
   const [collateral, setCollateral] = useState<Token>(tokens[0])
+
+  const { refresh, unlock } = useAllowance(collateral)
+  const [allowance, setAllowance] = useState<Remote<BigNumber>>(Remote.notAsked<BigNumber>())
+
+  const defaultConditionId = props.match.params.condition || ''
   const [outcomeSlot, setOutcomeSlot] = useState(0)
+  const [hasUnlockedCollateral, setHasUnlockedCollateral] = useState(false)
 
   const values = getValues() as { amount?: BigNumber; conditionId: string }
   const amount = values.amount || ZERO_BN
   const conditionId = values.conditionId
-
-  const { allowance, unlock } = useAllowance(collateral)
 
   const onSubmit = async () => {
     const partition = range(outcomeSlot).reduce((acc: BigNumber[], _, index: number) => {
@@ -67,7 +72,13 @@ export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
   }
 
   const unlockCollateral = async () => {
-    await unlock()
+    setAllowance(Remote.loading())
+    const { transactionHash } = await unlock()
+    if (transactionHash) {
+      await provider.waitForTransaction(transactionHash)
+      setHasUnlockedCollateral(true)
+      setAllowance(Remote.success(constants.MaxUint256))
+    }
   }
 
   useEffect(() => {
@@ -87,16 +98,35 @@ export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
     }
   }, [CTService, conditionId, errors.conditionId, setError])
 
+  const fetchAllowance = useCallback(async () => {
+    try {
+      const allowance = await refresh()
+      setAllowance(Remote.success(allowance))
+    } catch (e) {
+      setAllowance(Remote.failure(e))
+    }
+  }, [refresh])
+
+  useEffect(() => {
+    fetchAllowance()
+  }, [fetchAllowance])
+
   useEffect(() => {
     setValue('amount', ZERO_BN)
+    setHasUnlockedCollateral(false)
   }, [collateral, setValue])
 
-  const hasEnoughAllowance = allowance.map((allowance) => allowance.gte(amount), false)
-  const hasZeroAllowance = allowance.map((allowance) => allowance.isZero(), true)
+  const hasEnoughAllowance = allowance.map(
+    (allowance) => allowance.gte(amount) && !allowance.isZero()
+  )
 
-  const showAskAllowance = !hasEnoughAllowance || hasZeroAllowance
+  // We show the allowance component if we know the user doesn't have enough allowance
+  const showAskAllowance =
+    (hasEnoughAllowance.hasData() && !hasEnoughAllowance.get()) ||
+    hasUnlockedCollateral ||
+    allowance.isLoading()
 
-  console.log(errors, isValid)
+  const canSubmit = isValid && (hasEnoughAllowance.getOr(false) || hasUnlockedCollateral)
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -119,7 +149,7 @@ export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
       {errors.conditionId && (
         <div>
           <p>{errors.conditionId.type === 'pattern' && 'Invalid bytes32 string'}</p>
-          <p>{errors.conditionId.type === 'validate' && errors.conditionId.message}</p>
+          <p>{errors.conditionId.type === 'validate' && 'Invalid condition'}</p>
         </div>
       )}
 
@@ -144,6 +174,7 @@ export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
         <SetAllowance
           collateral={collateral}
           loading={allowance.isLoading()}
+          finished={hasUnlockedCollateral}
           onUnlock={unlockCollateral}
         />
       )}
@@ -157,7 +188,7 @@ export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
         as={BigNumberInputWrapper}
       />
 
-      <button type="submit" disabled={!isValid}>
+      <button type="submit" disabled={!canSubmit}>
         Split
       </button>
     </form>

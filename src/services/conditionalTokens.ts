@@ -27,7 +27,7 @@ export class ConditionalTokensService {
     private provider: ethers.providers.Provider,
     private signer: ethers.Signer
   ) {
-    const contractAddress = networkConfig.getConditionalTokenContract()
+    const contractAddress = networkConfig.getConditionalTokensAddress()
 
     this.contract = new ethers.Contract(contractAddress, conditionalTokensAbi, provider).connect(
       signer
