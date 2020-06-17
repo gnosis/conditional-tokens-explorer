@@ -10,8 +10,8 @@ const erc20Abi = [
 
 class ERC20Service {
   private contract: Contract
-  constructor(private provider: Provider, private signer: Signer, token: Token) {
-    this.contract = new ethers.Contract(token.address, erc20Abi, provider).connect(signer)
+  constructor(private provider: Provider, private signer: Signer, tokenAddress: string) {
+    this.contract = new ethers.Contract(tokenAddress, erc20Abi, provider).connect(signer)
   }
 
   /**

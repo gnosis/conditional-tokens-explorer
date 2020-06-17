@@ -1,58 +1,65 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useWeb3Connected } from '../../contexts/Web3Context'
-import { RouteComponentProps } from 'react-router'
 import { BigNumber } from 'ethers/utils'
 import { useForm, Controller } from 'react-hook-form'
 import { Token } from '../../config/networkConfig'
-import { useAllowance } from '../../hooks/useAllowance'
 import { SetAllowance } from '../../components/common/SetAllowance'
 import { BigNumberInputWrapper } from '../../components/common/BigNumberInputWrapper'
 import { ZERO_BN } from '../../config/constants'
 import { range } from '../../util/tools'
 import { Remote } from '../../util/remoteData'
-import { constants } from 'ethers'
-
-interface RouteParams {
-  condition: string
-}
-
-interface Form {
-  conditionId: Maybe<string>
-  collateral: Maybe<Token>
-  amount: BigNumber
-}
 
 const bytesRegex = /^0x[a-fA-F0-9]{64}$/
 const NULL_PARENT_ID = '0x0000000000000000000000000000000000000000000000000000000000000000'
 
-export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
+type Form = {
+  conditionId: string
+  collateral: string
+  amount: BigNumber
+}
+
+interface Props {
+  allowance: Remote<BigNumber>
+  unlockCollateral: () => void
+  onCollateralChange: (collateral: string) => void
+  hasUnlockedCollateral: boolean
+}
+
+export const SplitCondition = ({
+  allowance,
+  unlockCollateral,
+  onCollateralChange,
+  hasUnlockedCollateral,
+}: Props) => {
+  const { CTService, networkConfig } = useWeb3Connected()
+  const tokens = networkConfig.getTokens()
+
   const {
     register,
     errors,
     control,
     handleSubmit,
     setValue,
-    setError,
     reset,
+    watch,
     getValues,
     formState: { isValid },
-  } = useForm<Form>({ mode: 'onChange' })
+  } = useForm<Form>({
+    mode: 'onChange',
+    defaultValues: { conditionId: '', collateral: tokens[0].address, amount: ZERO_BN },
+  })
 
-  const { CTService, networkConfig, provider } = useWeb3Connected()
-  const tokens = networkConfig.getTokens()
-
-  const [collateral, setCollateral] = useState<Token>(tokens[0])
-
-  const { refresh, unlock } = useAllowance(collateral)
-  const [allowance, setAllowance] = useState<Remote<BigNumber>>(Remote.notAsked<BigNumber>())
-
-  const defaultConditionId = props.match.params.condition || ''
   const [outcomeSlot, setOutcomeSlot] = useState(0)
-  const [hasUnlockedCollateral, setHasUnlockedCollateral] = useState(false)
 
-  const values = getValues() as { amount?: BigNumber; conditionId: string }
-  const amount = values.amount || ZERO_BN
-  const conditionId = values.conditionId
+  const { amount, collateral, conditionId } = getValues() as Form
+  let token = tokens[0]
+
+  const watchCollateral = watch('collateral')
+  useEffect(() => {
+    token = tokens.find((t) => t.address === collateral) || tokens[0]
+    console.log(token.symbol)
+    onCollateralChange(collateral)
+  }, [watchCollateral])
 
   const onSubmit = async () => {
     const partition = range(outcomeSlot).reduce((acc: BigNumber[], _, index: number) => {
@@ -61,59 +68,22 @@ export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
       return acc
     }, [])
 
-    await CTService.splitPosition(
-      collateral.address,
-      conditionId,
-      NULL_PARENT_ID,
-      partition,
-      amount
-    )
-    reset({ amount: ZERO_BN, collateral: tokens[0], conditionId: '' })
-  }
-
-  const unlockCollateral = async () => {
-    setAllowance(Remote.loading())
-    const { transactionHash } = await unlock()
-    if (transactionHash) {
-      await provider.waitForTransaction(transactionHash)
-      setHasUnlockedCollateral(true)
-      setAllowance(Remote.success(constants.MaxUint256))
-    }
+    await CTService.splitPosition(collateral, conditionId, NULL_PARENT_ID, partition, amount)
+    reset({ amount: ZERO_BN, collateral: tokens[0].address, conditionId: '' })
   }
 
   useEffect(() => {
     const getOutcomeSlot = async (conditionId: string) => {
-      try {
-        const outcomeSlot = await CTService.getOutcomeSlotCount(conditionId)
-        setOutcomeSlot(outcomeSlot.toNumber())
-        if (outcomeSlot.isZero()) {
-          setError('conditionId', 'validate', "Condition doesn't exists")
-        }
-      } catch ({ reason }) {
-        setError('conditionId', 'validate', reason)
-      }
+      const outcomeSlot = await CTService.getOutcomeSlotCount(conditionId)
+      setOutcomeSlot(outcomeSlot.toNumber())
     }
     if (conditionId && !errors.conditionId) {
       getOutcomeSlot(conditionId)
     }
-  }, [CTService, conditionId, errors.conditionId, setError])
-
-  const fetchAllowance = useCallback(async () => {
-    try {
-      const allowance = await refresh()
-      setAllowance(Remote.success(allowance))
-    } catch (e) {
-      setAllowance(Remote.failure(e))
-    }
-  }, [refresh])
-
-  useEffect(() => {
-    fetchAllowance()
-  }, [fetchAllowance])
+  }, [CTService, conditionId, errors.conditionId])
 
   useEffect(() => {
     setValue('amount', ZERO_BN)
-    setHasUnlockedCollateral(false)
   }, [collateral, setValue])
 
   const hasEnoughAllowance = allowance.map(
@@ -134,8 +104,6 @@ export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
       {/* Select Condition */}
       <input
         name="conditionId"
-        defaultValue={defaultConditionId}
-        onChange={(e) => setValue('conditionId', e.target.value)}
         type="text"
         ref={register({
           required: true,
@@ -154,13 +122,7 @@ export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
       )}
 
       <label htmlFor="collateral">Collateral</label>
-      <select
-        ref={register({ required: true })}
-        name="collateral"
-        onChange={(e) =>
-          setCollateral(tokens.find((t) => t.address === e.target.value) || tokens[0])
-        }
-      >
+      <select ref={register({ required: true })} name="collateral">
         {tokens.map(({ symbol, address }) => {
           return (
             <option key={address} value={address}>
@@ -172,7 +134,7 @@ export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
 
       {showAskAllowance && (
         <SetAllowance
-          collateral={collateral}
+          collateral={token}
           loading={allowance.isLoading()}
           finished={hasUnlockedCollateral}
           onUnlock={unlockCollateral}
@@ -184,7 +146,7 @@ export const SplitCondition = (props: RouteComponentProps<RouteParams>) => {
         name="amount"
         rules={{ required: true, validate: (amount) => amount.gt(ZERO_BN) }}
         control={control}
-        decimals={collateral.decimals}
+        decimals={token.decimals}
         as={BigNumberInputWrapper}
       />
 

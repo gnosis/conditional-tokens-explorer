@@ -16,7 +16,7 @@ type WaitingForUser = {
   _type: 'waitingForUser'
 }
 
-type Connected = {
+export type Connected = {
   _type: 'connected'
   provider: Web3Provider
   address: string
