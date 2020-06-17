@@ -8,6 +8,7 @@ import { BigNumberInputWrapper } from '../../components/common/BigNumberInputWra
 import { ZERO_BN } from '../../config/constants'
 import { range } from '../../util/tools'
 import { Remote } from '../../util/remoteData'
+import { ConditionalTokensService } from '../../services/conditionalTokens'
 
 const bytesRegex = /^0x[a-fA-F0-9]{64}$/
 const NULL_PARENT_ID = '0x0000000000000000000000000000000000000000000000000000000000000000'
@@ -23,6 +24,8 @@ interface Props {
   unlockCollateral: () => void
   onCollateralChange: (collateral: string) => void
   hasUnlockedCollateral: boolean
+  tokens: Token[]
+  ctService: ConditionalTokensService
 }
 
 export const SplitCondition = ({
@@ -30,10 +33,9 @@ export const SplitCondition = ({
   unlockCollateral,
   onCollateralChange,
   hasUnlockedCollateral,
+  tokens,
+  ctService,
 }: Props) => {
-  const { CTService, networkConfig } = useWeb3Connected()
-  const tokens = networkConfig.getTokens()
-
   const {
     register,
     errors,
@@ -68,19 +70,19 @@ export const SplitCondition = ({
       return acc
     }, [])
 
-    await CTService.splitPosition(collateral, conditionId, NULL_PARENT_ID, partition, amount)
+    await ctService.splitPosition(collateral, conditionId, NULL_PARENT_ID, partition, amount)
     reset({ amount: ZERO_BN, collateral: tokens[0].address, conditionId: '' })
   }
 
   useEffect(() => {
     const getOutcomeSlot = async (conditionId: string) => {
-      const outcomeSlot = await CTService.getOutcomeSlotCount(conditionId)
+      const outcomeSlot = await ctService.getOutcomeSlotCount(conditionId)
       setOutcomeSlot(outcomeSlot.toNumber())
     }
     if (conditionId && !errors.conditionId) {
       getOutcomeSlot(conditionId)
     }
-  }, [CTService, conditionId, errors.conditionId])
+  }, [ctService, conditionId, errors.conditionId])
 
   useEffect(() => {
     setValue('amount', ZERO_BN)
@@ -109,7 +111,7 @@ export const SplitCondition = ({
           required: true,
           pattern: bytesRegex,
           validate: async (value) => {
-            const conditionExist = await CTService.conditionExists(value)
+            const conditionExist = await ctService.conditionExists(value)
             return conditionExist
           },
         })}
