@@ -10,8 +10,8 @@ import { Token } from '../../config/networkConfig'
 export const SplitConditionContainer = () => {
   const { networkConfig, provider, CTService } = useWeb3Connected()
   const tokens = networkConfig.getTokens()
-  const [collateral, setCollateral] = useState(tokens[0].address)
-  const { refresh, unlock } = useAllowance(collateral)
+  const [collateralToken, setCollateralToken] = useState(tokens[0])
+  const { refresh, unlock } = useAllowance(collateralToken.address)
   const [allowance, setAllowance] = useState<Remote<BigNumber>>(Remote.notAsked<BigNumber>())
   const [hasUnlockedCollateral, setHasUnlockedCollateral] = useState(false)
 
@@ -40,13 +40,13 @@ export const SplitConditionContainer = () => {
 
   useEffect(() => {
     setHasUnlockedCollateral(false)
-  }, [collateral])
+  }, [collateralToken])
 
   return (
     <SplitCondition
       allowance={allowance}
       unlockCollateral={unlockCollateral}
-      onCollateralChange={(collateral: string) => setCollateral(collateral)}
+      onCollateralChange={(collateral: Token) => setCollateralToken(collateral)}
       hasUnlockedCollateral={hasUnlockedCollateral}
       ctService={CTService}
       tokens={tokens}

@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, findByLabelText, findByPlaceholderText, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { SplitCondition } from './SplitCondition'
 import { Remote } from '../../util/remoteData'
 import { BigNumber } from 'ethers/utils'
@@ -35,7 +35,7 @@ test('show unlock allowance with zero allowance', async () => {
 test('dont show unlock allowance with not enough allowance', async () => {
   const allowance = Remote.success<BigNumber>(new BigNumber(10))
 
-  const { findByText, queryByText, findByLabelText, findByTestId } = render(
+  const { findByText, queryByText } = render(
     <SplitCondition
       allowance={allowance}
       unlockCollateral={unlockCollateral}

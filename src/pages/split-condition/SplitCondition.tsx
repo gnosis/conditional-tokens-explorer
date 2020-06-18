@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { useWeb3Connected } from '../../contexts/Web3Context'
+import React, { useState, useEffect } from 'react'
 import { BigNumber } from 'ethers/utils'
 import { useForm, Controller } from 'react-hook-form'
 import { Token } from '../../config/networkConfig'
@@ -22,7 +21,7 @@ type Form = {
 interface Props {
   allowance: Remote<BigNumber>
   unlockCollateral: () => void
-  onCollateralChange: (collateral: string) => void
+  onCollateralChange: (collateral: Token) => void
   hasUnlockedCollateral: boolean
   tokens: Token[]
   ctService: ConditionalTokensService
@@ -52,16 +51,15 @@ export const SplitCondition = ({
   })
 
   const [outcomeSlot, setOutcomeSlot] = useState(0)
-
+  const [collateralToken, setCollateralToken] = useState(tokens[0])
   const { amount, collateral, conditionId } = getValues() as Form
-  let token = tokens[0]
 
   const watchCollateral = watch('collateral')
   useEffect(() => {
-    token = tokens.find((t) => t.address === collateral) || tokens[0]
-    console.log(token.symbol)
-    onCollateralChange(collateral)
-  }, [watchCollateral])
+    const collateralToken = tokens.find((t) => t.address === collateral) || tokens[0]
+    setCollateralToken(collateralToken)
+    onCollateralChange(collateralToken)
+  }, [watchCollateral, onCollateralChange, tokens, collateral])
 
   const onSubmit = async () => {
     const partition = range(outcomeSlot).reduce((acc: BigNumber[], _, index: number) => {
@@ -136,7 +134,7 @@ export const SplitCondition = ({
 
       {showAskAllowance && (
         <SetAllowance
-          collateral={token}
+          collateral={collateralToken}
           loading={allowance.isLoading()}
           finished={hasUnlockedCollateral}
           onUnlock={unlockCollateral}
@@ -148,7 +146,7 @@ export const SplitCondition = ({
         name="amount"
         rules={{ required: true, validate: (amount) => amount.gt(ZERO_BN) }}
         control={control}
-        decimals={token.decimals}
+        decimals={collateralToken.decimals}
         as={BigNumberInputWrapper}
       />
 

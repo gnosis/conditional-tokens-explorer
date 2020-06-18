@@ -1,6 +1,5 @@
 import { useCallback } from 'react'
 import { ERC20Service } from '../services/erc20'
-import { Token } from '../config/networkConfig'
 import { useWeb3Connected } from '../contexts/Web3Context'
 
 /**
