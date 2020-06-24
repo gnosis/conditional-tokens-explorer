@@ -8,7 +8,7 @@ import { ConditionsList } from 'queries/conditions'
 import { ConditionList_conditions } from 'types/generatedGQL'
 
 export const Main = () => {
-  const { data, error, fetchMore, loading } = useQuery<ConditionList_conditions>(ConditionsList)
+  const { data } = useQuery<ConditionList_conditions>(ConditionsList)
 
   console.log(data)
 
