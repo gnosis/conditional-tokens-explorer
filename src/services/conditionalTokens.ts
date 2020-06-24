@@ -1,5 +1,6 @@
 import { Contract, ethers } from 'ethers'
 import { NetworkConfig } from '../config/networkConfig'
+import { BigNumber } from 'ethers/utils'
 
 const conditionalTokensAbi = [
   'function prepareCondition(address oracle, bytes32 questionId, uint outcomeSlotCount) external',
@@ -15,6 +16,7 @@ const conditionalTokensAbi = [
   'function safeTransferFrom(address from, address to, uint256 id, uint256 value, bytes data) external',
   'function getOutcomeSlotCount(bytes32 conditionId) external view returns (uint)',
   'function mergePositions(address collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] partition, uint amount) external',
+  'function splitPosition(address collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] partition, uint amount) external',
 ]
 
 export class ConditionalTokensService {
@@ -25,7 +27,7 @@ export class ConditionalTokensService {
     private provider: ethers.providers.Provider,
     private signer: ethers.Signer
   ) {
-    const contractAddress = networkConfig.getConditionalTokenContract()
+    const contractAddress = networkConfig.getConditionalTokensAddress()
 
     this.contract = new ethers.Contract(contractAddress, conditionalTokensAbi, provider).connect(
       signer
@@ -64,7 +66,32 @@ export class ConditionalTokensService {
     return transactionObject.hash
   }
 
-  async conditionExists(conditionId: string) {
-    return !(await this.contract.getOutcomeSlotCount(conditionId)).isZero()
+  async splitPosition(
+    collateralToken: string,
+    parentCollectionId: string,
+    conditionId: string,
+    partition: BigNumber[],
+    amount: BigNumber
+  ): Promise<string> {
+    const transactionObject = await this.contract.splitPosition(
+      collateralToken,
+      parentCollectionId,
+      conditionId,
+      partition,
+      amount,
+      {
+        value: '0x0',
+        gasLimit: 750000,
+      }
+    )
+    return transactionObject.hash
+  }
+
+  async getOutcomeSlotCount(conditionId: string): Promise<BigNumber> {
+    return await this.contract.getOutcomeSlotCount(conditionId)
+  }
+
+  async conditionExists(conditionId: string): Promise<boolean> {
+    return !(await this.getOutcomeSlotCount(conditionId)).isZero()
   }
 }
