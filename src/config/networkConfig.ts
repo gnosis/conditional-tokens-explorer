@@ -66,6 +66,7 @@ export class NetworkConfig {
   constructor(public networkId: NetworkId) {}
 
   static isKnownNetwork(networkId: number): networkId is NetworkId {
+    console.log('isKnownNetwork', networkId)
     return networkId === 1 || networkId === 4
   }
 
@@ -78,7 +79,8 @@ export class NetworkConfig {
   }
 }
 
-export const getGraphUris = (networkId: NetworkId): { httpUri: string; wsUri: string } => {
+export const getGraphUris = (networkId: number): { httpUri: string; wsUri: string } => {
+  console.log('getGraphUris', networkId)
   if (!NetworkConfig.isKnownNetwork(networkId)) {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
