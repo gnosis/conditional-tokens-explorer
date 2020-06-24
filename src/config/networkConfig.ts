@@ -1,4 +1,11 @@
-type NetworkId = 1 | 4
+import {
+  GRAPH_HTTP_MAINNET,
+  GRAPH_WS_MAINNET,
+  GRAPH_HTTP_RINKEBY,
+  GRAPH_WS_RINKEBY,
+} from './constants'
+
+export type NetworkId = 1 | 4
 
 const networkIds = {
   MAINNET: 1,
@@ -14,6 +21,8 @@ export type Token = {
 interface Network {
   conditionalTokensAddress: string
   tokens: Token[]
+  graphHttpUri: string
+  graphWsUri: string
 }
 
 const networks: { [K in NetworkId]: Network } = {
@@ -31,6 +40,8 @@ const networks: { [K in NetworkId]: Network } = {
         decimals: 6,
       },
     ],
+    graphHttpUri: GRAPH_HTTP_MAINNET,
+    graphWsUri: GRAPH_WS_MAINNET,
   },
   [networkIds.RINKEBY]: {
     conditionalTokensAddress: '0xe6Cdc22F99FD9ffdC03647C7fFF5bB753a4eBB21',
@@ -46,6 +57,8 @@ const networks: { [K in NetworkId]: Network } = {
         decimals: 6,
       },
     ],
+    graphHttpUri: GRAPH_HTTP_RINKEBY,
+    graphWsUri: GRAPH_WS_RINKEBY,
   },
 }
 
@@ -63,4 +76,14 @@ export class NetworkConfig {
   getTokens() {
     return networks[this.networkId].tokens
   }
+}
+
+export const getGraphUris = (networkId: NetworkId): { httpUri: string; wsUri: string } => {
+  if (!NetworkConfig.isKnownNetwork(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+
+  const httpUri = networks[networkId].graphHttpUri
+  const wsUri = networks[networkId].graphWsUri
+  return { httpUri, wsUri }
 }
