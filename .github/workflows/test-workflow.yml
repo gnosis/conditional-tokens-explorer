@@ -25,6 +25,9 @@ jobs:
       - name: Install dependencies
         run: yarn
 
+      - name: Check linter rules
+        run: yarn lint
+
       # Runs a single command using the runners shell
       - name: Run tests
         run: yarn test
