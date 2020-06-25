@@ -17,11 +17,16 @@ export const SplitConditionContainer = () => {
 
   const unlockCollateral = async () => {
     setAllowance(Remote.loading())
-    const { transactionHash } = await unlock()
-    if (transactionHash) {
-      await provider.waitForTransaction(transactionHash)
+    try {
+      const { transactionHash } = await unlock()
+      if (transactionHash) {
+        await provider.waitForTransaction(transactionHash)
+        setAllowance(Remote.success(constants.MaxUint256))
+      }
+    } catch (e) {
+      setAllowance(Remote.failure(e))
+    } finally {
       setHasUnlockedCollateral(true)
-      setAllowance(Remote.success(constants.MaxUint256))
     }
   }
 

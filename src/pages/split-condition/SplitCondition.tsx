@@ -136,7 +136,7 @@ export const SplitCondition = ({
         <SetAllowance
           collateral={collateralToken}
           loading={allowance.isLoading()}
-          finished={hasUnlockedCollateral}
+          finished={hasUnlockedCollateral && hasEnoughAllowance.getOr(false)}
           onUnlock={unlockCollateral}
         />
       )}
