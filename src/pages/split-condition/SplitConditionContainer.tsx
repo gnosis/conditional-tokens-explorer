@@ -48,15 +48,15 @@ export const SplitConditionContainer = () => {
 
   const splitPosition = async (
     collateral: string,
-    conditionId: string,
     parentCollection: string,
+    conditionId: string,
     partition: BigNumber[],
     amount: BigNumber
   ) => {
     const tx = await CTService.splitPosition(
       collateral,
-      conditionId,
       parentCollection,
+      conditionId,
       partition,
       amount
     )

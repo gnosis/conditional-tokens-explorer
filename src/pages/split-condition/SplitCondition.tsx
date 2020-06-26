@@ -31,8 +31,8 @@ interface Props {
   onCollateralChange: (collateral: string) => void
   splitPosition: (
     collateral: string,
-    conditionId: string,
     parentCollection: string,
+    conditionId: string,
     partition: BigNumber[],
     amount: BigNumber
   ) => void
@@ -87,14 +87,14 @@ export const SplitCondition = ({
     const partition = trivialPartition(outcomeSlot)
 
     if (splitFromCollateral) {
-      splitPosition(collateral, conditionId, NULL_PARENT_ID, partition, amount)
+      splitPosition(collateral, NULL_PARENT_ID, conditionId, partition, amount)
     }
     if (splitFromPosition && fetchedPosition?.position) {
       const {
         collection: { id: collectionId },
         collateralToken: { id: collateralAddress },
       } = fetchedPosition?.position
-      splitPosition(collateralAddress, conditionId, collectionId, partition, amount)
+      splitPosition(collateralAddress, collectionId, conditionId, partition, amount)
     }
 
     reset({
@@ -252,7 +252,9 @@ export const SplitCondition = ({
       )}
       <label htmlFor="amount">Amount</label>
       {splitFrom === 'position' && (
-        <a onClick={() => setValue('amount', balance)}>{`Wallet Balance ${balance.toString()}`}</a>
+        <button
+          onClick={() => setValue('amount', balance)}
+        >{`Wallet Balance ${balance.toString()}`}</button>
       )}
       <Controller
         name="amount"
