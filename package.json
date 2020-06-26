@@ -39,6 +39,7 @@
     "mutationobserver-shim": "^0.3.7",
     "prettier": "^2.0.5",
     "react": "^16.13.1",
+    "react-data-table-component": "^6.9.3",
     "react-dom": "^16.13.1",
     "react-hook-form": "^5.7.2",
     "react-router-dom": "^5.2.0",
