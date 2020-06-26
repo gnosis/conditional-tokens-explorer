@@ -81,7 +81,7 @@ export class ConditionalTokensService {
       amount,
       {
         value: '0x0',
-        gasLimit: 750000,
+        gasLimit: 1750000,
       }
     )
     return transactionObject.hash
@@ -93,5 +93,10 @@ export class ConditionalTokensService {
 
   async conditionExists(conditionId: string): Promise<boolean> {
     return !(await this.getOutcomeSlotCount(conditionId)).isZero()
+  }
+
+  async balanceOf(positionId: string): Promise<BigNumber> {
+    const owner = await this.signer.getAddress()
+    return await this.contract.balanceOf(owner, positionId)
   }
 }
