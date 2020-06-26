@@ -5,6 +5,7 @@ import { ConditionList } from 'pages/condition-list'
 
 export const Disconnected = () => {
   const { connect } = useWeb3Disconnected()
+
   return (
     <>
       <button onClick={connect}>Connect</button>

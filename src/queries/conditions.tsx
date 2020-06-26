@@ -7,6 +7,7 @@ export const ConditionsList = gql`
       oracle
       questionId
       outcomeSlotCount
+      resolved
     }
   }
 `

@@ -13,6 +13,7 @@ export interface ConditionList_conditions {
   oracle: any;
   questionId: any;
   outcomeSlotCount: number;
+  resolved: boolean;
 }
 
 export interface ConditionList {

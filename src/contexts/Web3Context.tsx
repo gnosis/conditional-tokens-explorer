@@ -16,6 +16,10 @@ type WaitingForUser = {
   _type: 'waitingForUser'
 }
 
+type Connecting = {
+  _type: 'connecting'
+}
+
 export type Connected = {
   _type: 'connected'
   provider: Web3Provider
@@ -30,7 +34,7 @@ type ErrorWeb3 = {
   error: Error
 }
 
-export type Web3Status = NotAsked | WaitingForUser | Connected | ErrorWeb3
+export type Web3Status = NotAsked | WaitingForUser | Connecting | Connected | ErrorWeb3
 export const Web3Context = createContext(null as Maybe<{ status: Web3Status; connect: () => void }>)
 
 interface Props {
@@ -50,7 +54,9 @@ const web3Modal = new Web3Modal({
 })
 
 export const Web3ContextProvider = ({ children }: Props) => {
-  const [web3Status, setWeb3Status] = useState<Web3Status>({ _type: 'notAsked' })
+  const [web3Status, setWeb3Status] = useState<Web3Status>(
+    web3Modal.cachedProvider ? { _type: 'connecting' } : { _type: 'notAsked' }
+  )
 
   const connect = useCallback(async () => {
     if (web3Status._type === 'connected') {
