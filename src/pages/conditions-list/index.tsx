@@ -3,8 +3,8 @@ import styled from 'styled-components'
 import { useQuery } from '@apollo/react-hooks'
 import DataTable from 'react-data-table-component'
 
-import { ConditionsList } from 'queries/conditions'
-import { ConditionList as ConditionListType, ConditionList_conditions } from 'types/generatedGQL'
+import { ConditionsListQuery } from 'queries/conditions'
+import { Conditions, Conditions_conditions } from 'types/generatedGQL'
 
 const columns = [
   {
@@ -32,8 +32,8 @@ const columns = [
     selector: 'resolved',
     sortable: true,
     // eslint-disable-next-line react/display-name
-    cell: (row: ConditionList_conditions) => <div>{row.resolved ? 'Resolved' : 'Open'}</div>,
-    sortFunction: (a: ConditionList_conditions, b: ConditionList_conditions) => {
+    cell: (row: Conditions_conditions) => <div>{row.resolved ? 'Resolved' : 'Open'}</div>,
+    sortFunction: (a: Conditions_conditions, b: Conditions_conditions) => {
       const valA = a.resolved ? 2 : 1
       const valB = b.resolved ? 2 : 1
       return valA - valB
@@ -47,8 +47,8 @@ const Wrapper = styled.div`
   justify-content: center;
 `
 
-export const ConditionList = () => {
-  const { data, error, loading } = useQuery<ConditionListType>(ConditionsList)
+export const ConditionsList = () => {
+  const { data, error, loading } = useQuery<Conditions>(ConditionsListQuery)
 
   return (
     <Wrapper>
