@@ -10,8 +10,6 @@ import { ConditionList_conditions } from 'types/generatedGQL'
 export const Main = () => {
   const { data } = useQuery<ConditionList_conditions>(ConditionsList)
 
-  console.log(data)
-
   const { status } = useWeb3Context()
   if (status._type === 'notAsked') {
     return <Disconnected></Disconnected>
