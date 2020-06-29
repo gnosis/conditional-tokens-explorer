@@ -68,7 +68,7 @@ export const SplitCondition = ({
       return acc
     }, [])
 
-    await ctService.splitPosition(collateral, conditionId, NULL_PARENT_ID, partition, amount)
+    await ctService.splitPosition(collateral, NULL_PARENT_ID, conditionId, partition, amount)
     reset({ amount: ZERO_BN, collateral: tokens[0].address, conditionId: '' })
   }
 
