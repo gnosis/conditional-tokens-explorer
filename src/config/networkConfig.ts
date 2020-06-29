@@ -44,7 +44,7 @@ const networks: { [K in NetworkId]: Network } = {
     graphWsUri: GRAPH_WS_MAINNET,
   },
   [networkIds.RINKEBY]: {
-    conditionalTokensAddress: '0xe6Cdc22F99FD9ffdC03647C7fFF5bB753a4eBB21',
+    conditionalTokensAddress: '0x36bede640D19981A82090519bC1626249984c908',
     tokens: [
       {
         symbol: 'DAI',

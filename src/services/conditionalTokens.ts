@@ -49,6 +49,16 @@ export class ConditionalTokensService {
     }
   }
 
+  async getCollectionId(parentCollectionId: string, conditionId: string, indexSet: BigNumber) {
+    const collectionId = await this.contract.getCollectionId(
+      parentCollectionId,
+      conditionId,
+      indexSet
+    )
+
+    return collectionId
+  }
+
   static getPositionId(collateralToken: string, collectionId: string): Maybe<string> {
     try {
       return ethers.utils.solidityKeccak256(['address', 'bytes32'], [collateralToken, collectionId])
