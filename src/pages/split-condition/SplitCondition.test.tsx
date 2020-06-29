@@ -7,8 +7,6 @@ import { NetworkConfig } from '../../config/networkConfig'
 import { ZERO_BN } from '../../config/constants'
 import { act } from 'react-dom/test-utils'
 import userEvent from '@testing-library/user-event'
-import { ApolloProvider } from '@apollo/react-hooks'
-import { ApolloProviderWrapper } from 'contexts/Apollo'
 import { MockedProvider } from '@apollo/react-testing'
 
 const unlockCollateral = jest.fn()
