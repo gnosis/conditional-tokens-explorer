@@ -3,37 +3,9 @@ import { useWeb3Context } from '../contexts/Web3Context'
 import { useQuery } from '@apollo/react-hooks'
 import { PositionsListQuery } from 'queries/positions'
 import { UserWithPositionsQuery } from 'queries/users'
-import {
-  Positions,
-  Positions_positions,
-  UserWithPositions,
-  UserWithPositions_user,
-} from 'types/generatedGQL'
+import { Positions, UserWithPositions } from 'types/generatedGQL'
 import { ApolloError } from 'apollo-client'
-import { ZERO_BN } from 'config/constants'
-import { BigNumber } from 'ethers/utils'
-
-export interface Position {
-  id: string
-  collateralToken: string
-  userBalance: BigNumber
-}
-
-const marshalData = (
-  positions: Positions_positions[],
-  userData?: Maybe<UserWithPositions_user>
-): Position[] => {
-  return positions.map((position) => {
-    const userPosition = userData
-      ? userData.userPositions?.find((userPosition) => position.id === userPosition.position.id)
-      : 0
-    return {
-      id: position.id,
-      collateralToken: position.collateralToken.id,
-      userBalance: userPosition ? new BigNumber(userPosition.balance) : ZERO_BN,
-    } as Position
-  })
-}
+import { Position, marshalPositionLisData } from './utils'
 
 /**
  * Return a array of positions, and the user balance if it's connected.
@@ -80,7 +52,7 @@ export const usePositions = () => {
 
   useEffect(() => {
     if (positionsData) {
-      setData(marshalData(positionsData.positions, userData?.user))
+      setData(marshalPositionLisData(positionsData.positions, userData?.user))
     }
   }, [positionsData, userData])
 
