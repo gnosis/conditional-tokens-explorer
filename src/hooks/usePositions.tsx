@@ -62,7 +62,7 @@ export const usePositions = () => {
 
   useEffect(() => {
     if (status._type === 'connected') {
-      account.current = status.address
+      account.current = status.address.toLowerCase()
     }
   }, [status])
 
