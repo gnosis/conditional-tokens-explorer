@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render } from '@testing-library/react'
 import { SplitCondition } from './SplitCondition'
 import { Remote } from '../../util/remoteData'
 import { BigNumber } from 'ethers/utils'
@@ -7,9 +7,12 @@ import { NetworkConfig } from '../../config/networkConfig'
 import { ZERO_BN } from '../../config/constants'
 import { act } from 'react-dom/test-utils'
 import userEvent from '@testing-library/user-event'
+import { ApolloProvider } from '@apollo/react-hooks'
+import { ApolloProviderWrapper } from 'contexts/Apollo'
 
 const unlockCollateral = jest.fn()
 const onCollateralChange = jest.fn()
+const splitPosition = jest.fn()
 const hasUnlockedCollateral = false
 const networkConfig = new NetworkConfig(4)
 const tokens = networkConfig.getTokens()
@@ -21,6 +24,7 @@ test('show unlock button with zero allowance', async () => {
   const { findByText } = render(
     <SplitCondition
       allowance={allowance}
+      splitPosition={splitPosition}
       unlockCollateral={unlockCollateral}
       onCollateralChange={onCollateralChange}
       hasUnlockedCollateral={hasUnlockedCollateral}
@@ -35,9 +39,10 @@ test('show unlock button with zero allowance', async () => {
 test('toggle unlock button visiblity according to allowance and amount', async () => {
   const allowance = Remote.success<BigNumber>(new BigNumber(10))
 
-  const { findByText, queryByText } = render(
+  const { findByText, queryByText, findByPlaceholderText } = render(
     <SplitCondition
       allowance={allowance}
+      splitPosition={splitPosition}
       unlockCollateral={unlockCollateral}
       onCollateralChange={onCollateralChange}
       hasUnlockedCollateral={hasUnlockedCollateral}
@@ -49,7 +54,7 @@ test('toggle unlock button visiblity according to allowance and amount', async (
   const unlockBefore = queryByText(/unlock/i)
   expect(unlockBefore).toBeNull()
 
-  const amountInput = await screen.findByPlaceholderText('0.00')
+  const amountInput = await findByPlaceholderText('0.00')
   await act(async () => {
     return userEvent.type(amountInput, '20')
   })
@@ -66,6 +71,7 @@ test('show unlock button after failure', async () => {
     <SplitCondition
       allowance={allowance}
       unlockCollateral={unlockCollateral}
+      splitPosition={splitPosition}
       onCollateralChange={onCollateralChange}
       hasUnlockedCollateral={hasUnlockedCollateral}
       ctService={CTService}
@@ -81,6 +87,7 @@ test('show unlock button after failure', async () => {
   rerender(
     <SplitCondition
       allowance={allowanceFailure}
+      splitPosition={splitPosition}
       unlockCollateral={unlockCollateral}
       onCollateralChange={onCollateralChange}
       hasUnlockedCollateral={true}
@@ -92,20 +99,3 @@ test('show unlock button after failure', async () => {
   const unlockAfterFailure = await findByText(/unlock/i)
   expect(unlockAfterFailure).toBeInTheDocument()
 })
-// test('hide unlock button with unknown allowance', async () => {
-//   const allowance = Remote.notAsked<BigNumber>()
-//   const { queryByText } = render(
-//     <SplitCondition
-//       allowance={allowance}
-//       unlockCollateral={unlockCollateral}
-//       onCollateralChange={onCollateralChange}
-//       hasUnlockedCollateral={hasUnlockedCollateral}
-//       ctService={CTService}
-//       tokens={tokens}
-//     />
-//   )
-//   console.log(allowance)
-
-//   const unlock = queryByText(/unlock/i)
-//   expect(unlock).toBeNull()
-// })

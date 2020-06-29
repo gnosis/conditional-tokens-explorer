@@ -49,6 +49,14 @@ export class ConditionalTokensService {
     }
   }
 
+  static getPositionId(collateralToken: string, collectionId: string): Maybe<string> {
+    try {
+      return ethers.utils.solidityKeccak256(['address', 'bytes32'], [collateralToken, collectionId])
+    } catch (err) {
+      return null
+    }
+  }
+
   async prepareCondition(
     questionId: string,
     oracleAddress: string,

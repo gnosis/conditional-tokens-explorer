@@ -5,6 +5,7 @@ import { useAllowance } from '../../hooks/useAllowance'
 import { Remote } from '../../util/remoteData'
 import { constants } from 'ethers'
 import { SplitCondition } from './index'
+import { ConditionalTokensService } from 'services/conditionalTokens'
 
 export const SplitConditionContainer = () => {
   const { networkConfig, provider, CTService } = useWeb3Connected()
@@ -53,6 +54,8 @@ export const SplitConditionContainer = () => {
     partition: BigNumber[],
     amount: BigNumber
   ) => {
+    const position = ConditionalTokensService.getPositionId(collateralToken, parentCollection)
+    console.log('position result: ', position)
     const tx = await CTService.splitPosition(
       collateral,
       parentCollection,
