@@ -6,12 +6,6 @@ import { Remote } from '../../util/remoteData'
 import { constants, ethers } from 'ethers'
 import { SplitCondition } from './index'
 import { ConditionalTokensService } from 'services/conditionalTokens'
-// import CTHelpersConstructor from '@gnosis.pm/conditional-tokens-contracts/utils/id-helpers'
-// const CTHelpers = CTHelpersConstructor({
-//   BN: ethers.utils.BigNumber,
-//   toBN: ethers.utils.bigNumberify,
-//   soliditySha3: ethers.utils.keccak256,
-// })
 
 export const SplitConditionContainer = () => {
   const { networkConfig, provider, CTService } = useWeb3Connected()
@@ -60,18 +54,19 @@ export const SplitConditionContainer = () => {
     partition: BigNumber[],
     amount: BigNumber
   ) => {
-    // console.log(CTHelpers)
-    const positions = await Promise.all(
-      partition.map(async (indexSet) => {
-        const collectionId = await CTService.getCollectionId(
-          parentCollection,
-          conditionId,
-          indexSet
-        )
-        return ConditionalTokensService.getPositionId(collateralToken, collectionId)
-      })
-    )
-    positions.forEach((pos, index) => console.log(`Position ${index}: ${pos}`))
+    partition.forEach((indexSet) => {
+      const collectionId = ConditionalTokensService.getCollectionId(
+        parentCollection,
+        conditionId,
+        indexSet
+      )
+
+      const positionId = ConditionalTokensService.getPositionId(collateralToken, collectionId)
+      console.log(
+        `conditionId: ${conditionId} / parentCollection: ${parentCollection} / indexSet: ${indexSet.toString()}`
+      )
+      console.log(`Position: ${positionId}`)
+    })
 
     const tx = await CTService.splitPosition(
       collateral,

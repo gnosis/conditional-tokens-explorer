@@ -2,6 +2,10 @@ import { Contract, ethers } from 'ethers'
 import { NetworkConfig } from '../config/networkConfig'
 import { BigNumber } from 'ethers/utils'
 
+import Web3Utils from 'web3-utils'
+import CTHelpersConstructor from '@gnosis.pm/conditional-tokens-contracts/utils/id-helpers'
+const CTHelpers = CTHelpersConstructor(Web3Utils)
+
 const conditionalTokensAbi = [
   'function prepareCondition(address oracle, bytes32 questionId, uint outcomeSlotCount) external',
   'event ConditionPreparation(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint outcomeSlotCount)',
@@ -49,22 +53,15 @@ export class ConditionalTokensService {
     }
   }
 
-  async getCollectionId(parentCollectionId: string, conditionId: string, indexSet: BigNumber) {
-    const collectionId = await this.contract.getCollectionId(
-      parentCollectionId,
-      conditionId,
-      indexSet
-    )
-
-    return collectionId
+  static getCollectionId(parentCollection: string, conditionId: string, indexSet: BigNumber) {
+    return CTHelpers.combineCollectionIds([
+      parentCollection,
+      CTHelpers.getCollectionId(conditionId, indexSet),
+    ])
   }
 
-  static getPositionId(collateralToken: string, collectionId: string): Maybe<string> {
-    try {
-      return ethers.utils.solidityKeccak256(['address', 'bytes32'], [collateralToken, collectionId])
-    } catch (err) {
-      return null
-    }
+  static getPositionId(collateralToken: string, collectionId: string): string {
+    return CTHelpers.getPositionId(collateralToken, collectionId)
   }
 
   async prepareCondition(
