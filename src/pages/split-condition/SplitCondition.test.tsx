@@ -19,8 +19,8 @@ const networkConfig = new NetworkConfig(4)
 const tokens = networkConfig.getTokens()
 // eslint-disable-next-line
 const CTService = jest.mock('../../services/conditionalTokens') as any
-const signer = jest.mock('ethers/ethers')
-const provider = jest.mock('ethers/providers')
+const signer = jest.mock('ethers/ethers') as any
+const provider = jest.mock('ethers/providers') as any
 const address = '0x123'
 
 test('show unlock button with zero allowance', async () => {
