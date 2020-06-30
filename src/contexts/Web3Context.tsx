@@ -8,7 +8,7 @@ import { INFURA_ID } from '../config/constants'
 import { NetworkConfig } from '../config/networkConfig'
 import { ConditionalTokensService } from '../services/conditionalTokens'
 
-type NotAsked = {
+export type NotAsked = {
   _type: 'notAsked'
 }
 

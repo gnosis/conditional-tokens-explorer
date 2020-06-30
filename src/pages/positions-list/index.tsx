@@ -6,7 +6,7 @@ import { useWeb3Context, Web3Status } from 'contexts/Web3Context'
 
 const dafaultColumns = [
   {
-    name: 'Positions Id',
+    name: 'Position Id',
     selector: 'id',
     sortable: true,
   },
