@@ -20,6 +20,7 @@ const notAskedStatus = {
   _type: 'notAsked',
 } as NotAsked
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const renderWithConnectedProvider = (component: any, query: any) => {
   return render(
     <Web3Context.Provider value={{ status: connectedStatus, connect }}>
@@ -28,6 +29,7 @@ const renderWithConnectedProvider = (component: any, query: any) => {
   )
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const renderWithDisconnectedProvider = (component: any, query: any) => {
   return render(
     <Web3Context.Provider value={{ status: notAskedStatus, connect }}>
@@ -93,7 +95,7 @@ test('position list shold show right columns when the user is connected', async 
     },
   ]
   await act(async () => {
-    const { findByText, debug, getByRole } = await renderWithConnectedProvider(
+    const { findByText, getByRole } = await renderWithConnectedProvider(
       <PositionsList />,
       mockQueryResult
     )
