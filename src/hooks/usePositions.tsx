@@ -5,7 +5,7 @@ import { PositionsListQuery } from 'queries/positions'
 import { UserWithPositionsQuery } from 'queries/users'
 import { Positions, UserWithPositions } from 'types/generatedGQL'
 import { ApolloError } from 'apollo-client'
-import { Position, marshalPositionLisData } from './utils'
+import { Position, marshalPositionListData } from './utils'
 
 /**
  * Return a array of positions, and the user balance if it's connected.
@@ -52,7 +52,7 @@ export const usePositions = () => {
 
   useEffect(() => {
     if (positionsData) {
-      setData(marshalPositionLisData(positionsData.positions, userData?.user))
+      setData(marshalPositionListData(positionsData.positions, userData?.user))
     }
   }, [positionsData, userData])
 

@@ -9,7 +9,7 @@ export interface Position {
   userBalance: BigNumber
 }
 
-export const marshalPositionLisData = (
+export const marshalPositionListData = (
   positions: Positions_positions[],
   userData?: Maybe<UserWithPositions_user>
 ): Position[] => {

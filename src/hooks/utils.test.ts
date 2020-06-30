@@ -1,6 +1,6 @@
 import { ZERO_BN } from 'config/constants'
 import { BigNumber } from 'ethers/utils'
-import { marshalPositionLisData } from './utils'
+import { marshalPositionListData } from './utils'
 import { Positions_positions, UserWithPositions_user } from 'types/generatedGQL'
 
 const positions: Positions_positions[] = [
@@ -37,7 +37,7 @@ const userWithBalance: UserWithPositions_user = {
   ],
 }
 
-test('marshalPositionLisData should return the Positions without balances', async () => {
+test('marshalPositionListData should return the Positions without balances', async () => {
   const expected = [
     {
       id: 'Position1',
@@ -51,10 +51,10 @@ test('marshalPositionLisData should return the Positions without balances', asyn
     },
   ]
 
-  expect(marshalPositionLisData(positions, null)).toStrictEqual(expected)
+  expect(marshalPositionListData(positions, null)).toStrictEqual(expected)
 })
 
-test('marshalPositionLisData should return the Positions with some balances', async () => {
+test('marshalPositionListData should return the Positions with some balances', async () => {
   const expected = [
     {
       id: 'Position1',
@@ -68,5 +68,5 @@ test('marshalPositionLisData should return the Positions with some balances', as
     },
   ]
 
-  expect(marshalPositionLisData(positions, userWithBalance)).toStrictEqual(expected)
+  expect(marshalPositionListData(positions, userWithBalance)).toStrictEqual(expected)
 })

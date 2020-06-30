@@ -104,14 +104,14 @@ test('position list shold show right columns when the user is connected', async 
       expect(getByRole('table')).toBeInTheDocument()
     })
 
-    const positinIdColum = await findByText(/Position Id/i)
-    expect(positinIdColum).toBeInTheDocument()
+    const positinIdColumn = await findByText(/Position Id/i)
+    expect(positinIdColumn).toBeInTheDocument()
 
-    const collateralColum = await findByText(/Collateral/i)
-    expect(collateralColum).toBeInTheDocument()
+    const collateralColumn = await findByText(/Collateral/i)
+    expect(collateralColumn).toBeInTheDocument()
 
-    const erc1155Colum = await findByText(/ERC1155 Amount/i)
-    expect(erc1155Colum).toBeInTheDocument()
+    const erc1155Column = await findByText(/ERC1155 Amount/i)
+    expect(erc1155Column).toBeInTheDocument()
   })
 })
 
@@ -155,11 +155,11 @@ test('position list shold show right columns when the user is not connected', as
       expect(getByRole('table')).toBeInTheDocument()
     })
 
-    const positinIdColum = await findByText(/Position Id/i)
-    expect(positinIdColum).toBeInTheDocument()
+    const positinIdColumn = await findByText(/Position Id/i)
+    expect(positinIdColumn).toBeInTheDocument()
 
-    const collateralColum = await findByText(/Collateral/i)
-    expect(collateralColum).toBeInTheDocument()
+    const collateralColumn = await findByText(/Collateral/i)
+    expect(collateralColumn).toBeInTheDocument()
 
     expect(queryByText(/ERC1155 Amount/i)).toBeNull()
   })
