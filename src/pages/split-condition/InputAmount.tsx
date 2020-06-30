@@ -10,28 +10,23 @@ import { ConditionalTokensService } from 'services/conditionalTokens'
 import { formatBigNumber } from 'util/tools'
 import { Signer } from 'ethers'
 import { JsonRpcProvider } from 'ethers/providers'
+import { useWeb3Connected } from 'contexts/Web3Context'
 
 interface Props {
   collateral: Token
   positionId: string
   formMethods: FormContextValues<SplitPositionForm>
   splitFrom: SplitFrom
-  ctService: ConditionalTokensService
-  signer: Signer
-  provider: JsonRpcProvider
-  address: string
 }
 export const InputAmount = ({
   collateral,
   positionId,
   formMethods: { setValue, control },
   splitFrom,
-  ctService,
-  signer,
-  provider,
-  address,
 }: Props) => {
   const [balance, setBalance] = useState<Maybe<BigNumber>>(null)
+
+  const { CTService, signer, provider, address } = useWeb3Connected()
 
   useEffect(() => {
     setValue('amount', ZERO_BN)
@@ -41,11 +36,11 @@ export const InputAmount = ({
     let isSubscribed = true
     const fetchBalance = async () => {
       if (splitFrom === 'position') {
-        const balance = await ctService.balanceOf(positionId)
+        const balance = await CTService.balanceOf(positionId)
         if (isSubscribed) {
           setBalance(balance)
         }
-      } else if (splitFrom === 'collateral') {
+      } else if (splitFrom === 'collateral' && provider && signer) {
         const erc20Service = new ERC20Service(provider, signer, collateral.address)
         const balance = await erc20Service.balanceOf(address)
         if (isSubscribed) {
@@ -59,7 +54,7 @@ export const InputAmount = ({
     return () => {
       isSubscribed = false
     }
-  }, [positionId, collateral, splitFrom, ctService, provider, signer, address])
+  }, [positionId, collateral, splitFrom, CTService, provider, signer, address])
 
   return (
     <div>

@@ -8,7 +8,7 @@ import { SplitCondition } from './index'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 
 export const SplitConditionContainer = () => {
-  const { address, networkConfig, provider, signer, CTService } = useWeb3Connected()
+  const { networkConfig, provider, CTService } = useWeb3Connected()
   const tokens = networkConfig.getTokens()
   const [collateralToken, setCollateralToken] = useState(tokens[0].address)
   const { refresh, unlock } = useAllowance(collateralToken)
@@ -90,11 +90,7 @@ export const SplitConditionContainer = () => {
       unlockCollateral={unlockCollateral}
       onCollateralChange={(collateral: string) => setCollateralToken(collateral)}
       hasUnlockedCollateral={hasUnlockedCollateral}
-      ctService={CTService}
       tokens={tokens}
-      signer={signer}
-      provider={provider}
-      address={address}
     ></SplitCondition>
   )
 }

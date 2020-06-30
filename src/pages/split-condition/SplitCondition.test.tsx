@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ReactElement } from 'react'
 import { render } from '@testing-library/react'
 import { SplitCondition } from './SplitCondition'
 import { Remote } from '../../util/remoteData'
@@ -10,6 +10,7 @@ import userEvent from '@testing-library/user-event'
 import { MockedProvider } from '@apollo/react-testing'
 import { Signer } from 'ethers/ethers'
 import { JsonRpcProvider } from 'ethers/providers'
+import { Connected, Web3Context } from 'contexts/Web3Context'
 
 const unlockCollateral = jest.fn()
 const onCollateralChange = jest.fn()
@@ -19,28 +20,37 @@ const networkConfig = new NetworkConfig(4)
 const tokens = networkConfig.getTokens()
 // eslint-disable-next-line
 const CTService = jest.mock('../../services/conditionalTokens') as any
-const signer = jest.mock('ethers/ethers') as any
-const provider = jest.mock('ethers/providers') as any
-const address = '0x123'
+
+const connect = jest.fn()
+const connectedStatus = {
+  _type: 'connected',
+  address: '0x123',
+  CTService,
+  networkConfig,
+  provider: null as any,
+  signer: null as any,
+} as Connected
+
+const renderWithConnectedProvider = (component: ReactElement) => (
+  <Web3Context.Provider value={{ status: connectedStatus, connect }}>
+    <MockedProvider>{component}</MockedProvider>
+  </Web3Context.Provider>
+)
 
 test('show unlock button with zero allowance', async () => {
   const allowance = Remote.success<BigNumber>(ZERO_BN)
 
   const { findByText } = render(
-    <MockedProvider>
+    renderWithConnectedProvider(
       <SplitCondition
         allowance={allowance}
         splitPosition={splitPosition}
         unlockCollateral={unlockCollateral}
         onCollateralChange={onCollateralChange}
         hasUnlockedCollateral={hasUnlockedCollateral}
-        ctService={CTService}
         tokens={tokens}
-        signer={signer}
-        provider={provider}
-        address={address}
       />
-    </MockedProvider>
+    )
   )
   const unlockBtn = await findByText(/unlock/i)
   expect(unlockBtn).toBeInTheDocument()
@@ -50,20 +60,16 @@ test('toggle unlock button visiblity according to allowance and amount', async (
   const allowance = Remote.success<BigNumber>(new BigNumber(10))
 
   const { findByText, queryByText, findByPlaceholderText } = render(
-    <MockedProvider>
+    renderWithConnectedProvider(
       <SplitCondition
         allowance={allowance}
         splitPosition={splitPosition}
         unlockCollateral={unlockCollateral}
         onCollateralChange={onCollateralChange}
         hasUnlockedCollateral={hasUnlockedCollateral}
-        ctService={CTService}
         tokens={tokens}
-        signer={signer}
-        provider={provider}
-        address={address}
       />
-    </MockedProvider>
+    )
   )
 
   const unlockBefore = queryByText(/unlock/i)
@@ -83,20 +89,16 @@ test('show unlock button after failure', async () => {
   const allowanceFailure = Remote.failure<BigNumber>(new Error('Metamask cancelled'))
 
   const { findByText, rerender } = render(
-    <MockedProvider>
+    renderWithConnectedProvider(
       <SplitCondition
         allowance={allowance}
         unlockCollateral={unlockCollateral}
         splitPosition={splitPosition}
         onCollateralChange={onCollateralChange}
         hasUnlockedCollateral={hasUnlockedCollateral}
-        ctService={CTService}
         tokens={tokens}
-        signer={signer}
-        provider={provider}
-        address={address}
       />
-    </MockedProvider>
+    )
   )
 
   const unlock = await findByText(/unlock/i)
@@ -105,20 +107,16 @@ test('show unlock button after failure', async () => {
   })
 
   rerender(
-    <MockedProvider>
+    renderWithConnectedProvider(
       <SplitCondition
         allowance={allowanceFailure}
         splitPosition={splitPosition}
         unlockCollateral={unlockCollateral}
         onCollateralChange={onCollateralChange}
         hasUnlockedCollateral={true}
-        ctService={CTService}
         tokens={tokens}
-        signer={signer}
-        provider={provider}
-        address={address}
       />
-    </MockedProvider>
+    )
   )
 
   const unlockAfterFailure = await findByText(/unlock/i)

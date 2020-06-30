@@ -15,6 +15,7 @@ import { fetchPosition_position } from 'types/generatedGQL'
 import { ERC20Service } from 'services/erc20'
 import { Signer } from 'ethers'
 import { JsonRpcProvider } from 'ethers/providers'
+import { useWeb3Connected } from 'contexts/Web3Context'
 
 export const bytesRegex = /^0x[a-fA-F0-9]{64}$/
 export const NULL_PARENT_ID = '0x0000000000000000000000000000000000000000000000000000000000000000'
@@ -41,10 +42,6 @@ interface Props {
   ) => void
   hasUnlockedCollateral: boolean
   tokens: Token[]
-  ctService: ConditionalTokensService
-  signer: Signer
-  provider: JsonRpcProvider
-  address: string
 }
 
 export const SplitCondition = ({
@@ -54,10 +51,6 @@ export const SplitCondition = ({
   hasUnlockedCollateral,
   splitPosition,
   tokens,
-  ctService,
-  signer,
-  provider,
-  address,
 }: Props) => {
   const formMethods = useForm<SplitPositionForm>({
     mode: 'onChange',
@@ -81,6 +74,7 @@ export const SplitCondition = ({
   const [outcomeSlot, setOutcomeSlot] = useState(0)
   const [collateralToken, setCollateralToken] = useState(tokens[0])
   const [position, setPosition] = useState<Maybe<fetchPosition_position>>(null)
+  const { signer, provider } = useWeb3Connected()
   const {
     amount,
     collateral,
@@ -165,7 +159,6 @@ export const SplitCondition = ({
   return (
     <div>
       <InputCondition
-        ctService={ctService}
         formMethods={formMethods}
         onOutcomeSlotChange={(n) => setOutcomeSlot(n)}
       ></InputCondition>
@@ -193,10 +186,6 @@ export const SplitCondition = ({
         collateral={collateralToken}
         positionId={positionId}
         splitFrom={splitFrom}
-        ctService={ctService}
-        address={address}
-        signer={signer}
-        provider={provider}
         formMethods={formMethods}
       ></InputAmount>
       <button onClick={handleSubmit(onSubmit)} disabled={!canSubmit}>

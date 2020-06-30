@@ -2,30 +2,31 @@ import React, { useEffect } from 'react'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 import { FormContextValues } from 'react-hook-form'
 import { SplitPositionForm, bytesRegex } from './SplitCondition'
+import { useWeb3Connected } from 'contexts/Web3Context'
 
 interface Props {
-  ctService: ConditionalTokensService
   formMethods: FormContextValues<SplitPositionForm>
   onOutcomeSlotChange: (n: number) => void
 }
 
 export const InputCondition = ({
-  ctService,
   onOutcomeSlotChange,
   formMethods: { watch, register, errors },
 }: Props) => {
   const conditionIdErrors = errors.conditionId
   const watchConditionId = watch('conditionId')
 
+  const { CTService } = useWeb3Connected()
+
   useEffect(() => {
     const getOutcomeSlot = async (conditionId: string) => {
-      const outcomeSlot = await ctService.getOutcomeSlotCount(conditionId)
+      const outcomeSlot = await CTService.getOutcomeSlotCount(conditionId)
       onOutcomeSlotChange(outcomeSlot.toNumber())
     }
     if (watchConditionId && !conditionIdErrors) {
       getOutcomeSlot(watchConditionId)
     }
-  }, [ctService, watchConditionId, conditionIdErrors, onOutcomeSlotChange])
+  }, [CTService, watchConditionId, conditionIdErrors, onOutcomeSlotChange])
 
   return (
     <div>
@@ -37,7 +38,7 @@ export const InputCondition = ({
           required: true,
           pattern: bytesRegex,
           validate: async (value) => {
-            const conditionExist = await ctService.conditionExists(value)
+            const conditionExist = await CTService.conditionExists(value)
             return conditionExist
           },
         })}
