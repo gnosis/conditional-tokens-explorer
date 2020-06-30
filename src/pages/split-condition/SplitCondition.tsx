@@ -1,23 +1,26 @@
 import React, { useState, useEffect } from 'react'
 import { BigNumber } from 'ethers/utils'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { Token } from '../../config/networkConfig'
 import { SetAllowance } from '../../components/common/SetAllowance'
-import { BigNumberInputWrapper } from '../../components/common/BigNumberInputWrapper'
 import { ZERO_BN } from '../../config/constants'
 import { trivialPartition } from '../../util/tools'
 import { Remote } from '../../util/remoteData'
 import { ConditionalTokensService } from '../../services/conditionalTokens'
-import { useQuery } from '@apollo/react-hooks'
-import { fetchPosition as FetchPosition, fetchPositionVariables } from 'types/generatedGQL'
-import { fetchPosition } from 'queries/positions'
+import { InputAmount } from './InputAmount'
+import { InputPosition } from './InputPosition'
+import { SelectCollateral } from './SelectCollateral'
+import { InputCondition } from './InputCondition'
+import { fetchPosition_position } from 'types/generatedGQL'
+import { ERC20Service } from 'services/erc20'
+import { Signer } from 'ethers'
+import { JsonRpcProvider } from 'ethers/providers'
 
-const bytesRegex = /^0x[a-fA-F0-9]{64}$/
-const NULL_PARENT_ID = '0x0000000000000000000000000000000000000000000000000000000000000000'
+export const bytesRegex = /^0x[a-fA-F0-9]{64}$/
+export const NULL_PARENT_ID = '0x0000000000000000000000000000000000000000000000000000000000000000'
+export type SplitFrom = 'collateral' | 'position'
 
-type SplitFrom = 'collateral' | 'position'
-
-type Form = {
+export type SplitPositionForm = {
   conditionId: string
   collateral: string
   amount: BigNumber
@@ -39,6 +42,9 @@ interface Props {
   hasUnlockedCollateral: boolean
   tokens: Token[]
   ctService: ConditionalTokensService
+  signer: Signer
+  provider: JsonRpcProvider
+  address: string
 }
 
 export const SplitCondition = ({
@@ -49,19 +55,11 @@ export const SplitCondition = ({
   splitPosition,
   tokens,
   ctService,
+  signer,
+  provider,
+  address,
 }: Props) => {
-  const {
-    register,
-    errors,
-    control,
-    handleSubmit,
-    setValue,
-    reset,
-    watch,
-    getValues,
-    setError,
-    formState: { isValid },
-  } = useForm<Form>({
+  const formMethods = useForm<SplitPositionForm>({
     mode: 'onChange',
     defaultValues: {
       conditionId: '',
@@ -72,10 +70,24 @@ export const SplitCondition = ({
     },
   })
 
+  const {
+    handleSubmit,
+    reset,
+    watch,
+    getValues,
+    formState: { isValid },
+  } = formMethods
+
   const [outcomeSlot, setOutcomeSlot] = useState(0)
   const [collateralToken, setCollateralToken] = useState(tokens[0])
-  const [balance, setBalance] = useState<BigNumber>(ZERO_BN)
-  const { amount, collateral, conditionId, splitFrom, positionId } = getValues() as Form
+  const [position, setPosition] = useState<Maybe<fetchPosition_position>>(null)
+  const {
+    amount,
+    collateral,
+    conditionId,
+    splitFrom,
+    positionId,
+  } = getValues() as SplitPositionForm
 
   watch('collateral')
   watch('splitFrom')
@@ -88,13 +100,14 @@ export const SplitCondition = ({
 
     if (splitFromCollateral) {
       splitPosition(collateral, NULL_PARENT_ID, conditionId, partition, amount)
-    }
-    if (splitFromPosition && fetchedPosition?.position) {
+    } else if (splitFromPosition && position) {
       const {
         collection: { id: collectionId },
         collateralToken: { id: collateralAddress },
-      } = fetchedPosition?.position
+      } = position
       splitPosition(collateralAddress, collectionId, conditionId, partition, amount)
+    } else {
+      throw Error('Invalid split origin')
     }
 
     reset({
@@ -107,55 +120,34 @@ export const SplitCondition = ({
   }
 
   useEffect(() => {
-    const getOutcomeSlot = async (conditionId: string) => {
-      const outcomeSlot = await ctService.getOutcomeSlotCount(conditionId)
-      setOutcomeSlot(outcomeSlot.toNumber())
+    let isSubscribed = true
+
+    const fetchToken = async (collateral: string) => {
+      const erc20Service = new ERC20Service(provider, signer, collateral)
+      const token = await erc20Service.getProfileSummary()
+      if (isSubscribed) {
+        setCollateralToken(token)
+      }
     }
-    if (conditionId && !errors.conditionId) {
-      getOutcomeSlot(conditionId)
-    }
-  }, [ctService, conditionId, errors.conditionId])
 
-  useEffect(() => {
-    setValue('amount', ZERO_BN)
-  }, [collateral, setValue])
-
-  const skipFetchPosition = positionId === '' || !splitFromPosition || !!errors.positionId
-  const { data: fetchedPosition, loading, error: errorFetchingPosition } = useQuery<
-    FetchPosition,
-    fetchPositionVariables
-  >(fetchPosition, {
-    variables: { id: positionId },
-    skip: skipFetchPosition,
-  })
-
-  useEffect(() => {
     if (splitFromCollateral) {
       const collateralToken = tokens.find((t) => t.address === collateral) || tokens[0]
       setCollateralToken(collateralToken)
-      onCollateralChange(collateral)
+    } else if (splitFromPosition) {
+      fetchToken(collateral)
     }
-  }, [splitFrom, onCollateralChange, tokens, collateral, splitFromCollateral])
 
-  useEffect(() => {
-    if (splitFromPosition && positionId && fetchedPosition?.position) {
-      onCollateralChange(collateral)
-      ctService.balanceOf(positionId).then((value) => {
-        setBalance(value)
-      })
-    } else if (errorFetchingPosition) {
-      setError('positionId', 'validate', 'Error fetching position')
+    return () => {
+      isSubscribed = false
     }
   }, [
-    splitFrom,
-    onCollateralChange,
-    positionId,
-    fetchedPosition,
     splitFromPosition,
-    errorFetchingPosition,
+    onCollateralChange,
+    tokens,
     collateral,
-    ctService,
-    setError,
+    splitFromCollateral,
+    provider,
+    signer,
   ])
 
   const hasEnoughAllowance = allowance.map(
@@ -168,80 +160,26 @@ export const SplitCondition = ({
     hasUnlockedCollateral ||
     allowance.isLoading()
 
-  const canSubmit =
-    isValid && (hasEnoughAllowance.getOr(false) || hasUnlockedCollateral) && !loading
+  const canSubmit = isValid && (hasEnoughAllowance.getOr(false) || hasUnlockedCollateral)
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div>
-        <label htmlFor="conditionId">Condition Id</label>
-        <input
-          name="conditionId"
-          type="text"
-          ref={register({
-            required: true,
-            pattern: bytesRegex,
-            validate: async (value) => {
-              const conditionExist = await ctService.conditionExists(value)
-              return conditionExist
-            },
-          })}
-        ></input>
-        {errors.conditionId && (
-          <div>
-            <p>{errors.conditionId.type === 'pattern' && 'Invalid bytes32 string'}</p>
-            <p>{errors.conditionId.type === 'validate' && 'Invalid condition'}</p>
-          </div>
-        )}
-      </div>
-      <div>
-        <label htmlFor="collateral">Collateral</label>
-        <input name="splitFrom" type="radio" value="collateral" ref={register} />
-        <select
-          ref={register({ required: splitFromCollateral })}
-          name="collateral"
-          disabled={!splitFromCollateral}
-        >
-          {tokens.map(({ symbol, address }) => {
-            return (
-              <option key={address} value={address}>
-                {symbol}
-              </option>
-            )
-          })}
-        </select>
-      </div>
-      <div>
-        <label>Position</label>
-        <input
-          name="splitFrom"
-          id="splitFrom-position"
-          type="radio"
-          value="position"
-          ref={register}
-        />
-        <input
-          name="positionId"
-          type="text"
-          disabled={!splitFromPosition}
-          ref={register({
-            required: splitFromPosition,
-            pattern: bytesRegex,
-          })}
-        ></input>
-        {errors.positionId && (
-          <div>
-            <p>{errors.positionId.type === 'pattern' && 'Invalid bytes32 string'}</p>
-            <p>
-              {errors.positionId.type === 'validate' &&
-                !skipFetchPosition &&
-                !loading &&
-                fetchedPosition?.position === null &&
-                'Invalid'}
-            </p>
-          </div>
-        )}
-      </div>
+    <div>
+      <InputCondition
+        ctService={ctService}
+        formMethods={formMethods}
+        onOutcomeSlotChange={(n) => setOutcomeSlot(n)}
+      ></InputCondition>
+      <SelectCollateral
+        formMethods={formMethods}
+        splitFromCollateral={splitFromCollateral}
+        onCollateralChange={onCollateralChange}
+        tokens={tokens}
+      ></SelectCollateral>
+      <InputPosition
+        onPositionChange={(p) => setPosition(p)}
+        splitFromPosition={splitFromPosition}
+        formMethods={formMethods}
+      ></InputPosition>
       {showAskAllowance && (
         <SetAllowance
           collateral={collateralToken}
@@ -250,22 +188,20 @@ export const SplitCondition = ({
           onUnlock={unlockCollateral}
         />
       )}
-      <label htmlFor="amount">Amount</label>
-      {splitFrom === 'position' && (
-        <button
-          onClick={() => setValue('amount', balance)}
-        >{`Wallet Balance ${balance.toString()}`}</button>
-      )}
-      <Controller
-        name="amount"
-        rules={{ required: true, validate: (amount) => amount.gt(ZERO_BN) }}
-        control={control}
-        decimals={collateralToken.decimals}
-        as={BigNumberInputWrapper}
-      />
-      <button type="submit" disabled={!canSubmit}>
+
+      <InputAmount
+        collateral={collateralToken}
+        positionId={positionId}
+        splitFrom={splitFrom}
+        ctService={ctService}
+        address={address}
+        signer={signer}
+        provider={provider}
+        formMethods={formMethods}
+      ></InputAmount>
+      <button onClick={handleSubmit(onSubmit)} disabled={!canSubmit}>
         Split
       </button>
-    </form>
+    </div>
   )
 }

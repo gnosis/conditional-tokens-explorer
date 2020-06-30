@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import { Provider } from 'ethers/providers'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, formatUnits } from 'ethers/utils'
 
 export const isAddress = (address: string) => {
   try {
@@ -27,3 +27,6 @@ export const trivialPartition = (size: number) => {
     return acc
   }, [])
 }
+
+export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2): string =>
+  Number(formatUnits(value, decimals)).toFixed(precision)

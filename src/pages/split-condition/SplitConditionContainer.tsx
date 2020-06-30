@@ -3,12 +3,12 @@ import { useWeb3Connected } from '../../contexts/Web3Context'
 import { BigNumber } from 'ethers/utils'
 import { useAllowance } from '../../hooks/useAllowance'
 import { Remote } from '../../util/remoteData'
-import { constants, ethers } from 'ethers'
+import { constants } from 'ethers'
 import { SplitCondition } from './index'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 
 export const SplitConditionContainer = () => {
-  const { networkConfig, provider, CTService } = useWeb3Connected()
+  const { address, networkConfig, provider, signer, CTService } = useWeb3Connected()
   const tokens = networkConfig.getTokens()
   const [collateralToken, setCollateralToken] = useState(tokens[0].address)
   const { refresh, unlock } = useAllowance(collateralToken)
@@ -92,6 +92,9 @@ export const SplitConditionContainer = () => {
       hasUnlockedCollateral={hasUnlockedCollateral}
       ctService={CTService}
       tokens={tokens}
+      signer={signer}
+      provider={provider}
+      address={address}
     ></SplitCondition>
   )
 }

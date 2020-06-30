@@ -8,6 +8,8 @@ import { ZERO_BN } from '../../config/constants'
 import { act } from 'react-dom/test-utils'
 import userEvent from '@testing-library/user-event'
 import { MockedProvider } from '@apollo/react-testing'
+import { Signer } from 'ethers/ethers'
+import { JsonRpcProvider } from 'ethers/providers'
 
 const unlockCollateral = jest.fn()
 const onCollateralChange = jest.fn()
@@ -15,7 +17,11 @@ const splitPosition = jest.fn()
 const hasUnlockedCollateral = false
 const networkConfig = new NetworkConfig(4)
 const tokens = networkConfig.getTokens()
+// eslint-disable-next-line
 const CTService = jest.mock('../../services/conditionalTokens') as any
+const signer = jest.mock('ethers/ethers')
+const provider = jest.mock('ethers/providers')
+const address = '0x123'
 
 test('show unlock button with zero allowance', async () => {
   const allowance = Remote.success<BigNumber>(ZERO_BN)
@@ -30,6 +36,9 @@ test('show unlock button with zero allowance', async () => {
         hasUnlockedCollateral={hasUnlockedCollateral}
         ctService={CTService}
         tokens={tokens}
+        signer={signer}
+        provider={provider}
+        address={address}
       />
     </MockedProvider>
   )
@@ -50,6 +59,9 @@ test('toggle unlock button visiblity according to allowance and amount', async (
         hasUnlockedCollateral={hasUnlockedCollateral}
         ctService={CTService}
         tokens={tokens}
+        signer={signer}
+        provider={provider}
+        address={address}
       />
     </MockedProvider>
   )
@@ -80,6 +92,9 @@ test('show unlock button after failure', async () => {
         hasUnlockedCollateral={hasUnlockedCollateral}
         ctService={CTService}
         tokens={tokens}
+        signer={signer}
+        provider={provider}
+        address={address}
       />
     </MockedProvider>
   )
@@ -99,6 +114,9 @@ test('show unlock button after failure', async () => {
         hasUnlockedCollateral={true}
         ctService={CTService}
         tokens={tokens}
+        signer={signer}
+        provider={provider}
+        address={address}
       />
     </MockedProvider>
   )
