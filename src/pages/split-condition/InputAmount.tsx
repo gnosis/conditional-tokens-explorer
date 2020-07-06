@@ -6,10 +6,7 @@ import { BigNumberInputWrapper } from 'components/common/BigNumberInputWrapper'
 import { ZERO_BN } from 'config/constants'
 import { BigNumber } from 'ethers/utils'
 import { ERC20Service } from 'services/erc20'
-import { ConditionalTokensService } from 'services/conditionalTokens'
 import { formatBigNumber } from 'util/tools'
-import { Signer } from 'ethers'
-import { JsonRpcProvider } from 'ethers/providers'
 import { useWeb3Connected } from 'contexts/Web3Context'
 
 interface Props {

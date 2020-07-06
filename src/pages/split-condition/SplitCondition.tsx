@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { BigNumber } from 'ethers/utils'
 import { useForm } from 'react-hook-form'
 import { Token } from '../../config/networkConfig'
@@ -6,15 +6,12 @@ import { SetAllowance } from '../../components/common/SetAllowance'
 import { ZERO_BN } from '../../config/constants'
 import { trivialPartition } from '../../util/tools'
 import { Remote } from '../../util/remoteData'
-import { ConditionalTokensService } from '../../services/conditionalTokens'
 import { InputAmount } from './InputAmount'
 import { InputPosition } from './InputPosition'
 import { SelectCollateral } from './SelectCollateral'
 import { InputCondition } from './InputCondition'
 import { fetchPosition_position } from 'types/generatedGQL'
 import { ERC20Service } from 'services/erc20'
-import { Signer } from 'ethers'
-import { JsonRpcProvider } from 'ethers/providers'
 import { useWeb3Connected } from 'contexts/Web3Context'
 
 export const bytesRegex = /^0x[a-fA-F0-9]{64}$/
@@ -75,13 +72,7 @@ export const SplitCondition = ({
   const [collateralToken, setCollateralToken] = useState(tokens[0])
   const [position, setPosition] = useState<Maybe<fetchPosition_position>>(null)
   const { signer, provider } = useWeb3Connected()
-  const {
-    amount,
-    collateral,
-    conditionId,
-    splitFrom,
-    positionId,
-  } = getValues() as SplitPositionForm
+  const { amount, collateral, splitFrom, positionId } = getValues() as SplitPositionForm
 
   watch('collateral')
   watch('splitFrom')
@@ -89,29 +80,32 @@ export const SplitCondition = ({
   const splitFromCollateral = splitFrom === 'collateral'
   const splitFromPosition = splitFrom === 'position'
 
-  const onSubmit = async () => {
-    const partition = trivialPartition(outcomeSlot)
+  const onSubmit = useCallback(
+    async ({ collateral, conditionId, amount }: SplitPositionForm) => {
+      const partition = trivialPartition(outcomeSlot)
 
-    if (splitFromCollateral) {
-      splitPosition(collateral, NULL_PARENT_ID, conditionId, partition, amount)
-    } else if (splitFromPosition && position) {
-      const {
-        collection: { id: collectionId },
-        collateralToken: { id: collateralAddress },
-      } = position
-      splitPosition(collateralAddress, collectionId, conditionId, partition, amount)
-    } else {
-      throw Error('Invalid split origin')
-    }
+      if (splitFromCollateral) {
+        splitPosition(collateral, NULL_PARENT_ID, conditionId, partition, amount)
+      } else if (splitFromPosition && position) {
+        const {
+          collection: { id: collectionId },
+          collateralToken: { id: collateral },
+        } = position
+        splitPosition(collateral, collectionId, conditionId, partition, amount)
+      } else {
+        throw Error('Invalid split origin')
+      }
 
-    reset({
-      amount: ZERO_BN,
-      collateral: tokens[0].address,
-      conditionId: '',
-      splitFrom: 'collateral',
-      positionId: '',
-    })
-  }
+      reset({
+        amount: ZERO_BN,
+        collateral: tokens[0].address,
+        conditionId: '',
+        splitFrom: 'collateral',
+        positionId: '',
+      })
+    },
+    [position, outcomeSlot, reset, splitFromCollateral, splitFromPosition, splitPosition, tokens]
+  )
 
   useEffect(() => {
     let isSubscribed = true

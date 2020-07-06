@@ -1,6 +1,6 @@
 import { ethers, Signer, Contract } from 'ethers'
 import { BigNumber } from 'ethers/utils'
-import { Provider, TransactionReceipt } from 'ethers/providers'
+import { Provider, TransactionResponse } from 'ethers/providers'
 import { Token } from 'config/networkConfig'
 
 const erc20Abi = [
@@ -30,21 +30,22 @@ class ERC20Service {
   /**
    * Approve `spender` to transfer `amount` tokens on behalf of the connected user.
    */
-  approve = async (spender: string, amount: BigNumber): Promise<TransactionReceipt> => {
-    const transactionObject = await this.contract.approve(spender, amount, {
+  approve = async (spender: string, amount: BigNumber): Promise<TransactionResponse> => {
+    const tx = await this.contract.approve(spender, amount, {
       value: '0x0',
     })
-    return this.provider.waitForTransaction(transactionObject.hash)
+
+    return tx
   }
 
   /**
    * Approve `spender` to transfer an "unlimited" amount of tokens on behalf of the connected user.
    */
-  approveUnlimited = async (spender: string): Promise<TransactionReceipt> => {
-    const transactionObject = await this.contract.approve(spender, ethers.constants.MaxUint256, {
+  approveUnlimited = async (spender: string): Promise<TransactionResponse> => {
+    const tx = await this.contract.approve(spender, ethers.constants.MaxUint256, {
       value: '0x0',
     })
-    return this.provider.waitForTransaction(transactionObject.hash)
+    return tx
   }
 
   getProfileSummary = async (): Promise<Token> => {

@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react'
-import { ConditionalTokensService } from 'services/conditionalTokens'
 import { FormContextValues } from 'react-hook-form'
 import { SplitPositionForm, bytesRegex } from './SplitCondition'
 import { useWeb3Connected } from 'contexts/Web3Context'

@@ -4,6 +4,7 @@ import { BigNumber } from 'ethers/utils'
 
 import Web3Utils from 'web3-utils'
 import CTHelpersConstructor from '@gnosis.pm/conditional-tokens-contracts/utils/id-helpers'
+import { TransactionResponse } from 'ethers/providers'
 const CTHelpers = CTHelpersConstructor(Web3Utils)
 
 const conditionalTokensAbi = [
@@ -87,8 +88,8 @@ export class ConditionalTokensService {
     conditionId: string,
     partition: BigNumber[],
     amount: BigNumber
-  ): Promise<string> {
-    const transactionObject = await this.contract.splitPosition(
+  ): Promise<TransactionResponse> {
+    const tx = await this.contract.splitPosition(
       collateralToken,
       parentCollectionId,
       conditionId,
@@ -99,7 +100,7 @@ export class ConditionalTokensService {
         gasLimit: 1750000,
       }
     )
-    return transactionObject.hash
+    return tx
   }
 
   async getOutcomeSlotCount(conditionId: string): Promise<BigNumber> {

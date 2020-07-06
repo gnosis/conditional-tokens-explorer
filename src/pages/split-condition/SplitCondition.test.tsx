@@ -8,8 +8,6 @@ import { ZERO_BN } from '../../config/constants'
 import { act } from 'react-dom/test-utils'
 import userEvent from '@testing-library/user-event'
 import { MockedProvider } from '@apollo/react-testing'
-import { Signer } from 'ethers/ethers'
-import { JsonRpcProvider } from 'ethers/providers'
 import { Connected, Web3Context } from 'contexts/Web3Context'
 
 const unlockCollateral = jest.fn()
@@ -27,7 +25,9 @@ const connectedStatus = {
   address: '0x123',
   CTService,
   networkConfig,
+  // eslint-disable-next-line
   provider: null as any,
+  // eslint-disable-next-line
   signer: null as any,
 } as Connected
 
