@@ -8,16 +8,17 @@
 // ====================================================
 
 export interface Conditions_conditions {
-  __typename: "Condition";
-  id: string;
-  oracle: any;
-  questionId: any;
-  outcomeSlotCount: number;
-  resolved: boolean;
+  __typename: 'Condition'
+  id: string
+  oracle: any
+  questionId: any
+  outcomeSlotCount: number
+  resolved: boolean
+  creator: any
 }
 
 export interface Conditions {
-  conditions: Conditions_conditions[];
+  conditions: Conditions_conditions[]
 }
 
 /* tslint:disable */
@@ -30,18 +31,18 @@ export interface Conditions {
 // ====================================================
 
 export interface Positions_positions_collateralToken {
-  __typename: "CollateralToken";
-  id: string;
+  __typename: 'CollateralToken'
+  id: string
 }
 
 export interface Positions_positions {
-  __typename: "Position";
-  id: string;
-  collateralToken: Positions_positions_collateralToken;
+  __typename: 'Position'
+  id: string
+  collateralToken: Positions_positions_collateralToken
 }
 
 export interface Positions {
-  positions: Positions_positions[];
+  positions: Positions_positions[]
 }
 
 /* tslint:disable */
@@ -54,28 +55,28 @@ export interface Positions {
 // ====================================================
 
 export interface UserWithPositions_user_userPositions_position {
-  __typename: "Position";
-  id: string;
+  __typename: 'Position'
+  id: string
 }
 
 export interface UserWithPositions_user_userPositions {
-  __typename: "UserPosition";
-  id: string;
-  position: UserWithPositions_user_userPositions_position;
-  balance: any;
+  __typename: 'UserPosition'
+  id: string
+  position: UserWithPositions_user_userPositions_position
+  balance: any
 }
 
 export interface UserWithPositions_user {
-  __typename: "User";
-  userPositions: UserWithPositions_user_userPositions[] | null;
+  __typename: 'User'
+  userPositions: UserWithPositions_user_userPositions[] | null
 }
 
 export interface UserWithPositions {
-  user: UserWithPositions_user | null;
+  user: UserWithPositions_user | null
 }
 
 export interface UserWithPositionsVariables {
-  account: any;
+  account: any
 }
 
 /* tslint:disable */
