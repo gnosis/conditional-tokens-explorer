@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { BigNumber } from 'ethers/utils'
 import { useForm, Controller } from 'react-hook-form'
+
 import { Token } from '../../config/networkConfig'
 import { SetAllowance } from '../../components/common/SetAllowance'
 import { BigNumberInputWrapper } from '../../components/common/BigNumberInputWrapper'
-import { ZERO_BN } from '../../config/constants'
+import { ZERO_BN, BYTES_REGEX, NULL_PARENT_ID } from '../../config/constants'
 import { range } from '../../util/tools'
 import { Remote } from '../../util/remoteData'
 import { ConditionalTokensService } from '../../services/conditionalTokens'
-
-const bytesRegex = /^0x[a-fA-F0-9]{64}$/
-const NULL_PARENT_ID = '0x0000000000000000000000000000000000000000000000000000000000000000'
 
 type Form = {
   conditionId: string
@@ -107,7 +105,7 @@ export const SplitCondition = ({
         type="text"
         ref={register({
           required: true,
-          pattern: bytesRegex,
+          pattern: BYTES_REGEX,
           validate: async (value) => {
             const conditionExist = await ctService.conditionExists(value)
             return conditionExist
