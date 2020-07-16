@@ -1,12 +1,13 @@
 import React, { createContext, useState, useEffect, useCallback, useContext } from 'react'
-
 import { ethers } from 'ethers'
 import Web3Modal from 'web3modal'
 import { Web3Provider, JsonRpcSigner } from 'ethers/providers'
 import WalletConnectProvider from '@walletconnect/web3-provider'
+
 import { INFURA_ID } from '../config/constants'
 import { NetworkConfig } from '../config/networkConfig'
 import { ConditionalTokensService } from '../services/conditionalTokens'
+import { RealitioService } from '../services/realitio'
 
 export type NotAsked = {
   _type: 'notAsked'
@@ -27,6 +28,7 @@ export type Connected = {
   signer: JsonRpcSigner
   networkConfig: NetworkConfig
   CTService: ConditionalTokensService
+  RtioService: RealitioService
 }
 
 type ErrorWeb3 = {
@@ -67,7 +69,7 @@ export const Web3ContextProvider = ({ children }: Props) => {
       web3Provider = await web3Modal.connect()
     } catch (error) {
       web3Modal.clearCachedProvider()
-      setWeb3Status({ _type: 'error', error })
+      setWeb3Status({ _type: 'error', error } as ErrorWeb3)
       return
     }
 
@@ -78,14 +80,23 @@ export const Web3ContextProvider = ({ children }: Props) => {
       const networkId = (await provider.getNetwork()).chainId
       if (NetworkConfig.isKnownNetwork(networkId)) {
         const networkConfig = new NetworkConfig(networkId)
+        const RtioService = new RealitioService(networkConfig, provider, signer)
         const CTService = new ConditionalTokensService(networkConfig, provider, signer)
         const address = await signer.getAddress()
-        setWeb3Status({ _type: 'connected', provider, signer, networkConfig, CTService, address })
+        setWeb3Status({
+          _type: 'connected',
+          provider,
+          signer,
+          networkConfig,
+          CTService,
+          RtioService,
+          address,
+        } as Connected)
       } else {
-        setWeb3Status({ _type: 'error', error: new Error('Unknown network') })
+        setWeb3Status({ _type: 'error', error: new Error('Unknown network') } as ErrorWeb3)
       }
     } catch (error) {
-      setWeb3Status({ _type: 'error', error })
+      setWeb3Status({ _type: 'error', error } as ErrorWeb3)
     }
   }, [web3Status])
 
