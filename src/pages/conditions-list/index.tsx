@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { useQuery } from '@apollo/react-hooks'
 import DataTable from 'react-data-table-component'
+import { useHistory } from 'react-router-dom'
 
 import { ConditionsListQuery } from 'queries/conditions'
 import { Conditions, Conditions_conditions } from 'types/generatedGQL'
@@ -47,8 +48,21 @@ const Wrapper = styled.div`
   justify-content: center;
 `
 
+const customStyles = {
+  rows: {
+    style: {
+      cursor: 'pointer',
+    },
+  },
+}
+
 export const ConditionsList = () => {
   const { data, error, loading } = useQuery<Conditions>(ConditionsListQuery)
+  const history = useHistory()
+
+  const handleRowClick = (row: Conditions_conditions) => {
+    history.push(`/conditions/${row.id}`)
+  }
 
   return (
     <Wrapper>
@@ -62,6 +76,9 @@ export const ConditionsList = () => {
           columns={columns}
           data={data?.conditions || []}
           pagination={true}
+          highlightOnHover
+          onRowClicked={handleRowClick}
+          customStyles={customStyles}
         />
       )}
     </Wrapper>
