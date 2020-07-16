@@ -3,6 +3,8 @@ import {
   GRAPH_WS_MAINNET,
   GRAPH_HTTP_RINKEBY,
   GRAPH_WS_RINKEBY,
+  EARLIEST_RINKEBY_BLOCK_TO_CHECK,
+  EARLIEST_MAINNET_BLOCK_TO_CHECK,
 } from './constants'
 
 export type NetworkId = 1 | 4
@@ -19,7 +21,11 @@ export type Token = {
 }
 
 interface Network {
-  conditionalTokensAddress: string
+  earliestBlockToCheck: number
+  contracts: {
+    conditionalTokensAddress: string
+    realitioAddress: string
+  }
   tokens: Token[]
   graphHttpUri: string
   graphWsUri: string
@@ -27,7 +33,11 @@ interface Network {
 
 const networks: { [K in NetworkId]: Network } = {
   [networkIds.MAINNET]: {
-    conditionalTokensAddress: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
+    earliestBlockToCheck: EARLIEST_MAINNET_BLOCK_TO_CHECK,
+    contracts: {
+      conditionalTokensAddress: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
+      realitioAddress: '0x325a2e0f3cca2ddbaebb4dfc38df8d19ca165b47',
+    },
     tokens: [
       {
         symbol: 'DAI',
@@ -44,7 +54,11 @@ const networks: { [K in NetworkId]: Network } = {
     graphWsUri: GRAPH_WS_MAINNET,
   },
   [networkIds.RINKEBY]: {
-    conditionalTokensAddress: '0x36bede640D19981A82090519bC1626249984c908',
+    earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
+    contracts: {
+      conditionalTokensAddress: '0x36bede640D19981A82090519bC1626249984c908',
+      realitioAddress: '0x3D00D77ee771405628a4bA4913175EcC095538da',
+    },
     tokens: [
       {
         symbol: 'DAI',
@@ -70,7 +84,11 @@ export class NetworkConfig {
   }
 
   getConditionalTokensAddress() {
-    return networks[this.networkId].conditionalTokensAddress
+    return networks[this.networkId].contracts.conditionalTokensAddress
+  }
+
+  getRealitioAddress() {
+    return networks[this.networkId].contracts.realitioAddress
   }
 
   getTokens() {
@@ -86,4 +104,60 @@ export const getGraphUris = (networkId: number): { httpUri: string; wsUri: strin
   const httpUri = networks[networkId].graphHttpUri
   const wsUri = networks[networkId].graphWsUri
   return { httpUri, wsUri }
+}
+
+export const getEarliestBlockToCheck = (networkId: number): number => {
+  if (!NetworkConfig.isKnownNetwork(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+
+  return networks[networkId].earliestBlockToCheck
+}
+
+interface KnownOracleData {
+  name: string
+  url: string
+  addresses: {
+    [networkId: number]: string
+  }
+}
+
+export const knownOracles: { [name in KnownOracle]: KnownOracleData } = {
+  realitio: {
+    name: 'Realitio Team',
+    url: 'https://realit.io/',
+    addresses: {
+      [networkIds.MAINNET]: '0x0e414d014a77971f4eaa22ab58e6d84d16ea838e',
+      [networkIds.RINKEBY]: '0x576B76eebE6B5411c0ef310E65De9Bff8A60130F',
+    },
+  },
+  kleros: {
+    name: 'Kleros',
+    url: 'https://kleros.io/',
+    addresses: {
+      [networkIds.MAINNET]: '0x0000000000000000000000000000000000000000',
+      [networkIds.RINKEBY]: '0x0000000000000000000000000000000000000000',
+    },
+  },
+  unknown: {
+    name: 'Unknown',
+    url: '',
+    addresses: {},
+  },
+}
+
+export const getKnowOracleFromAddress = (networkId: number, address: string): KnownOracle => {
+  for (const key in knownOracles) {
+    const oracleAddress = knownOracles[key as KnownOracle].addresses[networkId]
+
+    if (!oracleAddress) {
+      continue
+    }
+
+    if (oracleAddress.toLowerCase() === address.toLowerCase()) {
+      return key as KnownOracle
+    }
+  }
+
+  return 'unknown' as KnownOracle
 }
