@@ -20,6 +20,7 @@ export const range = (max: number): number[] => {
   return Array.from(new Array(max), (_, i) => i)
 }
 
+// Generate array of length size with values from 2^0 to 2^(size-1)
 export const trivialPartition = (size: number) => {
   return range(size).reduce((acc: BigNumber[], _, index: number) => {
     const two = new BigNumber(2)
