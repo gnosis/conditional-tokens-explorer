@@ -65,7 +65,7 @@ export const InputAmount = ({
         as={BigNumberInputWrapper}
       />
       {balance && (
-        <button onClick={() => setValue('amount', balance)}>{`Wallet Balance ${formatBigNumber(
+        <button onClick={() => setValue('amount', balance)}>{`Use wallet balance ${formatBigNumber(
           balance,
           collateral.decimals
         )}`}</button>
