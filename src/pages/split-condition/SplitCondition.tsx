@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { BigNumber } from 'ethers/utils'
 import { useForm } from 'react-hook-form'
 import { Token } from '../../config/networkConfig'
@@ -49,15 +49,19 @@ export const SplitCondition = ({
   splitPosition,
   tokens,
 }: Props) => {
-  const formMethods = useForm<SplitPositionForm>({
-    mode: 'onChange',
-    defaultValues: {
+  const DEFAULT_VALUES = useMemo(() => {
+    return {
       conditionId: '',
       collateral: tokens[0].address,
       amount: ZERO_BN,
-      splitFrom: 'collateral',
+      splitFrom: 'collateral' as SplitFrom,
       positionId: '',
-    },
+    }
+  }, [tokens])
+
+  const formMethods = useForm<SplitPositionForm>({
+    mode: 'onChange',
+    defaultValues: DEFAULT_VALUES,
   })
 
   const {
@@ -96,15 +100,17 @@ export const SplitCondition = ({
         throw Error('Invalid split origin')
       }
 
-      reset({
-        amount: ZERO_BN,
-        collateral: tokens[0].address,
-        conditionId: '',
-        splitFrom: 'collateral',
-        positionId: '',
-      })
+      reset(DEFAULT_VALUES)
     },
-    [position, outcomeSlot, reset, splitFromCollateral, splitFromPosition, splitPosition, tokens]
+    [
+      position,
+      outcomeSlot,
+      reset,
+      splitFromCollateral,
+      splitFromPosition,
+      splitPosition,
+      DEFAULT_VALUES,
+    ]
   )
 
   useEffect(() => {
