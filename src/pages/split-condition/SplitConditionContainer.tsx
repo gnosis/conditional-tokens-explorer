@@ -5,30 +5,28 @@ import { useAllowance } from '../../hooks/useAllowance'
 import { Remote } from '../../util/remoteData'
 import { constants } from 'ethers'
 import { SplitCondition } from './index'
-import { Token } from '../../config/networkConfig'
+import { ConditionalTokensService } from 'services/conditionalTokens'
 
 export const SplitConditionContainer = () => {
-  const { networkConfig, provider, CTService } = useWeb3Connected()
+  const { networkConfig, CTService } = useWeb3Connected()
   const tokens = networkConfig.getTokens()
-  const [collateralToken, setCollateralToken] = useState(tokens[0])
-  const { refresh, unlock } = useAllowance(collateralToken.address)
+  const [collateralToken, setCollateralToken] = useState(tokens[0].address)
+  const { refresh, unlock } = useAllowance(collateralToken)
   const [allowance, setAllowance] = useState<Remote<BigNumber>>(Remote.notAsked<BigNumber>())
   const [hasUnlockedCollateral, setHasUnlockedCollateral] = useState(false)
 
-  const unlockCollateral = async () => {
+  const unlockCollateral = useCallback(async () => {
     setAllowance(Remote.loading())
     try {
-      const { transactionHash } = await unlock()
-      if (transactionHash) {
-        await provider.waitForTransaction(transactionHash)
-        setAllowance(Remote.success(constants.MaxUint256))
-      }
+      const tx = await unlock()
+      await tx.wait()
+      setAllowance(Remote.success(constants.MaxUint256))
     } catch (e) {
       setAllowance(Remote.failure(e))
     } finally {
       setHasUnlockedCollateral(true)
     }
-  }
+  }, [unlock])
 
   const fetchAllowance = useCallback(async () => {
     try {
@@ -47,14 +45,53 @@ export const SplitConditionContainer = () => {
     setHasUnlockedCollateral(false)
   }, [collateralToken])
 
+  const splitPosition = useCallback(
+    async (
+      collateral: string,
+      parentCollection: string,
+      conditionId: string,
+      partition: BigNumber[],
+      amount: BigNumber
+    ) => {
+      partition.forEach((indexSet) => {
+        const collectionId = ConditionalTokensService.getCollectionId(
+          parentCollection,
+          conditionId,
+          indexSet
+        )
+
+        const positionId = ConditionalTokensService.getPositionId(collateralToken, collectionId)
+        console.log(
+          `conditionId: ${conditionId} / parentCollection: ${parentCollection} / indexSet: ${indexSet.toString()}`
+        )
+        console.log(`Position: ${positionId}`)
+      })
+
+      const tx = await CTService.splitPosition(
+        collateral,
+        parentCollection,
+        conditionId,
+        partition,
+        amount
+      )
+
+      try {
+        await tx.wait()
+      } catch (e) {
+        console.error(e)
+      }
+    },
+    [CTService, collateralToken]
+  )
+
   return (
     <SplitCondition
       allowance={allowance}
+      splitPosition={splitPosition}
       unlockCollateral={unlockCollateral}
-      onCollateralChange={(collateral: Token) => setCollateralToken(collateral)}
+      onCollateralChange={setCollateralToken}
       hasUnlockedCollateral={hasUnlockedCollateral}
-      ctService={CTService}
       tokens={tokens}
-    ></SplitCondition>
+    />
   )
 }
