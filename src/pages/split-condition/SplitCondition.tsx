@@ -160,18 +160,18 @@ export const SplitCondition = ({
       <InputCondition
         formMethods={formMethods}
         onOutcomeSlotChange={(n) => setOutcomeSlot(n)}
-      ></InputCondition>
+      />
       <SelectCollateral
         formMethods={formMethods}
         splitFromCollateral={splitFromCollateral}
         onCollateralChange={onCollateralChange}
         tokens={tokens}
-      ></SelectCollateral>
+      />
       <InputPosition
         onPositionChange={(p) => setPosition(p)}
         splitFromPosition={splitFromPosition}
         formMethods={formMethods}
-      ></InputPosition>
+      />
       {showAskAllowance && (
         <SetAllowance
           collateral={collateralToken}
@@ -186,7 +186,7 @@ export const SplitCondition = ({
         positionId={positionId}
         splitFrom={splitFrom}
         formMethods={formMethods}
-      ></InputAmount>
+      />
       <button onClick={handleSubmit(onSubmit)} disabled={!canSubmit}>
         Split
       </button>
