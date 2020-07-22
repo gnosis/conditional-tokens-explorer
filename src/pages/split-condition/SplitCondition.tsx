@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 
 import { Token } from '../../config/networkConfig'
 import { SetAllowance } from '../../components/common/SetAllowance'
-import { ZERO_BN, BYTES_REGEX, NULL_PARENT_ID } from '../../config/constants'
+import { ZERO_BN, NULL_PARENT_ID } from '../../config/constants'
 import { trivialPartition } from '../../util/tools'
 import { Remote } from '../../util/remoteData'
 import { InputAmount } from './InputAmount'
@@ -15,8 +15,6 @@ import { fetchPosition_position } from 'types/generatedGQL'
 import { ERC20Service } from 'services/erc20'
 import { useWeb3Connected } from 'contexts/Web3Context'
 
-export const bytesRegex = /^0x[a-fA-F0-9]{64}$/
-export const NULL_PARENT_ID = '0x0000000000000000000000000000000000000000000000000000000000000000'
 export type SplitFrom = 'collateral' | 'position'
 
 export type SplitPositionForm = {
