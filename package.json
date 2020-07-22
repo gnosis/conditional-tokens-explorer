@@ -94,5 +94,8 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "resolutions": {
+    "graphql": "^14.7.0"
+  }
 }
