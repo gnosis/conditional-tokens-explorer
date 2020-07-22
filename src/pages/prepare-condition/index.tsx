@@ -4,10 +4,7 @@ import { useForm } from 'react-hook-form'
 import { isAddress } from '../../util/tools'
 import { ConditionalTokensService } from '../../services/conditionalTokens'
 import { useWeb3Connected } from '../../contexts/Web3Context'
-import { BYTES_REGEX, ADDRESS_REGEX } from '../../config/constants'
-
-const MIN_OUTCOMES = 2
-const MAX_OUTCOMES = 256
+import { BYTES_REGEX, ADDRESS_REGEX, MIN_OUTCOMES, MAX_OUTCOMES } from '../../config/constants'
 
 const maxOutcomesError = 'Too many outcome slots'
 const minOutcomesError = 'There should be more than one outcome slot'
@@ -66,7 +63,7 @@ export const PrepareCondition = () => {
         onChange={(e) => setNumOutcomes(Number(e.target.value))}
         type="number"
         ref={register({ required: true, min: MIN_OUTCOMES, max: MAX_OUTCOMES })}
-      ></input>
+      />
       {errors.outcomesSlotCount && (
         <div>
           {errors.outcomesSlotCount.type === 'max' && maxOutcomesError}
@@ -86,7 +83,7 @@ export const PrepareCondition = () => {
           pattern: ADDRESS_REGEX,
           validate: (value: string) => isAddress(value),
         })}
-      ></input>
+      />
       {errors.oracle && (
         <div>
           {errors.oracle.type === 'pattern' && 'Invalid address'}
@@ -109,7 +106,7 @@ export const PrepareCondition = () => {
         onChange={(e) => setQuestionId(e.target.value)}
         type="text"
         ref={register({ required: true, pattern: BYTES_REGEX })}
-      ></input>
+      />
       {errors.questionId && (
         <div>{errors.questionId.type === 'pattern' && 'Invalid bytes32 string'}</div>
       )}
