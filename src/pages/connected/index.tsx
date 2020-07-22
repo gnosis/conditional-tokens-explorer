@@ -6,6 +6,7 @@ import { SplitConditionContainer } from '../split-condition'
 import { ConditionsList } from 'pages/conditions-list'
 import { ConditionsDetailContainer } from 'pages/condition-detail'
 import { PositionsList } from 'pages/positions-list'
+import { PositionDetailContainer } from 'pages/position-detail'
 
 export const Connected = () => {
   return (
@@ -15,6 +16,7 @@ export const Connected = () => {
       <Route component={ConditionsList} exact path="/conditions" />
       <Route component={ConditionsDetailContainer} exact path="/conditions/:conditionId" />
       <Route component={PositionsList} exact path="/positions" />
+      <Route component={PositionDetailContainer} exact path="/positions/:positionId" />
     </Switch>
   )
 }

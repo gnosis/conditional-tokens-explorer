@@ -69,6 +69,7 @@ export interface fetchPosition_position_collection {
 
 export interface fetchPosition_position {
   __typename: "Position";
+  id: string;
   collateralToken: fetchPosition_position_collateralToken;
   collection: fetchPosition_position_collection;
 }
