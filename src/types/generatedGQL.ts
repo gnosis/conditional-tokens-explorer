@@ -31,27 +31,27 @@ export interface Conditions {
 // ====================================================
 
 export interface fetchPosition_position_collateralToken {
-  __typename: "CollateralToken";
-  id: string;
+  __typename: 'CollateralToken'
+  id: string
 }
 
 export interface fetchPosition_position_collection {
-  __typename: "Collection";
-  id: string;
+  __typename: 'Collection'
+  id: string
 }
 
 export interface fetchPosition_position {
-  __typename: "Position";
-  collateralToken: fetchPosition_position_collateralToken;
-  collection: fetchPosition_position_collection;
+  __typename: 'Position'
+  collateralToken: fetchPosition_position_collateralToken
+  collection: fetchPosition_position_collection
 }
 
 export interface fetchPosition {
-  position: fetchPosition_position | null;
+  position: fetchPosition_position | null
 }
 
 export interface fetchPositionVariables {
-  id?: string | null;
+  id?: string | null
 }
 
 /* tslint:disable */
