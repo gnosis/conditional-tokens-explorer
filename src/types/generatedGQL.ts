@@ -14,10 +14,38 @@ export interface Conditions_conditions {
   questionId: any;
   outcomeSlotCount: number;
   resolved: boolean;
+  creator: any;
 }
 
 export interface Conditions {
   conditions: Conditions_conditions[];
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL query operation: GetCondition
+// ====================================================
+
+export interface GetCondition_condition {
+  __typename: "Condition";
+  id: string;
+  oracle: any;
+  questionId: any;
+  outcomeSlotCount: number;
+  resolved: boolean;
+  creator: any;
+}
+
+export interface GetCondition {
+  condition: GetCondition_condition | null;
+}
+
+export interface GetConditionVariables {
+  id: string;
 }
 
 /* tslint:disable */
@@ -50,7 +78,7 @@ export interface fetchPosition {
 }
 
 export interface fetchPositionVariables {
-  id?: string | null;
+  id: string;
 }
 
 /* tslint:disable */
@@ -108,7 +136,7 @@ export interface UserWithPositions {
 }
 
 export interface UserWithPositionsVariables {
-  account: any;
+  account: string;
 }
 
 /* tslint:disable */

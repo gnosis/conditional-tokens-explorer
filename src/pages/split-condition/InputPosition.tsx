@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import { FormContextValues } from 'react-hook-form'
-import { SplitPositionForm, bytesRegex } from './SplitCondition'
 import { useQuery } from '@apollo/react-hooks'
 import {
   fetchPositionVariables,
@@ -8,6 +7,8 @@ import {
   fetchPosition_position,
 } from 'types/generatedGQL'
 import { fetchPosition } from 'queries/positions'
+import { BYTES_REGEX } from '../../config/constants'
+import { SplitPositionForm } from './SplitCondition'
 
 interface Props {
   splitFromPosition: boolean
@@ -62,7 +63,7 @@ export const InputPosition = ({
         disabled={!splitFromPosition}
         ref={register({
           required: splitFromPosition,
-          pattern: bytesRegex,
+          pattern: BYTES_REGEX,
         })}
       ></input>
       {errorPositionId && (

@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+
 import { isAddress } from '../../util/tools'
 import { ConditionalTokensService } from '../../services/conditionalTokens'
 import { useWeb3Connected } from '../../contexts/Web3Context'
+import { BYTES_REGEX, ADDRESS_REGEX } from '../../config/constants'
 
 const MIN_OUTCOMES = 2
 const MAX_OUTCOMES = 256
 
 const maxOutcomesError = 'Too many outcome slots'
 const minOutcomesError = 'There should be more than one outcome slot'
-
-const bytesRegex = /^0x[a-fA-F0-9]{64}$/
-const addressRegex = /^0x[a-fA-F0-9]{40}$/
 
 export const PrepareCondition = () => {
   const [numOutcomes, setNumOutcomes] = useState(0)
@@ -84,7 +83,7 @@ export const PrepareCondition = () => {
         type="text"
         ref={register({
           required: true,
-          pattern: addressRegex,
+          pattern: ADDRESS_REGEX,
           validate: (value: string) => isAddress(value),
         })}
       ></input>
@@ -109,7 +108,7 @@ export const PrepareCondition = () => {
         name="questionId"
         onChange={(e) => setQuestionId(e.target.value)}
         type="text"
-        ref={register({ required: true, pattern: bytesRegex })}
+        ref={register({ required: true, pattern: BYTES_REGEX })}
       ></input>
       {errors.questionId && (
         <div>{errors.questionId.type === 'pattern' && 'Invalid bytes32 string'}</div>

@@ -1,7 +1,7 @@
 import gql from 'graphql-tag'
 
 export const UserWithPositionsQuery = gql`
-  query UserWithPositions($account: Bytes!) {
+  query UserWithPositions($account: ID!) {
     user(id: $account) {
       userPositions {
         id

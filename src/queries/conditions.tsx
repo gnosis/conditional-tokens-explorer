@@ -8,6 +8,20 @@ export const ConditionsListQuery = gql`
       questionId
       outcomeSlotCount
       resolved
+      creator
+    }
+  }
+`
+
+export const GetConditionQuery = gql`
+  query GetCondition($id: ID!) {
+    condition(id: $id) {
+      id
+      oracle
+      questionId
+      outcomeSlotCount
+      resolved
+      creator
     }
   }
 `
