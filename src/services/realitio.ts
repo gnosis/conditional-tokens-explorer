@@ -35,7 +35,7 @@ export class RealitioService {
   }
 
   async getQuestion(questionId: string): Promise<Question> {
-    const filter: any = this.contract.filters.LogNewQuestion(questionId)
+    const filter = this.contract.filters.LogNewQuestion(questionId)
     const network = await this.provider.getNetwork()
     const networkId = network.chainId
 
