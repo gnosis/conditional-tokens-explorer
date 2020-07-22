@@ -2,6 +2,11 @@ import { Contract, ethers } from 'ethers'
 import { NetworkConfig } from '../config/networkConfig'
 import { BigNumber } from 'ethers/utils'
 
+import Web3Utils from 'web3-utils'
+import CTHelpersConstructor from '@gnosis.pm/conditional-tokens-contracts/utils/id-helpers'
+import { TransactionResponse } from 'ethers/providers'
+const CTHelpers = CTHelpersConstructor(Web3Utils)
+
 const conditionalTokensAbi = [
   'function prepareCondition(address oracle, bytes32 questionId, uint outcomeSlotCount) external',
   'event ConditionPreparation(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint outcomeSlotCount)',
@@ -49,6 +54,17 @@ export class ConditionalTokensService {
     }
   }
 
+  static getCollectionId(parentCollection: string, conditionId: string, indexSet: BigNumber) {
+    return CTHelpers.combineCollectionIds([
+      parentCollection,
+      CTHelpers.getCollectionId(conditionId, indexSet),
+    ])
+  }
+
+  static getPositionId(collateralToken: string, collectionId: string): string {
+    return CTHelpers.getPositionId(collateralToken, collectionId)
+  }
+
   async prepareCondition(
     questionId: string,
     oracleAddress: string,
@@ -72,8 +88,8 @@ export class ConditionalTokensService {
     conditionId: string,
     partition: BigNumber[],
     amount: BigNumber
-  ): Promise<string> {
-    const transactionObject = await this.contract.splitPosition(
+  ): Promise<TransactionResponse> {
+    const tx = await this.contract.splitPosition(
       collateralToken,
       parentCollectionId,
       conditionId,
@@ -81,10 +97,10 @@ export class ConditionalTokensService {
       amount,
       {
         value: '0x0',
-        gasLimit: 750000,
+        gasLimit: 1750000,
       }
     )
-    return transactionObject.hash
+    return tx
   }
 
   async getOutcomeSlotCount(conditionId: string): Promise<BigNumber> {
@@ -93,5 +109,10 @@ export class ConditionalTokensService {
 
   async conditionExists(conditionId: string): Promise<boolean> {
     return !(await this.getOutcomeSlotCount(conditionId)).isZero()
+  }
+
+  async balanceOf(positionId: string): Promise<BigNumber> {
+    const owner = await this.signer.getAddress()
+    return await this.contract.balanceOf(owner, positionId)
   }
 }
