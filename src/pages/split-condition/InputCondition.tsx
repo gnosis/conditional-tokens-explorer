@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react'
 import { FormContextValues } from 'react-hook-form'
-import { SplitPositionForm, bytesRegex } from './SplitCondition'
+
+import { BYTES_REGEX } from '../../config/constants'
+import { SplitPositionForm } from './SplitCondition'
 import { useWeb3Connected } from 'contexts/Web3Context'
 
 interface Props {
@@ -35,7 +37,7 @@ export const InputCondition = ({
         type="text"
         ref={register({
           required: true,
-          pattern: bytesRegex,
+          pattern: BYTES_REGEX,
           validate: async (value) => {
             const conditionExist = await CTService.conditionExists(value)
             return conditionExist
