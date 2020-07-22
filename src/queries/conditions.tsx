@@ -13,10 +13,9 @@ export const ConditionsListQuery = gql`
   }
 `
 
-export const ConditionQuery = (conditionId: string) => {
-  const query = gql`
-  query Conditions {
-    conditions(where: {id:"${conditionId}"}) {
+export const GetConditionQuery = gql`
+  query GetCondition($id: ID!) {
+    condition(id: $id) {
       id
       oracle
       questionId
@@ -25,6 +24,4 @@ export const ConditionQuery = (conditionId: string) => {
       creator
     }
   }
-  `
-  return query
-}
+`
