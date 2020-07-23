@@ -1,7 +1,7 @@
 import React from 'react'
 
-import { fetchPosition_position } from '../../types/generatedGQL'
-import { fetchPosition } from '../../queries/positions'
+import { GetPosition } from '../../types/generatedGQL'
+import { GetPositionQuery } from '../../queries/positions'
 import { useQuery } from '@apollo/react-hooks'
 import { PositionDetailItem } from './PositionDetailItem'
 
@@ -12,12 +12,12 @@ interface PositionDetailWrapperProps {
 export const PositionDetailWrapper = (props: PositionDetailWrapperProps) => {
   const { positionId } = props
 
-  const { data: position, error, loading } = useQuery<fetchPosition_position>(fetchPosition, {
+  const { data, error, loading } = useQuery<GetPosition>(GetPositionQuery, {
     variables: { id: positionId },
   })
 
-  if (position) {
-    return <PositionDetailItem data={position} />
+  if (data && data.position) {
+    return <PositionDetailItem position={data.position} />
   } else {
     return loading ? <div>Loading...</div> : error ? <div>Error...</div> : <div>Not found ...</div>
   }

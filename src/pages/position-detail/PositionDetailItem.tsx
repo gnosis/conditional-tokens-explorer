@@ -1,14 +1,13 @@
 import React from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { truncateStringInTheMiddle } from 'util/tools'
-import { fetchPosition_position } from 'types/generatedGQL'
+import { GetPosition_position as Position } from '../../types/generatedGQL'
 
 interface Props {
-  data: any
+  position: Position
 }
 
-export const PositionDetailItem = ({ data }: Props) => {
-  const { position } = data
+export const PositionDetailItem = ({ position }: Props) => {
   const { id, collateralToken } = position
 
   return (
@@ -16,7 +15,7 @@ export const PositionDetailItem = ({ data }: Props) => {
       <div className="row">
         <label>Position Id: </label>
         {truncateStringInTheMiddle(id, 6, 6)}
-        <CopyToClipboard text={position.id}>
+        <CopyToClipboard text={id}>
           <button>Copy</button>
         </CopyToClipboard>
       </div>

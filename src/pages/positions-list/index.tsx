@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import DataTable from 'react-data-table-component'
 import { usePositions, Position } from 'hooks'
 import { useWeb3Context, Web3Status } from 'contexts/Web3Context'
+import { useHistory } from 'react-router-dom'
 
 const dafaultColumns = [
   {
@@ -49,6 +50,12 @@ export const PositionsList = () => {
     setTableColumns(getTableColumns(status))
   }, [status])
 
+  const history = useHistory()
+
+  const handleRowClick = (row: Position) => {
+    history.push(`/positions/${row.id}`)
+  }
+
   return (
     <Wrapper>
       {loading && <div>Loading...</div>}
@@ -60,6 +67,7 @@ export const PositionsList = () => {
           }}
           columns={tableColumns}
           data={data || []}
+          onRowClicked={handleRowClick}
           pagination={true}
         />
       )}

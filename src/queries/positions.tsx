@@ -1,7 +1,7 @@
 import gql from 'graphql-tag'
 
-export const fetchPosition = gql`
-  query fetchPosition($id: ID!) {
+export const GetPositionQuery = gql`
+  query GetPosition($id: ID!) {
     position(id: $id) {
       id
       collateralToken {
