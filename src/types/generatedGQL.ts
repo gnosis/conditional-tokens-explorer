@@ -72,6 +72,7 @@ export interface GetPosition_position {
   id: string;
   collateralToken: GetPosition_position_collateralToken;
   collection: GetPosition_position_collection;
+  indexSets: any[];
 }
 
 export interface GetPosition {

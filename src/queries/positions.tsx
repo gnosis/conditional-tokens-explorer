@@ -10,6 +10,7 @@ export const GetPositionQuery = gql`
       collection {
         id
       }
+      indexSets
     }
   }
 `

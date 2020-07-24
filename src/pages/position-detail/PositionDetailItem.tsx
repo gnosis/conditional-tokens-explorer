@@ -2,13 +2,33 @@ import React from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { truncateStringInTheMiddle } from 'util/tools'
 import { GetPosition_position as Position } from '../../types/generatedGQL'
+import { BigNumber } from 'ethers/utils'
 
 interface Props {
   position: Position
 }
 
+const OutcomeList = ({ outcomeList }: { outcomeList: number[] }) => {
+  return (
+    <>
+      {outcomeList.map((value) => (
+        <div key={`index-${value}`}>{value}</div>
+      ))}
+    </>
+  )
+}
+
 export const PositionDetailItem = ({ position }: Props) => {
-  const { id, collateralToken } = position
+  const { id, collateralToken, indexSets } = position
+
+  const numberedOutcomes = indexSets.map((indexSet: string) => {
+    return Number(indexSet)
+      .toString(2)
+      .split('')
+      .reverse()
+      .map((value, index) => (value === '1' ? index + 1 : 0))
+      .filter((n) => !!n)
+  })
 
   return (
     <>
@@ -22,6 +42,17 @@ export const PositionDetailItem = ({ position }: Props) => {
       <div className="row">
         <label>Collateral Token: </label>
         {collateralToken.id}
+      </div>
+      <div className="row">
+        <label>Partition: </label>
+
+        {numberedOutcomes.map((outcomeList, index) => {
+          return (
+            <div className="outcomePartition" key={`outcomelist-${index}`}>
+              <OutcomeList outcomeList={outcomeList}></OutcomeList>
+            </div>
+          )
+        })}
       </div>
     </>
   )
