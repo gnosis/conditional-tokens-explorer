@@ -2,7 +2,6 @@ import React from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { truncateStringInTheMiddle } from 'util/tools'
 import { GetPosition_position as Position } from '../../types/generatedGQL'
-import { BigNumber } from 'ethers/utils'
 
 interface Props {
   position: Position
