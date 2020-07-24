@@ -31,4 +31,5 @@ export const EARLIEST_RINKEBY_BLOCK_TO_CHECK = Number(
 
 export const INFORMATION_NOT_AVAILABLE = 'Information not available'
 
-export const LOGGER_ID: string = process.env.REACT_APP_LOGGER_ID || 'gnosis-conditional-token-explorer'
+export const LOGGER_ID: string =
+  process.env.REACT_APP_LOGGER_ID || 'gnosis-conditional-token-explorer'

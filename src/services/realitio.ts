@@ -5,6 +5,9 @@ import { bigNumberify } from 'ethers/utils'
 
 import { getEarliestBlockToCheck, NetworkConfig } from '../config/networkConfig'
 import { Question, QuestionLog } from '../util/types'
+import { getLogger } from '../util/logger'
+
+const logger = getLogger('Realitio Service')
 
 const realitioAbi = [
   'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public payable returns (bytes32)',
@@ -49,7 +52,7 @@ export class RealitioService {
       throw new Error(`No LogNewQuestion event found for questionId '${questionId}'`)
     }
     if (logs.length > 1) {
-      console.log(`There should be only one LogNewQuestion event for questionId '${questionId}'`)
+      logger.info(`There should be only one LogNewQuestion event for questionId '${questionId}'`)
     }
 
     const iface = new ethers.utils.Interface(realitioAbi)

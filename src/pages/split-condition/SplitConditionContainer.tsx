@@ -6,6 +6,9 @@ import { Remote } from '../../util/remoteData'
 import { constants } from 'ethers'
 import { SplitCondition } from './index'
 import { ConditionalTokensService } from 'services/conditionalTokens'
+import { getLogger } from '../../util/logger'
+
+const logger = getLogger('SplitCondition')
 
 export const SplitConditionContainer = () => {
   const { networkConfig, CTService } = useWeb3Connected()
@@ -61,10 +64,10 @@ export const SplitConditionContainer = () => {
         )
 
         const positionId = ConditionalTokensService.getPositionId(collateralToken, collectionId)
-        console.log(
+        logger.info(
           `conditionId: ${conditionId} / parentCollection: ${parentCollection} / indexSet: ${indexSet.toString()}`
         )
-        console.log(`Position: ${positionId}`)
+        logger.info(`Position: ${positionId}`)
       })
 
       const tx = await CTService.splitPosition(
@@ -78,7 +81,7 @@ export const SplitConditionContainer = () => {
       try {
         await tx.wait()
       } catch (e) {
-        console.error(e)
+        logger.error(e)
       }
     },
     [CTService, collateralToken]
