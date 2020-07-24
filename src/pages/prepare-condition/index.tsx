@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+import { useHistory } from 'react-router-dom'
 
 import { isAddress } from '../../util/tools'
 import { ConditionalTokensService } from '../../services/conditionalTokens'
@@ -29,6 +30,8 @@ export const PrepareCondition = () => {
     mode: 'onChange',
   })
 
+  const history = useHistory()
+
   const conditionId = isValid
     ? ConditionalTokensService.getConditionId(questionId, oracleAddress, numOutcomes)
     : null
@@ -42,6 +45,8 @@ export const PrepareCondition = () => {
       if (!conditionExists) {
         const tx = await CTService.prepareCondition(questionId, oracleAddress, numOutcomes)
         await provider.waitForTransaction(tx)
+
+        history.push(`/conditions/${conditionId}`)
       } else {
         setError(new Error('Condition already exists'))
       }
