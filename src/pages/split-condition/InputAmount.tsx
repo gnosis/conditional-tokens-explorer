@@ -25,7 +25,7 @@ export const InputAmount = ({
 
   const { CTService, signer, provider, address } = useWeb3Connected()
 
-  const regexpPosition: RegExp = BYTES_REGEX;
+  const regexpPosition: RegExp = BYTES_REGEX
 
   useEffect(() => {
     setValue('amount', ZERO_BN)
@@ -53,7 +53,7 @@ export const InputAmount = ({
     return () => {
       isSubscribed = false
     }
-  }, [positionId, collateral, splitFrom, CTService, provider, signer, address])
+  }, [positionId, collateral, splitFrom, CTService, provider, signer, address, regexpPosition])
 
   return (
     <div>
