@@ -54,30 +54,30 @@ export interface GetConditionVariables {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: fetchPosition
+// GraphQL query operation: GetPosition
 // ====================================================
 
-export interface fetchPosition_position_collateralToken {
+export interface GetPosition_position_collateralToken {
   __typename: "CollateralToken";
   id: string;
 }
 
-export interface fetchPosition_position_collection {
+export interface GetPosition_position_collection {
   __typename: "Collection";
   id: string;
 }
 
-export interface fetchPosition_position {
+export interface GetPosition_position {
   __typename: "Position";
-  collateralToken: fetchPosition_position_collateralToken;
-  collection: fetchPosition_position_collection;
+  collateralToken: GetPosition_position_collateralToken;
+  collection: GetPosition_position_collection;
 }
 
-export interface fetchPosition {
-  position: fetchPosition_position | null;
+export interface GetPosition {
+  position: GetPosition_position | null;
 }
 
-export interface fetchPositionVariables {
+export interface GetPositionVariables {
   id: string;
 }
 

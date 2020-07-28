@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 
-import { fetchPosition as FetchPosition } from '../../types/generatedGQL'
-import { fetchPosition } from '../../queries/positions'
+import { GetPosition as getPosition } from '../../types/generatedGQL'
+import { GetPosition } from '../../queries/positions'
 import { BYTES_REGEX } from '../../config/constants'
 import { useBalanceForPosition } from '../../hooks/useBalanceForPosition'
 
@@ -44,8 +44,8 @@ export const Position = (props: Props) => {
     [errors]
   )
 
-  const { data: fetchedPosition, loading, error: errorFetchingPosition } = useQuery<FetchPosition>(
-    fetchPosition,
+  const { data: fetchedPosition, loading, error: errorFetchingPosition } = useQuery<getPosition>(
+    GetPosition,
     {
       variables: { id: position },
       fetchPolicy: 'no-cache',
