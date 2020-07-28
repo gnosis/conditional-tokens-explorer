@@ -3,7 +3,7 @@ import { FormContextValues, Controller } from 'react-hook-form'
 import { SplitPositionForm, SplitFrom } from './SplitCondition'
 import { Token } from 'config/networkConfig'
 import { BigNumberInputWrapper } from 'components/common/BigNumberInputWrapper'
-import { ZERO_BN } from 'config/constants'
+import { ZERO_BN, BYTES_REGEX } from 'config/constants'
 import { BigNumber } from 'ethers/utils'
 import { ERC20Service } from 'services/erc20'
 import { formatBigNumber } from 'util/tools'
@@ -25,6 +25,8 @@ export const InputAmount = ({
 
   const { CTService, signer, provider, address } = useWeb3Connected()
 
+  const regexpPosition: RegExp = BYTES_REGEX
+
   useEffect(() => {
     setValue('amount', ZERO_BN)
   }, [collateral, positionId, setValue])
@@ -32,7 +34,7 @@ export const InputAmount = ({
   useEffect(() => {
     let isSubscribed = true
     const fetchBalance = async () => {
-      if (splitFrom === 'position') {
+      if (splitFrom === 'position' && regexpPosition.test(positionId)) {
         const balance = await CTService.balanceOf(positionId)
         if (isSubscribed) {
           setBalance(balance)
@@ -51,7 +53,7 @@ export const InputAmount = ({
     return () => {
       isSubscribed = false
     }
-  }, [positionId, collateral, splitFrom, CTService, provider, signer, address])
+  }, [positionId, collateral, splitFrom, CTService, provider, signer, address, regexpPosition])
 
   return (
     <div>
