@@ -16,6 +16,7 @@ export const Header = () => {
       <Link to="/conditions">Conditions</Link>
       <Link to="/positions">Positions</Link>
       <Link to="/split">Split Condition</Link>
+      <Link to="/redeem">Redeem Position</Link>
     </Wrapper>
   )
 }

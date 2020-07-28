@@ -65,3 +65,8 @@ export const getConditionTypeTitle = (templateId: Maybe<number>) => {
 export const formatDate = (date: Date): string => {
   return moment(date).tz('UTC').format('YYYY-MM-DD - HH:mm [UTC]')
 }
+
+export const getIndexSets = (outcomesCount: number) => {
+  const range = (length: number) => [...Array(length)].map((x, i) => i)
+  return range(outcomesCount).map((x) => 1 << x)
+}

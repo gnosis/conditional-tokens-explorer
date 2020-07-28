@@ -5,6 +5,7 @@ import { BigNumber } from 'ethers/utils'
 import Web3Utils from 'web3-utils'
 import CTHelpersConstructor from '@gnosis.pm/conditional-tokens-contracts/utils/id-helpers'
 import { TransactionResponse } from 'ethers/providers'
+import { getIndexSets } from '../util/tools'
 const CTHelpers = CTHelpersConstructor(Web3Utils)
 
 const conditionalTokensAbi = [
@@ -100,6 +101,24 @@ export class ConditionalTokensService {
         gasLimit: 1750000,
       }
     )
+    return tx
+  }
+
+  redeemPositions = async (
+    collateralToken: string,
+    parentCollectionId: string, // If doesn't exist, must be zero, ethers.constants.HashZero
+    conditionId: string,
+    outcomesCount: number
+  ): Promise<TransactionResponse> => {
+    const indexSets = getIndexSets(outcomesCount)
+
+    const tx = await this.contract.redeemPositions(
+      collateralToken,
+      parentCollectionId,
+      conditionId,
+      indexSets
+    )
+
     return tx
   }
 

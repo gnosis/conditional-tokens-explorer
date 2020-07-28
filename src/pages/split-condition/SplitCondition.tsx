@@ -157,10 +157,7 @@ export const SplitCondition = ({
 
   return (
     <div>
-      <InputCondition
-        formMethods={formMethods}
-        onOutcomeSlotChange={(n) => setOutcomeSlot(n)}
-      />
+      <InputCondition formMethods={formMethods} onOutcomeSlotChange={(n) => setOutcomeSlot(n)} />
       <SelectCollateral
         formMethods={formMethods}
         splitFromCollateral={splitFromCollateral}
