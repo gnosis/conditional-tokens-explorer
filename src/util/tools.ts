@@ -81,17 +81,24 @@ export const displayPositions = (position: any, networkId: number) => {
   // Get the conditions
   const conditionsToDisplay = displayConditions(conditions)
 
-  return `[${token.symbol.toUpperCase()} ${conditionsToDisplay}] x ${formatBigNumber(new BigNumber(activeValue), token.decimals, 2)}`
+  return `[${token.symbol.toUpperCase()} ${conditionsToDisplay}] x ${formatBigNumber(
+    new BigNumber(activeValue),
+    token.decimals,
+    2
+  )}`
 }
 
-export const displayConditions = (conditions: any) => conditions.map((condition: any) => {
-    const {id, outcomeSlotCount} = condition
-    const outcomes = []
+export const displayConditions = (conditions: any) =>
+  conditions
+    .map((condition: any) => {
+      const { id, outcomeSlotCount } = condition
+      const outcomes = []
 
-    //TODO Check if position had a question in realitio
-    for (let i = 0; i < outcomeSlotCount; i++) {
-      outcomes.push(i + '')
-    }
+      //TODO Check if position had a question in realitio
+      for (let i = 0; i < outcomeSlotCount; i++) {
+        outcomes.push(i + '')
+      }
 
-    return `C: ${id} O: ${outcomes.join('|')}`
-  }).join(` & `)
+      return `C: ${id} O: ${outcomes.join('|')}`
+    })
+    .join(` & `)

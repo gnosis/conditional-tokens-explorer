@@ -48,14 +48,11 @@ export const RedeemedPosition = (props: Props) => {
     [errors]
   )
 
-  const { data: fetchedCondition, loading } = useQuery<getCondition>(
-    GetConditionQuery,
-    {
-      variables: { id: condition },
-      fetchPolicy: 'no-cache',
-      skip: !condition || !position,
-    }
-  )
+  const { data: fetchedCondition, loading } = useQuery<getCondition>(GetConditionQuery, {
+    variables: { id: condition },
+    fetchPolicy: 'no-cache',
+    skip: !condition || !position,
+  })
 
   // Validate position belongs to the condition
   useEffect(() => {
@@ -63,14 +60,18 @@ export const RedeemedPosition = (props: Props) => {
       const { condition: conditionFromTheGraph } = fetchedCondition ?? { condition: null }
       if (conditionFromTheGraph) {
         const { positions, payouts } = conditionFromTheGraph
-        const positionFound = positions && positions.filter((positionObject: any) => positionObject.id.toLowerCase() === position.toLowerCase())
-        if(!positionFound || (positionFound && positionFound.length === 0)) {
+        const positionFound =
+          positions &&
+          positions.filter(
+            (positionObject: any) => positionObject.id.toLowerCase() === position.toLowerCase()
+          )
+        if (!positionFound || (positionFound && positionFound.length === 0)) {
           addError(positionBelongToConditionError)
         } else {
           removeError(positionBelongToConditionError)
         }
 
-        if(!payouts) {
+        if (!payouts) {
           addError(positionNotResolvedError)
         } else {
           removeError(positionNotResolvedError)

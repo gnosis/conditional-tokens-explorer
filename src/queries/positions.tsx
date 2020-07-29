@@ -18,7 +18,7 @@ export const GetPositionQuery = gql`
         }
       }
       conditions {
-        id 
+        id
         outcomeSlotCount
       }
     }

@@ -71,7 +71,7 @@ const networks: { [K in NetworkIds]: Network } = {
         symbol: 'DXD',
         address: '0xa1d65E8fB6e87b60FECCBc582F7f97804B725521',
         decimals: 18,
-      }
+      },
     ],
     graphHttpUri: GRAPH_HTTP_MAINNET,
     graphWsUri: GRAPH_WS_MAINNET,

@@ -36,12 +36,12 @@ export const RedeemPosition = () => {
 
       <div className="row">
         <label htmlFor="condition">Resolved condition ID: </label>
-        <Condition condition={condition}/>
+        <Condition condition={condition} />
         <button onClick={selectCondition}>Select Condition</button>
       </div>
 
       <div className="row">
-        <RedeemedPosition condition={condition} position={position}/>
+        <RedeemedPosition condition={condition} position={position} />
       </div>
 
       <button onClick={onRedeem}>Redeem</button>
