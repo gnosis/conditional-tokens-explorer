@@ -22,6 +22,7 @@ const conditionalTokensAbi = [
   'function getOutcomeSlotCount(bytes32 conditionId) external view returns (uint)',
   'function mergePositions(address collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] partition, uint amount) external',
   'function splitPosition(address collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] partition, uint amount) external',
+  'function reportPayouts(bytes32 questionId, uint[] payouts)',
 ]
 
 export class ConditionalTokensService {
@@ -114,5 +115,10 @@ export class ConditionalTokensService {
   async balanceOf(positionId: string): Promise<BigNumber> {
     const owner = await this.signer.getAddress()
     return await this.contract.balanceOf(owner, positionId)
+  }
+
+  async reportPayouts(questionId: string, payouts: number[]): Promise<TransactionResponse> {
+    const tx = await this.contract.reportPayouts(questionId, payouts)
+    return tx
   }
 }
