@@ -26,3 +26,10 @@ export enum ConditionType {
   Omen = 'Omen Condition',
   Unknown = 'Unknown',
 }
+
+export enum ConditionErrors {
+  INVALID_ERROR = `Invalid condition`,
+  FETCHING_ERROR = `Error fetching condition`,
+  NOT_FOUND_ERROR = `Condition doesn't exist`,
+  NOT_RESOLVED_ERROR = `Condition is not resolved`,
+}
