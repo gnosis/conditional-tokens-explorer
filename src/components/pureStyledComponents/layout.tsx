@@ -13,6 +13,7 @@ export const MainScroll = styled.div`
   flex-direction: column;
   flex-grow: 1;
   overflow: auto;
+  padding-top: 36px;
 `
 
 export const InnerContainer = styled.div`
