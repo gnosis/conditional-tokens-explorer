@@ -1,6 +1,6 @@
 import { useWeb3Context } from 'contexts/Web3Context'
 import React from 'react'
-import { Redirect, Route, Switch } from 'react-router-dom'
+import { Redirect, Route, RouteProps, Switch } from 'react-router-dom'
 
 import { ButtonConnect } from '../../components/buttons/ButtonConnect'
 import { ConditionsDetailContainer } from '../condition-detail'
@@ -9,13 +9,7 @@ import { PositionsList } from '../positions-list'
 import { PrepareCondition } from '../prepare-condition'
 import { SplitConditionContainer } from '../split-condition'
 
-interface IsConnectedProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  component: any
-  path: string
-}
-
-const IsConnected: React.FC<IsConnectedProps> = (props: IsConnectedProps) => {
+const ProtectedRoute: React.FC<RouteProps> = (props) => {
   const { component, path } = props
   const { status } = useWeb3Context()
 
@@ -35,8 +29,8 @@ export const Routes: React.FC = () => {
       <Route component={ConditionsDetailContainer} exact path="/conditions/:conditionId" />
       <Route component={ConditionsList} exact path="/conditions" />
       <Route component={PositionsList} exact path="/positions" />
-      <IsConnected component={PrepareCondition} path="/prepare" />
-      <IsConnected component={SplitConditionContainer} path="/split" />
+      <ProtectedRoute component={PrepareCondition} path="/prepare" />
+      <ProtectedRoute component={SplitConditionContainer} path="/split" />
       <Route exact path="/">
         <Redirect to="/conditions" />
       </Route>
