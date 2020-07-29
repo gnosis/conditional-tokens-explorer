@@ -41,6 +41,14 @@ const Wrapper = styled.div`
   justify-content: center;
 `
 
+const customStyles = {
+  rows: {
+    style: {
+      cursor: 'pointer',
+    },
+  },
+}
+
 export const PositionsList = () => {
   const { status } = useWeb3Context()
   const { data, error, loading } = usePositions()
@@ -68,6 +76,7 @@ export const PositionsList = () => {
           columns={tableColumns}
           data={data || []}
           onRowClicked={handleRowClick}
+          customStyles={customStyles}
           pagination={true}
         />
       )}
