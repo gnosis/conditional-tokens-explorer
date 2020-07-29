@@ -8,7 +8,7 @@ import { Mainmenu } from './components/navigation/Mainmenu'
 import { InnerContainer, MainScroll, MainWrapper } from './components/pureStyledComponents/layout'
 import { ApolloProviderWrapper } from './contexts/Apollo'
 import { Web3ContextProvider } from './contexts/Web3Context'
-import { Main } from './pages/main'
+import { Routes } from './pages/Routes'
 import 'sanitize.css'
 import theme from './theme'
 import { GlobalStyle } from './theme/globalStyle'
@@ -25,7 +25,7 @@ ReactDOM.render(
               <Mainmenu />
               <MainScroll>
                 <InnerContainer>
-                  <Main />
+                  <Routes />
                 </InnerContainer>
                 <Footer />
               </MainScroll>

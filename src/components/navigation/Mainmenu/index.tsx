@@ -9,11 +9,13 @@ const Wrapper = styled.nav`
   background-color: rgba(255, 255, 255, 0.8);
   box-shadow: 0 2px 8px 0 rgba(212, 213, 211, 0.7);
   display: flex;
+  flex-shrink: 0;
   height: 36px;
 `
 
 const MenuItems = styled(InnerContainer)`
   flex-direction: row;
+  flex-shrink: 0;
   height: 100%;
 `
 
@@ -60,8 +62,8 @@ export const Mainmenu: React.FC = (props) => {
       url: '/positions',
     },
     {
-      title: 'Prepare Position',
-      url: '/prepare-position',
+      title: 'Prepare Condition',
+      url: '/prepare',
     },
     {
       title: 'Split Position',
