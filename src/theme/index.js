@@ -10,7 +10,7 @@ const theme = {
   },
   colors: {
     darkestGray: '#081728',
-    error: '#fa0000',
+    error: '#db3a3d',
     mainBodyBackground: '#f3f2f2',
     primary: '#009cb4',
     textColor: '#5d6d74',
