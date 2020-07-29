@@ -6,7 +6,7 @@ const Wrapper = styled.header`
   display: flex;
   flex-direction: row;
   margin: 10px auto;
-  justify-content: space-evenly;
+  justify-content: space-between;
 `
 
 export const Header = () => {
