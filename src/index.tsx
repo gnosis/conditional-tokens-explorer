@@ -4,6 +4,7 @@ import { HashRouter as Router } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
 
 import { Footer, Header } from './components/layout'
+import { Mainmenu } from './components/navigation/Mainmenu'
 import { InnerContainer, MainScroll, MainWrapper } from './components/pureStyledComponents/layout'
 import { ApolloProviderWrapper } from './contexts/Apollo'
 import { Web3ContextProvider } from './contexts/Web3Context'
@@ -21,6 +22,7 @@ ReactDOM.render(
           <Router>
             <MainWrapper>
               <Header />
+              <Mainmenu />
               <MainScroll>
                 <InnerContainer>
                   <Main />

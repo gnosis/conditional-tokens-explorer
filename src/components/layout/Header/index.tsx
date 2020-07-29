@@ -12,6 +12,8 @@ const Wrapper = styled.header`
   justify-content: space-between;
   padding-left: ${(props) => props.theme.layout.horizontalPadding};
   padding-right: ${(props) => props.theme.layout.horizontalPadding};
+  position: relative;
+  z-index: 5;
 `
 
 const LogoLink = styled(Link)`
@@ -24,11 +26,6 @@ export const Header = () => {
       <LogoLink to="/">
         <Logo />
       </LogoLink>
-      <div>
-        <Link to="/conditions">Conditions</Link>
-        <Link to="/positions">Positions</Link>
-        <Link to="/split">Split Condition</Link>
-      </div>
     </Wrapper>
   )
 }
