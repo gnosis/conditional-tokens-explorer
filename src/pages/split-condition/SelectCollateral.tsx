@@ -1,7 +1,8 @@
+import { Token } from 'config/networkConfig'
 import React, { useEffect } from 'react'
 import { FormContextValues } from 'react-hook-form'
+
 import { SplitPositionForm } from './SplitCondition'
-import { Token } from 'config/networkConfig'
 
 interface Props {
   splitFromCollateral: boolean
@@ -10,10 +11,10 @@ interface Props {
   onCollateralChange: (c: string) => void
 }
 export const SelectCollateral = ({
+  formMethods: { register, watch },
+  onCollateralChange,
   splitFromCollateral,
   tokens,
-  onCollateralChange,
-  formMethods: { register, watch },
 }: Props) => {
   const watchCollateral = watch('collateral')
   useEffect(() => {
@@ -22,15 +23,15 @@ export const SelectCollateral = ({
 
   return (
     <div>
-      <input name="splitFrom" type="radio" value="collateral" ref={register} />
+      <input name="splitFrom" ref={register} type="radio" value="collateral" />
 
       <label htmlFor="collateral">Collateral</label>
       <select
-        ref={register({ required: splitFromCollateral })}
-        name="collateral"
         disabled={!splitFromCollateral}
+        name="collateral"
+        ref={register({ required: splitFromCollateral })}
       >
-        {tokens.map(({ symbol, address }) => {
+        {tokens.map(({ address, symbol }) => {
           return (
             <option key={address} value={address}>
               {symbol}

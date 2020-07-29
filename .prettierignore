@@ -1,1 +1,3 @@
 src/types/generatedGQL.ts
+scripts/*.*
+*.d.ts

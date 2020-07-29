@@ -1,10 +1,10 @@
 import { ApolloProvider } from '@apollo/react-hooks'
+import { getApolloClient } from 'apolloClientConfig'
+import { DEFAULT_NETWORK_ID } from 'config/constants'
+import { NetworkId } from 'config/networkConfig'
 import React from 'react'
 
-import { getApolloClient } from 'apolloClientConfig'
 import { useWeb3Context } from './Web3Context'
-import { NetworkId } from 'config/networkConfig'
-import { DEFAULT_NETWORK_ID } from 'config/constants'
 
 interface Props {
   children: JSX.Element

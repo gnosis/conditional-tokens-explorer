@@ -1,10 +1,12 @@
-import { useState, useRef, useEffect } from 'react'
-import { useWeb3Context } from '../contexts/Web3Context'
 import { useQuery } from '@apollo/react-hooks'
+import { ApolloError } from 'apollo-client'
 import { PositionsListQuery } from 'queries/positions'
 import { UserWithPositionsQuery } from 'queries/users'
+import { useEffect, useRef, useState } from 'react'
 import { Positions, UserWithPositions } from 'types/generatedGQL'
-import { ApolloError } from 'apollo-client'
+
+import { useWeb3Context } from '../contexts/Web3Context'
+
 import { Position, marshalPositionListData } from './utils'
 
 /**

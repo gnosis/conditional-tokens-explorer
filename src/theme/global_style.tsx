@@ -1,7 +1,8 @@
 import { createGlobalStyle } from 'styled-components'
+
 import { localFonts } from './fonts'
 
-import theme from './'
+import theme from '.'
 
 type ThemeType = typeof theme
 

@@ -1,14 +1,16 @@
-import React, { ReactElement } from 'react'
-import { render } from '@testing-library/react'
-import { SplitCondition } from './SplitCondition'
-import { Remote } from '../../util/remoteData'
-import { BigNumber } from 'ethers/utils'
-import { NetworkConfig } from '../../config/networkConfig'
-import { ZERO_BN } from '../../config/constants'
-import { act } from 'react-dom/test-utils'
-import userEvent from '@testing-library/user-event'
 import { MockedProvider } from '@apollo/react-testing'
+import { render } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { Connected, Web3Context } from 'contexts/Web3Context'
+import { BigNumber } from 'ethers/utils'
+import React, { ReactElement } from 'react'
+import { act } from 'react-dom/test-utils'
+
+import { ZERO_BN } from '../../config/constants'
+import { NetworkConfig } from '../../config/networkConfig'
+import { Remote } from '../../util/remoteData'
+
+import { SplitCondition } from './SplitCondition'
 
 const unlockCollateral = jest.fn()
 const onCollateralChange = jest.fn()
@@ -44,11 +46,11 @@ test('show unlock button with zero allowance', async () => {
     renderWithConnectedProvider(
       <SplitCondition
         allowance={allowance}
-        splitPosition={splitPosition}
-        unlockCollateral={unlockCollateral}
-        onCollateralChange={onCollateralChange}
         hasUnlockedCollateral={hasUnlockedCollateral}
+        onCollateralChange={onCollateralChange}
+        splitPosition={splitPosition}
         tokens={tokens}
+        unlockCollateral={unlockCollateral}
       />
     )
   )
@@ -59,15 +61,15 @@ test('show unlock button with zero allowance', async () => {
 test('toggle unlock button visiblity according to allowance and amount', async () => {
   const allowance = Remote.success<BigNumber>(new BigNumber(10))
 
-  const { findByText, queryByText, findByPlaceholderText } = render(
+  const { findByPlaceholderText, findByText, queryByText } = render(
     renderWithConnectedProvider(
       <SplitCondition
         allowance={allowance}
-        splitPosition={splitPosition}
-        unlockCollateral={unlockCollateral}
-        onCollateralChange={onCollateralChange}
         hasUnlockedCollateral={hasUnlockedCollateral}
+        onCollateralChange={onCollateralChange}
+        splitPosition={splitPosition}
         tokens={tokens}
+        unlockCollateral={unlockCollateral}
       />
     )
   )
@@ -92,11 +94,11 @@ test('show unlock button after failure', async () => {
     renderWithConnectedProvider(
       <SplitCondition
         allowance={allowance}
-        unlockCollateral={unlockCollateral}
-        splitPosition={splitPosition}
-        onCollateralChange={onCollateralChange}
         hasUnlockedCollateral={hasUnlockedCollateral}
+        onCollateralChange={onCollateralChange}
+        splitPosition={splitPosition}
         tokens={tokens}
+        unlockCollateral={unlockCollateral}
       />
     )
   )
@@ -110,11 +112,11 @@ test('show unlock button after failure', async () => {
     renderWithConnectedProvider(
       <SplitCondition
         allowance={allowanceFailure}
-        splitPosition={splitPosition}
-        unlockCollateral={unlockCollateral}
-        onCollateralChange={onCollateralChange}
         hasUnlockedCollateral={true}
+        onCollateralChange={onCollateralChange}
+        splitPosition={splitPosition}
         tokens={tokens}
+        unlockCollateral={unlockCollateral}
       />
     )
   )

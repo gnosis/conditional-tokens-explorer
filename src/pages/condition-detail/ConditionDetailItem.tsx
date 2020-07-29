@@ -1,17 +1,17 @@
+import { Provider } from 'ethers/providers'
 import React, { useEffect, useState } from 'react'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 
+import { INFORMATION_NOT_AVAILABLE } from '../../config/constants'
+import { getKnowOracleFromAddress } from '../../config/networkConfig'
+import { useWeb3Context } from '../../contexts/Web3Context'
+import { useQuestion } from '../../hooks/useQuestion'
 import {
   formatDate,
   getConditionTypeTitle,
   isContract,
   truncateStringInTheMiddle,
 } from '../../util/tools'
-import { useQuestion } from '../../hooks/useQuestion'
-import { INFORMATION_NOT_AVAILABLE } from '../../config/constants'
-import { getKnowOracleFromAddress } from '../../config/networkConfig'
-import { useWeb3Context } from '../../contexts/Web3Context'
-import { Provider } from 'ethers/providers'
 import { ConditionStatus, ConditionType } from '../../util/types'
 
 interface ConditionDetailItemProps {
@@ -25,7 +25,7 @@ interface ConditionDetailItemProps {
 
 export const ConditionDetailItem = (props: ConditionDetailItemProps) => {
   const { status } = useWeb3Context()
-  const { conditionId, resolved, questionId, oracle, outcomeSlotCount, creator } = props
+  const { conditionId, creator, oracle, outcomeSlotCount, questionId, resolved } = props
 
   let networkId = null
   if (status._type === 'connected') {
@@ -33,7 +33,7 @@ export const ConditionDetailItem = (props: ConditionDetailItemProps) => {
     networkId = networkConfig.networkId
   }
 
-  const { question, loading } = useQuestion(questionId)
+  const { loading, question } = useQuestion(questionId)
   const [isAContract, setIsAContract] = useState(false)
 
   const {

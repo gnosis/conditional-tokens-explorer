@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react'
-import styled from 'styled-components'
+import { Web3Status, useWeb3Context } from 'contexts/Web3Context'
+import { Position, usePositions } from 'hooks'
+import React, { useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { usePositions, Position } from 'hooks'
-import { useWeb3Context, Web3Status } from 'contexts/Web3Context'
+import styled from 'styled-components'
 
 const dafaultColumns = [
   {
@@ -26,7 +26,7 @@ const getTableColumns = (status: Web3Status) => {
         selector: 'userBalance',
         sortable: true,
         // eslint-disable-next-line react/display-name
-        cell: (row: Position) => <div>{row.userBalance.toString()}</div>, // TODO: Should we show this as decimal number, based on collateral decimals?
+        cell: (row: Position) => <div>{row.userBalance.toString()}</div>, // Q: Should we show this as decimal number, based on collateral decimals?
       },
     ]
   }
@@ -55,12 +55,12 @@ export const PositionsList = () => {
       {error && <div>Error...</div>}
       {data && (
         <DataTable
-          style={{
-            width: '80%',
-          }}
           columns={tableColumns}
           data={data || []}
           pagination={true}
+          style={{
+            width: '80%',
+          }}
         />
       )}
     </Wrapper>

@@ -1,8 +1,9 @@
-import React from 'react'
-import { useWeb3Disconnected } from '../../contexts/Web3Context'
-import { Route, Switch } from 'react-router-dom'
 import { ConditionsList } from 'pages/conditions-list'
 import { PositionsList } from 'pages/positions-list'
+import React from 'react'
+import { Route, Switch } from 'react-router-dom'
+
+import { useWeb3Disconnected } from '../../contexts/Web3Context'
 
 export const Disconnected = () => {
   const { connect } = useWeb3Disconnected()

@@ -1,11 +1,11 @@
+import { ConditionsDetailContainer } from 'pages/condition-detail'
+import { ConditionsList } from 'pages/conditions-list'
+import { PositionsList } from 'pages/positions-list'
 import React from 'react'
 import { Route, Switch } from 'react-router-dom'
 
 import { PrepareCondition } from '../prepare-condition'
 import { SplitConditionContainer } from '../split-condition'
-import { ConditionsList } from 'pages/conditions-list'
-import { ConditionsDetailContainer } from 'pages/condition-detail'
-import { PositionsList } from 'pages/positions-list'
 
 export const Connected = () => {
   return (
