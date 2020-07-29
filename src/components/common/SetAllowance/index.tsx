@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { Token } from '../../config/networkConfig'
+import { Token } from '../../../config/networkConfig'
 
 const Wrapper = styled.div``
 

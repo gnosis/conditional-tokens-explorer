@@ -2,7 +2,7 @@ import { BigNumberInput } from 'big-number-input'
 import { BigNumber } from 'ethers/utils'
 import React from 'react'
 
-import { ZERO_BN } from '../../config/constants'
+import { ZERO_BN } from '../../../config/constants'
 
 interface Props {
   value?: BigNumber
