@@ -22,6 +22,7 @@ const LogoSVG = styled.svg`
 
   .fillColor {
     fill: ${(props) => props.theme.colors.primary};
+    transition: fill 0.15s linear;
   }
 `
 
@@ -32,6 +33,10 @@ const Text = styled.span`
   flex-grow: 1;
   text-decoration: none;
   justify-content: center;
+
+  .text {
+    transition: color 0.15s linear;
+  }
 `
 
 const TextTop = styled.span`
