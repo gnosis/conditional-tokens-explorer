@@ -108,7 +108,7 @@ export const Position = (props: Props) => {
         setPositionToDisplay(displayPositions(positionFromTheGraph, networkConfig.networkId))
       }
     }
-  }, [position, fetchedPosition, loading])
+  }, [position, fetchedPosition, loading, networkConfig.networkId])
 
   if (loading) {
     return <p>Loading...</p>

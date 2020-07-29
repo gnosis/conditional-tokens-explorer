@@ -22,6 +22,12 @@ export const GetConditionQuery = gql`
       outcomeSlotCount
       resolved
       creator
+      payouts
+      payoutNumerators
+      payoutDenominator
+      positions {
+        id
+      }
     }
   }
 `

@@ -30,6 +30,11 @@ export interface Conditions {
 // GraphQL query operation: GetCondition
 // ====================================================
 
+export interface GetCondition_condition_positions {
+  __typename: "Position";
+  id: string;
+}
+
 export interface GetCondition_condition {
   __typename: "Condition";
   id: string;
@@ -38,6 +43,10 @@ export interface GetCondition_condition {
   outcomeSlotCount: number;
   resolved: boolean;
   creator: any;
+  payouts: any[] | null;
+  payoutNumerators: any[] | null;
+  payoutDenominator: any | null;
+  positions: GetCondition_condition_positions[] | null;
 }
 
 export interface GetCondition {
@@ -78,6 +87,7 @@ export interface GetPosition_position_collection {
 export interface GetPosition_position_conditions {
   __typename: "Condition";
   id: string;
+  outcomeSlotCount: number;
 }
 
 export interface GetPosition_position {

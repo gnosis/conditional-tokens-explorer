@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 
 import { Position } from './Position'
 import { Condition } from './Condition'
+import { RedeemedPosition } from './RedeemedPosition'
 
 export const RedeemPosition = () => {
   const [position, setPosition] = useState<string>('')
@@ -40,8 +41,7 @@ export const RedeemPosition = () => {
       </div>
 
       <div className="row">
-        <strong>Redeemed position preview</strong>
-        <span>{redeemedPosition}</span>
+        <RedeemedPosition condition={condition} position={position}/>
       </div>
 
       <button onClick={onRedeem}>Redeem</button>

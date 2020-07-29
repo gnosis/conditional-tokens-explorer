@@ -4,7 +4,7 @@ import { useQuery } from '@apollo/react-hooks'
 import { GetCondition as getCondition } from '../../types/generatedGQL'
 import { BYTES_REGEX } from '../../config/constants'
 import { GetConditionQuery } from '../../queries/conditions'
-import { displayConditions, displayPositions } from '../../util/tools'
+import { displayConditions } from '../../util/tools'
 
 interface Props {
   condition: string
