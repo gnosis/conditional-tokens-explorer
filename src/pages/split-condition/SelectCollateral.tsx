@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react'
 import { FormContextValues } from 'react-hook-form'
 import { SplitPositionForm } from './SplitCondition'
-import { Token } from 'config/networkConfig'
+
+import { Token } from '../../util/types'
 
 interface Props {
   splitFromCollateral: boolean

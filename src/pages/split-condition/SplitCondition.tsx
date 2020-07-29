@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { BigNumber } from 'ethers/utils'
 import { useForm } from 'react-hook-form'
 
-import { Token } from '../../config/networkConfig'
+import { Token } from '../../util/types'
 import { SetAllowance } from '../../components/common/SetAllowance'
 import { ZERO_BN, NULL_PARENT_ID } from '../../config/constants'
 import { trivialPartition } from '../../util/tools'
@@ -11,7 +11,7 @@ import { InputAmount } from './InputAmount'
 import { InputPosition } from './InputPosition'
 import { SelectCollateral } from './SelectCollateral'
 import { InputCondition } from './InputCondition'
-import { fetchPosition_position } from 'types/generatedGQL'
+import { GetPosition_position } from 'types/generatedGQL'
 import { ERC20Service } from 'services/erc20'
 import { useWeb3Connected } from 'contexts/Web3Context'
 
@@ -73,7 +73,7 @@ export const SplitCondition = ({
 
   const [outcomeSlot, setOutcomeSlot] = useState(0)
   const [collateralToken, setCollateralToken] = useState(tokens[0])
-  const [position, setPosition] = useState<Maybe<fetchPosition_position>>(null)
+  const [position, setPosition] = useState<Maybe<GetPosition_position>>(null)
   const { signer, provider } = useWeb3Connected()
   const { amount, collateral, splitFrom, positionId } = getValues() as SplitPositionForm
 

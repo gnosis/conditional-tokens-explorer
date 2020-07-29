@@ -1,13 +1,25 @@
 import gql from 'graphql-tag'
 
-export const GetPosition = gql`
+export const GetPositionQuery = gql`
   query GetPosition($id: ID!) {
     position(id: $id) {
+      id
+      indexSets
+      activeValue
       collateralToken {
         id
       }
       collection {
         id
+        conditionIds
+        indexSets
+        positions {
+          id
+        }
+      }
+      conditions {
+        id 
+        outcomeSlotCount
       }
     }
   }

@@ -6,7 +6,7 @@ import {
   GetPosition as getPosition,
   GetPosition_position,
 } from 'types/generatedGQL'
-import { GetPosition } from 'queries/positions'
+import { GetPositionQuery } from 'queries/positions'
 import { BYTES_REGEX } from '../../config/constants'
 import { SplitPositionForm } from './SplitCondition'
 
@@ -27,7 +27,7 @@ export const InputPosition = ({
   const { data: fetchedPosition, loading, error: errorFetchingPosition } = useQuery<
     getPosition,
     GetPositionVariables
-  >(GetPosition, {
+  >(GetPositionQuery, {
     variables: { id: watchPositionId },
     skip: skipFetchPosition,
   })

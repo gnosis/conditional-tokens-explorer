@@ -62,15 +62,32 @@ export interface GetPosition_position_collateralToken {
   id: string;
 }
 
+export interface GetPosition_position_collection_positions {
+  __typename: "Position";
+  id: string;
+}
+
 export interface GetPosition_position_collection {
   __typename: "Collection";
+  id: string;
+  conditionIds: string[];
+  indexSets: any[];
+  positions: GetPosition_position_collection_positions[] | null;
+}
+
+export interface GetPosition_position_conditions {
+  __typename: "Condition";
   id: string;
 }
 
 export interface GetPosition_position {
   __typename: "Position";
+  id: string;
+  indexSets: any[];
+  activeValue: any;
   collateralToken: GetPosition_position_collateralToken;
   collection: GetPosition_position_collection;
+  conditions: GetPosition_position_conditions[];
 }
 
 export interface GetPosition {

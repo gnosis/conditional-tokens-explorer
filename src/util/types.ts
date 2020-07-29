@@ -26,3 +26,16 @@ export enum ConditionType {
   Omen = 'Omen Condition',
   Unknown = 'Unknown',
 }
+
+export type Token = {
+  symbol: string
+  address: string
+  decimals: number
+}
+
+export type NetworkId = 1 | 4
+
+export enum NetworkIds {
+  MAINNET = 1,
+  RINKEBY = 4,
+}

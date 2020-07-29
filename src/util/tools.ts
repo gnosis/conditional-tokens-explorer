@@ -4,6 +4,7 @@ import { BigNumber, formatUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
 
 import { BYTES_REGEX } from '../config/constants'
+import { getTokenFromAddress } from '../config/networkConfig'
 
 export const isAddress = (address: string) => {
   try {
@@ -70,3 +71,27 @@ export const getIndexSets = (outcomesCount: number) => {
   const range = (length: number) => [...Array(length)].map((x, i) => i)
   return range(outcomesCount).map((x) => 1 << x)
 }
+
+export const displayPositions = (position: any, networkId: number) => {
+  const { collateralToken, activeValue, conditions } = position
+
+  // Get the token
+  const token = getTokenFromAddress(networkId, collateralToken.id)
+
+  // Get the conditions
+  const conditionsToDisplay = displayConditions(conditions)
+
+  return `[${token.symbol.toUpperCase()} ${conditionsToDisplay}] x ${formatBigNumber(new BigNumber(activeValue), token.decimals, 2)}`
+}
+
+export const displayConditions = (conditions: any) => conditions.map((condition: any) => {
+    const {id, outcomeSlotCount} = condition
+    const outcomes = []
+
+    //TODO Check if position had a question in realitio
+    for (let i = 0; i < outcomeSlotCount; i++) {
+      outcomes.push(i + '')
+    }
+
+    return `C: ${id} O: ${outcomes.join('|')}`
+  }).join(` & `)

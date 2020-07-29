@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { FormContextValues, Controller } from 'react-hook-form'
+import { BigNumber } from 'ethers/utils'
+
 import { SplitPositionForm, SplitFrom } from './SplitCondition'
-import { Token } from 'config/networkConfig'
+import { Token } from '../../util/types'
 import { BigNumberInputWrapper } from 'components/common/BigNumberInputWrapper'
 import { ZERO_BN, BYTES_REGEX } from 'config/constants'
-import { BigNumber } from 'ethers/utils'
 import { ERC20Service } from 'services/erc20'
 import { formatBigNumber } from 'util/tools'
 import { useWeb3Connected } from 'contexts/Web3Context'
