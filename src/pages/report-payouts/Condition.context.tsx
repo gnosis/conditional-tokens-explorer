@@ -19,6 +19,7 @@ export const CONDITION_CONTEXT_DEFAULT_VALUE = {
   conditionId: '',
   loading: false,
   errors: [],
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   setConditionId: (conditionId: string) => {},
 }
 
@@ -30,7 +31,7 @@ interface Props {
 
 export const ConditionProvider = (props: Props) => {
   const [conditionId, setConditionId] = React.useState('')
-  let errors = []
+  const errors = []
   let condition: Maybe<GetCondition_condition> = null
 
   const setConditionIdCallback = React.useCallback((conditionId: string): void => {
