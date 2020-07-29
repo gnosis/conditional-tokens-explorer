@@ -9,10 +9,10 @@ const theme = {
     borderRadius: '6px',
   },
   colors: {
+    darkestGray: '#081728',
     error: '#fa0000',
     mainBodyBackground: '#f3f2f2',
-    primary: '#1565C0',
-    secondary: '#E3F2FD',
+    primary: '#009cb4',
     textColor: '#5d6d74',
   },
   header: {
