@@ -10,7 +10,7 @@ import { Web3ContextProvider } from './contexts/Web3Context'
 import { Main } from './pages/main'
 import 'sanitize.css'
 import theme from './theme'
-import { GlobalStyle } from './theme/global_style'
+import { GlobalStyle } from './theme/globalStyle'
 
 ReactDOM.render(
   <React.StrictMode>
