@@ -2,9 +2,11 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 
 import { GetPosition as getPosition } from '../../types/generatedGQL'
-import { GetPosition } from '../../queries/positions'
+import { GetPositionQuery } from '../../queries/positions'
 import { BYTES_REGEX } from '../../config/constants'
 import { useBalanceForPosition } from '../../hooks/useBalanceForPosition'
+import { useWeb3Connected } from '../../contexts/Web3Context'
+import { displayPositions } from '../../util/tools'
 
 interface Props {
   position: string
@@ -19,12 +21,16 @@ const balanceIsZeroError = `Balance for this position is zero`
 export const Position = (props: Props) => {
   const { position } = props
 
+  const { networkConfig } = useWeb3Connected()
+
   const [errors, setErrors] = useState<string[]>([])
+  const [positionToDisplay, setPositionToDisplay] = useState<string>('')
 
   const addError = useCallback(
     (error: string) => {
       const newErrors = [...errors]
-      if (newErrors.indexOf(error) === -1) {
+      const index = newErrors.indexOf(error)
+      if (index === -1) {
         newErrors.push(error)
         setErrors(newErrors)
       }
@@ -37,7 +43,7 @@ export const Position = (props: Props) => {
       const newErrors = [...errors]
       const index = newErrors.indexOf(error)
       if (index !== -1) {
-        delete newErrors[index]
+        newErrors.splice(index, 1)
         setErrors(newErrors)
       }
     },
@@ -45,10 +51,11 @@ export const Position = (props: Props) => {
   )
 
   const { data: fetchedPosition, loading, error: errorFetchingPosition } = useQuery<getPosition>(
-    GetPosition,
+    GetPositionQuery,
     {
       variables: { id: position },
       fetchPolicy: 'no-cache',
+      skip: !position,
     }
   )
 
@@ -93,13 +100,23 @@ export const Position = (props: Props) => {
     }
   }, [balance, position, addError, removeError])
 
+  // Generate position to display, see method `displayPosition`
+  useEffect(() => {
+    if (position) {
+      const { position: positionFromTheGraph } = fetchedPosition ?? { position: null }
+      if (positionFromTheGraph) {
+        setPositionToDisplay(displayPositions(positionFromTheGraph, networkConfig.networkId))
+      }
+    }
+  }, [position, fetchedPosition, loading])
+
   if (loading) {
     return <p>Loading...</p>
   }
 
   return (
     <>
-      <p>{position}</p>
+      <p>{positionToDisplay}</p>
       {errors.map((error: string, index: number) => (
         <p key={index}>{error}</p>
       ))}

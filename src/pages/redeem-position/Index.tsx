@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 
 import { Position } from './Position'
+import { Condition } from './Condition'
 
 export const RedeemPosition = () => {
   const [position, setPosition] = useState<string>('')
@@ -34,7 +35,7 @@ export const RedeemPosition = () => {
 
       <div className="row">
         <label htmlFor="condition">Resolved condition ID: </label>
-        {/*<Condition condition={condition}/>*/}
+        <Condition condition={condition}/>
         <button onClick={selectCondition}>Select Condition</button>
       </div>
 
