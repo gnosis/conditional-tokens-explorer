@@ -9,6 +9,7 @@ import { Logo } from '../../common/Logo'
 const Wrapper = styled.header`
   align-items: center;
   background-color: ${(props) => props.theme.header.backgroundColor};
+  border-bottom: solid 1px #e8e7e6;
   display: flex;
   flex-shrink: 0;
   height: ${(props) => props.theme.header.height};
