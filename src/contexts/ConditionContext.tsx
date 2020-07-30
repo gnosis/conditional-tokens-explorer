@@ -1,10 +1,10 @@
 import React from 'react'
 import { useQuery } from '@apollo/react-hooks'
 
-import { GetCondition, GetCondition_condition } from '../../types/generatedGQL'
-import { GetConditionQuery } from '../../queries/conditions'
-import { BYTES_REGEX } from '../../config/constants'
-import { ConditionErrors } from '../../util/types'
+import { GetCondition, GetCondition_condition } from '../types/generatedGQL'
+import { GetConditionQuery } from '../queries/conditions'
+import { ConditionErrors } from '../util/types'
+import { isConditionIdValid } from '../util/tools'
 
 export interface ConditionContext {
   condition: Maybe<GetCondition_condition>
@@ -63,7 +63,7 @@ export const ConditionProvider = (props: Props) => {
   }
 
   // Validate string condition
-  const hasError: boolean = conditionId !== '' && !BYTES_REGEX.test(conditionId)
+  const hasError: boolean = conditionId !== '' && !isConditionIdValid(conditionId)
   if (hasError) {
     errors.push(ConditionErrors.INVALID_ERROR)
   }
