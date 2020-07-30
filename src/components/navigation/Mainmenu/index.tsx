@@ -34,6 +34,7 @@ const Item = styled(NavLink)`
   text-align: center;
   text-decoration: none;
   text-transform: uppercase;
+  user-select: none;
   z-index: 1;
 
   &:last-child {

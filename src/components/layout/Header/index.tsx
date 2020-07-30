@@ -5,6 +5,7 @@ import styled from 'styled-components'
 
 import { ButtonConnect } from '../../buttons/ButtonConnect'
 import { Logo } from '../../common/Logo'
+import { UserDropdown } from '../../common/UserDropdown'
 
 const Wrapper = styled.header`
   align-items: center;
@@ -34,7 +35,7 @@ export const Header = () => {
         <Logo />
       </LogoLink>
       {status._type === 'notAsked' && <ButtonConnect disabled={isConnecting} />}
-      {status._type === 'connected' && <div>dropdown</div>}
+      {status._type === 'connected' && <UserDropdown />}
     </Wrapper>
   )
 }
