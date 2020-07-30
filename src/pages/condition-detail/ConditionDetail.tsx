@@ -28,12 +28,7 @@ export const ConditionDetail = (props: ConditionDetailWrapperProps) => {
       {error && !loading && <ConditionDetailNotFound />}
       {condition && (
         <ConditionDetailItem
-          conditionId={conditionId}
-          resolved={condition.resolved}
-          oracle={condition.oracle}
-          questionId={condition.questionId}
-          outcomeSlotCount={condition.outcomeSlotCount}
-          creator={condition.creator}
+          condition={condition}
         />
       )}
     </>

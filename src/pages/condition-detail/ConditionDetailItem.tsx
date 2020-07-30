@@ -8,35 +8,31 @@ import { getKnowOracleFromAddress } from '../../config/networkConfig'
 import { useWeb3Connected } from '../../contexts/Web3Context'
 import { ConditionStatus, ConditionType } from '../../util/types'
 import { useIsConditionFromOmen } from '../../hooks/useIsConditionFromOmen'
+import { GetCondition_condition } from '../../types/generatedGQL'
 
 interface ConditionDetailItemProps {
-  conditionId: string
-  resolved: boolean
-  questionId: string
-  oracle: string
-  creator: string
-  outcomeSlotCount: number
+  condition: GetCondition_condition
 }
 
-export const ConditionDetailItem = (props: ConditionDetailItemProps) => {
-  const { conditionId, resolved, questionId, oracle, outcomeSlotCount, creator } = props
+export const ConditionDetailItem = ({ condition }: ConditionDetailItemProps) => {
+  const { id: conditionId, resolved, questionId, oracle, outcomeSlotCount, creator } = condition
   const { networkConfig } = useWeb3Connected()
 
-  const { question, loading: loadingQuestion } = useQuestion(questionId)
-
-  const {
-    templateId = null,
-    resolution = null,
-    title = INFORMATION_NOT_AVAILABLE,
-    category = INFORMATION_NOT_AVAILABLE,
-    outcomes = Array.from(Array(outcomeSlotCount), (_, i) => i + 1 + ''),
-  } = question ?? {}
+  const { question, loading: loadingQuestion, outcomesPrettier } = useQuestion(questionId, outcomeSlotCount)
 
   const { isConditionFromOmen, loading: loadingIsConditionFromOmen } = useIsConditionFromOmen(
     creator,
     oracle,
     question
   )
+
+  const {
+    templateId = null,
+    resolution = null,
+    title = INFORMATION_NOT_AVAILABLE,
+    category = INFORMATION_NOT_AVAILABLE,
+  } = question ?? {}
+
 
   const loading = loadingQuestion || loadingIsConditionFromOmen
   return (
@@ -69,7 +65,7 @@ export const ConditionDetailItem = (props: ConditionDetailItemProps) => {
           <div className="row">
             <label>Outcomes:</label>
             <ul>
-              {outcomes.map((outcome: string, index: number) => (
+              {outcomesPrettier.map((outcome: string, index: number) => (
                 <li key={index}>{outcome}</li>
               ))}
             </ul>
