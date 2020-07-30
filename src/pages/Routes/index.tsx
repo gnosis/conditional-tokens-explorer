@@ -13,14 +13,21 @@ const ProtectedRoute: React.FC<RouteProps> = (props) => {
   const { component, path } = props
   const { status } = useWeb3Context()
 
-  return status._type === 'notAsked' ? (
+  return (
     <>
-      <p>This should trigger the connection prompt automatically (not show the connect button)</p>
-      <ButtonConnect />
+      {status._type === 'notAsked' && (
+        <>
+          <p>
+            This should trigger the connection prompt automatically (not show the connect button)
+          </p>
+          <ButtonConnect style={{ flexGrow: 0, height: 'auto' }} />
+        </>
+      )}
+      {status._type === 'connecting' && <p>Connecting...</p>}
+      {status._type === 'error' && <p>Error when trying to connect...</p>}
+      {status._type === 'connected' && <Route component={component} exact path={path} />}
     </>
-  ) : status._type === 'connected' ? (
-    <Route component={component} exact path={path} />
-  ) : null
+  )
 }
 
 export const Routes: React.FC = () => {

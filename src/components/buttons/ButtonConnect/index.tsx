@@ -1,5 +1,5 @@
 import { darken } from 'polished'
-import React from 'react'
+import React, { ButtonHTMLAttributes } from 'react'
 import styled from 'styled-components'
 
 import { useWeb3Disconnected } from '../../../contexts/Web3Context'
@@ -42,11 +42,11 @@ const Text = styled.span`
   margin-right: 10px;
 `
 
-export const ButtonConnect: React.FC = () => {
+export const ButtonConnect: React.FC<ButtonHTMLAttributes<HTMLButtonElement>> = (props) => {
   const { connect } = useWeb3Disconnected()
 
   return (
-    <Wrapper onClick={connect}>
+    <Wrapper {...props} onClick={connect}>
       <Text>Connect To Wallet</Text>
       <ChevronRight />
     </Wrapper>

@@ -25,17 +25,15 @@ const LogoLink = styled(Link)`
 
 export const Header = () => {
   const { status } = useWeb3Context()
+  const isConnecting = status._type === 'connecting' // this doesn't seem to work
 
   return (
     <Wrapper>
       <LogoLink to="/">
         <Logo />
       </LogoLink>
-      {status._type === 'notAsked' ? (
-        <ButtonConnect />
-      ) : status._type === 'connected' ? (
-        <div>dropdown</div>
-      ) : null}
+      {status._type === 'notAsked' && <ButtonConnect disabled={isConnecting} />}
+      {status._type === 'connected' && <div>dropdown</div>}
     </Wrapper>
   )
 }
