@@ -1,34 +1,36 @@
-import { useState, useEffect } from 'react'
+import React from 'react'
 
-import { useWeb3Context } from '../contexts/Web3Context'
+import { useWeb3Connected } from '../contexts/Web3Context'
 import { Question } from '../util/types'
 
 export const useQuestion = (questionId: string) => {
-  const { status } = useWeb3Context()
+  const { RtioService } = useWeb3Connected()
 
-  const [question, setQuestion] = useState<Maybe<Question>>(null)
-  const [error, setError] = useState(undefined)
-  const [loading, setLoading] = useState<boolean>(true)
+  const [question, setQuestion] = React.useState<Maybe<Question>>(null)
+  const [error, setError] = React.useState(undefined)
+  const [loading, setLoading] = React.useState<boolean>(true)
 
-  useEffect(() => {
-    if (status._type === 'connected') {
-      setLoading(true)
-      const { RtioService } = status
+  React.useEffect(() => {
+    let cancelled = false
+    if (!cancelled) setLoading(true)
 
-      const getQuestion = async (questionId: string) => {
-        try {
-          const question = await RtioService.getQuestion(questionId)
-          setQuestion(question)
-        } catch (err) {
-          setError(err)
-        }
+    const getQuestion = async (questionId: string) => {
+      try {
+        const question = await RtioService.getQuestion(questionId)
+        if (!cancelled) setQuestion(question)
+      } catch (err) {
+        setError(err)
       }
-
-      getQuestion(questionId)
-
-      setLoading(false)
     }
-  }, [status, questionId])
+
+    getQuestion(questionId)
+
+    if (!cancelled) setLoading(false)
+
+    return () => {
+      cancelled = true
+    }
+  }, [RtioService, questionId])
 
   return {
     question,
