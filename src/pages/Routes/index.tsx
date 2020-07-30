@@ -34,12 +34,12 @@ const ProtectedRoute: React.FC<RouteProps> = (props) => {
 export const Routes: React.FC = () => {
   return (
     <Switch>
-      <Route component={ConditionsDetailContainer} exact path="/conditions/:conditionId" />
       <Route component={ConditionsList} exact path="/conditions" />
+      <Route component={ConditionsDetailContainer} exact path="/conditions/:conditionId" />
       <Route component={PositionsList} exact path="/positions" />
+      <Route component={PositionDetailContainer} exact path="/positions/:positionId" />
       <ProtectedRoute component={PrepareCondition} path="/prepare" />
       <ProtectedRoute component={SplitConditionContainer} path="/split" />
-      <ProtectedRoute component={PositionDetailContainer} path="/positions/:positionId" />
       <Route exact path="/">
         <Redirect to="/conditions" />
       </Route>
