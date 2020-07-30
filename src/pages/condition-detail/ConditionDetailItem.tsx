@@ -1,18 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 
-import {
-  formatDate,
-  getConditionTypeTitle,
-  isContract,
-  truncateStringInTheMiddle,
-} from '../../util/tools'
+import { formatDate, getConditionTypeTitle, truncateStringInTheMiddle } from '../../util/tools'
 import { useQuestion } from '../../hooks/useQuestion'
 import { INFORMATION_NOT_AVAILABLE } from '../../config/constants'
 import { getKnowOracleFromAddress } from '../../config/networkConfig'
-import { useWeb3Context } from '../../contexts/Web3Context'
-import { Provider } from 'ethers/providers'
+import { useWeb3Connected } from '../../contexts/Web3Context'
 import { ConditionStatus, ConditionType } from '../../util/types'
+import { useIsConditionFromOmen } from '../../hooks/useIsConditionFromOmen'
 
 interface ConditionDetailItemProps {
   conditionId: string
@@ -24,17 +19,10 @@ interface ConditionDetailItemProps {
 }
 
 export const ConditionDetailItem = (props: ConditionDetailItemProps) => {
-  const { status } = useWeb3Context()
   const { conditionId, resolved, questionId, oracle, outcomeSlotCount, creator } = props
+  const { networkConfig } = useWeb3Connected()
 
-  let networkId = null
-  if (status._type === 'connected') {
-    const { networkConfig } = status
-    networkId = networkConfig.networkId
-  }
-
-  const { question, loading } = useQuestion(questionId)
-  const [isAContract, setIsAContract] = useState(false)
+  const { question, loading: loadingQuestion } = useQuestion(questionId)
 
   const {
     templateId = null,
@@ -44,26 +32,13 @@ export const ConditionDetailItem = (props: ConditionDetailItemProps) => {
     outcomes = Array.from(Array(outcomeSlotCount), (_, i) => i + 1 + ''),
   } = question ?? {}
 
-  // We check if the owner is a contract, if is a contract is from Safe, and Omen use safe, we can say the origin is from omen, maybe we can improve this in the future
-  useEffect(() => {
-    if (status._type === 'connected') {
-      const { provider } = status
+  const { isConditionFromOmen, loading: loadingIsConditionFromOmen } = useIsConditionFromOmen(
+    creator,
+    oracle,
+    question
+  )
 
-      const checkIfThisConditionIsFromOmen = async (provider: Provider, address: string) => {
-        const isReallyAContract = await isContract(provider, address)
-
-        setIsAContract(isReallyAContract)
-      }
-
-      checkIfThisConditionIsFromOmen(provider, creator)
-    }
-  }, [creator, status])
-
-  const isFromOmen =
-    isAContract ||
-    !!question ||
-    (networkId && getKnowOracleFromAddress(networkId, oracle) === 'realitio')
-
+  const loading = loadingQuestion || loadingIsConditionFromOmen
   return (
     <>
       {loading && <div>Loading...</div>}
@@ -71,7 +46,7 @@ export const ConditionDetailItem = (props: ConditionDetailItemProps) => {
         <>
           <div className="row">
             <label>Condition Type</label>{' '}
-            <label>{isFromOmen ? ConditionType.Omen : ConditionType.Unknown}</label>
+            <label>{isConditionFromOmen ? ConditionType.Omen : ConditionType.Unknown}</label>
             <button>Actions</button>
           </div>
           <div className="row">
@@ -109,7 +84,7 @@ export const ConditionDetailItem = (props: ConditionDetailItemProps) => {
           <div className="row">
             <label>Oracle</label>{' '}
             <label title={oracle}>
-              {(networkId && getKnowOracleFromAddress(networkId, oracle)) ||
+              {getKnowOracleFromAddress(networkConfig.networkId, oracle) ||
                 truncateStringInTheMiddle(oracle, 6, 6)}
             </label>
           </div>
