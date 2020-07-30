@@ -37,7 +37,9 @@ export const useQuestion = (questionId: string, outcomeSlotCount: number) => {
     let cancelled = false
     if (!cancelled) setLoading(true)
 
-    const outcomesSlots = question ? question.outcomes: Array.from(Array(outcomeSlotCount), (_, i) => i + 1 + '')
+    const outcomesSlots = question
+      ? question.outcomes
+      : Array.from(Array(outcomeSlotCount), (_, i) => i + 1 + '')
 
     if (!cancelled) setOutcomesPrettier(outcomesSlots)
     if (!cancelled) setLoading(false)
@@ -45,7 +47,7 @@ export const useQuestion = (questionId: string, outcomeSlotCount: number) => {
     return () => {
       cancelled = true
     }
-  }, [question])
+  }, [question, outcomeSlotCount])
 
   return {
     question,

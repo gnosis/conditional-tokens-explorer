@@ -18,7 +18,10 @@ export const ConditionDetailItem = ({ condition }: ConditionDetailItemProps) => 
   const { id: conditionId, resolved, questionId, oracle, outcomeSlotCount, creator } = condition
   const { networkConfig } = useWeb3Connected()
 
-  const { question, loading: loadingQuestion, outcomesPrettier } = useQuestion(questionId, outcomeSlotCount)
+  const { question, loading: loadingQuestion, outcomesPrettier } = useQuestion(
+    questionId,
+    outcomeSlotCount
+  )
 
   const { isConditionFromOmen, loading: loadingIsConditionFromOmen } = useIsConditionFromOmen(
     creator,
@@ -32,7 +35,6 @@ export const ConditionDetailItem = ({ condition }: ConditionDetailItemProps) => 
     title = INFORMATION_NOT_AVAILABLE,
     category = INFORMATION_NOT_AVAILABLE,
   } = question ?? {}
-
 
   const loading = loadingQuestion || loadingIsConditionFromOmen
   return (

@@ -3,7 +3,7 @@ import React from 'react'
 
 import { getApolloClient } from 'apolloClientConfig'
 import { useWeb3Context } from './Web3Context'
-import { NetworkId } from 'config/networkConfig'
+import { NetworkId } from '../util/types'
 import { DEFAULT_NETWORK_ID } from 'config/constants'
 
 interface Props {

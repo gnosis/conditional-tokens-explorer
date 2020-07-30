@@ -1,7 +1,7 @@
 import { ethers, Signer, Contract } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import { Provider, TransactionResponse } from 'ethers/providers'
-import { Token } from 'config/networkConfig'
+import { Token } from '../util/types'
 
 const erc20Abi = [
   'function allowance(address owner, address spender) external view returns (uint256)',

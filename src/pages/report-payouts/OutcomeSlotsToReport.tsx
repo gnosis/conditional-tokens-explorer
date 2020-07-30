@@ -16,7 +16,6 @@ interface Outcome {
 }
 
 export const OutcomeSlotsToReport = ({ condition }: Props) => {
-
   const { questionId, outcomeSlotCount } = condition
   const { outcomesPrettier } = useQuestion(questionId, outcomeSlotCount)
 
@@ -24,7 +23,7 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
     return {
       name: outcome,
       probability: 0,
-      payout: new BigNumber(0)
+      payout: new BigNumber(0),
     }
   })
 
@@ -40,7 +39,7 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
         </thead>
         <tbody>
           {outcomes.map((outcome, index) => {
-            const {name, probability, payout} = outcome
+            const { name, probability, payout } = outcome
             return (
               <tr key={index}>
                 <td>{name}</td>

@@ -6,7 +6,8 @@ import apolloLogger from 'apollo-link-logger'
 import { WebSocketLink } from 'apollo-link-ws'
 import { getMainDefinition } from 'apollo-utilities'
 
-import { getGraphUris, NetworkId } from './config/networkConfig'
+import { getGraphUris } from './config/networkConfig'
+import { NetworkId } from './util/types'
 
 // using the ability to split links, you can send data to each link
 // depending on what kind of operation is being sent

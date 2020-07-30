@@ -19,9 +19,8 @@ export const ReportPayouts: React.FC = () => {
       <label htmlFor="position">Condition ID </label>
       <Condition conditionId={conditionId} errors={errors} loading={loading} />
       <button onClick={selectCondition}>Select Condition</button>
-      {condition && <OutcomeSlotsToReport condition={condition}/>}
+      {condition && <OutcomeSlotsToReport condition={condition} />}
       {!condition && <div>Please load a condition to report</div>}
-
     </>
   )
 }

@@ -26,11 +26,7 @@ export const ConditionDetail = (props: ConditionDetailWrapperProps) => {
 
       {loading && <div>Loading...</div>}
       {error && !loading && <ConditionDetailNotFound />}
-      {condition && (
-        <ConditionDetailItem
-          condition={condition}
-        />
-      )}
+      {condition && <ConditionDetailItem condition={condition} />}
     </>
   )
 }

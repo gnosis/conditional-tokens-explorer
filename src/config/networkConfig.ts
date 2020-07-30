@@ -6,19 +6,7 @@ import {
   EARLIEST_RINKEBY_BLOCK_TO_CHECK,
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
 } from './constants'
-
-export type NetworkId = 1 | 4
-
-const networkIds = {
-  MAINNET: 1,
-  RINKEBY: 4,
-} as const
-
-export type Token = {
-  symbol: string
-  address: string
-  decimals: number
-}
+import { Token, NetworkIds } from '../util/types'
 
 interface Network {
   earliestBlockToCheck: number
@@ -31,8 +19,8 @@ interface Network {
   graphWsUri: string
 }
 
-const networks: { [K in NetworkId]: Network } = {
-  [networkIds.MAINNET]: {
+const networks: { [K in NetworkIds]: Network } = {
+  [NetworkIds.MAINNET]: {
     earliestBlockToCheck: EARLIEST_MAINNET_BLOCK_TO_CHECK,
     contracts: {
       conditionalTokensAddress: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
@@ -49,11 +37,46 @@ const networks: { [K in NetworkId]: Network } = {
         address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
         decimals: 6,
       },
+      {
+        symbol: 'CDAI',
+        address: '0xa4c993e32876795abf80842adb0a241bb0eecd47',
+        decimals: 18,
+      },
+      {
+        symbol: 'WETH',
+        address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+        decimals: 18,
+      },
+      {
+        symbol: 'OWL',
+        address: '0x1a5f9352af8af974bfc03399e3767df6370d82e4',
+        decimals: 18,
+      },
+      {
+        symbol: 'GNO',
+        address: '0x6810e776880c02933d47db1b9fc05908e5386b96',
+        decimals: 18,
+      },
+      {
+        symbol: 'CHAI',
+        address: '0x06AF07097C9Eeb7fD685c692751D5C66dB49c215',
+        decimals: 18,
+      },
+      {
+        symbol: 'PNK',
+        address: '0x93ed3fbe21207ec2e8f2d3c3de6e058cb73bc04d',
+        decimals: 18,
+      },
+      {
+        symbol: 'DXD',
+        address: '0xa1d65E8fB6e87b60FECCBc582F7f97804B725521',
+        decimals: 18,
+      },
     ],
     graphHttpUri: GRAPH_HTTP_MAINNET,
     graphWsUri: GRAPH_WS_MAINNET,
   },
-  [networkIds.RINKEBY]: {
+  [NetworkIds.RINKEBY]: {
     earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
     contracts: {
       conditionalTokensAddress: '0x36bede640D19981A82090519bC1626249984c908',
@@ -70,6 +93,26 @@ const networks: { [K in NetworkId]: Network } = {
         address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
         decimals: 6,
       },
+      {
+        symbol: 'CDAI',
+        address: '0x7a978b38d5af06ff929ca06647e025b759479318',
+        decimals: 18,
+      },
+      {
+        symbol: 'WETH',
+        address: '0xc778417e063141139fce010982780140aa0cd5ab',
+        decimals: 18,
+      },
+      {
+        symbol: 'OWL',
+        address: '0x9187a7788410f54a630407fa994c1555722f9abc',
+        decimals: 18,
+      },
+      {
+        symbol: 'GNO',
+        address: '0x3e6e3f3266b1c3d814f9d237e7d144e563292112',
+        decimals: 18,
+      },
     ],
     graphHttpUri: GRAPH_HTTP_RINKEBY,
     graphWsUri: GRAPH_WS_RINKEBY,
@@ -77,9 +120,9 @@ const networks: { [K in NetworkId]: Network } = {
 }
 
 export class NetworkConfig {
-  constructor(public networkId: NetworkId) {}
+  constructor(public networkId: NetworkIds) {}
 
-  static isKnownNetwork(networkId: number): networkId is NetworkId {
+  static isKnownNetwork(networkId: number): networkId is NetworkIds {
     return networkId === 1 || networkId === 4
   }
 
@@ -127,16 +170,16 @@ export const knownOracles: { [name in KnownOracle]: KnownOracleData } = {
     name: 'Realitio Team',
     url: 'https://realit.io/',
     addresses: {
-      [networkIds.MAINNET]: '0x0e414d014a77971f4eaa22ab58e6d84d16ea838e',
-      [networkIds.RINKEBY]: '0x576B76eebE6B5411c0ef310E65De9Bff8A60130F',
+      [NetworkIds.MAINNET]: '0x0e414d014a77971f4eaa22ab58e6d84d16ea838e',
+      [NetworkIds.RINKEBY]: '0x576B76eebE6B5411c0ef310E65De9Bff8A60130F',
     },
   },
   kleros: {
     name: 'Kleros',
     url: 'https://kleros.io/',
     addresses: {
-      [networkIds.MAINNET]: '0x0000000000000000000000000000000000000000',
-      [networkIds.RINKEBY]: '0x0000000000000000000000000000000000000000',
+      [NetworkIds.MAINNET]: '0x0000000000000000000000000000000000000000',
+      [NetworkIds.RINKEBY]: '0x0000000000000000000000000000000000000000',
     },
   },
   unknown: {
@@ -160,4 +203,21 @@ export const getKnowOracleFromAddress = (networkId: number, address: string): Kn
   }
 
   return 'unknown' as KnownOracle
+}
+
+export const getTokenFromAddress = (networkId: number, address: string): Token => {
+  if (!NetworkConfig.isKnownNetwork(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+
+  const tokens = networks[networkId].tokens
+
+  for (const token of tokens) {
+    const tokenAddress = token.address
+    if (tokenAddress.toLowerCase() === address.toLowerCase()) {
+      return token
+    }
+  }
+
+  throw new Error(`Couldn't find token with address '${address}' in network '${networkId}'`)
 }

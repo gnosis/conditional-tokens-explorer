@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { FormContextValues, Controller } from 'react-hook-form'
 import { SplitPositionForm, SplitFrom } from './SplitCondition'
-import { Token } from 'config/networkConfig'
+import { Token } from '../../util/types'
 import { BigNumberInputWrapper } from 'components/common/BigNumberInputWrapper'
 import { ZERO_BN, BYTES_REGEX } from 'config/constants'
 import { BigNumber } from 'ethers/utils'

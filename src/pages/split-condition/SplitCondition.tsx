@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { BigNumber } from 'ethers/utils'
 import { useForm } from 'react-hook-form'
 
-import { Token } from '../../config/networkConfig'
+import { Token } from '../../util/types'
 import { SetAllowance } from '../../components/common/SetAllowance'
 import { ZERO_BN, NULL_PARENT_ID } from '../../config/constants'
 import { trivialPartition } from '../../util/tools'
