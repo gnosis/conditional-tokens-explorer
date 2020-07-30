@@ -2,9 +2,10 @@ import React from 'react'
 
 import { useConditionContext } from '../../contexts/ConditionContext'
 import { Condition } from './Condition'
+import { OutcomeSlotsToReport } from './OutcomeSlotsToReport'
 
 export const ReportPayouts: React.FC = () => {
-  const { conditionId, errors, loading, setConditionId } = useConditionContext()
+  const { condition, conditionId, errors, loading, setConditionId } = useConditionContext()
 
   const selectCondition = () => {
     const conditionIdFromPrompt = window.prompt(`Enter the condition: `)
@@ -18,6 +19,9 @@ export const ReportPayouts: React.FC = () => {
       <label htmlFor="position">Condition ID </label>
       <Condition conditionId={conditionId} errors={errors} loading={loading} />
       <button onClick={selectCondition}>Select Condition</button>
+      {condition && <OutcomeSlotsToReport condition={condition}/>}
+      {!condition && <div>Please load a condition to report</div>}
+
     </>
   )
 }
