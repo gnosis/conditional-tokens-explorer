@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { useConditionContext } from './Condition.context'
+import { useConditionContext } from '../../contexts/ConditionContext'
 import { Condition } from './Condition'
 
 export const ReportPayouts: React.FC = () => {
