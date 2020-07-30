@@ -5,6 +5,7 @@ import { Redirect, Route, RouteProps, Switch } from 'react-router-dom'
 import { ButtonConnect } from '../../components/buttons/ButtonConnect'
 import { ConditionsDetailContainer } from '../condition-detail'
 import { ConditionsList } from '../conditions-list'
+import { PositionDetailContainer } from '../position-detail'
 import { PositionsList } from '../positions-list'
 import { PrepareCondition } from '../prepare-condition'
 import { SplitConditionContainer } from '../split-condition'
@@ -38,6 +39,7 @@ export const Routes: React.FC = () => {
       <Route component={PositionsList} exact path="/positions" />
       <ProtectedRoute component={PrepareCondition} path="/prepare" />
       <ProtectedRoute component={SplitConditionContainer} path="/split" />
+      <ProtectedRoute component={PositionDetailContainer} path="/positions/:positionId" />
       <Route exact path="/">
         <Redirect to="/conditions" />
       </Route>

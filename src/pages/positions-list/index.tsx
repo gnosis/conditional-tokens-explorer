@@ -2,6 +2,7 @@ import { Web3Status, useWeb3Context } from 'contexts/Web3Context'
 import { Position, usePositions } from 'hooks'
 import React, { useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
+import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
 const dafaultColumns = [
@@ -26,7 +27,7 @@ const getTableColumns = (status: Web3Status) => {
         selector: 'userBalance',
         sortable: true,
         // eslint-disable-next-line react/display-name
-        cell: (row: Position) => <div>{row.userBalance.toString()}</div>, // Q: Should we show this as decimal number, based on collateral decimals?
+        cell: (row: Position) => <div>{row.userBalance.toString()}</div>, // Note: Should we show this as decimal number, based on collateral decimals?
       },
     ]
   }
@@ -40,6 +41,14 @@ const Wrapper = styled.div`
   justify-content: center;
 `
 
+const customStyles = {
+  rows: {
+    style: {
+      cursor: 'pointer',
+    },
+  },
+}
+
 export const PositionsList = () => {
   const { status } = useWeb3Context()
   const { data, error, loading } = usePositions()
@@ -49,6 +58,12 @@ export const PositionsList = () => {
     setTableColumns(getTableColumns(status))
   }, [status])
 
+  const history = useHistory()
+
+  const handleRowClick = (row: Position) => {
+    history.push(`/positions/${row.id}`)
+  }
+
   return (
     <Wrapper>
       {loading && <div>Loading...</div>}
@@ -56,7 +71,9 @@ export const PositionsList = () => {
       {data && (
         <DataTable
           columns={tableColumns}
+          customStyles={customStyles}
           data={data || []}
+          onRowClicked={handleRowClick}
           pagination={true}
           style={{
             width: '80%',

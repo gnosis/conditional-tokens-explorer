@@ -106,9 +106,7 @@ const UserDropdownButton: React.FC<UserDropdownProps> = ({ data }) => {
   )
 }
 
-const UserDropdownContent: React.FC<UserDropdownProps> = ({ data }) => {
-  const { address } = data
-
+const UserDropdownContent: React.FC<UserDropdownProps> = () => {
   return <div>asdads</div>
 }
 
@@ -119,8 +117,6 @@ export const UserDropdown: React.FC = (props) => {
       content: <UserDropdownContent data={data} />,
     },
   ]
-
-  console.dir(data)
 
   return (
     <Wrapper
