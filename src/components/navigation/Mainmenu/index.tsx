@@ -5,10 +5,9 @@ import styled from 'styled-components'
 import { InnerContainer } from '../../pureStyledComponents/layout'
 
 const Wrapper = styled.nav`
-  align-items: center;
   background-color: rgba(255, 255, 255, 0.8);
   box-shadow: 0 2px 8px 0 rgba(212, 213, 211, 0.7);
-  display: flex;
+  display: block;
   flex-shrink: 0;
   height: 36px;
 `
