@@ -4,6 +4,7 @@ import { BigNumber, formatUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
 
 import { BYTES_REGEX } from '../config/constants'
+import { ConditionErrors } from './types'
 
 export const isAddress = (address: string) => {
   try {
@@ -65,3 +66,15 @@ export const getConditionTypeTitle = (templateId: Maybe<number>) => {
 export const formatDate = (date: Date): string => {
   return moment(date).tz('UTC').format('YYYY-MM-DD - HH:mm [UTC]')
 }
+
+export const isConditionErrorNotFound = (errors: ConditionErrors[]): boolean =>
+  errors.indexOf(ConditionErrors.NOT_FOUND_ERROR) > -1
+
+export const isConditionErrorNotResolved = (errors: ConditionErrors[]): boolean =>
+  errors.indexOf(ConditionErrors.NOT_RESOLVED_ERROR) > -1
+
+export const isConditionErrorFetching = (errors: ConditionErrors[]): boolean =>
+  errors.indexOf(ConditionErrors.FETCHING_ERROR) > -1
+
+export const isConditionErrorInvalid = (errors: ConditionErrors[]): boolean =>
+  errors.indexOf(ConditionErrors.INVALID_ERROR) > -1
