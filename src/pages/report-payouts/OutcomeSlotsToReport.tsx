@@ -24,11 +24,24 @@ interface FormInputs {
   payouts: BigNumber[]
 }
 
+const ORACLE_NOT_VALID_TO_REPORT_ERROR = 'The connected user is a not allowed to report payouts'
+const PAYOUTS_POSITIVE_ERROR = 'At least one payout must be positive'
+
 export const OutcomeSlotsToReport = ({ condition }: Props) => {
-  const { networkConfig } = useWeb3Connected()
+  const { networkConfig, address } = useWeb3Connected()
 
-  const { questionId, outcomeSlotCount, positions } = condition
+  const { questionId, outcomeSlotCount, positions, oracle } = condition
 
+  const { outcomesPrettier } = useQuestion(questionId, outcomeSlotCount)
+
+  const [outcomes, setOutcomes] = React.useState<Outcome[]>([])
+  const [payoutEmptyError, setPayoutEmptyError] = React.useState(false)
+  const { getValues, control, handleSubmit, watch } = useForm<FormInputs>({ mode: 'onChange' })
+
+  // Check if the sender is valid
+  const oracleNotValidError = oracle !== address
+
+  // Calculate the decimals of the collateral used in the positions of the condition
   let decimals = 18
   if (positions) {
     const { collateralToken } = positions[0]
@@ -37,14 +50,10 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
     decimals = token.decimals
   }
 
-  const { outcomesPrettier } = useQuestion(questionId, outcomeSlotCount)
-
-  const [outcomes, setOutcomes] = React.useState<Outcome[]>([])
-
   React.useEffect(() => {
     let cancelled = false
     if (outcomes.length === 0) {
-      const outcomes: Outcome[] = outcomesPrettier.map((outcome, index) => {
+      const outcomes: Outcome[] = outcomesPrettier.map((outcome) => {
         return {
           name: outcome,
           probability: 0,
@@ -57,10 +66,19 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
     }
   }, [outcomesPrettier, outcomes.length])
 
-  const { getValues, control, handleSubmit } = useForm<FormInputs>({ mode: 'onChange' })
+  const watchPayouts = watch('payouts')
 
-  const onSubmit = (payouts: FormInputs) => {
+  // Validate payouts (positive, at least one non 0)
+  React.useEffect(() => {
+    if (watchPayouts && watchPayouts.length > 0) {
+      const nonZero = (currentValue: BigNumber) => !currentValue.isZero()
+      setPayoutEmptyError(!watchPayouts.some(nonZero))
+    }
+  }, [watchPayouts])
+
+  const onSubmit = (data: FormInputs) => {
     // Validate exist at least one payout
+    const { payouts } = data
     console.log(payouts)
   }
 
@@ -77,7 +95,9 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
     // Calculate probabilities against the total calculated previously
     const outcomesValues: Outcome[] = (outcomes as Outcome[]).map((outcome, currentIndex) => {
       const amount = currentIndex === index ? value : (values[currentIndex] as BigNumber)
-      const probability = divBN(amount, total as BigNumber) * 100
+      const probability = (total as BigNumber).isZero()
+        ? 0
+        : divBN(amount, total as BigNumber) * 100
       return {
         ...outcome,
         probability,
@@ -87,6 +107,9 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
     // Update the outcomes with the new probabilities
     setOutcomes(outcomesValues)
   }
+
+  // Variable used to disable the submit button, check for payouts not empty and the oracle must be valid
+  const disableSubmit = payoutEmptyError || oracleNotValidError
 
   return (
     <>
@@ -125,7 +148,9 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
             })}
           </tbody>
         </table>
-        <input type="submit" />
+        {payoutEmptyError && <p>{PAYOUTS_POSITIVE_ERROR}</p>}
+        {oracleNotValidError && <p>{ORACLE_NOT_VALID_TO_REPORT_ERROR}</p>}
+        <input type="submit" disabled={disableSubmit} />
       </form>
     </>
   )
