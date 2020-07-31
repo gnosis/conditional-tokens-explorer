@@ -1,7 +1,13 @@
 import React from 'react'
 import styled from 'styled-components'
 
-const Wrapper = styled.svg``
+const Wrapper = styled.svg`
+  bottom: auto;
+  left: auto;
+  position: relative;
+  right: auto;
+  top: auto;
+`
 
 export const ChevronRight: React.FC = (props) => (
   <Wrapper {...props} height="11.999" width="7" xmlns="http://www.w3.org/2000/svg">

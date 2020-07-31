@@ -5,8 +5,14 @@ import styled, { css } from 'styled-components'
 import { version as appVersion } from '../../../../package.json'
 
 const Wrapper = styled.footer`
+  align-items: initial;
+  border-radius: 0;
+  display: block;
+  height: auto;
   margin-top: auto;
+  overflow: visible;
   padding: 25px 0;
+  width: 100%;
 `
 
 const Items = styled.ul`

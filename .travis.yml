@@ -7,7 +7,6 @@ env:
   global:
     - CI=true
     - REACT_APP_SC_ATTR='avoid-sc-conflicts'
-    - REACT_APP_SC_DISABLE_SPEEDY=true
 before_install:
   # Needed to deploy pull request and releases
   - sudo apt-get update
