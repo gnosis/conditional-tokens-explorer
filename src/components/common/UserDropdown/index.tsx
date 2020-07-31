@@ -181,7 +181,6 @@ const UserDropdownContent: React.FC<UserDropdownProps> = ({ data }) => {
           </Item>
         )
       })}
-
       <Item>
         <DisconnectButton buttonType={ButtonType.danger}>Disconnect</DisconnectButton>
       </Item>
