@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components'
 
 import { version as appVersion } from '../../../../package.json'
 
-const Wrapper = styled.footer`
+const Wrapper = styled.div`
   margin-top: auto;
   padding: 25px 0;
 `
