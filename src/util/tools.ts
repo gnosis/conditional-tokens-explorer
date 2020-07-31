@@ -78,3 +78,11 @@ export const isConditionErrorFetching = (errors: ConditionErrors[]): boolean =>
 
 export const isConditionErrorInvalid = (errors: ConditionErrors[]): boolean =>
   errors.indexOf(ConditionErrors.INVALID_ERROR) > -1
+
+export const divBN = (a: BigNumber, b: BigNumber, scale = 10000): number => {
+  return a.mul(scale).div(b).toNumber() / scale
+}
+
+export const mulBN = (a: BigNumber, b: number, scale = 10000): BigNumber => {
+  return a.mul(Math.round(b * scale)).div(scale)
+}
