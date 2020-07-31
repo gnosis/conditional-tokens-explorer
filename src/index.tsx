@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import { HashRouter as Router } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
 
-import { Header, MainFooter } from './components/layout'
+import { Footer, Header } from './components/layout'
 import { Mainmenu } from './components/navigation/Mainmenu'
 import { InnerContainer, MainScroll, MainWrapper } from './components/pureStyledComponents/layout'
 import { ApolloProviderWrapper } from './contexts/Apollo'
@@ -27,7 +27,7 @@ ReactDOM.render(
                 <InnerContainer>
                   <Routes />
                 </InnerContainer>
-                <MainFooter />
+                <Footer />
               </MainScroll>
             </MainWrapper>
           </Router>

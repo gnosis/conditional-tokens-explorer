@@ -54,7 +54,7 @@ const Break = styled.span`
 
 const Text = styled.span``
 
-export const MainFooter: React.FC = (props) => {
+export const Footer: React.FC = (props) => {
   const date = new Date()
   const year = date.getFullYear()
   const version = appVersion || 'Invalid Version Number'
