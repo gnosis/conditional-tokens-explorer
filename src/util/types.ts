@@ -46,3 +46,11 @@ export enum NetworkIds {
   MAINNET = 1,
   RINKEBY = 4,
 }
+
+export enum Status {
+  Ready = 'Ready',
+  Loading = 'Loading',
+  Refreshing = 'Refreshing',
+  Done = 'Done',
+  Error = 'Error',
+}

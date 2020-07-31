@@ -57,9 +57,6 @@ export const ConditionProvider = (props: Props) => {
     if (!conditionFromTheGraph) {
       errors.push(ConditionErrors.NOT_FOUND_ERROR)
     }
-    if (conditionFromTheGraph && conditionFromTheGraph.resolved) {
-      errors.push(ConditionErrors.NOT_RESOLVED_ERROR)
-    }
   }
 
   // Validate string condition

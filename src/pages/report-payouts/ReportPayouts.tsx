@@ -3,6 +3,7 @@ import React from 'react'
 import { useConditionContext } from '../../contexts/ConditionContext'
 import { Condition } from './Condition'
 import { OutcomeSlotsToReport } from './OutcomeSlotsToReport'
+import { ConditionResolved } from './ConditionResolved'
 
 export const ReportPayouts: React.FC = () => {
   const { condition, conditionId, errors, loading, setConditionId } = useConditionContext()
@@ -19,7 +20,8 @@ export const ReportPayouts: React.FC = () => {
       <label htmlFor="position">Condition ID </label>
       <Condition conditionId={conditionId} errors={errors} loading={loading} />
       <button onClick={selectCondition}>Select Condition</button>
-      {condition && <OutcomeSlotsToReport condition={condition} />}
+      {condition && !condition.resolved && <OutcomeSlotsToReport condition={condition} />}
+      {condition && condition.resolved && <ConditionResolved />}
       {!condition && <div>Please load a condition to report</div>}
     </>
   )

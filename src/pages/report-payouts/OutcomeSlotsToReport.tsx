@@ -1,15 +1,15 @@
 import React from 'react'
 import { useForm, Controller } from 'react-hook-form'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, formatUnits } from 'ethers/utils'
 
 import { BigNumberInputWrapper } from 'components/common/BigNumberInputWrapper'
 import { GetCondition_condition } from '../../types/generatedGQL'
 import { useQuestion } from '../../hooks/useQuestion'
-import { getTokenFromAddress } from '../../config/networkConfig'
 import { useWeb3Connected } from '../../contexts/Web3Context'
-import { Token } from '../../util/types'
+import { Status } from '../../util/types'
 import { ZERO_BN } from '../../config/constants'
 import { divBN } from '../../util/tools'
+import { getLogger } from '../../util/logger'
 
 interface Props {
   condition: GetCondition_condition
@@ -24,31 +24,27 @@ interface FormInputs {
   payouts: BigNumber[]
 }
 
+const logger = getLogger('OutcomSlotsToReport')
+
 const ORACLE_NOT_VALID_TO_REPORT_ERROR = 'The connected user is a not allowed to report payouts'
 const PAYOUTS_POSITIVE_ERROR = 'At least one payout must be positive'
 
-export const OutcomeSlotsToReport = ({ condition }: Props) => {
-  const { networkConfig, address } = useWeb3Connected()
+const DECIMALS = 2
 
-  const { questionId, outcomeSlotCount, positions, oracle } = condition
+export const OutcomeSlotsToReport = ({ condition }: Props) => {
+  const { address, CTService } = useWeb3Connected()
+
+  const { questionId, outcomeSlotCount, oracle } = condition
 
   const { outcomesPrettier } = useQuestion(questionId, outcomeSlotCount)
 
   const [outcomes, setOutcomes] = React.useState<Outcome[]>([])
   const [payoutEmptyError, setPayoutEmptyError] = React.useState(false)
+  const [status, setStatus] = React.useState<Maybe<Status>>(null)
   const { getValues, control, handleSubmit, watch } = useForm<FormInputs>({ mode: 'onChange' })
 
   // Check if the sender is valid
-  const oracleNotValidError = oracle !== address
-
-  // Calculate the decimals of the collateral used in the positions of the condition
-  let decimals = 18
-  if (positions) {
-    const { collateralToken } = positions[0]
-    const { id: collateralAddress } = collateralToken
-    const token: Token = getTokenFromAddress(networkConfig.networkId, collateralAddress)
-    decimals = token.decimals
-  }
+  const oracleNotValidError = oracle.toLowerCase() !== address.toLowerCase()
 
   React.useEffect(() => {
     let cancelled = false
@@ -76,12 +72,6 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
     }
   }, [watchPayouts])
 
-  const onSubmit = (data: FormInputs) => {
-    // Validate exist at least one payout
-    const { payouts } = data
-    console.log(payouts)
-  }
-
   const onChange = (value: BigNumber, index: number) => {
     const values = Object.values(getValues())
 
@@ -103,13 +93,30 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
         probability,
       }
     })
-
     // Update the outcomes with the new probabilities
     setOutcomes(outcomesValues)
   }
 
+  const onSubmit = async (data: FormInputs) => {
+    // Validate exist at least one payout
+    const { payouts } = data
+    try {
+      setStatus(Status.Loading)
+
+      const payoutsNumbered = payouts.map((payout: BigNumber) =>
+        Number(formatUnits(payout, DECIMALS))
+      )
+      await CTService.reportPayouts(questionId, payoutsNumbered)
+
+      setStatus(Status.Ready)
+    } catch (err) {
+      setStatus(Status.Error)
+      logger.error(err)
+    }
+  }
+
   // Variable used to disable the submit button, check for payouts not empty and the oracle must be valid
-  const disableSubmit = payoutEmptyError || oracleNotValidError
+  const disableSubmit = payoutEmptyError || oracleNotValidError || status === Status.Loading
 
   return (
     <>
@@ -133,7 +140,7 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
                     <Controller
                       control={control}
                       name={`payouts[${index}]`}
-                      decimals={decimals}
+                      decimals={DECIMALS}
                       as={BigNumberInputWrapper}
                       defaultValue={new BigNumber(0)}
                       rules={{ required: true, validate: (amount) => amount.gte(ZERO_BN) }}
