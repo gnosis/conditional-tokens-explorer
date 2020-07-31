@@ -1,5 +1,10 @@
 import styled, { css } from 'styled-components'
 
+export enum PillTypes {
+  primary,
+  open,
+}
+
 export const CommonDisabledCSS = css`
   &.disabled,
   &.disabled:hover,
@@ -32,6 +37,35 @@ export const BaseCard = styled.div<{ noPadding?: boolean }>`
         props.theme.cards.paddingHorizontal +
         ';'};
 `
+
+const PillPrimaryCSS = css`
+  color: ${(props) => props.theme.pillPrimary.color};
+  background-color: ${(props) => props.theme.pillPrimary.backgroundColor};
+`
+
+const PillOpenCSS = css`
+  color: ${(props) => props.theme.pillOpen.color};
+  background-color: ${(props) => props.theme.pillOpen.backgroundColor};
+`
+
+export const Pill = styled.div<{ type?: PillTypes }>`
+  align-items: center;
+  border-radius: 4px;
+  display: flex;
+  font-size: 12px;
+  font-weight: 600;
+  height: 22px;
+  justify-content: center;
+  line-height: 1;
+  padding: 0 10px;
+
+  ${(props) => props.type === PillTypes.primary && PillPrimaryCSS}
+  ${(props) => props.type === PillTypes.open && PillOpenCSS}
+`
+
+Pill.defaultProps = {
+  type: PillTypes.primary,
+}
 
 BaseCard.defaultProps = {
   noPadding: false,

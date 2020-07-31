@@ -3,7 +3,10 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { truncateStringInTheMiddle } from '../../../util/tools'
+import { Button } from '../../buttons/Button'
+import { ButtonType } from '../../buttons/buttonStylingTypes'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../common/Dropdown'
+import { Pill } from '../../pureStyledComponents/common'
 
 import { ChevronDown } from './img/ChevronDown'
 
@@ -12,6 +15,10 @@ const Wrapper = styled(Dropdown)`
   display: flex;
   height: 100%;
 
+  .dropdownItem {
+    padding: 0;
+  }
+
   &.isOpen {
     .chevronDown {
       transform: rotateX(180deg);
@@ -19,7 +26,7 @@ const Wrapper = styled(Dropdown)`
   }
 `
 
-const Button = styled.div`
+const DropdownButton = styled.div`
   align-items: flex-start;
   cursor: pointer;
   display: flex;
@@ -92,17 +99,48 @@ const Item = styled.div`
   width: 245px;
 `
 
+const Title = styled.div`
+  padding-right: 10px;
+`
+
+const Value = styled.div`
+  font-weight: 600;
+  text-transform: capitalize;
+`
+
+const DisconnectButton = styled(Button)`
+  font-size: 14px;
+  height: 28px;
+  line-height: 1;
+  width: 100%;
+`
+
+const StatusPill = styled(Pill)`
+  border-radius: 2px;
+  height: 18px;
+  padding-left: 8px;
+  padding-right: 8px;
+`
+
 interface UserDropdownProps {
   data: Connected
+}
+
+const getNetworkName = (data: Connected): string => {
+  return data.provider.network.name
+}
+
+const getWalletName = (): string => {
+  return 'Metamask'
 }
 
 const UserDropdownButton: React.FC<UserDropdownProps> = ({ data }) => {
   const { address, networkConfig } = data
 
   return (
-    <Button>
+    <DropdownButton>
       <Address>
-        <AddressText className="addressText">
+        <AddressText className="addressText" title={address}>
           {truncateStringInTheMiddle(address, 6, 4)}
         </AddressText>{' '}
         <ChevronDown />
@@ -110,22 +148,43 @@ const UserDropdownButton: React.FC<UserDropdownProps> = ({ data }) => {
       {networkConfig.networkId && (
         <Network>
           <NetworkStatus />
-          <NetworkText>
-            <>
-              {networkConfig.networkId === 1 && 'Mainnet'}
-              {networkConfig.networkId === 4 && 'Rinkeby'}
-            </>
-          </NetworkText>
+          <NetworkText>{getNetworkName(data)}</NetworkText>
         </Network>
       )}
-    </Button>
+    </DropdownButton>
   )
 }
 
-const UserDropdownContent: React.FC<UserDropdownProps> = () => {
+const UserDropdownContent: React.FC<UserDropdownProps> = ({ data }) => {
+  const items = [
+    {
+      title: 'Status',
+      value: <StatusPill>Connected</StatusPill>,
+    },
+    {
+      title: 'Wallet',
+      value: getWalletName(),
+    },
+    {
+      title: 'Network',
+      value: getNetworkName(data),
+    },
+  ]
+
   return (
     <Content>
-      <Item>as</Item>
+      {items.map((item, index) => {
+        return (
+          <Item key={index}>
+            <Title>{item.title}</Title>
+            <Value>{item.value}</Value>
+          </Item>
+        )
+      })}
+
+      <Item>
+        <DisconnectButton buttonType={ButtonType.danger}>Disconnect</DisconnectButton>
+      </Item>
     </Content>
   )
 }

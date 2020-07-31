@@ -74,6 +74,14 @@ const theme = {
   paddings: {
     mainPadding: '15px',
   },
+  pillPrimary: {
+    backgroundColor: '#caf2eb',
+    color: '#348174',
+  },
+  pillOpen: {
+    backgroundColor: '#e8e7e6',
+    color: '#5d6d74',
+  },
   themeBreakPoints: {
     lg: '992px',
     md: '768px',

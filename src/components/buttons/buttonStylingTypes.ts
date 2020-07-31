@@ -39,19 +39,19 @@ const PrimaryCSS = css`
 
 const DangerCSS = css`
   & {
-    background-color: ${(props) => props.theme.buttonPrimary.backgroundColor};
-    color: ${(props) => props.theme.buttonPrimary.color};
+    background-color: ${(props) => props.theme.buttonDanger.backgroundColor};
+    color: ${(props) => props.theme.buttonDanger.color};
   }
 
   &:hover {
-    background-color: ${(props) => props.theme.buttonPrimary.backgroundColorHover};
-    color: ${(props) => props.theme.buttonPrimary.colorHover};
+    background-color: ${(props) => props.theme.buttonDanger.backgroundColorHover};
+    color: ${(props) => props.theme.buttonDanger.colorHover};
   }
 
   &[disabled],
   &[disabled]:hover {
-    background-color: ${(props) => props.theme.buttonPrimary.backgroundColor};
-    color: ${(props) => props.theme.buttonPrimary.color};
+    background-color: ${(props) => props.theme.buttonDanger.backgroundColor};
+    color: ${(props) => props.theme.buttonDanger.color};
     cursor: not-allowed;
     opacity: 0.5;
   }
