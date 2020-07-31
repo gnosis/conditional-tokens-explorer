@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components'
 
 import { version as appVersion } from '../../../../package.json'
 
-const Wrapper = styled.div`
+const Wrapper = styled.footer`
   margin-top: auto;
   padding: 25px 0;
 `
@@ -54,7 +54,7 @@ const Break = styled.span`
 
 const Text = styled.span``
 
-export const Footer: React.FC = (props) => {
+export const MainFooter: React.FC = (props) => {
   const date = new Date()
   const year = date.getFullYear()
   const version = appVersion || 'Invalid Version Number'
