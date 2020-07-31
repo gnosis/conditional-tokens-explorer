@@ -22,6 +22,12 @@ export const GetConditionQuery = gql`
       outcomeSlotCount
       resolved
       creator
+      positions {
+        id
+        collateralToken {
+          id
+        }
+      }
     }
   }
 `

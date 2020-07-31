@@ -30,6 +30,17 @@ export interface Conditions {
 // GraphQL query operation: GetCondition
 // ====================================================
 
+export interface GetCondition_condition_positions_collateralToken {
+  __typename: "CollateralToken";
+  id: string;
+}
+
+export interface GetCondition_condition_positions {
+  __typename: "Position";
+  id: string;
+  collateralToken: GetCondition_condition_positions_collateralToken;
+}
+
 export interface GetCondition_condition {
   __typename: "Condition";
   id: string;
@@ -38,6 +49,7 @@ export interface GetCondition_condition {
   outcomeSlotCount: number;
   resolved: boolean;
   creator: any;
+  positions: GetCondition_condition_positions[] | null;
 }
 
 export interface GetCondition {
