@@ -76,6 +76,22 @@ const NetworkText = styled.div`
   margin-bottom: -4px;
 `
 
+const Content = styled.div`
+  width: 245px;
+`
+
+const Item = styled.div`
+  align-items: center;
+  border-bottom: 1px solid ${(props) => props.theme.dropdown.item.borderColor};
+  color: ${(props) => props.theme.colors.darkerGray};
+  display: flex;
+  font-size: 13px;
+  justify-content: space-between;
+  line-height: 1.2;
+  padding: 12px;
+  width: 245px;
+`
+
 interface UserDropdownProps {
   data: Connected
 }
@@ -107,7 +123,11 @@ const UserDropdownButton: React.FC<UserDropdownProps> = ({ data }) => {
 }
 
 const UserDropdownContent: React.FC<UserDropdownProps> = () => {
-  return <div>asdads</div>
+  return (
+    <Content>
+      <Item>as</Item>
+    </Content>
+  )
 }
 
 export const UserDropdown: React.FC = (props) => {

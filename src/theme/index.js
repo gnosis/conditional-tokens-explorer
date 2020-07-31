@@ -8,6 +8,18 @@ const theme = {
     color: '#ECEFF1',
     borderRadius: '6px',
   },
+  buttonPrimary: {
+    backgroundColor: '#009cb4',
+    backgroundColorHover: '#00879B',
+    color: '#fff',
+    colorHover: '#fff',
+  },
+  buttonDanger: {
+    backgroundColor: '#db3a3d',
+    backgroundColorHover: '#BC3033',
+    color: '#fff',
+    colorHover: '#fff',
+  },
   cards: {
     backgroundColor: '#fff',
     borderRadius: '8px ',
@@ -16,14 +28,23 @@ const theme = {
     paddingVertical: '24px',
   },
   colors: {
+    darkBlue: '#001428',
     darkGrey: '#5D6D74',
     darkerGray: '#445055',
     darkestGray: '#081728',
     error: '#db3a3d',
-    holdGreen: '#008C73',
+    holdGreen: '#008c73',
+    lightGreen: '#a1d2ca',
+    lightGrey: '#d4d5d3',
+    lighterGreen: '#b6e2da',
     mainBodyBackground: '#f3f2f2',
+    mediumGrey: '#b2b5b2',
     primary: '#009cb4',
     textColor: '#5d6d74',
+    tomatoRed: '#db3a3d',
+    whitesmoke1: '#e8e7e6',
+    whitesmoke2: '#f3f2f2',
+    whitesmoke3: '#fafafa',
   },
   dropdown: {
     item: {
