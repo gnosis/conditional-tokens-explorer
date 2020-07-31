@@ -25,12 +25,12 @@ const LogoLink = styled(Link)`
   text-decoration: none;
 `
 
-export const Header = () => {
+export const Header: React.FC = (props) => {
   const { status } = useWeb3Context()
   const isConnecting = status._type === 'connecting' // this doesn't seem to work
 
   return (
-    <Wrapper>
+    <Wrapper {...props}>
       <LogoLink to="/">
         <Logo />
       </LogoLink>

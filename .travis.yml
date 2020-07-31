@@ -6,7 +6,7 @@ cache: 'yarn'
 env:
   global:
     - CI=true
-    - REACT_APP_SC_ATTR='now-i-am-become-conflict-the-destroyer-of-styles'
+    - REACT_APP_SC_ATTR='avoid-sc-conflicts'
 before_install:
   # Needed to deploy pull request and releases
   - sudo apt-get update

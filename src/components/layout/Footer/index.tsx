@@ -54,7 +54,7 @@ const Break = styled.span`
 
 const Text = styled.span``
 
-export const Footer = () => {
+export const Footer: React.FC = (props) => {
   const date = new Date()
   const year = date.getFullYear()
   const version = appVersion || 'Invalid Version Number'
@@ -85,7 +85,7 @@ export const Footer = () => {
   ]
 
   return (
-    <Wrapper>
+    <Wrapper {...props}>
       <Items>
         {items.map((item, index) => {
           return (
