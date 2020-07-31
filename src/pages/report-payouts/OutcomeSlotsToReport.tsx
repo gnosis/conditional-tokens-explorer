@@ -10,6 +10,7 @@ import { Status } from '../../util/types'
 import { ZERO_BN } from '../../config/constants'
 import { divBN } from '../../util/tools'
 import { getLogger } from '../../util/logger'
+import { useConditionContext } from '../../contexts/ConditionContext'
 
 interface Props {
   condition: GetCondition_condition
@@ -33,6 +34,7 @@ const DECIMALS = 2
 
 export const OutcomeSlotsToReport = ({ condition }: Props) => {
   const { address, CTService } = useWeb3Connected()
+  const { setConditionId } = useConditionContext()
 
   const { questionId, outcomeSlotCount, oracle } = condition
 
@@ -109,6 +111,9 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
       await CTService.reportPayouts(questionId, payoutsNumbered)
 
       setStatus(Status.Ready)
+
+      // Setting the condition to '', update the state of the provider and reload the HOC component, works like a reload
+      setConditionId('')
     } catch (err) {
       setStatus(Status.Error)
       logger.error(err)
