@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import DataTable from 'react-data-table-component'
 import { usePositions, Position } from 'hooks'
 import { useWeb3Context, Web3Status } from 'contexts/Web3Context'
+import { useHistory } from 'react-router-dom'
 
 const dafaultColumns = [
   {
@@ -40,6 +41,14 @@ const Wrapper = styled.div`
   justify-content: center;
 `
 
+const customStyles = {
+  rows: {
+    style: {
+      cursor: 'pointer',
+    },
+  },
+}
+
 export const PositionsList = () => {
   const { status } = useWeb3Context()
   const { data, error, loading } = usePositions()
@@ -48,6 +57,12 @@ export const PositionsList = () => {
   useEffect(() => {
     setTableColumns(getTableColumns(status))
   }, [status])
+
+  const history = useHistory()
+
+  const handleRowClick = (row: Position) => {
+    history.push(`/positions/${row.id}`)
+  }
 
   return (
     <Wrapper>
@@ -60,6 +75,8 @@ export const PositionsList = () => {
           }}
           columns={tableColumns}
           data={data || []}
+          onRowClicked={handleRowClick}
+          customStyles={customStyles}
           pagination={true}
         />
       )}

@@ -27,6 +27,13 @@ export enum ConditionType {
   Unknown = 'Unknown',
 }
 
+export enum ConditionErrors {
+  INVALID_ERROR = `Invalid condition`,
+  FETCHING_ERROR = `Error fetching condition`,
+  NOT_FOUND_ERROR = `Condition doesn't exist`,
+  NOT_RESOLVED_ERROR = `Condition is not resolved`,
+}
+
 export type Token = {
   symbol: string
   address: string
@@ -38,4 +45,12 @@ export type NetworkId = 1 | 4
 export enum NetworkIds {
   MAINNET = 1,
   RINKEBY = 4,
+}
+
+export enum Status {
+  Ready = 'Ready',
+  Loading = 'Loading',
+  Refreshing = 'Refreshing',
+  Done = 'Done',
+  Error = 'Error',
 }

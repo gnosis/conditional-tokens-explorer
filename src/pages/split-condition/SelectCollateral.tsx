@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react'
 import { FormContextValues } from 'react-hook-form'
 import { SplitPositionForm } from './SplitCondition'
-
 import { Token } from '../../util/types'
 
 interface Props {

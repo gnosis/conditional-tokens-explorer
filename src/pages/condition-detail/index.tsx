@@ -1,18 +1,15 @@
 import React from 'react'
 import { useParams } from 'react-router-dom'
 
-import { ConditionDetailNotFound } from './ConditionDetailNotFound'
-import { ConditionDetailWrapper } from './ConditionDetailWrapper'
-import { isConditionIdValid } from '../../util/tools'
+import { ConditionDetail } from './ConditionDetail'
+import { ConditionProvider } from '../../contexts/ConditionContext'
 
 export const ConditionsDetailContainer = () => {
   const { conditionId } = useParams()
 
-  const ConditionDetail = isConditionIdValid(conditionId) ? (
-    <ConditionDetailWrapper conditionId={conditionId} />
-  ) : (
-    <ConditionDetailNotFound />
+  return (
+    <ConditionProvider>
+      <ConditionDetail conditionId={conditionId} />
+    </ConditionProvider>
   )
-
-  return ConditionDetail
 }

@@ -1,11 +1,7 @@
 import React, { useEffect } from 'react'
 import { FormContextValues } from 'react-hook-form'
 import { useQuery } from '@apollo/react-hooks'
-import {
-  GetPositionVariables,
-  GetPosition as getPosition,
-  GetPosition_position,
-} from 'types/generatedGQL'
+import { GetPositionVariables, GetPosition, GetPosition_position } from 'types/generatedGQL'
 import { GetPositionQuery } from 'queries/positions'
 import { BYTES_REGEX } from '../../config/constants'
 import { SplitPositionForm } from './SplitCondition'
@@ -25,7 +21,7 @@ export const InputPosition = ({
   const skipFetchPosition = watchPositionId === '' || !splitFromPosition || !!errorPositionId
 
   const { data: fetchedPosition, loading, error: errorFetchingPosition } = useQuery<
-    getPosition,
+    GetPosition,
     GetPositionVariables
   >(GetPositionQuery, {
     variables: { id: watchPositionId },

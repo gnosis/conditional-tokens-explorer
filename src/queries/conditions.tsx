@@ -27,6 +27,9 @@ export const GetConditionQuery = gql`
       payoutDenominator
       positions {
         id
+        collateralToken {
+          id
+        }
       }
     }
   }
