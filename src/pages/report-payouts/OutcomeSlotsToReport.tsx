@@ -34,7 +34,7 @@ const DECIMALS = 2
 
 export const OutcomeSlotsToReport = ({ condition }: Props) => {
   const { address, CTService } = useWeb3Connected()
-  const { setConditionId } = useConditionContext()
+  const { clearCondition } = useConditionContext()
 
   const { questionId, outcomeSlotCount, oracle } = condition
 
@@ -113,7 +113,7 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
       setStatus(Status.Ready)
 
       // Setting the condition to '', update the state of the provider and reload the HOC component, works like a reload
-      setConditionId('')
+      clearCondition()
     } catch (err) {
       setStatus(Status.Error)
       logger.error(err)

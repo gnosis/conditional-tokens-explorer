@@ -12,6 +12,7 @@ export interface ConditionContext {
   loading: boolean
   errors: ConditionErrors[]
   setConditionId: (conditionId: string) => void
+  clearCondition: () => void
 }
 
 export const CONDITION_CONTEXT_DEFAULT_VALUE = {
@@ -21,6 +22,7 @@ export const CONDITION_CONTEXT_DEFAULT_VALUE = {
   errors: [],
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setConditionId: (conditionId: string) => {},
+  clearCondition: () => {},
 }
 
 const ConditionContext = React.createContext<ConditionContext>(CONDITION_CONTEXT_DEFAULT_VALUE)
@@ -76,6 +78,7 @@ export const ConditionProvider = (props: Props) => {
     errors,
     loading,
     setConditionId: setConditionIdCallback,
+    clearCondition: () => setConditionIdCallback(''),
   }
 
   return <ConditionContext.Provider value={value}>{props.children}</ConditionContext.Provider>
