@@ -1,7 +1,7 @@
 import { Provider } from 'ethers/providers'
 import React, { useEffect, useState } from 'react'
-import { CopyToClipboard } from 'react-copy-to-clipboard'
 
+import { ButtonCopy } from '../../components/buttons/ButtonCopy'
 import { FormCard } from '../../components/pureStyledComponents/FormCard'
 import { GridTwoColumns } from '../../components/pureStyledComponents/GridTwoColumns'
 import { Pill, PillTypes } from '../../components/pureStyledComponents/Pill'
@@ -78,10 +78,15 @@ export const ConditionDetailItem = (props: ConditionDetailItemProps) => {
               title="Condition Type"
               value={isFromOmen ? ConditionType.Omen : ConditionType.Unknown}
             />
-            <TitleValue title="Condition Id" value={truncateStringInTheMiddle(conditionId, 6, 6)} />
-            {/* <CopyToClipboard text={conditionId}>
-                <button>Copy</button>
-              </CopyToClipboard> */}
+            <TitleValue
+              title="Condition Id"
+              value={
+                <>
+                  {truncateStringInTheMiddle(conditionId, 8, 6)}
+                  <ButtonCopy value={conditionId} />
+                </>
+              }
+            />
             <TitleValue
               title="Status"
               value={
