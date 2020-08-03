@@ -130,11 +130,7 @@ export const Dropdown: React.FC<Props> = (props) => {
   }, [])
 
   const onWrapperClick = useCallback(() => {
-    if (isOpen) {
-      setIsOpen(false)
-    } else {
-      setIsOpen(true)
-    }
+    setIsOpen(!isOpen)
   }, [isOpen])
 
   return (
