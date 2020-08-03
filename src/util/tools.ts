@@ -4,6 +4,7 @@ import { BigNumber, formatUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
 
 import { BYTES_REGEX } from '../config/constants'
+
 import { ConditionErrors } from './types'
 
 export const isAddress = (address: string) => {

@@ -1,9 +1,10 @@
 import React from 'react'
 
 import { useConditionContext } from '../../contexts/ConditionContext'
+
 import { Condition } from './Condition'
-import { OutcomeSlotsToReport } from './OutcomeSlotsToReport'
 import { ConditionResolved } from './ConditionResolved'
+import { OutcomeSlotsToReport } from './OutcomeSlotsToReport'
 
 export const ReportPayouts: React.FC = () => {
   const { condition, conditionId, errors, loading, setConditionId } = useConditionContext()

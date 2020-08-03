@@ -1,10 +1,13 @@
+import { getLogger } from 'util/logger'
+
+import { useQuery } from '@apollo/react-hooks'
 import React from 'react'
 
-import { GetPosition } from '../../types/generatedGQL'
 import { GetPositionQuery } from '../../queries/positions'
-import { useQuery } from '@apollo/react-hooks'
+import { GetPosition } from '../../types/generatedGQL'
+
 import { PositionDetailItem } from './PositionDetailItem'
-import { getLogger } from 'util/logger'
+
 interface PositionDetailWrapperProps {
   positionId: string
 }

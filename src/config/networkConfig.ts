@@ -1,12 +1,13 @@
+import { NetworkIds, Token } from '../util/types'
+
 import {
-  GRAPH_HTTP_MAINNET,
-  GRAPH_WS_MAINNET,
-  GRAPH_HTTP_RINKEBY,
-  GRAPH_WS_RINKEBY,
-  EARLIEST_RINKEBY_BLOCK_TO_CHECK,
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
+  EARLIEST_RINKEBY_BLOCK_TO_CHECK,
+  GRAPH_HTTP_MAINNET,
+  GRAPH_HTTP_RINKEBY,
+  GRAPH_WS_MAINNET,
+  GRAPH_WS_RINKEBY,
 } from './constants'
-import { Token, NetworkIds } from '../util/types'
 
 interface Network {
   earliestBlockToCheck: number

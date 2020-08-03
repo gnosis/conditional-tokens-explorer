@@ -1,10 +1,9 @@
-import React from 'react'
-import styled from 'styled-components'
 import { useQuery } from '@apollo/react-hooks'
+import { ConditionsListQuery } from 'queries/conditions'
+import React from 'react'
 import DataTable from 'react-data-table-component'
 import { useHistory } from 'react-router-dom'
-
-import { ConditionsListQuery } from 'queries/conditions'
+import styled from 'styled-components'
 import { Conditions, Conditions_conditions } from 'types/generatedGQL'
 
 const columns = [
@@ -70,15 +69,15 @@ export const ConditionsList = () => {
       {error && <div>Error...</div>}
       {data && (
         <DataTable
+          columns={columns}
+          customStyles={customStyles}
+          data={data?.conditions || []}
+          highlightOnHover
+          onRowClicked={handleRowClick}
+          pagination={true}
           style={{
             width: '80%',
           }}
-          columns={columns}
-          data={data?.conditions || []}
-          pagination={true}
-          highlightOnHover
-          onRowClicked={handleRowClick}
-          customStyles={customStyles}
         />
       )}
     </Wrapper>

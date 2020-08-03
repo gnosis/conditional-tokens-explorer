@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
-import { ERC20Service } from '../services/erc20'
+
 import { useWeb3Connected } from '../contexts/Web3Context'
+import { ERC20Service } from '../services/erc20'
 
 /**
  * Return the allowance of the given `signer` for the conditional tokens contract.

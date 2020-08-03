@@ -1,7 +1,8 @@
-import React from 'react'
 import { BigNumberInput } from 'big-number-input'
 import { BigNumber } from 'ethers/utils'
-import { ZERO_BN } from '../../config/constants'
+import React from 'react'
+
+import { ZERO_BN } from '../../../config/constants'
 
 interface Props {
   value?: BigNumber
@@ -10,7 +11,7 @@ interface Props {
 }
 
 export const BigNumberInputWrapper = (props: Props) => {
-  const { value, onChange, decimals = 0 } = props
+  const { decimals = 0, onChange, value } = props
 
   const handleChange = (newValue: string) => {
     if (onChange) {

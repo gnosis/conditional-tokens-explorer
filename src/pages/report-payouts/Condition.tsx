@@ -9,7 +9,7 @@ interface Props {
 }
 
 export const Condition = (props: Props) => {
-  const { conditionId, loading, errors } = props
+  const { conditionId, errors, loading } = props
 
   if (loading) {
     return <p>Loading...</p>

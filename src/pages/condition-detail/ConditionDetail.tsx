@@ -1,8 +1,9 @@
 import React from 'react'
 
-import { ConditionDetailItem } from './ConditionDetailItem'
 import { useConditionContext } from '../../contexts/ConditionContext'
 import { isConditionErrorInvalid, isConditionErrorNotFound } from '../../util/tools'
+
+import { ConditionDetailItem } from './ConditionDetailItem'
 import { ConditionDetailNotFound } from './ConditionDetailNotFound'
 
 interface ConditionDetailWrapperProps {
