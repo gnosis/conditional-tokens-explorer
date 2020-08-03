@@ -22,6 +22,7 @@ export const CONDITION_CONTEXT_DEFAULT_VALUE = {
   errors: [],
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setConditionId: (conditionId: string) => {},
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   clearCondition: () => {},
 }
 
