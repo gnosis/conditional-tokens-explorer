@@ -36,7 +36,8 @@ export const trivialPartition = (size: number) => {
 export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2): string =>
   Number(formatUnits(value, decimals)).toFixed(precision)
 
-export const isConditionIdValid = (conditionId: string): boolean => BYTES_REGEX.test(conditionId)
+export const isBytes32String = (s: string): boolean => BYTES_REGEX.test(s)
+export const isConditionIdValid = (conditionId: string): boolean => isBytes32String(conditionId)
 
 export const truncateStringInTheMiddle = (
   str: string,
