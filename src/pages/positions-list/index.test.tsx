@@ -1,13 +1,13 @@
-import React from 'react'
-import { render } from '@testing-library/react'
-import { waitFor } from '@testing-library/dom'
-import { act } from 'react-dom/test-utils'
 import { MockedProvider } from '@apollo/react-testing'
-
-import { Web3Context, Connected, NotAsked } from 'contexts/Web3Context'
-import { PositionsList } from './index'
-import { UserWithPositionsQuery } from 'queries/users'
+import { waitFor } from '@testing-library/dom'
+import { render } from '@testing-library/react'
+import { Connected, NotAsked, Web3Context } from 'contexts/Web3Context'
 import { PositionsListQuery } from 'queries/positions'
+import { UserWithPositionsQuery } from 'queries/users'
+import React from 'react'
+import { act } from 'react-dom/test-utils'
+
+import { PositionsList } from './index'
 
 const connect = jest.fn()
 
@@ -146,7 +146,7 @@ test('position list shold show right columns when the user is not connected', as
     },
   ]
   await act(async () => {
-    const { findByText, queryByText, getByRole } = renderWithDisconnectedProvider(
+    const { findByText, getByRole, queryByText } = renderWithDisconnectedProvider(
       <PositionsList />,
       mockQueryResult
     )

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useWeb3Context } from '../contexts/Web3Context'
 import { Question } from '../util/types'

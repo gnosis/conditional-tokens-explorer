@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react'
-import { FormContextValues, Controller } from 'react-hook-form'
-import { SplitPositionForm, SplitFrom } from './SplitCondition'
-import { Token } from 'config/networkConfig'
-import { BigNumberInputWrapper } from 'components/common/BigNumberInputWrapper'
-import { ZERO_BN, BYTES_REGEX } from 'config/constants'
-import { BigNumber } from 'ethers/utils'
-import { ERC20Service } from 'services/erc20'
 import { formatBigNumber } from 'util/tools'
+
+import { BigNumberInputWrapper } from 'components/common/BigNumberInputWrapper'
+import { BYTES_REGEX, ZERO_BN } from 'config/constants'
+import { Token } from 'config/networkConfig'
 import { useWeb3Connected } from 'contexts/Web3Context'
+import { BigNumber } from 'ethers/utils'
+import React, { useEffect, useState } from 'react'
+import { Controller, FormContextValues } from 'react-hook-form'
+import { ERC20Service } from 'services/erc20'
+
+import { SplitFrom, SplitPositionForm } from './SplitCondition'
 
 interface Props {
   collateral: Token
@@ -17,13 +19,13 @@ interface Props {
 }
 export const InputAmount = ({
   collateral,
+  formMethods: { control, setValue },
   positionId,
-  formMethods: { setValue, control },
   splitFrom,
 }: Props) => {
   const [balance, setBalance] = useState<Maybe<BigNumber>>(null)
 
-  const { CTService, signer, provider, address } = useWeb3Connected()
+  const { CTService, address, provider, signer } = useWeb3Connected()
 
   const regexpPosition: RegExp = BYTES_REGEX
 
@@ -60,11 +62,11 @@ export const InputAmount = ({
       <label htmlFor="amount">Amount</label>
 
       <Controller
-        name="amount"
-        rules={{ required: true, validate: (amount) => amount.gt(ZERO_BN) }}
+        as={BigNumberInputWrapper}
         control={control}
         decimals={collateral.decimals}
-        as={BigNumberInputWrapper}
+        name="amount"
+        rules={{ required: true, validate: (amount) => amount.gt(ZERO_BN) }}
       />
       {balance && (
         <button onClick={() => setValue('amount', balance)}>{`Use wallet balance ${formatBigNumber(

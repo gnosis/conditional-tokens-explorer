@@ -1,8 +1,9 @@
+import { useQuery } from '@apollo/react-hooks'
 import React from 'react'
 
-import { GetCondition } from '../../types/generatedGQL'
 import { GetConditionQuery } from '../../queries/conditions'
-import { useQuery } from '@apollo/react-hooks'
+import { GetCondition } from '../../types/generatedGQL'
+
 import { ConditionDetailItem } from './ConditionDetailItem'
 
 interface ConditionDetailWrapperProps {
@@ -26,11 +27,11 @@ export const ConditionDetailWrapper = (props: ConditionDetailWrapperProps) => {
       {data && data?.condition && (
         <ConditionDetailItem
           conditionId={conditionId}
-          resolved={data.condition?.resolved}
-          oracle={data.condition?.oracle}
-          questionId={data.condition?.questionId}
-          outcomeSlotCount={data.condition?.outcomeSlotCount}
           creator={data.condition?.creator}
+          oracle={data.condition?.oracle}
+          outcomeSlotCount={data.condition?.outcomeSlotCount}
+          questionId={data.condition?.questionId}
+          resolved={data.condition?.resolved}
         />
       )}
     </>

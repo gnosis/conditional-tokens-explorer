@@ -1,10 +1,11 @@
-import { Contract, ethers } from 'ethers'
-import { NetworkConfig } from '../config/networkConfig'
-import { BigNumber } from 'ethers/utils'
-
-import Web3Utils from 'web3-utils'
 import CTHelpersConstructor from '@gnosis.pm/conditional-tokens-contracts/utils/id-helpers'
+import { Contract, ethers } from 'ethers'
 import { TransactionResponse } from 'ethers/providers'
+import { BigNumber } from 'ethers/utils'
+import Web3Utils from 'web3-utils'
+
+import { NetworkConfig } from '../config/networkConfig'
+
 const CTHelpers = CTHelpersConstructor(Web3Utils)
 
 const conditionalTokensAbi = [

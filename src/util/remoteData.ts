@@ -43,10 +43,10 @@ export class Remote<T> {
   }
 
   public match<U>({
-    onSuccess,
+    onFailure,
     onLoading,
     onNotAsked,
-    onFailure,
+    onSuccess,
   }: {
     onSuccess: (data: T) => U
     onLoading: () => U

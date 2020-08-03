@@ -1,9 +1,10 @@
 import React from 'react'
 import { useParams } from 'react-router-dom'
 
+import { isConditionIdValid } from '../../util/tools'
+
 import { ConditionDetailNotFound } from './ConditionDetailNotFound'
 import { ConditionDetailWrapper } from './ConditionDetailWrapper'
-import { isConditionIdValid } from '../../util/tools'
 
 export const ConditionsDetailContainer = () => {
   const { conditionId } = useParams()

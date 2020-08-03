@@ -1,17 +1,19 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { useWeb3Connected } from '../../contexts/Web3Context'
-import { BigNumber } from 'ethers/utils'
-import { useAllowance } from '../../hooks/useAllowance'
-import { Remote } from '../../util/remoteData'
 import { constants } from 'ethers'
-import { SplitCondition } from './index'
+import { BigNumber } from 'ethers/utils'
+import React, { useCallback, useEffect, useState } from 'react'
 import { ConditionalTokensService } from 'services/conditionalTokens'
+
+import { useWeb3Connected } from '../../contexts/Web3Context'
+import { useAllowance } from '../../hooks/useAllowance'
 import { getLogger } from '../../util/logger'
+import { Remote } from '../../util/remoteData'
+
+import { SplitCondition } from './index'
 
 const logger = getLogger('SplitCondition')
 
 export const SplitConditionContainer = () => {
-  const { networkConfig, CTService } = useWeb3Connected()
+  const { CTService, networkConfig } = useWeb3Connected()
   const tokens = networkConfig.getTokens()
   const [collateralToken, setCollateralToken] = useState(tokens[0].address)
   const { refresh, unlock } = useAllowance(collateralToken)
@@ -90,11 +92,11 @@ export const SplitConditionContainer = () => {
   return (
     <SplitCondition
       allowance={allowance}
-      splitPosition={splitPosition}
-      unlockCollateral={unlockCollateral}
-      onCollateralChange={setCollateralToken}
       hasUnlockedCollateral={hasUnlockedCollateral}
+      onCollateralChange={setCollateralToken}
+      splitPosition={splitPosition}
       tokens={tokens}
+      unlockCollateral={unlockCollateral}
     />
   )
 }

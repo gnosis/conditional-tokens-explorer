@@ -1,9 +1,10 @@
+import { useWeb3Connected } from 'contexts/Web3Context'
 import React, { useEffect } from 'react'
 import { FormContextValues } from 'react-hook-form'
 
 import { BYTES_REGEX } from '../../config/constants'
+
 import { SplitPositionForm } from './SplitCondition'
-import { useWeb3Connected } from 'contexts/Web3Context'
 
 interface Props {
   formMethods: FormContextValues<SplitPositionForm>
@@ -11,8 +12,8 @@ interface Props {
 }
 
 export const InputCondition = ({
+  formMethods: { errors, register, watch },
   onOutcomeSlotChange,
-  formMethods: { watch, register, errors },
 }: Props) => {
   const conditionIdErrors = errors.conditionId
   const watchConditionId = watch('conditionId')
@@ -34,7 +35,6 @@ export const InputCondition = ({
       <label htmlFor="conditionId">Condition Id</label>
       <input
         name="conditionId"
-        type="text"
         ref={register({
           required: true,
           pattern: BYTES_REGEX,
@@ -43,6 +43,7 @@ export const InputCondition = ({
             return conditionExist
           },
         })}
+        type="text"
       ></input>
       {conditionIdErrors && (
         <div>

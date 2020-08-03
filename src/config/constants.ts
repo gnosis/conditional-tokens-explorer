@@ -1,4 +1,5 @@
 import { BigNumber } from 'ethers/utils'
+
 import { NetworkId } from './networkConfig'
 
 export const ZERO_BN = new BigNumber(0)
