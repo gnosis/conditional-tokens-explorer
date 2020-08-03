@@ -68,6 +68,7 @@ const theme = {
     height: '60px',
   },
   layout: {
+    commonContainerMaxWidth: '600px',
     horizontalPadding: '10px',
     maxWidth: '1272px',
   },

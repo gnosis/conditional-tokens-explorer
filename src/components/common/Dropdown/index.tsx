@@ -1,7 +1,7 @@
 import React, { DOMAttributes, useCallback, useState } from 'react'
 import styled, { css } from 'styled-components'
 
-import { BaseCard } from '../../pureStyledComponents/common'
+import { BaseCard } from '../../pureStyledComponents/BaseCard'
 
 export enum DropdownPosition {
   center,

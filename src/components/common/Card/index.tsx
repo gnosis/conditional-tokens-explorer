@@ -1,7 +1,7 @@
 import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
 
-import { BaseCard } from '../../pureStyledComponents/common'
+import { BaseCard } from '../../pureStyledComponents/BaseCard'
 
 const Title = styled.h2<{ titleAlign?: string }>`
   color: ${(props) => props.theme.cards.titleColor};

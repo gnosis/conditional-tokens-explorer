@@ -1,21 +1,5 @@
 import styled from 'styled-components'
 
-export const MainWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  width: 100vw;
-`
-
-export const MainScroll = styled.div`
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  overflow: auto;
-  padding-top: 36px;
-`
-
 export const InnerContainer = styled.div`
   display: flex;
   flex-direction: column;

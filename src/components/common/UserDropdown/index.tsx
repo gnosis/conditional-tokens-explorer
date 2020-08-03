@@ -6,7 +6,7 @@ import { truncateStringInTheMiddle } from '../../../util/tools'
 import { Button } from '../../buttons/Button'
 import { ButtonType } from '../../buttons/buttonStylingTypes'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../common/Dropdown'
-import { Pill } from '../../pureStyledComponents/common'
+import { Pill } from '../../pureStyledComponents/Pill'
 
 import { ChevronDown } from './img/ChevronDown'
 
