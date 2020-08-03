@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 
 import { FormCard } from '../../components/pureStyledComponents/FormCard'
+import { GridTwoColumns } from '../../components/pureStyledComponents/GridTwoColumns'
 import { INFORMATION_NOT_AVAILABLE } from '../../config/constants'
 import { getKnowOracleFromAddress } from '../../config/networkConfig'
 import { useWeb3Context } from '../../contexts/Web3Context'
@@ -70,25 +71,27 @@ export const ConditionDetailItem = (props: ConditionDetailItemProps) => {
       {loading && <div>Loading...</div>}
       {!loading && (
         <FormCard>
-          <div className="row">
-            <label>Condition Type</label>{' '}
-            <label>{isFromOmen ? ConditionType.Omen : ConditionType.Unknown}</label>
-            <button>Actions</button>
-          </div>
-          <div className="row">
-            <label>Condition Id</label>{' '}
-            <label title={conditionId}>{truncateStringInTheMiddle(conditionId, 6, 6)}</label>
-            <CopyToClipboard text={conditionId}>
-              <button>Copy</button>
-            </CopyToClipboard>
-          </div>
-          <div className="row">
-            <label>Status</label>{' '}
-            <label>{resolved ? ConditionStatus.Resolved : ConditionStatus.Open}</label>
-          </div>
-          <div className="row">
-            <label>Condition Type:</label> <label>{getConditionTypeTitle(templateId)}</label>
-          </div>
+          <GridTwoColumns>
+            <div className="row">
+              <label>Condition Type</label>{' '}
+              <label>{isFromOmen ? ConditionType.Omen : ConditionType.Unknown}</label>
+              <button>Actions</button>
+            </div>
+            <div className="row">
+              <label>Condition Id</label>{' '}
+              <label title={conditionId}>{truncateStringInTheMiddle(conditionId, 6, 6)}</label>
+              <CopyToClipboard text={conditionId}>
+                <button>Copy</button>
+              </CopyToClipboard>
+            </div>
+            <div className="row">
+              <label>Status</label>{' '}
+              <label>{resolved ? ConditionStatus.Resolved : ConditionStatus.Open}</label>
+            </div>
+            <div className="row">
+              <label>Condition Type:</label> <label>{getConditionTypeTitle(templateId)}</label>
+            </div>
+          </GridTwoColumns>
           <div className="row">
             <label>Question:</label> <label>{title}</label>
           </div>
