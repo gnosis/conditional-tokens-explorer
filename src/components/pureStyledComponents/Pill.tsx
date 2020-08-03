@@ -18,7 +18,7 @@ const PillOpenCSS = css`
 export const Pill = styled.div<{ type?: PillTypes }>`
   align-items: center;
   border-radius: 4px;
-  display: flex;
+  display: inline-flex;
   font-size: 12px;
   font-weight: 600;
   height: 22px;
