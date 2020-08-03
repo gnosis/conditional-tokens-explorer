@@ -5,6 +5,7 @@ import moment from 'moment-timezone'
 
 import { BYTES_REGEX } from '../config/constants'
 import { getTokenFromAddress } from '../config/networkConfig'
+import { GetPosition_position, GetPosition_position_conditions } from '../types/generatedGQL'
 
 import { ConditionErrors } from './types'
 
@@ -96,7 +97,7 @@ export const getIndexSets = (outcomesCount: number) => {
   return range(outcomesCount).map((x) => 1 << x)
 }
 
-export const displayPositions = (position: any, networkId: number) => {
+export const displayPositions = (position: GetPosition_position, networkId: number) => {
   const { activeValue, collateralToken, conditions } = position
 
   // Get the token
@@ -112,9 +113,9 @@ export const displayPositions = (position: any, networkId: number) => {
   )}`
 }
 
-export const displayConditions = (conditions: any) =>
+export const displayConditions = (conditions: GetPosition_position_conditions[]) =>
   conditions
-    .map((condition: any) => {
+    .map((condition: GetPosition_position_conditions) => {
       const { id, outcomeSlotCount } = condition
       const outcomes = []
 

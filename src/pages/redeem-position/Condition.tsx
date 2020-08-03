@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 
 import { BYTES_REGEX } from '../../config/constants'
 import { GetConditionQuery } from '../../queries/conditions'
-import { GetCondition as getCondition } from '../../types/generatedGQL'
+import { GetCondition } from '../../types/generatedGQL'
 import { displayConditions } from '../../util/tools'
 
 interface Props {
@@ -46,7 +46,7 @@ export const Condition = (props: Props) => {
     [errors]
   )
 
-  const { data: fetchedCondition, error: errorFetchingCondition, loading } = useQuery<getCondition>(
+  const { data: fetchedCondition, error: errorFetchingCondition, loading } = useQuery<GetCondition>(
     GetConditionQuery,
     {
       variables: { id: condition },

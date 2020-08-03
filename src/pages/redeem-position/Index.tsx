@@ -1,16 +1,18 @@
 import React, { useState } from 'react'
 
+import { getLogger } from '../../util/logger'
+
 import { Condition } from './Condition'
 import { Position } from './Position'
 import { RedeemedPosition } from './RedeemedPosition'
+
+const logger = getLogger('RedeemPosition')
 
 export const RedeemPosition = () => {
   const [position, setPosition] = useState<string>('')
   const [condition, setCondition] = useState<string>('')
 
-  const [redeemedPosition, setRedeemedPosition] = useState<Maybe<string>>(null)
-
-  const onRedeem = () => console.log('Redeem')
+  const onRedeem = () => logger.log('On redeem')
 
   const selectPosition = () => {
     const positionFromPrompt = window.prompt(`Enter the position: `)

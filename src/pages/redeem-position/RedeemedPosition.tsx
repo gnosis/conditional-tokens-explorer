@@ -1,13 +1,8 @@
 import { useQuery } from '@apollo/react-hooks'
 import React, { useCallback, useEffect, useState } from 'react'
 
-import { BYTES_REGEX } from '../../config/constants'
-import { useWeb3Connected } from '../../contexts/Web3Context'
-import { useBalanceForPosition } from '../../hooks/useBalanceForPosition'
 import { GetConditionQuery } from '../../queries/conditions'
-import { GetPositionQuery } from '../../queries/positions'
-import { GetCondition as getCondition, GetPosition as getPosition } from '../../types/generatedGQL'
-import { displayPositions } from '../../util/tools'
+import { GetCondition, GetCondition_condition_positions } from '../../types/generatedGQL'
 
 interface Props {
   position: string
@@ -48,7 +43,7 @@ export const RedeemedPosition = (props: Props) => {
     [errors]
   )
 
-  const { data: fetchedCondition, loading } = useQuery<getCondition>(GetConditionQuery, {
+  const { data: fetchedCondition, loading } = useQuery<GetCondition>(GetConditionQuery, {
     variables: { id: condition },
     fetchPolicy: 'no-cache',
     skip: !condition || !position,
@@ -63,7 +58,8 @@ export const RedeemedPosition = (props: Props) => {
         const positionFound =
           positions &&
           positions.filter(
-            (positionObject: any) => positionObject.id.toLowerCase() === position.toLowerCase()
+            (positionObject: GetCondition_condition_positions) =>
+              positionObject.id.toLowerCase() === position.toLowerCase()
           )
         if (!positionFound || (positionFound && positionFound.length === 0)) {
           addError(positionBelongToConditionError)
