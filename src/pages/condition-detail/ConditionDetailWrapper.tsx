@@ -1,6 +1,7 @@
 import { useQuery } from '@apollo/react-hooks'
 import React from 'react'
 
+import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
 import { GetConditionQuery } from '../../queries/conditions'
 import { GetCondition } from '../../types/generatedGQL'
 
@@ -19,7 +20,7 @@ export const ConditionDetailWrapper = (props: ConditionDetailWrapperProps) => {
 
   return (
     <>
-      <h3>Condition detail</h3>
+      <PageTitle>Condition detail</PageTitle>
 
       {loading && <div>Loading...</div>}
       {error && <div>Error...</div>}
