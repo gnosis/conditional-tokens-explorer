@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useHistory } from 'react-router-dom'
 
-import { isAddress } from '../../util/tools'
-import { ConditionalTokensService } from '../../services/conditionalTokens'
+import { ADDRESS_REGEX, BYTES_REGEX, MAX_OUTCOMES, MIN_OUTCOMES } from '../../config/constants'
 import { useWeb3Connected } from '../../contexts/Web3Context'
-import { BYTES_REGEX, ADDRESS_REGEX, MIN_OUTCOMES, MAX_OUTCOMES } from '../../config/constants'
+import { ConditionalTokensService } from '../../services/conditionalTokens'
+import { isAddress } from '../../util/tools'
 
 const maxOutcomesError = 'Too many outcome slots'
 const minOutcomesError = 'There should be more than one outcome slot'
@@ -19,10 +19,10 @@ export const PrepareCondition = () => {
 
   const { CTService, address, provider } = useWeb3Connected()
   const {
-    register,
     errors,
-    setValue,
     formState: { isValid },
+    register,
+    setValue,
   } = useForm<{ outcomesSlotCount: number; oracle: string; questionId: string }>({
     mode: 'onChange',
   })
@@ -66,8 +66,8 @@ export const PrepareCondition = () => {
       <input
         name="outcomesSlotCount"
         onChange={(e) => setNumOutcomes(Number(e.target.value))}
-        type="number"
         ref={register({ required: true, min: MIN_OUTCOMES, max: MAX_OUTCOMES })}
+        type="number"
       />
       {errors.outcomesSlotCount && (
         <div>
@@ -82,12 +82,12 @@ export const PrepareCondition = () => {
       <input
         name="oracle"
         onChange={(e) => setOracleAddress(e.target.value)}
-        type="text"
         ref={register({
           required: true,
           pattern: ADDRESS_REGEX,
           validate: (value: string) => isAddress(value),
         })}
+        type="text"
       />
       {errors.oracle && (
         <div>
@@ -109,8 +109,8 @@ export const PrepareCondition = () => {
       <input
         name="questionId"
         onChange={(e) => setQuestionId(e.target.value)}
-        type="text"
         ref={register({ required: true, pattern: BYTES_REGEX })}
+        type="text"
       />
       {errors.questionId && (
         <div>{errors.questionId.type === 'pattern' && 'Invalid bytes32 string'}</div>

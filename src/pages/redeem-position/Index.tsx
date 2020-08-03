@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
-import { Position } from './Position'
 import { Condition } from './Condition'
+import { Position } from './Position'
 import { RedeemedPosition } from './RedeemedPosition'
 
 export const RedeemPosition = () => {

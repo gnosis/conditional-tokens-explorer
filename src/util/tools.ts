@@ -4,8 +4,9 @@ import { BigNumber, formatUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
 
 import { BYTES_REGEX } from '../config/constants'
-import { ConditionErrors } from './types'
 import { getTokenFromAddress } from '../config/networkConfig'
+
+import { ConditionErrors } from './types'
 
 export const isAddress = (address: string) => {
   try {
@@ -96,7 +97,7 @@ export const getIndexSets = (outcomesCount: number) => {
 }
 
 export const displayPositions = (position: any, networkId: number) => {
-  const { collateralToken, activeValue, conditions } = position
+  const { activeValue, collateralToken, conditions } = position
 
   // Get the token
   const token = getTokenFromAddress(networkId, collateralToken.id)

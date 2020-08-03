@@ -1,8 +1,8 @@
-import React, { createContext, useState, useEffect, useCallback, useContext } from 'react'
-import { ethers } from 'ethers'
-import Web3Modal from 'web3modal'
-import { Web3Provider, JsonRpcSigner } from 'ethers/providers'
 import WalletConnectProvider from '@walletconnect/web3-provider'
+import { ethers } from 'ethers'
+import { JsonRpcSigner, Web3Provider } from 'ethers/providers'
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import Web3Modal from 'web3modal'
 
 import { INFURA_ID } from '../config/constants'
 import { NetworkConfig } from '../config/networkConfig'

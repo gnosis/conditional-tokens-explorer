@@ -1,13 +1,13 @@
-import React, { useCallback, useEffect, useState } from 'react'
 import { useQuery } from '@apollo/react-hooks'
+import React, { useCallback, useEffect, useState } from 'react'
 
-import { GetCondition as getCondition, GetPosition as getPosition } from '../../types/generatedGQL'
-import { GetPositionQuery } from '../../queries/positions'
 import { BYTES_REGEX } from '../../config/constants'
-import { useBalanceForPosition } from '../../hooks/useBalanceForPosition'
 import { useWeb3Connected } from '../../contexts/Web3Context'
-import { displayPositions } from '../../util/tools'
+import { useBalanceForPosition } from '../../hooks/useBalanceForPosition'
 import { GetConditionQuery } from '../../queries/conditions'
+import { GetPositionQuery } from '../../queries/positions'
+import { GetCondition as getCondition, GetPosition as getPosition } from '../../types/generatedGQL'
+import { displayPositions } from '../../util/tools'
 
 interface Props {
   position: string
@@ -19,7 +19,7 @@ const positionBelongToConditionError = `The position doesn't belong to the condi
 const positionNotResolvedError = `Position not resolved`
 
 export const RedeemedPosition = (props: Props) => {
-  const { position, condition } = props
+  const { condition, position } = props
 
   const [errors, setErrors] = useState<string[]>([])
   const [redeemedPositionToDisplay, setRedeemedPositionToDisplay] = useState<string>('')
@@ -59,7 +59,7 @@ export const RedeemedPosition = (props: Props) => {
     if (condition && position) {
       const { condition: conditionFromTheGraph } = fetchedCondition ?? { condition: null }
       if (conditionFromTheGraph) {
-        const { positions, payouts } = conditionFromTheGraph
+        const { payouts, positions } = conditionFromTheGraph
         const positionFound =
           positions &&
           positions.filter(

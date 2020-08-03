@@ -1,24 +1,24 @@
 import React from 'react'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 
-import { formatDate, getConditionTypeTitle, truncateStringInTheMiddle } from '../../util/tools'
-import { useQuestion } from '../../hooks/useQuestion'
 import { INFORMATION_NOT_AVAILABLE } from '../../config/constants'
 import { getKnowOracleFromAddress } from '../../config/networkConfig'
 import { useWeb3Connected } from '../../contexts/Web3Context'
-import { ConditionStatus, ConditionType } from '../../util/types'
 import { useIsConditionFromOmen } from '../../hooks/useIsConditionFromOmen'
+import { useQuestion } from '../../hooks/useQuestion'
 import { GetCondition_condition } from '../../types/generatedGQL'
+import { formatDate, getConditionTypeTitle, truncateStringInTheMiddle } from '../../util/tools'
+import { ConditionStatus, ConditionType } from '../../util/types'
 
 interface ConditionDetailItemProps {
   condition: GetCondition_condition
 }
 
 export const ConditionDetailItem = ({ condition }: ConditionDetailItemProps) => {
-  const { id: conditionId, resolved, questionId, oracle, outcomeSlotCount, creator } = condition
+  const { creator, id: conditionId, oracle, outcomeSlotCount, questionId, resolved } = condition
   const { networkConfig } = useWeb3Connected()
 
-  const { question, loading: loadingQuestion, outcomesPrettier } = useQuestion(
+  const { loading: loadingQuestion, outcomesPrettier, question } = useQuestion(
     questionId,
     outcomeSlotCount
   )

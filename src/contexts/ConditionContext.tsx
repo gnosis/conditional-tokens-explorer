@@ -1,10 +1,10 @@
-import React from 'react'
 import { useQuery } from '@apollo/react-hooks'
+import React from 'react'
 
-import { GetCondition, GetCondition_condition } from '../types/generatedGQL'
 import { GetConditionQuery } from '../queries/conditions'
-import { ConditionErrors } from '../util/types'
+import { GetCondition, GetCondition_condition } from '../types/generatedGQL'
 import { isConditionIdValid } from '../util/tools'
+import { ConditionErrors } from '../util/types'
 
 export interface ConditionContext {
   condition: Maybe<GetCondition_condition>
@@ -21,7 +21,7 @@ export const CONDITION_CONTEXT_DEFAULT_VALUE = {
   loading: false,
   errors: [],
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  setConditionId: (conditionId: string) => {},
+  setConditionId: () => {},
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   clearCondition: () => {},
 }

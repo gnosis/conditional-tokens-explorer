@@ -1,8 +1,8 @@
+import CTHelpersConstructor from '@gnosis.pm/conditional-tokens-contracts/utils/id-helpers'
 import { Contract, ethers } from 'ethers'
+import { TransactionReceipt, TransactionResponse } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 import Web3Utils from 'web3-utils'
-import CTHelpersConstructor from '@gnosis.pm/conditional-tokens-contracts/utils/id-helpers'
-import { TransactionReceipt, TransactionResponse } from 'ethers/providers'
 
 import { NetworkConfig } from '../config/networkConfig'
 import { getIndexSets } from '../util/tools'

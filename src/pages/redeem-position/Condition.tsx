@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react'
 import { useQuery } from '@apollo/react-hooks'
+import React, { useCallback, useEffect, useState } from 'react'
 
-import { GetCondition as getCondition } from '../../types/generatedGQL'
 import { BYTES_REGEX } from '../../config/constants'
 import { GetConditionQuery } from '../../queries/conditions'
+import { GetCondition as getCondition } from '../../types/generatedGQL'
 import { displayConditions } from '../../util/tools'
 
 interface Props {
@@ -46,7 +46,7 @@ export const Condition = (props: Props) => {
     [errors]
   )
 
-  const { data: fetchedCondition, loading, error: errorFetchingCondition } = useQuery<getCondition>(
+  const { data: fetchedCondition, error: errorFetchingCondition, loading } = useQuery<getCondition>(
     GetConditionQuery,
     {
       variables: { id: condition },

@@ -1,19 +1,20 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import { useWeb3Connected } from 'contexts/Web3Context'
 import { BigNumber } from 'ethers/utils'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { ERC20Service } from 'services/erc20'
+import { GetPosition_position } from 'types/generatedGQL'
 
-import { Token } from '../../util/types'
 import { SetAllowance } from '../../components/common/SetAllowance'
-import { ZERO_BN, NULL_PARENT_ID } from '../../config/constants'
-import { trivialPartition } from '../../util/tools'
+import { NULL_PARENT_ID, ZERO_BN } from '../../config/constants'
 import { Remote } from '../../util/remoteData'
+import { trivialPartition } from '../../util/tools'
+import { Token } from '../../util/types'
+
 import { InputAmount } from './InputAmount'
+import { InputCondition } from './InputCondition'
 import { InputPosition } from './InputPosition'
 import { SelectCollateral } from './SelectCollateral'
-import { InputCondition } from './InputCondition'
-import { GetPosition_position } from 'types/generatedGQL'
-import { ERC20Service } from 'services/erc20'
-import { useWeb3Connected } from 'contexts/Web3Context'
 
 export type SplitFrom = 'collateral' | 'position'
 
@@ -42,11 +43,11 @@ interface Props {
 
 export const SplitCondition = ({
   allowance,
-  unlockCollateral,
-  onCollateralChange,
   hasUnlockedCollateral,
+  onCollateralChange,
   splitPosition,
   tokens,
+  unlockCollateral,
 }: Props) => {
   const DEFAULT_VALUES = useMemo(() => {
     return {
@@ -64,18 +65,18 @@ export const SplitCondition = ({
   })
 
   const {
+    formState: { isValid },
+    getValues,
     handleSubmit,
     reset,
     watch,
-    getValues,
-    formState: { isValid },
   } = formMethods
 
   const [outcomeSlot, setOutcomeSlot] = useState(0)
   const [collateralToken, setCollateralToken] = useState(tokens[0])
   const [position, setPosition] = useState<Maybe<GetPosition_position>>(null)
-  const { signer, provider } = useWeb3Connected()
-  const { amount, collateral, splitFrom, positionId } = getValues() as SplitPositionForm
+  const { provider, signer } = useWeb3Connected()
+  const { amount, collateral, positionId, splitFrom } = getValues() as SplitPositionForm
 
   watch('collateral')
   watch('splitFrom')
@@ -84,15 +85,15 @@ export const SplitCondition = ({
   const splitFromPosition = splitFrom === 'position'
 
   const onSubmit = useCallback(
-    async ({ collateral, conditionId, amount }: SplitPositionForm) => {
+    async ({ amount, collateral, conditionId }: SplitPositionForm) => {
       const partition = trivialPartition(outcomeSlot)
 
       if (splitFromCollateral) {
         splitPosition(collateral, NULL_PARENT_ID, conditionId, partition, amount)
       } else if (splitFromPosition && position) {
         const {
-          collection: { id: collectionId },
           collateralToken: { id: collateral },
+          collection: { id: collectionId },
         } = position
         splitPosition(collateral, collectionId, conditionId, partition, amount)
       } else {
@@ -160,31 +161,31 @@ export const SplitCondition = ({
       <InputCondition formMethods={formMethods} onOutcomeSlotChange={(n) => setOutcomeSlot(n)} />
       <SelectCollateral
         formMethods={formMethods}
-        splitFromCollateral={splitFromCollateral}
         onCollateralChange={onCollateralChange}
+        splitFromCollateral={splitFromCollateral}
         tokens={tokens}
       />
       <InputPosition
+        formMethods={formMethods}
         onPositionChange={(p) => setPosition(p)}
         splitFromPosition={splitFromPosition}
-        formMethods={formMethods}
       />
       {showAskAllowance && (
         <SetAllowance
           collateral={collateralToken}
-          loading={allowance.isLoading()}
           finished={hasUnlockedCollateral && hasEnoughAllowance.getOr(false)}
+          loading={allowance.isLoading()}
           onUnlock={unlockCollateral}
         />
       )}
 
       <InputAmount
         collateral={collateralToken}
+        formMethods={formMethods}
         positionId={positionId}
         splitFrom={splitFrom}
-        formMethods={formMethods}
       />
-      <button onClick={handleSubmit(onSubmit)} disabled={!canSubmit}>
+      <button disabled={!canSubmit} onClick={handleSubmit(onSubmit)}>
         Split
       </button>
     </div>

@@ -1,16 +1,16 @@
-import React from 'react'
-import { useForm, Controller } from 'react-hook-form'
-import { BigNumber, formatUnits } from 'ethers/utils'
-
 import { BigNumberInputWrapper } from 'components/common/BigNumberInputWrapper'
-import { GetCondition_condition } from '../../types/generatedGQL'
-import { useQuestion } from '../../hooks/useQuestion'
-import { useWeb3Connected } from '../../contexts/Web3Context'
-import { Status } from '../../util/types'
+import { BigNumber, formatUnits } from 'ethers/utils'
+import React from 'react'
+import { Controller, useForm } from 'react-hook-form'
+
 import { ZERO_BN } from '../../config/constants'
-import { divBN } from '../../util/tools'
-import { getLogger } from '../../util/logger'
 import { useConditionContext } from '../../contexts/ConditionContext'
+import { useWeb3Connected } from '../../contexts/Web3Context'
+import { useQuestion } from '../../hooks/useQuestion'
+import { GetCondition_condition } from '../../types/generatedGQL'
+import { getLogger } from '../../util/logger'
+import { divBN } from '../../util/tools'
+import { Status } from '../../util/types'
 
 interface Props {
   condition: GetCondition_condition
@@ -33,17 +33,17 @@ const PAYOUTS_POSITIVE_ERROR = 'At least one payout must be positive'
 const DECIMALS = 2
 
 export const OutcomeSlotsToReport = ({ condition }: Props) => {
-  const { address, CTService } = useWeb3Connected()
+  const { CTService, address } = useWeb3Connected()
   const { clearCondition } = useConditionContext()
 
-  const { questionId, outcomeSlotCount, oracle } = condition
+  const { oracle, outcomeSlotCount, questionId } = condition
 
   const { outcomesPrettier } = useQuestion(questionId, outcomeSlotCount)
 
   const [outcomes, setOutcomes] = React.useState<Outcome[]>([])
   const [payoutEmptyError, setPayoutEmptyError] = React.useState(false)
   const [status, setStatus] = React.useState<Maybe<Status>>(null)
-  const { getValues, control, handleSubmit, watch } = useForm<FormInputs>({ mode: 'onChange' })
+  const { control, getValues, handleSubmit, watch } = useForm<FormInputs>({ mode: 'onChange' })
 
   // Check if the sender is valid
   const oracleNotValidError = oracle.toLowerCase() !== address.toLowerCase()
@@ -143,16 +143,16 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
                   <td>{probability.toFixed(2)}%</td>
                   <td>
                     <Controller
-                      control={control}
-                      name={`payouts[${index}]`}
-                      decimals={DECIMALS}
                       as={BigNumberInputWrapper}
+                      control={control}
+                      decimals={DECIMALS}
                       defaultValue={new BigNumber(0)}
-                      rules={{ required: true, validate: (amount) => amount.gte(ZERO_BN) }}
+                      name={`payouts[${index}]`}
                       onChange={(value) => {
                         onChange(value[0], index)
                         return value[0]
                       }}
+                      rules={{ required: true, validate: (amount) => amount.gte(ZERO_BN) }}
                     />
                   </td>
                 </tr>
@@ -162,7 +162,7 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
         </table>
         {payoutEmptyError && <p>{PAYOUTS_POSITIVE_ERROR}</p>}
         {oracleNotValidError && <p>{ORACLE_NOT_VALID_TO_REPORT_ERROR}</p>}
-        <input type="submit" disabled={disableSubmit} />
+        <input disabled={disableSubmit} type="submit" />
       </form>
     </>
   )

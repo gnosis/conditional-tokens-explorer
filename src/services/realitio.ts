@@ -3,9 +3,9 @@ import RealitioTemplateLib from '@realitio/realitio-lib/formatters/template'
 import { Contract, ethers } from 'ethers'
 import { bigNumberify } from 'ethers/utils'
 
-import { getEarliestBlockToCheck, NetworkConfig } from '../config/networkConfig'
-import { Question, QuestionLog } from '../util/types'
+import { NetworkConfig, getEarliestBlockToCheck } from '../config/networkConfig'
 import { getLogger } from '../util/logger'
+import { Question, QuestionLog } from '../util/types'
 
 const logger = getLogger('Realitio Service')
 

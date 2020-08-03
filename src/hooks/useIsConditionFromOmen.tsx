@@ -1,10 +1,10 @@
+import { Provider } from 'ethers/providers'
 import React from 'react'
 
-import { useWeb3Connected } from '../contexts/Web3Context'
-import { Question } from '../util/types'
-import { Provider } from 'ethers/providers'
-import { isContract } from '../util/tools'
 import { getKnowOracleFromAddress } from '../config/networkConfig'
+import { useWeb3Connected } from '../contexts/Web3Context'
+import { isContract } from '../util/tools'
+import { Question } from '../util/types'
 
 // We check if the owner is a contract, if is a contract is from Safe, and Omen use safe, we can say the origin is from omen, maybe we can improve this in the future
 export const useIsConditionFromOmen = (
@@ -12,7 +12,7 @@ export const useIsConditionFromOmen = (
   oracle: string,
   question: Maybe<Question>
 ) => {
-  const { RtioService, provider, networkConfig } = useWeb3Connected()
+  const { RtioService, networkConfig, provider } = useWeb3Connected()
 
   const [isConditionCreatorAContract, setIsConditionCreatorAContract] = React.useState(false)
   const [error, setError] = React.useState(undefined)

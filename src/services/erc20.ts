@@ -1,6 +1,7 @@
-import { ethers, Signer, Contract } from 'ethers'
-import { BigNumber } from 'ethers/utils'
+import { Contract, Signer, ethers } from 'ethers'
 import { Provider, TransactionResponse } from 'ethers/providers'
+import { BigNumber } from 'ethers/utils'
+
 import { Token } from '../util/types'
 
 const erc20Abi = [

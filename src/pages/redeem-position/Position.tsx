@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react'
 import { useQuery } from '@apollo/react-hooks'
+import React, { useCallback, useEffect, useState } from 'react'
 
-import { GetPosition as getPosition } from '../../types/generatedGQL'
-import { GetPositionQuery } from '../../queries/positions'
 import { BYTES_REGEX } from '../../config/constants'
-import { useBalanceForPosition } from '../../hooks/useBalanceForPosition'
 import { useWeb3Connected } from '../../contexts/Web3Context'
+import { useBalanceForPosition } from '../../hooks/useBalanceForPosition'
+import { GetPositionQuery } from '../../queries/positions'
+import { GetPosition as getPosition } from '../../types/generatedGQL'
 import { displayPositions } from '../../util/tools'
 
 interface Props {
@@ -50,7 +50,7 @@ export const Position = (props: Props) => {
     [errors]
   )
 
-  const { data: fetchedPosition, loading, error: errorFetchingPosition } = useQuery<getPosition>(
+  const { data: fetchedPosition, error: errorFetchingPosition, loading } = useQuery<getPosition>(
     GetPositionQuery,
     {
       variables: { id: position },

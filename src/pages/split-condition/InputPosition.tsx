@@ -1,9 +1,11 @@
+import { useQuery } from '@apollo/react-hooks'
+import { GetPositionQuery } from 'queries/positions'
 import React, { useEffect } from 'react'
 import { FormContextValues } from 'react-hook-form'
-import { useQuery } from '@apollo/react-hooks'
-import { GetPositionVariables, GetPosition, GetPosition_position } from 'types/generatedGQL'
-import { GetPositionQuery } from 'queries/positions'
+import { GetPosition, GetPositionVariables, GetPosition_position } from 'types/generatedGQL'
+
 import { BYTES_REGEX } from '../../config/constants'
+
 import { SplitPositionForm } from './SplitCondition'
 
 interface Props {
@@ -12,15 +14,15 @@ interface Props {
   onPositionChange: (position: GetPosition_position) => void
 }
 export const InputPosition = ({
-  splitFromPosition,
+  formMethods: { errors, register, setError, watch },
   onPositionChange,
-  formMethods: { register, watch, errors, setError },
+  splitFromPosition,
 }: Props) => {
   const watchPositionId = watch('positionId')
   const errorPositionId = errors.positionId
   const skipFetchPosition = watchPositionId === '' || !splitFromPosition || !!errorPositionId
 
-  const { data: fetchedPosition, loading, error: errorFetchingPosition } = useQuery<
+  const { data: fetchedPosition, error: errorFetchingPosition, loading } = useQuery<
     GetPosition,
     GetPositionVariables
   >(GetPositionQuery, {
@@ -49,18 +51,18 @@ export const InputPosition = ({
 
   return (
     <div>
-      <input name="splitFrom" type="radio" value="position" ref={register} />
+      <input name="splitFrom" ref={register} type="radio" value="position" />
 
       <label>Position</label>
 
       <input
-        name="positionId"
-        type="text"
         disabled={!splitFromPosition}
+        name="positionId"
         ref={register({
           required: splitFromPosition,
           pattern: BYTES_REGEX,
         })}
+        type="text"
       ></input>
       {errorPositionId && (
         <div>
