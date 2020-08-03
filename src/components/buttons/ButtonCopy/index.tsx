@@ -19,9 +19,7 @@ const Wrapper = styled.button`
     opacity: 0.7;
   }
 
-  &[disabled] {
-    ${CommonDisabledCSS}
-  }
+  ${CommonDisabledCSS}
 `
 
 interface ButtonCopyProps {

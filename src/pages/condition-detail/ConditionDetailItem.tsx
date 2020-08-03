@@ -2,7 +2,9 @@ import { Provider } from 'ethers/providers'
 import React, { useEffect, useState } from 'react'
 
 import { ButtonCopy } from '../../components/buttons/ButtonCopy'
-import { FormCard } from '../../components/pureStyledComponents/FormCard'
+import { ButtonDropdownCircle } from '../../components/buttons/ButtonDropdownCircle'
+import { Dropdown, DropdownItemProps, DropdownPosition } from '../../components/common/Dropdown'
+import { FormCard } from '../../components/common/FormCard'
 import { GridTwoColumns } from '../../components/pureStyledComponents/GridTwoColumns'
 import { Pill, PillTypes } from '../../components/pureStyledComponents/Pill'
 import { TitleValue } from '../../components/text/TitleValue'
@@ -30,6 +32,32 @@ interface ConditionDetailItemProps {
 export const ConditionDetailItem = (props: ConditionDetailItemProps) => {
   const { status } = useWeb3Context()
   const { conditionId, creator, oracle, outcomeSlotCount, questionId, resolved } = props
+  const dropdownItems: Array<DropdownItemProps> = [
+    {
+      content: 'Resolve Condition',
+      onClick: () => {
+        console.log('clickity')
+      },
+    },
+    {
+      content: 'Split Position',
+      onClick: () => {
+        console.log('clickity')
+      },
+    },
+    {
+      content: 'Merge Positions',
+      onClick: () => {
+        console.log('clickity')
+      },
+    },
+    {
+      content: 'Report Payouts',
+      onClick: () => {
+        console.log('clickity')
+      },
+    },
+  ]
 
   let networkId = null
   if (status._type === 'connected') {
@@ -72,7 +100,16 @@ export const ConditionDetailItem = (props: ConditionDetailItemProps) => {
     <>
       {loading && <div>Loading...</div>}
       {!loading && (
-        <FormCard>
+        <FormCard
+          dropdown={
+            <Dropdown
+              activeItemHightlight={false}
+              dropdownButtonContent={<ButtonDropdownCircle />}
+              dropdownPosition={DropdownPosition.right}
+              items={dropdownItems}
+            />
+          }
+        >
           <GridTwoColumns>
             <TitleValue
               title="Condition Type"

@@ -82,6 +82,10 @@ const Item = styled.div<{ active: boolean; hasOnClick?: boolean }>`
   min-height: 34px;
   padding: 0 12px;
 
+  &:last-child {
+    border-bottom: none;
+  }
+
   &:hover {
     background: ${(props) =>
       props.hasOnClick

@@ -14,7 +14,6 @@ const Title = styled.h2<{ flexDirection?: string }>`
   line-height: 1.2;
   margin: ${(props) => (props.flexDirection === 'column' ? '0 0 6px 0' : '0 5px 0 0')};
   text-transform: uppercase;
-  white-space: nowrap;
 `
 
 const Value = styled.div<{ flexDirection?: string }>`
