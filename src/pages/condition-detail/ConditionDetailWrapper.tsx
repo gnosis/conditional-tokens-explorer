@@ -20,7 +20,7 @@ export const ConditionDetailWrapper = (props: ConditionDetailWrapperProps) => {
 
   return (
     <>
-      <PageTitle>Condition detail</PageTitle>
+      <PageTitle>Condition Details</PageTitle>
 
       {loading && <div>Loading...</div>}
       {error && <div>Error...</div>}
