@@ -8,6 +8,7 @@ import { ConditionsList } from '../conditions-list'
 import { PositionDetailContainer } from '../position-detail'
 import { PositionsList } from '../positions-list'
 import { PrepareCondition } from '../prepare-condition'
+import { RedeemPositionContainer } from '../redeem-position'
 import { ReportPayoutsContainer } from '../report-payouts'
 import { SplitConditionContainer } from '../split-condition'
 
@@ -42,6 +43,7 @@ export const Routes: React.FC = () => {
       <ProtectedRoute component={PrepareCondition} path="/prepare" />
       <ProtectedRoute component={SplitConditionContainer} path="/split" />
       <ProtectedRoute component={ReportPayoutsContainer} path="/report" />
+      <ProtectedRoute component={RedeemPositionContainer} path="/redeem" />
       <Route exact path="/">
         <Redirect to="/conditions" />
       </Route>
