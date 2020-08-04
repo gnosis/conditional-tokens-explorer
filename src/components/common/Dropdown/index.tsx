@@ -77,12 +77,21 @@ const Item = styled.div<{ active: boolean; hasOnClick?: boolean }>`
     props.active ? props.theme.dropdown.item.color : props.theme.dropdown.item.colorActive};
   cursor: ${(props) => (props.hasOnClick ? 'pointer' : 'default')};
   display: flex;
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 400;
   line-height: 1.4;
-  min-height: 34px;
+  min-height: 40px;
+  overflow: hidden;
   padding: 0 12px;
 
+  &:first-child {
+    border-top-left-radius: ${(props) => props.theme.cards.borderRadius};
+    border-top-right-radius: ${(props) => props.theme.cards.borderRadius};
+  }
+
   &:last-child {
+    border-bottom-left-radius: ${(props) => props.theme.cards.borderRadius};
+    border-bottom-right-radius: ${(props) => props.theme.cards.borderRadius};
     border-bottom: none;
   }
 
