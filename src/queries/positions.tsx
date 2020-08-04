@@ -11,6 +11,17 @@ export const GetPositionQuery = gql`
       }
       collection {
         id
+        conditions {
+          id
+          oracle
+          questionId
+          outcomeSlotCount
+          resolved
+          creator
+          payouts
+          payoutNumerators
+          payoutDenominator
+        }
         conditionIds
         indexSets
         positions {
