@@ -5,7 +5,11 @@ import moment from 'moment-timezone'
 
 import { BYTES_REGEX } from '../config/constants'
 import { getTokenFromAddress } from '../config/networkConfig'
-import { GetPosition_position, GetPosition_position_conditions } from '../types/generatedGQL'
+import {
+  GetCondition_condition,
+  GetPosition_position,
+  GetPosition_position_collection_conditions,
+} from '../types/generatedGQL'
 
 import { ConditionErrors } from './types'
 
@@ -42,6 +46,8 @@ export const formatBigNumber = (value: BigNumber, decimals: number, precision = 
 export const isBytes32String = (s: string): boolean => BYTES_REGEX.test(s)
 
 export const isConditionIdValid = (conditionId: string): boolean => isBytes32String(conditionId)
+
+export const isPositionIdValid = (positionId: string): boolean => isBytes32String(positionId)
 
 export const truncateStringInTheMiddle = (
   str: string,
@@ -97,33 +103,53 @@ export const getIndexSets = (outcomesCount: number) => {
   return range(outcomesCount).map((x) => 1 << x)
 }
 
-export const displayPositions = (position: GetPosition_position, networkId: number) => {
-  const { activeValue, collateralToken, conditions } = position
+export const displayPositions = (
+  position: GetPosition_position,
+  balance: BigNumber,
+  networkId: number
+) => {
+  const { collateralToken, collection } = position
 
   // Get the token
   const token = getTokenFromAddress(networkId, collateralToken.id)
 
   // Get the conditions
+  const { conditions } = collection
   const conditionsToDisplay = displayConditions(conditions)
 
   return `[${token.symbol.toUpperCase()} ${conditionsToDisplay}] x ${formatBigNumber(
-    new BigNumber(activeValue),
+    balance,
     token.decimals,
     2
   )}`
 }
 
-export const displayConditions = (conditions: GetPosition_position_conditions[]) =>
-  conditions
-    .map((condition: GetPosition_position_conditions) => {
-      const { id, outcomeSlotCount } = condition
-      const outcomes = []
+export const displayConditions = (conditions: GetPosition_position_collection_conditions[]) => {
+  return (
+    conditions
+      .map((condition: GetPosition_position_collection_conditions) => {
+        const { id, outcomeSlotCount } = condition
+        return buildCondition(id, outcomeSlotCount)
+      })
+      // TODO what about the OR, when is OR or AND ?
+      .join(` & `)
+  )
+}
 
-      //TODO Check if position had a question in realitio
-      for (let i = 0; i < outcomeSlotCount; i++) {
-        outcomes.push(i + '')
-      }
+export const displayCondition = (condition: GetCondition_condition) => {
+  const { id, outcomeSlotCount } = condition
 
-      return `C: ${id} O: ${outcomes.join('|')}`
-    })
-    .join(` & `)
+  return buildCondition(id, outcomeSlotCount)
+}
+
+const buildCondition = (id: string, outcomeSlotCount: number) => {
+  const outcomes = []
+
+  // TODO Check if position condition had a question in realitio, also I think this is not correct (is a first approach) , I think this also needs the indexSets and other type of calculations
+  for (let i = 0; i < outcomeSlotCount; i++) {
+    outcomes.push(i + '')
+  }
+
+  // TODO what about the AND, when is OR or AND ?
+  return `C: ${id} O: ${outcomes.join('|')}`
+}
