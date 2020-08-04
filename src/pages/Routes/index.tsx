@@ -3,6 +3,7 @@ import React from 'react'
 import { Redirect, Route, RouteProps, Switch } from 'react-router-dom'
 
 import { ButtonConnect } from '../../components/buttons/ButtonConnect'
+import { InfoCard } from '../../components/common/InfoCard'
 import { ConditionsDetailContainer } from '../conditionDetails'
 import { ConditionsList } from '../conditions-list'
 import { PositionDetailContainer } from '../position-detail'
@@ -19,7 +20,8 @@ const ProtectedRoute: React.FC<RouteProps> = (props) => {
       {status._type === 'notAsked' && (
         <>
           <p>
-            This should trigger the connection prompt automatically (not show the connect button)
+            This should trigger the connection prompt automatically (it should not show the connect
+            button)
           </p>
           <ButtonConnect style={{ flexGrow: 0, height: 'auto' }} />
         </>
@@ -44,7 +46,7 @@ export const Routes: React.FC = () => {
         <Redirect to="/conditions" />
       </Route>
       <Route path="*">
-        <div>Section not found...</div>
+        <InfoCard message="Page not found..." title="Error 404" />
       </Route>
     </Switch>
   )
