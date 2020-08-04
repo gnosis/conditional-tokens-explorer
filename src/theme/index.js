@@ -5,7 +5,8 @@ const theme = {
     fontFamilyCode: `source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace`,
   },
   border: {
-    color: '#ECEFF1',
+    color: '#eceff1',
+    colorDark: '#d4d5d3',
     borderRadius: '6px',
   },
   buttonPrimary: {

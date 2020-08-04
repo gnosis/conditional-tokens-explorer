@@ -23,7 +23,7 @@ interface FormCardProps {
   dropdown?: React.ReactNode
 }
 
-export const FormCard: React.FC<FormCardProps> = (props) => {
+export const CenteredCard: React.FC<FormCardProps> = (props) => {
   const { children, dropdown, ...restProps } = props
 
   return (

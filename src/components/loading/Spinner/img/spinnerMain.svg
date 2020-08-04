@@ -1,0 +1,17 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="48"
+  height="48"
+>
+  <circle
+    cx="24"
+    cy="24"
+    r="24"
+    fill="#009cb4"
+    data-name="Ellipse 5"
+  />
+  <path
+    fill="#fff"
+    d="M24 41A17 17 0 107 23.721a1.7 1.7 0 003.4.054A13.6 13.6 0 1124 37.6a1.7 1.7 0 100 3.4z"
+    data-name="Path 33"
+  /></svg>
