@@ -4,11 +4,11 @@ import { Redirect, Route, RouteProps, Switch } from 'react-router-dom'
 
 import { ButtonConnect } from '../../components/buttons/ButtonConnect'
 import { InfoCard } from '../../components/common/InfoCard'
-import { ConditionsDetailContainer } from '../conditionDetails'
-import { ConditionsList } from '../conditions-list'
-import { PositionDetailContainer } from '../position-detail'
-import { PositionsList } from '../positions-list'
-import { PrepareCondition } from '../prepare-condition'
+import { ConditionDetails } from '../ConditionDetails'
+import { ConditionsList } from '../ConditionsList'
+import { PositionDetail } from '../PositionDetail'
+import { PositionsList } from '../PositionsList'
+import { PrepareCondition } from '../PrepareCondition'
 import { SplitConditionContainer } from '../split-condition'
 
 const ProtectedRoute: React.FC<RouteProps> = (props) => {
@@ -37,9 +37,9 @@ export const Routes: React.FC = () => {
   return (
     <Switch>
       <Route component={ConditionsList} exact path="/conditions" />
-      <Route component={ConditionsDetailContainer} exact path="/conditions/:conditionId" />
+      <Route component={ConditionDetails} exact path="/conditions/:conditionId" />
       <Route component={PositionsList} exact path="/positions" />
-      <Route component={PositionDetailContainer} exact path="/positions/:positionId" />
+      <Route component={PositionDetail} exact path="/positions/:positionId" />
       <ProtectedRoute component={PrepareCondition} path="/prepare" />
       <ProtectedRoute component={SplitConditionContainer} path="/split" />
       <Route exact path="/">

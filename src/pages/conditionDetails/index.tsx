@@ -6,14 +6,12 @@ import { isConditionIdValid } from '../../util/tools'
 
 import { Wrapper } from './Wrapper'
 
-export const ConditionsDetailContainer = () => {
+export const ConditionDetails = () => {
   const { conditionId } = useParams()
 
-  const ConditionDetail = isConditionIdValid(conditionId) ? (
+  return isConditionIdValid(conditionId) ? (
     <Wrapper conditionId={conditionId} />
   ) : (
     <InfoCard message="We couldn't find this condition..." title="Not Found" />
   )
-
-  return ConditionDetail
 }
