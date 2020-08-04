@@ -44,7 +44,7 @@ interface StripedList {
 }
 
 export const StripedList: React.FC<StripedList> = (props) => {
-  const { children, maxHeight = '87px', ...restProps } = props
+  const { children, maxHeight = '90px', ...restProps } = props
 
   return (
     <Wrapper maxHeight={maxHeight} {...restProps}>
