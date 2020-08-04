@@ -1,7 +1,7 @@
 import React, { HTMLAttributes } from 'react'
 import styled, { keyframes } from 'styled-components'
 
-import SpinnerSVG from './img/spinnerMain.svg'
+import { SpinnerSVG } from './img/SpinnerSVG'
 
 const rotate = keyframes`
   from {
@@ -18,30 +18,29 @@ const Wrapper = styled.div<{ height: string | undefined; width: string | undefin
   flex-shrink: 0;
   height: ${(props) => props.height};
   width: ${(props) => props.width};
+
+  svg {
+    height: 100%;
+    width: 100%;
+  }
 `
 
 Wrapper.defaultProps = {
-  height: '42px',
-  width: '42px',
+  height: '48px',
+  width: '48px',
 }
 
-const SpinnerIcon = styled.img`
-  height: 100%;
-  width: 100%;
-`
-
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  color?: string
   height?: string | undefined
   width?: string | undefined
 }
 
 export const Spinner: React.FC<Props> = (props: Props) => {
-  const { color = '#fff', height, width, ...restProps } = props
+  const { height, width, ...restProps } = props
 
   return (
-    <Wrapper color={color} height={height} width={width} {...restProps}>
-      <SpinnerIcon alt="Loading..." src={SpinnerSVG} />
+    <Wrapper height={height} width={width} {...restProps}>
+      <SpinnerSVG />
     </Wrapper>
   )
 }
