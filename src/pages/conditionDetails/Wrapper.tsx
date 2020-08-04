@@ -1,20 +1,20 @@
 import { useQuery } from '@apollo/react-hooks'
 import React from 'react'
 
+import { InfoCard } from '../../components/common/InfoCard'
 import { InlineLoading } from '../../components/loading/InlineLoading'
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
 import { GetConditionQuery } from '../../queries/conditions'
 import { GetCondition } from '../../types/generatedGQL'
 
-import { ConditionDetailItem } from './ConditionDetailItem'
+import { Contents } from './Contents'
 
-interface ConditionDetailWrapperProps {
+interface WrapperProps {
   conditionId: string
 }
 
-export const ConditionDetailWrapper = (props: ConditionDetailWrapperProps) => {
+export const Wrapper = (props: WrapperProps) => {
   const { conditionId } = props
-
   const { data, error, loading } = useQuery<GetCondition>(GetConditionQuery, {
     variables: { id: conditionId },
   })
@@ -23,10 +23,12 @@ export const ConditionDetailWrapper = (props: ConditionDetailWrapperProps) => {
     <>
       <PageTitle>Condition Details</PageTitle>
       {loading && <InlineLoading />}
-      {error && <div>Error...</div>}
-      {!data && !loading && !error && <div>Not found...</div>}
+      {error && <InfoCard title="Error" />}
+      {!data && !loading && !error && (
+        <InfoCard message="We couldn't fetch the data for this condition..." title="Error" />
+      )}
       {data && data?.condition && (
-        <ConditionDetailItem
+        <Contents
           conditionId={conditionId}
           creator={data.condition?.creator}
           oracle={data.condition?.oracle}

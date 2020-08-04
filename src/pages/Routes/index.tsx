@@ -3,7 +3,7 @@ import React from 'react'
 import { Redirect, Route, RouteProps, Switch } from 'react-router-dom'
 
 import { ButtonConnect } from '../../components/buttons/ButtonConnect'
-import { ConditionsDetailContainer } from '../condition-detail'
+import { ConditionsDetailContainer } from '../conditionDetails'
 import { ConditionsList } from '../conditions-list'
 import { PositionDetailContainer } from '../position-detail'
 import { PositionsList } from '../positions-list'

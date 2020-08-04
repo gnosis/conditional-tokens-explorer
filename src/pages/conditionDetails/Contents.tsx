@@ -21,16 +21,16 @@ import {
 } from '../../util/tools'
 import { ConditionStatus, ConditionType } from '../../util/types'
 
-interface ConditionDetailItemProps {
+interface Props {
   conditionId: string
-  resolved: boolean
-  questionId: string
-  oracle: string
   creator: string
+  oracle: string
   outcomeSlotCount: number
+  questionId: string
+  resolved: boolean
 }
 
-export const ConditionDetailItem = (props: ConditionDetailItemProps) => {
+export const Contents: React.FC<Props> = (props) => {
   const { status } = useWeb3Context()
   const { conditionId, creator, oracle, outcomeSlotCount, questionId, resolved } = props
   const dropdownItems: Array<DropdownItemProps> = [
@@ -98,72 +98,69 @@ export const ConditionDetailItem = (props: ConditionDetailItemProps) => {
     (networkId && getKnowOracleFromAddress(networkId, oracle) === 'realitio')
 
   return (
-    <>
-      <CenteredCard
-        dropdown={
-          <Dropdown
-            activeItemHightlight={false}
-            dropdownButtonContent={<ButtonDropdownCircle />}
-            dropdownPosition={DropdownPosition.right}
-            items={dropdownItems}
-          />
-        }
-      >
-        <GridTwoColumns marginBottomXL>
-          <TitleValue
-            title="Condition Type"
-            value={isFromOmen ? ConditionType.Omen : ConditionType.Unknown}
-          />
-          <TitleValue
-            title="Condition Id"
-            value={
-              <>
-                {truncateStringInTheMiddle(conditionId, 8, 6)}
-                <ButtonCopy value={conditionId} />
-              </>
-            }
-          />
-          <TitleValue
-            title="Status"
-            value={
-              <Pill type={resolved ? PillTypes.primary : PillTypes.open}>
-                {resolved ? ConditionStatus.Resolved : ConditionStatus.Open}
-              </Pill>
-            }
-          />
-          <TitleValue title="Question Type" value={getConditionTypeTitle(templateId)} />
-        </GridTwoColumns>
-        <GridTwoColumns forceOneColumn marginBottomXL>
-          <TitleValue title="Question" value={title} />
-        </GridTwoColumns>
-        <GridTwoColumns forceOneColumn marginBottomXL>
-          <TitleValue
-            title="Outcomes"
-            value={
-              <StripedList>
-                {outcomes.map((outcome: string, index: number) => (
-                  <StripedListItem key={index}>{outcome}</StripedListItem>
-                ))}
-              </StripedList>
-            }
-          />
-        </GridTwoColumns>
-        <GridTwoColumns>
-          <TitleValue
-            title="Resolution Date"
-            value={(resolution && formatDate(resolution)) || INFORMATION_NOT_AVAILABLE}
-          />
-          <TitleValue title="Category" value={category} />
-          <TitleValue
-            title="Oracle"
-            value={
-              (networkId && getKnowOracleFromAddress(networkId, oracle)) ||
-              truncateStringInTheMiddle(oracle, 6, 6)
-            }
-          />
-        </GridTwoColumns>
-      </CenteredCard>
-      {/* )} */}
-    </>
+    <CenteredCard
+      dropdown={
+        <Dropdown
+          activeItemHightlight={false}
+          dropdownButtonContent={<ButtonDropdownCircle />}
+          dropdownPosition={DropdownPosition.right}
+          items={dropdownItems}
+        />
+      }
+    >
+      <GridTwoColumns marginBottomXL>
+        <TitleValue
+          title="Condition Type"
+          value={isFromOmen ? ConditionType.Omen : ConditionType.Unknown}
+        />
+        <TitleValue
+          title="Condition Id"
+          value={
+            <>
+              {truncateStringInTheMiddle(conditionId, 8, 6)}
+              <ButtonCopy value={conditionId} />
+            </>
+          }
+        />
+        <TitleValue
+          title="Status"
+          value={
+            <Pill type={resolved ? PillTypes.primary : PillTypes.open}>
+              {resolved ? ConditionStatus.Resolved : ConditionStatus.Open}
+            </Pill>
+          }
+        />
+        <TitleValue title="Question Type" value={getConditionTypeTitle(templateId)} />
+      </GridTwoColumns>
+      <GridTwoColumns forceOneColumn marginBottomXL>
+        <TitleValue title="Question" value={title} />
+      </GridTwoColumns>
+      <GridTwoColumns forceOneColumn marginBottomXL>
+        <TitleValue
+          title="Outcomes"
+          value={
+            <StripedList>
+              {outcomes.map((outcome: string, index: number) => (
+                <StripedListItem key={index}>{outcome}</StripedListItem>
+              ))}
+            </StripedList>
+          }
+        />
+      </GridTwoColumns>
+      <GridTwoColumns>
+        <TitleValue
+          title="Resolution Date"
+          value={(resolution && formatDate(resolution)) || INFORMATION_NOT_AVAILABLE}
+        />
+        <TitleValue title="Category" value={category} />
+        <TitleValue
+          title="Oracle"
+          value={
+            (networkId && getKnowOracleFromAddress(networkId, oracle)) ||
+            truncateStringInTheMiddle(oracle, 6, 6)
+          }
+        />
+      </GridTwoColumns>
+    </CenteredCard>
   )
 }

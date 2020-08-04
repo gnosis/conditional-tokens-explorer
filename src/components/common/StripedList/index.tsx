@@ -5,6 +5,7 @@ const Wrapper = styled.div<{ maxHeight?: string }>`
   border-radius: 4px;
   border: solid 1px ${(props) => props.theme.border.colorDark};
   max-height: ${(props) => props.maxHeight};
+  overflow: auto;
 `
 
 export const StripedListItem = styled.div<{ justifyContent?: string }>`
@@ -28,7 +29,7 @@ export const StripedListItem = styled.div<{ justifyContent?: string }>`
     border-top-right-radius: 4px;
   }
 
-  &:first-child {
+  &:last-child {
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
   }
@@ -43,7 +44,7 @@ interface StripedList {
 }
 
 export const StripedList: React.FC<StripedList> = (props) => {
-  const { children, maxHeight = '81px', ...restProps } = props
+  const { children, maxHeight = '87px', ...restProps } = props
 
   return (
     <Wrapper maxHeight={maxHeight} {...restProps}>
