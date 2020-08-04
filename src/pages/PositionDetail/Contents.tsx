@@ -3,6 +3,7 @@ import { truncateStringInTheMiddle } from 'util/tools'
 import React from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 
+import { CenteredCard } from '../../components/common/CenteredCard'
 import { GetPosition_position as Position } from '../../types/generatedGQL'
 
 interface Props {
@@ -19,7 +20,7 @@ const OutcomeList = ({ outcomeList }: { outcomeList: number[] }) => {
   )
 }
 
-export const PositionDetailItem = ({ position }: Props) => {
+export const Contents = ({ position }: Props) => {
   const { collateralToken, id, indexSets } = position
 
   const numberedOutcomes = indexSets.map((indexSet: string) => {
@@ -32,7 +33,7 @@ export const PositionDetailItem = ({ position }: Props) => {
   })
 
   return (
-    <>
+    <CenteredCard>
       <div className="row">
         <label>Position Id: </label>
         {truncateStringInTheMiddle(id, 6, 6)}
@@ -55,6 +56,6 @@ export const PositionDetailItem = ({ position }: Props) => {
           )
         })}
       </div>
-    </>
+    </CenteredCard>
   )
 }

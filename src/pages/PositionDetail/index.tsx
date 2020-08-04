@@ -1,17 +1,17 @@
 import React from 'react'
 import { useParams } from 'react-router-dom'
 
+import { InfoCard } from '../../components/common/InfoCard'
 import { isBytes32String } from '../../util/tools'
 
-import { PositionDetailNotFound } from './PositionDetailNotFound'
-import { PositionDetailWrapper } from './PositionDetailWrapper'
+import { Wrapper } from './Wrapper'
 
 export const PositionDetail = () => {
   const { positionId } = useParams()
 
   return isBytes32String(positionId) ? (
-    <PositionDetailWrapper positionId={positionId} />
+    <Wrapper positionId={positionId} />
   ) : (
-    <PositionDetailNotFound />
+    <InfoCard message="We couldn't find this position..." title="Not Found" />
   )
 }
