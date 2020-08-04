@@ -12,11 +12,20 @@ const Wrapper = styled.button`
   cursor: pointer;
   height: 15px;
   margin: 0 0 0 12px;
+  outline: none;
   padding: 0;
   width: 13px;
 
   &:active {
     opacity: 0.7;
+  }
+
+  &:hover {
+    svg {
+      path {
+        fill: ${(props) => props.theme.colors.primary};
+      }
+    }
   }
 
   ${CommonDisabledCSS}
