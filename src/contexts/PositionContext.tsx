@@ -1,10 +1,11 @@
 import { useQuery } from '@apollo/react-hooks'
 import React from 'react'
 
+import { useBalanceForPosition } from '../hooks/useBalanceForPosition'
+import { GetPositionQuery } from '../queries/positions'
 import { GetPosition, GetPosition_position } from '../types/generatedGQL'
 import { isPositionIdValid } from '../util/tools'
 import { PositionErrors } from '../util/types'
-import { GetPositionQuery } from '../queries/positions'
 
 export interface PositionContext {
   position: Maybe<GetPosition_position>
@@ -29,11 +30,14 @@ export const POSITION_CONTEXT_DEFAULT_VALUE = {
 const PositionContext = React.createContext<PositionContext>(POSITION_CONTEXT_DEFAULT_VALUE)
 
 interface Props {
+  checkForEmptyBalance?: boolean
   children: React.ReactNode
 }
 
 export const PositionProvider = (props: Props) => {
+  const { checkForEmptyBalance } = props
   const [positionId, setPositionId] = React.useState('')
+
   const errors = []
   let position: Maybe<GetPosition_position> = null
 
@@ -60,6 +64,11 @@ export const PositionProvider = (props: Props) => {
     if (!positionFromTheGraph) {
       errors.push(PositionErrors.NOT_FOUND_ERROR)
     }
+  }
+
+  const { balance } = useBalanceForPosition(positionId)
+  if (position && balance && balance.isZero() && checkForEmptyBalance) {
+    errors.push(PositionErrors.EMPTY_BALANCE_ERROR)
   }
 
   // Validate string position

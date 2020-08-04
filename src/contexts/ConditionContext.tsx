@@ -29,10 +29,13 @@ export const CONDITION_CONTEXT_DEFAULT_VALUE = {
 const ConditionContext = React.createContext<ConditionContext>(CONDITION_CONTEXT_DEFAULT_VALUE)
 
 interface Props {
+  checkForConditionNotResolved?: boolean
   children: React.ReactNode
 }
 
 export const ConditionProvider = (props: Props) => {
+  const { checkForConditionNotResolved } = props
+
   const [conditionId, setConditionId] = React.useState('')
   const errors = []
   let condition: Maybe<GetCondition_condition> = null
@@ -59,6 +62,11 @@ export const ConditionProvider = (props: Props) => {
     // Validate condition exist and if is resolved
     if (!conditionFromTheGraph) {
       errors.push(ConditionErrors.NOT_FOUND_ERROR)
+    }
+
+    if (conditionFromTheGraph && !conditionFromTheGraph.resolved && checkForConditionNotResolved) {
+      if (!errors.includes(ConditionErrors.NOT_RESOLVED_ERROR))
+        errors.push(ConditionErrors.NOT_RESOLVED_ERROR)
     }
   }
 
