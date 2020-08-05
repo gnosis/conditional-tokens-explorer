@@ -2,7 +2,7 @@ import React from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { InnerContainer } from '../../pureStyledComponents/layout'
+import { InnerContainer } from '../../pureStyledComponents/InnerContainer'
 
 const Wrapper = styled.nav`
   background-color: rgba(255, 255, 255, 0.8);

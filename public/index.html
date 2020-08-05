@@ -69,11 +69,51 @@
       href="%PUBLIC_URL%/manifest.json"
     />
     <title>Conditional Tokens Explorer And Factory</title>
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+      }
+
+      #root:empty {
+        align-items: center;
+        display: flex;
+        height: 100vh;
+        justify-content: center;
+        width: 100vw;
+      }
+
+      #root:empty:before {
+        animation: rotate 2s linear infinite;
+        background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGlkPSJwcmVmaXhfX3NwaW5uZXIiIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij4KICAgIDxjaXJjbGUgaWQ9InByZWZpeF9fRWxsaXBzZV81IiBjeD0iMjQiIGN5PSIyNCIgcj0iMjQiIGZpbGw9IiMwMDljYjQiIGRhdGEtbmFtZT0iRWxsaXBzZSA1Ii8+CiAgICA8cGF0aCBpZD0icHJlZml4X19QYXRoXzMzIiBmaWxsPSIjZmZmIiBkPSJNMjQgNDFBMTcgMTcgMCAxIDAgNyAyMy43MjFhMS43IDEuNyAwIDAgMCAzLjQuMDU0QTEzLjYgMTMuNiAwIDEgMSAyNCAzNy42YTEuNyAxLjcgMCAxIDAgMCAzLjR6IiBkYXRhLW5hbWU9IlBhdGggMzMiLz4KPC9zdmc+Cg==');
+        background-position: 50% 50%;
+        background-repeat: no-repeat;
+        background-size: cover;
+        content: '';
+        flex-grow: 0;
+        flex-shrink: 0;
+        height: 50px;
+        width: 50px;
+      }
+
+      @keyframes rotate {
+        from {
+          transform: rotate(0deg);
+        }
+
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+    </style>
   </head>
 
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <div id="portalContainer"></div>
   </body>
 
 </html>

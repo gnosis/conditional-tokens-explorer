@@ -1,4 +1,4 @@
-import { BigNumberInputWrapper } from 'components/common/BigNumberInputWrapper'
+import { BigNumberInputWrapper } from 'components/form/BigNumberInputWrapper'
 import { BigNumber, formatUnits } from 'ethers/utils'
 import React from 'react'
 import { Controller, useForm } from 'react-hook-form'
