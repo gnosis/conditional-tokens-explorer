@@ -17,7 +17,7 @@ export const StripedListItem = styled.div<{ justifyContent?: string }>`
   font-weight: 400;
   justify-content: ${(props) => props.justifyContent};
   line-height: 1;
-  padding: 14px 21px;
+  padding: 12px 20px;
   text-align: left;
 
   &:nth-child(even) {
