@@ -1,6 +1,6 @@
 import { formatBigNumber } from 'util/tools'
 
-import { BigNumberInputWrapper } from 'components/common/BigNumberInputWrapper'
+import { BigNumberInputWrapper } from 'components/form/BigNumberInputWrapper'
 import { BYTES_REGEX, ZERO_BN } from 'config/constants'
 import { useWeb3Connected } from 'contexts/Web3Context'
 import { BigNumber } from 'ethers/utils'

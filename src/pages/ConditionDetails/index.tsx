@@ -3,14 +3,14 @@ import { useParams } from 'react-router-dom'
 
 import { ConditionProvider } from '../../contexts/ConditionContext'
 
-import { ConditionDetail } from './ConditionDetail'
+import { Wrapper } from './Wrapper'
 
-export const ConditionsDetailContainer = () => {
+export const ConditionDetails = () => {
   const { conditionId } = useParams()
 
   return (
     <ConditionProvider>
-      <ConditionDetail conditionId={conditionId} />
+      <Wrapper conditionId={conditionId} />
     </ConditionProvider>
   )
 }
