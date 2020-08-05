@@ -1,0 +1,34 @@
+version: '3'
+services:
+  graph-node:
+    image: graphprotocol/graph-node:v0.18.0
+    ports:
+      - '8000:8000'
+      - '8020:8020'
+    environment:
+      postgres_host: 'postgres:5432'
+      postgres_user: postgres
+      postgres_pass: letmein
+      postgres_db: postgres
+      ipfs: 'ipfs:5001'
+      ethereum: 'development:http://ganache:8545'
+    depends_on:
+      - ipfs
+      - postgres
+      - ganache
+  ipfs:
+    image: ipfs/go-ipfs:v0.6.0
+    ports:
+      - '5001:5001'
+  postgres:
+    image: postgres:12.3-alpine
+    environment:
+      POSTGRES_PASSWORD: letmein
+  ganache:
+    # image: trufflesuite/ganache-cli
+    build: ./docker/ganache/
+    ports:
+      - '8545:8545'
+  hg-subgraph:
+    build: ./docker/hg-subgraph/
+    command: ["cd hg-subgraph && graph create --node http://graph-node:8020 gnosis/hg"]
