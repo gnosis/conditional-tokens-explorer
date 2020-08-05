@@ -8,6 +8,7 @@ import { InlineLoading } from '../../components/loading/InlineLoading'
 import { ConditionDetails } from '../ConditionDetails'
 import { ConditionsList } from '../ConditionsList'
 import { PositionDetails } from '../PositionDetails'
+import { MergePositions } from '../MergePositions'
 import { PositionsList } from '../PositionsList'
 import { PrepareCondition } from '../PrepareCondition'
 import { SplitPosition } from '../SplitPosition'
@@ -49,6 +50,7 @@ export const Routes: React.FC = () => {
       <ProtectedRoute component={SplitPosition} path="/split" />
       <ProtectedRoute component={ReportPayoutsContainer} path="/report" />
       <ProtectedRoute component={RedeemPositionContainer} path="/redeem" />
+      <ProtectedRoute component={MergePositions} path="/merge" />
       <Route exact path="/">
         <Redirect to="/conditions" />
       </Route>
