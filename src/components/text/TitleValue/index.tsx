@@ -12,7 +12,7 @@ const Title = styled.h2<{ flexDirection?: string }>`
   font-size: 16px;
   font-weight: 600;
   line-height: 1.2;
-  margin: ${(props) => (props.flexDirection === 'column' ? '0 0 8px 0' : '0 5px 0 0')};
+  margin: ${(props) => (props.flexDirection === 'column' ? '0 0 6px 0' : '0 5px 0 0')};
   text-transform: uppercase;
 `
 

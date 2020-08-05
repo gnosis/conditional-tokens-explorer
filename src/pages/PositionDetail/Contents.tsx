@@ -9,6 +9,7 @@ import { ButtonDropdownCircle } from '../../components/buttons/ButtonDropdownCir
 import { CenteredCard } from '../../components/common/CenteredCard'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../components/common/Dropdown'
 import { StripedList, StripedListItem } from '../../components/common/StripedList'
+import { TokenIcon } from '../../components/common/TokenIcon'
 import { GridTwoColumns } from '../../components/pureStyledComponents/GridTwoColumns'
 import { Pill, PillTypes } from '../../components/pureStyledComponents/Pill'
 import { TitleValue } from '../../components/text/TitleValue'
@@ -103,7 +104,7 @@ export const Contents = ({ position }: Props) => {
             </>
           }
         />
-        <TitleValue title="Collateral Token" value={tokenSymbol} />
+        <TitleValue title="Collateral Token" value={<TokenIcon symbol={tokenSymbol} />} />
         <TitleValue
           title="Contract Address"
           value={
