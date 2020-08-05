@@ -4,6 +4,7 @@ import React from 'react'
 import { useConditionContext } from '../../contexts/ConditionContext'
 import { usePositionContext } from '../../contexts/PositionContext'
 import { useWeb3Connected } from '../../contexts/Web3Context'
+import { useIsPositionRelatedToCondition } from '../../hooks/useIsPositionRelatedToCondition'
 import { getLogger } from '../../util/logger'
 import { Status } from '../../util/types'
 
@@ -44,12 +45,15 @@ export const RedeemPositionWrapper = () => {
     }
   }
 
+  const { isRelated } = useIsPositionRelatedToCondition(position?.id || '', condition?.id || '')
+
   const disabled =
     status === Status.Loading ||
     positionErrors.length > 0 ||
     conditionErrors.length > 0 ||
     !position ||
-    !condition
+    !condition ||
+    !isRelated
 
   return (
     <>
@@ -60,6 +64,8 @@ export const RedeemPositionWrapper = () => {
       <div className="row">
         <SelectCondition />
       </div>
+
+      {!isRelated && position && condition && <span>Position is not related to the condition</span>}
 
       <button disabled={disabled} onClick={onRedeem}>
         Redeem
