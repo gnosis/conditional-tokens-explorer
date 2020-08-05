@@ -1,17 +1,16 @@
 import React from 'react'
 import { useParams } from 'react-router-dom'
 
-import { InfoCard } from '../../components/common/InfoCard'
-import { isConditionIdValid } from '../../util/tools'
+import { ConditionProvider } from '../../contexts/ConditionContext'
 
 import { Wrapper } from './Wrapper'
 
 export const ConditionDetails = () => {
   const { conditionId } = useParams()
 
-  return isConditionIdValid(conditionId) ? (
-    <Wrapper conditionId={conditionId} />
-  ) : (
-    <InfoCard message="We couldn't find this condition..." title="Not Found" />
+  return (
+    <ConditionProvider>
+      <Wrapper conditionId={conditionId} />
+    </ConditionProvider>
   )
 }

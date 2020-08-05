@@ -5,6 +5,8 @@ import moment from 'moment-timezone'
 
 import { BYTES_REGEX } from '../config/constants'
 
+import { ConditionErrors } from './types'
+
 export const isAddress = (address: string) => {
   try {
     ethers.utils.getAddress(address)
@@ -65,4 +67,24 @@ export const getConditionTypeTitle = (templateId: Maybe<number>) => {
 
 export const formatDate = (date: Date): string => {
   return moment(date).tz('UTC').format('YYYY-MM-DD - HH:mm [UTC]')
+}
+
+export const isConditionErrorNotFound = (errors: ConditionErrors[]): boolean =>
+  errors.indexOf(ConditionErrors.NOT_FOUND_ERROR) > -1
+
+export const isConditionErrorNotResolved = (errors: ConditionErrors[]): boolean =>
+  errors.indexOf(ConditionErrors.NOT_RESOLVED_ERROR) > -1
+
+export const isConditionErrorFetching = (errors: ConditionErrors[]): boolean =>
+  errors.indexOf(ConditionErrors.FETCHING_ERROR) > -1
+
+export const isConditionErrorInvalid = (errors: ConditionErrors[]): boolean =>
+  errors.indexOf(ConditionErrors.INVALID_ERROR) > -1
+
+export const divBN = (a: BigNumber, b: BigNumber, scale = 10000): number => {
+  return a.mul(scale).div(b).toNumber() / scale
+}
+
+export const mulBN = (a: BigNumber, b: number, scale = 10000): BigNumber => {
+  return a.mul(Math.round(b * scale)).div(scale)
 }

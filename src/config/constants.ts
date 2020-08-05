@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers/utils'
 
-import { NetworkId } from './networkConfig'
+import { NetworkId } from '../util/types'
 
 export const ZERO_BN = new BigNumber(0)
 export const INFURA_ID = process.env.REACT_APP_INFURA_ID

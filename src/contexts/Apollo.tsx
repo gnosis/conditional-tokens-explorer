@@ -1,8 +1,9 @@
 import { ApolloProvider } from '@apollo/react-hooks'
 import { getApolloClient } from 'apolloClientConfig'
 import { DEFAULT_NETWORK_ID } from 'config/constants'
-import { NetworkId } from 'config/networkConfig'
 import React from 'react'
+
+import { NetworkId } from '../util/types'
 
 import { useWeb3Context } from './Web3Context'
 

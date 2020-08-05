@@ -1,5 +1,4 @@
-import { Provider } from 'ethers/providers'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 
 import { ButtonCopy } from '../../components/buttons/ButtonCopy'
 import { ButtonDropdownCircle } from '../../components/buttons/ButtonDropdownCircle'
@@ -12,50 +11,45 @@ import { TitleValue } from '../../components/text/TitleValue'
 import { INFORMATION_NOT_AVAILABLE } from '../../config/constants'
 import { getKnowOracleFromAddress } from '../../config/networkConfig'
 import { useWeb3Context } from '../../contexts/Web3Context'
+import { useIsConditionFromOmen } from '../../hooks/useIsConditionFromOmen'
 import { useQuestion } from '../../hooks/useQuestion'
-import {
-  formatDate,
-  getConditionTypeTitle,
-  isContract,
-  truncateStringInTheMiddle,
-} from '../../util/tools'
+import { GetCondition_condition } from '../../types/generatedGQL'
+import { getLogger } from '../../util/logger'
+import { formatDate, getConditionTypeTitle, truncateStringInTheMiddle } from '../../util/tools'
 import { ConditionStatus, ConditionType } from '../../util/types'
 
+const logger = getLogger('ConditionDetails')
+
 interface Props {
-  conditionId: string
-  creator: string
-  oracle: string
-  outcomeSlotCount: number
-  questionId: string
-  resolved: boolean
+  condition: GetCondition_condition
 }
 
-export const Contents: React.FC<Props> = (props) => {
+export const Contents: React.FC<Props> = ({ condition }) => {
   const { status } = useWeb3Context()
-  const { conditionId, creator, oracle, outcomeSlotCount, questionId, resolved } = props
+  const { creator, id: conditionId, oracle, outcomeSlotCount, questionId, resolved } = condition
   const dropdownItems: Array<DropdownItemProps> = [
     {
       content: 'Resolve Condition',
       onClick: () => {
-        console.log('clickity')
+        logger.log('clickity')
       },
     },
     {
       content: 'Split Position',
       onClick: () => {
-        console.log('clickity')
+        logger.log('clickity')
       },
     },
     {
       content: 'Merge Positions',
       onClick: () => {
-        console.log('clickity')
+        logger.log('clickity')
       },
     },
     {
       content: 'Report Payouts',
       onClick: () => {
-        console.log('clickity')
+        logger.log('clickity')
       },
     },
   ]
@@ -66,36 +60,14 @@ export const Contents: React.FC<Props> = (props) => {
     networkId = networkConfig.networkId
   }
 
-  const { question } = useQuestion(questionId)
-  const [isAContract, setIsAContract] = useState(false)
-
+  const { outcomesPrettier, question } = useQuestion(questionId, outcomeSlotCount)
+  const { isConditionFromOmen } = useIsConditionFromOmen(creator, oracle, question)
   const {
     templateId = null,
     resolution = null,
     title = INFORMATION_NOT_AVAILABLE,
     category = INFORMATION_NOT_AVAILABLE,
-    outcomes = Array.from(Array(outcomeSlotCount), (_, i) => i + 1 + ''),
   } = question ?? {}
-
-  // We check if the owner is a contract, if is a contract is from Safe, and Omen use safe, we can say the origin is from omen, maybe we can improve this in the future
-  useEffect(() => {
-    if (status._type === 'connected') {
-      const { provider } = status
-
-      const checkIfThisConditionIsFromOmen = async (provider: Provider, address: string) => {
-        const isReallyAContract = await isContract(provider, address)
-
-        setIsAContract(isReallyAContract)
-      }
-
-      checkIfThisConditionIsFromOmen(provider, creator)
-    }
-  }, [creator, status])
-
-  const isFromOmen =
-    isAContract ||
-    !!question ||
-    (networkId && getKnowOracleFromAddress(networkId, oracle) === 'realitio')
 
   return (
     <CenteredCard
@@ -111,7 +83,7 @@ export const Contents: React.FC<Props> = (props) => {
       <GridTwoColumns marginBottomXL>
         <TitleValue
           title="Condition Type"
-          value={isFromOmen ? ConditionType.Omen : ConditionType.Unknown}
+          value={isConditionFromOmen ? ConditionType.Omen : ConditionType.Unknown}
         />
         <TitleValue
           title="Condition Id"
@@ -140,7 +112,7 @@ export const Contents: React.FC<Props> = (props) => {
           title="Outcomes"
           value={
             <StripedList>
-              {outcomes.map((outcome: string, index: number) => (
+              {outcomesPrettier.map((outcome: string, index: number) => (
                 <StripedListItem key={index}>{outcome}</StripedListItem>
               ))}
             </StripedList>
