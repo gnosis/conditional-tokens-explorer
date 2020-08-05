@@ -8,10 +8,10 @@ import { ButtonCopy } from '../../components/buttons/ButtonCopy'
 import { ButtonDropdownCircle } from '../../components/buttons/ButtonDropdownCircle'
 import { CenteredCard } from '../../components/common/CenteredCard'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../components/common/Dropdown'
+import { SetAllowance } from '../../components/common/SetAllowance'
 import { StripedList, StripedListItem } from '../../components/common/StripedList'
 import { TokenIcon } from '../../components/common/TokenIcon'
 import { GridTwoColumns } from '../../components/pureStyledComponents/GridTwoColumns'
-import { Pill, PillTypes } from '../../components/pureStyledComponents/Pill'
 import { TitleValue } from '../../components/text/TitleValue'
 import { getTokenFromAddress } from '../../config/networkConfig'
 import { useWeb3Connected } from '../../contexts/Web3Context'
@@ -115,6 +115,12 @@ export const Contents = ({ position }: Props) => {
           }
         />
       </GridTwoColumns>
+      <SetAllowance
+        collateral={collateralToken}
+        finished={false}
+        loading={false}
+        onUnlock={() => {}}
+      />
       <GridTwoColumns forceOneColumn marginBottomXL>
         <TitleValue
           title="Collateral Wrapping"

@@ -1,33 +1,25 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { Token } from '../../../util/types'
+import { Button } from '../../buttons/Button'
 
-const Wrapper = styled.div``
-
-const Title = styled.h2`
-  font-size: 16px;
-  letter-spacing: 0.4px;
-  line-height: 1.2;
-  margin: 0 0 20px;
-`
-
-const DescriptionWrapper = styled.div`
-  align-items: center;
+const Wrapper = styled.div`
   border-radius: 4px;
+  border: solid 1px ${(props) => props.theme.colors.primary};
   display: flex;
-  padding: 21px 25px;
+  margin-bottom: 25px;
+  padding: 13px 16px;
 `
 
 const Description = styled.p`
-  font-size: 14px;
-  letter-spacing: 0.2px;
+  font-size: 15px;
   line-height: 1.4;
-  margin: 0 25px 0 0;
+  margin: 0 15px 0 0;
+  color: ${(props) => props.theme.colors.primary};
 `
 
 interface Props {
-  collateral: Token
+  collateral: any
   onUnlock: () => void
   loading: boolean
   finished: boolean
@@ -35,22 +27,17 @@ interface Props {
 
 export const SetAllowance = (props: Props) => {
   const { collateral, finished, loading, onUnlock } = props
-
   const btnText = loading ? 'loading' : finished ? 'finished' : 'unlock'
 
   return (
     <Wrapper>
-      <Title>Set Allowance</Title>
-      <DescriptionWrapper>
-        <Description>
-          This permission allows the smart contracts to interact with your {collateral.symbol}. This
-          has to be done for each new token.
-        </Description>
-        <button disabled={loading || finished} onClick={onUnlock}>
-          {btnText}
-        </button>
-        {/* <ToggleTokenLock finished={finished} loading={loading} onUnlock={onUnlock} /> */}
-      </DescriptionWrapper>
+      <Description>
+        You need to unlock <strong>{collateral.symbol}</strong> to allow the smart contract to
+        interact with it. This has to be done for each new token.
+      </Description>
+      <Button disabled={loading || finished} onClick={onUnlock}>
+        {btnText}
+      </Button>
     </Wrapper>
   )
 }
