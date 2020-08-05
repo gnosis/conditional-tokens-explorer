@@ -1,33 +1,37 @@
-import React from 'react'
 import { ethers } from 'ethers'
+import React from 'react'
 
 import { useConditionContext } from '../../contexts/ConditionContext'
 import { usePositionContext } from '../../contexts/PositionContext'
+import { useWeb3Connected } from '../../contexts/Web3Context'
 import { getLogger } from '../../util/logger'
+import { Status } from '../../util/types'
 
 import { SelectCondition } from './SelectCondition'
 import { SelectPosition } from './SelectPosition'
-import { BigNumber, formatUnits } from 'ethers/utils'
-import { Status } from '../../util/types'
-import { useWeb3Connected } from '../../contexts/Web3Context'
 
 const logger = getLogger('RedeemPosition')
 
 export const RedeemPositionWrapper = () => {
-  const { CTService, address } = useWeb3Connected()
+  const { CTService } = useWeb3Connected()
 
-  const { condition, errors: conditionErrors, clearCondition } = useConditionContext()
-  const { position, errors: positionErrors, clearPosition } = usePositionContext()
+  const { clearCondition, condition, errors: conditionErrors } = useConditionContext()
+  const { clearPosition, errors: positionErrors, position } = usePositionContext()
   const [status, setStatus] = React.useState<Maybe<Status>>(null)
 
   const onRedeem = async () => {
     try {
-      if(position && condition ) {
+      if (position && condition) {
         setStatus(Status.Loading)
 
         const { collateralToken } = position
 
-        await CTService.redeemPositions(collateralToken.id, ethers.constants.HashZero, condition.id, condition.outcomeSlotCount)
+        await CTService.redeemPositions(
+          collateralToken.id,
+          ethers.constants.HashZero,
+          condition.id,
+          condition.outcomeSlotCount
+        )
 
         clearCondition()
         clearPosition()
@@ -40,8 +44,12 @@ export const RedeemPositionWrapper = () => {
     }
   }
 
-  const disabled = status === Status.Loading ||
-    positionErrors.length > 0 || conditionErrors.length > 0 || !position || !condition
+  const disabled =
+    status === Status.Loading ||
+    positionErrors.length > 0 ||
+    conditionErrors.length > 0 ||
+    !position ||
+    !condition
 
   return (
     <>

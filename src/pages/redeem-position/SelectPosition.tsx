@@ -3,12 +3,9 @@ import React from 'react'
 import { usePositionContext } from '../../contexts/PositionContext'
 import { useWeb3Connected } from '../../contexts/Web3Context'
 import { useBalanceForPosition } from '../../hooks/useBalanceForPosition'
-import { getLogger } from '../../util/logger'
 import { displayPositions } from '../../util/tools'
 
 import { WrapperDisplay } from './WrapperDisplay'
-
-const logger = getLogger('SelectPosition')
 
 export const SelectPosition = () => {
   const { networkConfig } = useWeb3Connected()
