@@ -3,11 +3,12 @@ import React from 'react'
 import { Redirect, Route, RouteProps, Switch } from 'react-router-dom'
 
 import { ButtonConnect } from '../../components/buttons/ButtonConnect'
-import { ConditionsDetailContainer } from '../condition-detail'
-import { ConditionsList } from '../conditions-list'
-import { PositionDetailContainer } from '../position-detail'
-import { PositionsList } from '../positions-list'
-import { PrepareCondition } from '../prepare-condition'
+import { InfoCard } from '../../components/common/InfoCard'
+import { ConditionDetails } from '../ConditionDetails'
+import { ConditionsList } from '../ConditionsList'
+import { PositionDetail } from '../PositionDetail'
+import { PositionsList } from '../PositionsList'
+import { PrepareCondition } from '../PrepareCondition'
 import { SplitConditionContainer } from '../split-condition'
 
 const ProtectedRoute: React.FC<RouteProps> = (props) => {
@@ -19,7 +20,8 @@ const ProtectedRoute: React.FC<RouteProps> = (props) => {
       {status._type === 'notAsked' && (
         <>
           <p>
-            This should trigger the connection prompt automatically (not show the connect button)
+            This should trigger the connection prompt automatically (it should not show the connect
+            button)
           </p>
           <ButtonConnect style={{ flexGrow: 0, height: 'auto' }} />
         </>
@@ -35,16 +37,16 @@ export const Routes: React.FC = () => {
   return (
     <Switch>
       <Route component={ConditionsList} exact path="/conditions" />
-      <Route component={ConditionsDetailContainer} exact path="/conditions/:conditionId" />
+      <Route component={ConditionDetails} exact path="/conditions/:conditionId" />
       <Route component={PositionsList} exact path="/positions" />
-      <Route component={PositionDetailContainer} exact path="/positions/:positionId" />
+      <Route component={PositionDetail} exact path="/positions/:positionId" />
       <ProtectedRoute component={PrepareCondition} path="/prepare" />
       <ProtectedRoute component={SplitConditionContainer} path="/split" />
       <Route exact path="/">
         <Redirect to="/conditions" />
       </Route>
       <Route path="*">
-        <div>Section not found...</div>
+        <InfoCard message="Page not found..." title="Error 404" />
       </Route>
     </Switch>
   )

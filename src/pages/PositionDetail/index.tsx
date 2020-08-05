@@ -6,7 +6,7 @@ import { isBytes32String } from '../../util/tools'
 import { PositionDetailNotFound } from './PositionDetailNotFound'
 import { PositionDetailWrapper } from './PositionDetailWrapper'
 
-export const PositionDetailContainer = () => {
+export const PositionDetail = () => {
   const { positionId } = useParams()
 
   return isBytes32String(positionId) ? (
