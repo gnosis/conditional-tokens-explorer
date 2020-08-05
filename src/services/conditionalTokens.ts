@@ -111,7 +111,7 @@ export class ConditionalTokensService {
     parentCollectionId: string, // If doesn't exist, must be zero, ethers.constants.HashZero
     conditionId: string,
     outcomesCount: number
-  ): Promise<TransactionResponse> => {
+  ): Promise<TransactionReceipt> => {
     const indexSets = getIndexSets(outcomesCount)
 
     const tx = await this.contract.redeemPositions(
@@ -120,8 +120,7 @@ export class ConditionalTokensService {
       conditionId,
       indexSets
     )
-
-    return tx
+    return this.provider.waitForTransaction(tx.hash)
   }
 
   async getOutcomeSlotCount(conditionId: string): Promise<BigNumber> {

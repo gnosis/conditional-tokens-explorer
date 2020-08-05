@@ -44,6 +44,10 @@ export const ConditionProvider = (props: Props) => {
     setConditionId(conditionId)
   }, [])
 
+  const clearCondition = React.useCallback((): void => {
+    setConditionId('')
+  }, [])
+
   const { data: fetchedCondition, error: errorFetchingCondition, loading } = useQuery<GetCondition>(
     GetConditionQuery,
     {
@@ -87,7 +91,7 @@ export const ConditionProvider = (props: Props) => {
     errors,
     loading,
     setConditionId: setConditionIdCallback,
-    clearCondition: () => setConditionIdCallback(''),
+    clearCondition,
   }
 
   return <ConditionContext.Provider value={value}>{props.children}</ConditionContext.Provider>

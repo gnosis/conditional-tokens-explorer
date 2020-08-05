@@ -28,7 +28,8 @@ export const SelectPosition = () => {
   React.useEffect(() => {
     if (position) {
       setPositionToDisplay(displayPositions(position, balance, networkConfig.networkId))
-      logger.log(position)
+    } else {
+      setPositionToDisplay('')
     }
   }, [balance, networkConfig.networkId, position])
 

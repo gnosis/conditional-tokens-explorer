@@ -45,6 +45,10 @@ export const PositionProvider = (props: Props) => {
     setPositionId(positionId)
   }, [])
 
+  const clearPosition = React.useCallback((): void => {
+    setPositionId('')
+  }, [])
+
   const { data: fetchedPosition, error: errorFetchingPosition, loading } = useQuery<GetPosition>(
     GetPositionQuery,
     {
@@ -88,7 +92,7 @@ export const PositionProvider = (props: Props) => {
     errors,
     loading,
     setPositionId: setPositionIdCallback,
-    clearPosition: () => setPositionIdCallback(''),
+    clearPosition,
   }
 
   return <PositionContext.Provider value={value}>{props.children}</PositionContext.Provider>
