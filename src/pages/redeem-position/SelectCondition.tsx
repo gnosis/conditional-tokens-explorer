@@ -1,7 +1,6 @@
 import React from 'react'
 
 import { useConditionContext } from '../../contexts/ConditionContext'
-import { displayCondition } from '../../util/tools'
 
 import { WrapperDisplay } from './WrapperDisplay'
 
@@ -18,7 +17,8 @@ export const SelectCondition = () => {
 
   React.useEffect(() => {
     if (condition) {
-      setConditionToDisplay(displayCondition(condition))
+      // TODO: improve using the method "displayCondition(condition)"
+      setConditionToDisplay(condition.id)
     } else {
       setConditionToDisplay('')
     }

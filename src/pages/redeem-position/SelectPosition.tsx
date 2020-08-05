@@ -1,15 +1,11 @@
 import React from 'react'
 
 import { usePositionContext } from '../../contexts/PositionContext'
-import { useWeb3Connected } from '../../contexts/Web3Context'
 import { useBalanceForPosition } from '../../hooks/useBalanceForPosition'
-import { displayPositions } from '../../util/tools'
 
 import { WrapperDisplay } from './WrapperDisplay'
 
 export const SelectPosition = () => {
-  const { networkConfig } = useWeb3Connected()
-
   const { errors, loading, position, positionId, setPositionId } = usePositionContext()
   const { balance } = useBalanceForPosition(positionId)
 
@@ -24,11 +20,12 @@ export const SelectPosition = () => {
 
   React.useEffect(() => {
     if (position) {
-      setPositionToDisplay(displayPositions(position, balance, networkConfig.networkId))
+      // TODO: improve using the method "displayPositions(position, balance, networkConfig.networkId)"
+      setPositionToDisplay(position.id)
     } else {
       setPositionToDisplay('')
     }
-  }, [balance, networkConfig.networkId, position])
+  }, [balance, position])
 
   return (
     <>
