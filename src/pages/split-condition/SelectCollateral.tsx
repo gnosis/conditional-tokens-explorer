@@ -1,6 +1,7 @@
-import { Token } from 'config/networkConfig'
 import React, { useEffect } from 'react'
 import { FormContextValues } from 'react-hook-form'
+
+import { Token } from '../../util/types'
 
 import { SplitPositionForm } from './SplitCondition'
 

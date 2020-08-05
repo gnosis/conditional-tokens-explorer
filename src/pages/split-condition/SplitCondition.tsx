@@ -7,9 +7,9 @@ import { GetPosition_position } from 'types/generatedGQL'
 
 import { SetAllowance } from '../../components/common/SetAllowance'
 import { NULL_PARENT_ID, ZERO_BN } from '../../config/constants'
-import { Token } from '../../config/networkConfig'
 import { Remote } from '../../util/remoteData'
 import { trivialPartition } from '../../util/tools'
+import { Token } from '../../util/types'
 
 import { InputAmount } from './InputAmount'
 import { InputCondition } from './InputCondition'
