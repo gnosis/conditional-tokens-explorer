@@ -1,13 +1,14 @@
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { ethers } from 'ethers'
-import { JsonRpcSigner, Web3Provider } from 'ethers/providers'
+import { InfuraProvider, JsonRpcSigner, Web3Provider } from 'ethers/providers'
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import Web3Modal from 'web3modal'
 
-import { INFURA_ID } from '../config/constants'
+import { DEFAULT_NETWORK_ID, INFURA_ID } from '../config/constants'
 import { NetworkConfig } from '../config/networkConfig'
 import { ConditionalTokensService } from '../services/conditionalTokens'
 import { RealitioService } from '../services/realitio'
+import { NetworkId, NetworkIds } from '../util/types'
 
 export type NotAsked = {
   _type: 'notAsked'
@@ -31,12 +32,20 @@ export type Connected = {
   RtioService: RealitioService
 }
 
+export type Infura = {
+  _type: 'infura'
+  provider: InfuraProvider
+  networkConfig: NetworkConfig
+  CTService: ConditionalTokensService
+  RtioService: RealitioService
+}
+
 type ErrorWeb3 = {
   _type: 'error'
   error: Error
 }
 
-export type Web3Status = NotAsked | WaitingForUser | Connecting | Connected | ErrorWeb3
+export type Web3Status = NotAsked | WaitingForUser | Connecting | Connected | ErrorWeb3 | Infura
 export const Web3Context = createContext(null as Maybe<{ status: Web3Status; connect: () => void }>)
 
 interface Props {
@@ -60,7 +69,7 @@ export const Web3ContextProvider = ({ children }: Props) => {
     web3Modal.cachedProvider ? { _type: 'connecting' } : { _type: 'notAsked' }
   )
 
-  const connect = useCallback(async () => {
+  const connectWeb3Modal = useCallback(async () => {
     if (web3Status._type === 'connected') {
       return
     }
@@ -100,14 +109,44 @@ export const Web3ContextProvider = ({ children }: Props) => {
     }
   }, [web3Status])
 
+  const connectInfura = useCallback(async () => {
+    if (web3Status._type === 'infura') {
+      return
+    }
+
+    try {
+      const provider = new ethers.providers.InfuraProvider('rinkeby', INFURA_ID)
+
+      const networkId = (await provider.getNetwork()).chainId
+      if (NetworkConfig.isKnownNetwork(networkId)) {
+        const networkConfig = new NetworkConfig(networkId)
+        const RtioService = new RealitioService(networkConfig, provider)
+        const CTService = new ConditionalTokensService(networkConfig, provider)
+        setWeb3Status({
+          _type: 'infura',
+          provider,
+          networkConfig,
+          CTService,
+          RtioService,
+        } as Infura)
+      } else {
+        setWeb3Status({ _type: 'error', error: new Error('Unknown network') } as ErrorWeb3)
+      }
+    } catch (error) {
+      setWeb3Status({ _type: 'error', error } as ErrorWeb3)
+    }
+  }, [web3Status])
+
   useEffect(() => {
     if (web3Modal.cachedProvider) {
-      connect()
+      connectWeb3Modal()
+    } else {
+      connectInfura()
     }
-  }, [connect])
+  }, [connectWeb3Modal, connectInfura])
 
   return (
-    <Web3Context.Provider value={{ status: web3Status, connect }}>{children}</Web3Context.Provider>
+    <Web3Context.Provider value={{ status: web3Status, connect: connectWeb3Modal }}>{children}</Web3Context.Provider>
   )
 }
 

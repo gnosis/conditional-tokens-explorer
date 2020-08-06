@@ -26,6 +26,7 @@ interface Props {
 
 export const Contents: React.FC<Props> = ({ condition }) => {
   const { status } = useWeb3Context()
+  console.log(status)
   const {
     creator,
     id: conditionId,
