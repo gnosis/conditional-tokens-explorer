@@ -31,4 +31,5 @@ services:
       - '8545:8545'
   hg-subgraph:
     build: ./docker/hg-subgraph/
-    command: ["cd hg-subgraph && graph create --node http://graph-node:8020 gnosis/hg"]
+    depends_on:
+      - graph-node
