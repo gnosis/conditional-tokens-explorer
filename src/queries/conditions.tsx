@@ -22,6 +22,8 @@ export const GetConditionQuery = gql`
       outcomeSlotCount
       resolved
       creator
+      payouts
+      resolveTimestamp
       positions {
         id
         collateralToken {
