@@ -26,7 +26,7 @@ export const SelectCondition = () => {
 
   return (
     <>
-      <label>Condition ID</label>
+      <label>Resolved Condition ID</label>
       <WrapperDisplay dataToDisplay={conditionToDisplay} errors={errors} loading={loading} />
       <button onClick={selectCondition}>Select Condition</button>
     </>

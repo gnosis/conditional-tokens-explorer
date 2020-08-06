@@ -29,7 +29,7 @@ export const SelectPosition = () => {
 
   return (
     <>
-      <label>Position ID</label>
+      <label>Position</label>
       <WrapperDisplay dataToDisplay={positionToDisplay} errors={errors} loading={loading} />
       <button onClick={selectPosition}>Select Position</button>
     </>

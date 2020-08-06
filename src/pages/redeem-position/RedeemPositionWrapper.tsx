@@ -8,13 +8,14 @@ import { useIsPositionRelatedToCondition } from '../../hooks/useIsPositionRelate
 import { getLogger } from '../../util/logger'
 import { Status } from '../../util/types'
 
+import { PositionPreview } from './PositionPreview'
 import { SelectCondition } from './SelectCondition'
 import { SelectPosition } from './SelectPosition'
 
 const logger = getLogger('RedeemPosition')
 
 export const RedeemPositionWrapper = () => {
-  const { CTService } = useWeb3Connected()
+  const { CTService, networkConfig } = useWeb3Connected()
 
   const { clearCondition, condition, errors: conditionErrors } = useConditionContext()
   const { clearPosition, errors: positionErrors, position } = usePositionContext()
@@ -55,6 +56,8 @@ export const RedeemPositionWrapper = () => {
     !condition ||
     !isRelated
 
+  // TODO: add collection parent if exist!
+
   return (
     <>
       <div className="row">
@@ -67,6 +70,13 @@ export const RedeemPositionWrapper = () => {
 
       {!isRelated && position && condition && <span>Position is not related to the condition</span>}
 
+      <div className="row">
+        <PositionPreview
+          collateralTokenAddress={position?.collateralToken?.id || ''}
+          networkId={networkConfig.networkId}
+          positionId={position?.id || ''}
+        />
+      </div>
       <button disabled={disabled} onClick={onRedeem}>
         Redeem
       </button>
