@@ -10,7 +10,7 @@ export const useIsPositionRelatedToCondition = (positionId: string, conditionId:
   const { data: fetchedPosition, error, loading } = useQuery<GetPosition>(GetPositionQuery, {
     variables: { id: positionId },
     fetchPolicy: 'no-cache',
-    skip: !positionId,
+    skip: !positionId || !conditionId,
   })
 
   React.useEffect(() => {
