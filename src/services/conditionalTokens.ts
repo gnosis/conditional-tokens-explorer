@@ -5,7 +5,6 @@ import { BigNumber } from 'ethers/utils'
 import Web3Utils from 'web3-utils'
 
 import { NetworkConfig } from '../config/networkConfig'
-import { getIndexSets } from '../util/tools'
 
 const CTHelpers = CTHelpersConstructor(Web3Utils)
 
