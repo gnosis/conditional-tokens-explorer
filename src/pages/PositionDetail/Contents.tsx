@@ -11,6 +11,7 @@ import { Dropdown, DropdownItemProps, DropdownPosition } from '../../components/
 import { SetAllowance } from '../../components/common/SetAllowance'
 import { StripedList, StripedListItem } from '../../components/common/StripedList'
 import { TokenIcon } from '../../components/common/TokenIcon'
+import { Partition } from '../../components/partitions/Partition'
 import { GridTwoColumns } from '../../components/pureStyledComponents/GridTwoColumns'
 import { TitleValue } from '../../components/text/TitleValue'
 import { getTokenFromAddress } from '../../config/networkConfig'
@@ -40,18 +41,16 @@ const CollateralWrapButton = styled(Button)`
   width: 80px;
 `
 
+const StripedListStyled = styled(StripedList)`
+  margin-top: 6px;
+`
+
+const PartitionStyled = styled(Partition)`
+  margin-top: 6px;
+`
+
 interface Props {
   position: Position
-}
-
-const OutcomeList = ({ outcomeList }: { outcomeList: number[] }) => {
-  return (
-    <>
-      {outcomeList.map((value) => (
-        <div key={`index-${value}`}>{value}</div>
-      ))}
-    </>
-  )
 }
 
 export const Contents = ({ position }: Props) => {
@@ -125,7 +124,7 @@ export const Contents = ({ position }: Props) => {
         <TitleValue
           title="Collateral Wrapping"
           value={
-            <StripedList>
+            <StripedListStyled>
               <StripedListItem>
                 <CollateralText>
                   <CollateralTextStrong>ERC20:</CollateralTextStrong>{' '}
@@ -146,21 +145,12 @@ export const Contents = ({ position }: Props) => {
                 </CollateralText>
                 <CollateralWrapButton disabled={!ERC1155Amount}>Unwrap</CollateralWrapButton>
               </StripedListItem>
-            </StripedList>
+            </StripedListStyled>
           }
         />
       </GridTwoColumns>
       <GridTwoColumns forceOneColumn marginBottomXL>
-        <TitleValue
-          title="Partition"
-          value={numberedOutcomes.map((outcomeList, index) => {
-            return (
-              <div className="outcomePartition" key={`outcomelist-${index}`}>
-                <OutcomeList outcomeList={outcomeList}></OutcomeList>
-              </div>
-            )
-          })}
-        />
+        <TitleValue title="Partition" value={<PartitionStyled collections={numberedOutcomes} />} />
       </GridTwoColumns>
     </CenteredCard>
   )
