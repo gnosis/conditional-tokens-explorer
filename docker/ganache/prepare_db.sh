@@ -1,7 +1,10 @@
+#!/bin/bash
+
 set -e # exit when any command fails
 
 mkdir db
-ganache-cli -d --db db -i 50 &
+#ganache-cli -d --db db -i 50 &
+./node_modules/.bin/ganache-cli -d --db db -h 0.0.0.0 -i 50 -p 8545 &
 PID=$!
 
 # deploy realitio contracts
@@ -18,6 +21,12 @@ MOCK_CHAI_ADDRESS=$(eth contract:deploy --pk '0x4f3edf983ac636a65a842ce7c78d9aa7
 
 # deploy conditional tokens contracts
 (cd conditional-tokens-contracts && npm run migrate -- --network local)
+
+# deploy conditional tokens market maker contracts
+cd conditional-tokens-market-makers
+npm run migrate -- --network develop
+export CONDITIONAL_TOKENS_ADDRESS=$(jq -r '.networks["50"].address' build/contracts/ConditionalTokens.json)
+cd ..
 
 # deploy realitio proxy
 cd realitio-gnosis-proxy
