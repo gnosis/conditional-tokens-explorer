@@ -110,9 +110,8 @@ export class ConditionalTokensService {
     collateralToken: string,
     parentCollectionId: string, // If doesn't exist, must be zero, ethers.constants.HashZero
     conditionId: string,
-    outcomesCount: number
+    indexSets: string[]
   ): Promise<TransactionReceipt> => {
-    const indexSets = getIndexSets(outcomesCount)
 
     const tx = await this.contract.redeemPositions(
       collateralToken,

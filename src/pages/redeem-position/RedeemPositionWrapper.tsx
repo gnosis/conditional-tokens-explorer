@@ -26,13 +26,15 @@ export const RedeemPositionWrapper = () => {
       if (position && condition) {
         setStatus(Status.Loading)
 
-        const { collateralToken } = position
+        const { collateralToken, collection } = position
+        const {id: collectionId, indexSets} = collection
+        const parentCollectionId = collectionId || ethers.constants.HashZero
 
         await CTService.redeemPositions(
           collateralToken.id,
-          ethers.constants.HashZero,
+          parentCollectionId,
           condition.id,
-          condition.outcomeSlotCount
+          indexSets,
         )
 
         clearCondition()
@@ -55,8 +57,6 @@ export const RedeemPositionWrapper = () => {
     !position ||
     !condition ||
     !isRelated
-
-  // TODO: add collection parent if exist!
 
   return (
     <>
