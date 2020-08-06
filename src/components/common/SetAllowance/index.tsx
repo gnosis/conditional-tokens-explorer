@@ -2,8 +2,10 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { Button } from '../../buttons/Button'
+import { ButtonType } from '../../buttons/buttonStylingTypes'
 
 const Wrapper = styled.div`
+  align-items: center;
   border-radius: 4px;
   border: solid 1px ${(props) => props.theme.colors.primary};
   display: flex;
@@ -13,21 +15,26 @@ const Wrapper = styled.div`
 
 const Description = styled.p`
   font-size: 15px;
-  line-height: 1.4;
-  margin: 0 15px 0 0;
+  line-height: 1.2;
+  margin: 0 10px 0 0;
   color: ${(props) => props.theme.colors.primary};
+`
+
+const UnlockButton = styled(Button)`
+  font-size: 18px;
+  height: 32px;
 `
 
 interface Props {
   collateral: any
-  onUnlock: () => void
-  loading: boolean
   finished: boolean
+  loading: boolean
+  onUnlock: () => void
 }
 
 export const SetAllowance = (props: Props) => {
   const { collateral, finished, loading, onUnlock } = props
-  const btnText = loading ? 'loading' : finished ? 'finished' : 'unlock'
+  const btnText = loading ? 'Working...' : finished ? 'Done!' : 'Unlock'
 
   return (
     <Wrapper>
@@ -35,9 +42,13 @@ export const SetAllowance = (props: Props) => {
         You need to unlock <strong>{collateral.symbol}</strong> to allow the smart contract to
         interact with it. This has to be done for each new token.
       </Description>
-      <Button disabled={loading || finished} onClick={onUnlock}>
+      <UnlockButton
+        buttonType={ButtonType.primaryInverted}
+        disabled={loading || finished}
+        onClick={onUnlock}
+      >
         {btnText}
-      </Button>
+      </UnlockButton>
     </Wrapper>
   )
 }

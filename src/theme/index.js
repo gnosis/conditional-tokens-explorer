@@ -1,7 +1,9 @@
 const darkerGray = '#445055'
 const error = '#db3a3d'
+const errorDark = '#BC3033'
 const lightGrey = '#d4d5d3'
 const primary = '#009cb4'
+const primaryDark = '#00879B'
 const textColor = '#5d6d74'
 const whitesmoke1 = '#e8e7e6'
 const whitesmoke2 = '#f3f2f2'
@@ -20,13 +22,25 @@ const theme = {
   },
   buttonPrimary: {
     backgroundColor: primary,
-    backgroundColorHover: '#00879B',
+    backgroundColorHover: primaryDark,
+    borderColor: primary,
+    borderColorHover: primaryDark,
     color: '#fff',
+    colorHover: '#fff',
+  },
+  buttonPrimaryInverted: {
+    backgroundColor: '#fff',
+    backgroundColorHover: primaryDark,
+    borderColor: primary,
+    borderColorHover: primaryDark,
+    color: primary,
     colorHover: '#fff',
   },
   buttonDanger: {
     backgroundColor: error,
-    backgroundColorHover: '#BC3033',
+    backgroundColorHover: errorDark,
+    borderColor: error,
+    borderColorHover: errorDark,
     color: '#fff',
     colorHover: '#fff',
   },
