@@ -37,3 +37,5 @@ services:
   deploy-contracts:
     build: ./docker/deploy-contracts/
     command: "./prepare_db.sh"
+    depends_on:
+      - ganache
