@@ -3,11 +3,11 @@ import { FormContextValues } from 'react-hook-form'
 
 import { Token } from '../../util/types'
 
-import { SplitPositionForm } from './Form'
+import { SplitPositionFormMethods } from './Form'
 
 interface Props {
   splitFromCollateral: boolean
-  formMethods: FormContextValues<SplitPositionForm>
+  formMethods: FormContextValues<SplitPositionFormMethods>
   tokens: Token[]
   onCollateralChange: (c: string) => void
 }

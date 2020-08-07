@@ -35,7 +35,7 @@ const PartitionStyled = styled(Partition)`
 
 export type SplitFrom = 'collateral' | 'position'
 
-export type SplitPositionForm = {
+export type SplitPositionFormMethods = {
   amount: BigNumber
   collateral: string
   conditionId: string
@@ -76,7 +76,7 @@ export const Form = ({
     }
   }, [tokens])
 
-  const formMethods = useForm<SplitPositionForm>({
+  const formMethods = useForm<SplitPositionFormMethods>({
     mode: 'onChange',
     defaultValues: DEFAULT_VALUES,
   })
@@ -93,7 +93,7 @@ export const Form = ({
   const [collateralToken, setCollateralToken] = useState(tokens[0])
   const [position, setPosition] = useState<Maybe<GetPosition_position>>(null)
   const { provider, signer } = useWeb3Connected()
-  const { amount, collateral, positionId, splitFrom } = getValues() as SplitPositionForm
+  const { amount, collateral, positionId, splitFrom } = getValues() as SplitPositionFormMethods
 
   watch('collateral')
   watch('splitFrom')
@@ -102,7 +102,7 @@ export const Form = ({
   const splitFromPosition = splitFrom === 'position'
 
   const onSubmit = useCallback(
-    async ({ amount, collateral, conditionId }: SplitPositionForm) => {
+    async ({ amount, collateral, conditionId }: SplitPositionFormMethods) => {
       const partition = trivialPartition(outcomeSlot)
 
       if (splitFromCollateral) {

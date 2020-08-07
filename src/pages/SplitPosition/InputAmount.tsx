@@ -10,12 +10,12 @@ import { ERC20Service } from 'services/erc20'
 
 import { Token } from '../../util/types'
 
-import { SplitFrom, SplitPositionForm } from './Form'
+import { SplitFrom, SplitPositionFormMethods } from './Form'
 
 interface Props {
   collateral: Token
   positionId: string
-  formMethods: FormContextValues<SplitPositionForm>
+  formMethods: FormContextValues<SplitPositionFormMethods>
   splitFrom: SplitFrom
 }
 export const InputAmount = ({
@@ -59,15 +59,14 @@ export const InputAmount = ({
   }, [positionId, collateral, splitFrom, CTService, provider, signer, address, regexpPosition])
 
   return (
-    <div>
-      <label htmlFor="amount">Amount</label>
-
+    <>
       <Controller
         as={BigNumberInputWrapper}
         control={control}
         decimals={collateral.decimals}
         name="amount"
         rules={{ required: true, validate: (amount) => amount.gt(ZERO_BN) }}
+        tokenSymbol={collateral.symbol}
       />
       {balance && (
         <button onClick={() => setValue('amount', balance)}>{`Use wallet balance ${formatBigNumber(
@@ -75,6 +74,6 @@ export const InputAmount = ({
           collateral.decimals
         )}`}</button>
       )}
-    </div>
+    </>
   )
 }

@@ -11,7 +11,7 @@ const Title = styled.h2<{ flexDirection?: string }>`
   align-items: center;
   display: flex;
   justify-content: space-between;
-  margin: ${(props) => (props.flexDirection === 'column' ? '0 0 6px 0' : '0 5px 0 0')};
+  margin: ${(props) => (props.flexDirection === 'column' ? '0 0 10px 0' : '0 5px 0 0')};
 `
 
 const TitleText = styled.span`

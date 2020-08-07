@@ -4,13 +4,14 @@ import React, { useEffect } from 'react'
 import { FormContextValues } from 'react-hook-form'
 import { GetPosition, GetPositionVariables, GetPosition_position } from 'types/generatedGQL'
 
+import { Textfield } from '../../components/pureStyledComponents/Textfield'
 import { BYTES_REGEX } from '../../config/constants'
 
-import { SplitPositionForm } from './Form'
+import { SplitPositionFormMethods } from './Form'
 
 interface Props {
   splitFromPosition: boolean
-  formMethods: FormContextValues<SplitPositionForm>
+  formMethods: FormContextValues<SplitPositionFormMethods>
   onPositionChange: (position: GetPosition_position) => void
 }
 export const InputPosition = ({
@@ -52,10 +53,8 @@ export const InputPosition = ({
   return (
     <div>
       <input name="splitFrom" ref={register} type="radio" value="position" />
-
       <label>Position</label>
-
-      <input
+      <Textfield
         disabled={!splitFromPosition}
         name="positionId"
         ref={register({
@@ -63,7 +62,7 @@ export const InputPosition = ({
           pattern: BYTES_REGEX,
         })}
         type="text"
-      ></input>
+      />
       {errorPositionId && (
         <div>
           <p>{errorPositionId.type === 'pattern' && 'Invalid bytes32 string'}</p>

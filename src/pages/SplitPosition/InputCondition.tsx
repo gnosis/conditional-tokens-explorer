@@ -2,12 +2,13 @@ import { useWeb3Connected } from 'contexts/Web3Context'
 import React, { useEffect } from 'react'
 import { FormContextValues } from 'react-hook-form'
 
+import { Textfield } from '../../components/pureStyledComponents/Textfield'
 import { BYTES_REGEX } from '../../config/constants'
 
-import { SplitPositionForm } from './Form'
+import { SplitPositionFormMethods } from './Form'
 
 interface Props {
-  formMethods: FormContextValues<SplitPositionForm>
+  formMethods: FormContextValues<SplitPositionFormMethods>
   onOutcomeSlotChange: (n: number) => void
 }
 
@@ -32,7 +33,7 @@ export const InputCondition = ({
 
   return (
     <>
-      <input
+      <Textfield
         name="conditionId"
         ref={register({
           required: true,
