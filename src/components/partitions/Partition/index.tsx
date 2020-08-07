@@ -9,10 +9,10 @@ interface Props {
 }
 
 export const Partition: React.FC<Props> = (props) => {
-  const { collections } = props
+  const { collections, ...restProps } = props
 
   return (
-    <Wrapper>
+    <Wrapper {...restProps}>
       {collections.map((outcomeList: unknown | any, outcomeListIndex: number) => {
         return (
           <ListItem key={outcomeListIndex}>
