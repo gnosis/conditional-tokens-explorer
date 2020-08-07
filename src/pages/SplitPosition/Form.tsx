@@ -3,13 +3,17 @@ import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { ERC20Service } from 'services/erc20'
+import styled from 'styled-components'
 import { GetPosition_position } from 'types/generatedGQL'
 
 import { Button } from '../../components/buttons/Button'
 import { CenteredCard } from '../../components/common/CenteredCard'
 import { SetAllowance } from '../../components/common/SetAllowance'
+import { StripedList, StripedListItem } from '../../components/common/StripedList'
+import { Partition } from '../../components/partitions/Partition'
 import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
 import { Row } from '../../components/pureStyledComponents/Row'
+import { TitleControl } from '../../components/pureStyledComponents/TitleControl'
 import { TitleValue } from '../../components/text/TitleValue'
 import { NULL_PARENT_ID, ZERO_BN } from '../../config/constants'
 import { Remote } from '../../util/remoteData'
@@ -20,6 +24,14 @@ import { InputAmount } from './InputAmount'
 import { InputCondition } from './InputCondition'
 import { InputPosition } from './InputPosition'
 import { SelectCollateral } from './SelectCollateral'
+
+const StripedListStyled = styled(StripedList)`
+  margin-top: 6px;
+`
+
+const PartitionStyled = styled(Partition)`
+  margin-top: 6px;
+`
 
 export type SplitFrom = 'collateral' | 'position'
 
@@ -160,12 +172,20 @@ export const Form = ({
     allowance.isLoading()
 
   const canSubmit = isValid && (hasEnoughAllowance.getOr(false) || hasUnlockedCollateral)
+  const mockedNumberedOutcomes = [
+    [1, 4, 3],
+    [6, 5],
+    [9, 7, 10],
+    [2, 8],
+    [12, 13, 14, 15],
+  ]
 
   return (
     <CenteredCard>
       <Row cols="1fr">
         <TitleValue
           title="Condition Id"
+          titleControl={<TitleControl>Select Condition</TitleControl>}
           value={
             <InputCondition
               formMethods={formMethods}
@@ -205,6 +225,7 @@ export const Form = ({
       <Row cols="1fr" marginBottomXL>
         <TitleValue
           title="Amount"
+          titleControl={<TitleControl>Use Wallet Balance (1000.00)</TitleControl>}
           value={
             <InputAmount
               collateral={collateralToken}
@@ -212,6 +233,24 @@ export const Form = ({
               positionId={positionId}
               splitFrom={splitFrom}
             ></InputAmount>
+          }
+        />
+      </Row>
+      <Row cols="1fr" marginBottomXL>
+        <TitleValue
+          title="Partition"
+          titleControl={<TitleControl>Split Partition</TitleControl>}
+          value={<PartitionStyled collections={mockedNumberedOutcomes} />}
+        />
+      </Row>
+      <Row cols="1fr" marginBottomXL>
+        <TitleValue
+          title="Split Position Preview"
+          value={
+            <StripedListStyled>
+              <StripedListItem>[DAI C: 0x123 O: 0] x 10</StripedListItem>
+              <StripedListItem>[DAI C: 0x123 O: 1] x 10</StripedListItem>
+            </StripedListStyled>
           }
         />
       </Row>
