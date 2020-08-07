@@ -4,6 +4,7 @@ import { Redirect, Route, RouteProps, Switch } from 'react-router-dom'
 
 import { ButtonConnect } from '../../components/buttons/ButtonConnect'
 import { InfoCard } from '../../components/common/InfoCard'
+import { InlineLoading } from '../../components/loading/InlineLoading'
 import { ConditionDetails } from '../ConditionDetails'
 import { ConditionsList } from '../ConditionsList'
 import { PositionDetails } from '../PositionDetails'
@@ -27,8 +28,10 @@ const ProtectedRoute: React.FC<RouteProps> = (props) => {
           <ButtonConnect style={{ flexGrow: 0, height: 'auto' }} />
         </>
       )}
-      {status._type === 'connecting' && <p>Connecting...</p>}
-      {status._type === 'error' && <p>Error when trying to connect...</p>}
+      {status._type === 'connecting' && <InlineLoading />}
+      {status._type === 'error' && (
+        <InfoCard message="Error when trying to connect..." title="Error" />
+      )}
       {status._type === 'connected' && <Route component={component} exact path={path} />}
     </>
   )
