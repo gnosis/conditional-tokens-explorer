@@ -31,8 +31,7 @@ export const InputCondition = ({
   }, [CTService, watchConditionId, conditionIdErrors, onOutcomeSlotChange])
 
   return (
-    <div>
-      <label htmlFor="conditionId">Condition Id</label>
+    <>
       <input
         name="conditionId"
         ref={register({
@@ -44,13 +43,13 @@ export const InputCondition = ({
           },
         })}
         type="text"
-      ></input>
+      />
       {conditionIdErrors && (
         <div>
           <p>{conditionIdErrors.type === 'pattern' && 'Invalid bytes32 string'}</p>
           <p>{conditionIdErrors.type === 'validate' && 'Invalid condition'}</p>
         </div>
       )}
-    </div>
+    </>
   )
 }

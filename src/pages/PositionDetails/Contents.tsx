@@ -12,7 +12,7 @@ import { SetAllowance } from '../../components/common/SetAllowance'
 import { StripedList, StripedListItem } from '../../components/common/StripedList'
 import { TokenIcon } from '../../components/common/TokenIcon'
 import { Partition } from '../../components/partitions/Partition'
-import { GridTwoColumns } from '../../components/pureStyledComponents/GridTwoColumns'
+import { Row } from '../../components/pureStyledComponents/Row'
 import { TitleValue } from '../../components/text/TitleValue'
 import { getTokenFromAddress } from '../../config/networkConfig'
 import { useWeb3Connected } from '../../contexts/Web3Context'
@@ -93,7 +93,7 @@ export const Contents = ({ position }: Props) => {
         />
       }
     >
-      <GridTwoColumns marginBottomXL>
+      <Row marginBottomXL>
         <TitleValue
           title="Position Id"
           value={
@@ -113,14 +113,14 @@ export const Contents = ({ position }: Props) => {
             </>
           }
         />
-      </GridTwoColumns>
+      </Row>
       <SetAllowance
         collateral={collateralToken}
         finished={false}
         loading={false}
         onUnlock={() => {}}
       />
-      <GridTwoColumns forceOneColumn marginBottomXL>
+      <Row cols="1fr" marginBottomXL>
         <TitleValue
           title="Collateral Wrapping"
           value={
@@ -148,10 +148,10 @@ export const Contents = ({ position }: Props) => {
             </StripedListStyled>
           }
         />
-      </GridTwoColumns>
-      <GridTwoColumns forceOneColumn marginBottomXL>
+      </Row>
+      <Row cols="1fr" marginBottomXL>
         <TitleValue title="Partition" value={<PartitionStyled collections={numberedOutcomes} />} />
-      </GridTwoColumns>
+      </Row>
     </CenteredCard>
   )
 }

@@ -5,8 +5,12 @@ import { useForm } from 'react-hook-form'
 import { ERC20Service } from 'services/erc20'
 import { GetPosition_position } from 'types/generatedGQL'
 
+import { Button } from '../../components/buttons/Button'
 import { CenteredCard } from '../../components/common/CenteredCard'
 import { SetAllowance } from '../../components/common/SetAllowance'
+import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
+import { Row } from '../../components/pureStyledComponents/Row'
+import { TitleValue } from '../../components/text/TitleValue'
 import { NULL_PARENT_ID, ZERO_BN } from '../../config/constants'
 import { Remote } from '../../util/remoteData'
 import { trivialPartition } from '../../util/tools'
@@ -159,21 +163,37 @@ export const Form = ({
 
   return (
     <CenteredCard>
-      <InputCondition
-        formMethods={formMethods}
-        onOutcomeSlotChange={(n) => setOutcomeSlot(n)}
-      ></InputCondition>
-      <SelectCollateral
-        formMethods={formMethods}
-        onCollateralChange={onCollateralChange}
-        splitFromCollateral={splitFromCollateral}
-        tokens={tokens}
-      ></SelectCollateral>
-      <InputPosition
-        formMethods={formMethods}
-        onPositionChange={(p) => setPosition(p)}
-        splitFromPosition={splitFromPosition}
-      ></InputPosition>
+      <Row cols="1fr">
+        <TitleValue
+          title="Condition Id"
+          value={
+            <InputCondition
+              formMethods={formMethods}
+              onOutcomeSlotChange={(n) => setOutcomeSlot(n)}
+            />
+          }
+        />
+      </Row>
+      <Row cols="1fr" marginBottomXL>
+        <TitleValue
+          title="Split From"
+          value={
+            <>
+              <SelectCollateral
+                formMethods={formMethods}
+                onCollateralChange={onCollateralChange}
+                splitFromCollateral={splitFromCollateral}
+                tokens={tokens}
+              />
+              <InputPosition
+                formMethods={formMethods}
+                onPositionChange={(p) => setPosition(p)}
+                splitFromPosition={splitFromPosition}
+              ></InputPosition>
+            </>
+          }
+        />
+      </Row>
       {showAskAllowance && (
         <SetAllowance
           collateral={collateralToken}
@@ -182,16 +202,24 @@ export const Form = ({
           onUnlock={unlockCollateral}
         />
       )}
-
-      <InputAmount
-        collateral={collateralToken}
-        formMethods={formMethods}
-        positionId={positionId}
-        splitFrom={splitFrom}
-      ></InputAmount>
-      <button disabled={!canSubmit} onClick={handleSubmit(onSubmit)}>
-        Split
-      </button>
+      <Row cols="1fr" marginBottomXL>
+        <TitleValue
+          title="Amount"
+          value={
+            <InputAmount
+              collateral={collateralToken}
+              formMethods={formMethods}
+              positionId={positionId}
+              splitFrom={splitFrom}
+            ></InputAmount>
+          }
+        />
+      </Row>
+      <ButtonContainer>
+        <Button disabled={!canSubmit} onClick={handleSubmit(onSubmit)}>
+          Split
+        </Button>
+      </ButtonContainer>
     </CenteredCard>
   )
 }

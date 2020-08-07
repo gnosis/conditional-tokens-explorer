@@ -5,8 +5,8 @@ import { ButtonDropdownCircle } from '../../components/buttons/ButtonDropdownCir
 import { CenteredCard } from '../../components/common/CenteredCard'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../components/common/Dropdown'
 import { StripedList, StripedListItem } from '../../components/common/StripedList'
-import { GridTwoColumns } from '../../components/pureStyledComponents/GridTwoColumns'
 import { Pill, PillTypes } from '../../components/pureStyledComponents/Pill'
+import { Row } from '../../components/pureStyledComponents/Row'
 import { TitleValue } from '../../components/text/TitleValue'
 import { INFORMATION_NOT_AVAILABLE } from '../../config/constants'
 import { getKnowOracleFromAddress } from '../../config/networkConfig'
@@ -80,7 +80,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
         />
       }
     >
-      <GridTwoColumns marginBottomXL>
+      <Row marginBottomXL>
         <TitleValue
           title="Condition Type"
           value={isConditionFromOmen ? ConditionType.Omen : ConditionType.Unknown}
@@ -103,11 +103,11 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           }
         />
         <TitleValue title="Question Type" value={getConditionTypeTitle(templateId)} />
-      </GridTwoColumns>
-      <GridTwoColumns forceOneColumn marginBottomXL>
+      </Row>
+      <Row cols="1fr" marginBottomXL>
         <TitleValue title="Question" value={title} />
-      </GridTwoColumns>
-      <GridTwoColumns forceOneColumn marginBottomXL>
+      </Row>
+      <Row cols="1fr" marginBottomXL>
         <TitleValue
           title="Outcomes"
           value={
@@ -118,8 +118,8 @@ export const Contents: React.FC<Props> = ({ condition }) => {
             </StripedList>
           }
         />
-      </GridTwoColumns>
-      <GridTwoColumns>
+      </Row>
+      <Row>
         <TitleValue
           title="Resolution Date"
           value={(resolution && formatDate(resolution)) || INFORMATION_NOT_AVAILABLE}
@@ -132,7 +132,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
             truncateStringInTheMiddle(oracle, 6, 6)
           }
         />
-      </GridTwoColumns>
+      </Row>
     </CenteredCard>
   )
 }
