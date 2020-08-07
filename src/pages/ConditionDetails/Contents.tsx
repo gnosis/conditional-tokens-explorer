@@ -1,4 +1,5 @@
 import React from 'react'
+import styled from 'styled-components'
 
 import { ButtonCopy } from '../../components/buttons/ButtonCopy'
 import { ButtonDropdownCircle } from '../../components/buttons/ButtonDropdownCircle'
@@ -17,6 +18,10 @@ import { GetCondition_condition } from '../../types/generatedGQL'
 import { getLogger } from '../../util/logger'
 import { formatDate, getConditionTypeTitle, truncateStringInTheMiddle } from '../../util/tools'
 import { ConditionStatus, ConditionType } from '../../util/types'
+
+const StripedListStyled = styled(StripedList)`
+  margin-top: 6px;
+`
 
 const logger = getLogger('ConditionDetails')
 
@@ -111,11 +116,11 @@ export const Contents: React.FC<Props> = ({ condition }) => {
         <TitleValue
           title="Outcomes"
           value={
-            <StripedList>
+            <StripedListStyled>
               {outcomesPrettier.map((outcome: string, index: number) => (
                 <StripedListItem key={index}>{outcome}</StripedListItem>
               ))}
-            </StripedList>
+            </StripedListStyled>
           }
         />
       </Row>
