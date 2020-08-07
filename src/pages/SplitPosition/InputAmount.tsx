@@ -8,16 +8,19 @@ import React, { useEffect, useState } from 'react'
 import { Controller, FormContextValues } from 'react-hook-form'
 import { ERC20Service } from 'services/erc20'
 
+import { TitleControl } from '../../components/pureStyledComponents/TitleControl'
+import { TitleValue } from '../../components/text/TitleValue'
 import { Token } from '../../util/types'
 
 import { SplitFrom, SplitPositionFormMethods } from './Form'
 
 interface Props {
   collateral: Token
-  positionId: string
   formMethods: FormContextValues<SplitPositionFormMethods>
+  positionId: string
   splitFrom: SplitFrom
 }
+
 export const InputAmount = ({
   collateral,
   formMethods: { control, setValue },
@@ -25,9 +28,7 @@ export const InputAmount = ({
   splitFrom,
 }: Props) => {
   const [balance, setBalance] = useState<Maybe<BigNumber>>(null)
-
   const { CTService, address, provider, signer } = useWeb3Connected()
-
   const regexpPosition: RegExp = BYTES_REGEX
 
   useEffect(() => {
@@ -59,21 +60,25 @@ export const InputAmount = ({
   }, [positionId, collateral, splitFrom, CTService, provider, signer, address, regexpPosition])
 
   return (
-    <>
-      <Controller
-        as={BigNumberInputWrapper}
-        control={control}
-        decimals={collateral.decimals}
-        name="amount"
-        rules={{ required: true, validate: (amount) => amount.gt(ZERO_BN) }}
-        tokenSymbol={collateral.symbol}
-      />
-      {balance && (
-        <button onClick={() => setValue('amount', balance)}>{`Use wallet balance ${formatBigNumber(
-          balance,
-          collateral.decimals
-        )}`}</button>
-      )}
-    </>
+    <TitleValue
+      title="Amount"
+      titleControl={
+        balance && (
+          <TitleControl onClick={() => setValue('amount', balance)}>
+            Use Wallet Balance (${formatBigNumber(balance, collateral.decimals)})
+          </TitleControl>
+        )
+      }
+      value={
+        <Controller
+          as={BigNumberInputWrapper}
+          control={control}
+          decimals={collateral.decimals}
+          name="amount"
+          rules={{ required: true, validate: (amount) => amount.gt(ZERO_BN) }}
+          tokenSymbol={collateral.symbol}
+        />
+      }
+    />
   )
 }

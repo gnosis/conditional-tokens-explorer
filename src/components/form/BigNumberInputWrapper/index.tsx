@@ -6,15 +6,16 @@ import styled from 'styled-components'
 import { ZERO_BN } from '../../../config/constants'
 import { TextfieldCSS } from '../../pureStyledComponents/Textfield'
 
-const Wrapper = styled.span`
+const Wrapper = styled.span<{ hasTokenSymbol?: boolean }>`
   position: relative;
   width: 100%;
 
   > input {
     ${TextfieldCSS}
-    padding-right: 60px;
     position: relative;
     z-index: 1;
+
+    ${(props) => props.hasTokenSymbol && 'padding-right: 60px;'}
   }
 `
 
@@ -51,7 +52,7 @@ export const BigNumberInputWrapper: React.FC<Props> = (props) => {
   }
 
   return (
-    <Wrapper>
+    <Wrapper hasTokenSymbol={tokenSymbol !== ''}>
       <BigNumberInput
         decimals={decimals}
         onChange={handleChange}

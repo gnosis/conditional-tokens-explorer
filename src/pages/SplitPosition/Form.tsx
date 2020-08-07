@@ -223,18 +223,12 @@ export const Form = ({
         />
       )}
       <Row cols="1fr" marginBottomXL>
-        <TitleValue
-          title="Amount"
-          titleControl={<TitleControl>Use Wallet Balance (1000.00)</TitleControl>}
-          value={
-            <InputAmount
-              collateral={collateralToken}
-              formMethods={formMethods}
-              positionId={positionId}
-              splitFrom={splitFrom}
-            ></InputAmount>
-          }
-        />
+        <InputAmount
+          collateral={collateralToken}
+          formMethods={formMethods}
+          positionId={positionId}
+          splitFrom={splitFrom}
+        ></InputAmount>
       </Row>
       <Row cols="1fr" marginBottomXL>
         <TitleValue
