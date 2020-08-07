@@ -8,7 +8,6 @@ import { DEFAULT_NETWORK_ID, INFURA_ID } from '../config/constants'
 import { NetworkConfig } from '../config/networkConfig'
 import { ConditionalTokensService } from '../services/conditionalTokens'
 import { RealitioService } from '../services/realitio'
-import { NetworkId, NetworkIds } from '../util/types'
 
 export type NotAsked = {
   _type: 'notAsked'
@@ -115,7 +114,7 @@ export const Web3ContextProvider = ({ children }: Props) => {
     }
 
     try {
-      const provider = new ethers.providers.InfuraProvider('rinkeby', INFURA_ID)
+      const provider = new ethers.providers.InfuraProvider(DEFAULT_NETWORK_ID, INFURA_ID)
 
       const networkId = (await provider.getNetwork()).chainId
       if (NetworkConfig.isKnownNetwork(networkId)) {
@@ -146,7 +145,9 @@ export const Web3ContextProvider = ({ children }: Props) => {
   }, [connectWeb3Modal, connectInfura])
 
   return (
-    <Web3Context.Provider value={{ status: web3Status, connect: connectWeb3Modal }}>{children}</Web3Context.Provider>
+    <Web3Context.Provider value={{ status: web3Status, connect: connectWeb3Modal }}>
+      {children}
+    </Web3Context.Provider>
   )
 }
 

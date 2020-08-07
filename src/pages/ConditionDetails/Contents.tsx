@@ -26,7 +26,7 @@ interface Props {
 
 export const Contents: React.FC<Props> = ({ condition }) => {
   const { status } = useWeb3Context()
-  console.log(status)
+
   const {
     creator,
     id: conditionId,
@@ -65,7 +65,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
   ]
 
   let networkId = null
-  if (status._type === 'connected') {
+  if (status._type === 'connected' || status._type === 'infura') {
     const { networkConfig } = status
     networkId = networkConfig.networkId
   }

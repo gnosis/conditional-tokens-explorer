@@ -2,8 +2,8 @@ import { Provider } from 'ethers/providers'
 import React from 'react'
 
 import { getKnowOracleFromAddress } from '../config/networkConfig'
-import { useWeb3Connected } from '../contexts/Web3Context'
-import { isContract } from '../util/tools'
+import { useWeb3Context } from '../contexts/Web3Context'
+// import { isContract } from '../util/tools'
 import { Question } from '../util/types'
 
 // We check if the owner is a contract, if is a contract is from Safe, and Omen use safe, we can say the origin is from omen, maybe we can improve this in the future
@@ -12,39 +12,53 @@ export const useIsConditionFromOmen = (
   oracle: string,
   question: Maybe<Question>
 ) => {
-  const { RtioService, networkConfig, provider } = useWeb3Connected()
+  // const { RtioService, networkConfig, provider } = useWeb3Connected()
+  const { status } = useWeb3Context()
 
-  const [isConditionCreatorAContract, setIsConditionCreatorAContract] = React.useState(false)
+  // const [isConditionCreatorAContract, setIsConditionCreatorAContract] = React.useState(false)
   const [error, setError] = React.useState(undefined)
   const [loading, setLoading] = React.useState<boolean>(true)
 
-  React.useEffect(() => {
-    let cancelled = false
-    if (!cancelled) setLoading(true)
+  // React.useEffect(() => {
+  //   let cancelled = false
+  //   if (status._type === 'connected' || status._type === 'infura') {
+  //     if (!cancelled) setLoading(true)
+  //     const { provider } = status
+  //     const checkIfConditionCreatorIsAContract = async (provider: Provider, address: string) => {
+  //       try {
+  //         const isCreatorAContract = await isContract(provider, address)
+  //         if (!cancelled) setIsConditionCreatorAContract(isCreatorAContract)
+  //       } catch (err) {
+  //         setError(err)
+  //       }
+  //     }
 
-    const checkIfConditionCreatorIsAContract = async (provider: Provider, address: string) => {
-      try {
-        const isCreatorAContract = await isContract(provider, address)
-        if (!cancelled) setIsConditionCreatorAContract(isCreatorAContract)
-      } catch (err) {
-        setError(err)
-      }
-    }
+  //     checkIfConditionCreatorIsAContract(provider, conditionCreatorAddress)
 
-    checkIfConditionCreatorIsAContract(provider, conditionCreatorAddress)
+  //     if (!cancelled) setLoading(false)
+  //   }
 
-    if (!cancelled) setLoading(false)
+  //   return () => {
+  //     cancelled = true
+  //   }
+  // }, [status, conditionCreatorAddress])
 
-    return () => {
-      cancelled = true
-    }
-  }, [RtioService, provider, conditionCreatorAddress])
+  const networkId = React.useMemo(
+    () =>
+      status._type === 'connected' || status._type === 'infura'
+        ? status.networkConfig.networkId
+        : null,
+    [status]
+  )
 
-  const isConditionFromOmen =
-    isConditionCreatorAContract ||
-    !!question ||
-    (networkConfig.networkId &&
-      getKnowOracleFromAddress(networkConfig.networkId, oracle) === ('realitio' as KnownOracle))
+  // This apparently should also check if condition creator is a contract but it seems it doesn't work - TODO: Confirm this idea
+  const isConditionFromOmen = React.useMemo(
+    () =>
+      !!question &&
+      networkId &&
+      getKnowOracleFromAddress(networkId, oracle) === ('realitio' as KnownOracle),
+    [question, oracle, networkId]
+  )
 
   return {
     isConditionFromOmen,
