@@ -6,7 +6,7 @@ import { isBytes32String } from '../../util/tools'
 
 import { Wrapper } from './Wrapper'
 
-export const PositionDetail = () => {
+export const PositionDetails = () => {
   const { positionId } = useParams()
 
   return isBytes32String(positionId) ? (
