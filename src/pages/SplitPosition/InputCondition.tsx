@@ -4,7 +4,7 @@ import { FormContextValues } from 'react-hook-form'
 
 import { BYTES_REGEX } from '../../config/constants'
 
-import { SplitPositionForm } from './SplitCondition'
+import { SplitPositionForm } from './Form'
 
 interface Props {
   formMethods: FormContextValues<SplitPositionForm>

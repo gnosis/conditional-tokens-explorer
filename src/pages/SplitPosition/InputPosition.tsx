@@ -6,7 +6,7 @@ import { GetPosition, GetPositionVariables, GetPosition_position } from 'types/g
 
 import { BYTES_REGEX } from '../../config/constants'
 
-import { SplitPositionForm } from './SplitCondition'
+import { SplitPositionForm } from './Form'
 
 interface Props {
   splitFromPosition: boolean

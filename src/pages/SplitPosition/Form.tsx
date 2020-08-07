@@ -19,11 +19,11 @@ import { SelectCollateral } from './SelectCollateral'
 export type SplitFrom = 'collateral' | 'position'
 
 export type SplitPositionForm = {
-  conditionId: string
-  collateral: string
   amount: BigNumber
-  splitFrom: SplitFrom
+  collateral: string
+  conditionId: string
   positionId: string
+  splitFrom: SplitFrom
 }
 
 interface Props {
@@ -41,7 +41,7 @@ interface Props {
   tokens: Token[]
 }
 
-export const SplitCondition = ({
+export const Form = ({
   allowance,
   hasUnlockedCollateral,
   onCollateralChange,

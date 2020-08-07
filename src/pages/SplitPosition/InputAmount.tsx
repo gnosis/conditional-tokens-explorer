@@ -10,7 +10,7 @@ import { ERC20Service } from 'services/erc20'
 
 import { Token } from '../../util/types'
 
-import { SplitFrom, SplitPositionForm } from './SplitCondition'
+import { SplitFrom, SplitPositionForm } from './Form'
 
 interface Props {
   collateral: Token

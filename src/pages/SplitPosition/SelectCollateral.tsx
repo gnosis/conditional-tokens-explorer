@@ -3,7 +3,7 @@ import { FormContextValues } from 'react-hook-form'
 
 import { Token } from '../../util/types'
 
-import { SplitPositionForm } from './SplitCondition'
+import { SplitPositionForm } from './Form'
 
 interface Props {
   splitFromCollateral: boolean

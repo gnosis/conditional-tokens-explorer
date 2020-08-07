@@ -10,7 +10,7 @@ import { ZERO_BN } from '../../config/constants'
 import { NetworkConfig } from '../../config/networkConfig'
 import { Remote } from '../../util/remoteData'
 
-import { SplitCondition } from './SplitCondition'
+import { Form } from './Form'
 
 const unlockCollateral = jest.fn()
 const onCollateralChange = jest.fn()
@@ -44,7 +44,7 @@ test('show unlock button with zero allowance', async () => {
 
   const { findByText } = render(
     renderWithConnectedProvider(
-      <SplitCondition
+      <Form
         allowance={allowance}
         hasUnlockedCollateral={hasUnlockedCollateral}
         onCollateralChange={onCollateralChange}
@@ -63,7 +63,7 @@ test('toggle unlock button visiblity according to allowance and amount', async (
 
   const { findByPlaceholderText, findByText, queryByText } = render(
     renderWithConnectedProvider(
-      <SplitCondition
+      <Form
         allowance={allowance}
         hasUnlockedCollateral={hasUnlockedCollateral}
         onCollateralChange={onCollateralChange}
@@ -92,7 +92,7 @@ test('show unlock button after failure', async () => {
 
   const { findByText, rerender } = render(
     renderWithConnectedProvider(
-      <SplitCondition
+      <Form
         allowance={allowance}
         hasUnlockedCollateral={hasUnlockedCollateral}
         onCollateralChange={onCollateralChange}
@@ -110,7 +110,7 @@ test('show unlock button after failure', async () => {
 
   rerender(
     renderWithConnectedProvider(
-      <SplitCondition
+      <Form
         allowance={allowanceFailure}
         hasUnlockedCollateral={true}
         onCollateralChange={onCollateralChange}
