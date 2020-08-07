@@ -3,6 +3,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useEffect, useState } from 'react'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 
+import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
 import { useWeb3Connected } from '../../contexts/Web3Context'
 import { useAllowance } from '../../hooks/useAllowance'
 import { getLogger } from '../../util/logger'
@@ -90,13 +91,16 @@ export const SplitPosition = () => {
   )
 
   return (
-    <Form
-      allowance={allowance}
-      hasUnlockedCollateral={hasUnlockedCollateral}
-      onCollateralChange={setCollateralToken}
-      splitPosition={splitPosition}
-      tokens={tokens}
-      unlockCollateral={unlockCollateral}
-    />
+    <>
+      <PageTitle>Split Position</PageTitle>
+      <Form
+        allowance={allowance}
+        hasUnlockedCollateral={hasUnlockedCollateral}
+        onCollateralChange={setCollateralToken}
+        splitPosition={splitPosition}
+        tokens={tokens}
+        unlockCollateral={unlockCollateral}
+      />
+    </>
   )
 }

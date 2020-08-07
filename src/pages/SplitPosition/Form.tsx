@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { ERC20Service } from 'services/erc20'
 import { GetPosition_position } from 'types/generatedGQL'
 
+import { CenteredCard } from '../../components/common/CenteredCard'
 import { SetAllowance } from '../../components/common/SetAllowance'
 import { NULL_PARENT_ID, ZERO_BN } from '../../config/constants'
 import { Remote } from '../../util/remoteData'
@@ -157,7 +158,7 @@ export const Form = ({
   const canSubmit = isValid && (hasEnoughAllowance.getOr(false) || hasUnlockedCollateral)
 
   return (
-    <div>
+    <CenteredCard>
       <InputCondition
         formMethods={formMethods}
         onOutcomeSlotChange={(n) => setOutcomeSlot(n)}
@@ -191,6 +192,6 @@ export const Form = ({
       <button disabled={!canSubmit} onClick={handleSubmit(onSubmit)}>
         Split
       </button>
-    </div>
+    </CenteredCard>
   )
 }
