@@ -1,10 +1,10 @@
 import React from 'react'
 import styled from 'styled-components'
 
+import { SelectCollateral, SelectCollateralProps } from '../../components/form/SelectCollateral'
 import { TitleControl } from '../../components/pureStyledComponents/TitleControl'
 
 import { InputPosition, InputPositionProps } from './InputPosition'
-import { SelectCollateral, SelectCollateralProps } from './SelectCollateral'
 
 const Controls = styled.div`
   align-items: center;

@@ -2,9 +2,8 @@ import React, { useEffect } from 'react'
 import { FormContextValues } from 'react-hook-form'
 import styled from 'styled-components'
 
-import { Token } from '../../util/types'
-
-import { SplitPositionFormMethods } from './Form'
+import { SplitPositionFormMethods } from '../../../pages/SplitPosition/Form'
+import { Token } from '../../../util/types'
 
 const Wrapper = styled.div<{ visible?: boolean }>`
   display: ${(props) => (props.visible ? 'block' : 'none')};
