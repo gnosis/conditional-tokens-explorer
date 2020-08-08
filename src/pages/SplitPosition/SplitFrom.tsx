@@ -1,10 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
 
+import { InputPosition, InputPositionProps } from '../../components/form/InputPosition'
 import { SelectCollateral, SelectCollateralProps } from '../../components/form/SelectCollateral'
 import { TitleControl } from '../../components/pureStyledComponents/TitleControl'
-
-import { InputPosition, InputPositionProps } from './InputPosition'
 
 const Controls = styled.div`
   align-items: center;
@@ -102,6 +101,7 @@ export const SplitFrom: React.FC<Props> = (props) => {
         visible={splitFromCollateral}
       />
       <ToggleableInputPosition
+        barebones
         formMethods={formMethods}
         onPositionChange={onPositionChange}
         splitFromPosition={splitFromPosition}

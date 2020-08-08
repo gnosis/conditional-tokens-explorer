@@ -5,19 +5,23 @@ import { FormContextValues } from 'react-hook-form'
 import styled from 'styled-components'
 import { GetPosition, GetPositionVariables, GetPosition_position } from 'types/generatedGQL'
 
-import { Textfield } from '../../components/pureStyledComponents/Textfield'
-import { BYTES_REGEX } from '../../config/constants'
+import { BYTES_REGEX } from '../../../config/constants'
+import { SplitPositionFormMethods } from '../../../pages/SplitPosition/Form'
+import { Textfield } from '../../pureStyledComponents/Textfield'
+import { TitleControl } from '../../pureStyledComponents/TitleControl'
+import { TitleValue } from '../../text/TitleValue'
 
-import { SplitPositionFormMethods } from './Form'
-
-const Wrapper = styled.div``
+const Span = styled.span``
 
 export interface InputPositionProps {
-  splitFromPosition: boolean
+  barebones?: boolean
   formMethods: FormContextValues<SplitPositionFormMethods>
   onPositionChange: (position: GetPosition_position) => void
+  splitFromPosition: boolean
 }
+
 export const InputPosition = ({
+  barebones = false,
   formMethods: { errors, register, setError, watch },
   onPositionChange,
   splitFromPosition,
@@ -54,8 +58,8 @@ export const InputPosition = ({
     }
   }, [errorFetchingPosition, setError])
 
-  return (
-    <Wrapper {...restProps}>
+  const value = (
+    <Span {...restProps}>
       <Textfield
         disabled={!splitFromPosition}
         name="positionId"
@@ -71,6 +75,17 @@ export const InputPosition = ({
           <p>{errorPositionId.type === 'validate' && errorPositionId.message}</p>
         </div>
       )}
-    </Wrapper>
+    </Span>
+  )
+
+  return barebones ? (
+    value
+  ) : (
+    <TitleValue
+      title="Position Id"
+      titleControl={<TitleControl>Select Position</TitleControl>}
+      value={value}
+      {...restProps}
+    />
   )
 }
