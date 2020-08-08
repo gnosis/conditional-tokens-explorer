@@ -22,8 +22,7 @@ import { Token } from '../../util/types'
 
 import { InputAmount } from './InputAmount'
 import { InputCondition } from './InputCondition'
-import { InputPosition } from './InputPosition'
-import { SelectCollateral } from './SelectCollateral'
+import { SplitFrom } from './SplitFrom'
 
 const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
@@ -198,19 +197,14 @@ export const Form = ({
         <TitleValue
           title="Split From"
           value={
-            <>
-              <SelectCollateral
-                formMethods={formMethods}
-                onCollateralChange={onCollateralChange}
-                splitFromCollateral={splitFromCollateral}
-                tokens={tokens}
-              />
-              <InputPosition
-                formMethods={formMethods}
-                onPositionChange={(p) => setPosition(p)}
-                splitFromPosition={splitFromPosition}
-              ></InputPosition>
-            </>
+            <SplitFrom
+              formMethods={formMethods}
+              onCollateralChange={onCollateralChange}
+              onPositionChange={(p) => setPosition(p)}
+              splitFromCollateral={splitFromCollateral}
+              splitFromPosition={splitFromPosition}
+              tokens={tokens}
+            />
           }
         />
       </Row>

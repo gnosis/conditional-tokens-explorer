@@ -2,6 +2,7 @@ import { useQuery } from '@apollo/react-hooks'
 import { GetPositionQuery } from 'queries/positions'
 import React, { useEffect } from 'react'
 import { FormContextValues } from 'react-hook-form'
+import styled from 'styled-components'
 import { GetPosition, GetPositionVariables, GetPosition_position } from 'types/generatedGQL'
 
 import { Textfield } from '../../components/pureStyledComponents/Textfield'
@@ -9,7 +10,11 @@ import { BYTES_REGEX } from '../../config/constants'
 
 import { SplitPositionFormMethods } from './Form'
 
-interface Props {
+const Wrapper = styled.div<{ visible?: boolean }>`
+  display: ${(props) => (props.visible ? 'block' : 'none')};
+`
+
+export interface InputPositionProps {
   splitFromPosition: boolean
   formMethods: FormContextValues<SplitPositionFormMethods>
   onPositionChange: (position: GetPosition_position) => void
@@ -18,7 +23,8 @@ export const InputPosition = ({
   formMethods: { errors, register, setError, watch },
   onPositionChange,
   splitFromPosition,
-}: Props) => {
+  ...restProps
+}: InputPositionProps) => {
   const watchPositionId = watch('positionId')
   const errorPositionId = errors.positionId
   const skipFetchPosition = watchPositionId === '' || !splitFromPosition || !!errorPositionId
@@ -51,9 +57,7 @@ export const InputPosition = ({
   }, [errorFetchingPosition, setError])
 
   return (
-    <div>
-      <input name="splitFrom" ref={register} type="radio" value="position" />
-      <label>Position</label>
+    <Wrapper visible={splitFromPosition} {...restProps}>
       <Textfield
         disabled={!splitFromPosition}
         name="positionId"
@@ -69,6 +73,6 @@ export const InputPosition = ({
           <p>{errorPositionId.type === 'validate' && errorPositionId.message}</p>
         </div>
       )}
-    </div>
+    </Wrapper>
   )
 }

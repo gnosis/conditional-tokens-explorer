@@ -1,32 +1,36 @@
 import React, { useEffect } from 'react'
 import { FormContextValues } from 'react-hook-form'
+import styled from 'styled-components'
 
 import { Token } from '../../util/types'
 
 import { SplitPositionFormMethods } from './Form'
 
-interface Props {
-  splitFromCollateral: boolean
+const Wrapper = styled.div<{ visible?: boolean }>`
+  display: ${(props) => (props.visible ? 'block' : 'none')};
+`
+
+export interface SelectCollateralProps {
   formMethods: FormContextValues<SplitPositionFormMethods>
-  tokens: Token[]
   onCollateralChange: (c: string) => void
+  splitFromCollateral: boolean
+  tokens: Token[]
 }
+
 export const SelectCollateral = ({
   formMethods: { register, watch },
   onCollateralChange,
   splitFromCollateral,
   tokens,
-}: Props) => {
+  ...restProps
+}: SelectCollateralProps) => {
   const watchCollateral = watch('collateral')
   useEffect(() => {
     onCollateralChange(watchCollateral)
   }, [watchCollateral, onCollateralChange])
 
   return (
-    <div>
-      <input name="splitFrom" ref={register} type="radio" value="collateral" />
-
-      <label htmlFor="collateral">Collateral</label>
+    <Wrapper visible={splitFromCollateral} {...restProps}>
       <select
         disabled={!splitFromCollateral}
         name="collateral"
@@ -40,6 +44,6 @@ export const SelectCollateral = ({
           )
         })}
       </select>
-    </div>
+    </Wrapper>
   )
 }
