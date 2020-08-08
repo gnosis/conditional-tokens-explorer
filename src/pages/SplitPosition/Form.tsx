@@ -11,6 +11,7 @@ import { CenteredCard } from '../../components/common/CenteredCard'
 import { SetAllowance } from '../../components/common/SetAllowance'
 import { StripedList, StripedListItem } from '../../components/common/StripedList'
 import { InputAmount } from '../../components/form/InputAmount'
+import { InputCondition } from '../../components/form/InputCondition'
 import { Partition } from '../../components/partitions/Partition'
 import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
 import { Row } from '../../components/pureStyledComponents/Row'
@@ -21,7 +22,6 @@ import { Remote } from '../../util/remoteData'
 import { trivialPartition } from '../../util/tools'
 import { Token } from '../../util/types'
 
-import { InputCondition } from './InputCondition'
 import { SplitFrom } from './SplitFrom'
 
 const StripedListStyled = styled(StripedList)`
@@ -182,16 +182,7 @@ export const Form = ({
   return (
     <CenteredCard>
       <Row cols="1fr">
-        <TitleValue
-          title="Condition Id"
-          titleControl={<TitleControl>Select Condition</TitleControl>}
-          value={
-            <InputCondition
-              formMethods={formMethods}
-              onOutcomeSlotChange={(n) => setOutcomeSlot(n)}
-            />
-          }
-        />
+        <InputCondition formMethods={formMethods} onOutcomeSlotChange={(n) => setOutcomeSlot(n)} />
       </Row>
       <Row cols="1fr" marginBottomXL>
         <TitleValue
