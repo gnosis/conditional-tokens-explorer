@@ -10,7 +10,7 @@ import { Button } from '../../components/buttons/Button'
 import { CenteredCard } from '../../components/common/CenteredCard'
 import { SetAllowance } from '../../components/common/SetAllowance'
 import { StripedList, StripedListItem } from '../../components/common/StripedList'
-import { Amount } from '../../components/form/Amount'
+import { InputAmount } from '../../components/form/InputAmount'
 import { Partition } from '../../components/partitions/Partition'
 import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
 import { Row } from '../../components/pureStyledComponents/Row'
@@ -217,7 +217,7 @@ export const Form = ({
         />
       )}
       <Row cols="1fr" marginBottomXL>
-        <Amount
+        <InputAmount
           collateral={collateralToken}
           formMethods={formMethods}
           positionId={positionId}

@@ -20,7 +20,7 @@ interface Props {
   splitFrom: SplitFrom
 }
 
-export const Amount = ({
+export const InputAmount = ({
   collateral,
   formMethods: { control, setValue },
   positionId,
