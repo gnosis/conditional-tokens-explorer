@@ -25,13 +25,14 @@ export const SelectCollateral = ({
   ...restProps
 }: SelectCollateralProps) => {
   const watchCollateral = watch('collateral')
+
   useEffect(() => {
     onCollateralChange(watchCollateral)
   }, [watchCollateral, onCollateralChange])
 
   return (
     <Wrapper visible={splitFromCollateral} {...restProps}>
-      <select
+      {/* <select
         disabled={!splitFromCollateral}
         name="collateral"
         ref={register({ required: splitFromCollateral })}
@@ -43,7 +44,20 @@ export const SelectCollateral = ({
             </option>
           )
         })}
-      </select>
+      </select> */}
+      {tokens.map(({ address, symbol }) => {
+        return (
+          <div key={address}>
+            <input
+              name="collateral"
+              ref={register({ required: splitFromCollateral })}
+              type="radio"
+              value={address}
+            />
+            {symbol}
+          </div>
+        )
+      })}
     </Wrapper>
   )
 }
