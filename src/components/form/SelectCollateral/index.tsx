@@ -5,9 +5,7 @@ import styled from 'styled-components'
 import { SplitPositionFormMethods } from '../../../pages/SplitPosition/Form'
 import { Token } from '../../../util/types'
 
-const Wrapper = styled.div<{ visible?: boolean }>`
-  display: ${(props) => (props.visible ? 'block' : 'none')};
-`
+const Wrapper = styled.div``
 
 export interface SelectCollateralProps {
   formMethods: FormContextValues<SplitPositionFormMethods>
@@ -30,7 +28,7 @@ export const SelectCollateral = ({
   }, [watchCollateral, onCollateralChange])
 
   return (
-    <Wrapper visible={splitFromCollateral} {...restProps}>
+    <Wrapper {...restProps}>
       {/* <select
         disabled={!splitFromCollateral}
         name="collateral"
@@ -46,7 +44,7 @@ export const SelectCollateral = ({
       </select> */}
       {tokens.map(({ address, symbol }) => {
         return (
-          <div key={address}>
+          <label key={address}>
             <input
               name="collateral"
               ref={register({ required: splitFromCollateral })}
@@ -54,7 +52,7 @@ export const SelectCollateral = ({
               value={address}
             />
             {symbol}
-          </div>
+          </label>
         )
       })}
     </Wrapper>

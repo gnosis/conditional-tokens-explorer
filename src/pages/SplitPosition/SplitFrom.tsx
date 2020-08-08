@@ -54,6 +54,14 @@ const ToggleableTitleControl = styled(TitleControl)<{ visible?: boolean }>`
   display: ${(props) => (props.visible ? 'block' : 'none')};
 `
 
+const ToggleableSelectCollateral = styled(SelectCollateral)<{ visible?: boolean }>`
+  display: ${(props) => (props.visible ? 'block' : 'none')};
+`
+
+const ToggleableInputPosition = styled(InputPosition)<{ visible?: boolean }>`
+  display: ${(props) => (props.visible ? 'block' : 'none')};
+`
+
 interface Props extends InputPositionProps, SelectCollateralProps {}
 
 export const SplitFrom: React.FC<Props> = (props) => {
@@ -86,17 +94,19 @@ export const SplitFrom: React.FC<Props> = (props) => {
         </ToggleableTitleControl>
         <ToggleableTitleControl visible={splitFromPosition}>Select Position</ToggleableTitleControl>
       </Controls>
-      <SelectCollateral
+      <ToggleableSelectCollateral
         formMethods={formMethods}
         onCollateralChange={onCollateralChange}
         splitFromCollateral={splitFromCollateral}
         tokens={tokens}
+        visible={splitFromCollateral}
       />
-      <InputPosition
+      <ToggleableInputPosition
         formMethods={formMethods}
         onPositionChange={onPositionChange}
         splitFromPosition={splitFromPosition}
-      ></InputPosition>
+        visible={splitFromPosition}
+      />
     </>
   )
 }

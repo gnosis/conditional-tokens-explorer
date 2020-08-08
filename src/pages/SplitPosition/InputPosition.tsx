@@ -10,9 +10,7 @@ import { BYTES_REGEX } from '../../config/constants'
 
 import { SplitPositionFormMethods } from './Form'
 
-const Wrapper = styled.div<{ visible?: boolean }>`
-  display: ${(props) => (props.visible ? 'block' : 'none')};
-`
+const Wrapper = styled.div``
 
 export interface InputPositionProps {
   splitFromPosition: boolean
@@ -57,7 +55,7 @@ export const InputPosition = ({
   }, [errorFetchingPosition, setError])
 
   return (
-    <Wrapper visible={splitFromPosition} {...restProps}>
+    <Wrapper {...restProps}>
       <Textfield
         disabled={!splitFromPosition}
         name="positionId"
