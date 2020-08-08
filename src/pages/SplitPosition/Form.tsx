@@ -10,6 +10,7 @@ import { Button } from '../../components/buttons/Button'
 import { CenteredCard } from '../../components/common/CenteredCard'
 import { SetAllowance } from '../../components/common/SetAllowance'
 import { StripedList, StripedListItem } from '../../components/common/StripedList'
+import { Amount } from '../../components/form/Amount'
 import { Partition } from '../../components/partitions/Partition'
 import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
 import { Row } from '../../components/pureStyledComponents/Row'
@@ -20,7 +21,6 @@ import { Remote } from '../../util/remoteData'
 import { trivialPartition } from '../../util/tools'
 import { Token } from '../../util/types'
 
-import { InputAmount } from './InputAmount'
 import { InputCondition } from './InputCondition'
 import { SplitFrom } from './SplitFrom'
 
@@ -217,12 +217,12 @@ export const Form = ({
         />
       )}
       <Row cols="1fr" marginBottomXL>
-        <InputAmount
+        <Amount
           collateral={collateralToken}
           formMethods={formMethods}
           positionId={positionId}
           splitFrom={splitFrom}
-        ></InputAmount>
+        />
       </Row>
       <Row cols="1fr" marginBottomXL>
         <TitleValue

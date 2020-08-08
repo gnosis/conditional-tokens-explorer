@@ -8,11 +8,10 @@ import React, { useEffect, useState } from 'react'
 import { Controller, FormContextValues } from 'react-hook-form'
 import { ERC20Service } from 'services/erc20'
 
-import { TitleControl } from '../../components/pureStyledComponents/TitleControl'
-import { TitleValue } from '../../components/text/TitleValue'
-import { Token } from '../../util/types'
-
-import { SplitFrom, SplitPositionFormMethods } from './Form'
+import { SplitFrom, SplitPositionFormMethods } from '../../../pages/SplitPosition/Form'
+import { Token } from '../../../util/types'
+import { TitleControl } from '../../pureStyledComponents/TitleControl'
+import { TitleValue } from '../../text/TitleValue'
 
 interface Props {
   collateral: Token
@@ -21,7 +20,7 @@ interface Props {
   splitFrom: SplitFrom
 }
 
-export const InputAmount = ({
+export const Amount = ({
   collateral,
   formMethods: { control, setValue },
   positionId,
