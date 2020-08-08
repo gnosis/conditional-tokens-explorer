@@ -10,7 +10,7 @@ import { ERC20Service } from 'services/erc20'
 
 import { SplitFrom, SplitPositionFormMethods } from '../../../pages/SplitPosition/Form'
 import { Token } from '../../../util/types'
-import { TitleControl } from '../../pureStyledComponents/TitleControl'
+import { TitleControlButton } from '../../pureStyledComponents/TitleControl'
 import { TitleValue } from '../../text/TitleValue'
 
 interface Props {
@@ -63,9 +63,12 @@ export const InputAmount = ({
       title="Amount"
       titleControl={
         balance && (
-          <TitleControl onClick={() => setValue('amount', balance)}>
+          <TitleControlButton
+            disabled={balance.isZero()}
+            onClick={() => setValue('amount', balance)}
+          >
             Use Wallet Balance (${formatBigNumber(balance, collateral.decimals)})
-          </TitleControl>
+          </TitleControlButton>
         )
       }
       value={

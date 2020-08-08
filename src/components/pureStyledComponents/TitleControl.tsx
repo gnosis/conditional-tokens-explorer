@@ -25,3 +25,20 @@ export const TitleControlA = styled.a`
 export const TitleControlNavLink = styled(NavLink)`
   ${TitleControlCSS}
 `
+
+export const TitleControlButton = styled.button`
+  ${TitleControlCSS}
+  background-color: transparent;
+  border: none;
+  outline: none;
+  padding: 0;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+`
