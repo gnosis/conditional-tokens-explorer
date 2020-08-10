@@ -18,6 +18,10 @@ export const GRAPH_HTTP_RINKEBY =
 export const GRAPH_WS_RINKEBY =
   process.env.REACT_APP_GRAPH_WS_RINKEBY ||
   'wss://api.thegraph.com/subgraphs/name/gnosis/hg-rinkeby'
+export const GRAPH_HTTP_GANACHE =
+  process.env.REACT_APP_GRAPH_HTTP_GANACHE || 'http://localhost:8000/subgraphs/name/gnosis/hg'
+export const GRAPH_WS_GANACHE =
+  process.env.REACT_APP_GRAPH_WS_GANACHE || 'ws://localhost:8001/subgraphs/name/gnosis/hg'
 
 export const BYTES_REGEX = /^0x[a-fA-F0-9]{64}$/
 export const NULL_PARENT_ID = '0x0000000000000000000000000000000000000000000000000000000000000000'
