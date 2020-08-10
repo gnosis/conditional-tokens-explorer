@@ -40,6 +40,7 @@ export const InputCondition = ({
         <>
           <Textfield
             name="conditionId"
+            placeholder="Please select a condition..."
             ref={register({
               required: true,
               pattern: BYTES_REGEX,

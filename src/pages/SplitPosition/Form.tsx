@@ -199,14 +199,13 @@ export const Form = ({
           }
         />
       </Row>
-      {showAskAllowance && (
-        <SetAllowance
-          collateral={collateralToken}
-          finished={hasUnlockedCollateral && hasEnoughAllowance.getOr(false)}
-          loading={allowance.isLoading()}
-          onUnlock={unlockCollateral}
-        />
-      )}
+      <SetAllowance
+        collateral={collateralToken}
+        fetching={!showAskAllowance}
+        finished={hasUnlockedCollateral && hasEnoughAllowance.getOr(false)}
+        loading={allowance.isLoading()}
+        onUnlock={unlockCollateral}
+      />
       <Row cols="1fr" marginBottomXL>
         <InputAmount
           collateral={collateralToken}
