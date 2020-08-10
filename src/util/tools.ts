@@ -9,6 +9,7 @@ import {
   GetCondition_condition,
   GetPosition_position,
   GetPosition_position_collection_conditions,
+  GetPosition_position_conditions,
 } from '../types/generatedGQL'
 
 import { ConditionErrors } from './types'
@@ -102,6 +103,31 @@ export const getIndexSets = (outcomesCount: number) => {
   const range = (length: number) => [...Array(length)].map((x, i) => i)
   return range(outcomesCount).map((x) => 1 << x)
 }
+
+export const positionSring = (
+  collateralTokenId: string,
+  conditionIds: string[],
+  indexSets: any[],
+  balance: BigNumber,
+  networkId: number
+) => {
+  // Get the token
+  const token = getTokenFromAddress(networkId, collateralTokenId)
+
+  return `[${token.symbol.toUpperCase()} ${conditionIds.map((conditionId, i) => {
+    return `C:${truncateStringInTheMiddle(conditionId, 8, 6)} O:${outcomeString(
+      parseInt(indexSets[i], 10)
+    )}`
+  })}]  ${formatBigNumber(balance, token.decimals, 2)}`
+}
+
+const outcomeString = (indexSet: number) =>
+  indexSet
+    .toString(2)
+    .split('')
+    .reverse()
+    .reduce((acc, e, i) => (e !== '0' ? [...acc, i] : acc), new Array<number>())
+    .join('|')
 
 export const displayPositions = (
   position: GetPosition_position,

@@ -17,12 +17,8 @@ export const useIsPositionRelatedToCondition = (positionId: string, conditionId:
     if (positionId && conditionId) {
       const { position: positionFromTheGraph } = fetchedPosition ?? { position: null }
       if (positionFromTheGraph) {
-        const { collection } = positionFromTheGraph
-        // I can use `includes`, but I prefer to check the string with 'toLowerCase' to be more safe
-        const conditionsIds = collection.conditionIds.filter(
-          (value) => value.toLowerCase() === conditionId.toLowerCase()
-        )
-        setIsRelated(conditionsIds.length > 0)
+        const { conditionIds } = positionFromTheGraph
+        setIsRelated(conditionIds.includes(conditionId.toLowerCase()))
       }
     }
   }, [fetchedPosition, positionId, conditionId])

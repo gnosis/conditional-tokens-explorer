@@ -1,5 +1,7 @@
 import { ethers } from 'ethers'
+import { BigNumber } from 'ethers/utils'
 import React from 'react'
+import { ConditionalTokensService } from 'services/conditionalTokens'
 
 import { useConditionContext } from '../../contexts/ConditionContext'
 import { usePositionContext } from '../../contexts/PositionContext'
@@ -26,15 +28,35 @@ export const RedeemPositionWrapper = () => {
       if (position && condition) {
         setStatus(Status.Loading)
 
-        const { collateralToken, collection } = position
-        const {id: collectionId, indexSets} = collection
-        const parentCollectionId = collectionId || ethers.constants.HashZero
+        const { collateralToken, conditionIds, indexSets } = position
+        const newCollectionsSet = conditionIds.reduce(
+          (acc, conditionId, i) =>
+            conditionId !== condition.id
+              ? [...acc, { conditionId, indexSet: new BigNumber(indexSets[i]) }]
+              : acc,
+          new Array<{ conditionId: string; indexSet: BigNumber }>()
+        )
+        const parentCollectionId = newCollectionsSet.length
+          ? ConditionalTokensService.getConbinedCollectionId(newCollectionsSet)
+          : ethers.constants.HashZero
+
+        // This UI only allows to redeem 1 position although it's possible to redeem multiple position when you the user owns different positions with the same set of conditions and several indexSets for the resolved condition.
+        // i.e.
+        // - DAI C:0x123 0:0b01 && C:0x345 O:0b01
+        // - DAI C:0x123 0:0b01 && C:0x345 O:0b10
+        // 0x345 is the resolved condition
+        // a could call redeeemPositions(DAI, parentCollectionId, 0x345, [1,2])
+
+        // It shouldn't be able to call onRedeem if resolved condition id were not included in conditionsIds, so no -1 for findIndex.
+        const redeemedIndexSet = [
+          indexSets[conditionIds.findIndex((conditionId) => conditionId === condition.id)],
+        ]
 
         await CTService.redeemPositions(
           collateralToken.id,
           parentCollectionId,
           condition.id,
-          indexSets,
+          redeemedIndexSet
         )
 
         clearCondition()

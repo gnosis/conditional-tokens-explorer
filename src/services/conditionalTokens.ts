@@ -63,6 +63,14 @@ export class ConditionalTokensService {
     ])
   }
 
+  static getConbinedCollectionId(collections: Array<{ conditionId: string; indexSet: BigNumber }>) {
+    return CTHelpers.combineCollectionIds(
+      collections.map(({ conditionId, indexSet }) =>
+        CTHelpers.getCollectionId(conditionId, indexSet)
+      )
+    )
+  }
+
   static getPositionId(collateralToken: string, collectionId: string): string {
     return CTHelpers.getPositionId(collateralToken, collectionId)
   }
@@ -111,7 +119,6 @@ export class ConditionalTokensService {
     conditionId: string,
     indexSets: string[]
   ): Promise<TransactionReceipt> => {
-
     const tx = await this.contract.redeemPositions(
       collateralToken,
       parentCollectionId,
