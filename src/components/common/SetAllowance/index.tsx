@@ -24,6 +24,9 @@ const Description = styled.p`
 const UnlockButton = styled(Button)`
   font-size: 18px;
   height: 32px;
+  min-width: 125px;
+  padding-left: 15px;
+  padding-right: 15px;
 `
 
 interface Props {

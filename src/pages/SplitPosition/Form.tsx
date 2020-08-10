@@ -217,7 +217,7 @@ export const Form = ({
       <Row cols="1fr" marginBottomXL>
         <TitleValue
           title="Partition"
-          titleControl={<TitleControl>Split Partition</TitleControl>}
+          titleControl={<TitleControl>Edit Partition</TitleControl>}
           value={<PartitionStyled collections={mockedNumberedOutcomes} />}
         />
       </Row>
