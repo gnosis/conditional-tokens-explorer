@@ -29,6 +29,9 @@ export const EARLIEST_MAINNET_BLOCK_TO_CHECK = Number(
 export const EARLIEST_RINKEBY_BLOCK_TO_CHECK = Number(
   process.env.REACT_APP_EARLIEST_RINKEBY_BLOCK_TO_CHECK || 6127043
 )
+export const EARLIEST_GANACHE_BLOCK_TO_CHECK = Number(
+  process.env.REACT_APP_EARLIEST_GANACHE_BLOCK_TO_CHECK || 0
+)
 
 export const INFORMATION_NOT_AVAILABLE = 'Information not available'
 

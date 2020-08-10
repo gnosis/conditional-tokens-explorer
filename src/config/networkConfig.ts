@@ -118,6 +118,47 @@ const networks: { [K in NetworkIds]: Network } = {
     graphHttpUri: GRAPH_HTTP_RINKEBY,
     graphWsUri: GRAPH_WS_RINKEBY,
   },
+  [NetworkIds.GANACHE]: {
+    earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
+    contracts: {
+      conditionalTokensAddress: '0xA57B8a5584442B467b4689F1144D269d096A3daF',
+      realitioAddress: '0xcfeb869f69431e42cdb54a4f4f105c19c080a601',
+    },
+    tokens: [
+      {
+        symbol: 'DAI',
+        address: '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7',
+        decimals: 18,
+      },
+      {
+        symbol: 'USDC',
+        address: '0xe982E462b094850F12AF94d21D470e21bE9D0E9C',
+        decimals: 6,
+      },
+      {
+        symbol: 'CDAI',
+        address: '0xD833215cBcc3f914bD1C9ece3EE7BF8B14f841bb',
+        decimals: 18,
+      },
+      {
+        symbol: 'WETH',
+        address: '0x0290FB167208Af455bB137780163b7B7a9a10C16',
+        decimals: 18,
+      },
+      {
+        symbol: 'OWL',
+        address: '0x59d3631c86BbE35EF041872d502F218A39FBa150',
+        decimals: 18,
+      },
+      {
+        symbol: 'GNO',
+        address: '0x9b1f7F645351AF3631a656421eD2e40f2802E6c0',
+        decimals: 18,
+      },
+    ],
+    graphHttpUri: GRAPH_HTTP_GANACHE,
+    graphWsUri: GRAPH_WS_GANACHE,
+  },
 }
 
 export class NetworkConfig {
