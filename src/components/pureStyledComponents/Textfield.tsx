@@ -3,15 +3,15 @@ import styled, { css } from 'styled-components'
 export const TextfieldCSS = css`
   background-color: ${(props) => props.theme.textField.backgroundColor};
   border-color: ${(props) => props.theme.textField.borderColor};
-  border-radius: 4px;
-  border-style: solid;
-  border-width: 1px;
+  border-radius: ${(props) => props.theme.textField.borderRadius};
+  border-style: ${(props) => props.theme.textField.borderStyle};
+  border-width: ${(props) => props.theme.textField.borderWidth};
   color: ${(props) => props.theme.textField.color};
-  font-size: 16px;
-  font-weight: 400;
-  height: 36px;
+  font-size: ${(props) => props.theme.textField.fontSize};
+  font-weight: ${(props) => props.theme.textField.fontWeight};
+  height: ${(props) => props.theme.textField.height};
   outline: none;
-  padding: 0 11px;
+  padding: 0 ${(props) => props.theme.textField.paddingHorizontal};
   width: 100%;
 
   &:active,

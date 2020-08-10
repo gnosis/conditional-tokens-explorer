@@ -5,8 +5,8 @@ import styled from 'styled-components'
 import { truncateStringInTheMiddle } from '../../../util/tools'
 import { Button } from '../../buttons/Button'
 import { ButtonType } from '../../buttons/buttonStylingTypes'
-import { Dropdown, DropdownItemProps, DropdownPosition } from '../../common/Dropdown'
 import { Pill } from '../../pureStyledComponents/Pill'
+import { Dropdown, DropdownItemProps, DropdownPosition } from '../Dropdown'
 
 import { ChevronDown } from './img/ChevronDown'
 

@@ -1,11 +1,64 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FormContextValues } from 'react-hook-form'
 import styled from 'styled-components'
 
 import { SplitPositionFormMethods } from '../../../pages/SplitPosition/Form'
 import { Token } from '../../../util/types'
+import { Dropdown, DropdownPosition } from '../../common/Dropdown'
+import { TokenIcon } from '../../common/TokenIcon'
 
-const Wrapper = styled.div``
+import { ChevronDown } from './img/ChevronDown'
+
+const Wrapper = styled(Dropdown)`
+  .dropdownItems {
+    width: 100%;
+  }
+
+  .dropdownItem {
+    cursor: pointer;
+
+    &:hover {
+      background-color: ${(props) => props.theme.dropdown.item.backgroundColorHover};
+    }
+  }
+`
+
+const Button = styled.div`
+  align-items: center;
+  background-color: ${(props) => props.theme.textField.backgroundColor};
+  border-color: ${(props) => props.theme.textField.borderColor};
+  border-radius: ${(props) => props.theme.textField.borderRadius};
+  border-style: ${(props) => props.theme.textField.borderStyle};
+  border-width: ${(props) => props.theme.textField.borderWidth};
+  color: ${(props) => props.theme.textField.color};
+  display: flex;
+  font-size: ${(props) => props.theme.textField.fontSize};
+  font-weight: ${(props) => props.theme.textField.fontWeight};
+  height: ${(props) => props.theme.textField.height};
+  justify-content: space-between;
+  outline: none;
+  padding: 0 ${(props) => props.theme.textField.paddingHorizontal};
+  width: 100%;
+`
+
+const Item = styled.label`
+  display: block;
+  height: 100%;
+  position: relative;
+`
+
+const Radio = styled.input`
+  height: 100%;
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  z-index: 5;
+`
+
+const TokenIconStyled = styled(TokenIcon)`
+  position: relative;
+  z-index: 1;
+`
 
 export interface SelectCollateralProps {
   formMethods: FormContextValues<SplitPositionFormMethods>
@@ -22,39 +75,41 @@ export const SelectCollateral = ({
   ...restProps
 }: SelectCollateralProps) => {
   const watchCollateral = watch('collateral')
+  const [collateral, setCollateral] = useState(tokens[0].symbol)
+  const button = (
+    <Button>
+      <TokenIconStyled symbol={collateral} /> <ChevronDown />
+    </Button>
+  )
+  const dropdownItems = tokens.map(({ address, symbol }) => {
+    return {
+      content: (
+        <Item key={address}>
+          <Radio
+            name="collateral"
+            ref={register({ required: splitFromCollateral })}
+            type="radio"
+            value={address}
+          />
+          <TokenIconStyled symbol={symbol} />
+        </Item>
+      ),
+      onClick: () => {
+        setCollateral(symbol)
+      },
+    }
+  })
 
   useEffect(() => {
     onCollateralChange(watchCollateral)
   }, [watchCollateral, onCollateralChange])
 
   return (
-    <Wrapper {...restProps}>
-      {/* <select
-        disabled={!splitFromCollateral}
-        name="collateral"
-        ref={register({ required: splitFromCollateral })}
-      >
-        {tokens.map(({ address, symbol }) => {
-          return (
-            <option key={address} value={address}>
-              {symbol}
-            </option>
-          )
-        })}
-      </select> */}
-      {tokens.map(({ address, symbol }) => {
-        return (
-          <label key={address}>
-            <input
-              name="collateral"
-              ref={register({ required: splitFromCollateral })}
-              type="radio"
-              value={address}
-            />
-            {symbol}
-          </label>
-        )
-      })}
-    </Wrapper>
+    <Wrapper
+      {...restProps}
+      dropdownButtonContent={button}
+      dropdownPosition={DropdownPosition.center}
+      items={dropdownItems}
+    />
   )
 }
