@@ -33,7 +33,6 @@ services:
     build: ./docker/hg-subgraph/
     depends_on:
       - graph-node
-    command: "create --node http://graph-node:8020 gnosis/hg"
   deploy-contracts:
     build: ./docker/deploy-contracts/
     command: "./prepare_db.sh"
