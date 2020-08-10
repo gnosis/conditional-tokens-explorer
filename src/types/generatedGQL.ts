@@ -117,6 +117,7 @@ export interface GetPosition_position {
   activeValue: any;
   collateralToken: GetPosition_position_collateralToken;
   collection: GetPosition_position_collection;
+  conditionIds: string[];
   conditions: GetPosition_position_conditions[];
 }
 

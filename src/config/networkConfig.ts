@@ -80,7 +80,7 @@ const networks: { [K in NetworkIds]: Network } = {
   [NetworkIds.RINKEBY]: {
     earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
     contracts: {
-      conditionalTokensAddress: '0x36bede640D19981A82090519bC1626249984c908',
+      conditionalTokensAddress: '0xe6Cdc22F99FD9ffdC03647C7fFF5bB753a4eBB21',
       realitioAddress: '0x3D00D77ee771405628a4bA4913175EcC095538da',
     },
     tokens: [
