@@ -44,6 +44,7 @@ export const SetAllowance = (props: Props) => {
       </Description>
       <UnlockButton
         buttonType={ButtonType.primaryInverted}
+        data-testid="unlockButton"
         disabled={loading || finished}
         onClick={onUnlock}
       >
