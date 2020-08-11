@@ -4,7 +4,12 @@ import { InfoCard } from '../../components/common/InfoCard'
 import { InlineLoading } from '../../components/loading/InlineLoading'
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
 import { useConditionContext } from '../../contexts/ConditionContext'
-import { isConditionErrorFetching, isConditionErrorInvalid, isConditionErrorNotFound } from '../../util/tools'
+import {
+  isConditionErrorFetching,
+  isConditionErrorInvalid,
+  isConditionErrorNotFound,
+} from '../../util/tools'
+
 import { Contents } from './Contents'
 
 interface WrapperProps {

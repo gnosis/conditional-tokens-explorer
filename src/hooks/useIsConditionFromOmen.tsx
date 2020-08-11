@@ -1,4 +1,3 @@
-import { Provider } from 'ethers/providers'
 import React from 'react'
 
 import { getKnowOracleFromAddress } from '../config/networkConfig'
@@ -16,8 +15,10 @@ export const useIsConditionFromOmen = (
   const { status } = useWeb3Context()
 
   // const [isConditionCreatorAContract, setIsConditionCreatorAContract] = React.useState(false)
-  const [error, setError] = React.useState(undefined)
-  const [loading, setLoading] = React.useState<boolean>(true)
+  // const [error, setError] = React.useState(undefined)
+  // const [loading, setLoading] = React.useState<boolean>(true)
+  const error = undefined
+  const loading = true
 
   // React.useEffect(() => {
   //   let cancelled = false

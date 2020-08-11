@@ -1,3 +1,14 @@
+const darkerGray = '#445055'
+const error = '#db3a3d'
+const errorDark = '#BC3033'
+const lightGrey = '#d4d5d3'
+const primary = '#009cb4'
+const primaryDark = '#00879B'
+const textColor = '#5d6d74'
+const whitesmoke1 = '#e8e7e6'
+const whitesmoke2 = '#f3f2f2'
+const whitesmoke3 = '#fafafa'
+
 const theme = {
   fonts: {
     defaultSize: '14px',
@@ -6,18 +17,30 @@ const theme = {
   },
   border: {
     color: '#eceff1',
-    colorDark: '#d4d5d3',
+    colorDark: lightGrey,
     borderRadius: '6px',
   },
   buttonPrimary: {
-    backgroundColor: '#009cb4',
-    backgroundColorHover: '#00879B',
+    backgroundColor: primary,
+    backgroundColorHover: primaryDark,
+    borderColor: primary,
+    borderColorHover: primaryDark,
     color: '#fff',
     colorHover: '#fff',
   },
+  buttonPrimaryInverted: {
+    backgroundColor: '#fff',
+    backgroundColorHover: primaryDark,
+    borderColor: primary,
+    borderColorHover: primaryDark,
+    color: primary,
+    colorHover: '#fff',
+  },
   buttonDanger: {
-    backgroundColor: '#db3a3d',
-    backgroundColorHover: '#BC3033',
+    backgroundColor: error,
+    backgroundColorHover: errorDark,
+    borderColor: error,
+    borderColorHover: errorDark,
     color: '#fff',
     colorHover: '#fff',
   },
@@ -31,30 +54,30 @@ const theme = {
   colors: {
     darkBlue: '#001428',
     darkGrey: '#5D6D74',
-    darkerGray: '#445055',
+    darkerGray: darkerGray,
     darkestGray: '#081728',
-    error: '#db3a3d',
+    error: error,
     holdGreen: '#008c73',
     lightGreen: '#a1d2ca',
-    lightGrey: '#d4d5d3',
+    lightGrey: lightGrey,
     lighterGreen: '#b6e2da',
-    mainBodyBackground: '#f3f2f2',
+    mainBodyBackground: whitesmoke2,
     mediumGrey: '#b2b5b2',
-    primary: '#009cb4',
-    textColor: '#5d6d74',
-    tomatoRed: '#db3a3d',
-    whitesmoke1: '#e8e7e6',
-    whitesmoke2: '#f3f2f2',
-    whitesmoke3: '#fafafa',
+    primary: primary,
+    textColor: textColor,
+    tomatoRed: error,
+    whitesmoke1: whitesmoke1,
+    whitesmoke2: whitesmoke2,
+    whitesmoke3: whitesmoke3,
   },
   dropdown: {
     item: {
       backgroundColor: 'transparent',
-      backgroundColorActive: '#fafafa',
-      backgroundColorHover: '#fafafa',
-      borderColor: '#d4d5d3',
-      color: '#5d6d74',
-      colorActive: '#445055',
+      backgroundColorActive: whitesmoke3,
+      backgroundColorHover: whitesmoke3,
+      borderColor: lightGrey,
+      color: textColor,
+      colorActive: darkerGray,
     },
   },
   form: {
@@ -81,8 +104,8 @@ const theme = {
     color: '#348174',
   },
   pillOpen: {
-    backgroundColor: '#e8e7e6',
-    color: '#5d6d74',
+    backgroundColor: whitesmoke1,
+    color: textColor,
   },
   themeBreakPoints: {
     lg: '992px',
