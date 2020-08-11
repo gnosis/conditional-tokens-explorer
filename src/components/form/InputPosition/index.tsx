@@ -7,6 +7,7 @@ import { GetPosition, GetPositionVariables, GetPosition_position } from 'types/g
 
 import { BYTES_REGEX } from '../../../config/constants'
 import { SplitPositionFormMethods } from '../../../pages/SplitPosition/Form'
+import { Error, ErrorContainer } from '../../pureStyledComponents/Error'
 import { Textfield } from '../../pureStyledComponents/Textfield'
 import { TitleControl } from '../../pureStyledComponents/TitleControl'
 import { TitleValue } from '../../text/TitleValue'
@@ -63,6 +64,7 @@ export const InputPosition = ({
       <Textfield
         disabled={!splitFromPosition}
         name="positionId"
+        placeholder="Please select a position..."
         ref={register({
           required: splitFromPosition,
           pattern: BYTES_REGEX,
@@ -70,10 +72,10 @@ export const InputPosition = ({
         type="text"
       />
       {errorPositionId && (
-        <div>
-          <p>{errorPositionId.type === 'pattern' && 'Invalid bytes32 string'}</p>
-          <p>{errorPositionId.type === 'validate' && errorPositionId.message}</p>
-        </div>
+        <ErrorContainer>
+          {errorPositionId.type === 'pattern' && <Error>{'Invalid bytes32 string'}</Error>}
+          {errorPositionId.type === 'validate' && <Error>{errorPositionId.message}</Error>}
+        </ErrorContainer>
       )}
     </Span>
   )

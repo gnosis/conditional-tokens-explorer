@@ -4,6 +4,7 @@ import { FormContextValues } from 'react-hook-form'
 
 import { BYTES_REGEX } from '../../../config/constants'
 import { SplitPositionFormMethods } from '../../../pages/SplitPosition/Form'
+import { Error, ErrorContainer } from '../../pureStyledComponents/Error'
 import { Textfield } from '../../pureStyledComponents/Textfield'
 import { TitleControl } from '../../pureStyledComponents/TitleControl'
 import { TitleValue } from '../../text/TitleValue'
@@ -52,10 +53,10 @@ export const InputCondition = ({
             type="text"
           />
           {conditionIdErrors && (
-            <div>
-              <p>{conditionIdErrors.type === 'pattern' && 'Invalid bytes32 string'}</p>
-              <p>{conditionIdErrors.type === 'validate' && 'Invalid condition'}</p>
-            </div>
+            <ErrorContainer>
+              {conditionIdErrors.type === 'pattern' && <Error>{'Invalid bytes32 string'}</Error>}
+              {conditionIdErrors.type === 'validate' && <Error>{'Invalid condition'}</Error>}
+            </ErrorContainer>
           )}
         </>
       }

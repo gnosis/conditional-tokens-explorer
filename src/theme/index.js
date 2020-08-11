@@ -119,6 +119,7 @@ const theme = {
     borderWidth: '1px',
     color: textColor,
     colorPlaceholder: mediumGrey,
+    errorColor: error,
     fontSize: '16px',
     fontWeight: '400',
     height: '36px',
