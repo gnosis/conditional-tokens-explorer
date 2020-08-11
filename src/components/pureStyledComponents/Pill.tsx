@@ -23,7 +23,7 @@ export const Pill = styled.div<{ type?: PillTypes }>`
   font-weight: 600;
   height: 22px;
   justify-content: center;
-  line-height: 1;
+  line-height: 1.2;
   padding: 0 10px;
 
   ${(props) => props.type === PillTypes.primary && PillPrimaryCSS}
