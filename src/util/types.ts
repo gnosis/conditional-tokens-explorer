@@ -40,11 +40,12 @@ export type Token = {
   decimals: number
 }
 
-export type NetworkId = 1 | 4
+export type NetworkId = 1 | 4 | 50
 
 export enum NetworkIds {
   MAINNET = 1,
   RINKEBY = 4,
+  GANACHE = 50,
 }
 
 export enum Status {

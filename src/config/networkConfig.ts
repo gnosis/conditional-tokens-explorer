@@ -122,7 +122,7 @@ const networks: { [K in NetworkIds]: Network } = {
     graphWsUri: GRAPH_WS_RINKEBY,
   },
   [NetworkIds.GANACHE]: {
-    earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
+    earliestBlockToCheck: EARLIEST_GANACHE_BLOCK_TO_CHECK,
     contracts: {
       conditionalTokensAddress: '0xA57B8a5584442B467b4689F1144D269d096A3daF',
       realitioAddress: '0xcfeb869f69431e42cdb54a4f4f105c19c080a601',
@@ -168,7 +168,7 @@ export class NetworkConfig {
   constructor(public networkId: NetworkIds) {}
 
   static isKnownNetwork(networkId: number): networkId is NetworkIds {
-    return networkId === 1 || networkId === 4
+    return networkId === 1 || networkId === 4 || networkId === 50
   }
 
   getConditionalTokensAddress() {
@@ -217,6 +217,7 @@ export const knownOracles: { [name in KnownOracle]: KnownOracleData } = {
     addresses: {
       [NetworkIds.MAINNET]: '0x0e414d014a77971f4eaa22ab58e6d84d16ea838e',
       [NetworkIds.RINKEBY]: '0x576B76eebE6B5411c0ef310E65De9Bff8A60130F',
+      [NetworkIds.GANACHE]: '0xDb56f2e9369E0D7bD191099125a3f6C370F8ed15',
     },
   },
   kleros: {
@@ -225,6 +226,7 @@ export const knownOracles: { [name in KnownOracle]: KnownOracleData } = {
     addresses: {
       [NetworkIds.MAINNET]: '0x0000000000000000000000000000000000000000',
       [NetworkIds.RINKEBY]: '0x0000000000000000000000000000000000000000',
+      [NetworkIds.GANACHE]: '0x0000000000000000000000000000000000000000',
     },
   },
   unknown: {
