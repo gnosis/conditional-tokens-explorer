@@ -24,7 +24,6 @@ export const SelectPosition = () => {
 
   React.useEffect(() => {
     if (position) {
-      // TODO: improve using the method "displayPositions(position, balance, networkConfig.networkId)"
       setPositionToDisplay(
         positionSring(
           position.collateralToken.id,

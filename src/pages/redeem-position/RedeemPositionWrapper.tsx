@@ -94,9 +94,9 @@ export const RedeemPositionWrapper = () => {
 
       <div className="row">
         <PositionPreview
-          collateralTokenAddress={position?.collateralToken?.id || ''}
+          condition={condition}
           networkId={networkConfig.networkId}
-          positionId={position?.id || ''}
+          position={position}
         />
       </div>
       <button disabled={disabled} onClick={onRedeem}>

@@ -1,30 +1,36 @@
-import React from 'react'
+import { BigNumber } from 'ethers/utils'
+import React, { useEffect, useMemo, useState } from 'react'
+import { GetCondition_condition, GetPosition_position } from 'types/generatedGQL'
 
-import { getTokenFromAddress } from '../../config/networkConfig'
 import { useBalanceForPosition } from '../../hooks/useBalanceForPosition'
-import { formatBigNumber } from '../../util/tools'
+import { getRedeemedBalance, getRedeemedPreview } from '../../util/tools'
 
 interface Props {
-  positionId: string
-  collateralTokenAddress: string
+  position: Maybe<GetPosition_position>
+  condition: Maybe<GetCondition_condition>
   networkId: number
 }
 
-export const PositionPreview = ({ collateralTokenAddress, networkId, positionId }: Props) => {
-  const { balance } = useBalanceForPosition(positionId)
-  const [decimals, setDecimals] = React.useState(18)
+export const PositionPreview = ({ condition, networkId, position }: Props) => {
+  const { balance } = useBalanceForPosition(position?.id || '')
 
-  React.useEffect(() => {
-    if (networkId && collateralTokenAddress) {
-      const { decimals } = getTokenFromAddress(networkId, collateralTokenAddress)
-      setDecimals(decimals)
-    }
-  }, [networkId, collateralTokenAddress])
+  const redeemedBalance = useMemo(
+    () =>
+      position && condition ? getRedeemedBalance(position, condition, balance) : new BigNumber(0),
+    [position, condition, balance]
+  )
+  const redeemedPreview = useMemo(
+    () =>
+      position && condition && networkId
+        ? getRedeemedPreview(position, condition, redeemedBalance, networkId)
+        : '',
+    [position, condition, redeemedBalance, networkId]
+  )
 
   return (
     <>
       <label>Redeemed position preview </label>
-      <span>{formatBigNumber(balance, decimals)}</span>
+      <span>{redeemedPreview}</span>
     </>
   )
 }

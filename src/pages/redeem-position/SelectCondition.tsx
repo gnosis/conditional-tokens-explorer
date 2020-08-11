@@ -17,7 +17,6 @@ export const SelectCondition = () => {
 
   React.useEffect(() => {
     if (condition) {
-      // TODO: improve using the method "displayCondition(condition)"
       setConditionToDisplay(condition.id)
     } else {
       setConditionToDisplay('')

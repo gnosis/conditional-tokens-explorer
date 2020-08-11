@@ -129,6 +129,52 @@ const outcomeString = (indexSet: number) =>
     .reduce((acc, e, i) => (e !== '0' ? [...acc, i] : acc), new Array<number>())
     .join('|')
 
+// FIXME - This won't work for position with indexSet like A|B, only for positions with 1 outcome. We need to find out how to calculate this for that kind on positions
+export const getRedeemedBalance = (
+  position: GetPosition_position,
+  resolvedCondition: GetCondition_condition,
+  balance: BigNumber
+) => {
+  const conditionIndex = position.conditions.findIndex(({ id }) => id === resolvedCondition.id)
+  const indexSet = position.indexSets[conditionIndex]
+
+  const { payouts } = resolvedCondition
+  const positionOutcomes = parseInt(indexSet, 10).toString(2).split('').reverse()
+
+  return positionOutcomes.reduce((acc, posOutcome, i) => {
+    const payout = payouts?.[i] as Maybe<string>
+    if (posOutcome === '1' && payout) {
+      return balance.mul(payout)
+    }
+
+    return acc
+  }, new BigNumber(0))
+}
+
+export const getRedeemedPreview = (
+  position: GetPosition_position,
+  resolvedCondition: GetCondition_condition,
+  redeemedBalance: BigNumber,
+  networkId: number
+) => {
+  if (position.conditions.length > 1) {
+    const conditionIndex = position.conditions.findIndex(({ id }) => id === resolvedCondition.id)
+    const filteredConditionIds = position.conditionIds.filter((_, i) => i !== conditionIndex)
+    const filteredIndexSets = position.indexSets.filter((_, i) => i !== conditionIndex)
+
+    return positionSring(
+      position.collateralToken.id,
+      filteredConditionIds,
+      filteredIndexSets,
+      redeemedBalance,
+      networkId
+    )
+  }
+
+  const { decimals, symbol } = getTokenFromAddress(networkId, position.collateralToken.id)
+  return `${formatBigNumber(redeemedBalance, decimals)} ${symbol}`
+}
+
 export const displayPositions = (
   position: GetPosition_position,
   balance: BigNumber,
