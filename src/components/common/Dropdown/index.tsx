@@ -81,9 +81,9 @@ const Item = styled.div<{ active: boolean; hasOnClick?: boolean }>`
   font-size: 14px;
   font-weight: 400;
   line-height: 1.4;
-  min-height: 40px;
+  min-height: ${(props) => props.theme.dropdown.item.height};
   overflow: hidden;
-  padding: 0 12px;
+  padding: 0 ${(props) => props.theme.dropdown.item.paddingHorizontal};
 
   &:first-child {
     border-top-left-radius: ${(props) => props.theme.cards.borderRadius};
@@ -153,7 +153,9 @@ export const Dropdown: React.FC<Props> = (props) => {
       disabled={disabled}
       isOpen={isOpen}
       onBlur={() => {
-        setIsOpen(false)
+        setTimeout(() => {
+          setIsOpen(false)
+        }, 150)
       }}
       onClick={onWrapperClick}
       tabIndex={-1}

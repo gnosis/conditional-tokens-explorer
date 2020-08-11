@@ -80,6 +80,8 @@ const theme = {
       borderColor: lightGrey,
       color: textColor,
       colorActive: darkerGray,
+      height: '40px',
+      paddingHorizontal: '12px',
     },
   },
   form: {

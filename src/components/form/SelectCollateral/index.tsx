@@ -15,11 +15,7 @@ const Wrapper = styled(Dropdown)`
   }
 
   .dropdownItem {
-    cursor: pointer;
-
-    &:hover {
-      background-color: ${(props) => props.theme.dropdown.item.backgroundColorHover};
-    }
+    padding: 0;
   }
 `
 
@@ -39,12 +35,21 @@ const Button = styled.div`
   outline: none;
   padding: 0 ${(props) => props.theme.textField.paddingHorizontal};
   width: 100%;
+
+  .isOpen & {
+    background-color: ${(props) => props.theme.textField.backgroundColorActive};
+    border-color: ${(props) => props.theme.textField.borderColorActive};
+  }
 `
 
 const Item = styled.label`
-  display: block;
-  height: 100%;
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  height: ${(props) => props.theme.dropdown.item.height};
+  padding: 0 ${(props) => props.theme.dropdown.item.paddingHorizontal};
   position: relative;
+  width: 100%;
 `
 
 const Radio = styled.input`
