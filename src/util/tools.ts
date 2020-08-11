@@ -129,7 +129,6 @@ const outcomeString = (indexSet: number) =>
     .reduce((acc, e, i) => (e !== '0' ? [...acc, i] : acc), new Array<number>())
     .join('|')
 
-// FIXME - This won't work for position with indexSet like A|B, only for positions with 1 outcome. We need to find out how to calculate this for that kind on positions
 export const getRedeemedBalance = (
   position: GetPosition_position,
   resolvedCondition: GetCondition_condition,
@@ -144,7 +143,7 @@ export const getRedeemedBalance = (
   return positionOutcomes.reduce((acc, posOutcome, i) => {
     const payout = payouts?.[i] as Maybe<string>
     if (posOutcome === '1' && payout) {
-      return balance.mul(payout)
+      return acc.add(mulBN(balance, Number(payout)))
     }
 
     return acc
@@ -173,55 +172,4 @@ export const getRedeemedPreview = (
 
   const { decimals, symbol } = getTokenFromAddress(networkId, position.collateralToken.id)
   return `${formatBigNumber(redeemedBalance, decimals)} ${symbol}`
-}
-
-export const displayPositions = (
-  position: GetPosition_position,
-  balance: BigNumber,
-  networkId: number
-) => {
-  const { collateralToken, collection } = position
-
-  // Get the token
-  const token = getTokenFromAddress(networkId, collateralToken.id)
-
-  // Get the conditions
-  const { conditions } = collection
-  const conditionsToDisplay = displayConditions(conditions)
-
-  return `[${token.symbol.toUpperCase()} ${conditionsToDisplay}] x ${formatBigNumber(
-    balance,
-    token.decimals,
-    2
-  )}`
-}
-
-export const displayConditions = (conditions: GetPosition_position_collection_conditions[]) => {
-  return (
-    conditions
-      .map((condition: GetPosition_position_collection_conditions) => {
-        const { id, outcomeSlotCount } = condition
-        return buildCondition(id, outcomeSlotCount)
-      })
-      // TODO what about the OR, when is OR or AND ?
-      .join(` & `)
-  )
-}
-
-export const displayCondition = (condition: GetCondition_condition) => {
-  const { id, outcomeSlotCount } = condition
-
-  return buildCondition(id, outcomeSlotCount)
-}
-
-const buildCondition = (id: string, outcomeSlotCount: number) => {
-  const outcomes = []
-
-  // TODO Check if position condition had a question in realitio, also I think this is not correct (is a first approach) , I think this also needs the indexSets and other type of calculations
-  for (let i = 0; i < outcomeSlotCount; i++) {
-    outcomes.push(i + '')
-  }
-
-  // TODO what about the AND, when is OR or AND ?
-  return `C: ${id} O: ${outcomes.join('|')}`
 }
