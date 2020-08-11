@@ -3,8 +3,11 @@ import { ConditionsListQuery } from 'queries/conditions'
 import React from 'react'
 import DataTable from 'react-data-table-component'
 import { useHistory } from 'react-router-dom'
-import styled from 'styled-components'
 import { Conditions, Conditions_conditions } from 'types/generatedGQL'
+
+import { InfoCard } from '../../components/common/InfoCard'
+import { InlineLoading } from '../../components/loading/InlineLoading'
+import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
 
 const columns = [
   {
@@ -41,12 +44,6 @@ const columns = [
   },
 ]
 
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-`
-
 const customStyles = {
   rows: {
     style: {
@@ -64,9 +61,10 @@ export const ConditionsList = () => {
   }
 
   return (
-    <Wrapper>
-      {loading && <div>Loading...</div>}
-      {error && <div>Error...</div>}
+    <>
+      <PageTitle>Conditions</PageTitle>
+      {loading && <InlineLoading />}
+      {error && <InfoCard title="Error" />}
       {data && (
         <DataTable
           columns={columns}
@@ -76,10 +74,10 @@ export const ConditionsList = () => {
           onRowClicked={handleRowClick}
           pagination={true}
           style={{
-            width: '80%',
+            width: '100%',
           }}
         />
       )}
-    </Wrapper>
+    </>
   )
 }

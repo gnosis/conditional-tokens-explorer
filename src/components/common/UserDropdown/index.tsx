@@ -80,7 +80,7 @@ const NetworkText = styled.div`
   font-size: 9px;
   font-weight: 600;
   line-height: 1.2;
-  margin-bottom: -4px;
+  margin-bottom: -2px;
 `
 
 const Content = styled.div`
