@@ -28,13 +28,14 @@ const LogoLink = styled(Link)`
 export const Header: React.FC = (props) => {
   const { status } = useWeb3Context()
   const isConnecting = status._type === 'connecting' // this doesn't seem to work
+  const isDisconnected = status._type === 'notAsked' || status._type === 'infura'
 
   return (
     <Wrapper {...props}>
       <LogoLink to="/">
         <Logo />
       </LogoLink>
-      {status._type === 'notAsked' && <ButtonConnect disabled={isConnecting} />}
+      {isDisconnected && <ButtonConnect disabled={isConnecting} />}
       {status._type === 'connected' && <UserDropdown />}
     </Wrapper>
   )
