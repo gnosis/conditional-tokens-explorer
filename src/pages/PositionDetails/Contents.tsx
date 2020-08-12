@@ -7,16 +7,17 @@ import { Button } from '../../components/buttons/Button'
 import { ButtonCopy } from '../../components/buttons/ButtonCopy'
 import { ButtonDropdownCircle } from '../../components/buttons/ButtonDropdownCircle'
 import { CenteredCard } from '../../components/common/CenteredCard'
-import { Dropdown, DropdownItemProps, DropdownPosition } from '../../components/common/Dropdown'
+import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
 import { SetAllowance } from '../../components/common/SetAllowance'
 import { StripedList, StripedListItem } from '../../components/common/StripedList'
 import { TokenIcon } from '../../components/common/TokenIcon'
 import { Partition } from '../../components/partitions/Partition'
-import { GridTwoColumns } from '../../components/pureStyledComponents/GridTwoColumns'
+import { Row } from '../../components/pureStyledComponents/Row'
 import { TitleValue } from '../../components/text/TitleValue'
 import { getTokenFromAddress } from '../../config/networkConfig'
 import { useWeb3Connected } from '../../contexts/Web3Context'
 import { GetPosition_position as Position } from '../../types/generatedGQL'
+import { getLogger } from '../../util/logger'
 
 const CollateralText = styled.span`
   color: ${(props) => props.theme.colors.darkerGray};
@@ -49,6 +50,8 @@ const PartitionStyled = styled(Partition)`
   margin-top: 6px;
 `
 
+const logger = getLogger('ConditionDetails')
+
 interface Props {
   position: Position
 }
@@ -63,18 +66,18 @@ export const Contents = ({ position }: Props) => {
       .map((value, index) => (value === '1' ? index + 1 : 0))
       .filter((n) => !!n)
   })
-  const dropdownItems: Array<DropdownItemProps> = [
+  const dropdownItems = [
     {
-      content: 'Redeem',
       onClick: () => {
-        console.log('clickity')
+        logger.log('Redeem')
       },
+      text: 'Redeem',
     },
     {
-      content: 'Split',
       onClick: () => {
-        console.log('clickity')
+        logger.log('Split')
       },
+      text: 'Split',
     },
   ]
   const { networkConfig } = useWeb3Connected()
@@ -86,14 +89,17 @@ export const Contents = ({ position }: Props) => {
     <CenteredCard
       dropdown={
         <Dropdown
-          activeItemHightlight={false}
           dropdownButtonContent={<ButtonDropdownCircle />}
           dropdownPosition={DropdownPosition.right}
-          items={dropdownItems}
+          items={dropdownItems.map((item, index) => (
+            <DropdownItem key={index} onClick={item.onClick}>
+              {item.text}
+            </DropdownItem>
+          ))}
         />
       }
     >
-      <GridTwoColumns marginBottomXL>
+      <Row marginBottomXL>
         <TitleValue
           title="Position Id"
           value={
@@ -113,7 +119,7 @@ export const Contents = ({ position }: Props) => {
             </>
           }
         />
-      </GridTwoColumns>
+      </Row>
       <SetAllowance
         collateral={collateralToken}
         finished={false}
@@ -122,7 +128,7 @@ export const Contents = ({ position }: Props) => {
           return 1
         }}
       />
-      <GridTwoColumns forceOneColumn marginBottomXL>
+      <Row cols="1fr" marginBottomXL>
         <TitleValue
           title="Collateral Wrapping"
           value={
@@ -150,10 +156,10 @@ export const Contents = ({ position }: Props) => {
             </StripedListStyled>
           }
         />
-      </GridTwoColumns>
-      <GridTwoColumns forceOneColumn marginBottomXL>
+      </Row>
+      <Row cols="1fr" marginBottomXL>
         <TitleValue title="Partition" value={<PartitionStyled collections={numberedOutcomes} />} />
-      </GridTwoColumns>
+      </Row>
     </CenteredCard>
   )
 }

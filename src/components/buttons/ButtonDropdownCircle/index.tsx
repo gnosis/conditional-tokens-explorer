@@ -1,7 +1,6 @@
 import React, { ButtonHTMLAttributes } from 'react'
 import styled from 'styled-components'
 
-import { CommonDisabledCSS } from '../../pureStyledComponents/common'
 import { ButtonProps } from '../buttonStylingTypes'
 
 import { ChevronDown } from './img/ChevronDown'
@@ -39,7 +38,11 @@ const Wrapper = styled.button`
     border-color: ${(props) => props.theme.colors.primary};
   }
 
-  ${CommonDisabledCSS}
+  &[disabled],
+  &[disabled]:hover {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
 `
 
 export const ButtonDropdownCircle: React.FC<ButtonHTMLAttributes<HTMLButtonElement>> = (

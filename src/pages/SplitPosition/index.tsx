@@ -3,16 +3,17 @@ import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useEffect, useState } from 'react'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 
+import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
 import { useWeb3Connected } from '../../contexts/Web3Context'
 import { useAllowance } from '../../hooks/useAllowance'
 import { getLogger } from '../../util/logger'
 import { Remote } from '../../util/remoteData'
 
-import { SplitCondition } from './index'
+import { Form } from './Form'
 
-const logger = getLogger('SplitCondition')
+const logger = getLogger('Form')
 
-export const SplitConditionContainer = () => {
+export const SplitPosition = () => {
   const { CTService, networkConfig } = useWeb3Connected()
   const tokens = networkConfig.getTokens()
   const [collateralToken, setCollateralToken] = useState(tokens[0].address)
@@ -90,13 +91,16 @@ export const SplitConditionContainer = () => {
   )
 
   return (
-    <SplitCondition
-      allowance={allowance}
-      hasUnlockedCollateral={hasUnlockedCollateral}
-      onCollateralChange={setCollateralToken}
-      splitPosition={splitPosition}
-      tokens={tokens}
-      unlockCollateral={unlockCollateral}
-    />
+    <>
+      <PageTitle>Split Position</PageTitle>
+      <Form
+        allowance={allowance}
+        hasUnlockedCollateral={hasUnlockedCollateral}
+        onCollateralChange={setCollateralToken}
+        splitPosition={splitPosition}
+        tokens={tokens}
+        unlockCollateral={unlockCollateral}
+      />
+    </>
   )
 }

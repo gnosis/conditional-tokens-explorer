@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 import { Button } from '../../buttons/Button'
 import { ButtonType } from '../../buttons/buttonStylingTypes'
+import { InlineLoading } from '../../loading/InlineLoading'
 
 const Wrapper = styled.div`
   align-items: center;
@@ -23,33 +24,43 @@ const Description = styled.p`
 const UnlockButton = styled(Button)`
   font-size: 18px;
   height: 32px;
+  min-width: 125px;
+  padding-left: 15px;
+  padding-right: 15px;
 `
 
 interface Props {
   collateral: any
+  fetching?: boolean
   finished: boolean
   loading: boolean
   onUnlock: () => void
 }
 
 export const SetAllowance = (props: Props) => {
-  const { collateral, finished, loading, onUnlock } = props
+  const { collateral, fetching, finished, loading, onUnlock } = props
   const btnText = loading ? 'Working...' : finished ? 'Done!' : 'Unlock'
 
   return (
     <Wrapper>
-      <Description>
-        You need to unlock <strong>{collateral.symbol}</strong> to allow the smart contract to
-        interact with it. This has to be done for each new token.
-      </Description>
-      <UnlockButton
-        buttonType={ButtonType.primaryInverted}
-        data-testid="unlock-btn"
-        disabled={loading || finished}
-        onClick={onUnlock}
-      >
-        {btnText}
-      </UnlockButton>
+      {fetching ? (
+        <InlineLoading height="30px" width="30px" />
+      ) : (
+        <>
+          <Description>
+            You need to unlock <strong>{collateral.symbol}</strong> to allow the smart contract to
+            interact with it. This has to be done for each new token.
+          </Description>
+          <UnlockButton
+            buttonType={ButtonType.primaryInverted}
+            data-testid="unlock-btn"
+            disabled={loading || finished}
+            onClick={onUnlock}
+          >
+            {btnText}
+          </UnlockButton>
+        </>
+      )}
     </Wrapper>
   )
 }

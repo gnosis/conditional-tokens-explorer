@@ -1,7 +1,7 @@
 import { Remote } from 'util/remoteData'
 
 import { MockedProvider } from '@apollo/react-testing'
-import { findByTestId, render } from '@testing-library/react'
+import { render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ZERO_BN } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
@@ -12,7 +12,7 @@ import { act } from 'react-dom/test-utils'
 import { ThemeProvider } from 'styled-components'
 import theme from 'theme'
 
-import { SplitCondition } from './SplitCondition'
+import { Form } from './Form'
 
 const unlockCollateral = jest.fn()
 const onCollateralChange = jest.fn()
@@ -24,6 +24,8 @@ const tokens = networkConfig.getTokens()
 const CTService = jest.mock('services/conditionalTokens') as any
 
 const connect = jest.fn()
+const disconnect = jest.fn()
+
 const connectedStatus = {
   _type: 'connected',
   address: '0x123',
@@ -36,19 +38,19 @@ const connectedStatus = {
 } as Connected
 
 const renderWithConnectedProvider = (component: ReactElement) => (
-  <ThemeProvider theme={theme}>
-    <Web3Context.Provider value={{ status: connectedStatus, connect }}>
+  <Web3Context.Provider value={{ status: connectedStatus, connect, disconnect }}>
+    <ThemeProvider theme={theme}>
       <MockedProvider>{component}</MockedProvider>
-    </Web3Context.Provider>
-  </ThemeProvider>
+    </ThemeProvider>
+  </Web3Context.Provider>
 )
 
 test('show unlock button with zero allowance', async () => {
   const allowance = Remote.success<BigNumber>(ZERO_BN)
 
-  const { findByTestId, findByText } = render(
+  const { findByTestId } = render(
     renderWithConnectedProvider(
-      <SplitCondition
+      <Form
         allowance={allowance}
         hasUnlockedCollateral={hasUnlockedCollateral}
         onCollateralChange={onCollateralChange}
@@ -65,9 +67,9 @@ test('show unlock button with zero allowance', async () => {
 test('toggle unlock button visiblity according to allowance and amount', async () => {
   const allowance = Remote.success<BigNumber>(new BigNumber(10))
 
-  const { findByPlaceholderText, findByTestId, findByText, queryByText } = render(
+  const { findByPlaceholderText, findByTestId } = render(
     renderWithConnectedProvider(
-      <SplitCondition
+      <Form
         allowance={allowance}
         hasUnlockedCollateral={hasUnlockedCollateral}
         onCollateralChange={onCollateralChange}
@@ -78,8 +80,8 @@ test('toggle unlock button visiblity according to allowance and amount', async (
     )
   )
 
-  const unlockBefore = queryByText(/unlock/i)
-  expect(unlockBefore).toBeNull()
+  const unlockBefore = findByTestId('unlockButton')
+  expect(unlockBefore).toMatchObject({})
 
   const amountInput = await findByPlaceholderText('0.00')
   await act(async () => {
@@ -96,7 +98,7 @@ test('show unlock button after failure', async () => {
 
   const { findByTestId, rerender } = render(
     renderWithConnectedProvider(
-      <SplitCondition
+      <Form
         allowance={allowance}
         hasUnlockedCollateral={hasUnlockedCollateral}
         onCollateralChange={onCollateralChange}
@@ -114,7 +116,7 @@ test('show unlock button after failure', async () => {
 
   rerender(
     renderWithConnectedProvider(
-      <SplitCondition
+      <Form
         allowance={allowanceFailure}
         hasUnlockedCollateral={true}
         onCollateralChange={onCollateralChange}

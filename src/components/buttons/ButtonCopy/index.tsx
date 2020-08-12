@@ -2,8 +2,6 @@ import React from 'react'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import styled from 'styled-components'
 
-import { CommonDisabledCSS } from '../../pureStyledComponents/common'
-
 import { CopyIcon } from './img/CopyIcon'
 
 const Wrapper = styled.button`
@@ -28,7 +26,11 @@ const Wrapper = styled.button`
     }
   }
 
-  ${CommonDisabledCSS}
+  &[disabled],
+  &[disabled]:hover {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
 `
 
 interface ButtonCopyProps {

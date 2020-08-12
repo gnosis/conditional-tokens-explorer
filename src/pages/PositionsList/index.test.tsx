@@ -12,6 +12,7 @@ import theme from 'theme'
 import { PositionsList } from './index'
 
 const connect = jest.fn()
+const disconnect = jest.fn()
 
 const connectedStatus = {
   _type: 'connected',
@@ -25,22 +26,22 @@ const notAskedStatus = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const renderWithConnectedProvider = (component: any, query: any) => {
   return render(
-    <ThemeProvider theme={theme}>
-      <Web3Context.Provider value={{ status: connectedStatus, connect }}>
+    <Web3Context.Provider value={{ status: connectedStatus, connect, disconnect }}>
+      <ThemeProvider theme={theme}>
         <MockedProvider mocks={query}>{component}</MockedProvider>
-      </Web3Context.Provider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </Web3Context.Provider>
   )
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const renderWithDisconnectedProvider = (component: any, query: any) => {
   return render(
-    <ThemeProvider theme={theme}>
-      <Web3Context.Provider value={{ status: notAskedStatus, connect }}>
+    <Web3Context.Provider value={{ status: notAskedStatus, connect, disconnect }}>
+      <ThemeProvider theme={theme}>
         <MockedProvider mocks={query}>{component}</MockedProvider>
-      </Web3Context.Provider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </Web3Context.Provider>
   )
 }
 

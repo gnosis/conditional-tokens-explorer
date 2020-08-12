@@ -8,16 +8,18 @@ import React, { useEffect, useState } from 'react'
 import { Controller, FormContextValues } from 'react-hook-form'
 import { ERC20Service } from 'services/erc20'
 
-import { Token } from '../../util/types'
-
-import { SplitFrom, SplitPositionForm } from './SplitCondition'
+import { SplitFrom, SplitPositionFormMethods } from '../../../pages/SplitPosition/Form'
+import { Token } from '../../../util/types'
+import { TitleControlButton } from '../../pureStyledComponents/TitleControl'
+import { TitleValue } from '../../text/TitleValue'
 
 interface Props {
   collateral: Token
+  formMethods: FormContextValues<SplitPositionFormMethods>
   positionId: string
-  formMethods: FormContextValues<SplitPositionForm>
   splitFrom: SplitFrom
 }
+
 export const InputAmount = ({
   collateral,
   formMethods: { control, setValue },
@@ -25,9 +27,7 @@ export const InputAmount = ({
   splitFrom,
 }: Props) => {
   const [balance, setBalance] = useState<Maybe<BigNumber>>(null)
-
   const { CTService, address, provider, signer } = useWeb3Connected()
-
   const regexpPosition: RegExp = BYTES_REGEX
 
   useEffect(() => {
@@ -59,22 +59,30 @@ export const InputAmount = ({
   }, [positionId, collateral, splitFrom, CTService, provider, signer, address, regexpPosition])
 
   return (
-    <div>
-      <label htmlFor="amount">Amount</label>
-
-      <Controller
-        as={BigNumberInputWrapper}
-        control={control}
-        decimals={collateral.decimals}
-        name="amount"
-        rules={{ required: true, validate: (amount) => amount.gt(ZERO_BN) }}
-      />
-      {balance && (
-        <button onClick={() => setValue('amount', balance)}>{`Use wallet balance ${formatBigNumber(
-          balance,
-          collateral.decimals
-        )}`}</button>
-      )}
-    </div>
+    <TitleValue
+      title="Amount"
+      titleControl={
+        balance && (
+          <TitleControlButton
+            disabled={balance.isZero()}
+            onClick={() => setValue('amount', balance)}
+          >
+            Use Wallet Balance (${formatBigNumber(balance, collateral.decimals)})
+          </TitleControlButton>
+        )
+      }
+      value={
+        <Controller
+          as={BigNumberInputWrapper}
+          control={control}
+          decimals={collateral.decimals}
+          disabled={(balance && balance.isZero()) || false}
+          name="amount"
+          placeholder={balance && balance.isZero() ? 'Please add funds to your wallet...' : '0.00'}
+          rules={{ required: true, validate: (amount) => amount.gt(ZERO_BN) }}
+          tokenSymbol={collateral.symbol}
+        />
+      }
+    />
   )
 }
