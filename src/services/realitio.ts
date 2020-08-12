@@ -23,13 +23,17 @@ export class RealitioService {
   constructor(
     private networkConfig: NetworkConfig,
     private providerContext: ethers.providers.Provider,
-    private signer: ethers.Signer
+    private signer?: ethers.Signer
   ) {
     const contractAddress = networkConfig.getRealitioAddress()
 
-    this.contract = new ethers.Contract(contractAddress, realitioAbi, providerContext).connect(
-      signer
-    )
+    if (signer) {
+      this.contract = new ethers.Contract(contractAddress, realitioAbi, providerContext).connect(
+        signer
+      )
+    } else {
+      this.contract = new ethers.Contract(contractAddress, realitioAbi, providerContext)
+    }
     this.provider = providerContext
   }
 

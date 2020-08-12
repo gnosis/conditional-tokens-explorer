@@ -16,7 +16,7 @@ import { useIsConditionFromOmen } from '../../hooks/useIsConditionFromOmen'
 import { useQuestion } from '../../hooks/useQuestion'
 import { GetCondition_condition } from '../../types/generatedGQL'
 import { getLogger } from '../../util/logger'
-import { formatDate, getConditionTypeTitle, truncateStringInTheMiddle } from '../../util/tools'
+import { formatTS, getConditionTypeTitle, truncateStringInTheMiddle } from '../../util/tools'
 import { ConditionStatus, ConditionType } from '../../util/types'
 
 const StripedListStyled = styled(StripedList)`
@@ -31,7 +31,15 @@ interface Props {
 
 export const Contents: React.FC<Props> = ({ condition }) => {
   const { status } = useWeb3Context()
-  const { creator, id: conditionId, oracle, outcomeSlotCount, questionId, resolved } = condition
+  const {
+    creator,
+    id: conditionId,
+    oracle,
+    outcomeSlotCount,
+    questionId,
+    resolveTimestamp,
+    resolved,
+  } = condition
   const dropdownItems = [
     {
       onClick: () => {
@@ -60,7 +68,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
   ]
 
   let networkId = null
-  if (status._type === 'connected') {
+  if (status._type === 'connected' || status._type === 'infura') {
     const { networkConfig } = status
     networkId = networkConfig.networkId
   }
@@ -69,10 +77,14 @@ export const Contents: React.FC<Props> = ({ condition }) => {
   const { isConditionFromOmen } = useIsConditionFromOmen(creator, oracle, question)
   const {
     templateId = null,
-    resolution = null,
     title = INFORMATION_NOT_AVAILABLE,
     category = INFORMATION_NOT_AVAILABLE,
   } = question ?? {}
+
+  const oracleTitle =
+    isConditionFromOmen && networkId
+      ? getKnowOracleFromAddress(networkId, oracle)
+      : truncateStringInTheMiddle(oracle, 8, 6)
 
   return (
     <CenteredCard
@@ -91,7 +103,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
       <Row marginBottomXL>
         <TitleValue
           title="Condition Type"
-          value={isConditionFromOmen ? ConditionType.Omen : ConditionType.Unknown}
+          value={isConditionFromOmen ? ConditionType.Omen : ConditionType.Custom}
         />
         <TitleValue
           title="Condition Id"
@@ -110,34 +122,55 @@ export const Contents: React.FC<Props> = ({ condition }) => {
             </Pill>
           }
         />
-        <TitleValue title="Question Type" value={getConditionTypeTitle(templateId)} />
+        {isConditionFromOmen && (
+          <>
+            <TitleValue title="Question Type" value={getConditionTypeTitle(templateId)} />
+            <TitleValue
+              title="Question Id"
+              value={
+                <>
+                  {truncateStringInTheMiddle(questionId, 8, 6)}
+                  <ButtonCopy value={questionId} />
+                </>
+              }
+            />
+          </>
+        )}
       </Row>
-      <Row cols="1fr" marginBottomXL>
-        <TitleValue title="Question" value={title} />
-      </Row>
-      <Row cols="1fr" marginBottomXL>
-        <TitleValue
-          title="Outcomes"
-          value={
-            <StripedListStyled>
-              {outcomesPrettier.map((outcome: string, index: number) => (
-                <StripedListItem key={index}>{outcome}</StripedListItem>
-              ))}
-            </StripedListStyled>
-          }
-        />
-      </Row>
+      {isConditionFromOmen && (
+        <>
+          <Row cols="1fr" marginBottomXL>
+            <TitleValue title="Question" value={title} />
+          </Row>
+          <Row cols="1fr" marginBottomXL>
+            <TitleValue
+              title="Outcomes"
+              value={
+                <StripedListStyled>
+                  {outcomesPrettier.map((outcome: string, index: number) => (
+                    <StripedListItem key={index}>{outcome}</StripedListItem>
+                  ))}
+                </StripedListStyled>
+              }
+            />
+          </Row>
+        </>
+      )}
       <Row>
-        <TitleValue
-          title="Resolution Date"
-          value={(resolution && formatDate(resolution)) || INFORMATION_NOT_AVAILABLE}
-        />
-        <TitleValue title="Category" value={category} />
+        {resolved && (
+          <TitleValue
+            title="Resolution Date"
+            value={formatTS(resolveTimestamp) || INFORMATION_NOT_AVAILABLE}
+          />
+        )}
+        {isConditionFromOmen && <TitleValue title="Category" value={category} />}
         <TitleValue
           title="Oracle"
           value={
-            (networkId && getKnowOracleFromAddress(networkId, oracle)) ||
-            truncateStringInTheMiddle(oracle, 6, 6)
+            <>
+              {oracleTitle}
+              <ButtonCopy value={oracle} />
+            </>
           }
         />
       </Row>

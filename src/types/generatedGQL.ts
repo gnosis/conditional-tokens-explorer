@@ -49,6 +49,8 @@ export interface GetCondition_condition {
   outcomeSlotCount: number;
   resolved: boolean;
   creator: any;
+  payouts: any[] | null;
+  resolveTimestamp: any | null;
   positions: GetCondition_condition_positions[] | null;
 }
 
