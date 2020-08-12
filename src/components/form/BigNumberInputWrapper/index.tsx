@@ -4,18 +4,21 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { ZERO_BN } from '../../../config/constants'
-import { TextfieldCSS } from '../../pureStyledComponents/Textfield'
+import { Textfield } from '../../pureStyledComponents/Textfield'
 
 const Wrapper = styled.span<{ hasTokenSymbol?: boolean }>`
   position: relative;
   width: 100%;
 
   > input {
-    ${TextfieldCSS}
     position: relative;
     z-index: 1;
 
     ${(props) => props.hasTokenSymbol && 'padding-right: 60px;'}
+
+    &::placeholder {
+      color: #000;
+    }
   }
 `
 
@@ -32,6 +35,7 @@ const TokenSymbol = styled.span`
 `
 
 interface Props {
+  disabled?: boolean | undefined
   decimals?: number | undefined
   onChange?: (n: BigNumber) => void
   tokenSymbol?: string
@@ -39,7 +43,7 @@ interface Props {
 }
 
 export const BigNumberInputWrapper: React.FC<Props> = (props) => {
-  const { decimals = 0, onChange, tokenSymbol, value } = props
+  const { decimals = 0, disabled, onChange, tokenSymbol, value } = props
 
   const handleChange = (newValue: string) => {
     if (onChange) {
@@ -56,6 +60,10 @@ export const BigNumberInputWrapper: React.FC<Props> = (props) => {
       <BigNumberInput
         decimals={decimals}
         onChange={handleChange}
+        placeholder={disabled ? 'Please add funds to your wallet...' : '0.00'}
+        renderInput={(props: unknown) => {
+          return <Textfield disabled={disabled} {...props} />
+        }}
         value={value ? value.toString() : ''}
       />
       {tokenSymbol && <TokenSymbol>{tokenSymbol}</TokenSymbol>}

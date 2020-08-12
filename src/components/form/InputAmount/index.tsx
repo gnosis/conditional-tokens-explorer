@@ -76,6 +76,7 @@ export const InputAmount = ({
           as={BigNumberInputWrapper}
           control={control}
           decimals={collateral.decimals}
+          disabled={(balance && balance.isZero()) || false}
           name="amount"
           rules={{ required: true, validate: (amount) => amount.gt(ZERO_BN) }}
           tokenSymbol={collateral.symbol}

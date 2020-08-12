@@ -29,6 +29,8 @@ export const TextfieldCSS = css<{ error?: boolean }>`
 
   &[disabled],
   &[disabled]:hover {
+    background-color: ${(props) => props.theme.textField.backgroundColorActive};
+    border-color: ${(props) => props.theme.textField.borderColor};
     cursor: not-allowed;
     opacity: 0.5;
   }
