@@ -189,12 +189,15 @@ const UserDropdownContent: React.FC<UserDropdownProps> = ({ data }) => {
           </Item>
         )
       })}
-      <Item
-        onClick={() => {
-          data.disconnect()
-        }}
-      >
-        <DisconnectButton buttonType={ButtonType.danger}>Disconnect</DisconnectButton>
+      <Item>
+        <DisconnectButton
+          buttonType={ButtonType.danger}
+          onClick={() => {
+            data.disconnect()
+          }}
+        >
+          Disconnect
+        </DisconnectButton>
       </Item>
     </Content>
   )
