@@ -6,6 +6,8 @@ import { PositionsListQuery } from 'queries/positions'
 import { UserWithPositionsQuery } from 'queries/users'
 import React from 'react'
 import { act } from 'react-dom/test-utils'
+import { ThemeProvider } from 'styled-components'
+import theme from 'theme'
 
 import { PositionsList } from './index'
 
@@ -23,18 +25,22 @@ const notAskedStatus = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const renderWithConnectedProvider = (component: any, query: any) => {
   return render(
-    <Web3Context.Provider value={{ status: connectedStatus, connect }}>
-      <MockedProvider mocks={query}>{component}</MockedProvider>
-    </Web3Context.Provider>
+    <ThemeProvider theme={theme}>
+      <Web3Context.Provider value={{ status: connectedStatus, connect }}>
+        <MockedProvider mocks={query}>{component}</MockedProvider>
+      </Web3Context.Provider>
+    </ThemeProvider>
   )
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const renderWithDisconnectedProvider = (component: any, query: any) => {
   return render(
-    <Web3Context.Provider value={{ status: notAskedStatus, connect }}>
-      <MockedProvider mocks={query}>{component}</MockedProvider>
-    </Web3Context.Provider>
+    <ThemeProvider theme={theme}>
+      <Web3Context.Provider value={{ status: notAskedStatus, connect }}>
+        <MockedProvider mocks={query}>{component}</MockedProvider>
+      </Web3Context.Provider>
+    </ThemeProvider>
   )
 }
 
