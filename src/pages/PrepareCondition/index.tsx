@@ -2,6 +2,16 @@ import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useHistory } from 'react-router-dom'
 
+import { Button } from '../../components/buttons/Button'
+import { CenteredCard } from '../../components/common/CenteredCard'
+import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
+import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
+import { ErrorContainer, Error as ErrorMessage } from '../../components/pureStyledComponents/Error'
+import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
+import { Row } from '../../components/pureStyledComponents/Row'
+import { Textfield } from '../../components/pureStyledComponents/Textfield'
+import { TitleControl } from '../../components/pureStyledComponents/TitleControl'
+import { TitleValue } from '../../components/text/TitleValue'
 import { ADDRESS_REGEX, BYTES_REGEX } from '../../config/constants'
 import { useWeb3Connected } from '../../contexts/Web3Context'
 import { ConditionalTokensService } from '../../services/conditionalTokens'
@@ -64,65 +74,116 @@ export const PrepareCondition = () => {
   const submitDisabled = !isValid || isLoading
   return (
     <>
-      <p>{numOutcomes}</p>
-      <h3>Outcomes number</h3>
-      <input
-        name="outcomesSlotCount"
-        onChange={(e) => setNumOutcomes(Number(e.target.value))}
-        ref={register({ required: true, min: MIN_OUTCOMES, max: MAX_OUTCOMES })}
-        type="number"
-      ></input>
-      {errors.outcomesSlotCount && (
-        <div>
-          {errors.outcomesSlotCount.type === 'max' && maxOutcomesError}
-          {errors.outcomesSlotCount.type === 'min' && minOutcomesError}
-          {errors.outcomesSlotCount.type === 'required' && 'Required field'}
-        </div>
-      )}
+      <PageTitle>Prepare Condition</PageTitle>
+      <CenteredCard>
+        <Row cols="1fr">
+          <TitleValue title="Condition Type" value="Condition Type" />
+        </Row>
+        <Row cols="1fr">
+          <TitleValue
+            title="Question Id"
+            value={
+              <>
+                <Textfield
+                  error={errors.questionId && true}
+                  name="questionId"
+                  onChange={(e) => setQuestionId(e.target.value)}
+                  placeholder="Type in a question Id..."
+                  ref={register({ required: true, pattern: BYTES_REGEX })}
+                  type="text"
+                />
+                {errors.questionId && (
+                  <ErrorContainer>
+                    {errors.questionId.type === 'pattern' && (
+                      <ErrorMessage>Invalid bytes32 string</ErrorMessage>
+                    )}
+                  </ErrorContainer>
+                )}
+              </>
+            }
+          />
+        </Row>
+        <Row cols="1fr">
+          <TitleValue
+            title="Outcomes"
+            value={
+              <>
+                <Textfield
+                  error={errors.outcomesSlotCount && true}
+                  name="outcomesSlotCount"
+                  onChange={(e) => setNumOutcomes(Number(e.target.value))}
+                  placeholder="You can add between 2 and 256 outcomes..."
+                  ref={register({ required: true, min: MIN_OUTCOMES, max: MAX_OUTCOMES })}
+                  type="number"
+                />
+                {errors.outcomesSlotCount && (
+                  <ErrorContainer>
+                    {errors.outcomesSlotCount.type === 'max' && (
+                      <ErrorMessage>{maxOutcomesError}</ErrorMessage>
+                    )}
+                    {errors.outcomesSlotCount.type === 'min' && (
+                      <ErrorMessage>{minOutcomesError}</ErrorMessage>
+                    )}
+                    {errors.outcomesSlotCount.type === 'required' && (
+                      <ErrorMessage>Required field</ErrorMessage>
+                    )}
+                  </ErrorContainer>
+                )}
+              </>
+            }
+          />
+        </Row>
+        <Row cols="1fr">
+          <TitleValue
+            title="Reporting Address"
+            titleControl={
+              <TitleControl
+                onClick={() => {
+                  setValue('oracle', address, true)
+                  setOracleAddress(address)
+                }}
+              >
+                Use MyWallet
+              </TitleControl>
+            }
+            value={
+              <>
+                <Textfield
+                  error={errors.oracle && true}
+                  name="oracle"
+                  onChange={(e) => setOracleAddress(e.target.value)}
+                  placeholder="Type in a valid reporting address..."
+                  ref={register({
+                    required: true,
+                    pattern: ADDRESS_REGEX,
+                    validate: (value: string) => isAddress(value),
+                  })}
+                  type="text"
+                />
+                {errors.oracle && (
+                  <ErrorContainer>
+                    {errors.oracle.type === 'pattern' && (
+                      <ErrorMessage>Invalid address</ErrorMessage>
+                    )}
+                    {errors.oracle.type === 'validate' && (
+                      <ErrorMessage>Address checksum failed</ErrorMessage>
+                    )}
+                  </ErrorContainer>
+                )}
+              </>
+            }
+          />
+        </Row>
 
-      <p>{oracleAddress}</p>
-      <h3>Oracle Address</h3>
-      <input
-        name="oracle"
-        onChange={(e) => setOracleAddress(e.target.value)}
-        ref={register({
-          required: true,
-          pattern: ADDRESS_REGEX,
-          validate: (value: string) => isAddress(value),
-        })}
-        type="text"
-      ></input>
-      {errors.oracle && (
-        <div>
-          {errors.oracle.type === 'pattern' && 'Invalid address'}
-          {errors.oracle.type === 'validate' && 'Address checksum failed'}
-        </div>
-      )}
-      <button
-        onClick={() => {
-          setValue('oracle', address, true)
-          setOracleAddress(address)
-        }}
-      >
-        Use MyWallet
-      </button>
-
-      <p>{questionId}</p>
-      <h3>Question Id</h3>
-      <input
-        name="questionId"
-        onChange={(e) => setQuestionId(e.target.value)}
-        ref={register({ required: true, pattern: BYTES_REGEX })}
-        type="text"
-      ></input>
-      {errors.questionId && (
-        <div>{errors.questionId.type === 'pattern' && 'Invalid bytes32 string'}</div>
-      )}
-      {conditionId ? <h1>{conditionId}</h1> : null}
-      <button disabled={submitDisabled} onClick={prepareCondition}>
-        Prepare Condition
-      </button>
-      <p>{error && error.message}</p>
+        <ButtonContainer>
+          <Button disabled={submitDisabled} onClick={prepareCondition}>
+            Prepare
+          </Button>
+          <ErrorContainer>
+            <ErrorMessage>{error && error.message}</ErrorMessage>
+          </ErrorContainer>
+        </ButtonContainer>
+      </CenteredCard>
     </>
   )
 }
