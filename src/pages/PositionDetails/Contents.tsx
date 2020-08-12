@@ -7,7 +7,7 @@ import { Button } from '../../components/buttons/Button'
 import { ButtonCopy } from '../../components/buttons/ButtonCopy'
 import { ButtonDropdownCircle } from '../../components/buttons/ButtonDropdownCircle'
 import { CenteredCard } from '../../components/common/CenteredCard'
-import { Dropdown, DropdownItemProps, DropdownPosition } from '../../components/common/Dropdown'
+import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
 import { SetAllowance } from '../../components/common/SetAllowance'
 import { StripedList, StripedListItem } from '../../components/common/StripedList'
 import { TokenIcon } from '../../components/common/TokenIcon'
@@ -17,6 +17,7 @@ import { TitleValue } from '../../components/text/TitleValue'
 import { getTokenFromAddress } from '../../config/networkConfig'
 import { useWeb3Connected } from '../../contexts/Web3Context'
 import { GetPosition_position as Position } from '../../types/generatedGQL'
+import { getLogger } from '../../util/logger'
 
 const CollateralText = styled.span`
   color: ${(props) => props.theme.colors.darkerGray};
@@ -49,6 +50,8 @@ const PartitionStyled = styled(Partition)`
   margin-top: 6px;
 `
 
+const logger = getLogger('ConditionDetails')
+
 interface Props {
   position: Position
 }
@@ -63,19 +66,23 @@ export const Contents = ({ position }: Props) => {
       .map((value, index) => (value === '1' ? index + 1 : 0))
       .filter((n) => !!n)
   })
-  const dropdownItems: Array<DropdownItemProps> = [
-    {
-      content: 'Redeem',
-      onClick: () => {
-        console.log('clickity')
-      },
-    },
-    {
-      content: 'Split',
-      onClick: () => {
-        console.log('clickity')
-      },
-    },
+  const dropdownItems = [
+    <DropdownItem
+      key="1"
+      onClick={() => {
+        logger.log('Redeem')
+      }}
+    >
+      Redeem
+    </DropdownItem>,
+    <DropdownItem
+      key="2"
+      onClick={() => {
+        logger.log('Split')
+      }}
+    >
+      Split
+    </DropdownItem>,
   ]
   const { networkConfig } = useWeb3Connected()
   const tokenSymbol = getTokenFromAddress(networkConfig.networkId, collateralToken.id).symbol
@@ -86,7 +93,6 @@ export const Contents = ({ position }: Props) => {
     <CenteredCard
       dropdown={
         <Dropdown
-          activeItemHightlight={false}
           dropdownButtonContent={<ButtonDropdownCircle />}
           dropdownPosition={DropdownPosition.right}
           items={dropdownItems}
@@ -118,7 +124,9 @@ export const Contents = ({ position }: Props) => {
         collateral={collateralToken}
         finished={false}
         loading={false}
-        onUnlock={() => {}}
+        onUnlock={() => {
+          /**/
+        }}
       />
       <Row cols="1fr" marginBottomXL>
         <TitleValue

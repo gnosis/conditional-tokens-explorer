@@ -6,7 +6,7 @@ import { truncateStringInTheMiddle } from '../../../util/tools'
 import { Button } from '../../buttons/Button'
 import { ButtonType } from '../../buttons/buttonStylingTypes'
 import { Pill } from '../../pureStyledComponents/Pill'
-import { Dropdown, DropdownItemProps, DropdownPosition } from '../Dropdown'
+import { Dropdown, DropdownItem, DropdownPosition } from '../Dropdown'
 
 import { ChevronDown } from './img/ChevronDown'
 
@@ -85,6 +85,13 @@ const NetworkText = styled.div`
 
 const Content = styled.div`
   width: 245px;
+`
+const DropdownItemStyled = styled(DropdownItem)`
+  cursor: default;
+
+  &:hover {
+    background-color: transparent;
+  }
 `
 
 const Item = styled.div`
@@ -190,16 +197,16 @@ const UserDropdownContent: React.FC<UserDropdownProps> = ({ data }) => {
 
 export const UserDropdown: React.FC = (props) => {
   const data = useWeb3Connected()
-  const headerDropdownItems: Array<DropdownItemProps> = [
-    {
-      content: <UserDropdownContent data={data} />,
-    },
+  const headerDropdownItems = [
+    <DropdownItemStyled key="1">
+      <UserDropdownContent data={data} />
+    </DropdownItemStyled>,
   ]
 
   return (
     <Wrapper
       {...props}
-      activeItemHightlight={false}
+      activeItemHighlight={false}
       dropdownButtonContent={<UserDropdownButton data={data} />}
       dropdownPosition={DropdownPosition.right}
       items={headerDropdownItems}

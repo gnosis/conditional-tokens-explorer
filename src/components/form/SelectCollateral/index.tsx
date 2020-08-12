@@ -4,7 +4,7 @@ import styled from 'styled-components'
 
 import { SplitPositionFormMethods } from '../../../pages/SplitPosition/Form'
 import { Token } from '../../../util/types'
-import { Dropdown, DropdownPosition } from '../../common/Dropdown'
+import { Dropdown, DropdownItem, DropdownPosition } from '../../common/Dropdown'
 import { TokenIcon } from '../../common/TokenIcon'
 
 import { ChevronDown } from './img/ChevronDown'
@@ -42,7 +42,7 @@ const Button = styled.div`
   }
 `
 
-const Item = styled.label`
+const Option = styled.label`
   align-items: center;
   cursor: pointer;
   display: flex;
@@ -87,9 +87,14 @@ export const SelectCollateral = ({
     </Button>
   )
   const dropdownItems = tokens.map(({ address, symbol }) => {
-    return {
-      content: (
-        <Item key={address}>
+    return (
+      <DropdownItem
+        key={address}
+        onClick={() => {
+          setCollateral(symbol)
+        }}
+      >
+        <Option>
           <Radio
             name="collateral"
             ref={register({ required: splitFromCollateral })}
@@ -97,12 +102,9 @@ export const SelectCollateral = ({
             value={address}
           />
           <TokenIconStyled symbol={symbol} />
-        </Item>
-      ),
-      onClick: () => {
-        setCollateral(symbol)
-      },
-    }
+        </Option>
+      </DropdownItem>
+    )
   })
 
   useEffect(() => {

@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { ButtonCopy } from '../../components/buttons/ButtonCopy'
 import { ButtonDropdownCircle } from '../../components/buttons/ButtonDropdownCircle'
 import { CenteredCard } from '../../components/common/CenteredCard'
-import { Dropdown, DropdownItemProps, DropdownPosition } from '../../components/common/Dropdown'
+import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
 import { StripedList, StripedListItem } from '../../components/common/StripedList'
 import { Pill, PillTypes } from '../../components/pureStyledComponents/Pill'
 import { Row } from '../../components/pureStyledComponents/Row'
@@ -32,31 +32,39 @@ interface Props {
 export const Contents: React.FC<Props> = ({ condition }) => {
   const { status } = useWeb3Context()
   const { creator, id: conditionId, oracle, outcomeSlotCount, questionId, resolved } = condition
-  const dropdownItems: Array<DropdownItemProps> = [
-    {
-      content: 'Resolve Condition',
-      onClick: () => {
-        logger.log('clickity')
-      },
-    },
-    {
-      content: 'Split Position',
-      onClick: () => {
-        logger.log('clickity')
-      },
-    },
-    {
-      content: 'Merge Positions',
-      onClick: () => {
-        logger.log('clickity')
-      },
-    },
-    {
-      content: 'Report Payouts',
-      onClick: () => {
-        logger.log('clickity')
-      },
-    },
+  const dropdownItems = [
+    <DropdownItem
+      key="1"
+      onClick={() => {
+        logger.log('Resolve Condition')
+      }}
+    >
+      Resolve Condition
+    </DropdownItem>,
+    <DropdownItem
+      key="2"
+      onClick={() => {
+        logger.log('Split Position')
+      }}
+    >
+      Split Position
+    </DropdownItem>,
+    <DropdownItem
+      key="3"
+      onClick={() => {
+        logger.log('Merge Positions')
+      }}
+    >
+      Merge Positions
+    </DropdownItem>,
+    <DropdownItem
+      key="4"
+      onClick={() => {
+        logger.log('Report Payouts')
+      }}
+    >
+      Report Payouts
+    </DropdownItem>,
   ]
 
   let networkId = null
@@ -78,7 +86,6 @@ export const Contents: React.FC<Props> = ({ condition }) => {
     <CenteredCard
       dropdown={
         <Dropdown
-          activeItemHightlight={false}
           dropdownButtonContent={<ButtonDropdownCircle />}
           dropdownPosition={DropdownPosition.right}
           items={dropdownItems}
