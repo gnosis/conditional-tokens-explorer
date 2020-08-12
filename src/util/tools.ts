@@ -5,12 +5,7 @@ import moment from 'moment-timezone'
 
 import { BYTES_REGEX } from '../config/constants'
 import { getTokenFromAddress } from '../config/networkConfig'
-import {
-  GetCondition_condition,
-  GetPosition_position,
-  GetPosition_position_collection_conditions,
-  GetPosition_position_conditions,
-} from '../types/generatedGQL'
+import { GetCondition_condition, GetPosition_position } from '../types/generatedGQL'
 
 import { ConditionErrors } from './types'
 

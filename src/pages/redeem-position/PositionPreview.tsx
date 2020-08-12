@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import { GetCondition_condition, GetPosition_position } from 'types/generatedGQL'
 
 import { useBalanceForPosition } from '../../hooks/useBalanceForPosition'
