@@ -36,7 +36,7 @@ export class ConditionalTokensService {
   ) {
     const contractAddress = networkConfig.getConditionalTokensAddress()
 
-    if(signer) {
+    if (signer) {
       this.contract = new ethers.Contract(contractAddress, conditionalTokensAbi, provider).connect(
         signer
       )
@@ -118,7 +118,7 @@ export class ConditionalTokensService {
   }
 
   async balanceOf(positionId: string): Promise<BigNumber> {
-    if(this.signer) {
+    if (this.signer) {
       const owner = await this.signer.getAddress()
       return await this.contract.balanceOf(owner, positionId)
     } else {

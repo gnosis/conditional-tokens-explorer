@@ -3,27 +3,43 @@ import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { ERC20Service } from 'services/erc20'
+import styled from 'styled-components'
 import { GetPosition_position } from 'types/generatedGQL'
 
+import { Button } from '../../components/buttons/Button'
+import { CenteredCard } from '../../components/common/CenteredCard'
 import { SetAllowance } from '../../components/common/SetAllowance'
+import { StripedList, StripedListItem } from '../../components/common/StripedList'
+import { InputAmount } from '../../components/form/InputAmount'
+import { InputCondition } from '../../components/form/InputCondition'
+import { Partition } from '../../components/partitions/Partition'
+import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
+import { Row } from '../../components/pureStyledComponents/Row'
+import { TitleControl } from '../../components/pureStyledComponents/TitleControl'
+import { TitleValue } from '../../components/text/TitleValue'
 import { NULL_PARENT_ID, ZERO_BN } from '../../config/constants'
 import { Remote } from '../../util/remoteData'
 import { trivialPartition } from '../../util/tools'
 import { Token } from '../../util/types'
 
-import { InputAmount } from './InputAmount'
-import { InputCondition } from './InputCondition'
-import { InputPosition } from './InputPosition'
-import { SelectCollateral } from './SelectCollateral'
+import { SplitFrom } from './SplitFrom'
+
+const StripedListStyled = styled(StripedList)`
+  margin-top: 6px;
+`
+
+const PartitionStyled = styled(Partition)`
+  margin-top: 6px;
+`
 
 export type SplitFrom = 'collateral' | 'position'
 
-export type SplitPositionForm = {
-  conditionId: string
-  collateral: string
+export type SplitPositionFormMethods = {
   amount: BigNumber
-  splitFrom: SplitFrom
+  collateral: string
+  conditionId: string
   positionId: string
+  splitFrom: SplitFrom
 }
 
 interface Props {
@@ -41,7 +57,7 @@ interface Props {
   tokens: Token[]
 }
 
-export const SplitCondition = ({
+export const Form = ({
   allowance,
   hasUnlockedCollateral,
   onCollateralChange,
@@ -59,7 +75,7 @@ export const SplitCondition = ({
     }
   }, [tokens])
 
-  const formMethods = useForm<SplitPositionForm>({
+  const formMethods = useForm<SplitPositionFormMethods>({
     mode: 'onChange',
     defaultValues: DEFAULT_VALUES,
   })
@@ -76,7 +92,7 @@ export const SplitCondition = ({
   const [collateralToken, setCollateralToken] = useState(tokens[0])
   const [position, setPosition] = useState<Maybe<GetPosition_position>>(null)
   const { provider, signer } = useWeb3Connected()
-  const { amount, collateral, positionId, splitFrom } = getValues() as SplitPositionForm
+  const { amount, collateral, positionId, splitFrom } = getValues() as SplitPositionFormMethods
 
   watch('collateral')
   watch('splitFrom')
@@ -85,7 +101,7 @@ export const SplitCondition = ({
   const splitFromPosition = splitFrom === 'position'
 
   const onSubmit = useCallback(
-    async ({ amount, collateral, conditionId }: SplitPositionForm) => {
+    async ({ amount, collateral, conditionId }: SplitPositionFormMethods) => {
       const partition = trivialPartition(outcomeSlot)
 
       if (splitFromCollateral) {
@@ -155,42 +171,72 @@ export const SplitCondition = ({
     allowance.isLoading()
 
   const canSubmit = isValid && (hasEnoughAllowance.getOr(false) || hasUnlockedCollateral)
+  const mockedNumberedOutcomes = [
+    [1, 4, 3],
+    [6, 5],
+    [9, 7, 10],
+    [2, 8],
+    [12, 13, 14, 15],
+  ]
 
   return (
-    <div>
-      <InputCondition
-        formMethods={formMethods}
-        onOutcomeSlotChange={(n) => setOutcomeSlot(n)}
-      ></InputCondition>
-      <SelectCollateral
-        formMethods={formMethods}
-        onCollateralChange={onCollateralChange}
-        splitFromCollateral={splitFromCollateral}
-        tokens={tokens}
-      ></SelectCollateral>
-      <InputPosition
-        formMethods={formMethods}
-        onPositionChange={(p) => setPosition(p)}
-        splitFromPosition={splitFromPosition}
-      ></InputPosition>
-      {showAskAllowance && (
-        <SetAllowance
-          collateral={collateralToken}
-          finished={hasUnlockedCollateral && hasEnoughAllowance.getOr(false)}
-          loading={allowance.isLoading()}
-          onUnlock={unlockCollateral}
+    <CenteredCard>
+      <Row cols="1fr">
+        <InputCondition formMethods={formMethods} onOutcomeSlotChange={(n) => setOutcomeSlot(n)} />
+      </Row>
+      <Row cols="1fr" marginBottomXL>
+        <TitleValue
+          title="Split From"
+          value={
+            <SplitFrom
+              formMethods={formMethods}
+              onCollateralChange={onCollateralChange}
+              onPositionChange={(p) => setPosition(p)}
+              splitFromCollateral={splitFromCollateral}
+              splitFromPosition={splitFromPosition}
+              tokens={tokens}
+            />
+          }
         />
-      )}
-
-      <InputAmount
+      </Row>
+      <SetAllowance
         collateral={collateralToken}
-        formMethods={formMethods}
-        positionId={positionId}
-        splitFrom={splitFrom}
-      ></InputAmount>
-      <button disabled={!canSubmit} onClick={handleSubmit(onSubmit)}>
-        Split
-      </button>
-    </div>
+        fetching={!showAskAllowance}
+        finished={hasUnlockedCollateral && hasEnoughAllowance.getOr(false)}
+        loading={allowance.isLoading()}
+        onUnlock={unlockCollateral}
+      />
+      <Row cols="1fr" marginBottomXL>
+        <InputAmount
+          collateral={collateralToken}
+          formMethods={formMethods}
+          positionId={positionId}
+          splitFrom={splitFrom}
+        />
+      </Row>
+      <Row cols="1fr" marginBottomXL>
+        <TitleValue
+          title="Partition"
+          titleControl={<TitleControl>Edit Partition</TitleControl>}
+          value={<PartitionStyled collections={mockedNumberedOutcomes} />}
+        />
+      </Row>
+      <Row cols="1fr" marginBottomXL>
+        <TitleValue
+          title="Split Position Preview"
+          value={
+            <StripedListStyled>
+              <StripedListItem>[DAI C: 0x123 O: 0] x 10</StripedListItem>
+              <StripedListItem>[DAI C: 0x123 O: 1] x 10</StripedListItem>
+            </StripedListStyled>
+          }
+        />
+      </Row>
+      <ButtonContainer>
+        <Button disabled={!canSubmit} onClick={handleSubmit(onSubmit)}>
+          Split
+        </Button>
+      </ButtonContainer>
+    </CenteredCard>
   )
 }

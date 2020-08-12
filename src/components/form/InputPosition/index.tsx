@@ -2,22 +2,32 @@ import { useQuery } from '@apollo/react-hooks'
 import { GetPositionQuery } from 'queries/positions'
 import React, { useEffect } from 'react'
 import { FormContextValues } from 'react-hook-form'
+import styled from 'styled-components'
 import { GetPosition, GetPositionVariables, GetPosition_position } from 'types/generatedGQL'
 
-import { BYTES_REGEX } from '../../config/constants'
+import { BYTES_REGEX } from '../../../config/constants'
+import { SplitPositionFormMethods } from '../../../pages/SplitPosition/Form'
+import { Error, ErrorContainer } from '../../pureStyledComponents/Error'
+import { Textfield } from '../../pureStyledComponents/Textfield'
+import { TitleControl } from '../../pureStyledComponents/TitleControl'
+import { TitleValue } from '../../text/TitleValue'
 
-import { SplitPositionForm } from './SplitCondition'
+const Span = styled.span``
 
-interface Props {
-  splitFromPosition: boolean
-  formMethods: FormContextValues<SplitPositionForm>
+export interface InputPositionProps {
+  barebones?: boolean
+  formMethods: FormContextValues<SplitPositionFormMethods>
   onPositionChange: (position: GetPosition_position) => void
+  splitFromPosition: boolean
 }
+
 export const InputPosition = ({
+  barebones = false,
   formMethods: { errors, register, setError, watch },
   onPositionChange,
   splitFromPosition,
-}: Props) => {
+  ...restProps
+}: InputPositionProps) => {
   const watchPositionId = watch('positionId')
   const errorPositionId = errors.positionId
   const skipFetchPosition = watchPositionId === '' || !splitFromPosition || !!errorPositionId
@@ -49,27 +59,35 @@ export const InputPosition = ({
     }
   }, [errorFetchingPosition, setError])
 
-  return (
-    <div>
-      <input name="splitFrom" ref={register} type="radio" value="position" />
-
-      <label>Position</label>
-
-      <input
+  const value = (
+    <Span {...restProps}>
+      <Textfield
         disabled={!splitFromPosition}
         name="positionId"
+        placeholder="Please select a position..."
         ref={register({
           required: splitFromPosition,
           pattern: BYTES_REGEX,
         })}
         type="text"
-      ></input>
+      />
       {errorPositionId && (
-        <div>
-          <p>{errorPositionId.type === 'pattern' && 'Invalid bytes32 string'}</p>
-          <p>{errorPositionId.type === 'validate' && errorPositionId.message}</p>
-        </div>
+        <ErrorContainer>
+          {errorPositionId.type === 'pattern' && <Error>{'Invalid bytes32 string'}</Error>}
+          {errorPositionId.type === 'validate' && <Error>{errorPositionId.message}</Error>}
+        </ErrorContainer>
       )}
-    </div>
+    </Span>
+  )
+
+  return barebones ? (
+    value
+  ) : (
+    <TitleValue
+      title="Position Id"
+      titleControl={<TitleControl>Select Position</TitleControl>}
+      value={value}
+      {...restProps}
+    />
   )
 }

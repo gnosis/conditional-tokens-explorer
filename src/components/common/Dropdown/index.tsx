@@ -1,4 +1,4 @@
-import React, { DOMAttributes, useCallback, useState } from 'react'
+import React, { DOMAttributes, createRef, useCallback, useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 
 import { BaseCard } from '../../pureStyledComponents/BaseCard'
@@ -18,6 +18,7 @@ const Wrapper = styled.div<{ isOpen: boolean; disabled: boolean }>`
   outline: none;
   pointer-events: ${(props) => (props.disabled ? 'none' : 'initial')};
   position: relative;
+  z-index: 100;
 `
 
 const Button = styled.div`
@@ -66,7 +67,7 @@ Items.defaultProps = {
   dropdownDirection: DropdownDirection.downwards,
 }
 
-const Item = styled.div<{ active: boolean; hasOnClick?: boolean }>`
+export const DropdownItem = styled.div<{ active?: boolean }>`
   align-items: center;
   background-color: ${(props) =>
     props.active
@@ -75,14 +76,14 @@ const Item = styled.div<{ active: boolean; hasOnClick?: boolean }>`
   border-bottom: 1px solid ${(props) => props.theme.dropdown.item.borderColor};
   color: ${(props) =>
     props.active ? props.theme.dropdown.item.color : props.theme.dropdown.item.colorActive};
-  cursor: ${(props) => (props.hasOnClick ? 'pointer' : 'default')};
+  cursor: pointer;
   display: flex;
   font-size: 14px;
   font-weight: 400;
   line-height: 1.4;
-  min-height: 40px;
+  min-height: ${(props) => props.theme.dropdown.item.height};
   overflow: hidden;
-  padding: 0 12px;
+  padding: 0 ${(props) => props.theme.dropdown.item.paddingHorizontal};
 
   &:first-child {
     border-top-left-radius: ${(props) => props.theme.cards.borderRadius};
@@ -96,10 +97,7 @@ const Item = styled.div<{ active: boolean; hasOnClick?: boolean }>`
   }
 
   &:hover {
-    background: ${(props) =>
-      props.hasOnClick
-        ? props.theme.dropdown.item.backgroundColorHover
-        : props.theme.dropdown.item.backgroundColor};
+    background: ${(props) => props.theme.dropdown.item.backgroundColorHover};
   }
 `
 
@@ -109,20 +107,22 @@ export interface DropdownItemProps {
 }
 
 interface Props extends DOMAttributes<HTMLDivElement> {
-  activeItemHightlight?: boolean | undefined
+  activeItemHighlight?: boolean | undefined
+  className?: string
+  closeOnClick?: boolean
   currentItem?: number | undefined
   disabled?: boolean
   dropdownButtonContent?: React.ReactNode | string
   dropdownDirection?: DropdownDirection | undefined
   dropdownPosition?: DropdownPosition | undefined
-  items: Array<DropdownItemProps>
-  className?: string
+  items: Array<unknown>
 }
 
 export const Dropdown: React.FC<Props> = (props) => {
   const {
-    activeItemHightlight = true,
+    activeItemHighlight = true,
     className,
+    closeOnClick = true,
     currentItem = 0,
     disabled = false,
     dropdownButtonContent,
@@ -133,32 +133,44 @@ export const Dropdown: React.FC<Props> = (props) => {
   } = props
   const [currentItemIndex, setCurrentItemIndex] = useState<number>(currentItem)
   const [isOpen, setIsOpen] = useState<boolean>(false)
+  const node = createRef<HTMLDivElement>()
 
-  const optionClick = useCallback((onClick: (() => void) | undefined, itemIndex: number) => {
-    if (!onClick) return
+  const onButtonClick = useCallback(
+    (e) => {
+      e.stopPropagation()
+      if (disabled) return
+      setIsOpen(!isOpen)
+    },
+    [disabled, isOpen]
+  )
 
-    setCurrentItemIndex(itemIndex)
-    onClick()
-    setIsOpen(false)
-  }, [])
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleClick = (e: any) => {
+      if (node && node.current && node.current.contains(e.target)) {
+        return
+      }
+      setIsOpen(false)
+    }
 
-  const onWrapperClick = useCallback(() => {
-    setIsOpen(!isOpen)
-  }, [isOpen])
+    document.addEventListener('mousedown', handleClick)
+
+    return () => {
+      document.removeEventListener('mousedown', handleClick)
+    }
+  }, [node])
 
   return (
     <Wrapper
       className={`dropdown ${isOpen ? 'isOpen' : ''} ${className}`}
       disabled={disabled}
       isOpen={isOpen}
-      onBlur={() => {
-        setIsOpen(false)
-      }}
-      onClick={onWrapperClick}
-      tabIndex={-1}
+      ref={node}
       {...restProps}
     >
-      <Button className="dropdownButton">{dropdownButtonContent}</Button>
+      <Button className="dropdownButton" onClick={onButtonClick}>
+        {dropdownButtonContent}
+      </Button>
       <Items
         className="dropdownItems"
         dropdownDirection={dropdownDirection}
@@ -166,22 +178,29 @@ export const Dropdown: React.FC<Props> = (props) => {
         isOpen={isOpen}
         noPadding
       >
-        {items.map((item: DropdownItemProps, index: number) => {
-          return (
-            <Item
-              active={activeItemHightlight && index === currentItemIndex}
-              className="dropdownItem"
-              hasOnClick={item.onClick !== undefined}
-              key={index}
-              onClick={
-                item.onClick !== undefined
-                  ? () => optionClick(item.onClick, index)
-                  : () => setIsOpen(false)
+        {items.map((item: any, index: number) => {
+          const isActive = activeItemHighlight && index === currentItemIndex
+          const dropdownItem = React.cloneElement(item, {
+            active: isActive,
+            className: 'dropdownItem',
+            key: item.key ? item.key : index,
+            onClick: (e) => {
+              e.stopPropagation()
+
+              if (closeOnClick) {
+                setIsOpen(false)
               }
-            >
-              {item.content}
-            </Item>
-          )
+
+              if (!item.props.onClick) {
+                return
+              }
+
+              item.props.onClick()
+              setCurrentItemIndex(index)
+            },
+          })
+
+          return dropdownItem
         })}
       </Items>
     </Wrapper>

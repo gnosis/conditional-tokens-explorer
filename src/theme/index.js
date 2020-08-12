@@ -1,7 +1,9 @@
+const darkGrey = '#5D6D74'
 const darkerGray = '#445055'
 const error = '#db3a3d'
 const errorDark = '#BC3033'
 const lightGrey = '#d4d5d3'
+const mediumGrey = '#b2b5b2'
 const primary = '#009cb4'
 const primaryDark = '#00879B'
 const textColor = '#5d6d74'
@@ -53,7 +55,7 @@ const theme = {
   },
   colors: {
     darkBlue: '#001428',
-    darkGrey: '#5D6D74',
+    darkGrey: darkGrey,
     darkerGray: darkerGray,
     darkestGray: '#081728',
     error: error,
@@ -62,7 +64,7 @@ const theme = {
     lightGrey: lightGrey,
     lighterGreen: '#b6e2da',
     mainBodyBackground: whitesmoke2,
-    mediumGrey: '#b2b5b2',
+    mediumGrey: mediumGrey,
     primary: primary,
     textColor: textColor,
     tomatoRed: error,
@@ -78,6 +80,8 @@ const theme = {
       borderColor: lightGrey,
       color: textColor,
       colorActive: darkerGray,
+      height: '40px',
+      paddingHorizontal: '12px',
     },
   },
   form: {
@@ -106,6 +110,22 @@ const theme = {
   pillOpen: {
     backgroundColor: whitesmoke1,
     color: textColor,
+  },
+  textField: {
+    backgroundColor: '#fff',
+    backgroundColorActive: '#fff',
+    borderColor: mediumGrey,
+    borderColorActive: darkGrey,
+    borderRadius: '4px',
+    borderStyle: 'solid',
+    borderWidth: '1px',
+    color: textColor,
+    colorPlaceholder: mediumGrey,
+    errorColor: error,
+    fontSize: '16px',
+    fontWeight: '400',
+    height: '36px',
+    paddingHorizontal: '11px',
   },
   themeBreakPoints: {
     lg: '992px',

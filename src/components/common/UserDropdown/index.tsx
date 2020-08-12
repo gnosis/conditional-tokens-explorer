@@ -6,8 +6,8 @@ import { getInjectedProviderName, getProviderInfo } from 'web3modal'
 import { truncateStringInTheMiddle } from '../../../util/tools'
 import { Button } from '../../buttons/Button'
 import { ButtonType } from '../../buttons/buttonStylingTypes'
-import { Dropdown, DropdownItemProps, DropdownPosition } from '../../common/Dropdown'
 import { Pill } from '../../pureStyledComponents/Pill'
+import { Dropdown, DropdownItem, DropdownPosition } from '../Dropdown'
 
 import { ChevronDown } from './img/ChevronDown'
 
@@ -16,8 +16,8 @@ const Wrapper = styled(Dropdown)`
   display: flex;
   height: 100%;
 
-  .dropdownItem {
-    padding: 0;
+  .dropdownButton {
+    height: 100%;
   }
 
   &.isOpen {
@@ -87,6 +87,14 @@ const NetworkText = styled.div`
 const Content = styled.div`
   width: 245px;
 `
+const DropdownItemStyled = styled(DropdownItem)`
+  cursor: default;
+  padding: 0;
+
+  &:hover {
+    background-color: transparent;
+  }
+`
 
 const Item = styled.div`
   align-items: center;
@@ -97,7 +105,7 @@ const Item = styled.div`
   justify-content: space-between;
   line-height: 1.2;
   padding: 12px;
-  width: 245px;
+  width: 100%;
 `
 
 const Title = styled.div`
@@ -184,12 +192,15 @@ const UserDropdownContent: React.FC<UserDropdownProps> = ({ data }) => {
           </Item>
         )
       })}
-      <Item
-        onClick={() => {
-          data.disconnect()
-        }}
-      >
-        <DisconnectButton buttonType={ButtonType.danger}>Disconnect</DisconnectButton>
+      <Item>
+        <DisconnectButton
+          buttonType={ButtonType.danger}
+          onClick={() => {
+            data.disconnect()
+          }}
+        >
+          Disconnect
+        </DisconnectButton>
       </Item>
     </Content>
   )
@@ -197,16 +208,16 @@ const UserDropdownContent: React.FC<UserDropdownProps> = ({ data }) => {
 
 export const UserDropdown: React.FC = (props) => {
   const data = useWeb3Connected()
-  const headerDropdownItems: Array<DropdownItemProps> = [
-    {
-      content: <UserDropdownContent data={data} />,
-    },
+  const headerDropdownItems = [
+    <DropdownItemStyled key="1">
+      <UserDropdownContent data={data} />
+    </DropdownItemStyled>,
   ]
 
   return (
     <Wrapper
       {...props}
-      activeItemHightlight={false}
+      activeItemHighlight={false}
       dropdownButtonContent={<UserDropdownButton data={data} />}
       dropdownPosition={DropdownPosition.right}
       items={headerDropdownItems}
