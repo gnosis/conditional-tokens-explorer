@@ -24,7 +24,7 @@ export enum ConditionStatus {
 
 export enum ConditionType {
   Omen = 'Omen Condition',
-  Unknown = 'Unknown',
+  Custom = 'Custom reporter',
 }
 
 export enum ConditionErrors {

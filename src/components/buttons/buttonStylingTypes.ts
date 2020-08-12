@@ -3,6 +3,7 @@ import { FlattenInterpolation, ThemeProps, css } from 'styled-components'
 
 export enum ButtonType {
   primary,
+  primaryInverted,
   danger,
 }
 
@@ -20,18 +21,44 @@ export interface ButtonLinkProps
 const PrimaryCSS = css`
   & {
     background-color: ${(props) => props.theme.buttonPrimary.backgroundColor};
+    border-color: ${(props) => props.theme.buttonPrimary.borderColor};
     color: ${(props) => props.theme.buttonPrimary.color};
   }
 
   &:hover {
     background-color: ${(props) => props.theme.buttonPrimary.backgroundColorHover};
+    border-color: ${(props) => props.theme.buttonPrimary.borderColorHover};
     color: ${(props) => props.theme.buttonPrimary.colorHover};
   }
 
   &[disabled],
   &[disabled]:hover {
-    background-color: ${(props) => props.theme.buttonPrimary.backgroundColor};
+    background-color: ${(props) => props.theme.buttonPrimary.borderColor};
+    border-color: ${(props) => props.theme.buttonPrimary.borderColor};
     color: ${(props) => props.theme.buttonPrimary.color};
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+`
+
+const PrimaryInvertedCSS = css`
+  & {
+    background-color: ${(props) => props.theme.buttonPrimaryInverted.backgroundColor};
+    border-color: ${(props) => props.theme.buttonPrimaryInverted.borderColor};
+    color: ${(props) => props.theme.buttonPrimaryInverted.color};
+  }
+
+  &:hover {
+    background-color: ${(props) => props.theme.buttonPrimaryInverted.backgroundColorHover};
+    border-color: ${(props) => props.theme.buttonPrimaryInverted.borderColorHover};
+    color: ${(props) => props.theme.buttonPrimaryInverted.colorHover};
+  }
+
+  &[disabled],
+  &[disabled]:hover {
+    background-color: ${(props) => props.theme.buttonPrimaryInverted.borderColor};
+    border-color: ${(props) => props.theme.buttonPrimaryInverted.borderColor};
+    color: ${(props) => props.theme.buttonPrimaryInverted.color};
     cursor: not-allowed;
     opacity: 0.5;
   }
@@ -40,17 +67,20 @@ const PrimaryCSS = css`
 const DangerCSS = css`
   & {
     background-color: ${(props) => props.theme.buttonDanger.backgroundColor};
+    border-color: ${(props) => props.theme.buttonDanger.borderColor};
     color: ${(props) => props.theme.buttonDanger.color};
   }
 
   &:hover {
     background-color: ${(props) => props.theme.buttonDanger.backgroundColorHover};
+    border-color: ${(props) => props.theme.buttonDanger.borderColorHover};
     color: ${(props) => props.theme.buttonDanger.colorHover};
   }
 
   &[disabled],
   &[disabled]:hover {
     background-color: ${(props) => props.theme.buttonDanger.backgroundColor};
+    border-color: ${(props) => props.theme.buttonDanger.borderColor};
     color: ${(props) => props.theme.buttonDanger.color};
     cursor: not-allowed;
     opacity: 0.5;
@@ -64,6 +94,10 @@ const getButtonTypeStyles = (
     return PrimaryCSS
   }
 
+  if (buttonType === ButtonType.primaryInverted) {
+    return PrimaryInvertedCSS
+  }
+
   if (buttonType === ButtonType.danger) {
     return DangerCSS
   }
@@ -75,7 +109,7 @@ export const ButtonCSS = css<ButtonCommonProps>`
   align-items: center;
   border-radius: 4px;
   border-style: solid;
-  border: none;
+  border-width: 1px;
   cursor: pointer;
   display: flex;
   font-size: 20px;

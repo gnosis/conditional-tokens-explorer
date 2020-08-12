@@ -83,7 +83,7 @@ const networks: { [K in NetworkIds]: Network } = {
   [NetworkIds.RINKEBY]: {
     earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
     contracts: {
-      conditionalTokensAddress: '0x36bede640D19981A82090519bC1626249984c908',
+      conditionalTokensAddress: '0xe6Cdc22F99FD9ffdC03647C7fFF5bB753a4eBB21',
       realitioAddress: '0x3D00D77ee771405628a4bA4913175EcC095538da',
     },
     tokens: [
@@ -216,7 +216,7 @@ export const knownOracles: { [name in KnownOracle]: KnownOracleData } = {
     url: 'https://realit.io/',
     addresses: {
       [NetworkIds.MAINNET]: '0x0e414d014a77971f4eaa22ab58e6d84d16ea838e',
-      [NetworkIds.RINKEBY]: '0x576B76eebE6B5411c0ef310E65De9Bff8A60130F',
+      [NetworkIds.RINKEBY]: '0x576b76eebe6b5411c0ef310e65de9bff8a60130f',
       [NetworkIds.GANACHE]: '0xDb56f2e9369E0D7bD191099125a3f6C370F8ed15',
     },
   },

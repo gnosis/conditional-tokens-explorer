@@ -1,10 +1,10 @@
 import React from 'react'
 
-import { useWeb3Connected } from '../contexts/Web3Context'
+import { useWeb3Context } from '../contexts/Web3Context'
 import { Question } from '../util/types'
 
 export const useQuestion = (questionId: string, outcomeSlotCount: number) => {
-  const { RtioService } = useWeb3Connected()
+  const { status } = useWeb3Context()
 
   const [question, setQuestion] = React.useState<Maybe<Question>>(null)
   const [outcomesPrettier, setOutcomesPrettier] = React.useState<string[]>([])
@@ -13,25 +13,28 @@ export const useQuestion = (questionId: string, outcomeSlotCount: number) => {
 
   React.useEffect(() => {
     let cancelled = false
-    if (!cancelled) setLoading(true)
+    if (status._type === 'connected' || status._type === 'infura') {
+      if (!cancelled) setLoading(true)
 
-    const getQuestion = async (questionId: string) => {
-      try {
-        const question = await RtioService.getQuestion(questionId)
-        if (!cancelled) setQuestion(question)
-      } catch (err) {
-        setError(err)
+      const { RtioService } = status
+      const getQuestion = async (questionId: string) => {
+        try {
+          const question = await RtioService.getQuestion(questionId)
+          if (!cancelled) setQuestion(question)
+        } catch (err) {
+          setError(err)
+        }
       }
+
+      getQuestion(questionId)
+
+      if (!cancelled) setLoading(false)
     }
-
-    getQuestion(questionId)
-
-    if (!cancelled) setLoading(false)
 
     return () => {
       cancelled = true
     }
-  }, [RtioService, questionId])
+  }, [status, questionId])
 
   React.useEffect(() => {
     let cancelled = false
