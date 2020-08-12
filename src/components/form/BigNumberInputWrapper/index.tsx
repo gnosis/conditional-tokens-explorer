@@ -16,8 +16,11 @@ const Wrapper = styled.span<{ hasTokenSymbol?: boolean }>`
 
     ${(props) => props.hasTokenSymbol && 'padding-right: 60px;'}
 
-    &::placeholder {
-      color: #000;
+    &:disabled,
+    &[disabled] {
+      &::placeholder {
+        color: #000;
+      }
     }
   }
 `
@@ -40,10 +43,11 @@ interface Props {
   onChange?: (n: BigNumber) => void
   tokenSymbol?: string
   value?: BigNumber
+  placeholder?: string | undefined
 }
 
 export const BigNumberInputWrapper: React.FC<Props> = (props) => {
-  const { decimals = 0, disabled, onChange, tokenSymbol, value } = props
+  const { decimals = 0, disabled, onChange, placeholder, tokenSymbol, value } = props
 
   const handleChange = (newValue: string) => {
     if (onChange) {
@@ -60,7 +64,7 @@ export const BigNumberInputWrapper: React.FC<Props> = (props) => {
       <BigNumberInput
         decimals={decimals}
         onChange={handleChange}
-        placeholder={disabled ? 'Please add funds to your wallet...' : '0.00'}
+        placeholder={placeholder}
         renderInput={(props: unknown) => {
           return <Textfield disabled={disabled} {...props} />
         }}
