@@ -49,11 +49,13 @@ const DirectionUpwardsCSS = css`
 const Items = styled(BaseCard)<{
   dropdownDirection?: DropdownDirection
   dropdownPosition?: DropdownPosition
+  fullWidth?: boolean
   isOpen: boolean
 }>`
   display: ${(props) => (props.isOpen ? 'block' : 'none')};
   min-width: 160px;
   position: absolute;
+  ${(props) => props.fullWidth && 'width: 100%;'}
   ${(props) => (props.dropdownPosition === DropdownPosition.left ? PositionLeftCSS : '')}
   ${(props) => (props.dropdownPosition === DropdownPosition.right ? PositionRightCSS : '')}
   ${(props) => (props.dropdownPosition === DropdownPosition.center ? PositionCenterCSS : '')}
@@ -63,8 +65,10 @@ const Items = styled(BaseCard)<{
 `
 
 Items.defaultProps = {
-  dropdownPosition: DropdownPosition.left,
   dropdownDirection: DropdownDirection.downwards,
+  dropdownPosition: DropdownPosition.left,
+  fullWidth: false,
+  isOpen: false,
 }
 
 export const DropdownItem = styled.div<{ active?: boolean }>`
@@ -115,6 +119,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   dropdownButtonContent?: React.ReactNode | string
   dropdownDirection?: DropdownDirection | undefined
   dropdownPosition?: DropdownPosition | undefined
+  fullWidth?: boolean
   items: Array<unknown>
 }
 
@@ -128,6 +133,7 @@ export const Dropdown: React.FC<Props> = (props) => {
     dropdownButtonContent,
     dropdownDirection,
     dropdownPosition,
+    fullWidth,
     items,
     ...restProps
   } = props
@@ -175,6 +181,7 @@ export const Dropdown: React.FC<Props> = (props) => {
         className="dropdownItems"
         dropdownDirection={dropdownDirection}
         dropdownPosition={dropdownPosition}
+        fullWidth={fullWidth}
         isOpen={isOpen}
         noPadding
       >

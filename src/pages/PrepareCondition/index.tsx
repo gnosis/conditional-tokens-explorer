@@ -73,20 +73,28 @@ export const PrepareCondition = () => {
   }, [questionId, oracleAddress, numOutcomes])
 
   const submitDisabled = !isValid || isLoading
+
+  enum ConditionType {
+    custom,
+    omen,
+  }
   const dropdownItems = [
     {
       text: 'Custom Reporter',
       onClick: () => {
-        console.log('Custom Reporter')
+        setConditionType(ConditionType.custom)
       },
+      type: ConditionType.custom,
     },
     {
       text: 'Omen Condition',
       onClick: () => {
-        console.log('Omen Condition')
+        setConditionType(ConditionType.omen)
       },
+      type: ConditionType.omen,
     },
   ]
+  const [conditionType, setConditionType] = useState(dropdownItems[0].type)
 
   return (
     <>
@@ -97,8 +105,13 @@ export const PrepareCondition = () => {
             title="Condition Type"
             value={
               <Dropdown
-                dropdownButtonContent={<ButtonSelect content="IGORRR" />}
+                dropdownButtonContent={
+                  <ButtonSelect
+                    content={dropdownItems.filter((item) => item.type === conditionType)[0].text}
+                  />
+                }
                 dropdownPosition={DropdownPosition.center}
+                fullWidth
                 items={dropdownItems.map((item, index) => (
                   <DropdownItem key={index} onClick={item.onClick}>
                     {item.text}
