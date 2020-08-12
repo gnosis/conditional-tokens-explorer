@@ -1,4 +1,4 @@
-FROM node:14-alpine
+FROM node:12-alpine
 
 ENV PATH="./hg-subgraph/node_modules/.bin:${PATH}"
 
@@ -6,6 +6,7 @@ COPY create_subgraph.sh ./
 
 RUN apk --update add bash git python make g++ libsecret-dev pkgconfig && rm -rf /var/cache/apk/* && \
     pkg-config --libs-only-l libsecret-1 && \
+    npm install -g ganache-cli && \
     chmod +x create_subgraph.sh && \
     git clone https://github.com/gnosis/hg-subgraph.git && \
     cd hg-subgraph && \

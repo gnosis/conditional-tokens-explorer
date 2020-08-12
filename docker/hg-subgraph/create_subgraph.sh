@@ -6,11 +6,14 @@ waitport() {
     while ! nc -z $1 $2 ; do sleep 1 ; done
 }
 
-cd hg-subgraph/
-sed -i 's/localhost/ganache/g' ops/render-subgraph-conf.js
-sed -i 's/localhost/ganache/g' node_modules/@gnosis.pm/conditional-tokens-contracts/truffle.js
+ganache-cli -d -i 50 &
+PID=$!
 
-waitport ganache 8545
+cd hg-subgraph/
+#sed -i 's/localhost/ganache/g' ops/render-subgraph-conf.js
+#sed -i 's/localhost/ganache/g' node_modules/@gnosis.pm/conditional-tokens-contracts/truffle.js
+
+waitport localhost 8545
 
 echo "Run migrate"
 npm run migrate
@@ -28,3 +31,5 @@ echo "Creating gnosis/hg at http://graph-node:8020"
 
 echo "Deploying gnosis/hg at local"
 ./node_modules/.bin/graph deploy --node http://graph-node:8020 --ipfs http://ipfs:5001 gnosis/hg
+
+kill $PID
