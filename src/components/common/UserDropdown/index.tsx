@@ -1,6 +1,7 @@
 import { Connected, useWeb3Connected } from 'contexts/Web3Context'
 import React from 'react'
 import styled from 'styled-components'
+import { getInjectedProviderName, getProviderInfo } from 'web3modal'
 
 import { truncateStringInTheMiddle } from '../../../util/tools'
 import { Button } from '../../buttons/Button'
@@ -138,8 +139,10 @@ const getNetworkName = (data: Connected): string => {
   return data.provider.network.name
 }
 
-const getWalletName = (): string => {
-  return 'Metamask'
+const getWalletName = (data: Connected): string => {
+  const injectedName = getInjectedProviderName()
+  const provider = getProviderInfo(data.provider)
+  return injectedName || provider.name
 }
 
 const UserDropdownButton: React.FC<UserDropdownProps> = ({ data }) => {
@@ -171,7 +174,7 @@ const UserDropdownContent: React.FC<UserDropdownProps> = ({ data }) => {
     },
     {
       title: 'Wallet',
-      value: getWalletName(),
+      value: getWalletName(data),
     },
     {
       title: 'Network',
