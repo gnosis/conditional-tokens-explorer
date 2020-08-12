@@ -19,6 +19,7 @@ const conditionalTokensAbi = [
   'function getCollectionId(bytes32 parentCollectionId, bytes32 conditionId, uint indexSet) external view returns (bytes32) ',
   'function getPositionId(address collateralToken, bytes32 collectionId) external pure returns (uint) ',
   'function balanceOf(address owner, uint256 positionId) external view returns (uint256)',
+  'function balanceOfBatch(address[] owners, uint256[] ids) public view returns (uint256[])',
   'function safeTransferFrom(address from, address to, uint256 id, uint256 value, bytes data) external',
   'function getOutcomeSlotCount(bytes32 conditionId) external view returns (uint)',
   'function mergePositions(address collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] partition, uint amount) external',
@@ -147,6 +148,12 @@ export class ConditionalTokensService {
     } else {
       return new BigNumber(0)
     }
+  }
+
+  async balanceOfBatch(positionIds: Array<string>): Promise<Array<BigNumber>> {
+    const owner = await this.signer.getAddress()
+    const owners = Array.from(new Array(positionIds.length), (_) => owner)
+    return this.contract.balanceOfBatch(owners, positionIds)
   }
 
   async reportPayouts(questionId: string, payouts: number[]): Promise<TransactionReceipt> {

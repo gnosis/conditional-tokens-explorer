@@ -1,5 +1,8 @@
+import { ButtonLink } from 'components/buttons'
+import { TitleValue } from 'components/text/TitleValue'
 import { WrapperDisplay } from 'components/text/WrapperDisplay'
 import React from 'react'
+import styled from 'styled-components'
 
 import { useConditionContext } from '../../contexts/ConditionContext'
 
@@ -23,12 +26,23 @@ export const SelectCondition = () => {
   }, [condition])
 
   return (
-    <>
-      <label>Resolved Condition ID</label>
-      <WrapperDisplay errors={errors} loading={loading}>
-        <p>{conditionToDisplay}</p>
-      </WrapperDisplay>
-      <button onClick={selectCondition}>Select Condition</button>
-    </>
+    <TitleValue
+      title={
+        <TitleWrapper>
+          <span>Condition Id</span>
+          <ButtonLink onClick={selectCondition}>Select Condition</ButtonLink>
+        </TitleWrapper>
+      }
+      value={
+        <WrapperDisplay errors={errors} loading={loading}>
+          {conditionToDisplay}
+        </WrapperDisplay>
+      }
+    />
   )
 }
+
+const TitleWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+`

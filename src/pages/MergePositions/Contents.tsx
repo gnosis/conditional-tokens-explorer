@@ -6,12 +6,49 @@ import { StripedList, StripedListItem } from 'components/common/StripedList'
 import { BigNumberInputWrapper } from 'components/form/BigNumberInputWrapper'
 import { GridTwoColumns } from 'components/pureStyledComponents/GridTwoColumns'
 import { TitleValue } from 'components/text/TitleValue'
-import React, { useState } from 'react'
+import { useConditionContext } from 'contexts/ConditionContext'
+import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
+import React, { useMemo, useState } from 'react'
 import styled from 'styled-components'
+
+import { SelectCondition } from './SelectCondition'
+import { SelectPosition } from './SelectPosition'
 
 const logger = getLogger('MergePosition')
 
 export const Contents = () => {
+  const { positions } = useMultiPositionsContext()
+  const arePositionMergeables = useMemo(() => {
+    // all postions include same conditions set
+    const conditionIdsSet = positions.map((position) => [...position.conditionIds].sort().join(''))
+    return positions.length > 1 && conditionIdsSet.every((set) => set === conditionIdsSet[0])
+
+    // once condition is set, check in indexSets for condition on each position sum condition outcomeSlotCont full indexSet
+  }, [positions])
+
+  const { clearCondition, condition, errors: conditionErrors } = useConditionContext()
+  const isFullIndexSet = useMemo(() => {
+    if (condition && arePositionMergeables) {
+      // once condition is set, check in indexSets for condition on each position sum condition outcomeSlotCont full indexSet
+      const fullIndexSet = condition
+        ? parseInt(Array.from(new Array(condition.outcomeSlotCount), (_) => 1).join(''), 2)
+        : 0
+      const partitionIndexSet = positions.reduce((acc, position) => {
+        const conditionIndex = position.conditionIds.findIndex((id) => condition.id)
+        return acc + Number(position.indexSets[conditionIndex])
+      }, 0)
+
+      console.log('isFullIndexSet', fullIndexSet, partitionIndexSet)
+      return fullIndexSet === partitionIndexSet
+    }
+
+    return false
+  }, [positions, condition, arePositionMergeables])
+
+  console.log('isFullIndexSet', isFullIndexSet)
+
+  const disabled = useMemo(() => !isFullIndexSet, [isFullIndexSet])
+
   const [positionsToMerge, setPositions] = useState<Array<any>>([
     '[DAI C:0x123 O:0|1, C:0x345 O:0] x10',
     '[DAI C:0x123 O:0|1, C:0x345 O:1] x10',
@@ -22,32 +59,10 @@ export const Contents = () => {
   return (
     <CenteredCard>
       <GridTwoColumns forceOneColumn marginBottomXL>
-        <TitleValue
-          title={
-            <TitleWrapper>
-              <span>Positions</span>
-              <ButtonLink>Select Positions</ButtonLink>
-            </TitleWrapper>
-          }
-          value={
-            <StripedList>
-              {positionsToMerge.map((position: string, index: number) => (
-                <StripedListItem key={index}>{position}</StripedListItem>
-              ))}
-            </StripedList>
-          }
-        />
+        <SelectPosition />
       </GridTwoColumns>
       <GridTwoColumns forceOneColumn marginBottomXL>
-        <TitleValue
-          title={
-            <TitleWrapper>
-              <span>Condition Id</span>
-              <ButtonLink>Select Condition</ButtonLink>
-            </TitleWrapper>
-          }
-          value={conditionId}
-        />
+        <SelectCondition />
       </GridTwoColumns>
       <GridTwoColumns forceOneColumn marginBottomXL>
         <TitleValue
@@ -71,7 +86,7 @@ export const Contents = () => {
         />
       </GridTwoColumns>
       <ButtonWrapper>
-        <Button>Merge</Button>
+        <Button disabled={disabled}>Merge</Button>
       </ButtonWrapper>
     </CenteredCard>
   )
