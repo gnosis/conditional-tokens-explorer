@@ -1,5 +1,5 @@
 import { AnchorHTMLAttributes, ButtonHTMLAttributes } from 'react'
-import { FlattenInterpolation, ThemeProps, css } from 'styled-components'
+import { css } from 'styled-components'
 
 export enum ButtonType {
   primary,
@@ -87,9 +87,7 @@ const DangerCSS = css`
   }
 `
 
-const getButtonTypeStyles = (
-  buttonType: ButtonType = ButtonType.primary
-): FlattenInterpolation<ThemeProps<unknown>> => {
+const getButtonTypeStyles = (buttonType: ButtonType = ButtonType.primary): any => {
   if (buttonType === ButtonType.primary) {
     return PrimaryCSS
   }

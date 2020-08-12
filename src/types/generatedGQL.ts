@@ -52,6 +52,7 @@ export interface GetCondition_condition {
   payouts: any[] | null;
   payoutNumerators: any[] | null;
   payoutDenominator: any | null;
+  resolveTimestamp: any | null;
   positions: GetCondition_condition_positions[] | null;
 }
 

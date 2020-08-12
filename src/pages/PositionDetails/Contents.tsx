@@ -118,7 +118,9 @@ export const Contents = ({ position }: Props) => {
         collateral={collateralToken}
         finished={false}
         loading={false}
-        onUnlock={() => {}}
+        onUnlock={() => {
+          return 1
+        }}
       />
       <GridTwoColumns forceOneColumn marginBottomXL>
         <TitleValue

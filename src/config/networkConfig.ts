@@ -172,7 +172,7 @@ export const knownOracles: { [name in KnownOracle]: KnownOracleData } = {
     url: 'https://realit.io/',
     addresses: {
       [NetworkIds.MAINNET]: '0x0e414d014a77971f4eaa22ab58e6d84d16ea838e',
-      [NetworkIds.RINKEBY]: '0x576B76eebE6B5411c0ef310E65De9Bff8A60130F',
+      [NetworkIds.RINKEBY]: '0x576b76eebe6b5411c0ef310e65de9bff8a60130f',
     },
   },
   kleros: {
