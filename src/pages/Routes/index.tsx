@@ -6,7 +6,7 @@ import { ButtonConnect } from '../../components/buttons/ButtonConnect'
 import { InfoCard } from '../../components/common/InfoCard'
 import { ConditionDetails } from '../ConditionDetails'
 import { ConditionsList } from '../ConditionsList'
-import { PositionDetail } from '../PositionDetail'
+import { PositionDetails } from '../PositionDetails'
 import { PositionsList } from '../PositionsList'
 import { PrepareCondition } from '../PrepareCondition'
 import { RedeemPositionContainer } from '../redeem-position'
@@ -41,7 +41,7 @@ export const Routes: React.FC = () => {
       <Route component={ConditionsList} exact path="/conditions" />
       <Route component={ConditionDetails} exact path="/conditions/:conditionId" />
       <Route component={PositionsList} exact path="/positions" />
-      <Route component={PositionDetail} exact path="/positions/:positionId" />
+      <Route component={PositionDetails} exact path="/positions/:positionId" />
       <ProtectedRoute component={PrepareCondition} path="/prepare" />
       <ProtectedRoute component={SplitConditionContainer} path="/split" />
       <ProtectedRoute component={ReportPayoutsContainer} path="/report" />

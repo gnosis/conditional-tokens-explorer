@@ -32,13 +32,17 @@ export class ConditionalTokensService {
   constructor(
     private networkConfig: NetworkConfig,
     private provider: ethers.providers.Provider,
-    private signer: ethers.Signer
+    private signer?: ethers.Signer
   ) {
     const contractAddress = networkConfig.getConditionalTokensAddress()
 
-    this.contract = new ethers.Contract(contractAddress, conditionalTokensAbi, provider).connect(
-      signer
-    )
+    if (signer) {
+      this.contract = new ethers.Contract(contractAddress, conditionalTokensAbi, provider).connect(
+        signer
+      )
+    } else {
+      this.contract = new ethers.Contract(contractAddress, conditionalTokensAbi, provider)
+    }
   }
 
   static getConditionId(
@@ -137,8 +141,12 @@ export class ConditionalTokensService {
   }
 
   async balanceOf(positionId: string): Promise<BigNumber> {
-    const owner = await this.signer.getAddress()
-    return await this.contract.balanceOf(owner, positionId)
+    if (this.signer) {
+      const owner = await this.signer.getAddress()
+      return await this.contract.balanceOf(owner, positionId)
+    } else {
+      return new BigNumber(0)
+    }
   }
 
   async reportPayouts(questionId: string, payouts: number[]): Promise<TransactionReceipt> {

@@ -79,6 +79,10 @@ export const formatDate = (date: Date): string => {
   return moment(date).tz('UTC').format('YYYY-MM-DD - HH:mm [UTC]')
 }
 
+export const formatTS = (timestamp: number): string => {
+  return moment.unix(timestamp).utc().format('YYYY-MM-DD - HH:mm [UTC]')
+}
+
 export const isConditionErrorNotFound = (errors: ConditionErrors[]): boolean =>
   errors.indexOf(ConditionErrors.NOT_FOUND_ERROR) > -1
 

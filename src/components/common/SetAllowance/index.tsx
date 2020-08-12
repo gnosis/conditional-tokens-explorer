@@ -1,56 +1,54 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { Token } from '../../../util/types'
+import { Button } from '../../buttons/Button'
+import { ButtonType } from '../../buttons/buttonStylingTypes'
 
-const Wrapper = styled.div``
-
-const Title = styled.h2`
-  font-size: 16px;
-  letter-spacing: 0.4px;
-  line-height: 1.2;
-  margin: 0 0 20px;
-`
-
-const DescriptionWrapper = styled.div`
+const Wrapper = styled.div`
   align-items: center;
   border-radius: 4px;
+  border: solid 1px ${(props) => props.theme.colors.primary};
   display: flex;
-  padding: 21px 25px;
+  margin-bottom: 25px;
+  padding: 13px 16px;
 `
 
 const Description = styled.p`
-  font-size: 14px;
-  letter-spacing: 0.2px;
-  line-height: 1.4;
-  margin: 0 25px 0 0;
+  font-size: 15px;
+  line-height: 1.2;
+  margin: 0 10px 0 0;
+  color: ${(props) => props.theme.colors.primary};
+`
+
+const UnlockButton = styled(Button)`
+  font-size: 18px;
+  height: 32px;
 `
 
 interface Props {
-  collateral: Token
-  onUnlock: () => void
-  loading: boolean
+  collateral: any
   finished: boolean
+  loading: boolean
+  onUnlock: () => void
 }
 
 export const SetAllowance = (props: Props) => {
   const { collateral, finished, loading, onUnlock } = props
-
-  const btnText = loading ? 'loading' : finished ? 'finished' : 'unlock'
+  const btnText = loading ? 'Working...' : finished ? 'Done!' : 'Unlock'
 
   return (
     <Wrapper>
-      <Title>Set Allowance</Title>
-      <DescriptionWrapper>
-        <Description>
-          This permission allows the smart contracts to interact with your {collateral.symbol}. This
-          has to be done for each new token.
-        </Description>
-        <button disabled={loading || finished} onClick={onUnlock}>
-          {btnText}
-        </button>
-        {/* <ToggleTokenLock finished={finished} loading={loading} onUnlock={onUnlock} /> */}
-      </DescriptionWrapper>
+      <Description>
+        You need to unlock <strong>{collateral.symbol}</strong> to allow the smart contract to
+        interact with it. This has to be done for each new token.
+      </Description>
+      <UnlockButton
+        buttonType={ButtonType.primaryInverted}
+        disabled={loading || finished}
+        onClick={onUnlock}
+      >
+        {btnText}
+      </UnlockButton>
     </Wrapper>
   )
 }

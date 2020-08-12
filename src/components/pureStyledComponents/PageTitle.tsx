@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 
 export const PageTitle = styled.div`
-  color: ${(props) => props.theme.colors.textColor};
+  color: ${(props) => props.theme.colors.darkBlue};
   font-size: 28px;
   font-weight: 400;
   line-height: 1.2;
