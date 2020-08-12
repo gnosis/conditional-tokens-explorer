@@ -13,10 +13,6 @@ const Wrapper = styled(Dropdown)`
   .dropdownItems {
     width: 100%;
   }
-
-  .dropdownItem {
-    padding: 0;
-  }
 `
 
 const Button = styled.div`
@@ -40,6 +36,10 @@ const Button = styled.div`
     background-color: ${(props) => props.theme.textField.backgroundColorActive};
     border-color: ${(props) => props.theme.textField.borderColorActive};
   }
+`
+
+const DropdownItemStyled = styled(DropdownItem)`
+  padding: 0;
 `
 
 const Option = styled.label`
@@ -88,7 +88,7 @@ export const SelectCollateral = ({
   )
   const dropdownItems = tokens.map(({ address, symbol }) => {
     return (
-      <DropdownItem
+      <DropdownItemStyled
         key={address}
         onClick={() => {
           setCollateral(symbol)
@@ -103,7 +103,7 @@ export const SelectCollateral = ({
           />
           <TokenIconStyled symbol={symbol} />
         </Option>
-      </DropdownItem>
+      </DropdownItemStyled>
     )
   })
 

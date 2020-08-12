@@ -33,38 +33,30 @@ export const Contents: React.FC<Props> = ({ condition }) => {
   const { status } = useWeb3Context()
   const { creator, id: conditionId, oracle, outcomeSlotCount, questionId, resolved } = condition
   const dropdownItems = [
-    <DropdownItem
-      key="1"
-      onClick={() => {
+    {
+      onClick: () => {
         logger.log('Resolve Condition')
-      }}
-    >
-      Resolve Condition
-    </DropdownItem>,
-    <DropdownItem
-      key="2"
-      onClick={() => {
+      },
+      text: 'Resolve Condition',
+    },
+    {
+      onClick: () => {
         logger.log('Split Position')
-      }}
-    >
-      Split Position
-    </DropdownItem>,
-    <DropdownItem
-      key="3"
-      onClick={() => {
+      },
+      text: 'Split Position',
+    },
+    {
+      onClick: () => {
         logger.log('Merge Positions')
-      }}
-    >
-      Merge Positions
-    </DropdownItem>,
-    <DropdownItem
-      key="4"
-      onClick={() => {
+      },
+      text: 'Merge Positions',
+    },
+    {
+      onClick: () => {
         logger.log('Report Payouts')
-      }}
-    >
-      Report Payouts
-    </DropdownItem>,
+      },
+      text: 'Report Payouts',
+    },
   ]
 
   let networkId = null
@@ -88,7 +80,11 @@ export const Contents: React.FC<Props> = ({ condition }) => {
         <Dropdown
           dropdownButtonContent={<ButtonDropdownCircle />}
           dropdownPosition={DropdownPosition.right}
-          items={dropdownItems}
+          items={dropdownItems.map((item, index) => (
+            <DropdownItem key={index} onClick={item.onClick}>
+              {item.text}
+            </DropdownItem>
+          ))}
         />
       }
     >

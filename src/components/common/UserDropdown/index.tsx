@@ -15,8 +15,8 @@ const Wrapper = styled(Dropdown)`
   display: flex;
   height: 100%;
 
-  .dropdownItem {
-    padding: 0;
+  .dropdownButton {
+    height: 100%;
   }
 
   &.isOpen {
@@ -88,6 +88,7 @@ const Content = styled.div`
 `
 const DropdownItemStyled = styled(DropdownItem)`
   cursor: default;
+  padding: 0;
 
   &:hover {
     background-color: transparent;
@@ -103,7 +104,7 @@ const Item = styled.div`
   justify-content: space-between;
   line-height: 1.2;
   padding: 12px;
-  width: 245px;
+  width: 100%;
 `
 
 const Title = styled.div`

@@ -67,22 +67,18 @@ export const Contents = ({ position }: Props) => {
       .filter((n) => !!n)
   })
   const dropdownItems = [
-    <DropdownItem
-      key="1"
-      onClick={() => {
+    {
+      onClick: () => {
         logger.log('Redeem')
-      }}
-    >
-      Redeem
-    </DropdownItem>,
-    <DropdownItem
-      key="2"
-      onClick={() => {
+      },
+      text: 'Redeem',
+    },
+    {
+      onClick: () => {
         logger.log('Split')
-      }}
-    >
-      Split
-    </DropdownItem>,
+      },
+      text: 'Split',
+    },
   ]
   const { networkConfig } = useWeb3Connected()
   const tokenSymbol = getTokenFromAddress(networkConfig.networkId, collateralToken.id).symbol
@@ -95,7 +91,11 @@ export const Contents = ({ position }: Props) => {
         <Dropdown
           dropdownButtonContent={<ButtonDropdownCircle />}
           dropdownPosition={DropdownPosition.right}
-          items={dropdownItems}
+          items={dropdownItems.map((item, index) => (
+            <DropdownItem key={index} onClick={item.onClick}>
+              {item.text}
+            </DropdownItem>
+          ))}
         />
       }
     >
