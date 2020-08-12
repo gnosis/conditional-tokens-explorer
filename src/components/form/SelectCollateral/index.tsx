@@ -4,37 +4,13 @@ import styled from 'styled-components'
 
 import { SplitPositionFormMethods } from '../../../pages/SplitPosition/Form'
 import { Token } from '../../../util/types'
+import { ButtonSelect } from '../../buttons/ButtonSelect'
 import { Dropdown, DropdownItem, DropdownPosition } from '../../common/Dropdown'
 import { TokenIcon } from '../../common/TokenIcon'
-
-import { ChevronDown } from './img/ChevronDown'
 
 const Wrapper = styled(Dropdown)`
   .dropdownItems {
     width: 100%;
-  }
-`
-
-const Button = styled.div`
-  align-items: center;
-  background-color: ${(props) => props.theme.textField.backgroundColor};
-  border-color: ${(props) => props.theme.textField.borderColor};
-  border-radius: ${(props) => props.theme.textField.borderRadius};
-  border-style: ${(props) => props.theme.textField.borderStyle};
-  border-width: ${(props) => props.theme.textField.borderWidth};
-  color: ${(props) => props.theme.textField.color};
-  display: flex;
-  font-size: ${(props) => props.theme.textField.fontSize};
-  font-weight: ${(props) => props.theme.textField.fontWeight};
-  height: ${(props) => props.theme.textField.height};
-  justify-content: space-between;
-  outline: none;
-  padding: 0 ${(props) => props.theme.textField.paddingHorizontal};
-  width: 100%;
-
-  .isOpen & {
-    background-color: ${(props) => props.theme.textField.backgroundColorActive};
-    border-color: ${(props) => props.theme.textField.borderColorActive};
   }
 `
 
@@ -81,11 +57,7 @@ export const SelectCollateral = ({
 }: SelectCollateralProps) => {
   const watchCollateral = watch('collateral')
   const [collateral, setCollateral] = useState(tokens[0].symbol)
-  const button = (
-    <Button>
-      <TokenIconStyled symbol={collateral} /> <ChevronDown />
-    </Button>
-  )
+  const button = <ButtonSelect content={<TokenIconStyled symbol={collateral} />} />
   const dropdownItems = tokens.map(({ address, symbol }) => {
     return (
       <DropdownItemStyled

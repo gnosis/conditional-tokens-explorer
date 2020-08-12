@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { useHistory } from 'react-router-dom'
 
 import { Button } from '../../components/buttons/Button'
+import { ButtonSelect } from '../../components/buttons/ButtonSelect'
 import { CenteredCard } from '../../components/common/CenteredCard'
 import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
 import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
@@ -72,12 +73,40 @@ export const PrepareCondition = () => {
   }, [questionId, oracleAddress, numOutcomes])
 
   const submitDisabled = !isValid || isLoading
+  const dropdownItems = [
+    {
+      text: 'Custom Reporter',
+      onClick: () => {
+        console.log('Custom Reporter')
+      },
+    },
+    {
+      text: 'Omen Condition',
+      onClick: () => {
+        console.log('Omen Condition')
+      },
+    },
+  ]
+
   return (
     <>
       <PageTitle>Prepare Condition</PageTitle>
       <CenteredCard>
         <Row cols="1fr">
-          <TitleValue title="Condition Type" value="Condition Type" />
+          <TitleValue
+            title="Condition Type"
+            value={
+              <Dropdown
+                dropdownButtonContent={<ButtonSelect content="IGORRR" />}
+                dropdownPosition={DropdownPosition.center}
+                items={dropdownItems.map((item, index) => (
+                  <DropdownItem key={index} onClick={item.onClick}>
+                    {item.text}
+                  </DropdownItem>
+                ))}
+              />
+            }
+          />
         </Row>
         <Row cols="1fr">
           <TitleValue
@@ -174,7 +203,6 @@ export const PrepareCondition = () => {
             }
           />
         </Row>
-
         <ButtonContainer>
           <Button disabled={submitDisabled} onClick={prepareCondition}>
             Prepare
