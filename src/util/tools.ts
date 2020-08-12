@@ -104,7 +104,7 @@ export const getIndexSets = (outcomesCount: number) => {
   return range(outcomesCount).map((x) => 1 << x)
 }
 
-export const positionSring = (
+export const positionString = (
   collateralTokenId: string,
   conditionIds: string[],
   indexSets: any[],
@@ -161,7 +161,7 @@ export const getRedeemedPreview = (
     const filteredConditionIds = position.conditionIds.filter((_, i) => i !== conditionIndex)
     const filteredIndexSets = position.indexSets.filter((_, i) => i !== conditionIndex)
 
-    return positionSring(
+    return positionString(
       position.collateralToken.id,
       filteredConditionIds,
       filteredIndexSets,

@@ -1,4 +1,4 @@
-import { positionSring } from 'util/tools'
+import { positionString } from 'util/tools'
 
 import React from 'react'
 
@@ -25,7 +25,7 @@ export const SelectPosition = () => {
   React.useEffect(() => {
     if (position) {
       setPositionToDisplay(
-        positionSring(
+        positionString(
           position.collateralToken.id,
           position.conditionIds,
           position.indexSets,
