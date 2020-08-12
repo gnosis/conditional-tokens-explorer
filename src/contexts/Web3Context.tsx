@@ -29,6 +29,7 @@ export type Connected = {
   networkConfig: NetworkConfig
   CTService: ConditionalTokensService
   RtioService: RealitioService
+  disconnect: () => void
 }
 
 export type Infura = {
@@ -45,7 +46,9 @@ type ErrorWeb3 = {
 }
 
 export type Web3Status = NotAsked | WaitingForUser | Connecting | Connected | ErrorWeb3 | Infura
-export const Web3Context = createContext(null as Maybe<{ status: Web3Status; connect: () => void }>)
+export const Web3Context = createContext(
+  null as Maybe<{ status: Web3Status; connect: () => void; disconnect: () => void }>
+)
 
 interface Props {
   children: JSX.Element
@@ -67,6 +70,24 @@ export const Web3ContextProvider = ({ children }: Props) => {
   const [web3Status, setWeb3Status] = useState<Web3Status>(
     web3Modal.cachedProvider ? { _type: 'connecting' } : { _type: 'notAsked' }
   )
+
+  const disconnectWeb3Modal = useCallback(async () => {
+    if (web3Status._type !== 'connected') {
+      return
+    }
+
+    try {
+      const provider = web3Status.provider as any
+      if (provider && provider.close) {
+        provider.close()
+      }
+      await web3Modal.clearCachedProvider()
+      setWeb3Status({ _type: 'notAsked' })
+    } catch (error) {
+      setWeb3Status({ _type: 'error', error } as ErrorWeb3)
+      return
+    }
+  }, [web3Status])
 
   const connectWeb3Modal = useCallback(async () => {
     if (web3Status._type === 'connected') {
@@ -145,7 +166,9 @@ export const Web3ContextProvider = ({ children }: Props) => {
   }, [connectWeb3Modal, connectInfura])
 
   return (
-    <Web3Context.Provider value={{ status: web3Status, connect: connectWeb3Modal }}>
+    <Web3Context.Provider
+      value={{ status: web3Status, connect: connectWeb3Modal, disconnect: disconnectWeb3Modal }}
+    >
       {children}
     </Web3Context.Provider>
   )
@@ -160,16 +183,16 @@ export const useWeb3Context = () => {
 }
 
 export const useWeb3Connected = () => {
-  const { status } = useWeb3Context()
+  const { disconnect, status } = useWeb3Context()
   if (status._type === 'connected') {
-    return status
+    return { ...status, disconnect }
   }
   throw new Error('[useWeb3Connected] Hook not used under a connected context')
 }
 
 export const useWeb3Disconnected = () => {
   const context = useWeb3Context()
-  if (context.status._type === 'notAsked') {
+  if (context.status._type === 'notAsked' || context.status._type === 'infura') {
     return context
   }
   throw new Error('[useWeb3Disconnected] Hook not used under a disconnected context')
