@@ -13,6 +13,8 @@ import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
 import { Row } from '../../components/pureStyledComponents/Row'
 import { Textfield } from '../../components/pureStyledComponents/Textfield'
 import { TitleControl } from '../../components/pureStyledComponents/TitleControl'
+import { FullLoading } from '../../components/statusInfo/FullLoading'
+import { IconTypes } from '../../components/statusInfo/common'
 import { TitleValue } from '../../components/text/TitleValue'
 import { ADDRESS_REGEX, BYTES_REGEX, MAX_OUTCOMES, MIN_OUTCOMES } from '../../config/constants'
 import { useWeb3Connected } from '../../contexts/Web3Context'
@@ -26,7 +28,7 @@ export const PrepareCondition = () => {
   const [numOutcomes, setNumOutcomes] = useState(0)
   const [oracleAddress, setOracleAddress] = useState('')
   const [questionId, setQuestionId] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const [isWorking, setIsWorking] = useState(false)
   const [error, setError] = useState<Maybe<Error>>(null)
 
   const { CTService, address, provider } = useWeb3Connected()
@@ -47,8 +49,10 @@ export const PrepareCondition = () => {
 
   const prepareCondition = async () => {
     if (!conditionId) return
+
     setError(null)
-    setIsLoading(true)
+    setIsWorking(true)
+
     try {
       const conditionExists = await CTService.conditionExists(conditionId)
       if (!conditionExists) {
@@ -62,7 +66,7 @@ export const PrepareCondition = () => {
     } catch (e) {
       setError(e)
     } finally {
-      setIsLoading(false)
+      setIsWorking(false)
     }
   }
 
@@ -70,7 +74,7 @@ export const PrepareCondition = () => {
     setError(null)
   }, [questionId, oracleAddress, numOutcomes])
 
-  const submitDisabled = !isValid || isLoading
+  const submitDisabled = !isValid || isWorking
 
   enum ConditionType {
     custom = 'custom',
@@ -415,14 +419,18 @@ export const PrepareCondition = () => {
             />
           )}
         </Row>
-        {conditionId ? <h1>{conditionId}</h1> : null}
+        {isWorking && (
+          <FullLoading
+            actionButton={!error ? { text: 'OK', onClick: () => setIsWorking(true) } : undefined}
+            icon={error ? IconTypes.error : IconTypes.spinner}
+            message={error ? error.message : 'Preparing condition...'}
+            title={error ? 'Error' : 'Working'}
+          />
+        )}
         <ButtonContainer>
           <Button disabled={submitDisabled} onClick={prepareCondition}>
             Prepare
           </Button>
-          <ErrorContainer>
-            <ErrorMessage>{error && error.message}</ErrorMessage>
-          </ErrorContainer>
         </ButtonContainer>
       </CenteredCard>
     </>

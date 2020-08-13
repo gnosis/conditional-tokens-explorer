@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 import { Button } from '../../buttons/Button'
 import { ButtonType } from '../../buttons/buttonStylingTypes'
-import { InlineLoading } from '../../loading/InlineLoading'
+import { InlineLoading } from '../../statusInfo/InlineLoading'
 
 const Wrapper = styled.div`
   align-items: center;

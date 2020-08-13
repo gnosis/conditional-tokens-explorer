@@ -3,9 +3,9 @@ import { getLogger } from 'util/logger'
 import { useQuery } from '@apollo/react-hooks'
 import React from 'react'
 
-import { InfoCard } from '../../components/common/InfoCard'
-import { InlineLoading } from '../../components/loading/InlineLoading'
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
+import { InfoCard } from '../../components/statusInfo/InfoCard'
+import { InlineLoading } from '../../components/statusInfo/InlineLoading'
 import { GetPositionQuery } from '../../queries/positions'
 import { GetPosition } from '../../types/generatedGQL'
 
