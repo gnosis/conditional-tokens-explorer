@@ -421,7 +421,7 @@ export const PrepareCondition = () => {
         </Row>
         {isWorking && (
           <FullLoading
-            actionButton={!error ? { text: 'OK', onClick: () => setIsWorking(true) } : undefined}
+            actionButton={error ? { text: 'OK', onClick: () => setIsWorking(true) } : undefined}
             icon={error ? IconTypes.error : IconTypes.spinner}
             message={error ? error.message : 'Preparing condition...'}
             title={error ? 'Error' : 'Working'}
