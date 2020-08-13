@@ -14,13 +14,10 @@ import { Row } from '../../components/pureStyledComponents/Row'
 import { Textfield } from '../../components/pureStyledComponents/Textfield'
 import { TitleControl } from '../../components/pureStyledComponents/TitleControl'
 import { TitleValue } from '../../components/text/TitleValue'
-import { ADDRESS_REGEX, BYTES_REGEX } from '../../config/constants'
+import { ADDRESS_REGEX, BYTES_REGEX, MAX_OUTCOMES, MIN_OUTCOMES } from '../../config/constants'
 import { useWeb3Connected } from '../../contexts/Web3Context'
 import { ConditionalTokensService } from '../../services/conditionalTokens'
 import { isAddress } from '../../util/tools'
-
-const MIN_OUTCOMES = 2
-const MAX_OUTCOMES = 256
 
 const maxOutcomesError = 'Too many outcome slots'
 const minOutcomesError = 'There should be more than one outcome slot'
@@ -386,7 +383,7 @@ export const PrepareCondition = () => {
                     setOracleAddress(address)
                   }}
                 >
-                  Use MyWallet
+                  Use My Wallet
                 </TitleControl>
               }
               value={
@@ -418,6 +415,7 @@ export const PrepareCondition = () => {
             />
           )}
         </Row>
+        {conditionId ? <h1>{conditionId}</h1> : null}
         <ButtonContainer>
           <Button disabled={submitDisabled} onClick={prepareCondition}>
             Prepare

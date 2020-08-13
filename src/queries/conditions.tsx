@@ -23,6 +23,8 @@ export const GetConditionQuery = gql`
       resolved
       creator
       payouts
+      payoutNumerators
+      payoutDenominator
       resolveTimestamp
       positions {
         id
