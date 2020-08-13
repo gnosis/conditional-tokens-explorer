@@ -4,6 +4,8 @@ import { BigNumber, formatUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
 
 import { BYTES_REGEX } from '../config/constants'
+import { getTokenFromAddress } from '../config/networkConfig'
+import { GetCondition_condition, GetPosition_position } from '../types/generatedGQL'
 
 import { ConditionErrors } from './types'
 
@@ -38,7 +40,10 @@ export const formatBigNumber = (value: BigNumber, decimals: number, precision = 
   Number(formatUnits(value, decimals)).toFixed(precision)
 
 export const isBytes32String = (s: string): boolean => BYTES_REGEX.test(s)
+
 export const isConditionIdValid = (conditionId: string): boolean => isBytes32String(conditionId)
+
+export const isPositionIdValid = (positionId: string): boolean => isBytes32String(positionId)
 
 export const truncateStringInTheMiddle = (
   str: string,
@@ -91,4 +96,79 @@ export const divBN = (a: BigNumber, b: BigNumber, scale = 10000): number => {
 
 export const mulBN = (a: BigNumber, b: number, scale = 10000): BigNumber => {
   return a.mul(Math.round(b * scale)).div(scale)
+}
+
+export const getIndexSets = (outcomesCount: number) => {
+  const range = (length: number) => [...Array(length)].map((x, i) => i)
+  return range(outcomesCount).map((x) => 1 << x)
+}
+
+export const positionString = (
+  collateralTokenId: string,
+  conditionIds: string[],
+  indexSets: any[],
+  balance: BigNumber,
+  networkId: number
+) => {
+  // Get the token
+  const token = getTokenFromAddress(networkId, collateralTokenId)
+
+  return `[${token.symbol.toUpperCase()} ${conditionIds.map((conditionId, i) => {
+    return `C:${truncateStringInTheMiddle(conditionId, 8, 6)} O:${outcomeString(
+      parseInt(indexSets[i], 10)
+    )}`
+  })}]  ${formatBigNumber(balance, token.decimals, 2)}`
+}
+
+const outcomeString = (indexSet: number) =>
+  indexSet
+    .toString(2)
+    .split('')
+    .reverse()
+    .reduce((acc, e, i) => (e !== '0' ? [...acc, i] : acc), new Array<number>())
+    .join('|')
+
+export const getRedeemedBalance = (
+  position: GetPosition_position,
+  resolvedCondition: GetCondition_condition,
+  balance: BigNumber
+) => {
+  const conditionIndex = position.conditions.findIndex(({ id }) => id === resolvedCondition.id)
+  const indexSet = position.indexSets[conditionIndex]
+
+  const { payouts } = resolvedCondition
+  const positionOutcomes = parseInt(indexSet, 10).toString(2).split('').reverse()
+
+  return positionOutcomes.reduce((acc, posOutcome, i) => {
+    const payout = payouts?.[i] as Maybe<string>
+    if (posOutcome === '1' && payout) {
+      return acc.add(mulBN(balance, Number(payout)))
+    }
+
+    return acc
+  }, new BigNumber(0))
+}
+
+export const getRedeemedPreview = (
+  position: GetPosition_position,
+  resolvedCondition: GetCondition_condition,
+  redeemedBalance: BigNumber,
+  networkId: number
+) => {
+  if (position.conditions.length > 1) {
+    const conditionIndex = position.conditions.findIndex(({ id }) => id === resolvedCondition.id)
+    const filteredConditionIds = position.conditionIds.filter((_, i) => i !== conditionIndex)
+    const filteredIndexSets = position.indexSets.filter((_, i) => i !== conditionIndex)
+
+    return positionString(
+      position.collateralToken.id,
+      filteredConditionIds,
+      filteredIndexSets,
+      redeemedBalance,
+      networkId
+    )
+  }
+
+  const { decimals, symbol } = getTokenFromAddress(networkId, position.collateralToken.id)
+  return `${formatBigNumber(redeemedBalance, decimals)} ${symbol}`
 }

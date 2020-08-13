@@ -125,7 +125,7 @@ export const Contents = ({ position }: Props) => {
         finished={false}
         loading={false}
         onUnlock={() => {
-          /**/
+          return 1
         }}
       />
       <Row cols="1fr" marginBottomXL>

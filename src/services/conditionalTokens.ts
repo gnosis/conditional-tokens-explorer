@@ -67,6 +67,14 @@ export class ConditionalTokensService {
     ])
   }
 
+  static getConbinedCollectionId(collections: Array<{ conditionId: string; indexSet: BigNumber }>) {
+    return CTHelpers.combineCollectionIds(
+      collections.map(({ conditionId, indexSet }) =>
+        CTHelpers.getCollectionId(conditionId, indexSet)
+      )
+    )
+  }
+
   static getPositionId(collateralToken: string, collectionId: string): string {
     return CTHelpers.getPositionId(collateralToken, collectionId)
   }
@@ -107,6 +115,21 @@ export class ConditionalTokensService {
       }
     )
     return tx
+  }
+
+  redeemPositions = async (
+    collateralToken: string,
+    parentCollectionId: string, // If doesn't exist, must be zero, ethers.constants.HashZero
+    conditionId: string,
+    indexSets: string[]
+  ): Promise<TransactionReceipt> => {
+    const tx = await this.contract.redeemPositions(
+      collateralToken,
+      parentCollectionId,
+      conditionId,
+      indexSets
+    )
+    return this.provider.waitForTransaction(tx.hash)
   }
 
   async getOutcomeSlotCount(conditionId: string): Promise<BigNumber> {

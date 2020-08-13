@@ -34,6 +34,15 @@ export enum ConditionErrors {
   NOT_RESOLVED_ERROR = `Condition is not resolved`,
 }
 
+export enum PositionErrors {
+  INVALID_ERROR = `Invalid position`,
+  FETCHING_ERROR = `Error fetching position`,
+  NOT_FOUND_ERROR = `Position doesn't exist`,
+  EMPTY_BALANCE_ERROR = `User doesn't had position balance`,
+}
+
+export type Errors = ConditionErrors | PositionErrors
+
 export type Token = {
   symbol: string
   address: string

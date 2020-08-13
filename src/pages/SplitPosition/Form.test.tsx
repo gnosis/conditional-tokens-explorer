@@ -1,16 +1,16 @@
+import { Remote } from 'util/remoteData'
+
 import { MockedProvider } from '@apollo/react-testing'
 import { render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { ZERO_BN } from 'config/constants'
+import { NetworkConfig } from 'config/networkConfig'
 import { Connected, Web3Context } from 'contexts/Web3Context'
 import { BigNumber } from 'ethers/utils'
 import React, { ReactElement } from 'react'
 import { act } from 'react-dom/test-utils'
 import { ThemeProvider } from 'styled-components'
-
-import { ZERO_BN } from '../../config/constants'
-import { NetworkConfig } from '../../config/networkConfig'
-import theme from '../../theme'
-import { Remote } from '../../util/remoteData'
+import theme from 'theme'
 
 import { Form } from './Form'
 
@@ -21,9 +21,11 @@ const hasUnlockedCollateral = false
 const networkConfig = new NetworkConfig(4)
 const tokens = networkConfig.getTokens()
 // eslint-disable-next-line
-const CTService = jest.mock('../../services/conditionalTokens') as any
+const CTService = jest.mock('services/conditionalTokens') as any
 
 const connect = jest.fn()
+const disconnect = jest.fn()
+
 const connectedStatus = {
   _type: 'connected',
   address: '0x123',
@@ -36,7 +38,7 @@ const connectedStatus = {
 } as Connected
 
 const renderWithConnectedProvider = (component: ReactElement) => (
-  <Web3Context.Provider value={{ status: connectedStatus, connect }}>
+  <Web3Context.Provider value={{ status: connectedStatus, connect, disconnect }}>
     <ThemeProvider theme={theme}>
       <MockedProvider>{component}</MockedProvider>
     </ThemeProvider>
@@ -58,7 +60,7 @@ test('show unlock button with zero allowance', async () => {
       />
     )
   )
-  const unlockBtn = await findByTestId('unlockButton')
+  const unlockBtn = await findByTestId('unlock-btn')
   expect(unlockBtn).toBeInTheDocument()
 })
 
@@ -85,7 +87,8 @@ test('toggle unlock button visiblity according to allowance and amount', async (
   await act(async () => {
     return userEvent.type(amountInput, '20')
   })
-  const unlockAfter = await findByTestId('unlockButton')
+  const unlockAfter = await findByTestId('unlock-btn')
+
   expect(unlockAfter).toBeInTheDocument()
 })
 
@@ -106,7 +109,7 @@ test('show unlock button after failure', async () => {
     )
   )
 
-  const unlock = await findByTestId('unlockButton')
+  const unlock = await findByTestId('unlock-btn')
   act(() => {
     return userEvent.click(unlock)
   })
@@ -124,6 +127,6 @@ test('show unlock button after failure', async () => {
     )
   )
 
-  const unlockAfterFailure = await findByTestId('unlockButton')
+  const unlockAfterFailure = await findByTestId('unlock-btn')
   expect(unlockAfterFailure).toBeInTheDocument()
 })
