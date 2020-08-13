@@ -103,7 +103,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
       <Row marginBottomXL>
         <TitleValue
           title="Condition Type"
-          value={!isConditionFromOmen ? ConditionType.Omen : ConditionType.Custom}
+          value={isConditionFromOmen ? ConditionType.Omen : ConditionType.Custom}
         />
         <TitleValue
           title="Condition Id"
@@ -122,7 +122,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
             </Pill>
           }
         />
-        {!isConditionFromOmen && (
+        {isConditionFromOmen && (
           <TitleValue title="Question Type" value={getConditionTypeTitle(templateId)} />
         )}
         <TitleValue
@@ -135,7 +135,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           }
         />
       </Row>
-      {!isConditionFromOmen && (
+      {isConditionFromOmen && (
         <>
           <Row cols="1fr" marginBottomXL>
             <TitleValue title="Question" value={title} />
@@ -161,7 +161,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
             value={formatTS(resolveTimestamp) || INFORMATION_NOT_AVAILABLE}
           />
         )}
-        {!isConditionFromOmen && <TitleValue title="Category" value={category} />}
+        {isConditionFromOmen && <TitleValue title="Category" value={category} />}
         <TitleValue
           title="Oracle"
           value={
