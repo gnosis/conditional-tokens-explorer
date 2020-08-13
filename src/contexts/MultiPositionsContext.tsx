@@ -49,7 +49,7 @@ export const MultiPositionsProvider = (props: Props) => {
   const [positionIds, setPositionIds] = useState<Array<string>>([])
   const [positions, setPositions] = useState<Array<GetMultiPositions_positions>>([])
 
-  const errors = []
+  const errors: any[] = []
 
   const addPositionId = useCallback((positionId: string): void => {
     const positionIdLc = positionId.toLowerCase()

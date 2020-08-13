@@ -1,13 +1,13 @@
 import { positionString } from 'util/tools'
 
-import { ButtonLink } from 'components/buttons'
 import { StripedList, StripedListItem } from 'components/common/StripedList'
+import { Row } from 'components/pureStyledComponents/Row'
+import { TitleControl } from 'components/pureStyledComponents/TitleControl'
 import { TitleValue } from 'components/text/TitleValue'
 import { WrapperDisplay } from 'components/text/WrapperDisplay'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { useWeb3Connected } from 'contexts/Web3Context'
 import React from 'react'
-import styled from 'styled-components'
 
 export const SelectPosition = () => {
   const { networkConfig } = useWeb3Connected()
@@ -36,6 +36,9 @@ export const SelectPosition = () => {
       setPositionsToDisplay(
         positions.map((position) => {
           const i = positionIds.findIndex((id) => id === position.id)
+
+          console.log('balance', balances[i].toString())
+
           return positionString(
             position.collateralToken.id,
             position.conditionIds,
@@ -51,27 +54,20 @@ export const SelectPosition = () => {
   }, [balances, networkConfig.networkId, positions, loading, positionIds])
 
   return (
-    <TitleValue
-      title={
-        <TitleWrapper>
-          <span>Positions</span>
-          <ButtonLink onClick={selectPosition}>Select Positions</ButtonLink>
-        </TitleWrapper>
-      }
-      value={
-        <WrapperDisplay errors={errors} loading={loading}>
-          <StripedList>
-            {positionsToDisplay.map((position: string, index: number) => (
-              <StripedListItem key={index}>{position}</StripedListItem>
-            ))}
-          </StripedList>
-        </WrapperDisplay>
-      }
-    />
+    <Row cols={'1fr'} marginBottomXL>
+      <TitleValue
+        title="Positions"
+        titleControl={<TitleControl onClick={selectPosition}>Select Positions</TitleControl>}
+        value={
+          <WrapperDisplay errors={errors} loading={loading}>
+            <StripedList>
+              {positionsToDisplay.map((position: string, index: number) => (
+                <StripedListItem key={index}>{position}</StripedListItem>
+              ))}
+            </StripedList>
+          </WrapperDisplay>
+        }
+      />
+    </Row>
   )
 }
-
-const TitleWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-`

@@ -151,9 +151,14 @@ export class ConditionalTokensService {
   }
 
   async balanceOfBatch(positionIds: Array<string>): Promise<Array<BigNumber>> {
-    const owner = await this.signer.getAddress()
-    const owners = Array.from(new Array(positionIds.length), (_) => owner)
-    return this.contract.balanceOfBatch(owners, positionIds)
+    console.log(this.signer)
+    if (this.signer) {
+      const owner = await this.signer.getAddress()
+      const owners = Array.from(new Array(positionIds.length), (_) => owner)
+      return this.contract.balanceOfBatch(owners, positionIds)
+    } else {
+      return [new BigNumber(0)]
+    }
   }
 
   async reportPayouts(questionId: string, payouts: number[]): Promise<TransactionReceipt> {

@@ -1,8 +1,8 @@
-import { ButtonLink } from 'components/buttons'
+import { Row } from 'components/pureStyledComponents/Row'
+import { TitleControl } from 'components/pureStyledComponents/TitleControl'
 import { TitleValue } from 'components/text/TitleValue'
 import { WrapperDisplay } from 'components/text/WrapperDisplay'
 import React from 'react'
-import styled from 'styled-components'
 
 import { useConditionContext } from '../../contexts/ConditionContext'
 
@@ -26,23 +26,16 @@ export const SelectCondition = () => {
   }, [condition])
 
   return (
-    <TitleValue
-      title={
-        <TitleWrapper>
-          <span>Condition Id</span>
-          <ButtonLink onClick={selectCondition}>Select Condition</ButtonLink>
-        </TitleWrapper>
-      }
-      value={
-        <WrapperDisplay errors={errors} loading={loading}>
-          {conditionToDisplay}
-        </WrapperDisplay>
-      }
-    />
+    <Row cols={'1fr'} marginBottomXL>
+      <TitleValue
+        title="Condition Id"
+        titleControl={<TitleControl onClick={selectCondition}>Select Condition</TitleControl>}
+        value={
+          <WrapperDisplay errors={errors} loading={loading}>
+            {conditionToDisplay}
+          </WrapperDisplay>
+        }
+      />
+    </Row>
   )
 }
-
-const TitleWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-`
