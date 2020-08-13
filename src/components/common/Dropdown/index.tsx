@@ -18,7 +18,7 @@ const Wrapper = styled.div<{ isOpen: boolean; disabled: boolean }>`
   outline: none;
   pointer-events: ${(props) => (props.disabled ? 'none' : 'initial')};
   position: relative;
-  z-index: 100;
+  z-index: ${(props) => (props.isOpen ? '100' : '50')};
 `
 
 const Button = styled.div`
@@ -126,7 +126,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 export const Dropdown: React.FC<Props> = (props) => {
   const {
     activeItemHighlight = true,
-    className,
+    className = '',
     closeOnClick = true,
     currentItem = 0,
     disabled = false,
