@@ -5,7 +5,8 @@ import { useHistory } from 'react-router-dom'
 import { Button } from '../../components/buttons/Button'
 import { ButtonSelect } from '../../components/buttons/ButtonSelect'
 import { CenteredCard } from '../../components/common/CenteredCard'
-import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
+import { Dropdown, DropdownPosition } from '../../components/common/Dropdown'
+import { SelectItem } from '../../components/form/SelectItem'
 import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
 import { ErrorContainer, Error as ErrorMessage } from '../../components/pureStyledComponents/Error'
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
@@ -75,26 +76,127 @@ export const PrepareCondition = () => {
   const submitDisabled = !isValid || isLoading
 
   enum ConditionType {
-    custom,
-    omen,
+    custom = 'custom',
+    omen = 'omen',
   }
-  const dropdownItems = [
+  const conditionTypeItems = [
     {
       text: 'Custom Reporter',
       onClick: () => {
         setConditionType(ConditionType.custom)
       },
-      type: ConditionType.custom,
+      value: ConditionType.custom,
     },
     {
       text: 'Omen Condition',
       onClick: () => {
         setConditionType(ConditionType.omen)
       },
-      type: ConditionType.omen,
+      value: ConditionType.omen,
     },
   ]
-  const [conditionType, setConditionType] = useState(dropdownItems[0].type)
+  const [conditionType, setConditionType] = useState(conditionTypeItems[0].value)
+
+  enum QuestionType {
+    nuancedBinary = 'nuancedBinary',
+    categorical = 'categorical',
+    binary = 'binary',
+  }
+  const questionTypeItems = [
+    {
+      text: 'Binary',
+      onClick: () => {
+        setQuestionType(QuestionType.binary)
+      },
+      value: QuestionType.binary,
+    },
+    {
+      text: 'Nuanced Binary',
+      onClick: () => {
+        setQuestionType(QuestionType.nuancedBinary)
+      },
+      value: QuestionType.nuancedBinary,
+    },
+    {
+      text: 'Categorical',
+      onClick: () => {
+        setQuestionType(QuestionType.categorical)
+      },
+      value: QuestionType.categorical,
+    },
+  ]
+  const [questionType, setQuestionType] = useState(questionTypeItems[0].value)
+
+  const categoryItems = [
+    {
+      text: 'Business & Finance',
+      onClick: () => {
+        setCategory(0)
+      },
+      value: 0,
+    },
+    {
+      text: 'Cryptocurrency',
+      onClick: () => {
+        setCategory(1)
+      },
+      value: 1,
+    },
+    {
+      text: 'News & Politics',
+      onClick: () => {
+        setCategory(2)
+      },
+      value: 2,
+    },
+    {
+      text: 'Science & Tech',
+      onClick: () => {
+        setCategory(3)
+      },
+      value: 3,
+    },
+    {
+      text: 'Sports',
+      onClick: () => {
+        setCategory(4)
+      },
+      value: 4,
+    },
+    {
+      text: 'Weather',
+      onClick: () => {
+        setCategory(5)
+      },
+      value: 5,
+    },
+    {
+      text: 'Miscellaneous',
+      onClick: () => {
+        setCategory(6)
+      },
+      value: 6,
+    },
+  ]
+  const [category, setCategory] = useState(categoryItems[0].value)
+
+  const arbitratorItems = [
+    {
+      text: 'Realit.io',
+      onClick: () => {
+        setArbitrator('realitio')
+      },
+      value: 'realitio',
+    },
+    {
+      text: 'Kleros',
+      onClick: () => {
+        setArbitrator('kleros')
+      },
+      value: 'kleros',
+    },
+  ]
+  const [arbitrator, setArbitrator] = useState(arbitratorItems[0].value)
 
   return (
     <>
@@ -107,114 +209,214 @@ export const PrepareCondition = () => {
               <Dropdown
                 dropdownButtonContent={
                   <ButtonSelect
-                    content={dropdownItems.filter((item) => item.type === conditionType)[0].text}
+                    content={
+                      conditionTypeItems.filter((item) => item.value === conditionType)[0].text
+                    }
                   />
                 }
                 dropdownPosition={DropdownPosition.center}
                 fullWidth
-                items={dropdownItems.map((item, index) => (
-                  <DropdownItem key={index} onClick={item.onClick}>
-                    {item.text}
-                  </DropdownItem>
+                items={conditionTypeItems.map((item, index) => (
+                  <SelectItem
+                    content={item.text}
+                    key={index}
+                    name="conditionType"
+                    onClick={item.onClick}
+                    value={item.value}
+                  />
                 ))}
               />
             }
           />
+          {conditionType === ConditionType.custom && (
+            <TitleValue
+              title="Question Id"
+              value={
+                <>
+                  <Textfield
+                    error={errors.questionId && true}
+                    name="questionId"
+                    onChange={(e) => setQuestionId(e.target.value)}
+                    placeholder="Type in a question Id..."
+                    ref={register({ required: true, pattern: BYTES_REGEX })}
+                    type="text"
+                  />
+                  {errors.questionId && (
+                    <ErrorContainer>
+                      {errors.questionId.type === 'pattern' && (
+                        <ErrorMessage>Invalid bytes32 string</ErrorMessage>
+                      )}
+                    </ErrorContainer>
+                  )}
+                </>
+              }
+            />
+          )}
+          {conditionType === ConditionType.omen && (
+            <>
+              <TitleValue
+                title="Question"
+                value={
+                  <Textfield name="question" placeholder="Type in a question..." type="text" />
+                }
+              />
+              <TitleValue
+                title="Question Type"
+                value={
+                  <Dropdown
+                    dropdownButtonContent={
+                      <ButtonSelect
+                        content={
+                          questionTypeItems.filter((item) => item.value === questionType)[0].text
+                        }
+                      />
+                    }
+                    dropdownPosition={DropdownPosition.center}
+                    fullWidth
+                    items={questionTypeItems.map((item, index) => (
+                      <SelectItem
+                        content={item.text}
+                        key={index}
+                        name="questionType"
+                        onClick={item.onClick}
+                        value={item.value}
+                      />
+                    ))}
+                  />
+                }
+              />
+            </>
+          )}
+          {conditionType === ConditionType.custom && (
+            <TitleValue
+              title="Outcomes"
+              value={
+                <>
+                  <Textfield
+                    error={errors.outcomesSlotCount && true}
+                    name="outcomesSlotCount"
+                    onChange={(e) => setNumOutcomes(Number(e.target.value))}
+                    placeholder="You can add between 2 and 256 outcomes..."
+                    ref={register({ required: true, min: MIN_OUTCOMES, max: MAX_OUTCOMES })}
+                    type="number"
+                  />
+                  {errors.outcomesSlotCount && (
+                    <ErrorContainer>
+                      {errors.outcomesSlotCount.type === 'max' && (
+                        <ErrorMessage>{maxOutcomesError}</ErrorMessage>
+                      )}
+                      {errors.outcomesSlotCount.type === 'min' && (
+                        <ErrorMessage>{minOutcomesError}</ErrorMessage>
+                      )}
+                      {errors.outcomesSlotCount.type === 'required' && (
+                        <ErrorMessage>Required field</ErrorMessage>
+                      )}
+                    </ErrorContainer>
+                  )}
+                </>
+              }
+            />
+          )}
         </Row>
+        {conditionType === ConditionType.omen && <Row cols="1fr">Outcomes stuff...</Row>}
         <Row cols="1fr">
-          <TitleValue
-            title="Question Id"
-            value={
-              <>
-                <Textfield
-                  error={errors.questionId && true}
-                  name="questionId"
-                  onChange={(e) => setQuestionId(e.target.value)}
-                  placeholder="Type in a question Id..."
-                  ref={register({ required: true, pattern: BYTES_REGEX })}
-                  type="text"
-                />
-                {errors.questionId && (
-                  <ErrorContainer>
-                    {errors.questionId.type === 'pattern' && (
-                      <ErrorMessage>Invalid bytes32 string</ErrorMessage>
-                    )}
-                  </ErrorContainer>
-                )}
-              </>
-            }
-          />
-        </Row>
-        <Row cols="1fr">
-          <TitleValue
-            title="Outcomes"
-            value={
-              <>
-                <Textfield
-                  error={errors.outcomesSlotCount && true}
-                  name="outcomesSlotCount"
-                  onChange={(e) => setNumOutcomes(Number(e.target.value))}
-                  placeholder="You can add between 2 and 256 outcomes..."
-                  ref={register({ required: true, min: MIN_OUTCOMES, max: MAX_OUTCOMES })}
-                  type="number"
-                />
-                {errors.outcomesSlotCount && (
-                  <ErrorContainer>
-                    {errors.outcomesSlotCount.type === 'max' && (
-                      <ErrorMessage>{maxOutcomesError}</ErrorMessage>
-                    )}
-                    {errors.outcomesSlotCount.type === 'min' && (
-                      <ErrorMessage>{minOutcomesError}</ErrorMessage>
-                    )}
-                    {errors.outcomesSlotCount.type === 'required' && (
-                      <ErrorMessage>Required field</ErrorMessage>
-                    )}
-                  </ErrorContainer>
-                )}
-              </>
-            }
-          />
-        </Row>
-        <Row cols="1fr">
-          <TitleValue
-            title="Reporting Address"
-            titleControl={
-              <TitleControl
-                onClick={() => {
-                  setValue('oracle', address, true)
-                  setOracleAddress(address)
-                }}
-              >
-                Use MyWallet
-              </TitleControl>
-            }
-            value={
-              <>
-                <Textfield
-                  error={errors.oracle && true}
-                  name="oracle"
-                  onChange={(e) => setOracleAddress(e.target.value)}
-                  placeholder="Type in a valid reporting address..."
-                  ref={register({
-                    required: true,
-                    pattern: ADDRESS_REGEX,
-                    validate: (value: string) => isAddress(value),
-                  })}
-                  type="text"
-                />
-                {errors.oracle && (
-                  <ErrorContainer>
-                    {errors.oracle.type === 'pattern' && (
-                      <ErrorMessage>Invalid address</ErrorMessage>
-                    )}
-                    {errors.oracle.type === 'validate' && (
-                      <ErrorMessage>Address checksum failed</ErrorMessage>
-                    )}
-                  </ErrorContainer>
-                )}
-              </>
-            }
-          />
+          {conditionType === ConditionType.omen && (
+            <>
+              <TitleValue
+                title="Resolution Date"
+                value={<Textfield name="resolutionDate" placeholder="MM/DD/YYY" type="date" />}
+              />
+              <TitleValue
+                title="Category"
+                value={
+                  <Dropdown
+                    dropdownButtonContent={
+                      <ButtonSelect
+                        content={categoryItems.filter((item) => item.value === category)[0].text}
+                      />
+                    }
+                    dropdownPosition={DropdownPosition.center}
+                    fullWidth
+                    items={categoryItems.map((item, index) => (
+                      <SelectItem
+                        content={item.text}
+                        key={index}
+                        name="category"
+                        onClick={item.onClick}
+                        value={item.value.toString()}
+                      />
+                    ))}
+                  />
+                }
+              />
+              <TitleValue
+                title="Arbitrator"
+                value={
+                  <Dropdown
+                    dropdownButtonContent={
+                      <ButtonSelect
+                        content={
+                          arbitratorItems.filter((item) => item.value === arbitrator)[0].text
+                        }
+                      />
+                    }
+                    dropdownPosition={DropdownPosition.center}
+                    fullWidth
+                    items={arbitratorItems.map((item, index) => (
+                      <SelectItem
+                        content={item.text}
+                        key={index}
+                        name="arbitrator"
+                        onClick={item.onClick}
+                        value={item.value}
+                      />
+                    ))}
+                  />
+                }
+              />
+            </>
+          )}
+          {conditionType === ConditionType.custom && (
+            <TitleValue
+              title="Reporting Address"
+              titleControl={
+                <TitleControl
+                  onClick={() => {
+                    setValue('oracle', address, true)
+                    setOracleAddress(address)
+                  }}
+                >
+                  Use MyWallet
+                </TitleControl>
+              }
+              value={
+                <>
+                  <Textfield
+                    error={errors.oracle && true}
+                    name="oracle"
+                    onChange={(e) => setOracleAddress(e.target.value)}
+                    placeholder="Type in a valid reporting address..."
+                    ref={register({
+                      required: true,
+                      pattern: ADDRESS_REGEX,
+                      validate: (value: string) => isAddress(value),
+                    })}
+                    type="text"
+                  />
+                  {errors.oracle && (
+                    <ErrorContainer>
+                      {errors.oracle.type === 'pattern' && (
+                        <ErrorMessage>Invalid address</ErrorMessage>
+                      )}
+                      {errors.oracle.type === 'validate' && (
+                        <ErrorMessage>Address checksum failed</ErrorMessage>
+                      )}
+                    </ErrorContainer>
+                  )}
+                </>
+              }
+            />
+          )}
         </Row>
         <ButtonContainer>
           <Button disabled={submitDisabled} onClick={prepareCondition}>
