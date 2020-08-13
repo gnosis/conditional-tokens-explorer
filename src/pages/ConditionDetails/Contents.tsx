@@ -155,15 +155,13 @@ export const Contents: React.FC<Props> = ({ condition }) => {
         </>
       )}
       <Row>
-        {resolved && (
-          <TitleValue
-            title="Resolution Date"
-            value={formatTS(resolveTimestamp) || INFORMATION_NOT_AVAILABLE}
-          />
-        )}
+        <TitleValue
+          title="Resolution Date"
+          value={formatTS(resolveTimestamp) || INFORMATION_NOT_AVAILABLE}
+        />
         {isConditionFromOmen && <TitleValue title="Category" value={category} />}
         <TitleValue
-          title="Oracle"
+          title={isConditionFromOmen ? 'Oracle' : 'Reporting Address'}
           value={
             <>
               {oracleTitle}
