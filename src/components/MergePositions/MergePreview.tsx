@@ -8,8 +8,7 @@ import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { useWeb3Connected } from 'contexts/Web3Context'
 import { BigNumber } from 'ethers/utils'
 import { position } from 'polished'
-import React, { useMemo, useState } from 'react'
-import { GetMultiPositions_positions } from 'types/generatedGQL'
+import React, { useMemo } from 'react'
 
 interface Props {
   amount: BigNumber

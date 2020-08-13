@@ -14,12 +14,10 @@ export const SelectPosition = () => {
   const {
     addPositionId,
     balances,
-    clearPositions,
     errors,
     loading,
     positionIds,
     positions,
-    removePositionId,
   } = useMultiPositionsContext()
 
   const [positionsToDisplay, setPositionsToDisplay] = React.useState<Array<string>>([])

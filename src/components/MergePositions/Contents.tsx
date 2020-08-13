@@ -1,10 +1,8 @@
 import { getLogger } from 'util/logger'
-import { arePositionMergeables, isConditionFullIndexSet, minBigNumber } from 'util/tools'
+import { isConditionFullIndexSet, minBigNumber } from 'util/tools'
 
 import { Button } from 'components/buttons'
 import { CenteredCard } from 'components/common/CenteredCard'
-import { StripedList, StripedListItem } from 'components/common/StripedList'
-import { TitleValue } from 'components/text/TitleValue'
 import { ZERO_BN } from 'config/constants'
 import { getTokenFromAddress } from 'config/networkConfig'
 import { useConditionContext } from 'contexts/ConditionContext'
@@ -13,8 +11,6 @@ import { useWeb3Connected } from 'contexts/Web3Context'
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useMemo, useState } from 'react'
 import styled from 'styled-components'
-
-import { Row } from '../../components/pureStyledComponents/Row'
 
 import { Amount } from './Amount'
 import { MergePreview } from './MergePreview'
@@ -30,7 +26,7 @@ export const Contents = () => {
 
   const { balances, positions } = useMultiPositionsContext()
 
-  const { clearCondition, condition, errors: conditionErrors } = useConditionContext()
+  const { condition, errors: conditionErrors } = useConditionContext()
 
   const isFullIndexSet = useMemo(() => {
     return condition && isConditionFullIndexSet(positions, condition)

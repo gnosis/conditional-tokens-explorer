@@ -1,13 +1,11 @@
 import { formatBigNumber } from 'util/tools'
-import { Token } from 'util/types'
 
 import { BigNumberInputWrapper } from 'components/form/BigNumberInputWrapper'
 import { Row } from 'components/pureStyledComponents/Row'
 import { TitleControl } from 'components/pureStyledComponents/TitleControl'
 import { TitleValue } from 'components/text/TitleValue'
-import { ZERO_BN } from 'config/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { useCallback, useMemo, useState } from 'react'
+import React from 'react'
 
 interface Props {
   amount: BigNumber

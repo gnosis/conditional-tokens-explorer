@@ -1,4 +1,5 @@
 import { useWeb3Context } from 'contexts/Web3Context'
+import { MergePositions } from 'pages/MergePositions'
 import React from 'react'
 import { Redirect, Route, RouteProps, Switch } from 'react-router-dom'
 
@@ -8,7 +9,6 @@ import { InlineLoading } from '../../components/loading/InlineLoading'
 import { ConditionDetails } from '../ConditionDetails'
 import { ConditionsList } from '../ConditionsList'
 import { PositionDetails } from '../PositionDetails'
-import { MergePositions } from '../MergePositions'
 import { PositionsList } from '../PositionsList'
 import { PrepareCondition } from '../PrepareCondition'
 import { SplitPosition } from '../SplitPosition'
