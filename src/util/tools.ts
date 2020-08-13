@@ -5,7 +5,11 @@ import moment from 'moment-timezone'
 
 import { BYTES_REGEX } from '../config/constants'
 import { getTokenFromAddress } from '../config/networkConfig'
-import { GetCondition_condition, GetPosition_position } from '../types/generatedGQL'
+import {
+  GetCondition_condition,
+  GetMultiPositions_positions,
+  GetPosition_position,
+} from '../types/generatedGQL'
 
 import { ConditionErrors } from './types'
 
@@ -171,4 +175,45 @@ export const getRedeemedPreview = (
 
   const { decimals, symbol } = getTokenFromAddress(networkId, position.collateralToken.id)
   return `${formatBigNumber(redeemedBalance, decimals)} ${symbol}`
+}
+
+export const arePositionMergeables = (positions: GetMultiPositions_positions[]) => {
+  // all postions include same conditions set and collateral token
+  const conditionIdsSet = positions.map((position) => [...position.conditionIds].sort().join(''))
+  return (
+    positions.length > 1 &&
+    conditionIdsSet.every((set) => set === conditionIdsSet[0]) &&
+    positions.every((position) => position.collateralToken.id === positions[0].collateralToken.id)
+  )
+}
+
+export const isConditionFullIndexSet = (
+  positions: GetMultiPositions_positions[],
+  condition: GetCondition_condition
+) => {
+  if (arePositionMergeables(positions)) {
+    // check that indexSets for condition on each position sum condition outcomeSlotCont full indexSet
+    const fullIndexSet = condition
+      ? parseInt(Array.from(new Array(condition.outcomeSlotCount), (_) => 1).join(''), 2)
+      : 0
+    const partitionIndexSet = positions.reduce((acc, position) => {
+      const conditionIndex = position.conditionIds.findIndex((id) => condition.id)
+      return acc + Number(position.indexSets[conditionIndex])
+    }, 0)
+
+    return fullIndexSet === partitionIndexSet
+  }
+  return false
+}
+
+export const minBigNumber = (values: BigNumber[]) =>
+  values.reduce((min, value) => (min.lte(value) ? min : value), values[0])
+
+export const getMergePreview = (
+  positions: GetPosition_position[],
+  condition: GetCondition_condition,
+  amount: BigNumber,
+  networkId: number
+) => {
+  return getRedeemedPreview(positions[0], condition, amount, networkId)
 }

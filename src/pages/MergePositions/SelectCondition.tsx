@@ -1,3 +1,5 @@
+import { truncateStringInTheMiddle } from 'util/tools'
+
 import { Row } from 'components/pureStyledComponents/Row'
 import { TitleControl } from 'components/pureStyledComponents/TitleControl'
 import { TitleValue } from 'components/text/TitleValue'
@@ -19,7 +21,7 @@ export const SelectCondition = () => {
 
   React.useEffect(() => {
     if (condition) {
-      setConditionToDisplay(condition.id)
+      setConditionToDisplay(truncateStringInTheMiddle(condition.id, 8, 6))
     } else {
       setConditionToDisplay('')
     }

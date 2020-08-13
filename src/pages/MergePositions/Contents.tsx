@@ -1,19 +1,23 @@
 import { getLogger } from 'util/logger'
+import { arePositionMergeables, isConditionFullIndexSet, minBigNumber } from 'util/tools'
 
 import { Button } from 'components/buttons'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { StripedList, StripedListItem } from 'components/common/StripedList'
 import { TitleValue } from 'components/text/TitleValue'
+import { ZERO_BN } from 'config/constants'
 import { getTokenFromAddress } from 'config/networkConfig'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { useWeb3Connected } from 'contexts/Web3Context'
-import React, { useMemo, useState } from 'react'
+import { BigNumber } from 'ethers/utils'
+import React, { useCallback, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
 import { Row } from '../../components/pureStyledComponents/Row'
 
 import { Amount } from './Amount'
+import { MergePreview } from './MergePreview'
 import { SelectCondition } from './SelectCondition'
 import { SelectPosition } from './SelectPosition'
 
@@ -25,66 +29,59 @@ export const Contents = () => {
   } = useWeb3Connected()
 
   const { balances, positions } = useMultiPositionsContext()
-  const arePositionMergeables = useMemo(() => {
-    // all postions include same conditions set and collateral token
-    const conditionIdsSet = positions.map((position) => [...position.conditionIds].sort().join(''))
-    return (
-      positions.length > 1 &&
-      conditionIdsSet.every((set) => set === conditionIdsSet[0]) &&
-      positions.every((position) => position.collateralToken.id === positions[0].collateralToken.id)
-    )
-  }, [positions])
 
   const { clearCondition, condition, errors: conditionErrors } = useConditionContext()
 
   const isFullIndexSet = useMemo(() => {
-    if (condition && arePositionMergeables) {
-      // once condition is set, check that indexSets for condition on each position sum condition outcomeSlotCont full indexSet
-      const fullIndexSet = condition
-        ? parseInt(Array.from(new Array(condition.outcomeSlotCount), (_) => 1).join(''), 2)
-        : 0
-      const partitionIndexSet = positions.reduce((acc, position) => {
-        const conditionIndex = position.conditionIds.findIndex((id) => condition.id)
-        return acc + Number(position.indexSets[conditionIndex])
-      }, 0)
-
-      return fullIndexSet === partitionIndexSet
-    }
-
-    return false
-  }, [positions, condition, arePositionMergeables])
+    return condition && isConditionFullIndexSet(positions, condition)
+  }, [positions, condition])
 
   const collateralToken = useMemo(() => {
-    if (positions.length && arePositionMergeables) {
+    if (positions.length && isFullIndexSet) {
       return getTokenFromAddress(networkId, positions[0].collateralToken.id)
     }
     return null
-  }, [positions, networkId, arePositionMergeables])
+  }, [positions, networkId, isFullIndexSet])
 
-  const disabled = useMemo(() => !isFullIndexSet, [isFullIndexSet])
-
-  const [positionsToMerge, setPositions] = useState<Array<any>>([
-    '[DAI C:0x123 O:0|1, C:0x345 O:0] x10',
-    '[DAI C:0x123 O:0|1, C:0x345 O:1] x10',
+  const maxBalance = useMemo(() => (isFullIndexSet ? minBigNumber(balances) : ZERO_BN), [
+    balances,
+    isFullIndexSet,
   ])
-  const [conditionId, setConditionId] = useState('0x345')
-  const [mergedPosition, setMergedPosition] = useState('[DAI C:0x123 O:0|1] x10')
+
+  const [amount, setAmount] = useState<BigNumber>(ZERO_BN)
+  const amountChangeHandler = useCallback(
+    (value: BigNumber) => {
+      if (isFullIndexSet && maxBalance.gte(value)) {
+        setAmount(value)
+      }
+    },
+    [maxBalance, isFullIndexSet]
+  )
+  const useWalletHandler = useCallback(() => {
+    if (isFullIndexSet && maxBalance.gt(ZERO_BN)) {
+      setAmount(maxBalance)
+    }
+  }, [maxBalance, isFullIndexSet])
+
+  const decimals = useMemo(() => (collateralToken ? collateralToken.decimals : 0), [
+    collateralToken,
+  ])
+
+  const disabled = useMemo(() => !isFullIndexSet || amount.isZero(), [isFullIndexSet, amount])
 
   return (
     <CenteredCard>
       <SelectPosition />
       <SelectCondition />
-      <Amount balances={balances} collateralToken={collateralToken} isMergeable={isFullIndexSet} />
-      <Row cols={'1fr'} marginBottomXL>
-        <TitleValue
-          title="Merged position preview"
-          value={
-            <StripedList>
-              <StripedListItem>{mergedPosition}</StripedListItem>
-            </StripedList>
-          }
-        />
-      </Row>
+      <Amount
+        amount={amount}
+        balance={maxBalance}
+        decimals={decimals}
+        disabled={!isFullIndexSet}
+        onAmountChange={amountChangeHandler}
+        onUseWalletBalance={useWalletHandler}
+      />
+      <MergePreview amount={amount} />
       <ButtonWrapper>
         <Button disabled={disabled}>Merge</Button>
       </ButtonWrapper>
