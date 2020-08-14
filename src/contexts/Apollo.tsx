@@ -5,7 +5,7 @@ import React from 'react'
 
 import { NetworkId } from '../util/types'
 
-import { useWeb3Context } from './Web3Context'
+import { Web3ContextStatus, useWeb3Context } from './Web3Context'
 
 interface Props {
   children: JSX.Element
@@ -16,7 +16,7 @@ export const ApolloProviderWrapper = ({ children }: Props) => {
   const client = React.useMemo(() => {
     let networkId: NetworkId = DEFAULT_NETWORK_ID
 
-    if (status._type === 'connected') {
+    if (status._type === Web3ContextStatus.Connected) {
       networkId = status.networkConfig.networkId
     }
 

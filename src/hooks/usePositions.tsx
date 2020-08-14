@@ -5,7 +5,7 @@ import { UserWithPositionsQuery } from 'queries/users'
 import { useEffect, useRef, useState } from 'react'
 import { Positions, UserWithPositions } from 'types/generatedGQL'
 
-import { useWeb3Context } from '../contexts/Web3Context'
+import { Web3ContextStatus, useWeb3Context } from '../contexts/Web3Context'
 
 import { Position, marshalPositionListData } from './utils'
 
@@ -35,7 +35,7 @@ export const usePositions = () => {
   )
 
   useEffect(() => {
-    if (status._type === 'connected') {
+    if (status._type === Web3ContextStatus.Connected) {
       account.current = status.address.toLowerCase()
     }
   }, [status])

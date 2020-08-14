@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { useWeb3Context } from '../contexts/Web3Context'
+import { Web3ContextStatus, useWeb3Context } from '../contexts/Web3Context'
 import { Question } from '../util/types'
 
 export const useQuestion = (questionId: string, outcomeSlotCount: number) => {
@@ -13,7 +13,7 @@ export const useQuestion = (questionId: string, outcomeSlotCount: number) => {
 
   React.useEffect(() => {
     let cancelled = false
-    if (status._type === 'connected' || status._type === 'infura') {
+    if (status._type === Web3ContextStatus.Connected || status._type === Web3ContextStatus.Infura) {
       if (!cancelled) setLoading(true)
 
       const { RtioService } = status

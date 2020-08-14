@@ -1,13 +1,14 @@
-import { getLogger } from 'util/logger'
-
-import { useQuery } from '@apollo/react-hooks'
 import React from 'react'
 
 import { InfoCard } from '../../components/common/InfoCard'
 import { InlineLoading } from '../../components/loading/InlineLoading'
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
-import { GetPositionQuery } from '../../queries/positions'
-import { GetPosition } from '../../types/generatedGQL'
+import { usePositionContext } from '../../contexts/PositionContext'
+import {
+  isPositionErrorFetching,
+  isPositionErrorInvalid,
+  isPositionErrorNotFound,
+} from '../../util/tools'
 
 import { Contents } from './Contents'
 
@@ -17,25 +18,28 @@ interface WrapperProps {
 
 export const Wrapper = (props: WrapperProps) => {
   const { positionId } = props
-  const logger = getLogger('PositionDetail')
 
-  const { data, error, loading } = useQuery<GetPosition>(GetPositionQuery, {
-    variables: { id: positionId },
-  })
+  const { errors, loading, position, setPositionId } = usePositionContext()
 
-  if (error) {
-    logger.error(error)
-  }
+  React.useEffect(() => {
+    setPositionId(positionId)
+  }, [positionId, setPositionId])
 
   return (
     <>
       <PageTitle>Position Details</PageTitle>
       {loading && <InlineLoading />}
-      {error && <InfoCard title="Error" />}
-      {!data && !loading && !error && (
+      {!loading && !position && isPositionErrorNotFound(errors) && (
+        <InfoCard message="We couldn't find this position..." title="Not Found" />
+      )}
+      {!loading && !position && isPositionErrorInvalid(errors) && (
+        <InfoCard message="Position not valid..." title="Error" />
+      )}
+
+      {!loading && !position && isPositionErrorFetching(errors) && (
         <InfoCard message="We couldn't fetch the data for this condition..." title="Error" />
       )}
-      {data && data.position && <Contents position={data.position} />}
+      {position && <Contents position={position} />}
     </>
   )
 }

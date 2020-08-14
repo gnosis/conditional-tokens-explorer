@@ -11,7 +11,7 @@ import { Row } from '../../components/pureStyledComponents/Row'
 import { TitleValue } from '../../components/text/TitleValue'
 import { INFORMATION_NOT_AVAILABLE } from '../../config/constants'
 import { getKnowOracleFromAddress } from '../../config/networkConfig'
-import { useWeb3Context } from '../../contexts/Web3Context'
+import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
 import { useIsConditionFromOmen } from '../../hooks/useIsConditionFromOmen'
 import { useQuestion } from '../../hooks/useQuestion'
 import { GetCondition_condition } from '../../types/generatedGQL'
@@ -68,7 +68,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
   ]
 
   let networkId = null
-  if (status._type === 'connected' || status._type === 'infura') {
+  if (status._type === Web3ContextStatus.Connected || status._type === Web3ContextStatus.Infura) {
     const { networkConfig } = status
     networkId = networkConfig.networkId
   }

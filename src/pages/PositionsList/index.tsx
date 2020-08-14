@@ -7,6 +7,7 @@ import { useHistory } from 'react-router-dom'
 import { InfoCard } from '../../components/common/InfoCard'
 import { InlineLoading } from '../../components/loading/InlineLoading'
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
+import { Web3ContextStatus } from '../../contexts/Web3Context'
 
 const dafaultColumns = [
   {
@@ -22,7 +23,7 @@ const dafaultColumns = [
 ]
 
 const getTableColumns = (status: Web3Status) => {
-  if (status._type === 'connected') {
+  if (status._type === Web3ContextStatus.Connected) {
     return [
       ...dafaultColumns,
       {

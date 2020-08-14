@@ -1,22 +1,28 @@
 import { BigNumber } from 'ethers/utils'
-import { useEffect, useState } from 'react'
+import React from 'react'
 
-import { useWeb3Connected } from '../contexts/Web3Context'
+import { Web3ContextStatus, useWeb3Context } from '../contexts/Web3Context'
 
 export const useBalanceForPosition = (position: string) => {
-  const { CTService } = useWeb3Connected()
+  const { status } = useWeb3Context()
 
-  const [balance, setBalance] = useState<BigNumber>(new BigNumber(0))
-  const [error, setError] = useState<Maybe<string>>(null)
-  const [loading, setLoading] = useState<boolean>(true)
+  const [balance, setBalance] = React.useState<BigNumber>(new BigNumber(0))
+  const [error, setError] = React.useState<Maybe<string>>(null)
+  const [loading, setLoading] = React.useState<boolean>(true)
 
-  useEffect(() => {
+  React.useEffect(() => {
     setLoading(true)
 
     const getBalance = async (position: string) => {
       try {
-        const balance = await CTService.balanceOf(position)
-        setBalance(balance)
+        if (
+          status._type === Web3ContextStatus.Infura ||
+          status._type === Web3ContextStatus.Connected
+        ) {
+          const { CTService } = status
+          const balance = await CTService.balanceOf(position)
+          setBalance(balance)
+        }
       } catch (err) {
         setError(err)
       }
@@ -25,7 +31,7 @@ export const useBalanceForPosition = (position: string) => {
     getBalance(position)
 
     setLoading(false)
-  }, [CTService, position, setBalance, setError, setLoading])
+  }, [status, position, setBalance, setError, setLoading])
 
   return {
     balance,
