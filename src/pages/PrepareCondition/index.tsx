@@ -6,6 +6,7 @@ import { Button } from '../../components/buttons/Button'
 import { ButtonSelect } from '../../components/buttons/ButtonSelect'
 import { CenteredCard } from '../../components/common/CenteredCard'
 import { Dropdown, DropdownPosition } from '../../components/common/Dropdown'
+import { AddOutcome } from '../../components/form/AddOutcome'
 import { SelectItem } from '../../components/form/SelectItem'
 import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
 import { ErrorContainer, Error as ErrorMessage } from '../../components/pureStyledComponents/Error'
@@ -286,6 +287,7 @@ export const PrepareCondition = () => {
                   />
                 }
               />
+              <AddOutcome />
             </>
           )}
           {conditionType === ConditionType.custom && (
@@ -319,7 +321,6 @@ export const PrepareCondition = () => {
             />
           )}
         </Row>
-        {conditionType === ConditionType.omen && <Row cols="1fr">Outcomes stuff...</Row>}
         <Row cols="1fr">
           {conditionType === ConditionType.omen && (
             <>
