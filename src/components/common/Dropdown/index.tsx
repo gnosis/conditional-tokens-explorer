@@ -19,6 +19,11 @@ const Wrapper = styled.div<{ isOpen: boolean; disabled: boolean }>`
   pointer-events: ${(props) => (props.disabled ? 'none' : 'initial')};
   position: relative;
   z-index: ${(props) => (props.isOpen ? '100' : '50')};
+
+  &[disabled] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
 `
 
 const Button = styled.div`
