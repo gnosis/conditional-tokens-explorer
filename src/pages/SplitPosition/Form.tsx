@@ -164,11 +164,15 @@ export const Form = ({
     (allowance) => allowance.gte(amount) && !allowance.isZero()
   )
 
-  // We show the allowance component if we know the user doesn't have enough allowance
-  const showAskAllowance =
-    (hasEnoughAllowance.hasData() && !hasEnoughAllowance.get()) ||
-    hasUnlockedCollateral ||
-    allowance.isLoading()
+  const notEnoughAllowance = hasEnoughAllowance.hasData() && !hasEnoughAllowance.get()
+
+  console.log('successWithEnoughAllowance', notEnoughAllowance)
+
+  // We show the allowance component if
+  // - *We know* that the user doesn't have enough allowance
+  // - The user just unlocked his collateral
+  // - allowance is loading
+  const showAskAllowance = notEnoughAllowance || hasUnlockedCollateral || allowance.isLoading()
 
   const canSubmit = isValid && (hasEnoughAllowance.getOr(false) || hasUnlockedCollateral)
   const mockedNumberedOutcomes = [
@@ -199,13 +203,14 @@ export const Form = ({
           }
         />
       </Row>
-      <SetAllowance
-        collateral={collateralToken}
-        fetching={!showAskAllowance}
-        finished={hasUnlockedCollateral && hasEnoughAllowance.getOr(false)}
-        loading={allowance.isLoading()}
-        onUnlock={unlockCollateral}
-      />
+      {showAskAllowance && (
+        <SetAllowance
+          collateral={collateralToken}
+          fetching={allowance.isLoading()}
+          finished={hasUnlockedCollateral && hasEnoughAllowance.getOr(false)}
+          onUnlock={unlockCollateral}
+        />
+      )}
       <Row cols="1fr" marginBottomXL>
         <InputAmount
           collateral={collateralToken}
