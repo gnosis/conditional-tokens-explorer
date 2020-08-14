@@ -34,7 +34,7 @@ export const SelectCollateral = ({
         onClick={() => {
           setCollateral(symbol)
         }}
-        ref={register({ required: splitFromCollateral })}
+        radioRef={register({ required: splitFromCollateral })}
         value={address}
       />
     )

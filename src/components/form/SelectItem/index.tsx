@@ -33,7 +33,7 @@ const Content = styled.span`
 interface Props {
   content: React.ReactNode | string
   name: string
-  ref?:
+  radioRef?:
     | ((instance: HTMLInputElement | null) => void)
     | React.RefObject<HTMLInputElement>
     | null
@@ -43,12 +43,12 @@ interface Props {
 }
 
 export const SelectItem: React.FC<Props> = (props) => {
-  const { content, name, ref, value, ...restProps } = props
+  const { content, name, radioRef, value, ...restProps } = props
 
   return (
     <Wrappper {...restProps}>
       <Option>
-        <Radio name={name} ref={ref} type="radio" value={value} />
+        <Radio name={name} ref={radioRef} type="radio" value={value} />
         <Content>{content}</Content>
       </Option>
     </Wrappper>
