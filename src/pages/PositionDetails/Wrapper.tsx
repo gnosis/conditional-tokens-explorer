@@ -37,7 +37,7 @@ export const Wrapper = (props: WrapperProps) => {
       )}
 
       {!loading && !position && isPositionErrorFetching(errors) && (
-        <InfoCard message="We couldn't fetch the data for this condition..." title="Error" />
+        <InfoCard message="We couldn't fetch the data for this position..." title="Error" />
       )}
       {position && <Contents position={position} />}
     </>

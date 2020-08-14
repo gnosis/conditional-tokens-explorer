@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { useForm } from 'react-hook-form'
 import { useHistory } from 'react-router-dom'
 
 import { ADDRESS_REGEX, BYTES_REGEX, MAX_OUTCOMES, MIN_OUTCOMES } from '../../config/constants'
-import { useWeb3Connected } from '../../contexts/Web3Context'
+import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
 import { ConditionalTokensService } from '../../services/conditionalTokens'
 import { isAddress } from '../../util/tools'
 
@@ -11,13 +11,14 @@ const maxOutcomesError = 'Too many outcome slots'
 const minOutcomesError = 'There should be more than one outcome slot'
 
 export const PrepareCondition = () => {
-  const [numOutcomes, setNumOutcomes] = useState(0)
-  const [oracleAddress, setOracleAddress] = useState('')
-  const [questionId, setQuestionId] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<Maybe<Error>>(null)
+  const [numOutcomes, setNumOutcomes] = React.useState(0)
+  const [oracleAddress, setOracleAddress] = React.useState('')
+  const [questionId, setQuestionId] = React.useState('')
+  const [isLoading, setIsLoading] = React.useState(false)
+  const [error, setError] = React.useState<Maybe<Error>>(null)
 
-  const { CTService, address, provider } = useWeb3Connected()
+  const { connect, status } = useWeb3Context()
+
   const {
     errors,
     formState: { isValid },
@@ -38,14 +39,20 @@ export const PrepareCondition = () => {
     setError(null)
     setIsLoading(true)
     try {
-      const conditionExists = await CTService.conditionExists(conditionId)
-      if (!conditionExists) {
-        const tx = await CTService.prepareCondition(questionId, oracleAddress, numOutcomes)
-        await provider.waitForTransaction(tx)
+      if (status._type === Web3ContextStatus.Connected) {
+        const { CTService, provider } = status
 
-        history.push(`/conditions/${conditionId}`)
-      } else {
-        setError(new Error('Condition already exists'))
+        const conditionExists = await CTService.conditionExists(conditionId)
+        if (!conditionExists) {
+          const tx = await CTService.prepareCondition(questionId, oracleAddress, numOutcomes)
+          await provider.waitForTransaction(tx)
+
+          history.push(`/conditions/${conditionId}`)
+        } else {
+          setError(new Error('Condition already exists'))
+        }
+      } else if (status._type === Web3ContextStatus.Infura) {
+        connect()
       }
     } catch (e) {
       setError(e)
@@ -54,11 +61,22 @@ export const PrepareCondition = () => {
     }
   }
 
-  useEffect(() => {
+  React.useEffect(() => {
     setError(null)
   }, [questionId, oracleAddress, numOutcomes])
 
   const submitDisabled = !isValid || isLoading
+
+  const onClickUseMyWallet = () => {
+    if (status._type === Web3ContextStatus.Connected) {
+      const { address } = status
+      setValue('oracle', address, true)
+      setOracleAddress(address)
+    } else if (status._type === Web3ContextStatus.Infura) {
+      connect()
+    }
+  }
+
   return (
     <>
       <p>{numOutcomes}</p>
@@ -95,14 +113,7 @@ export const PrepareCondition = () => {
           {errors.oracle.type === 'validate' && 'Address checksum failed'}
         </div>
       )}
-      <button
-        onClick={() => {
-          setValue('oracle', address, true)
-          setOracleAddress(address)
-        }}
-      >
-        Use MyWallet
-      </button>
+      <button onClick={onClickUseMyWallet}>Use MyWallet</button>
 
       <p>{questionId}</p>
       <h3>Question Id</h3>

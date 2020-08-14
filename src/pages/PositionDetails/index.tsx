@@ -13,7 +13,4 @@ export const PositionDetails = () => {
       <Wrapper positionId={positionId} />
     </PositionProvider>
   )
-  {
-    /*<InfoCard message="We couldn't find this position..." title="Not Found" />*/
-  }
 }
