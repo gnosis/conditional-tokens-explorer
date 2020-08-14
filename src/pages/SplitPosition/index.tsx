@@ -1,4 +1,5 @@
 import { BigNumber } from 'ethers/utils'
+import { useAllowance } from 'hooks/useAllowance'
 import React, { useCallback, useState } from 'react'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 
@@ -14,6 +15,7 @@ export const SplitPosition = () => {
   const { CTService, networkConfig } = useWeb3Connected()
   const tokens = networkConfig.getTokens()
   const [collateralToken, setCollateralToken] = useState(tokens[0].address)
+  const allowanceMethods = useAllowance(collateralToken)
 
   const splitPosition = useCallback(
     async (
@@ -57,7 +59,12 @@ export const SplitPosition = () => {
   return (
     <>
       <PageTitle>Split Position</PageTitle>
-      <Form onCollateralChange={setCollateralToken} splitPosition={splitPosition} tokens={tokens} />
+      <Form
+        allowanceMethods={allowanceMethods}
+        onCollateralChange={setCollateralToken}
+        splitPosition={splitPosition}
+        tokens={tokens}
+      />
     </>
   )
 }

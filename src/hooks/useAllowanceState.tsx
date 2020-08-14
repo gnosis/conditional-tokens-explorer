@@ -1,18 +1,21 @@
 import { Remote } from 'util/remoteData'
 
 import { constants } from 'ethers'
+import { TransactionResponse } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 import { useCallback, useEffect, useState } from 'react'
 
-import { useAllowance } from './useAllowance'
-
+export type AllowanceMethods = {
+  refresh: () => Promise<BigNumber>
+  unlock: () => Promise<TransactionResponse>
+}
 /**
- * Return the state related to allowance permission given a collateral token
+ * Return the state related to allowance permission given a pair of allowance methods
  * and an amount.
  *
  */
-export const useAllowanceState = (collateralToken: string, amount: BigNumber) => {
-  const { refresh, unlock } = useAllowance(collateralToken)
+export const useAllowanceState = (allowanceMethods: AllowanceMethods, amount: BigNumber) => {
+  const { refresh, unlock } = allowanceMethods
   const [allowance, setAllowance] = useState<Remote<BigNumber>>(Remote.notAsked<BigNumber>())
   const [hasUnlockedCollateral, setHasUnlockedCollateral] = useState(false)
   const [allowanceFinished, setAllowanceFinished] = useState(false)
@@ -46,7 +49,7 @@ export const useAllowanceState = (collateralToken: string, amount: BigNumber) =>
 
   useEffect(() => {
     setHasUnlockedCollateral(false)
-  }, [collateralToken])
+  }, [unlock, refresh])
 
   useEffect(() => {
     const hasEnoughAllowance = allowance.map(

@@ -1,6 +1,6 @@
 import { useWeb3Connected } from 'contexts/Web3Context'
 import { BigNumber } from 'ethers/utils'
-import { useAllowanceState } from 'hooks/useAllowanceState'
+import { AllowanceMethods, useAllowanceState } from 'hooks/useAllowanceState'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { ERC20Service } from 'services/erc20'
@@ -43,6 +43,7 @@ export type SplitPositionFormMethods = {
 }
 
 interface Props {
+  allowanceMethods: AllowanceMethods
   onCollateralChange: (collateral: string) => void
   splitPosition: (
     collateral: string,
@@ -54,7 +55,7 @@ interface Props {
   tokens: Token[]
 }
 
-export const Form = ({ onCollateralChange, splitPosition, tokens }: Props) => {
+export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, tokens }: Props) => {
   const DEFAULT_VALUES = useMemo(() => {
     return {
       conditionId: '',
@@ -151,7 +152,7 @@ export const Form = ({ onCollateralChange, splitPosition, tokens }: Props) => {
   ])
 
   const { allowanceFinished, fetching, showAskAllowance, unlockCollateral } = useAllowanceState(
-    collateralToken.address,
+    allowanceMethods,
     amount
   )
 
