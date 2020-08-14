@@ -40,7 +40,6 @@ export const SetAllowance = (props: Props) => {
   const { collateral, fetching, finished, onUnlock } = props
   const btnText = fetching ? 'Working...' : finished ? 'Done!' : 'Unlock'
 
-  console.log(props)
   return (
     <Wrapper>
       {fetching ? (
