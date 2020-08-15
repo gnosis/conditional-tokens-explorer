@@ -1,13 +1,18 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 
-import { StripedList, StripedListItem } from '../../common/StripedList'
 import { Row } from '../../pureStyledComponents/Row'
+import {
+  StripedList,
+  StripedListEmpty,
+  StripedListItem,
+} from '../../pureStyledComponents/StripedList'
 import { Textfield } from '../../pureStyledComponents/Textfield'
 import { TitleValue } from '../../text/TitleValue'
 
 import { IconDelete } from './img/IconDelete'
 import { IconEdit } from './img/IconEdit'
+import { IconOk } from './img/IconOk'
 import { IconPlus } from './img/IconPlus'
 
 const ButtonAdd = styled.button`
@@ -121,42 +126,31 @@ const Outcome = styled.input`
   }
 `
 
-const mockedOutcomes = [
-  {
-    text: 'Outcome Number 1',
-  },
-  {
-    text: 'Outcome Number 2',
-  },
-  {
-    text: 'Outcome Number 3',
-  },
-  {
-    text: 'Outcome Number 4',
-  },
-  {
-    text: 'Outcome Number 5',
-  },
-]
-
-const EditableOutcome: React.FC<{ index: number }> = (props) => {
-  const { index, ...restProps } = props
+const EditableOutcome: React.FC<{ item: OutcomeProps }> = (props) => {
+  const { item, ...restProps } = props
   const [isEditing, setIsEditing] = useState(false)
-  const [value, setValue] = useState<string>(mockedOutcomes[index].text)
+  const [value, setValue] = useState<OutcomeProps>(item)
 
   return (
     <OutcomeWrapper {...restProps}>
       <Outcome
         onBlur={() => setIsEditing(false)}
-        onChange={(e) => setValue(e.currentTarget.value)}
+        onChange={(e) => setValue({ text: e.currentTarget.value })}
         readOnly={!isEditing}
         type="text"
-        value={value}
+        value={value.text}
       />
       <Controls>
-        <ButtonControl onClick={() => setIsEditing(!isEditing)}>
-          <IconEdit />
-        </ButtonControl>
+        {!isEditing && (
+          <ButtonControl onClick={() => setIsEditing(true)}>
+            <IconEdit />
+          </ButtonControl>
+        )}
+        {isEditing && (
+          <ButtonControl onClick={() => setIsEditing(false)}>
+            <IconOk />
+          </ButtonControl>
+        )}
         <ButtonControl>
           <IconDelete />
         </ButtonControl>
@@ -165,8 +159,19 @@ const EditableOutcome: React.FC<{ index: number }> = (props) => {
   )
 }
 
-export const AddOutcome: React.FC = (props) => {
-  const { ...restProps } = props
+export interface OutcomeProps {
+  text: string | undefined
+}
+
+interface Props {
+  addOutcome: () => void
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  outcome: OutcomeProps
+  outcomes: Array<OutcomeProps>
+}
+
+export const AddOutcome: React.FC<Props> = (props) => {
+  const { addOutcome, onChange, outcome, outcomes, ...restProps } = props
 
   return (
     <Row cols="1fr" {...restProps}>
@@ -174,8 +179,13 @@ export const AddOutcome: React.FC = (props) => {
         title="Add Outcome"
         value={
           <NewOutcomeWrapper>
-            <Textfield name="addOutcome" placeholder="New outcome title..." type="text" />
-            <ButtonAdd>
+            <Textfield
+              onChange={onChange}
+              placeholder="New outcome title..."
+              type="text"
+              value={outcome.text}
+            />
+            <ButtonAdd disabled={!outcome.text} onClick={addOutcome}>
               <IconPlus />
             </ButtonAdd>
           </NewOutcomeWrapper>
@@ -185,11 +195,15 @@ export const AddOutcome: React.FC = (props) => {
         title="Outcomes"
         value={
           <StripedList>
-            {mockedOutcomes.map((item, index) => (
-              <StripedListItem key={index}>
-                <EditableOutcome index={index} />
-              </StripedListItem>
-            ))}
+            {outcomes.length ? (
+              outcomes.map((item, index) => (
+                <StripedListItem key={index}>
+                  <EditableOutcome item={item} />
+                </StripedListItem>
+              ))
+            ) : (
+              <StripedListEmpty>No outcomes.</StripedListEmpty>
+            )}
           </StripedList>
         }
       />

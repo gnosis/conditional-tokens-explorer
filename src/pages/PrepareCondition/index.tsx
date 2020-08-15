@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useHistory } from 'react-router-dom'
 
@@ -6,7 +6,7 @@ import { Button } from '../../components/buttons/Button'
 import { ButtonSelect } from '../../components/buttons/ButtonSelect'
 import { CenteredCard } from '../../components/common/CenteredCard'
 import { Dropdown, DropdownPosition } from '../../components/common/Dropdown'
-import { AddOutcome } from '../../components/form/AddOutcome'
+import { AddOutcome, OutcomeProps } from '../../components/form/AddOutcome'
 import { SelectItem } from '../../components/form/SelectItem'
 import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
 import { ErrorContainer, Error as ErrorMessage } from '../../components/pureStyledComponents/Error'
@@ -200,6 +200,17 @@ export const PrepareCondition = () => {
   ]
   const [arbitrator, setArbitrator] = useState(arbitratorItems[0].value)
 
+  const [outcomes, setOutcomes] = useState<Array<OutcomeProps>>([])
+  const [outcome, setOutcome] = useState<OutcomeProps>({ text: '' })
+
+  const addOutcome = useCallback(() => {
+    setOutcome({ text: '' })
+    setOutcomes([...outcomes, outcome])
+  }, [outcome, outcomes])
+
+  const onOutcomeChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setOutcome({ text: e.currentTarget.value })
+
   return (
     <>
       <PageTitle>Prepare Condition</PageTitle>
@@ -287,7 +298,12 @@ export const PrepareCondition = () => {
                   />
                 }
               />
-              <AddOutcome />
+              <AddOutcome
+                addOutcome={addOutcome}
+                onChange={onOutcomeChange}
+                outcome={outcome}
+                outcomes={outcomes}
+              />
             </>
           )}
           {conditionType === ConditionType.custom && (
