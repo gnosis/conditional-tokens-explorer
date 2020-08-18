@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { Row } from '../../pureStyledComponents/Row'
@@ -129,16 +129,19 @@ const Outcome = styled.input`
 const EditableOutcome: React.FC<{ item: OutcomeProps; removeOutcome: () => void }> = (props) => {
   const { item, removeOutcome, ...restProps } = props
   const [isEditing, setIsEditing] = useState(false)
-  const [value, setValue] = useState<OutcomeProps>(item)
+  const [value, setValue] = useState<string | undefined>(item.text)
+
+  console.log(item)
+  console.log('value: ' + value)
 
   return (
     <OutcomeWrapper {...restProps}>
       <Outcome
         onBlur={() => setIsEditing(false)}
-        onChange={(e) => setValue({ text: e.currentTarget.value })}
+        onChange={(e) => setValue(e.currentTarget.value)}
         readOnly={!isEditing}
         type="text"
-        value={value.text}
+        value={value}
       />
       <Controls>
         {!isEditing && (
@@ -186,7 +189,6 @@ export const AddOutcome: React.FC<Props> = (props) => {
       }
     }
   }
-
   return (
     <Row cols="1fr" {...restProps}>
       <TitleValue

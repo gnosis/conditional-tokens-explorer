@@ -211,6 +211,8 @@ export const PrepareCondition = () => {
   const removeOutcome = useCallback(
     (index: number) => {
       outcomes.splice(index, 1)
+      setOutcomes([...outcomes])
+      console.log(outcomes)
     },
     [outcomes]
   )
