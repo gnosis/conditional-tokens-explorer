@@ -1,7 +1,7 @@
 import { positionString } from 'util/tools'
 
-import { StripedList, StripedListItem } from 'components/common/StripedList'
 import { Row } from 'components/pureStyledComponents/Row'
+import { StripedList, StripedListItem } from 'components/pureStyledComponents/StripedList'
 import { TitleControl } from 'components/pureStyledComponents/TitleControl'
 import { TitleValue } from 'components/text/TitleValue'
 import { WrapperDisplay } from 'components/text/WrapperDisplay'
