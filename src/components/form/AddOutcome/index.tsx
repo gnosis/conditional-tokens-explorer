@@ -126,8 +126,8 @@ const Outcome = styled.input`
   }
 `
 
-const EditableOutcome: React.FC<{ item: OutcomeProps }> = (props) => {
-  const { item, ...restProps } = props
+const EditableOutcome: React.FC<{ item: OutcomeProps; removeOutcome: () => void }> = (props) => {
+  const { item, removeOutcome, ...restProps } = props
   const [isEditing, setIsEditing] = useState(false)
   const [value, setValue] = useState<OutcomeProps>(item)
 
@@ -151,7 +151,7 @@ const EditableOutcome: React.FC<{ item: OutcomeProps }> = (props) => {
             <IconOk />
           </ButtonControl>
         )}
-        <ButtonControl>
+        <ButtonControl onClick={removeOutcome}>
           <IconDelete />
         </ButtonControl>
       </Controls>
@@ -164,6 +164,7 @@ export interface OutcomeProps {
 }
 
 interface Props {
+  removeOutcome: (index: number) => void
   addOutcome: () => void
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   outcome: OutcomeProps
@@ -171,7 +172,20 @@ interface Props {
 }
 
 export const AddOutcome: React.FC<Props> = (props) => {
-  const { addOutcome, onChange, outcome, outcomes, ...restProps } = props
+  const { addOutcome, onChange, outcome, outcomes, removeOutcome, ...restProps } = props
+  const newOutcomeDisabled = outcomes.length === 256
+  const buttonAddDisabled = !outcome.text || newOutcomeDisabled
+  const outcomeNameRef = React.createRef<HTMLInputElement>()
+
+  const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !buttonAddDisabled) {
+      addOutcome()
+
+      if (outcomeNameRef && outcomeNameRef.current) {
+        outcomeNameRef.current.focus()
+      }
+    }
+  }
 
   return (
     <Row cols="1fr" {...restProps}>
@@ -180,12 +194,17 @@ export const AddOutcome: React.FC<Props> = (props) => {
         value={
           <NewOutcomeWrapper>
             <Textfield
+              disabled={newOutcomeDisabled}
               onChange={onChange}
+              onKeyUp={(e) => {
+                onPressEnter(e)
+              }}
               placeholder="New outcome title..."
+              ref={outcomeNameRef}
               type="text"
               value={outcome.text}
             />
-            <ButtonAdd disabled={!outcome.text} onClick={addOutcome}>
+            <ButtonAdd disabled={buttonAddDisabled} onClick={addOutcome}>
               <IconPlus />
             </ButtonAdd>
           </NewOutcomeWrapper>
@@ -198,7 +217,7 @@ export const AddOutcome: React.FC<Props> = (props) => {
             {outcomes.length ? (
               outcomes.map((item, index) => (
                 <StripedListItem key={index}>
-                  <EditableOutcome item={item} />
+                  <EditableOutcome item={item} removeOutcome={() => removeOutcome(index)} />
                 </StripedListItem>
               ))
             ) : (

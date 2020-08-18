@@ -208,6 +208,13 @@ export const PrepareCondition = () => {
     setOutcomes([...outcomes, outcome])
   }, [outcome, outcomes])
 
+  const removeOutcome = useCallback(
+    (index: number) => {
+      outcomes.splice(index, 1)
+    },
+    [outcomes]
+  )
+
   const onOutcomeChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setOutcome({ text: e.currentTarget.value })
 
@@ -303,6 +310,7 @@ export const PrepareCondition = () => {
                 onChange={onOutcomeChange}
                 outcome={outcome}
                 outcomes={outcomes}
+                removeOutcome={removeOutcome}
               />
             </>
           )}
