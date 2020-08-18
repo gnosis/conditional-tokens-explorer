@@ -1,69 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { FormContextValues } from 'react-hook-form'
-import styled from 'styled-components'
 
 import { SplitPositionFormMethods } from '../../../pages/SplitPosition/Form'
 import { Token } from '../../../util/types'
-import { Dropdown, DropdownItem, DropdownPosition } from '../../common/Dropdown'
+import { ButtonSelect } from '../../buttons/ButtonSelect'
+import { Dropdown, DropdownPosition } from '../../common/Dropdown'
 import { TokenIcon } from '../../common/TokenIcon'
-
-import { ChevronDown } from './img/ChevronDown'
-
-const Wrapper = styled(Dropdown)`
-  .dropdownItems {
-    width: 100%;
-  }
-`
-
-const Button = styled.div`
-  align-items: center;
-  background-color: ${(props) => props.theme.textField.backgroundColor};
-  border-color: ${(props) => props.theme.textField.borderColor};
-  border-radius: ${(props) => props.theme.textField.borderRadius};
-  border-style: ${(props) => props.theme.textField.borderStyle};
-  border-width: ${(props) => props.theme.textField.borderWidth};
-  color: ${(props) => props.theme.textField.color};
-  display: flex;
-  font-size: ${(props) => props.theme.textField.fontSize};
-  font-weight: ${(props) => props.theme.textField.fontWeight};
-  height: ${(props) => props.theme.textField.height};
-  justify-content: space-between;
-  outline: none;
-  padding: 0 ${(props) => props.theme.textField.paddingHorizontal};
-  width: 100%;
-
-  .isOpen & {
-    background-color: ${(props) => props.theme.textField.backgroundColorActive};
-    border-color: ${(props) => props.theme.textField.borderColorActive};
-  }
-`
-
-const DropdownItemStyled = styled(DropdownItem)`
-  padding: 0;
-`
-
-const Option = styled.label`
-  align-items: center;
-  cursor: pointer;
-  display: flex;
-  height: ${(props) => props.theme.dropdown.item.height};
-  padding: 0 ${(props) => props.theme.dropdown.item.paddingHorizontal};
-  position: relative;
-  width: 100%;
-`
-
-const Radio = styled.input`
-  height: 100%;
-  opacity: 0;
-  position: absolute;
-  width: 100%;
-  z-index: 5;
-`
-
-const TokenIconStyled = styled(TokenIcon)`
-  position: relative;
-  z-index: 1;
-`
+import { SelectItem } from '../../form/SelectItem'
 
 export interface SelectCollateralProps {
   formMethods: FormContextValues<SplitPositionFormMethods>
@@ -81,29 +24,19 @@ export const SelectCollateral = ({
 }: SelectCollateralProps) => {
   const watchCollateral = watch('collateral')
   const [collateral, setCollateral] = useState(tokens[0].symbol)
-  const button = (
-    <Button>
-      <TokenIconStyled symbol={collateral} /> <ChevronDown />
-    </Button>
-  )
+  const button = <ButtonSelect content={<TokenIcon symbol={collateral} />} />
   const dropdownItems = tokens.map(({ address, symbol }) => {
     return (
-      <DropdownItemStyled
+      <SelectItem
+        content={<TokenIcon symbol={symbol} />}
         key={address}
+        name="collateral"
         onClick={() => {
           setCollateral(symbol)
         }}
-      >
-        <Option>
-          <Radio
-            name="collateral"
-            ref={register({ required: splitFromCollateral })}
-            type="radio"
-            value={address}
-          />
-          <TokenIconStyled symbol={symbol} />
-        </Option>
-      </DropdownItemStyled>
+        radioRef={register({ required: splitFromCollateral })}
+        value={address}
+      />
     )
   })
 
@@ -112,10 +45,11 @@ export const SelectCollateral = ({
   }, [watchCollateral, onCollateralChange])
 
   return (
-    <Wrapper
+    <Dropdown
       {...restProps}
       dropdownButtonContent={button}
       dropdownPosition={DropdownPosition.center}
+      fullWidth
       items={dropdownItems}
     />
   )

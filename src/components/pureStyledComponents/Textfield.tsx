@@ -19,12 +19,14 @@ export const TextfieldCSS = css<{ error?: boolean }>`
   &:active,
   &:focus {
     background-color: ${(props) => props.theme.textField.backgroundColorActive};
-    border-color: ${(props) => props.theme.textField.borderColorActive};
+    border-color: ${(props) =>
+      props.error ? props.theme.textField.errorColor : props.theme.textField.borderColor};
   }
 
   &::placeholder {
     color: ${(props) => props.theme.textField.colorPlaceholder};
     font-style: normal;
+    opacity: 1;
   }
 
   &[disabled],
