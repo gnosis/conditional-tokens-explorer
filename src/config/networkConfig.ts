@@ -2,6 +2,8 @@ import { NetworkIds, Token } from '../util/types'
 
 import {
   EARLIEST_GANACHE_BLOCK_TO_CHECK,
+  CONDITION_TOKEN_CONTRACT_ADDRESS_FOR_MAINNET,
+  CONDITION_TOKEN_CONTRACT_ADDRESS_FOR_RINKEBY,
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
   EARLIEST_RINKEBY_BLOCK_TO_CHECK,
   GRAPH_HTTP_GANACHE,
@@ -10,6 +12,8 @@ import {
   GRAPH_WS_GANACHE,
   GRAPH_WS_MAINNET,
   GRAPH_WS_RINKEBY,
+  REALITIO_CONTRACT_ADDRESS_FOR_MAINNET,
+  REALITIO_CONTRACT_ADDRESS_FOR_RINKEBY,
 } from './constants'
 
 interface Network {
@@ -27,8 +31,8 @@ const networks: { [K in NetworkIds]: Network } = {
   [NetworkIds.MAINNET]: {
     earliestBlockToCheck: EARLIEST_MAINNET_BLOCK_TO_CHECK,
     contracts: {
-      conditionalTokensAddress: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
-      realitioAddress: '0x325a2e0f3cca2ddbaebb4dfc38df8d19ca165b47',
+      conditionalTokensAddress: CONDITION_TOKEN_CONTRACT_ADDRESS_FOR_MAINNET,
+      realitioAddress: REALITIO_CONTRACT_ADDRESS_FOR_MAINNET,
     },
     tokens: [
       {
@@ -83,8 +87,8 @@ const networks: { [K in NetworkIds]: Network } = {
   [NetworkIds.RINKEBY]: {
     earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
     contracts: {
-      conditionalTokensAddress: '0xe6Cdc22F99FD9ffdC03647C7fFF5bB753a4eBB21',
-      realitioAddress: '0x3D00D77ee771405628a4bA4913175EcC095538da',
+      conditionalTokensAddress: CONDITION_TOKEN_CONTRACT_ADDRESS_FOR_RINKEBY,
+      realitioAddress: REALITIO_CONTRACT_ADDRESS_FOR_RINKEBY,
     },
     tokens: [
       {

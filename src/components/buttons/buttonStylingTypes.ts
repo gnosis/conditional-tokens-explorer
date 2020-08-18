@@ -1,5 +1,5 @@
 import { AnchorHTMLAttributes, ButtonHTMLAttributes } from 'react'
-import { FlattenInterpolation, ThemeProps, css } from 'styled-components'
+import { css } from 'styled-components'
 
 export enum ButtonType {
   primary,
@@ -19,11 +19,9 @@ export interface ButtonLinkProps
     ButtonCommonProps {}
 
 const PrimaryCSS = css`
-  & {
-    background-color: ${(props) => props.theme.buttonPrimary.backgroundColor};
-    border-color: ${(props) => props.theme.buttonPrimary.borderColor};
-    color: ${(props) => props.theme.buttonPrimary.color};
-  }
+  background-color: ${(props) => props.theme.buttonPrimary.backgroundColor};
+  border-color: ${(props) => props.theme.buttonPrimary.borderColor};
+  color: ${(props) => props.theme.buttonPrimary.color};
 
   &:hover {
     background-color: ${(props) => props.theme.buttonPrimary.backgroundColorHover};
@@ -42,11 +40,9 @@ const PrimaryCSS = css`
 `
 
 const PrimaryInvertedCSS = css`
-  & {
-    background-color: ${(props) => props.theme.buttonPrimaryInverted.backgroundColor};
-    border-color: ${(props) => props.theme.buttonPrimaryInverted.borderColor};
-    color: ${(props) => props.theme.buttonPrimaryInverted.color};
-  }
+  background-color: ${(props) => props.theme.buttonPrimaryInverted.backgroundColor};
+  border-color: ${(props) => props.theme.buttonPrimaryInverted.borderColor};
+  color: ${(props) => props.theme.buttonPrimaryInverted.color};
 
   &:hover {
     background-color: ${(props) => props.theme.buttonPrimaryInverted.backgroundColorHover};
@@ -56,7 +52,7 @@ const PrimaryInvertedCSS = css`
 
   &[disabled],
   &[disabled]:hover {
-    background-color: ${(props) => props.theme.buttonPrimaryInverted.borderColor};
+    background-color: ${(props) => props.theme.buttonPrimaryInverted.backgroundColor};
     border-color: ${(props) => props.theme.buttonPrimaryInverted.borderColor};
     color: ${(props) => props.theme.buttonPrimaryInverted.color};
     cursor: not-allowed;
@@ -65,11 +61,9 @@ const PrimaryInvertedCSS = css`
 `
 
 const DangerCSS = css`
-  & {
-    background-color: ${(props) => props.theme.buttonDanger.backgroundColor};
-    border-color: ${(props) => props.theme.buttonDanger.borderColor};
-    color: ${(props) => props.theme.buttonDanger.color};
-  }
+  background-color: ${(props) => props.theme.buttonDanger.backgroundColor};
+  border-color: ${(props) => props.theme.buttonDanger.borderColor};
+  color: ${(props) => props.theme.buttonDanger.color};
 
   &:hover {
     background-color: ${(props) => props.theme.buttonDanger.backgroundColorHover};
@@ -87,9 +81,8 @@ const DangerCSS = css`
   }
 `
 
-const getButtonTypeStyles = (
-  buttonType: ButtonType = ButtonType.primary
-): FlattenInterpolation<ThemeProps<unknown>> => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const getButtonTypeStyles = (buttonType: ButtonType = ButtonType.primary): any => {
   if (buttonType === ButtonType.primary) {
     return PrimaryCSS
   }

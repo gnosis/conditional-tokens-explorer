@@ -1,16 +1,18 @@
+import { Remote } from 'util/remoteData'
+
 import { MockedProvider } from '@apollo/react-testing'
 import { render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { ZERO_BN } from 'config/constants'
+import { NetworkConfig } from 'config/networkConfig'
 import { Connected, Web3Context } from 'contexts/Web3Context'
 import { BigNumber } from 'ethers/utils'
 import React, { ReactElement } from 'react'
 import { act } from 'react-dom/test-utils'
+import { ThemeProvider } from 'styled-components'
+import theme from 'theme'
 
-import { ZERO_BN } from '../../config/constants'
-import { NetworkConfig } from '../../config/networkConfig'
-import { Remote } from '../../util/remoteData'
-
-import { SplitCondition } from './SplitCondition'
+import { Form } from './Form'
 
 const unlockCollateral = jest.fn()
 const onCollateralChange = jest.fn()
@@ -19,9 +21,11 @@ const hasUnlockedCollateral = false
 const networkConfig = new NetworkConfig(4)
 const tokens = networkConfig.getTokens()
 // eslint-disable-next-line
-const CTService = jest.mock('../../services/conditionalTokens') as any
+const CTService = jest.mock('services/conditionalTokens') as any
 
 const connect = jest.fn()
+const disconnect = jest.fn()
+
 const connectedStatus = {
   _type: 'connected',
   address: '0x123',
@@ -34,17 +38,19 @@ const connectedStatus = {
 } as Connected
 
 const renderWithConnectedProvider = (component: ReactElement) => (
-  <Web3Context.Provider value={{ status: connectedStatus, connect }}>
-    <MockedProvider>{component}</MockedProvider>
+  <Web3Context.Provider value={{ status: connectedStatus, connect, disconnect }}>
+    <ThemeProvider theme={theme}>
+      <MockedProvider>{component}</MockedProvider>
+    </ThemeProvider>
   </Web3Context.Provider>
 )
 
 test('show unlock button with zero allowance', async () => {
   const allowance = Remote.success<BigNumber>(ZERO_BN)
 
-  const { findByText } = render(
+  const { findByTestId } = render(
     renderWithConnectedProvider(
-      <SplitCondition
+      <Form
         allowance={allowance}
         hasUnlockedCollateral={hasUnlockedCollateral}
         onCollateralChange={onCollateralChange}
@@ -54,16 +60,16 @@ test('show unlock button with zero allowance', async () => {
       />
     )
   )
-  const unlockBtn = await findByText(/unlock/i)
+  const unlockBtn = await findByTestId('unlock-btn')
   expect(unlockBtn).toBeInTheDocument()
 })
 
 test('toggle unlock button visiblity according to allowance and amount', async () => {
   const allowance = Remote.success<BigNumber>(new BigNumber(10))
 
-  const { findByPlaceholderText, findByText, queryByText } = render(
+  const { findByPlaceholderText, findByTestId } = render(
     renderWithConnectedProvider(
-      <SplitCondition
+      <Form
         allowance={allowance}
         hasUnlockedCollateral={hasUnlockedCollateral}
         onCollateralChange={onCollateralChange}
@@ -74,14 +80,14 @@ test('toggle unlock button visiblity according to allowance and amount', async (
     )
   )
 
-  const unlockBefore = queryByText(/unlock/i)
-  expect(unlockBefore).toBeNull()
+  const unlockBefore = findByTestId('unlockButton')
+  expect(unlockBefore).toMatchObject({})
 
   const amountInput = await findByPlaceholderText('0.00')
   await act(async () => {
     return userEvent.type(amountInput, '20')
   })
-  const unlockAfter = await findByText(/unlock/i)
+  const unlockAfter = await findByTestId('unlock-btn')
 
   expect(unlockAfter).toBeInTheDocument()
 })
@@ -90,9 +96,9 @@ test('show unlock button after failure', async () => {
   const allowance = Remote.success<BigNumber>(ZERO_BN)
   const allowanceFailure = Remote.failure<BigNumber>(new Error('Metamask cancelled'))
 
-  const { findByText, rerender } = render(
+  const { findByTestId, rerender } = render(
     renderWithConnectedProvider(
-      <SplitCondition
+      <Form
         allowance={allowance}
         hasUnlockedCollateral={hasUnlockedCollateral}
         onCollateralChange={onCollateralChange}
@@ -103,14 +109,14 @@ test('show unlock button after failure', async () => {
     )
   )
 
-  const unlock = await findByText(/unlock/i)
+  const unlock = await findByTestId('unlock-btn')
   act(() => {
     return userEvent.click(unlock)
   })
 
   rerender(
     renderWithConnectedProvider(
-      <SplitCondition
+      <Form
         allowance={allowanceFailure}
         hasUnlockedCollateral={true}
         onCollateralChange={onCollateralChange}
@@ -121,6 +127,6 @@ test('show unlock button after failure', async () => {
     )
   )
 
-  const unlockAfterFailure = await findByText(/unlock/i)
+  const unlockAfterFailure = await findByTestId('unlock-btn')
   expect(unlockAfterFailure).toBeInTheDocument()
 })

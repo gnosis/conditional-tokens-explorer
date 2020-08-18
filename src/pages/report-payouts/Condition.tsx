@@ -8,6 +8,7 @@ interface Props {
   errors: ConditionErrors[]
 }
 
+// TODO: similar to wrapper display, maybe we can create a common component
 export const Condition = (props: Props) => {
   const { conditionId, errors, loading } = props
 

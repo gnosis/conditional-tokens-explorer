@@ -50,6 +50,8 @@ export interface GetCondition_condition {
   resolved: boolean;
   creator: any;
   payouts: any[] | null;
+  payoutNumerators: any[] | null;
+  payoutDenominator: any | null;
   resolveTimestamp: any | null;
   positions: GetCondition_condition_positions[] | null;
 }
@@ -76,17 +78,48 @@ export interface GetPosition_position_collateralToken {
   id: string;
 }
 
+export interface GetPosition_position_collection_conditions {
+  __typename: "Condition";
+  id: string;
+  oracle: any;
+  questionId: any;
+  outcomeSlotCount: number;
+  resolved: boolean;
+  creator: any;
+  payouts: any[] | null;
+  payoutNumerators: any[] | null;
+  payoutDenominator: any | null;
+}
+
+export interface GetPosition_position_collection_positions {
+  __typename: "Position";
+  id: string;
+}
+
 export interface GetPosition_position_collection {
   __typename: "Collection";
   id: string;
+  conditions: GetPosition_position_collection_conditions[];
+  conditionIds: string[];
+  indexSets: any[];
+  positions: GetPosition_position_collection_positions[] | null;
+}
+
+export interface GetPosition_position_conditions {
+  __typename: "Condition";
+  id: string;
+  outcomeSlotCount: number;
 }
 
 export interface GetPosition_position {
   __typename: "Position";
   id: string;
+  indexSets: any[];
+  activeValue: any;
   collateralToken: GetPosition_position_collateralToken;
   collection: GetPosition_position_collection;
-  indexSets: any[];
+  conditionIds: string[];
+  conditions: GetPosition_position_conditions[];
 }
 
 export interface GetPosition {

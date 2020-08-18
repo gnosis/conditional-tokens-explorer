@@ -36,7 +36,7 @@ export class ConditionalTokensService {
   ) {
     const contractAddress = networkConfig.getConditionalTokensAddress()
 
-    if(signer) {
+    if (signer) {
       this.contract = new ethers.Contract(contractAddress, conditionalTokensAbi, provider).connect(
         signer
       )
@@ -65,6 +65,14 @@ export class ConditionalTokensService {
       parentCollection,
       CTHelpers.getCollectionId(conditionId, indexSet),
     ])
+  }
+
+  static getConbinedCollectionId(collections: Array<{ conditionId: string; indexSet: BigNumber }>) {
+    return CTHelpers.combineCollectionIds(
+      collections.map(({ conditionId, indexSet }) =>
+        CTHelpers.getCollectionId(conditionId, indexSet)
+      )
+    )
   }
 
   static getPositionId(collateralToken: string, collectionId: string): string {
@@ -109,6 +117,21 @@ export class ConditionalTokensService {
     return tx
   }
 
+  redeemPositions = async (
+    collateralToken: string,
+    parentCollectionId: string, // If doesn't exist, must be zero, ethers.constants.HashZero
+    conditionId: string,
+    indexSets: string[]
+  ): Promise<TransactionReceipt> => {
+    const tx = await this.contract.redeemPositions(
+      collateralToken,
+      parentCollectionId,
+      conditionId,
+      indexSets
+    )
+    return this.provider.waitForTransaction(tx.hash)
+  }
+
   async getOutcomeSlotCount(conditionId: string): Promise<BigNumber> {
     return await this.contract.getOutcomeSlotCount(conditionId)
   }
@@ -118,7 +141,7 @@ export class ConditionalTokensService {
   }
 
   async balanceOf(positionId: string): Promise<BigNumber> {
-    if(this.signer) {
+    if (this.signer) {
       const owner = await this.signer.getAddress()
       return await this.contract.balanceOf(owner, positionId)
     } else {

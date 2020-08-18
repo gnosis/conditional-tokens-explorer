@@ -1,17 +1,53 @@
 import { BigNumberInput } from 'big-number-input'
 import { BigNumber } from 'ethers/utils'
 import React from 'react'
+import styled from 'styled-components'
 
 import { ZERO_BN } from '../../../config/constants'
+import { Textfield } from '../../pureStyledComponents/Textfield'
+
+const Wrapper = styled.span<{ hasTokenSymbol?: boolean }>`
+  position: relative;
+  width: 100%;
+
+  > input {
+    position: relative;
+    z-index: 1;
+
+    ${(props) => props.hasTokenSymbol && 'padding-right: 60px;'}
+
+    &:disabled,
+    &[disabled] {
+      &::placeholder {
+        color: #000;
+      }
+    }
+  }
+`
+
+const TokenSymbol = styled.span`
+  color: ${(props) => props.theme.colors.primary};
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+  position: absolute;
+  right: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+`
 
 interface Props {
-  value?: BigNumber
+  disabled?: boolean | undefined
+  decimals?: number | undefined
   onChange?: (n: BigNumber) => void
-  decimals?: number
+  tokenSymbol?: string
+  value?: BigNumber
+  placeholder?: string | undefined
 }
 
-export const BigNumberInputWrapper = (props: Props) => {
-  const { decimals = 0, onChange, value } = props
+export const BigNumberInputWrapper: React.FC<Props> = (props) => {
+  const { decimals = 0, disabled, onChange, placeholder, tokenSymbol, value } = props
 
   const handleChange = (newValue: string) => {
     if (onChange) {
@@ -24,11 +60,17 @@ export const BigNumberInputWrapper = (props: Props) => {
   }
 
   return (
-    <BigNumberInput
-      autofocus={true}
-      decimals={decimals}
-      onChange={handleChange}
-      value={value ? value.toString() : ''}
-    />
+    <Wrapper hasTokenSymbol={tokenSymbol !== ''}>
+      <BigNumberInput
+        decimals={decimals}
+        onChange={handleChange}
+        placeholder={placeholder}
+        renderInput={(props: unknown) => {
+          return <Textfield disabled={disabled} {...props} />
+        }}
+        value={value ? value.toString() : ''}
+      />
+      {tokenSymbol && <TokenSymbol>{tokenSymbol}</TokenSymbol>}
+    </Wrapper>
   )
 }

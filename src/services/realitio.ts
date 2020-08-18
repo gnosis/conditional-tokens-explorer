@@ -27,7 +27,7 @@ export class RealitioService {
   ) {
     const contractAddress = networkConfig.getRealitioAddress()
 
-    if(signer) {
+    if (signer) {
       this.contract = new ethers.Contract(contractAddress, realitioAbi, providerContext).connect(
         signer
       )

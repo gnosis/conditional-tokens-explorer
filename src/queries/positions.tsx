@@ -4,13 +4,35 @@ export const GetPositionQuery = gql`
   query GetPosition($id: ID!) {
     position(id: $id) {
       id
+      indexSets
+      activeValue
       collateralToken {
         id
       }
       collection {
         id
+        conditions {
+          id
+          oracle
+          questionId
+          outcomeSlotCount
+          resolved
+          creator
+          payouts
+          payoutNumerators
+          payoutDenominator
+        }
+        conditionIds
+        indexSets
+        positions {
+          id
+        }
       }
-      indexSets
+      conditionIds
+      conditions {
+        id
+        outcomeSlotCount
+      }
     }
   }
 `

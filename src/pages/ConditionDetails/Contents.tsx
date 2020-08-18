@@ -1,12 +1,13 @@
 import React from 'react'
+import styled from 'styled-components'
 
 import { ButtonCopy } from '../../components/buttons/ButtonCopy'
 import { ButtonDropdownCircle } from '../../components/buttons/ButtonDropdownCircle'
 import { CenteredCard } from '../../components/common/CenteredCard'
-import { Dropdown, DropdownItemProps, DropdownPosition } from '../../components/common/Dropdown'
+import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
 import { StripedList, StripedListItem } from '../../components/common/StripedList'
-import { GridTwoColumns } from '../../components/pureStyledComponents/GridTwoColumns'
 import { Pill, PillTypes } from '../../components/pureStyledComponents/Pill'
+import { Row } from '../../components/pureStyledComponents/Row'
 import { TitleValue } from '../../components/text/TitleValue'
 import { INFORMATION_NOT_AVAILABLE } from '../../config/constants'
 import { getKnowOracleFromAddress } from '../../config/networkConfig'
@@ -18,6 +19,10 @@ import { getLogger } from '../../util/logger'
 import { formatTS, getConditionTypeTitle, truncateStringInTheMiddle } from '../../util/tools'
 import { ConditionStatus, ConditionType } from '../../util/types'
 
+const StripedListStyled = styled(StripedList)`
+  margin-top: 6px;
+`
+
 const logger = getLogger('ConditionDetails')
 
 interface Props {
@@ -26,41 +31,39 @@ interface Props {
 
 export const Contents: React.FC<Props> = ({ condition }) => {
   const { status } = useWeb3Context()
-
   const {
     creator,
     id: conditionId,
     oracle,
     outcomeSlotCount,
-    payouts,
     questionId,
     resolveTimestamp,
     resolved,
   } = condition
-  const dropdownItems: Array<DropdownItemProps> = [
+  const dropdownItems = [
     {
-      content: 'Resolve Condition',
       onClick: () => {
-        logger.log('clickity')
+        logger.log('Resolve Condition')
       },
+      text: 'Resolve Condition',
     },
     {
-      content: 'Split Position',
       onClick: () => {
-        logger.log('clickity')
+        logger.log('Split Position')
       },
+      text: 'Split Position',
     },
     {
-      content: 'Merge Positions',
       onClick: () => {
-        logger.log('clickity')
+        logger.log('Merge Positions')
       },
+      text: 'Merge Positions',
     },
     {
-      content: 'Report Payouts',
       onClick: () => {
-        logger.log('clickity')
+        logger.log('Report Payouts')
       },
+      text: 'Report Payouts',
     },
   ]
 
@@ -81,20 +84,23 @@ export const Contents: React.FC<Props> = ({ condition }) => {
   const oracleTitle =
     isConditionFromOmen && networkId
       ? getKnowOracleFromAddress(networkId, oracle)
-      : truncateStringInTheMiddle(oracle, 6, 6)
+      : truncateStringInTheMiddle(oracle, 8, 6)
 
   return (
     <CenteredCard
       dropdown={
         <Dropdown
-          activeItemHightlight={false}
           dropdownButtonContent={<ButtonDropdownCircle />}
           dropdownPosition={DropdownPosition.right}
-          items={dropdownItems}
+          items={dropdownItems.map((item, index) => (
+            <DropdownItem key={index} onClick={item.onClick}>
+              {item.text}
+            </DropdownItem>
+          ))}
         />
       }
     >
-      <GridTwoColumns marginBottomXL>
+      <Row marginBottomXL>
         <TitleValue
           title="Condition Type"
           value={isConditionFromOmen ? ConditionType.Omen : ConditionType.Custom}
@@ -117,36 +123,40 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           }
         />
         {isConditionFromOmen && (
-          <TitleValue title="Question Type" value={getConditionTypeTitle(templateId)} />
+          <>
+            <TitleValue title="Question Type" value={getConditionTypeTitle(templateId)} />
+            <TitleValue
+              title="Question Id"
+              value={
+                <>
+                  {truncateStringInTheMiddle(questionId, 8, 6)}
+                  <ButtonCopy value={questionId} />
+                </>
+              }
+            />
+          </>
         )}
-        {!isConditionFromOmen && (
-          <TitleValue
-            title="Question Id"
-            value={
-              <>
-                {truncateStringInTheMiddle(questionId, 6, 6)}
-                <ButtonCopy value={questionId} />
-              </>
-            }
-          />
-        )}
-      </GridTwoColumns>
-      <GridTwoColumns forceOneColumn marginBottomXL>
-        {isConditionFromOmen && <TitleValue title="Question" value={title} />}
-      </GridTwoColumns>
-      <GridTwoColumns forceOneColumn marginBottomXL>
-        <TitleValue
-          title="Outcomes"
-          value={
-            <StripedList>
-              {outcomesPrettier.map((outcome: string, index: number) => (
-                <StripedListItem key={index}>{outcome}</StripedListItem>
-              ))}
-            </StripedList>
-          }
-        />
-      </GridTwoColumns>
-      <GridTwoColumns>
+      </Row>
+      {isConditionFromOmen && (
+        <>
+          <Row cols="1fr" marginBottomXL>
+            <TitleValue title="Question" value={title} />
+          </Row>
+          <Row cols="1fr" marginBottomXL>
+            <TitleValue
+              title="Outcomes"
+              value={
+                <StripedListStyled>
+                  {outcomesPrettier.map((outcome: string, index: number) => (
+                    <StripedListItem key={index}>{outcome}</StripedListItem>
+                  ))}
+                </StripedListStyled>
+              }
+            />
+          </Row>
+        </>
+      )}
+      <Row>
         {resolved && (
           <TitleValue
             title="Resolution Date"
@@ -163,8 +173,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
             </>
           }
         />
-        {resolved && <TitleValue title="Payouts" value={`[${payouts && payouts.toString()}]`} />}
-      </GridTwoColumns>
+      </Row>
     </CenteredCard>
   )
 }

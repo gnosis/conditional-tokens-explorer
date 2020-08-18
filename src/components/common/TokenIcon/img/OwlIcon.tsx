@@ -10,7 +10,10 @@ export const OwlIcon = () => (
     xmlnsXlink="http://www.w3.org/1999/xlink"
   >
     <defs>
-      <polygon id="path-1" points="0 75.6189047 77.3431358 75.6189047 77.3431358 0.598949737 0 0.598949737"></polygon>
+      <polygon
+        id="path-1"
+        points="0 75.6189047 77.3431358 75.6189047 77.3431358 0.598949737 0 0.598949737"
+      ></polygon>
     </defs>
     <g
       fill="none"
