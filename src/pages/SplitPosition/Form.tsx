@@ -1,5 +1,6 @@
 import { useWeb3Connected } from 'contexts/Web3Context'
 import { BigNumber } from 'ethers/utils'
+import { AllowanceMethods, useAllowanceState } from 'hooks/useAllowanceState'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { ERC20Service } from 'services/erc20'
@@ -18,7 +19,6 @@ import { StripedList, StripedListItem } from '../../components/pureStyledCompone
 import { TitleControl } from '../../components/pureStyledComponents/TitleControl'
 import { TitleValue } from '../../components/text/TitleValue'
 import { NULL_PARENT_ID, ZERO_BN } from '../../config/constants'
-import { Remote } from '../../util/remoteData'
 import { trivialPartition } from '../../util/tools'
 import { Token } from '../../util/types'
 
@@ -43,8 +43,7 @@ export type SplitPositionFormMethods = {
 }
 
 interface Props {
-  allowance: Remote<BigNumber>
-  unlockCollateral: () => void
+  allowanceMethods: AllowanceMethods
   onCollateralChange: (collateral: string) => void
   splitPosition: (
     collateral: string,
@@ -53,18 +52,10 @@ interface Props {
     partition: BigNumber[],
     amount: BigNumber
   ) => void
-  hasUnlockedCollateral: boolean
   tokens: Token[]
 }
 
-export const Form = ({
-  allowance,
-  hasUnlockedCollateral,
-  onCollateralChange,
-  splitPosition,
-  tokens,
-  unlockCollateral,
-}: Props) => {
+export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, tokens }: Props) => {
   const DEFAULT_VALUES = useMemo(() => {
     return {
       conditionId: '',
@@ -160,17 +151,12 @@ export const Form = ({
     signer,
   ])
 
-  const hasEnoughAllowance = allowance.map(
-    (allowance) => allowance.gte(amount) && !allowance.isZero()
+  const { allowanceFinished, fetching, showAskAllowance, unlockCollateral } = useAllowanceState(
+    allowanceMethods,
+    amount
   )
 
-  // We show the allowance component if we know the user doesn't have enough allowance
-  const showAskAllowance =
-    (hasEnoughAllowance.hasData() && !hasEnoughAllowance.get()) ||
-    hasUnlockedCollateral ||
-    allowance.isLoading()
-
-  const canSubmit = isValid && (hasEnoughAllowance.getOr(false) || hasUnlockedCollateral)
+  const canSubmit = isValid && allowanceFinished
   const mockedNumberedOutcomes = [
     [1, 4, 3],
     [6, 5],
@@ -199,13 +185,14 @@ export const Form = ({
           }
         />
       </Row>
-      <SetAllowance
-        collateral={collateralToken}
-        fetching={!showAskAllowance}
-        finished={hasUnlockedCollateral && hasEnoughAllowance.getOr(false)}
-        loading={allowance.isLoading()}
-        onUnlock={unlockCollateral}
-      />
+      {showAskAllowance && (
+        <SetAllowance
+          collateral={collateralToken}
+          fetching={fetching}
+          finished={allowanceFinished}
+          onUnlock={unlockCollateral}
+        />
+      )}
       <Row cols="1fr" marginBottomXL>
         <InputAmount
           collateral={collateralToken}

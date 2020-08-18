@@ -31,15 +31,14 @@ const UnlockButton = styled(Button)`
 
 interface Props {
   collateral: any
-  fetching?: boolean
+  fetching: boolean
   finished: boolean
-  loading: boolean
   onUnlock: () => void
 }
 
 export const SetAllowance = (props: Props) => {
-  const { collateral, fetching, finished, loading, onUnlock } = props
-  const btnText = loading ? 'Working...' : finished ? 'Done!' : 'Unlock'
+  const { collateral, fetching, finished, onUnlock } = props
+  const btnText = fetching ? 'Working...' : finished ? 'Done!' : 'Unlock'
 
   return (
     <Wrapper>
@@ -54,7 +53,7 @@ export const SetAllowance = (props: Props) => {
           <UnlockButton
             buttonType={ButtonType.primaryInverted}
             data-testid="unlock-btn"
-            disabled={loading || finished}
+            disabled={finished}
             onClick={onUnlock}
           >
             {btnText}

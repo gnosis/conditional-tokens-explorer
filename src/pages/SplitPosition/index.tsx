@@ -1,13 +1,11 @@
-import { constants } from 'ethers'
 import { BigNumber } from 'ethers/utils'
-import React, { useCallback, useEffect, useState } from 'react'
+import { useAllowance } from 'hooks/useAllowance'
+import React, { useCallback, useState } from 'react'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
 import { useWeb3Connected } from '../../contexts/Web3Context'
-import { useAllowance } from '../../hooks/useAllowance'
 import { getLogger } from '../../util/logger'
-import { Remote } from '../../util/remoteData'
 
 import { Form } from './Form'
 
@@ -17,39 +15,7 @@ export const SplitPosition = () => {
   const { CTService, networkConfig } = useWeb3Connected()
   const tokens = networkConfig.getTokens()
   const [collateralToken, setCollateralToken] = useState(tokens[0].address)
-  const { refresh, unlock } = useAllowance(collateralToken)
-  const [allowance, setAllowance] = useState<Remote<BigNumber>>(Remote.notAsked<BigNumber>())
-  const [hasUnlockedCollateral, setHasUnlockedCollateral] = useState(false)
-
-  const unlockCollateral = useCallback(async () => {
-    setAllowance(Remote.loading())
-    try {
-      const tx = await unlock()
-      await tx.wait()
-      setAllowance(Remote.success(constants.MaxUint256))
-    } catch (e) {
-      setAllowance(Remote.failure(e))
-    } finally {
-      setHasUnlockedCollateral(true)
-    }
-  }, [unlock])
-
-  const fetchAllowance = useCallback(async () => {
-    try {
-      const allowance = await refresh()
-      setAllowance(Remote.success(allowance))
-    } catch (e) {
-      setAllowance(Remote.failure(e))
-    }
-  }, [refresh])
-
-  useEffect(() => {
-    fetchAllowance()
-  }, [fetchAllowance])
-
-  useEffect(() => {
-    setHasUnlockedCollateral(false)
-  }, [collateralToken])
+  const allowanceMethods = useAllowance(collateralToken)
 
   const splitPosition = useCallback(
     async (
@@ -94,12 +60,10 @@ export const SplitPosition = () => {
     <>
       <PageTitle>Split Position</PageTitle>
       <Form
-        allowance={allowance}
-        hasUnlockedCollateral={hasUnlockedCollateral}
+        allowanceMethods={allowanceMethods}
         onCollateralChange={setCollateralToken}
         splitPosition={splitPosition}
         tokens={tokens}
-        unlockCollateral={unlockCollateral}
       />
     </>
   )

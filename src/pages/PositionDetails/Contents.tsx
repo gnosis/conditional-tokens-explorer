@@ -122,8 +122,8 @@ export const Contents = ({ position }: Props) => {
       </Row>
       <SetAllowance
         collateral={collateralToken}
+        fetching={false}
         finished={false}
-        loading={false}
         onUnlock={() => {
           return 1
         }}
