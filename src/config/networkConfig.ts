@@ -1,12 +1,15 @@
 import { NetworkIds, Token } from '../util/types'
 
 import {
+  EARLIEST_GANACHE_BLOCK_TO_CHECK,
   CONDITION_TOKEN_CONTRACT_ADDRESS_FOR_MAINNET,
   CONDITION_TOKEN_CONTRACT_ADDRESS_FOR_RINKEBY,
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
   EARLIEST_RINKEBY_BLOCK_TO_CHECK,
+  GRAPH_HTTP_GANACHE,
   GRAPH_HTTP_MAINNET,
   GRAPH_HTTP_RINKEBY,
+  GRAPH_WS_GANACHE,
   GRAPH_WS_MAINNET,
   GRAPH_WS_RINKEBY,
   REALITIO_CONTRACT_ADDRESS_FOR_MAINNET,
@@ -122,13 +125,54 @@ const networks: { [K in NetworkIds]: Network } = {
     graphHttpUri: GRAPH_HTTP_RINKEBY,
     graphWsUri: GRAPH_WS_RINKEBY,
   },
+  [NetworkIds.GANACHE]: {
+    earliestBlockToCheck: EARLIEST_GANACHE_BLOCK_TO_CHECK,
+    contracts: {
+      conditionalTokensAddress: '0xA57B8a5584442B467b4689F1144D269d096A3daF',
+      realitioAddress: '0xcfeb869f69431e42cdb54a4f4f105c19c080a601',
+    },
+    tokens: [
+      {
+        symbol: 'DAI',
+        address: '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7',
+        decimals: 18,
+      },
+      {
+        symbol: 'USDC',
+        address: '0xe982E462b094850F12AF94d21D470e21bE9D0E9C',
+        decimals: 6,
+      },
+      {
+        symbol: 'CDAI',
+        address: '0xD833215cBcc3f914bD1C9ece3EE7BF8B14f841bb',
+        decimals: 18,
+      },
+      {
+        symbol: 'WETH',
+        address: '0x0290FB167208Af455bB137780163b7B7a9a10C16',
+        decimals: 18,
+      },
+      {
+        symbol: 'OWL',
+        address: '0x59d3631c86BbE35EF041872d502F218A39FBa150',
+        decimals: 18,
+      },
+      {
+        symbol: 'GNO',
+        address: '0x9b1f7F645351AF3631a656421eD2e40f2802E6c0',
+        decimals: 18,
+      },
+    ],
+    graphHttpUri: GRAPH_HTTP_GANACHE,
+    graphWsUri: GRAPH_WS_GANACHE,
+  },
 }
 
 export class NetworkConfig {
   constructor(public networkId: NetworkIds) {}
 
   static isKnownNetwork(networkId: number): networkId is NetworkIds {
-    return networkId === 1 || networkId === 4
+    return networkId === 1 || networkId === 4 || networkId === 50
   }
 
   getConditionalTokensAddress() {
@@ -177,6 +221,7 @@ export const knownOracles: { [name in KnownOracle]: KnownOracleData } = {
     addresses: {
       [NetworkIds.MAINNET]: '0x0e414d014a77971f4eaa22ab58e6d84d16ea838e',
       [NetworkIds.RINKEBY]: '0x576b76eebe6b5411c0ef310e65de9bff8a60130f',
+      [NetworkIds.GANACHE]: '0xDb56f2e9369E0D7bD191099125a3f6C370F8ed15',
     },
   },
   kleros: {
@@ -185,6 +230,7 @@ export const knownOracles: { [name in KnownOracle]: KnownOracleData } = {
     addresses: {
       [NetworkIds.MAINNET]: '0x0000000000000000000000000000000000000000',
       [NetworkIds.RINKEBY]: '0x0000000000000000000000000000000000000000',
+      [NetworkIds.GANACHE]: '0x0000000000000000000000000000000000000000',
     },
   },
   unknown: {

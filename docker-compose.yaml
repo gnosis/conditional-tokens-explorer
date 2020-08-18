@@ -1,0 +1,40 @@
+version: '3'
+services:
+  graph-node:
+    image: graphprotocol/graph-node
+    ports:
+      - '8000:8000'
+      - '8020:8020'
+    environment:
+      postgres_host: 'postgres:5432'
+      postgres_user: postgres
+      postgres_pass: letmein
+      postgres_db: postgres
+      ipfs: 'ipfs:5001'
+      ethereum: 'development:http://ganache:8545'
+    depends_on:
+      - ipfs
+      - postgres
+      - ganache
+  ipfs:
+    image: ipfs/go-ipfs:v0.4.23
+    ports:
+      - '5001:5001'
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: letmein
+  ganache:
+    image: trufflesuite/ganache-cli
+    command: "-d -i 50"
+    ports:
+      - '8545:8545'
+  hg-subgraph:
+    build: ./docker/hg-subgraph/
+    depends_on:
+      - graph-node
+  deploy-contracts:
+    build: ./docker/deploy-contracts/
+    command: "./prepare_db.sh"
+    depends_on:
+      - ganache
