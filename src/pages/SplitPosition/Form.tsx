@@ -1,4 +1,3 @@
-import { useWeb3Connected } from 'contexts/Web3Context'
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -18,6 +17,7 @@ import { Row } from '../../components/pureStyledComponents/Row'
 import { TitleControl } from '../../components/pureStyledComponents/TitleControl'
 import { TitleValue } from '../../components/text/TitleValue'
 import { NULL_PARENT_ID, ZERO_BN } from '../../config/constants'
+import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
 import { Remote } from '../../util/remoteData'
 import { trivialPartition } from '../../util/tools'
 import { Token } from '../../util/types'
@@ -65,6 +65,8 @@ export const Form = ({
   tokens,
   unlockCollateral,
 }: Props) => {
+  const { status } = useWeb3Context()
+
   const DEFAULT_VALUES = useMemo(() => {
     return {
       conditionId: '',
@@ -91,7 +93,6 @@ export const Form = ({
   const [outcomeSlot, setOutcomeSlot] = useState(0)
   const [collateralToken, setCollateralToken] = useState(tokens[0])
   const [position, setPosition] = useState<Maybe<GetPosition_position>>(null)
-  const { provider, signer } = useWeb3Connected()
   const { amount, collateral, positionId, splitFrom } = getValues() as SplitPositionFormMethods
 
   watch('collateral')
@@ -133,10 +134,14 @@ export const Form = ({
     let isSubscribed = true
 
     const fetchToken = async (collateral: string) => {
-      const erc20Service = new ERC20Service(provider, signer, collateral)
-      const token = await erc20Service.getProfileSummary()
-      if (isSubscribed) {
-        setCollateralToken(token)
+      if (status._type === Web3ContextStatus.Connected) {
+        const { provider, signer } = status
+
+        const erc20Service = new ERC20Service(provider, signer, collateral)
+        const token = await erc20Service.getProfileSummary()
+        if (isSubscribed) {
+          setCollateralToken(token)
+        }
       }
     }
 
@@ -150,15 +155,7 @@ export const Form = ({
     return () => {
       isSubscribed = false
     }
-  }, [
-    splitFromPosition,
-    onCollateralChange,
-    tokens,
-    collateral,
-    splitFromCollateral,
-    provider,
-    signer,
-  ])
+  }, [splitFromPosition, onCollateralChange, tokens, collateral, splitFromCollateral, status])
 
   const hasEnoughAllowance = allowance.map(
     (allowance) => allowance.gte(amount) && !allowance.isZero()
