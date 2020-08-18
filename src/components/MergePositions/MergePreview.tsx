@@ -1,7 +1,7 @@
 import { getMergePreview, isConditionFullIndexSet } from 'util/tools'
 
-import { StripedList, StripedListItem } from 'components/common/StripedList'
 import { Row } from 'components/pureStyledComponents/Row'
+import { StripedList, StripedListItem } from 'components/pureStyledComponents/StripedList'
 import { TitleValue } from 'components/text/TitleValue'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
