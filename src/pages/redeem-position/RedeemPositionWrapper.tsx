@@ -5,7 +5,7 @@ import { ConditionalTokensService } from 'services/conditionalTokens'
 
 import { useConditionContext } from '../../contexts/ConditionContext'
 import { usePositionContext } from '../../contexts/PositionContext'
-import { useWeb3Connected } from '../../contexts/Web3Context'
+import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
 import { useIsPositionRelatedToCondition } from '../../hooks/useIsPositionRelatedToCondition'
 import { getLogger } from '../../util/logger'
 import { Status } from '../../util/types'
@@ -17,16 +17,24 @@ import { SelectPosition } from './SelectPosition'
 const logger = getLogger('RedeemPosition')
 
 export const RedeemPositionWrapper = () => {
-  const { CTService, networkConfig } = useWeb3Connected()
+  const { connect, status } = useWeb3Context()
 
   const { clearCondition, condition, errors: conditionErrors } = useConditionContext()
   const { clearPosition, errors: positionErrors, position } = usePositionContext()
-  const [status, setStatus] = React.useState<Maybe<Status>>(null)
+  const [statusTransaction, setStatusTransaction] = React.useState<Maybe<Status>>(null)
+
+  let networkId = null
+  if (status._type === Web3ContextStatus.Connected || status._type === Web3ContextStatus.Infura) {
+    const { networkConfig } = status
+    networkId = networkConfig.networkId
+  }
 
   const onRedeem = async () => {
     try {
-      if (position && condition) {
-        setStatus(Status.Loading)
+      if (position && condition && status._type === Web3ContextStatus.Connected) {
+        const { CTService } = status
+
+        setStatusTransaction(Status.Loading)
 
         const { collateralToken, conditionIds, indexSets } = position
         const newCollectionsSet = conditionIds.reduce(
@@ -62,10 +70,12 @@ export const RedeemPositionWrapper = () => {
         clearCondition()
         clearPosition()
 
-        setStatus(Status.Ready)
+        setStatusTransaction(Status.Ready)
+      } else if (status._type === Web3ContextStatus.Infura) {
+        connect()
       }
     } catch (err) {
-      setStatus(Status.Error)
+      setStatusTransaction(Status.Error)
       logger.error(err)
     }
   }
@@ -73,7 +83,7 @@ export const RedeemPositionWrapper = () => {
   const { isRelated } = useIsPositionRelatedToCondition(position?.id || '', condition?.id || '')
 
   const disabled =
-    status === Status.Loading ||
+    statusTransaction === Status.Loading ||
     positionErrors.length > 0 ||
     conditionErrors.length > 0 ||
     !position ||
@@ -83,7 +93,7 @@ export const RedeemPositionWrapper = () => {
   return (
     <>
       <div className="row">
-        <SelectPosition />
+        <SelectPosition networkId={networkId} />
       </div>
 
       <div className="row">
@@ -93,11 +103,7 @@ export const RedeemPositionWrapper = () => {
       {!isRelated && position && condition && <span>Position is not related to the condition</span>}
 
       <div className="row">
-        <PositionPreview
-          condition={condition}
-          networkId={networkConfig.networkId}
-          position={position}
-        />
+        <PositionPreview condition={condition} networkId={networkId} position={position} />
       </div>
       <button disabled={disabled} onClick={onRedeem}>
         Redeem
