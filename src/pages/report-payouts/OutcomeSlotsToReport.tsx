@@ -5,7 +5,7 @@ import { Controller, useForm } from 'react-hook-form'
 
 import { ZERO_BN } from '../../config/constants'
 import { useConditionContext } from '../../contexts/ConditionContext'
-import { useWeb3Context, Web3ContextStatus } from '../../contexts/Web3Context'
+import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
 import { useQuestion } from '../../hooks/useQuestion'
 import { GetCondition_condition } from '../../types/generatedGQL'
 import { getLogger } from '../../util/logger'
@@ -49,12 +49,12 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
 
   // Check if the sender is valid
   React.useEffect(() => {
-      if (status._type === Web3ContextStatus.Connected) {
-        const { address } = status
-        setOracleNotValidError(oracle.toLowerCase() !== address.toLowerCase())
-      } else {
-        setOracleNotValidError(true)
-      }
+    if (status._type === Web3ContextStatus.Connected) {
+      const { address } = status
+      setOracleNotValidError(oracle.toLowerCase() !== address.toLowerCase())
+    } else {
+      setOracleNotValidError(true)
+    }
   }, [status, oracle])
 
   React.useEffect(() => {
@@ -102,7 +102,7 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
       return {
         ...outcome,
         probability,
-      }
+      } as Outcome
     })
     // Update the outcomes with the new probabilities
     setOutcomes(outcomesValues)
@@ -136,7 +136,10 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
   }
 
   // Variable used to disable the submit button, check for payouts not empty and the oracle must be valid
-  const disableSubmit = payoutEmptyError || (status._type === Web3ContextStatus.Connected && oracleNotValidError) || transactionStatus === Status.Loading
+  const disableSubmit =
+    payoutEmptyError ||
+    (status._type === Web3ContextStatus.Connected && oracleNotValidError) ||
+    transactionStatus === Status.Loading
 
   return (
     <>
@@ -176,7 +179,9 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
           </tbody>
         </table>
         {payoutEmptyError && <p>{PAYOUTS_POSITIVE_ERROR}</p>}
-        {status._type === Web3ContextStatus.Connected && oracleNotValidError && <p>{ORACLE_NOT_VALID_TO_REPORT_ERROR}</p>}
+        {status._type === Web3ContextStatus.Connected && oracleNotValidError && (
+          <p>{ORACLE_NOT_VALID_TO_REPORT_ERROR}</p>
+        )}
         <input disabled={disableSubmit} type="submit" />
       </form>
     </>

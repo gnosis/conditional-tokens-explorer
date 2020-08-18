@@ -15,10 +15,7 @@ export const useBalanceForPosition = (position: string) => {
 
     const getBalance = async (position: string) => {
       try {
-        if (
-          status._type === Web3ContextStatus.Infura ||
-          status._type === Web3ContextStatus.Connected
-        ) {
+        if (status._type === Web3ContextStatus.Connected) {
           const { CTService } = status
           const balance = await CTService.balanceOf(position)
           setBalance(balance)
