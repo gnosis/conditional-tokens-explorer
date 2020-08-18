@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 
 import { useWeb3Connected } from '../contexts/Web3Context'
 
-export const useBalanceForMultiPosition = (positionIds: Array<string>) => {
+export const useBalanceForBatchPosition = (positionIds: Array<string>) => {
   const { CTService } = useWeb3Connected()
 
   const [balances, setBalances] = useState<Array<BigNumber>>([])
@@ -15,12 +15,9 @@ export const useBalanceForMultiPosition = (positionIds: Array<string>) => {
 
     const getBalance = async (positionIds: Array<string>) => {
       try {
-        console.log('useBalanceForMultiPosition ids', positionIds)
         const balances = await CTService.balanceOfBatch(positionIds)
-        console.log('useBalanceForMultiPosition balances', balances)
         setBalances(balances)
       } catch (err) {
-        console.log('useBalanceForMultiPosition error', err)
         setError(err)
       }
     }

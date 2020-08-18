@@ -2,7 +2,7 @@ import { useQuery } from '@apollo/react-hooks'
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useEffect, useState } from 'react'
 
-import { useBalanceForMultiPosition } from '../hooks/useBalanceForMultiPosition'
+import { useBalanceForBatchPosition } from '../hooks/useBalanceForBatchPosition'
 import { GetMultiPositionsQuery } from '../queries/positions'
 import { GetMultiPositions, GetMultiPositions_positions } from '../types/generatedGQL'
 import { isPositionIdValid } from '../util/tools'
@@ -59,7 +59,17 @@ export const MultiPositionsProvider = (props: Props) => {
   }, [])
 
   const removePositionId = useCallback((positionId: string): void => {
-    setPositionIds((current) => current.filter((id) => id !== positionId.toLowerCase()))
+    let clearPositions = false
+    setPositionIds((current) => {
+      const next = current.filter((id) => id !== positionId.toLowerCase())
+      if (!next.length) {
+        clearPositions = true
+      }
+      return next
+    })
+    if (clearPositions) {
+      setPositions([])
+    }
   }, [])
 
   const clearPositions = useCallback((): void => {
@@ -82,15 +92,12 @@ export const MultiPositionsProvider = (props: Props) => {
     }
 
     // Validate all positions exist
-    if (
-      !positionsFromTheGraph.length ||
-      (!loadingQuery && positionsFromTheGraph.length < positionIds.length)
-    ) {
+    if (positionIds.length && !loadingQuery && positionsFromTheGraph.length < positionIds.length) {
       errors.push(PositionErrors.NOT_FOUND_ERROR)
     }
   }, [fetchedPositions, positionIds, loadingQuery, errors])
 
-  const { balances, loading: loadingBalances } = useBalanceForMultiPosition(positionIds)
+  const { balances, loading: loadingBalances } = useBalanceForBatchPosition(positionIds)
   if (checkForEmptyBalance && positionIds.length && balances.length) {
     if (balances.includes(BIG_ZERO)) {
       errors.push(PositionErrors.EMPTY_BALANCE_ERROR)

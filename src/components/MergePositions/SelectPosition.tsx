@@ -14,10 +14,12 @@ export const SelectPosition = () => {
   const {
     addPositionId,
     balances,
+    clearPositions,
     errors,
     loading,
     positionIds,
     positions,
+    removePositionId,
   } = useMultiPositionsContext()
 
   const [positionsToDisplay, setPositionsToDisplay] = React.useState<Array<string>>([])
@@ -30,12 +32,10 @@ export const SelectPosition = () => {
   }
 
   React.useEffect(() => {
-    if (!loading && positions.length && balances.length) {
+    if (!loading && positions.length && balances.length && positionIds.length) {
       setPositionsToDisplay(
         positions.map((position) => {
           const i = positionIds.findIndex((id) => id === position.id)
-
-          console.log('balance', balances[i].toString())
 
           return positionString(
             position.collateralToken.id,
@@ -58,11 +58,15 @@ export const SelectPosition = () => {
         titleControl={<TitleControl onClick={selectPosition}>Select Positions</TitleControl>}
         value={
           <WrapperDisplay errors={errors} loading={loading}>
-            <StripedList>
-              {positionsToDisplay.map((position: string, index: number) => (
-                <StripedListItem key={index}>{position}</StripedListItem>
-              ))}
-            </StripedList>
+            {!!positionsToDisplay.length && (
+              <StripedList>
+                {positionsToDisplay.map((position: string, index: number) => (
+                  <StripedListItem key={index}>
+                    {position} <span onClick={() => removePositionId(positions[index].id)}>X</span>
+                  </StripedListItem>
+                ))}
+              </StripedList>
+            )}
           </WrapperDisplay>
         }
       />

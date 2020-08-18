@@ -117,11 +117,13 @@ export const positionString = (
   // Get the token
   const token = getTokenFromAddress(networkId, collateralTokenId)
 
-  return `[${token.symbol.toUpperCase()} ${conditionIds.map((conditionId, i) => {
-    return `C:${truncateStringInTheMiddle(conditionId, 8, 6)} O:${outcomeString(
-      parseInt(indexSets[i], 10)
-    )}`
-  })}]  ${formatBigNumber(balance, token.decimals, 2)}`
+  return `[${token.symbol.toUpperCase()} ${conditionIds
+    .map((conditionId, i) => {
+      return `C:${truncateStringInTheMiddle(conditionId, 8, 6)} O:${outcomeString(
+        parseInt(indexSets[i], 10)
+      )}`
+    })
+    .join(' & ')}] x${formatBigNumber(balance, token.decimals, 2)}`
 }
 
 const outcomeString = (indexSet: number) =>

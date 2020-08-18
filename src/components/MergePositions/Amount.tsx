@@ -4,7 +4,7 @@ import { BigNumberInputWrapper } from 'components/form/BigNumberInputWrapper'
 import { Row } from 'components/pureStyledComponents/Row'
 import { TitleControl } from 'components/pureStyledComponents/TitleControl'
 import { TitleValue } from 'components/text/TitleValue'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, formatUnits, parseUnits } from 'ethers/utils'
 import React from 'react'
 
 interface Props {
@@ -14,6 +14,7 @@ interface Props {
   balance: BigNumber
   disabled: boolean
   decimals: number
+  max: string
 }
 
 export const Amount = ({
@@ -21,6 +22,7 @@ export const Amount = ({
   balance,
   decimals,
   disabled,
+  max,
   onAmountChange,
   onUseWalletBalance,
 }: Props) => {
@@ -36,7 +38,8 @@ export const Amount = ({
         value={
           <BigNumberInputWrapper
             decimals={decimals}
-            disabled={disabled}
+            disabled={false}
+            max={`${1e18}`}
             onChange={onAmountChange}
             value={amount}
           />

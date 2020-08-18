@@ -133,6 +133,23 @@ export class ConditionalTokensService {
     return this.provider.waitForTransaction(tx.hash)
   }
 
+  mergePositions = async (
+    collateralToken: string,
+    parentCollectionId: string, // If doesn't exist, must be zero, ethers.constants.HashZero
+    conditionId: string,
+    partition: string[],
+    amount: BigNumber
+  ): Promise<TransactionReceipt> => {
+    const tx = await this.contract.mergePositions(
+      collateralToken,
+      parentCollectionId,
+      conditionId,
+      partition,
+      amount
+    )
+    return this.provider.waitForTransaction(tx.hash)
+  }
+
   async getOutcomeSlotCount(conditionId: string): Promise<BigNumber> {
     return await this.contract.getOutcomeSlotCount(conditionId)
   }
@@ -151,7 +168,6 @@ export class ConditionalTokensService {
   }
 
   async balanceOfBatch(positionIds: Array<string>): Promise<Array<BigNumber>> {
-    console.log(this.signer)
     if (this.signer) {
       const owner = await this.signer.getAddress()
       const owners = Array.from(new Array(positionIds.length), (_) => owner)
