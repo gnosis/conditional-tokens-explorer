@@ -1,3 +1,8 @@
+import { truncateStringInTheMiddle } from 'util/tools'
+
+import { Row } from 'components/pureStyledComponents/Row'
+import { TitleControl } from 'components/pureStyledComponents/TitleControl'
+import { TitleValue } from 'components/text/TitleValue'
 import { WrapperDisplay } from 'components/text/WrapperDisplay'
 import React from 'react'
 
@@ -16,19 +21,23 @@ export const SelectCondition = () => {
 
   React.useEffect(() => {
     if (condition) {
-      setConditionToDisplay(condition.id)
+      setConditionToDisplay(truncateStringInTheMiddle(condition.id, 8, 6))
     } else {
       setConditionToDisplay('')
     }
   }, [condition])
 
   return (
-    <>
-      <label>Resolved Condition ID</label>
-      <WrapperDisplay errors={errors} loading={loading}>
-        <p>{conditionToDisplay}</p>
-      </WrapperDisplay>
-      <button onClick={selectCondition}>Select Condition</button>
-    </>
+    <Row cols={'1fr'} marginBottomXL>
+      <TitleValue
+        title="Condition Id"
+        titleControl={<TitleControl onClick={selectCondition}>Select Condition</TitleControl>}
+        value={
+          <WrapperDisplay errors={errors} loading={loading}>
+            {conditionToDisplay}
+          </WrapperDisplay>
+        }
+      />
+    </Row>
   )
 }

@@ -1,4 +1,5 @@
 import { useWeb3Context } from 'contexts/Web3Context'
+import { MergePositions } from 'pages/MergePositions'
 import React from 'react'
 import { Redirect, Route, RouteProps, Switch } from 'react-router-dom'
 
@@ -49,6 +50,7 @@ export const Routes: React.FC = () => {
       <ProtectedRoute component={SplitPosition} path="/split" />
       <ProtectedRoute component={ReportPayoutsContainer} path="/report" />
       <ProtectedRoute component={RedeemPositionContainer} path="/redeem" />
+      <ProtectedRoute component={MergePositions} path="/merge" />
       <Route exact path="/">
         <Redirect to="/conditions" />
       </Route>

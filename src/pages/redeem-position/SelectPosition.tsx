@@ -1,12 +1,11 @@
 import { positionString } from 'util/tools'
 
+import { WrapperDisplay } from 'components/text/WrapperDisplay'
 import React from 'react'
 
 import { usePositionContext } from '../../contexts/PositionContext'
 import { useWeb3Connected } from '../../contexts/Web3Context'
 import { useBalanceForPosition } from '../../hooks/useBalanceForPosition'
-
-import { WrapperDisplay } from './WrapperDisplay'
 
 export const SelectPosition = () => {
   const { networkConfig } = useWeb3Connected()
@@ -41,7 +40,9 @@ export const SelectPosition = () => {
   return (
     <>
       <label>Position</label>
-      <WrapperDisplay dataToDisplay={positionToDisplay} errors={errors} loading={loading} />
+      <WrapperDisplay errors={errors} loading={loading}>
+        <p>{positionToDisplay}</p>
+      </WrapperDisplay>
       <button onClick={selectPosition}>Select Position</button>
     </>
   )
