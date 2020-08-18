@@ -4,7 +4,7 @@ import { BigNumberInputWrapper } from 'components/form/BigNumberInputWrapper'
 import { Row } from 'components/pureStyledComponents/Row'
 import { TitleControl } from 'components/pureStyledComponents/TitleControl'
 import { TitleValue } from 'components/text/TitleValue'
-import { BigNumber, formatUnits, parseUnits } from 'ethers/utils'
+import { BigNumber } from 'ethers/utils'
 import React from 'react'
 
 interface Props {

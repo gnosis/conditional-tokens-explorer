@@ -14,7 +14,6 @@ export const SelectPosition = () => {
   const {
     addPositionId,
     balances,
-    clearPositions,
     errors,
     loading,
     positionIds,
