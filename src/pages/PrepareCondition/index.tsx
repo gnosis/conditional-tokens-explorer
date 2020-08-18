@@ -6,7 +6,7 @@ import { Button } from '../../components/buttons/Button'
 import { ButtonSelect } from '../../components/buttons/ButtonSelect'
 import { CenteredCard } from '../../components/common/CenteredCard'
 import { Dropdown, DropdownPosition } from '../../components/common/Dropdown'
-import { AddOutcome, OutcomeProps } from '../../components/form/AddOutcome'
+import { AddOutcome } from '../../components/form/AddOutcome'
 import { SelectItem } from '../../components/form/SelectItem'
 import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
 import { ErrorContainer, Error as ErrorMessage } from '../../components/pureStyledComponents/Error'
@@ -200,25 +200,24 @@ export const PrepareCondition = () => {
   ]
   const [arbitrator, setArbitrator] = useState(arbitratorItems[0].value)
 
-  const [outcomes, setOutcomes] = useState<Array<OutcomeProps>>([])
-  const [outcome, setOutcome] = useState<OutcomeProps>({ text: '' })
+  const [outcomes, setOutcomes] = useState<Array<string | undefined>>([])
+  const [outcome, setOutcome] = useState<string | undefined>()
 
   const addOutcome = useCallback(() => {
-    setOutcome({ text: '' })
+    setOutcome('')
     setOutcomes([...outcomes, outcome])
-  }, [outcome, outcomes])
+  }, [outcome, outcomes, setOutcomes])
 
   const removeOutcome = useCallback(
     (index: number) => {
       outcomes.splice(index, 1)
       setOutcomes([...outcomes])
-      console.log(outcomes)
     },
     [outcomes]
   )
 
   const onOutcomeChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setOutcome({ text: e.currentTarget.value })
+    setOutcome(e.currentTarget.value)
 
   return (
     <>

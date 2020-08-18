@@ -126,13 +126,16 @@ const Outcome = styled.input`
   }
 `
 
-const EditableOutcome: React.FC<{ item: OutcomeProps; removeOutcome: () => void }> = (props) => {
+const EditableOutcome: React.FC<{ item: string | undefined; removeOutcome: () => void }> = (
+  props
+) => {
   const { item, removeOutcome, ...restProps } = props
   const [isEditing, setIsEditing] = useState(false)
-  const [value, setValue] = useState<string | undefined>(item.text)
+  const [value, setValue] = useState<string | undefined>(item)
 
-  console.log(item)
-  console.log('value: ' + value)
+  useEffect(() => {
+    setValue(item)
+  }, [item])
 
   return (
     <OutcomeWrapper {...restProps}>
@@ -162,22 +165,18 @@ const EditableOutcome: React.FC<{ item: OutcomeProps; removeOutcome: () => void 
   )
 }
 
-export interface OutcomeProps {
-  text: string | undefined
-}
-
 interface Props {
-  removeOutcome: (index: number) => void
   addOutcome: () => void
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-  outcome: OutcomeProps
-  outcomes: Array<OutcomeProps>
+  outcome: string | undefined
+  outcomes: Array<string | undefined>
+  removeOutcome: (index: number) => void
 }
 
 export const AddOutcome: React.FC<Props> = (props) => {
-  const { addOutcome, onChange, outcome, outcomes, removeOutcome, ...restProps } = props
+  const { addOutcome, onChange, outcome = '', outcomes, removeOutcome, ...restProps } = props
   const newOutcomeDisabled = outcomes.length === 256
-  const buttonAddDisabled = !outcome.text || newOutcomeDisabled
+  const buttonAddDisabled = !outcome || newOutcomeDisabled
   const outcomeNameRef = React.createRef<HTMLInputElement>()
 
   const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -189,6 +188,7 @@ export const AddOutcome: React.FC<Props> = (props) => {
       }
     }
   }
+
   return (
     <Row cols="1fr" {...restProps}>
       <TitleValue
@@ -204,7 +204,7 @@ export const AddOutcome: React.FC<Props> = (props) => {
               placeholder="New outcome title..."
               ref={outcomeNameRef}
               type="text"
-              value={outcome.text}
+              value={outcome}
             />
             <ButtonAdd disabled={buttonAddDisabled} onClick={addOutcome}>
               <IconPlus />
