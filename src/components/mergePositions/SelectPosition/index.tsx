@@ -4,6 +4,7 @@ import { useMultiPositionsContext } from '../../../contexts/MultiPositionsContex
 import { useWeb3Connected } from '../../../contexts/Web3Context'
 import { positionString } from '../../../util/tools'
 import { Errors } from '../../../util/types'
+import { ButtonControl, ButtonControlType } from '../../buttons/ButtonControl'
 import { Error, ErrorContainer } from '../../pureStyledComponents/Error'
 import {
   StripedList,
@@ -65,7 +66,11 @@ export const SelectPosition = () => {
             {positionsToDisplay.length ? (
               positionsToDisplay.map((position: string, index: number) => (
                 <StripedListItem key={index}>
-                  {position} <span onClick={() => removePositionId(positions[index].id)}>X</span>
+                  <span>{position}</span>
+                  <ButtonControl
+                    buttonType={ButtonControlType.delete}
+                    onClick={() => removePositionId(positions[index].id)}
+                  />
                 </StripedListItem>
               ))
             ) : (
