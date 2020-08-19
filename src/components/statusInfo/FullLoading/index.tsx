@@ -2,9 +2,11 @@ import React, { HTMLAttributes } from 'react'
 import ReactDOM from 'react-dom'
 import styled, { css } from 'styled-components'
 
-import { BaseCard } from '../../pureStyledComponents/BaseCard'
+import { Button } from '../../buttons/Button'
 import { Spinner } from '../Spinner'
-import { Text, Title } from '../common'
+import { Card, Icon, IconTypes, Text, Title } from '../common'
+import { AlertIcon } from '../icons/AlertIcon'
+import { ErrorIcon } from '../icons/ErrorIcon'
 
 const Wrapper = styled.div`
   align-items: center;
@@ -24,10 +26,7 @@ const NoOverlayCSS = css`
   margin: auto;
 `
 
-const LoadingCard = styled(BaseCard)<{ height?: string; width?: string; noOverlay?: boolean }>`
-  box-shadow: 0 2px 8px 0 rgba(212, 213, 211, 0.85);
-  flex-direction: column;
-  justify-content: space-between;
+const LoadingCard = styled(Card)<{ height?: string; width?: string; noOverlay?: boolean }>`
   min-height: ${(props) => props.height};
   width: ${(props) => props.width};
 
@@ -46,8 +45,23 @@ const LoadingSpinner = styled(Spinner)`
   margin-top: auto;
 `
 
+const ButtonContainer = styled.div`
+  padding-top: 25px;
+`
+
+const ActionButton = styled(Button)`
+  width: 100%;
+`
+
+interface ActionButtonProps {
+  text: string
+  onClick: () => void
+}
+
 interface Props extends HTMLAttributes<HTMLDivElement> {
+  actionButton?: ActionButtonProps | undefined
   height?: string
+  icon?: IconTypes
   message?: string
   noOverlay?: boolean
   title?: string
@@ -55,13 +69,31 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const FullLoading: React.FC<Props> = (props) => {
-  const { height, message, noOverlay, title, width, ...restProps } = props
+  const {
+    actionButton,
+    icon = IconTypes.spinner,
+    height,
+    message,
+    noOverlay,
+    title,
+    width,
+    ...restProps
+  } = props
   const portal: HTMLElement | null = document.getElementById('portalContainer')
   const loadingCard = (
     <LoadingCard height={height} noOverlay={noOverlay} width={width}>
       {title && <Title>{title}</Title>}
-      <LoadingSpinner />
+      <Icon>
+        {icon === IconTypes.spinner && <LoadingSpinner />}
+        {icon === IconTypes.alert && <AlertIcon />}
+        {icon === IconTypes.error && <ErrorIcon />}
+      </Icon>
       {message && <Text>{message}</Text>}
+      {actionButton && (
+        <ButtonContainer>
+          <ActionButton onClick={actionButton.onClick}>{actionButton.text}</ActionButton>
+        </ButtonContainer>
+      )}
     </LoadingCard>
   )
 

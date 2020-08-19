@@ -1,12 +1,15 @@
-import React from 'react'
 import styled from 'styled-components'
 
-const Wrapper = styled.div<{ maxHeight?: string }>`
+export const StripedList = styled.div<{ maxHeight?: string }>`
   border-radius: 4px;
   border: solid 1px ${(props) => props.theme.border.colorDark};
-  max-height: ${(props) => props.maxHeight};
+  height: ${(props) => props.maxHeight};
   overflow: auto;
 `
+
+StripedList.defaultProps = {
+  maxHeight: '300px',
+}
 
 export const StripedListItem = styled.div<{ justifyContent?: string }>`
   align-items: center;
@@ -39,16 +42,14 @@ StripedListItem.defaultProps = {
   justifyContent: 'space-between',
 }
 
-interface StripedList {
-  maxHeight?: string
-}
-
-export const StripedList: React.FC<StripedList> = (props) => {
-  const { children, maxHeight = '435px', ...restProps } = props
-
-  return (
-    <Wrapper maxHeight={maxHeight} {...restProps}>
-      {children}
-    </Wrapper>
-  )
-}
+export const StripedListEmpty = styled.p`
+  align-items: center;
+  color: ${(props) => props.theme.colors.textColor};
+  display: flex;
+  font-size: 15px;
+  height: 100%;
+  justify-content: center;
+  line-height: 1.5;
+  margin: 0;
+  width: 100%;
+`

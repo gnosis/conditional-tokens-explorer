@@ -9,10 +9,10 @@ import { ButtonDropdownCircle } from '../../components/buttons/ButtonDropdownCir
 import { CenteredCard } from '../../components/common/CenteredCard'
 import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
 import { SetAllowance } from '../../components/common/SetAllowance'
-import { StripedList, StripedListItem } from '../../components/common/StripedList'
 import { TokenIcon } from '../../components/common/TokenIcon'
 import { Partition } from '../../components/partitions/Partition'
 import { Row } from '../../components/pureStyledComponents/Row'
+import { StripedList, StripedListItem } from '../../components/pureStyledComponents/StripedList'
 import { TitleValue } from '../../components/text/TitleValue'
 import { getTokenFromAddress } from '../../config/networkConfig'
 import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
@@ -142,8 +142,8 @@ export const Contents = ({ position }: Props) => {
       </Row>
       <SetAllowance
         collateral={collateralToken}
+        fetching={false}
         finished={false}
-        loading={false}
         onUnlock={() => {
           return 1
         }}

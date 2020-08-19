@@ -1,7 +1,8 @@
+import { MergePositions } from 'pages/MergePositions'
 import React from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
 
-import { InfoCard } from '../../components/common/InfoCard'
+import { InfoCard } from '../../components/statusInfo/InfoCard'
 import { ConditionDetails } from '../ConditionDetails'
 import { ConditionsList } from '../ConditionsList'
 import { PositionDetails } from '../PositionDetails'
@@ -22,6 +23,7 @@ export const Routes: React.FC = () => {
       <Route component={SplitPosition} path="/split" />
       <Route component={ReportPayoutsContainer} path="/report" />
       <Route component={RedeemPositionContainer} path="/redeem" />
+      <Route component={MergePositions} path="/merge" />
       <Route exact path="/">
         <Redirect to="/conditions" />
       </Route>

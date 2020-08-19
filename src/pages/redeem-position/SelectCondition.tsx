@@ -1,8 +1,7 @@
+import { WrapperDisplay } from 'components/text/WrapperDisplay'
 import React from 'react'
 
 import { useConditionContext } from '../../contexts/ConditionContext'
-
-import { WrapperDisplay } from './WrapperDisplay'
 
 export const SelectCondition = () => {
   const { condition, errors, loading, setConditionId } = useConditionContext()
@@ -26,7 +25,9 @@ export const SelectCondition = () => {
   return (
     <>
       <label>Resolved Condition ID</label>
-      <WrapperDisplay dataToDisplay={conditionToDisplay} errors={errors} loading={loading} />
+      <WrapperDisplay errors={errors} loading={loading}>
+        <p>{conditionToDisplay}</p>
+      </WrapperDisplay>
       <button onClick={selectCondition}>Select Condition</button>
     </>
   )

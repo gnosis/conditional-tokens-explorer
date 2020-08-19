@@ -19,6 +19,7 @@ const conditionalTokensAbi = [
   'function getCollectionId(bytes32 parentCollectionId, bytes32 conditionId, uint indexSet) external view returns (bytes32) ',
   'function getPositionId(address collateralToken, bytes32 collectionId) external pure returns (uint) ',
   'function balanceOf(address owner, uint256 positionId) external view returns (uint256)',
+  'function balanceOfBatch(address[] owners, uint256[] ids) public view returns (uint256[])',
   'function safeTransferFrom(address from, address to, uint256 id, uint256 value, bytes data) external',
   'function getOutcomeSlotCount(bytes32 conditionId) external view returns (uint)',
   'function mergePositions(address collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] partition, uint amount) external',
@@ -132,6 +133,23 @@ export class ConditionalTokensService {
     return this.provider.waitForTransaction(tx.hash)
   }
 
+  mergePositions = async (
+    collateralToken: string,
+    parentCollectionId: string, // If doesn't exist, must be zero, ethers.constants.HashZero
+    conditionId: string,
+    partition: string[],
+    amount: BigNumber
+  ): Promise<TransactionReceipt> => {
+    const tx = await this.contract.mergePositions(
+      collateralToken,
+      parentCollectionId,
+      conditionId,
+      partition,
+      amount
+    )
+    return this.provider.waitForTransaction(tx.hash)
+  }
+
   async getOutcomeSlotCount(conditionId: string): Promise<BigNumber> {
     return await this.contract.getOutcomeSlotCount(conditionId)
   }
@@ -146,6 +164,16 @@ export class ConditionalTokensService {
       return await this.contract.balanceOf(owner, positionId)
     } else {
       return new BigNumber(0)
+    }
+  }
+
+  async balanceOfBatch(positionIds: Array<string>): Promise<Array<BigNumber>> {
+    if (this.signer) {
+      const owner = await this.signer.getAddress()
+      const owners = Array.from(new Array(positionIds.length), (_) => owner)
+      return this.contract.balanceOfBatch(owners, positionIds)
+    } else {
+      return [new BigNumber(0)]
     }
   }
 

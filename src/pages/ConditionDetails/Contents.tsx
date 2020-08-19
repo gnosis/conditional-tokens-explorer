@@ -5,9 +5,9 @@ import { ButtonCopy } from '../../components/buttons/ButtonCopy'
 import { ButtonDropdownCircle } from '../../components/buttons/ButtonDropdownCircle'
 import { CenteredCard } from '../../components/common/CenteredCard'
 import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
-import { StripedList, StripedListItem } from '../../components/common/StripedList'
 import { Pill, PillTypes } from '../../components/pureStyledComponents/Pill'
 import { Row } from '../../components/pureStyledComponents/Row'
+import { StripedList, StripedListItem } from '../../components/pureStyledComponents/StripedList'
 import { TitleValue } from '../../components/text/TitleValue'
 import { INFORMATION_NOT_AVAILABLE } from '../../config/constants'
 import { getKnowOracleFromAddress } from '../../config/networkConfig'
@@ -123,19 +123,17 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           }
         />
         {isConditionFromOmen && (
-          <>
-            <TitleValue title="Question Type" value={getConditionTypeTitle(templateId)} />
-            <TitleValue
-              title="Question Id"
-              value={
-                <>
-                  {truncateStringInTheMiddle(questionId, 8, 6)}
-                  <ButtonCopy value={questionId} />
-                </>
-              }
-            />
-          </>
+          <TitleValue title="Question Type" value={getConditionTypeTitle(templateId)} />
         )}
+        <TitleValue
+          title="Question Id"
+          value={
+            <>
+              {truncateStringInTheMiddle(questionId, 8, 6)}
+              <ButtonCopy value={questionId} />
+            </>
+          }
+        />
       </Row>
       {isConditionFromOmen && (
         <>
@@ -157,15 +155,13 @@ export const Contents: React.FC<Props> = ({ condition }) => {
         </>
       )}
       <Row>
-        {resolved && (
-          <TitleValue
-            title="Resolution Date"
-            value={formatTS(resolveTimestamp) || INFORMATION_NOT_AVAILABLE}
-          />
-        )}
+        <TitleValue
+          title="Resolution Date"
+          value={formatTS(resolveTimestamp) || INFORMATION_NOT_AVAILABLE}
+        />
         {isConditionFromOmen && <TitleValue title="Category" value={category} />}
         <TitleValue
-          title="Oracle"
+          title={isConditionFromOmen ? 'Oracle' : 'Reporting Address'}
           value={
             <>
               {oracleTitle}

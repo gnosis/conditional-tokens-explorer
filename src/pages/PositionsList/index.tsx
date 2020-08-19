@@ -4,12 +4,12 @@ import React, { useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useHistory } from 'react-router-dom'
 
-import { InfoCard } from '../../components/common/InfoCard'
-import { InlineLoading } from '../../components/loading/InlineLoading'
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
+import { InfoCard } from '../../components/statusInfo/InfoCard'
+import { InlineLoading } from '../../components/statusInfo/InlineLoading'
 import { Web3ContextStatus } from '../../contexts/Web3Context'
 
-const dafaultColumns = [
+const defaultColumns = [
   {
     name: 'Position Id',
     selector: 'id',
@@ -25,7 +25,7 @@ const dafaultColumns = [
 const getTableColumns = (status: Web3Status) => {
   if (status._type === Web3ContextStatus.Connected) {
     return [
-      ...dafaultColumns,
+      ...defaultColumns,
       {
         name: 'ERC1155 Amount',
         selector: 'userBalance',
@@ -36,7 +36,7 @@ const getTableColumns = (status: Web3Status) => {
     ]
   }
 
-  return dafaultColumns
+  return defaultColumns
 }
 
 const customStyles = {

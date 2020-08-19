@@ -1,21 +1,15 @@
 import { positionString } from 'util/tools'
 
+import { WrapperDisplay } from 'components/text/WrapperDisplay'
 import React from 'react'
 
 import { usePositionContext } from '../../contexts/PositionContext'
 import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
 import { useBalanceForPosition } from '../../hooks/useBalanceForPosition'
 
-import { WrapperDisplay } from './WrapperDisplay'
-
-interface Props {
-  networkId: Maybe<number>
-}
-
-export const SelectPosition = (props: Props) => {
+export const SelectPosition = () => {
   const { connect, status } = useWeb3Context()
 
-  const { networkId } = props
   const { errors, loading, position, positionId, setPositionId } = usePositionContext()
   const { balance } = useBalanceForPosition(positionId)
 
@@ -33,25 +27,31 @@ export const SelectPosition = (props: Props) => {
   }
 
   React.useEffect(() => {
-    if (position && networkId) {
+    if (
+      (status._type === Web3ContextStatus.Connected || status._type === Web3ContextStatus.Infura) &&
+      position
+    ) {
+      const { networkConfig } = status
       setPositionToDisplay(
         positionString(
           position.collateralToken.id,
           position.conditionIds,
           position.indexSets,
           balance,
-          networkId
+          networkConfig.networkId
         )
       )
     } else {
       setPositionToDisplay('')
     }
-  }, [balance, networkId, position])
+  }, [balance, position, status])
 
   return (
     <>
       <label>Position</label>
-      <WrapperDisplay dataToDisplay={positionToDisplay} errors={errors} loading={loading} />
+      <WrapperDisplay errors={errors} loading={loading}>
+        <p>{positionToDisplay}</p>
+      </WrapperDisplay>
       <button onClick={selectPosition}>Select Position</button>
     </>
   )

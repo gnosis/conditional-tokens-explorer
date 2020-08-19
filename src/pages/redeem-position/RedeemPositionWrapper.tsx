@@ -93,7 +93,7 @@ export const RedeemPositionWrapper = () => {
   return (
     <>
       <div className="row">
-        <SelectPosition networkId={networkId} />
+        <SelectPosition />
       </div>
 
       <div className="row">

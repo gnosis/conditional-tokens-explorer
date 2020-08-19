@@ -58,6 +58,7 @@ const theme = {
     darkGrey: darkGrey,
     darkerGray: darkerGray,
     darkestGray: '#081728',
+    delete: error,
     error: error,
     holdGreen: '#008c73',
     lightGreen: '#a1d2ca',
