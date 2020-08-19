@@ -1,3 +1,4 @@
+import { SelectConditionModal } from 'components/modals/SelectConditionModal'
 import { useWeb3Connected } from 'contexts/Web3Context'
 import { BigNumber } from 'ethers/utils'
 import { AllowanceMethods, useAllowanceState } from 'hooks/useAllowanceState'
@@ -166,64 +167,70 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
   ]
 
   return (
-    <CenteredCard>
-      <Row cols="1fr">
-        <InputCondition formMethods={formMethods} onOutcomeSlotChange={(n) => setOutcomeSlot(n)} />
-      </Row>
-      <Row cols="1fr" marginBottomXL>
-        <TitleValue
-          title="Split From"
-          value={
-            <SplitFrom
-              formMethods={formMethods}
-              onCollateralChange={onCollateralChange}
-              onPositionChange={(p) => setPosition(p)}
-              splitFromCollateral={splitFromCollateral}
-              splitFromPosition={splitFromPosition}
-              tokens={tokens}
-            />
-          }
-        />
-      </Row>
-      {showAskAllowance && (
-        <SetAllowance
-          collateral={collateralToken}
-          fetching={fetching}
-          finished={allowanceFinished}
-          onUnlock={unlockCollateral}
-        />
-      )}
-      <Row cols="1fr" marginBottomXL>
-        <InputAmount
-          collateral={collateralToken}
-          formMethods={formMethods}
-          positionId={positionId}
-          splitFrom={splitFrom}
-        />
-      </Row>
-      <Row cols="1fr" marginBottomXL>
-        <TitleValue
-          title="Partition"
-          titleControl={<TitleControl>Edit Partition</TitleControl>}
-          value={<PartitionStyled collections={mockedNumberedOutcomes} />}
-        />
-      </Row>
-      <Row cols="1fr" marginBottomXL>
-        <TitleValue
-          title="Split Position Preview"
-          value={
-            <StripedListStyled>
-              <StripedListItem>[DAI C: 0x123 O: 0] x 10</StripedListItem>
-              <StripedListItem>[DAI C: 0x123 O: 1] x 10</StripedListItem>
-            </StripedListStyled>
-          }
-        />
-      </Row>
-      <ButtonContainer>
-        <Button disabled={!canSubmit} onClick={handleSubmit(onSubmit)}>
-          Split
-        </Button>
-      </ButtonContainer>
-    </CenteredCard>
+    <>
+      <CenteredCard>
+        <Row cols="1fr">
+          <InputCondition
+            formMethods={formMethods}
+            onOutcomeSlotChange={(n) => setOutcomeSlot(n)}
+          />
+        </Row>
+        <Row cols="1fr" marginBottomXL>
+          <TitleValue
+            title="Split From"
+            value={
+              <SplitFrom
+                formMethods={formMethods}
+                onCollateralChange={onCollateralChange}
+                onPositionChange={(p) => setPosition(p)}
+                splitFromCollateral={splitFromCollateral}
+                splitFromPosition={splitFromPosition}
+                tokens={tokens}
+              />
+            }
+          />
+        </Row>
+        {showAskAllowance && (
+          <SetAllowance
+            collateral={collateralToken}
+            fetching={fetching}
+            finished={allowanceFinished}
+            onUnlock={unlockCollateral}
+          />
+        )}
+        <Row cols="1fr" marginBottomXL>
+          <InputAmount
+            collateral={collateralToken}
+            formMethods={formMethods}
+            positionId={positionId}
+            splitFrom={splitFrom}
+          />
+        </Row>
+        <Row cols="1fr" marginBottomXL>
+          <TitleValue
+            title="Partition"
+            titleControl={<TitleControl>Edit Partition</TitleControl>}
+            value={<PartitionStyled collections={mockedNumberedOutcomes} />}
+          />
+        </Row>
+        <Row cols="1fr" marginBottomXL>
+          <TitleValue
+            title="Split Position Preview"
+            value={
+              <StripedListStyled>
+                <StripedListItem>[DAI C: 0x123 O: 0] x 10</StripedListItem>
+                <StripedListItem>[DAI C: 0x123 O: 1] x 10</StripedListItem>
+              </StripedListStyled>
+            }
+          />
+        </Row>
+        <ButtonContainer>
+          <Button disabled={!canSubmit} onClick={handleSubmit(onSubmit)}>
+            Split
+          </Button>
+        </ButtonContainer>
+      </CenteredCard>
+      <SelectConditionModal isOpen={true} title={'Select Condition'} />
+    </>
   )
 }
