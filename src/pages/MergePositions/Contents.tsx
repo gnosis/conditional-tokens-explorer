@@ -4,6 +4,7 @@ import { Status } from 'util/types'
 
 import { Button } from 'components/buttons'
 import { CenteredCard } from 'components/common/CenteredCard'
+import { Row } from 'components/pureStyledComponents/Row'
 import { ZERO_BN } from 'config/constants'
 import { getTokenFromAddress } from 'config/networkConfig'
 import { useConditionContext } from 'contexts/ConditionContext'
@@ -15,10 +16,10 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 import styled from 'styled-components'
 
-import { Amount } from './Amount'
-import { MergePreview } from './MergePreview'
-import { SelectCondition } from './SelectCondition'
-import { SelectPosition } from './SelectPosition'
+import { Amount } from '../../components/MergePositions/Amount'
+import { MergePreview } from '../../components/MergePositions/MergePreview'
+import { SelectCondition } from '../../components/MergePositions/SelectCondition'
+import { SelectPosition } from '../../components/MergePositions/SelectPosition'
 
 const logger = getLogger('MergePosition')
 
@@ -122,7 +123,9 @@ export const Contents = () => {
 
   return (
     <CenteredCard>
-      <SelectPosition />
+      <Row cols="1fr" marginBottomXL>
+        <SelectPosition />
+      </Row>
       <SelectCondition />
       <Amount
         amount={amount}
