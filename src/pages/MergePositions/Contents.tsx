@@ -141,7 +141,9 @@ export const Contents = () => {
           tokenSymbol={collateralToken ? collateralToken.symbol : ''}
         />
       </Row>
-      <MergePreview amount={amount} />
+      <Row cols="1fr">
+        <MergePreview amount={amount} />
+      </Row>
       <ButtonWrapper>
         <Button disabled={disabled} onClick={onMerge}>
           Merge
