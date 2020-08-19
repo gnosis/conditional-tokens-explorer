@@ -129,15 +129,18 @@ export const Contents = () => {
       <Row cols="1fr">
         <SelectCondition />
       </Row>
-      <Amount
-        amount={amount}
-        balance={maxBalance}
-        decimals={decimals}
-        disabled={!isFullIndexSet}
-        max={maxBalance.toString()}
-        onAmountChange={amountChangeHandler}
-        onUseWalletBalance={useWalletHandler}
-      />
+      <Row cols="1fr">
+        <Amount
+          amount={amount}
+          balance={maxBalance}
+          decimals={decimals}
+          disabled={!isFullIndexSet}
+          max={maxBalance.toString()}
+          onAmountChange={amountChangeHandler}
+          onUseWalletBalance={useWalletHandler}
+          tokenSymbol={collateralToken ? collateralToken.symbol : ''}
+        />
+      </Row>
       <MergePreview amount={amount} />
       <ButtonWrapper>
         <Button disabled={disabled} onClick={onMerge}>

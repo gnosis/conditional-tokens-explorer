@@ -1,11 +1,10 @@
-import { formatBigNumber } from 'util/tools'
-
-import { BigNumberInputWrapper } from 'components/form/BigNumberInputWrapper'
-import { Row } from 'components/pureStyledComponents/Row'
-import { TitleControl } from 'components/pureStyledComponents/TitleControl'
-import { TitleValue } from 'components/text/TitleValue'
 import { BigNumber } from 'ethers/utils'
 import React from 'react'
+
+import { formatBigNumber } from '../../../util/tools'
+import { BigNumberInputWrapper } from '../../form/BigNumberInputWrapper'
+import { TitleControlButton } from '../../pureStyledComponents/TitleControl'
+import { TitleValue } from '../../text/TitleValue'
 
 interface Props {
   amount: BigNumber
@@ -15,6 +14,7 @@ interface Props {
   max: string
   onAmountChange: (value: BigNumber) => void
   onUseWalletBalance: () => void
+  tokenSymbol?: string
 }
 
 export const Amount = ({
@@ -22,29 +22,30 @@ export const Amount = ({
   balance,
   decimals,
   disabled,
-  max,
   onAmountChange,
   onUseWalletBalance,
+  tokenSymbol,
 }: Props) => {
+  const disable = amount.isZero() || disabled
+
   return (
-    <Row cols={'1fr'} marginBottomXL>
-      <TitleValue
-        title="Amount"
-        titleControl={
-          <TitleControl onClick={onUseWalletBalance}>
-            Use Wallet Balance (${formatBigNumber(balance, decimals)})
-          </TitleControl>
-        }
-        value={
-          <BigNumberInputWrapper
-            decimals={decimals}
-            disabled={false}
-            max={`${1e18}`}
-            onChange={onAmountChange}
-            value={amount}
-          />
-        }
-      />
-    </Row>
+    <TitleValue
+      title="Amount"
+      titleControl={
+        <TitleControlButton disabled={disable} onClick={onUseWalletBalance}>
+          Use Wallet Balance (${formatBigNumber(balance, decimals)})
+        </TitleControlButton>
+      }
+      value={
+        <BigNumberInputWrapper
+          decimals={decimals}
+          disabled={disable}
+          max={`${1e18}`}
+          onChange={onAmountChange}
+          tokenSymbol={tokenSymbol}
+          value={amount}
+        />
+      }
+    />
   )
 }
