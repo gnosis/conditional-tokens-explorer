@@ -9,12 +9,12 @@ import React from 'react'
 
 interface Props {
   amount: BigNumber
+  balance: BigNumber
+  decimals: number
+  disabled: boolean
+  max: string
   onAmountChange: (value: BigNumber) => void
   onUseWalletBalance: () => void
-  balance: BigNumber
-  disabled: boolean
-  decimals: number
-  max: string
 }
 
 export const Amount = ({

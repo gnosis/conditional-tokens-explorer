@@ -16,10 +16,10 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 import styled from 'styled-components'
 
-import { Amount } from '../../components/MergePositions/Amount'
-import { MergePreview } from '../../components/MergePositions/MergePreview'
-import { SelectCondition } from '../../components/MergePositions/SelectCondition'
-import { SelectPosition } from '../../components/MergePositions/SelectPosition'
+import { Amount } from '../../components/mergePositions/Amount'
+import { MergePreview } from '../../components/mergePositions/MergePreview'
+import { SelectCondition } from '../../components/mergePositions/SelectCondition'
+import { SelectPosition } from '../../components/mergePositions/SelectPosition'
 
 const logger = getLogger('MergePosition')
 

@@ -3,8 +3,7 @@ import React, { ButtonHTMLAttributes } from 'react'
 import styled from 'styled-components'
 
 import { useWeb3Disconnected } from '../../../contexts/Web3Context'
-
-import { ChevronRight } from './img/ChevronRight'
+import { ChevronRight } from '../../icons/ChevronRight'
 
 const Wrapper = styled.button`
   align-items: center;

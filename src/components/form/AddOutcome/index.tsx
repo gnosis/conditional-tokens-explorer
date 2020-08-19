@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
+import { IconDelete } from '../../icons/IconDelete'
+import { IconEdit } from '../../icons/IconEdit'
+import { IconOk } from '../../icons/IconOk'
+import { IconPlus } from '../../icons/IconPlus'
 import { Row } from '../../pureStyledComponents/Row'
 import {
   StripedList,
@@ -9,11 +13,6 @@ import {
 } from '../../pureStyledComponents/StripedList'
 import { Textfield } from '../../pureStyledComponents/Textfield'
 import { TitleValue } from '../../text/TitleValue'
-
-import { IconDelete } from './img/IconDelete'
-import { IconEdit } from './img/IconEdit'
-import { IconOk } from './img/IconOk'
-import { IconPlus } from './img/IconPlus'
 
 const ButtonAdd = styled.button`
   align-items: center;

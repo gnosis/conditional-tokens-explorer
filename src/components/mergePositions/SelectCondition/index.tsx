@@ -6,7 +6,7 @@ import { TitleValue } from 'components/text/TitleValue'
 import { WrapperDisplay } from 'components/text/WrapperDisplay'
 import React from 'react'
 
-import { useConditionContext } from '../../contexts/ConditionContext'
+import { useConditionContext } from '../../../contexts/ConditionContext'
 
 export const SelectCondition = () => {
   const { condition, errors, loading, setConditionId } = useConditionContext()
