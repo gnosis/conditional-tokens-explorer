@@ -4,25 +4,34 @@ import { WrapperDisplay } from 'components/text/WrapperDisplay'
 import React from 'react'
 
 import { usePositionContext } from '../../contexts/PositionContext'
-import { useWeb3Connected } from '../../contexts/Web3Context'
+import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
 import { useBalanceForPosition } from '../../hooks/useBalanceForPosition'
 
 export const SelectPosition = () => {
-  const { networkConfig } = useWeb3Connected()
+  const { connect, status } = useWeb3Context()
+
   const { errors, loading, position, positionId, setPositionId } = usePositionContext()
   const { balance } = useBalanceForPosition(positionId)
 
   const [positionToDisplay, setPositionToDisplay] = React.useState<string>('')
 
   const selectPosition = () => {
-    const positionIdFromPrompt = window.prompt(`Enter the position: `)
-    if (positionIdFromPrompt) {
-      setPositionId(positionIdFromPrompt)
+    if (status._type === Web3ContextStatus.Connected) {
+      const positionIdFromPrompt = window.prompt(`Enter the position: `)
+      if (positionIdFromPrompt) {
+        setPositionId(positionIdFromPrompt)
+      }
+    } else if (status._type === Web3ContextStatus.Infura) {
+      connect()
     }
   }
 
   React.useEffect(() => {
-    if (position) {
+    if (
+      (status._type === Web3ContextStatus.Connected || status._type === Web3ContextStatus.Infura) &&
+      position
+    ) {
+      const { networkConfig } = status
       setPositionToDisplay(
         positionString(
           position.collateralToken.id,
@@ -35,7 +44,7 @@ export const SelectPosition = () => {
     } else {
       setPositionToDisplay('')
     }
-  }, [balance, networkConfig.networkId, position])
+  }, [balance, position, status])
 
   return (
     <>

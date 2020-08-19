@@ -1,9 +1,9 @@
 import { NetworkIds, Token } from '../util/types'
 
 import {
+  CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_MAINNET,
+  CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_RINKEBY,
   EARLIEST_GANACHE_BLOCK_TO_CHECK,
-  CONDITION_TOKEN_CONTRACT_ADDRESS_FOR_MAINNET,
-  CONDITION_TOKEN_CONTRACT_ADDRESS_FOR_RINKEBY,
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
   EARLIEST_RINKEBY_BLOCK_TO_CHECK,
   GRAPH_HTTP_GANACHE,
@@ -31,7 +31,7 @@ const networks: { [K in NetworkIds]: Network } = {
   [NetworkIds.MAINNET]: {
     earliestBlockToCheck: EARLIEST_MAINNET_BLOCK_TO_CHECK,
     contracts: {
-      conditionalTokensAddress: CONDITION_TOKEN_CONTRACT_ADDRESS_FOR_MAINNET,
+      conditionalTokensAddress: CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_MAINNET,
       realitioAddress: REALITIO_CONTRACT_ADDRESS_FOR_MAINNET,
     },
     tokens: [
@@ -87,7 +87,7 @@ const networks: { [K in NetworkIds]: Network } = {
   [NetworkIds.RINKEBY]: {
     earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
     contracts: {
-      conditionalTokensAddress: CONDITION_TOKEN_CONTRACT_ADDRESS_FOR_RINKEBY,
+      conditionalTokensAddress: CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_RINKEBY,
       realitioAddress: REALITIO_CONTRACT_ADDRESS_FOR_RINKEBY,
     },
     tokens: [
