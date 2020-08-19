@@ -1,5 +1,26 @@
 import gql from 'graphql-tag'
 
+const DEFAULT_ORDER_FIELD = 'resolveBlockNumber'
+
+export const ConditionsSearchQuery = gql`
+  query Conditions($oracle: String!) {
+    conditions(
+      first: 1000
+      where: { oracle_contains: $oracle }
+      orderBy: $DEFAULT_ORDER_FIELD
+      orderDirection: desc
+    ) {
+      id
+      oracle
+      questionId
+      outcomeSlotCount
+      resolved
+      creator
+      resolveBlockNumber
+    }
+  }
+`
+
 export const ConditionsListQuery = gql`
   query Conditions {
     conditions(first: 1000) {
