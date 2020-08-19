@@ -1,6 +1,5 @@
 import { getMergePreview, isConditionFullIndexSet } from 'util/tools'
 
-import { Row } from 'components/pureStyledComponents/Row'
 import {
   StripedList,
   StripedListEmpty,
