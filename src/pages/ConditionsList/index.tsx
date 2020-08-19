@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/react-hooks'
-import { ConditionsListQuery } from 'queries/conditions'
+import { ConditionsListQuery, ConditionsSearchQuery } from 'queries/conditions'
 import React from 'react'
 import DataTable from 'react-data-table-component'
 import { useHistory } from 'react-router-dom'
@@ -53,8 +53,16 @@ const customStyles = {
 }
 
 export const ConditionsList = () => {
-  const { data, error, loading } = useQuery<Conditions>(ConditionsListQuery)
+  const oracleSearch = ''
+  const { data, error, loading } = useQuery<Conditions>(ConditionsSearchQuery, {
+    variables: { oracle: oracleSearch },
+  })
   const history = useHistory()
+  const [searchTerm, setSearchTerm] = React.useState('')
+  const [searchResults, setSearchResults] = React.useState([])
+  const handleChange = (event: { target: { value: React.SetStateAction<string> } }) => {
+    setSearchTerm(event.target.value)
+  }
 
   const handleRowClick = (row: Conditions_conditions) => {
     history.push(`/conditions/${row.id}`)
@@ -65,6 +73,14 @@ export const ConditionsList = () => {
       <PageTitle>Conditions</PageTitle>
       {loading && <InlineLoading />}
       {error && <InfoCard title="Error" />}
+      {
+        <input
+          onChange={handleChange}
+          placeholder="Search oracle"
+          type="text"
+          value={oracleSearch}
+        />
+      }
       {data && (
         <DataTable
           columns={columns}
