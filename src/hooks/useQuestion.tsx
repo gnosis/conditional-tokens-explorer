@@ -16,10 +16,11 @@ export const useQuestion = (questionId: string, outcomeSlotCount: number) => {
     if (status._type === Web3ContextStatus.Connected || status._type === Web3ContextStatus.Infura) {
       if (!cancelled) setLoading(true)
 
-      const { RtioService } = status
+      const { RtioService, networkConfig } = status
       const getQuestion = async (questionId: string) => {
         try {
-          const question = await RtioService.getQuestion(questionId)
+          const earliestBlockToCheck = networkConfig.getEarliestBlockToCheck()
+          const question = await RtioService.getQuestion(questionId, earliestBlockToCheck)
           if (!cancelled) setQuestion(question)
         } catch (err) {
           setError(err)

@@ -175,35 +175,40 @@ export class NetworkConfig {
     return networkId === 1 || networkId === 4 || networkId === 50
   }
 
-  getConditionalTokensAddress() {
+  getConditionalTokensAddress(): string {
     return networks[this.networkId].contracts.conditionalTokensAddress
   }
 
-  getRealitioAddress() {
+  getRealitioAddress(): string {
     return networks[this.networkId].contracts.realitioAddress
   }
 
-  getTokens() {
+  getTokens(): Token[] {
     return networks[this.networkId].tokens
   }
-}
 
-export const getGraphUris = (networkId: number): { httpUri: string; wsUri: string } => {
-  if (!NetworkConfig.isKnownNetwork(networkId)) {
-    throw new Error(`Unsupported network id: '${networkId}'`)
+  getGraphUris(): { httpUri: string; wsUri: string } {
+    const httpUri = networks[this.networkId].graphHttpUri
+    const wsUri = networks[this.networkId].graphWsUri
+    return { httpUri, wsUri }
   }
 
-  const httpUri = networks[networkId].graphHttpUri
-  const wsUri = networks[networkId].graphWsUri
-  return { httpUri, wsUri }
-}
-
-export const getEarliestBlockToCheck = (networkId: number): number => {
-  if (!NetworkConfig.isKnownNetwork(networkId)) {
-    throw new Error(`Unsupported network id: '${networkId}'`)
+  getEarliestBlockToCheck(): number {
+    return networks[this.networkId].earliestBlockToCheck
   }
 
-  return networks[networkId].earliestBlockToCheck
+  getTokenFromAddress(address: string): Token {
+    const tokens = networks[this.networkId].tokens
+
+    for (const token of tokens) {
+      const tokenAddress = token.address
+      if (tokenAddress.toLowerCase() === address.toLowerCase()) {
+        return token
+      }
+    }
+
+    throw new Error(`Couldn't find token with address '${address}' in network '${this.networkId}'`)
+  }
 }
 
 interface KnownOracleData {
@@ -254,21 +259,4 @@ export const getKnowOracleFromAddress = (networkId: number, address: string): Kn
   }
 
   return 'unknown' as KnownOracle
-}
-
-export const getTokenFromAddress = (networkId: number, address: string): Token => {
-  if (!NetworkConfig.isKnownNetwork(networkId)) {
-    throw new Error(`Unsupported network id: '${networkId}'`)
-  }
-
-  const tokens = networks[networkId].tokens
-
-  for (const token of tokens) {
-    const tokenAddress = token.address
-    if (tokenAddress.toLowerCase() === address.toLowerCase()) {
-      return token
-    }
-  }
-
-  throw new Error(`Couldn't find token with address '${address}' in network '${networkId}'`)
 }

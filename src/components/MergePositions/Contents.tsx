@@ -5,7 +5,6 @@ import { Status } from 'util/types'
 import { Button } from 'components/buttons'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { ZERO_BN } from 'config/constants'
-import { getTokenFromAddress } from 'config/networkConfig'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { useWeb3Connected } from 'contexts/Web3Context'
@@ -22,11 +21,14 @@ import { SelectPosition } from './SelectPosition'
 
 const logger = getLogger('MergePosition')
 
+const ButtonWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 80px;
+`
+
 export const Contents = () => {
-  const {
-    CTService,
-    networkConfig: { networkId },
-  } = useWeb3Connected()
+  const { CTService, networkConfig } = useWeb3Connected()
 
   const {
     balances,
@@ -43,10 +45,10 @@ export const Contents = () => {
 
   const collateralToken = useMemo(() => {
     if (positions.length && isFullIndexSet) {
-      return getTokenFromAddress(networkId, positions[0].collateralToken.id)
+      return networkConfig.getTokenFromAddress(positions[0].collateralToken.id)
     }
     return null
-  }, [positions, networkId, isFullIndexSet])
+  }, [positions, networkConfig, isFullIndexSet])
 
   const maxBalance = useMemo(
     () => (isFullIndexSet && balances.length ? minBigNumber(balances) : ZERO_BN),
@@ -142,9 +144,3 @@ export const Contents = () => {
     </CenteredCard>
   )
 }
-
-const ButtonWrapper = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 80px;
-`

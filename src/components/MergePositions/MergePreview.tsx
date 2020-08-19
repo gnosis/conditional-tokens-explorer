@@ -7,7 +7,6 @@ import { useConditionContext } from 'contexts/ConditionContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { useWeb3Connected } from 'contexts/Web3Context'
 import { BigNumber } from 'ethers/utils'
-import { position } from 'polished'
 import React, { useMemo } from 'react'
 
 interface Props {
@@ -15,9 +14,7 @@ interface Props {
 }
 
 export const MergePreview = ({ amount }: Props) => {
-  const {
-    networkConfig: { networkId },
-  } = useWeb3Connected()
+  const { networkConfig } = useWeb3Connected()
 
   const { positions } = useMultiPositionsContext()
   const { condition } = useConditionContext()
@@ -26,13 +23,13 @@ export const MergePreview = ({ amount }: Props) => {
     return condition && isConditionFullIndexSet(positions, condition)
   }, [positions, condition])
 
-  const mergedPosition = useMemo(
-    () =>
-      isFullIndexSet && condition && position.length
-        ? getMergePreview(positions, condition, amount, networkId)
-        : '',
-    [isFullIndexSet, condition, positions, amount, networkId]
-  )
+  const mergedPosition = useMemo(() => {
+    if (isFullIndexSet && condition && positions.length > 0) {
+      const token = networkConfig.getTokenFromAddress(positions[0].collateralToken.id)
+      return getMergePreview(positions, condition, amount, token)
+    }
+    return ''
+  }, [isFullIndexSet, condition, positions, amount, networkConfig])
 
   return (
     <Row cols={'1fr'} marginBottomXL>

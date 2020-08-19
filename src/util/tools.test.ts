@@ -1,14 +1,3 @@
-// positionString
-
-// getRedeemedBalance
-
-// getRedeemedPreview
-
-// arePositionMergeables
-
-// isConditionFullIndexSet
-
-// getMergePreview
 import { BigNumber } from 'ethers/utils'
 import { GetCondition_condition, GetPosition_position } from 'types/generatedGQL'
 
@@ -20,6 +9,7 @@ import {
   isConditionFullIndexSet,
   positionString,
 } from './tools'
+import { Token } from './types'
 
 test('positionString should return the rigth Positions string', async () => {
   expect(
@@ -28,7 +18,11 @@ test('positionString should return the rigth Positions string', async () => {
       ['0x123', '0x345'],
       [1, 5],
       new BigNumber(`${1e19}`),
-      4
+      {
+        symbol: 'DAI',
+        address: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+        decimals: 18,
+      } as Token
     )
   ).toStrictEqual('[DAI C:0x123 O:0 & C:0x345 O:0|2] x10.00')
 })
@@ -634,13 +628,21 @@ test('getRedeemedBalance should return the balance for multi outcome position', 
 
 test('getRedeemedPreview should return new position to redeem', async () => {
   expect(
-    getRedeemedPreview(positions[2], resolvedConditions[0], new BigNumber(`${1e19}`), 4)
+    getRedeemedPreview(positions[2], resolvedConditions[0], new BigNumber(`${1e19}`), {
+      symbol: 'DAI',
+      address: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      decimals: 18,
+    } as Token)
   ).toStrictEqual('[DAI C:0xf583ac...20856f O:0|2] x10.00')
 })
 
 test('getRedeemedPreview should return new collateral to redeem', async () => {
   expect(
-    getRedeemedPreview(positions[1], resolvedConditions[1], new BigNumber(`${1e19}`), 4)
+    getRedeemedPreview(positions[1], resolvedConditions[1], new BigNumber(`${1e19}`), {
+      symbol: 'DAI',
+      address: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      decimals: 18,
+    } as Token)
   ).toStrictEqual('10.00 DAI')
 })
 
@@ -688,22 +690,20 @@ test('#isConditionFullIndexSet - should be true', async () => {
 
 test('getMergePreview should return new position', async () => {
   expect(
-    getMergePreview(
-      [positions[2], positions[3]],
-      resolvedConditions[0],
-      new BigNumber(`${1e19}`),
-      4
-    )
+    getMergePreview([positions[2], positions[3]], resolvedConditions[0], new BigNumber(`${1e19}`), {
+      symbol: 'DAI',
+      address: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      decimals: 18,
+    } as Token)
   ).toStrictEqual('[DAI C:0xf583ac...20856f O:0|2] x10.00')
 })
 
 test('getMergePreview should return collateral', async () => {
   expect(
-    getMergePreview(
-      [positions[0], positions[2]],
-      resolvedConditions[1],
-      new BigNumber(`${1e19}`),
-      4
-    )
+    getMergePreview([positions[0], positions[2]], resolvedConditions[1], new BigNumber(`${1e19}`), {
+      symbol: 'DAI',
+      address: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      decimals: 18,
+    } as Token)
   ).toStrictEqual('10.00 DAI')
 })
