@@ -126,7 +126,9 @@ export const Contents = () => {
       <Row cols="1fr" marginBottomXL>
         <SelectPosition />
       </Row>
-      <SelectCondition />
+      <Row cols="1fr">
+        <SelectCondition />
+      </Row>
       <Amount
         amount={amount}
         balance={maxBalance}

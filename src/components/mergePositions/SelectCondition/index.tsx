@@ -1,12 +1,11 @@
-import { truncateStringInTheMiddle } from 'util/tools'
-
-import { Row } from 'components/pureStyledComponents/Row'
-import { TitleControl } from 'components/pureStyledComponents/TitleControl'
-import { TitleValue } from 'components/text/TitleValue'
-import { WrapperDisplay } from 'components/text/WrapperDisplay'
 import React from 'react'
 
 import { useConditionContext } from '../../../contexts/ConditionContext'
+import { Errors } from '../../../util/types'
+import { Error, ErrorContainer } from '../../pureStyledComponents/Error'
+import { Textfield } from '../../pureStyledComponents/Textfield'
+import { TitleControl } from '../../pureStyledComponents/TitleControl'
+import { TitleValue } from '../../text/TitleValue'
 
 export const SelectCondition = () => {
   const { condition, errors, loading, setConditionId } = useConditionContext()
@@ -21,23 +20,36 @@ export const SelectCondition = () => {
 
   React.useEffect(() => {
     if (condition) {
-      setConditionToDisplay(truncateStringInTheMiddle(condition.id, 8, 6))
+      setConditionToDisplay(condition.id)
     } else {
       setConditionToDisplay('')
     }
   }, [condition])
 
   return (
-    <Row cols={'1fr'} marginBottomXL>
-      <TitleValue
-        title="Condition Id"
-        titleControl={<TitleControl onClick={selectCondition}>Select Condition</TitleControl>}
-        value={
-          <WrapperDisplay errors={errors} loading={loading}>
-            {conditionToDisplay}
-          </WrapperDisplay>
-        }
-      />
-    </Row>
+    <TitleValue
+      title="Condition Id"
+      titleControl={<TitleControl onClick={selectCondition}>Select Condition</TitleControl>}
+      value={
+        <>
+          <Textfield
+            disabled={loading}
+            error={errors.length > 0}
+            name="conditionId"
+            onChange={(e) => setConditionToDisplay(e.currentTarget.value)}
+            placeholder="Please select a condition..."
+            type="text"
+            value={conditionToDisplay}
+          />
+          {errors && (
+            <ErrorContainer>
+              {errors.map((error: Errors, index: number) => (
+                <Error key={index}>{error}</Error>
+              ))}
+            </ErrorContainer>
+          )}
+        </>
+      }
+    />
   )
 }
