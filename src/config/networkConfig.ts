@@ -1,4 +1,4 @@
-import { NetworkIds, Token } from '../util/types'
+import { NetworkIds, Oracle, Token } from '../util/types'
 
 import {
   CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_MAINNET,
@@ -25,6 +25,7 @@ interface Network {
   tokens: Token[]
   graphHttpUri: string
   graphWsUri: string
+  oracles: Oracle[]
 }
 
 const networks: { [K in NetworkIds]: Network } = {
@@ -83,6 +84,20 @@ const networks: { [K in NetworkIds]: Network } = {
     ],
     graphHttpUri: GRAPH_HTTP_MAINNET,
     graphWsUri: GRAPH_WS_MAINNET,
+    oracles: [
+      {
+        name: 'realitio',
+        description: 'Realitio Team',
+        url: 'https://realit.io/',
+        address: '0x0e414d014a77971f4eaa22ab58e6d84d16ea838e',
+      },
+      {
+        name: 'kleros',
+        description: 'Kleros',
+        url: 'https://kleros.io/',
+        address: '0x0000000000000000000000000000000000000000',
+      },
+    ],
   },
   [NetworkIds.RINKEBY]: {
     earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
@@ -124,6 +139,20 @@ const networks: { [K in NetworkIds]: Network } = {
     ],
     graphHttpUri: GRAPH_HTTP_RINKEBY,
     graphWsUri: GRAPH_WS_RINKEBY,
+    oracles: [
+      {
+        name: 'realitio',
+        description: 'Realitio Team',
+        url: 'https://realit.io/',
+        address: '0x576b76eebe6b5411c0ef310e65de9bff8a60130f',
+      },
+      {
+        name: 'kleros',
+        description: 'Kleros',
+        url: 'https://kleros.io/',
+        address: '0x0000000000000000000000000000000000000000',
+      },
+    ],
   },
   [NetworkIds.GANACHE]: {
     earliestBlockToCheck: EARLIEST_GANACHE_BLOCK_TO_CHECK,
@@ -165,6 +194,20 @@ const networks: { [K in NetworkIds]: Network } = {
     ],
     graphHttpUri: GRAPH_HTTP_GANACHE,
     graphWsUri: GRAPH_WS_GANACHE,
+    oracles: [
+      {
+        name: 'realitio',
+        description: 'Realitio Team',
+        url: 'https://realit.io/',
+        address: '0xDb56f2e9369E0D7bD191099125a3f6C370F8ed15',
+      },
+      {
+        name: 'kleros',
+        description: 'Kleros',
+        url: 'https://kleros.io/',
+        address: '0x0000000000000000000000000000000000000000',
+      },
+    ],
   },
 }
 
@@ -209,54 +252,22 @@ export class NetworkConfig {
 
     throw new Error(`Couldn't find token with address '${address}' in network '${this.networkId}'`)
   }
-}
 
-interface KnownOracleData {
-  name: string
-  url: string
-  addresses: {
-    [networkId: number]: string
-  }
-}
+  getOracleFromAddress(address: string): Oracle {
+    const oracles = networks[this.networkId].oracles
 
-export const knownOracles: { [name in KnownOracle]: KnownOracleData } = {
-  realitio: {
-    name: 'Realitio Team',
-    url: 'https://realit.io/',
-    addresses: {
-      [NetworkIds.MAINNET]: '0x0e414d014a77971f4eaa22ab58e6d84d16ea838e',
-      [NetworkIds.RINKEBY]: '0x576b76eebe6b5411c0ef310e65de9bff8a60130f',
-      [NetworkIds.GANACHE]: '0xDb56f2e9369E0D7bD191099125a3f6C370F8ed15',
-    },
-  },
-  kleros: {
-    name: 'Kleros',
-    url: 'https://kleros.io/',
-    addresses: {
-      [NetworkIds.MAINNET]: '0x0000000000000000000000000000000000000000',
-      [NetworkIds.RINKEBY]: '0x0000000000000000000000000000000000000000',
-      [NetworkIds.GANACHE]: '0x0000000000000000000000000000000000000000',
-    },
-  },
-  unknown: {
-    name: 'Unknown',
-    url: '',
-    addresses: {},
-  },
-}
-
-export const getKnowOracleFromAddress = (networkId: number, address: string): KnownOracle => {
-  for (const key in knownOracles) {
-    const oracleAddress = knownOracles[key as KnownOracle].addresses[networkId]
-
-    if (!oracleAddress) {
-      continue
+    for (const oracle of oracles) {
+      const oracleAddress = oracle.address
+      if (oracleAddress.toLowerCase() === address.toLowerCase()) {
+        return oracle
+      }
     }
 
-    if (oracleAddress.toLowerCase() === address.toLowerCase()) {
-      return key as KnownOracle
+    return {
+      name: 'unknown',
+      description: 'Unknown',
+      url: '',
+      address: '',
     }
   }
-
-  return 'unknown' as KnownOracle
 }
