@@ -92,6 +92,13 @@ export const Web3ContextProvider = ({ children }: Props) => {
     }
 
     try {
+      // See example in this link https://github.com/Web3Modal/web3modal/blob/master/example/src/App.tsx#L533
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const provider = web3Status.provider as any
+      if (provider && provider.close) {
+        provider.close()
+      }
+
       await web3Modal.clearCachedProvider()
       setWeb3Status({ _type: Web3ContextStatus.NotAsked } as Web3Status)
     } catch (error) {
