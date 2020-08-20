@@ -1,4 +1,4 @@
-import { BigNumberInput } from 'big-number-input'
+import { BigNumberInput } from '../../common/BigNumberInput'
 import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
