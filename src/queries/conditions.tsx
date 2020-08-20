@@ -4,10 +4,10 @@ import gql from 'graphql-tag'
 const DEFAULT_ORDER_FIELD = 'resolveBlockNumber'
 
 export const ConditionsSearchQuery = gql`
-  query Conditions($oracle: String!) {
+  query Conditions($conditionId: String!) {
     conditions(
       first: 1000
-      where: { oracle: $oracle }
+      where: { id: $conditionId }
       orderBy: $DEFAULT_ORDER_FIELD
       orderDirection: desc
     ) {

@@ -57,7 +57,7 @@ export const ConditionsList = () => {
   const { data, error, loading } = useQuery<Conditions>(
     searchTerm ? ConditionsSearchQuery : ConditionsListQuery,
     {
-      variables: { oracle: searchTerm },
+      variables: { conditionId: searchTerm },
     }
   )
   const history = useHistory()
@@ -74,7 +74,14 @@ export const ConditionsList = () => {
       <PageTitle>Conditions</PageTitle>
       {loading && <InlineLoading />}
       {error && <InfoCard message={error.message} title="Error" />}
-      {<input onChange={handleChange} placeholder="Search oracle" type="text" value={searchTerm} />}
+      {
+        <input
+          onChange={handleChange}
+          placeholder="Search condition"
+          type="text"
+          value={searchTerm}
+        />
+      }
       {data && (
         <DataTable
           columns={columns}
