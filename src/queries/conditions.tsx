@@ -1,5 +1,6 @@
 import gql from 'graphql-tag'
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DEFAULT_ORDER_FIELD = 'resolveBlockNumber'
 
 export const ConditionsSearchQuery = gql`
@@ -23,7 +24,7 @@ export const ConditionsSearchQuery = gql`
 
 export const ConditionsListQuery = gql`
   query Conditions {
-    conditions(first: 1000) {
+    conditions(first: 1000, orderBy: $DEFAULT_ORDER_FIELD, orderDirection: desc) {
       id
       oracle
       questionId
