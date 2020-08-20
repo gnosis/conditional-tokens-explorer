@@ -1,8 +1,6 @@
 import React from 'react'
 
-import { Button } from '../../components/buttons/Button'
 import { CenteredCard } from '../../components/common/CenteredCard'
-import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
 import { Row } from '../../components/pureStyledComponents/Row'
 import { StripedList, StripedListEmpty } from '../../components/pureStyledComponents/StripedList'
 import { useConditionContext } from '../../contexts/ConditionContext'
@@ -23,7 +21,7 @@ export const Contents: React.FC = () => {
 
   return (
     <CenteredCard>
-      <Row cols="1fr">
+      <Row cols="1fr" marginBottomXL>
         <InputCondition
           conditionId={conditionId}
           errors={errors}
@@ -38,9 +36,6 @@ export const Contents: React.FC = () => {
           <StripedListEmpty>Please select a condition to report.</StripedListEmpty>
         </StripedList>
       )}
-      <ButtonContainer>
-        <Button>Report</Button>
-      </ButtonContainer>
     </CenteredCard>
   )
 }
