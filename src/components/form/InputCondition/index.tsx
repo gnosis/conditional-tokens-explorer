@@ -47,6 +47,7 @@ export const InputCondition = ({
               pattern: BYTES_REGEX,
               validate: async (value) => {
                 const conditionExist = await CTService.conditionExists(value)
+                console.log(conditionExist)
                 return conditionExist
               },
             })}

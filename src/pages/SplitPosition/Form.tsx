@@ -230,7 +230,6 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
           </Button>
         </ButtonContainer>
       </CenteredCard>
-      <SelectConditionModal isOpen={true} title={'Select Condition'} />
     </>
   )
 }

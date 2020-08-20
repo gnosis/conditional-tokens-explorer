@@ -134,7 +134,7 @@ const theme = {
       borderColor: 'transparent',
       borderRadius: '8px',
       bottom: 'auto',
-      boxShadow: '0 7px 64px rgba(0, 0, 0, 0.07)',
+      boxShadow: '0 2px 8px 0 rgba(212, 213, 211, 0.7)',
       display: 'flex',
       flexDirection: 'column',
       flexGrow: '0',
@@ -149,7 +149,7 @@ const theme = {
       position: 'relative',
       right: 'auto',
       top: 'auto',
-      width: '462px',
+      width: '600px',
       zIndex: '123456789',
     },
     overlay: {

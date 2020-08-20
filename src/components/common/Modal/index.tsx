@@ -2,12 +2,14 @@ import React from 'react'
 import ReactModal from 'react-modal'
 import { withTheme } from 'styled-components'
 
+import { ModalSubTitle } from '../ModalSubTitle'
 import { ModalTitle } from '../ModalTitle'
 
 export interface ModalBasicProps {
   disableCloseButton?: boolean
   hideCloseButton?: boolean
   title?: string
+  subTitle?: string
 }
 
 interface Props extends React.ComponentProps<typeof ReactModal>, ModalBasicProps {
@@ -20,6 +22,7 @@ const ModalWrapper: React.FC<Props> = (props) => {
     onRequestClose,
     theme,
     title,
+    subTitle,
     children,
     disableCloseButton,
     style = {},
@@ -45,6 +48,7 @@ const ModalWrapper: React.FC<Props> = (props) => {
       {...restProps}
     >
       <ModalTitle disableCloseButton={disableCloseButton} onClose={onRequestClose} title={title} />
+      {subTitle && <ModalSubTitle>{subTitle}</ModalSubTitle>}
       {children}
     </ReactModal>
   )

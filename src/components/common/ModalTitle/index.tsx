@@ -9,7 +9,6 @@ const ModalTitleWrapper = styled.div<{ noTitle: boolean }>`
   align-items: center;
   display: flex;
   justify-content: space-between;
-  margin-bottom: ${(props) => (props.noTitle ? '0' : '15px')};
   margin-left: -${(props) => props.theme.modalStyle.content.paddingHorizontal};
   margin-right: -${(props) => props.theme.modalStyle.content.paddingHorizontal};
   margin-top: 0;

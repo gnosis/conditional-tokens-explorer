@@ -1,3 +1,5 @@
+import { clear } from 'console'
+
 import { useQuery } from '@apollo/react-hooks'
 import React from 'react'
 
@@ -12,6 +14,7 @@ export interface ConditionContext {
   loading: boolean
   errors: ConditionErrors[]
   setConditionId: (conditionId: string) => void
+  setCondition: (condition: GetCondition_condition) => void
   clearCondition: () => void
 }
 
@@ -22,6 +25,8 @@ export const CONDITION_CONTEXT_DEFAULT_VALUE = {
   errors: [],
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setConditionId: () => {},
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  setCondition: () => {},
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   clearCondition: () => {},
 }
@@ -37,15 +42,49 @@ export const ConditionProvider = (props: Props) => {
   const { checkForConditionNotResolved } = props
 
   const [conditionId, setConditionId] = React.useState('')
-  const errors = []
-  let condition: Maybe<GetCondition_condition> = null
+  const [condition, setCondition] = React.useState<Maybe<GetCondition_condition>>(null)
+  const [errors, setErrors] = React.useState<ConditionErrors[]>([])
+  const [validId, setValidId] = React.useState(false)
+  // const errors = []
 
-  const setConditionIdCallback = React.useCallback((conditionId: string): void => {
-    setConditionId(conditionId)
-  }, [])
+  const setConditionIdCallback = React.useCallback(
+    (conditionId: string): void => {
+      clearCondition()
+
+      if (isConditionIdValid(conditionId)) {
+        setValidId(true)
+        setConditionId(conditionId)
+      } else if (conditionId !== '') {
+        pushError(ConditionErrors.INVALID_ERROR)
+      }
+    },
+    [clearCondition, pushError]
+  )
+
+  const setConditionCallback = React.useCallback(
+    (condition: GetCondition_condition): void => {
+      clearCondition()
+      setCondition(condition)
+    },
+    [clearCondition]
+  )
 
   const clearCondition = React.useCallback((): void => {
     setConditionId('')
+    setCondition(null)
+    clearErrors()
+  }, [clearErrors])
+
+  const clearErrors = React.useCallback((): void => {
+    setErrors([])
+  }, [])
+
+  const removeError = React.useCallback((error): void => {
+    setErrors((errors) => (errors ? errors.filter((e) => e !== error) : []))
+  }, [])
+
+  const pushError = React.useCallback((newError): void => {
+    setErrors((errors) => Array.from(new Set(errors).add(newError)))
   }, [])
 
   const { data: fetchedCondition, error: errorFetchingCondition, loading } = useQuery<GetCondition>(
@@ -53,37 +92,39 @@ export const ConditionProvider = (props: Props) => {
     {
       variables: { id: conditionId },
       fetchPolicy: 'no-cache',
-      skip: !conditionId,
+      skip: !conditionId || !validId,
     }
   )
 
-  if (conditionId) {
+  React.useEffect(() => {
     const { condition: conditionFromTheGraph } = fetchedCondition ?? { condition: null }
+
+    if (conditionId && validId && !loading && !conditionFromTheGraph) {
+      pushError(ConditionErrors.NOT_FOUND_ERROR)
+    }
+
     if (conditionFromTheGraph) {
-      condition = conditionFromTheGraph
+      setCondition(conditionFromTheGraph)
+      removeError(ConditionErrors.NOT_FOUND_ERROR)
     }
 
-    // Validate condition exist and if is resolved
-    if (!conditionFromTheGraph) {
-      errors.push(ConditionErrors.NOT_FOUND_ERROR)
+    console.log(fetchedCondition, validId, loading)
+  }, [fetchedCondition, validId, loading, conditionId, pushError, removeError])
+
+  React.useEffect(() => {
+    removeError(ConditionErrors.NOT_RESOLVED_ERROR)
+    if (condition && checkForConditionNotResolved && !condition.resolved) {
+      pushError(ConditionErrors.NOT_RESOLVED_ERROR)
     }
+  }, [condition, checkForConditionNotResolved, removeError, pushError])
 
-    if (conditionFromTheGraph && !conditionFromTheGraph.resolved && checkForConditionNotResolved) {
-      if (!errors.includes(ConditionErrors.NOT_RESOLVED_ERROR))
-        errors.push(ConditionErrors.NOT_RESOLVED_ERROR)
+  React.useEffect(() => {
+    if (errorFetchingCondition) {
+      pushError(ConditionErrors.FETCHING_ERROR)
+    } else {
+      removeError(ConditionErrors.FETCHING_ERROR)
     }
-  }
-
-  // Validate string condition
-  const hasError: boolean = conditionId !== '' && !isConditionIdValid(conditionId)
-  if (hasError) {
-    errors.push(ConditionErrors.INVALID_ERROR)
-  }
-
-  // Validate error condition from theGraph
-  if (errorFetchingCondition) {
-    errors.push(ConditionErrors.FETCHING_ERROR)
-  }
+  }, [errorFetchingCondition, pushError, removeError])
 
   const value = {
     condition,
@@ -91,6 +132,7 @@ export const ConditionProvider = (props: Props) => {
     errors,
     loading,
     setConditionId: setConditionIdCallback,
+    setCondition: setConditionCallback,
     clearCondition,
   }
 
