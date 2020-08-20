@@ -1,4 +1,5 @@
-import React from 'react'
+import { CustomCollateralModal } from 'components/form/CustomCollateralModal'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 
 import { InputPosition, InputPositionProps } from '../../components/form/InputPosition'
@@ -74,6 +75,8 @@ export const SplitFrom: React.FC<Props> = (props) => {
     tokens,
   } = props
 
+  const [showCustomCollateralModal, setShowCustomCollateralModal] = useState(false)
+
   return (
     <>
       <Controls>
@@ -88,7 +91,10 @@ export const SplitFrom: React.FC<Props> = (props) => {
             <TabText active={splitFromPosition}>Position</TabText>
           </Tab>
         </Tabs>
-        <ToggleableTitleControl visible={splitFromCollateral}>
+        <ToggleableTitleControl
+          onClick={() => setShowCustomCollateralModal(true)}
+          visible={splitFromCollateral}
+        >
           Add Custom Collateral
         </ToggleableTitleControl>
         <ToggleableTitleControl visible={splitFromPosition}>Select Position</ToggleableTitleControl>
@@ -107,6 +113,16 @@ export const SplitFrom: React.FC<Props> = (props) => {
         splitFromPosition={splitFromPosition}
         visible={splitFromPosition}
       />
+      {showCustomCollateralModal && (
+        <CustomCollateralModal
+          onAdd={(token) => {
+            onCollateralChange(token.address)
+          }}
+          onClose={() => {
+            setShowCustomCollateralModal(false)
+          }}
+        />
+      )}
     </>
   )
 }
