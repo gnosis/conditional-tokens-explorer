@@ -21,11 +21,14 @@ import { TitleValue } from '../../components/text/TitleValue'
 import { ADDRESS_REGEX, BYTES_REGEX, MAX_OUTCOMES, MIN_OUTCOMES } from '../../config/constants'
 import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
 import { ConditionalTokensService } from '../../services/conditionalTokens'
+import { getLogger } from '../../util/logger'
 import { isAddress } from '../../util/tools'
 import { Categories, ConditionType, QuestionType } from '../../util/types'
 
 const maxOutcomesError = 'Too many outcome slots'
 const minOutcomesError = 'There should be more than one outcome slot'
+
+const logger = getLogger('Prepare Condition')
 
 export const PrepareCondition = () => {
   const { connect, status } = useWeb3Context()
@@ -85,6 +88,7 @@ export const PrepareCondition = () => {
         const { CTService, provider } = status
 
         const conditionExists = await CTService.conditionExists(conditionId)
+        logger.log(`Condition ID ${conditionId}`)
         if (!conditionExists) {
           const tx = await CTService.prepareCondition(questionId, oracleAddress, numOutcomes)
           await provider.waitForTransaction(tx)
@@ -284,11 +288,18 @@ export const PrepareCondition = () => {
         </Row>
         {isTransactionExecuting && (
           <FullLoading
-            actionButton={error ? { text: 'OK', onClick: () => setIsTransactionExecuting(true) } : undefined}
+            actionButton={
+              error ? { text: 'OK', onClick: () => setIsTransactionExecuting(true) } : undefined
+            }
             icon={error ? IconTypes.error : IconTypes.spinner}
             message={error ? error.message : 'Waiting...'}
             title={error ? 'Error' : 'Prepare Condition'}
           />
+        )}
+        {error && (
+          <ErrorContainer>
+            <ErrorMessage>{error.message}</ErrorMessage>
+          </ErrorContainer>
         )}
         <ButtonContainer>
           <Button disabled={submitDisabled} onClick={prepareCondition}>
