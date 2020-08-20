@@ -11,6 +11,7 @@ export const Error = styled.p`
   line-height: 1.4;
   margin: 0 0 5px 0;
   text-align: left;
+  text-transform: none;
 
   &:last-child {
     margin-bottom: 0;

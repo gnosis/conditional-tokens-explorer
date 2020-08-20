@@ -9,40 +9,42 @@ import { ConditionErrors } from '../../util/types'
 interface Props {
   conditionId: string
   errors: ConditionErrors[]
+  isConditionResolved: boolean | null
   loading: boolean
   onClick: () => void
 }
 
 // TODO: similar to wrapper display, maybe we can create a common component
 export const InputCondition = (props: Props) => {
-  const { conditionId, errors, loading, onClick } = props
-  const isError = errors.length > 0
+  const { conditionId, errors, isConditionResolved, loading, onClick } = props
+  const isError = errors.length > 0 || isConditionResolved ? true : false
 
   return (
-    <>
-      <TitleValue
-        title="Condition ID"
-        titleControl={
-          <TitleControlButton disabled={loading} onClick={onClick}>
-            Select Condition
-          </TitleControlButton>
-        }
-        value={
+    <TitleValue
+      title="Condition ID"
+      titleControl={
+        <TitleControlButton disabled={loading} onClick={onClick}>
+          Select Condition
+        </TitleControlButton>
+      }
+      value={
+        <>
           <Textfield
             disabled={loading}
             error={isError}
             placeholder={loading ? 'Loading...' : ''}
             value={conditionId}
           />
-        }
-      />
-      {isError && (
-        <ErrorContainer>
-          {errors.map((error: ConditionErrors, index: number) => (
-            <Error key={index}>{error}</Error>
-          ))}
-        </ErrorContainer>
-      )}
-    </>
+          {isError && (
+            <ErrorContainer>
+              {isConditionResolved && <Error>Condition is already resolved.</Error>}
+              {errors.map((error: ConditionErrors, index: number) => (
+                <Error key={index}>{error}</Error>
+              ))}
+            </ErrorContainer>
+          )}
+        </>
+      }
+    />
   )
 }

@@ -1,6 +1,6 @@
 import { BigNumberInputWrapper } from 'components/form/BigNumberInputWrapper'
 import { BigNumber, formatUnits } from 'ethers/utils'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
 import { ZERO_BN } from '../../config/constants'
@@ -32,15 +32,11 @@ const PAYOUTS_POSITIVE_ERROR = 'At least one payout must be positive'
 
 const DECIMALS = 2
 
-export const OutcomeSlotsToReport = ({ condition }: Props) => {
+export const OutcomesTable = ({ condition }: Props) => {
   const { connect, status } = useWeb3Context()
-
   const { clearCondition } = useConditionContext()
-
   const { oracle, outcomeSlotCount, questionId } = condition
-
   const { outcomesPrettier } = useQuestion(questionId, outcomeSlotCount)
-
   const [outcomes, setOutcomes] = React.useState<Outcome[]>([])
   const [payoutEmptyError, setPayoutEmptyError] = React.useState(false)
   const [transactionStatus, setTransactionStatus] = React.useState<Maybe<Status>>(null)
@@ -48,7 +44,7 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
   const { control, getValues, handleSubmit, watch } = useForm<FormInputs>({ mode: 'onSubmit' })
 
   // Check if the sender is valid
-  React.useEffect(() => {
+  useEffect(() => {
     if (status._type === Web3ContextStatus.Connected) {
       const { address } = status
       setOracleNotValidError(oracle.toLowerCase() !== address.toLowerCase())
@@ -57,7 +53,7 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
     }
   }, [status, oracle])
 
-  React.useEffect(() => {
+  useEffect(() => {
     let cancelled = false
     if (outcomes.length === 0) {
       const outcomes: Outcome[] = outcomesPrettier.map((outcome) => {
@@ -76,7 +72,7 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
   const watchPayouts = watch('payouts')
 
   // Validate payouts (positive, at least one non 0)
-  React.useEffect(() => {
+  useEffect(() => {
     if (watchPayouts && watchPayouts.length > 0) {
       const nonZero = (currentValue: BigNumber) => !currentValue.isZero()
       setPayoutEmptyError(!watchPayouts.some(nonZero))
