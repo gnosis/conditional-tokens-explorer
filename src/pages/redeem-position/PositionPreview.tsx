@@ -8,7 +8,7 @@ import { getRedeemedBalance, getRedeemedPreview } from '../../util/tools'
 interface Props {
   position: Maybe<GetPosition_position>
   condition: Maybe<GetCondition_condition>
-  networkId: number
+  networkId: Maybe<number>
 }
 
 export const PositionPreview = ({ condition, networkId, position }: Props) => {

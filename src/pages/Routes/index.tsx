@@ -1,11 +1,8 @@
-import { useWeb3Context } from 'contexts/Web3Context'
 import { MergePositions } from 'pages/MergePositions'
 import React from 'react'
-import { Redirect, Route, RouteProps, Switch } from 'react-router-dom'
+import { Redirect, Route, Switch } from 'react-router-dom'
 
-import { ButtonConnect } from '../../components/buttons/ButtonConnect'
 import { InfoCard } from '../../components/statusInfo/InfoCard'
-import { InlineLoading } from '../../components/statusInfo/InlineLoading'
 import { ConditionDetails } from '../ConditionDetails'
 import { ConditionsList } from '../ConditionsList'
 import { PositionDetails } from '../PositionDetails'
@@ -15,30 +12,6 @@ import { SplitPosition } from '../SplitPosition'
 import { RedeemPositionContainer } from '../redeem-position'
 import { ReportPayoutsContainer } from '../report-payouts'
 
-const ProtectedRoute: React.FC<RouteProps> = (props) => {
-  const { component, path } = props
-  const { status } = useWeb3Context()
-
-  return (
-    <>
-      {status._type === 'notAsked' && (
-        <>
-          <p>
-            This should trigger the connection prompt automatically (it should not show the connect
-            button)
-          </p>
-          <ButtonConnect style={{ flexGrow: 0, height: 'auto' }} />
-        </>
-      )}
-      {status._type === 'connecting' && <InlineLoading />}
-      {status._type === 'error' && (
-        <InfoCard message="Error when trying to connect..." title="Error" />
-      )}
-      {status._type === 'connected' && <Route component={component} exact path={path} />}
-    </>
-  )
-}
-
 export const Routes: React.FC = () => {
   return (
     <Switch>
@@ -46,11 +19,11 @@ export const Routes: React.FC = () => {
       <Route component={ConditionDetails} exact path="/conditions/:conditionId" />
       <Route component={PositionsList} exact path="/positions" />
       <Route component={PositionDetails} exact path="/positions/:positionId" />
-      <ProtectedRoute component={PrepareCondition} path="/prepare" />
-      <ProtectedRoute component={SplitPosition} path="/split" />
-      <ProtectedRoute component={ReportPayoutsContainer} path="/report" />
-      <ProtectedRoute component={RedeemPositionContainer} path="/redeem" />
-      <ProtectedRoute component={MergePositions} path="/merge" />
+      <Route component={PrepareCondition} path="/prepare" />
+      <Route component={SplitPosition} path="/split" />
+      <Route component={ReportPayoutsContainer} path="/report" />
+      <Route component={RedeemPositionContainer} path="/redeem" />
+      <Route component={MergePositions} path="/merge" />
       <Route exact path="/">
         <Redirect to="/conditions" />
       </Route>

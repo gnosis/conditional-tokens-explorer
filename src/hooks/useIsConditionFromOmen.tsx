@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { getKnowOracleFromAddress } from '../config/networkConfig'
-import { useWeb3Context } from '../contexts/Web3Context'
+import { Web3ContextStatus, useWeb3Context } from '../contexts/Web3Context'
 // import { isContract } from '../util/tools'
 import { Question } from '../util/types'
 
@@ -46,7 +46,7 @@ export const useIsConditionFromOmen = (
 
   const networkId = React.useMemo(
     () =>
-      status._type === 'connected' || status._type === 'infura'
+      status._type === Web3ContextStatus.Connected || status._type === Web3ContextStatus.Infura
         ? status.networkConfig.networkId
         : null,
     [status]

@@ -1,6 +1,6 @@
 import CTHelpersConstructor from '@gnosis.pm/conditional-tokens-contracts/utils/id-helpers'
 import { Contract, ethers } from 'ethers'
-import { TransactionReceipt, TransactionResponse } from 'ethers/providers'
+import { TransactionReceipt } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 import Web3Utils from 'web3-utils'
 
@@ -103,7 +103,7 @@ export class ConditionalTokensService {
     conditionId: string,
     partition: BigNumber[],
     amount: BigNumber
-  ): Promise<TransactionResponse> {
+  ): Promise<TransactionReceipt> {
     const tx = await this.contract.splitPosition(
       collateralToken,
       parentCollectionId,
@@ -115,7 +115,7 @@ export class ConditionalTokensService {
         gasLimit: 1750000,
       }
     )
-    return tx
+    return this.provider.waitForTransaction(tx.hash)
   }
 
   redeemPositions = async (

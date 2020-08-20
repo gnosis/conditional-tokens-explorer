@@ -11,7 +11,7 @@ import {
   GetPosition_position,
 } from '../types/generatedGQL'
 
-import { ConditionErrors } from './types'
+import { ConditionErrors, PositionErrors } from './types'
 
 export const isAddress = (address: string) => {
   try {
@@ -82,17 +82,29 @@ export const formatTS = (timestamp: number): string => {
   return moment.unix(timestamp).utc().format('YYYY-MM-DD - HH:mm [UTC]')
 }
 
+export const isConditionErrorInvalid = (errors: ConditionErrors[]): boolean =>
+  errors.indexOf(ConditionErrors.INVALID_ERROR) > -1
+
+export const isConditionErrorFetching = (errors: ConditionErrors[]): boolean =>
+  errors.indexOf(ConditionErrors.FETCHING_ERROR) > -1
+
 export const isConditionErrorNotFound = (errors: ConditionErrors[]): boolean =>
   errors.indexOf(ConditionErrors.NOT_FOUND_ERROR) > -1
 
 export const isConditionErrorNotResolved = (errors: ConditionErrors[]): boolean =>
   errors.indexOf(ConditionErrors.NOT_RESOLVED_ERROR) > -1
 
-export const isConditionErrorFetching = (errors: ConditionErrors[]): boolean =>
-  errors.indexOf(ConditionErrors.FETCHING_ERROR) > -1
+export const isPositionErrorInvalid = (errors: PositionErrors[]): boolean =>
+  errors.indexOf(PositionErrors.INVALID_ERROR) > -1
 
-export const isConditionErrorInvalid = (errors: ConditionErrors[]): boolean =>
-  errors.indexOf(ConditionErrors.INVALID_ERROR) > -1
+export const isPositionErrorFetching = (errors: PositionErrors[]): boolean =>
+  errors.indexOf(PositionErrors.FETCHING_ERROR) > -1
+
+export const isPositionErrorNotFound = (errors: PositionErrors[]): boolean =>
+  errors.indexOf(PositionErrors.NOT_FOUND_ERROR) > -1
+
+export const isPositionErrorEmptyBalance = (errors: PositionErrors[]): boolean =>
+  errors.indexOf(PositionErrors.EMPTY_BALANCE_ERROR) > -1
 
 export const divBN = (a: BigNumber, b: BigNumber, scale = 10000): number => {
   return a.mul(scale).div(b).toNumber() / scale

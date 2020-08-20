@@ -5,7 +5,7 @@ import { Controller, useForm } from 'react-hook-form'
 
 import { ZERO_BN } from '../../config/constants'
 import { useConditionContext } from '../../contexts/ConditionContext'
-import { useWeb3Connected } from '../../contexts/Web3Context'
+import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
 import { useQuestion } from '../../hooks/useQuestion'
 import { GetCondition_condition } from '../../types/generatedGQL'
 import { getLogger } from '../../util/logger'
@@ -33,7 +33,8 @@ const PAYOUTS_POSITIVE_ERROR = 'At least one payout must be positive'
 const DECIMALS = 2
 
 export const OutcomeSlotsToReport = ({ condition }: Props) => {
-  const { CTService, address } = useWeb3Connected()
+  const { connect, status } = useWeb3Context()
+
   const { clearCondition } = useConditionContext()
 
   const { oracle, outcomeSlotCount, questionId } = condition
@@ -42,11 +43,19 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
 
   const [outcomes, setOutcomes] = React.useState<Outcome[]>([])
   const [payoutEmptyError, setPayoutEmptyError] = React.useState(false)
-  const [status, setStatus] = React.useState<Maybe<Status>>(null)
-  const { control, getValues, handleSubmit, watch } = useForm<FormInputs>({ mode: 'onChange' })
+  const [transactionStatus, setTransactionStatus] = React.useState<Maybe<Status>>(null)
+  const [oracleNotValidError, setOracleNotValidError] = React.useState(true)
+  const { control, getValues, handleSubmit, watch } = useForm<FormInputs>({ mode: 'onSubmit' })
 
   // Check if the sender is valid
-  const oracleNotValidError = oracle.toLowerCase() !== address.toLowerCase()
+  React.useEffect(() => {
+    if (status._type === Web3ContextStatus.Connected) {
+      const { address } = status
+      setOracleNotValidError(oracle.toLowerCase() !== address.toLowerCase())
+    } else {
+      setOracleNotValidError(true)
+    }
+  }, [status, oracle])
 
   React.useEffect(() => {
     let cancelled = false
@@ -93,7 +102,7 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
       return {
         ...outcome,
         probability,
-      }
+      } as Outcome
     })
     // Update the outcomes with the new probabilities
     setOutcomes(outcomesValues)
@@ -103,25 +112,34 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
     // Validate exist at least one payout
     const { payouts } = data
     try {
-      setStatus(Status.Loading)
+      if (status._type === Web3ContextStatus.Connected) {
+        const { CTService } = status
 
-      const payoutsNumbered = payouts.map((payout: BigNumber) =>
-        Number(formatUnits(payout, DECIMALS))
-      )
-      await CTService.reportPayouts(questionId, payoutsNumbered)
+        setTransactionStatus(Status.Loading)
 
-      setStatus(Status.Ready)
+        const payoutsNumbered = payouts.map((payout: BigNumber) =>
+          Number(formatUnits(payout, DECIMALS))
+        )
+        await CTService.reportPayouts(questionId, payoutsNumbered)
 
-      // Setting the condition to '', update the state of the provider and reload the HOC component, works like a reload
-      clearCondition()
+        setTransactionStatus(Status.Ready)
+
+        // Setting the condition to '', update the state of the provider and reload the HOC component, works like a reload
+        clearCondition()
+      } else if (status._type === Web3ContextStatus.Infura) {
+        connect()
+      }
     } catch (err) {
-      setStatus(Status.Error)
+      setTransactionStatus(Status.Error)
       logger.error(err)
     }
   }
 
   // Variable used to disable the submit button, check for payouts not empty and the oracle must be valid
-  const disableSubmit = payoutEmptyError || oracleNotValidError || status === Status.Loading
+  const disableSubmit =
+    payoutEmptyError ||
+    (status._type === Web3ContextStatus.Connected && oracleNotValidError) ||
+    transactionStatus === Status.Loading
 
   return (
     <>
@@ -161,7 +179,9 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
           </tbody>
         </table>
         {payoutEmptyError && <p>{PAYOUTS_POSITIVE_ERROR}</p>}
-        {oracleNotValidError && <p>{ORACLE_NOT_VALID_TO_REPORT_ERROR}</p>}
+        {status._type === Web3ContextStatus.Connected && oracleNotValidError && (
+          <p>{ORACLE_NOT_VALID_TO_REPORT_ERROR}</p>
+        )}
         <input disabled={disableSubmit} type="submit" />
       </form>
     </>
