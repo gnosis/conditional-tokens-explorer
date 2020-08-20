@@ -3,11 +3,12 @@ import { useForm } from 'react-hook-form'
 import { useHistory } from 'react-router-dom'
 
 import { Button } from '../../components/buttons/Button'
-import { ButtonSelect } from '../../components/buttons/ButtonSelect'
+import { ArbitratorDropdown } from '../../components/common/ArbitratorDropdown'
+import { CategoriesDropdown } from '../../components/common/CategoriesDropdown'
 import { CenteredCard } from '../../components/common/CenteredCard'
-import { Dropdown, DropdownPosition } from '../../components/common/Dropdown'
+import { ConditionTypesDropdown } from '../../components/common/ConditionTypesDropdown'
+import { QuestionTypesDropdown } from '../../components/common/QuestionTypesDropdown'
 import { AddOutcome } from '../../components/form/AddOutcome'
-import { SelectItem } from '../../components/form/SelectItem'
 import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
 import { ErrorContainer, Error as ErrorMessage } from '../../components/pureStyledComponents/Error'
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
@@ -21,18 +22,44 @@ import { ADDRESS_REGEX, BYTES_REGEX, MAX_OUTCOMES, MIN_OUTCOMES } from '../../co
 import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
 import { ConditionalTokensService } from '../../services/conditionalTokens'
 import { isAddress } from '../../util/tools'
+import { Categories, ConditionType, QuestionType } from '../../util/types'
 
 const maxOutcomesError = 'Too many outcome slots'
 const minOutcomesError = 'There should be more than one outcome slot'
 
 export const PrepareCondition = () => {
+  const { connect, status } = useWeb3Context()
+
   const [numOutcomes, setNumOutcomes] = React.useState(0)
   const [oracleAddress, setOracleAddress] = React.useState('')
   const [questionId, setQuestionId] = React.useState('')
   const [isWorking, setIsWorking] = React.useState(false)
   const [error, setError] = React.useState<Maybe<Error>>(null)
+  const [conditionType, setConditionType] = React.useState<ConditionType>(ConditionType.custom)
+  const [questionType, setQuestionType] = React.useState<QuestionType>(QuestionType.binary)
+  const [category, setCategory] = React.useState(Categories.businessAndFinance)
+  const [arbitrator, setArbitrator] = React.useState('realitio')
 
-  const { connect, status } = useWeb3Context()
+  const [outcomes, setOutcomes] = React.useState<Array<string | undefined>>([])
+  const [outcome, setOutcome] = React.useState<string | undefined>()
+
+  const history = useHistory()
+
+  const addOutcome = React.useCallback(() => {
+    setOutcome('')
+    setOutcomes([...outcomes, outcome])
+  }, [outcome, outcomes, setOutcomes])
+
+  const removeOutcome = React.useCallback(
+    (index: number) => {
+      outcomes.splice(index, 1)
+      setOutcomes([...outcomes])
+    },
+    [outcomes]
+  )
+
+  const onOutcomeChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setOutcome(e.currentTarget.value)
 
   const {
     errors,
@@ -42,8 +69,6 @@ export const PrepareCondition = () => {
   } = useForm<{ outcomesSlotCount: number; oracle: string; questionId: string }>({
     mode: 'onChange',
   })
-
-  const history = useHistory()
 
   const conditionId = isValid
     ? ConditionalTokensService.getConditionId(questionId, oracleAddress, numOutcomes)
@@ -94,148 +119,6 @@ export const PrepareCondition = () => {
 
   const submitDisabled = !isValid || isWorking
 
-  enum ConditionType {
-    custom = 'custom',
-    omen = 'omen',
-  }
-  const conditionTypeItems = [
-    {
-      text: 'Custom Reporter',
-      onClick: () => {
-        setConditionType(ConditionType.custom)
-      },
-      value: ConditionType.custom,
-    },
-    {
-      text: 'Omen Condition',
-      onClick: () => {
-        setConditionType(ConditionType.omen)
-      },
-      value: ConditionType.omen,
-    },
-  ]
-  const [conditionType, setConditionType] = React.useState(conditionTypeItems[0].value)
-
-  enum QuestionType {
-    nuancedBinary = 'nuancedBinary',
-    categorical = 'categorical',
-    binary = 'binary',
-  }
-  const questionTypeItems = [
-    {
-      text: 'Binary',
-      onClick: () => {
-        setQuestionType(QuestionType.binary)
-      },
-      value: QuestionType.binary,
-    },
-    {
-      text: 'Nuanced Binary',
-      onClick: () => {
-        setQuestionType(QuestionType.nuancedBinary)
-      },
-      value: QuestionType.nuancedBinary,
-    },
-    {
-      text: 'Categorical',
-      onClick: () => {
-        setQuestionType(QuestionType.categorical)
-      },
-      value: QuestionType.categorical,
-    },
-  ]
-  const [questionType, setQuestionType] = React.useState(questionTypeItems[0].value)
-
-  const categoryItems = [
-    {
-      text: 'Business & Finance',
-      onClick: () => {
-        setCategory(0)
-      },
-      value: 0,
-    },
-    {
-      text: 'Cryptocurrency',
-      onClick: () => {
-        setCategory(1)
-      },
-      value: 1,
-    },
-    {
-      text: 'News & Politics',
-      onClick: () => {
-        setCategory(2)
-      },
-      value: 2,
-    },
-    {
-      text: 'Science & Tech',
-      onClick: () => {
-        setCategory(3)
-      },
-      value: 3,
-    },
-    {
-      text: 'Sports',
-      onClick: () => {
-        setCategory(4)
-      },
-      value: 4,
-    },
-    {
-      text: 'Weather',
-      onClick: () => {
-        setCategory(5)
-      },
-      value: 5,
-    },
-    {
-      text: 'Miscellaneous',
-      onClick: () => {
-        setCategory(6)
-      },
-      value: 6,
-    },
-  ]
-  const [category, setCategory] = React.useState(categoryItems[0].value)
-
-  const arbitratorItems = [
-    {
-      text: 'Realit.io',
-      onClick: () => {
-        setArbitrator('realitio')
-      },
-      value: 'realitio',
-    },
-    {
-      text: 'Kleros',
-      onClick: () => {
-        setArbitrator('kleros')
-      },
-      value: 'kleros',
-    },
-  ]
-  const [arbitrator, setArbitrator] = React.useState(arbitratorItems[0].value)
-
-  const [outcomes, setOutcomes] = React.useState<Array<string | undefined>>([])
-  const [outcome, setOutcome] = React.useState<string | undefined>()
-
-  const addOutcome = React.useCallback(() => {
-    setOutcome('')
-    setOutcomes([...outcomes, outcome])
-  }, [outcome, outcomes, setOutcomes])
-
-  const removeOutcome = React.useCallback(
-    (index: number) => {
-      outcomes.splice(index, 1)
-      setOutcomes([...outcomes])
-    },
-    [outcomes]
-  )
-
-  const onOutcomeChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setOutcome(e.currentTarget.value)
-
   return (
     <>
       <PageTitle>Prepare Condition</PageTitle>
@@ -244,25 +127,11 @@ export const PrepareCondition = () => {
           <TitleValue
             title="Condition Type"
             value={
-              <Dropdown
-                dropdownButtonContent={
-                  <ButtonSelect
-                    content={
-                      conditionTypeItems.filter((item) => item.value === conditionType)[0].text
-                    }
-                  />
-                }
-                dropdownPosition={DropdownPosition.center}
-                fullWidth
-                items={conditionTypeItems.map((item, index) => (
-                  <SelectItem
-                    content={item.text}
-                    key={index}
-                    name="conditionType"
-                    onClick={item.onClick}
-                    value={item.value}
-                  />
-                ))}
+              <ConditionTypesDropdown
+                onClick={(value: ConditionType) => {
+                  setConditionType(value)
+                }}
+                value={conditionType}
               />
             }
           />
@@ -301,25 +170,11 @@ export const PrepareCondition = () => {
               <TitleValue
                 title="Question Type"
                 value={
-                  <Dropdown
-                    dropdownButtonContent={
-                      <ButtonSelect
-                        content={
-                          questionTypeItems.filter((item) => item.value === questionType)[0].text
-                        }
-                      />
-                    }
-                    dropdownPosition={DropdownPosition.center}
-                    fullWidth
-                    items={questionTypeItems.map((item, index) => (
-                      <SelectItem
-                        content={item.text}
-                        key={index}
-                        name="questionType"
-                        onClick={item.onClick}
-                        value={item.value}
-                      />
-                    ))}
+                  <QuestionTypesDropdown
+                    onClick={(value: QuestionType) => {
+                      setQuestionType(value)
+                    }}
+                    value={questionType}
                   />
                 }
               />
@@ -373,48 +228,22 @@ export const PrepareCondition = () => {
               <TitleValue
                 title="Category"
                 value={
-                  <Dropdown
-                    dropdownButtonContent={
-                      <ButtonSelect
-                        content={categoryItems.filter((item) => item.value === category)[0].text}
-                      />
-                    }
-                    dropdownPosition={DropdownPosition.center}
-                    fullWidth
-                    items={categoryItems.map((item, index) => (
-                      <SelectItem
-                        content={item.text}
-                        key={index}
-                        name="category"
-                        onClick={item.onClick}
-                        value={item.value.toString()}
-                      />
-                    ))}
+                  <CategoriesDropdown
+                    onClick={(value: Categories) => {
+                      setCategory(value)
+                    }}
+                    value={category}
                   />
                 }
               />
               <TitleValue
                 title="Arbitrator"
                 value={
-                  <Dropdown
-                    dropdownButtonContent={
-                      <ButtonSelect
-                        content={
-                          arbitratorItems.filter((item) => item.value === arbitrator)[0].text
-                        }
-                      />
-                    }
-                    dropdownPosition={DropdownPosition.center}
-                    fullWidth
-                    items={arbitratorItems.map((item, index) => (
-                      <SelectItem
-                        content={item.text}
-                        key={index}
-                        name="arbitrator"
-                        onClick={item.onClick}
-                        value={item.value}
-                      />
-                    ))}
+                  <ArbitratorDropdown
+                    onClick={(value: string) => {
+                      setArbitrator(value)
+                    }}
+                    value={arbitrator}
                   />
                 }
               />
