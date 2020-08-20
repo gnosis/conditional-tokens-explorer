@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { ChevronDown } from '../../buttons/ButtonSelect/img/ChevronDown'
+import { ChevronDown } from '../../icons/ChevronDown'
 
 const Wrapper = styled.div`
   align-items: center;

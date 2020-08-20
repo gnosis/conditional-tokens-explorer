@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
+import { ButtonControl, ButtonControlType } from '../../buttons/ButtonControl'
+import { IconPlus } from '../../icons/IconPlus'
 import { Row } from '../../pureStyledComponents/Row'
 import {
   StripedList,
@@ -9,11 +11,6 @@ import {
 } from '../../pureStyledComponents/StripedList'
 import { Textfield } from '../../pureStyledComponents/Textfield'
 import { TitleValue } from '../../text/TitleValue'
-
-import { IconDelete } from './img/IconDelete'
-import { IconEdit } from './img/IconEdit'
-import { IconOk } from './img/IconOk'
-import { IconPlus } from './img/IconPlus'
 
 const ButtonAdd = styled.button`
   align-items: center;
@@ -53,48 +50,6 @@ const Controls = styled.div`
   grid-template-columns: 20px 20px;
   column-gap: 15px;
   margin-left: 30px;
-`
-
-const ButtonControl = styled.button`
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  height: 20px;
-  outline: none;
-  padding: 0;
-  width: 20px;
-
-  &:hover {
-    .iconEdit {
-      path {
-        fill: ${(props) => props.theme.colors.primary};
-      }
-    }
-
-    .iconDelete {
-      path {
-        fill: ${(props) => props.theme.colors.delete};
-      }
-    }
-  }
-
-  &:active {
-    opacity: 0.6;
-  }
-
-  &[disabled],
-  &[disabled]:hover {
-    cursor: not-allowed;
-    opacity: 0.5;
-
-    .iconEdit,
-    .iconDelete {
-      path {
-        fill: ${(props) => props.theme.colors.darkGrey};
-      }
-    }
-  }
 `
 
 const OutcomeWrapper = styled.div`
@@ -148,18 +103,12 @@ const EditableOutcome: React.FC<{ item: string | undefined; removeOutcome: () =>
       />
       <Controls>
         {!isEditing && (
-          <ButtonControl onClick={() => setIsEditing(true)}>
-            <IconEdit />
-          </ButtonControl>
+          <ButtonControl buttonType={ButtonControlType.edit} onClick={() => setIsEditing(true)} />
         )}
         {isEditing && (
-          <ButtonControl onClick={() => setIsEditing(false)}>
-            <IconOk />
-          </ButtonControl>
+          <ButtonControl buttonType={ButtonControlType.ok} onClick={() => setIsEditing(false)} />
         )}
-        <ButtonControl onClick={removeOutcome}>
-          <IconDelete />
-        </ButtonControl>
+        <ButtonControl buttonType={ButtonControlType.delete} onClick={removeOutcome} />
       </Controls>
     </OutcomeWrapper>
   )

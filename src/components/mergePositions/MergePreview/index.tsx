@@ -1,7 +1,10 @@
 import { getMergePreview, isConditionFullIndexSet } from 'util/tools'
 
-import { Row } from 'components/pureStyledComponents/Row'
-import { StripedList, StripedListItem } from 'components/pureStyledComponents/StripedList'
+import {
+  StripedList,
+  StripedListEmpty,
+  StripedListItem,
+} from 'components/pureStyledComponents/StripedList'
 import { TitleValue } from 'components/text/TitleValue'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
@@ -35,15 +38,19 @@ export const MergePreview = ({ amount }: Props) => {
   )
 
   return (
-    <Row cols={'1fr'} marginBottomXL>
-      <TitleValue
-        title="Merged position preview"
-        value={
-          <StripedList>
-            <StripedListItem>{mergedPosition}</StripedListItem>
-          </StripedList>
-        }
-      />
-    </Row>
+    <TitleValue
+      title="Merged Positions Preview"
+      value={
+        <StripedList maxHeight="41px">
+          {mergedPosition ? (
+            <StripedListItem>
+              <strong>{mergedPosition}</strong>
+            </StripedListItem>
+          ) : (
+            <StripedListEmpty>No merged positions yet.</StripedListEmpty>
+          )}
+        </StripedList>
+      }
+    />
   )
 }
