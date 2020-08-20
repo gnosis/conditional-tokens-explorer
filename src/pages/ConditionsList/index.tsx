@@ -53,13 +53,14 @@ const customStyles = {
 }
 
 export const ConditionsList = () => {
-  const oracleSearch = ''
-  const { data, error, loading } = useQuery<Conditions>(ConditionsSearchQuery, {
-    variables: { oracle: oracleSearch },
-  })
-  const history = useHistory()
   const [searchTerm, setSearchTerm] = React.useState('')
-  const [searchResults, setSearchResults] = React.useState([])
+  const { data, error, loading } = useQuery<Conditions>(
+    searchTerm ? ConditionsSearchQuery : ConditionsListQuery,
+    {
+      variables: { oracle: searchTerm },
+    }
+  )
+  const history = useHistory()
   const handleChange = (event: { target: { value: React.SetStateAction<string> } }) => {
     setSearchTerm(event.target.value)
   }
@@ -72,15 +73,8 @@ export const ConditionsList = () => {
     <>
       <PageTitle>Conditions</PageTitle>
       {loading && <InlineLoading />}
-      {error && <InfoCard title="Error" />}
-      {
-        <input
-          onChange={handleChange}
-          placeholder="Search oracle"
-          type="text"
-          value={oracleSearch}
-        />
-      }
+      {error && <InfoCard message={error.message} title="Error" />}
+      {<input onChange={handleChange} placeholder="Search oracle" type="text" value={searchTerm} />}
       {data && (
         <DataTable
           columns={columns}

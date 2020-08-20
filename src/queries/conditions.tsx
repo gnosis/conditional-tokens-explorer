@@ -6,7 +6,7 @@ export const ConditionsSearchQuery = gql`
   query Conditions($oracle: String!) {
     conditions(
       first: 1000
-      where: { oracle_contains: $oracle }
+      where: { oracle: $oracle }
       orderBy: $DEFAULT_ORDER_FIELD
       orderDirection: desc
     ) {
