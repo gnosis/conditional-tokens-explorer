@@ -1,12 +1,16 @@
 import React from 'react'
 
+import { Button } from '../../components/buttons/Button'
+import { CenteredCard } from '../../components/common/CenteredCard'
+import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
+import { Row } from '../../components/pureStyledComponents/Row'
 import { useConditionContext } from '../../contexts/ConditionContext'
 
-import { Condition } from './Condition'
 import { ConditionResolved } from './ConditionResolved'
+import { InputCondition } from './InputCondition'
 import { OutcomeSlotsToReport } from './OutcomeSlotsToReport'
 
-export const ReportPayouts: React.FC = () => {
+export const Contents: React.FC = () => {
   const { condition, conditionId, errors, loading, setConditionId } = useConditionContext()
 
   const selectCondition = () => {
@@ -17,13 +21,22 @@ export const ReportPayouts: React.FC = () => {
   }
 
   return (
-    <>
-      <label htmlFor="position">Condition ID </label>
-      <Condition conditionId={conditionId} errors={errors} loading={loading} />
-      <button onClick={selectCondition}>Select Condition</button>
+    <CenteredCard>
+      <Row cols="1fr">
+        <InputCondition
+          conditionId={conditionId}
+          errors={errors}
+          loading={loading}
+          onClick={selectCondition}
+        />
+      </Row>
+
       {condition && !condition.resolved && <OutcomeSlotsToReport condition={condition} />}
       {condition && condition.resolved && <ConditionResolved />}
       {!condition && <div>Please load a condition to report</div>}
-    </>
+      <ButtonContainer>
+        <Button>Report</Button>
+      </ButtonContainer>
+    </CenteredCard>
   )
 }
