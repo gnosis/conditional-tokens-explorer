@@ -33,7 +33,7 @@ export const PrepareCondition = () => {
   const [numOutcomes, setNumOutcomes] = React.useState(0)
   const [oracleAddress, setOracleAddress] = React.useState('')
   const [questionId, setQuestionId] = React.useState('')
-  const [isWorking, setIsWorking] = React.useState(false)
+  const [isTransactionExecuting, setIsTransactionExecuting] = React.useState(false)
   const [error, setError] = React.useState<Maybe<Error>>(null)
   const [conditionType, setConditionType] = React.useState<ConditionType>(ConditionType.custom)
   const [questionType, setQuestionType] = React.useState<QuestionType>(QuestionType.binary)
@@ -78,7 +78,7 @@ export const PrepareCondition = () => {
     if (!conditionId) return
 
     setError(null)
-    setIsWorking(true)
+    setIsTransactionExecuting(true)
 
     try {
       if (status._type === Web3ContextStatus.Connected) {
@@ -99,7 +99,7 @@ export const PrepareCondition = () => {
     } catch (e) {
       setError(e)
     } finally {
-      setIsWorking(false)
+      setIsTransactionExecuting(false)
     }
   }
 
@@ -117,7 +117,7 @@ export const PrepareCondition = () => {
     }
   }
 
-  const submitDisabled = !isValid || isWorking
+  const submitDisabled = !isValid || isTransactionExecuting
 
   return (
     <>
@@ -282,11 +282,11 @@ export const PrepareCondition = () => {
             />
           )}
         </Row>
-        {isWorking && (
+        {isTransactionExecuting && (
           <FullLoading
-            actionButton={error ? { text: 'OK', onClick: () => setIsWorking(true) } : undefined}
+            actionButton={error ? { text: 'OK', onClick: () => setIsTransactionExecuting(true) } : undefined}
             icon={error ? IconTypes.error : IconTypes.spinner}
-            message={error ? error.message : 'Working...'}
+            message={error ? error.message : 'Waiting...'}
             title={error ? 'Error' : 'Prepare Condition'}
           />
         )}
