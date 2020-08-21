@@ -10,7 +10,7 @@ import { Row } from '../../components/pureStyledComponents/Row'
 import { StripedList, StripedListItem } from '../../components/pureStyledComponents/StripedList'
 import { TitleValue } from '../../components/text/TitleValue'
 import { INFORMATION_NOT_AVAILABLE } from '../../config/constants'
-import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
+import { useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 import { useIsConditionFromOmen } from '../../hooks/useIsConditionFromOmen'
 import { useQuestion } from '../../hooks/useQuestion'
 import { GetCondition_condition } from '../../types/generatedGQL'
@@ -29,7 +29,8 @@ interface Props {
 }
 
 export const Contents: React.FC<Props> = ({ condition }) => {
-  const { status } = useWeb3Context()
+  const { networkConfig } = useWeb3ConnectedOrInfura()
+
   const {
     creator,
     id: conditionId,
@@ -75,23 +76,9 @@ export const Contents: React.FC<Props> = ({ condition }) => {
     category = INFORMATION_NOT_AVAILABLE,
   } = question ?? {}
 
-  const oracleTitle = React.useMemo(() => {
-    const defaultOracleTitle = truncateStringInTheMiddle(oracle, 8, 6)
-    try {
-      if (
-        (status._type === Web3ContextStatus.Connected ||
-          status._type === Web3ContextStatus.Infura) &&
-        isConditionFromOmen
-      ) {
-        const { networkConfig } = status
-        return networkConfig.getOracleFromAddress(oracle).description
-      } else {
-        return defaultOracleTitle
-      }
-    } catch (err) {
-      return defaultOracleTitle
-    }
-  }, [isConditionFromOmen, status, oracle])
+  const oracleTitle = isConditionFromOmen
+    ? networkConfig.getOracleFromAddress(oracle).description
+    : truncateStringInTheMiddle(oracle, 8, 6)
 
   return (
     <CenteredCard

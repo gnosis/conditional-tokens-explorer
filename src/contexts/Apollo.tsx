@@ -1,7 +1,15 @@
 import { ApolloProvider } from '@apollo/react-hooks'
 import { getApolloClient } from 'apolloClientConfig'
-import { GRAPH_HTTP_MAINNET, GRAPH_WS_MAINNET } from 'config/constants'
+import {
+  DEFAULT_NETWORK_ID,
+  GRAPH_HTTP_MAINNET,
+  GRAPH_HTTP_RINKEBY,
+  GRAPH_WS_MAINNET,
+  GRAPH_WS_RINKEBY,
+} from 'config/constants'
 import React from 'react'
+
+import { NetworkId } from '../util/types'
 
 import { Web3ContextStatus, useWeb3Context } from './Web3Context'
 
@@ -15,6 +23,11 @@ export const ApolloProviderWrapper = ({ children }: Props) => {
   const client = React.useMemo(() => {
     let httpUri = GRAPH_HTTP_MAINNET
     let wsUri = GRAPH_WS_MAINNET
+
+    if (DEFAULT_NETWORK_ID === (4 as NetworkId)) {
+      httpUri = GRAPH_HTTP_RINKEBY
+      wsUri = GRAPH_WS_RINKEBY
+    }
 
     if (status._type === Web3ContextStatus.Connected) {
       const { networkConfig } = status

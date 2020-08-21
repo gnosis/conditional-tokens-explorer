@@ -5,7 +5,7 @@ import { Controller, useForm } from 'react-hook-form'
 
 import { ZERO_BN } from '../../config/constants'
 import { useConditionContext } from '../../contexts/ConditionContext'
-import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 import { useQuestion } from '../../hooks/useQuestion'
 import { GetCondition_condition } from '../../types/generatedGQL'
 import { getLogger } from '../../util/logger'
@@ -33,7 +33,7 @@ const PAYOUTS_POSITIVE_ERROR = 'At least one payout must be positive'
 const DECIMALS = 2
 
 export const OutcomeSlotsToReport = ({ condition }: Props) => {
-  const { connect, status } = useWeb3Context()
+  const { _type: status, CTService, address, connect } = useWeb3ConnectedOrInfura()
 
   const { clearCondition } = useConditionContext()
 
@@ -49,13 +49,12 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
 
   // Check if the sender is valid
   React.useEffect(() => {
-    if (status._type === Web3ContextStatus.Connected) {
-      const { address } = status
+    if (status === Web3ContextStatus.Connected && address) {
       setOracleNotValidError(oracle.toLowerCase() !== address.toLowerCase())
     } else {
       setOracleNotValidError(true)
     }
-  }, [status, oracle])
+  }, [status, address, oracle])
 
   React.useEffect(() => {
     let cancelled = false
@@ -112,9 +111,7 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
     // Validate exist at least one payout
     const { payouts } = data
     try {
-      if (status._type === Web3ContextStatus.Connected) {
-        const { CTService } = status
-
+      if (status === Web3ContextStatus.Connected) {
         setTransactionStatus(Status.Loading)
 
         const payoutsNumbered = payouts.map((payout: BigNumber) =>
@@ -126,7 +123,7 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
 
         // Setting the condition to '', update the state of the provider and reload the HOC component, works like a reload
         clearCondition()
-      } else if (status._type === Web3ContextStatus.Infura) {
+      } else if (status === Web3ContextStatus.Infura) {
         connect()
       }
     } catch (err) {
@@ -138,7 +135,7 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
   // Variable used to disable the submit button, check for payouts not empty and the oracle must be valid
   const disableSubmit =
     payoutEmptyError ||
-    (status._type === Web3ContextStatus.Connected && oracleNotValidError) ||
+    (status === Web3ContextStatus.Connected && oracleNotValidError) ||
     transactionStatus === Status.Loading
 
   return (
@@ -179,7 +176,7 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
           </tbody>
         </table>
         {payoutEmptyError && <p>{PAYOUTS_POSITIVE_ERROR}</p>}
-        {status._type === Web3ContextStatus.Connected && oracleNotValidError && (
+        {status === Web3ContextStatus.Connected && oracleNotValidError && (
           <p>{ORACLE_NOT_VALID_TO_REPORT_ERROR}</p>
         )}
         <input disabled={disableSubmit} type="submit" />

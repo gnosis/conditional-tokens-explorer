@@ -1,8 +1,9 @@
 import { MergePositions } from 'pages/MergePositions'
 import React from 'react'
-import { Redirect, Route, Switch } from 'react-router-dom'
+import { Redirect, Route, RouteProps, Switch } from 'react-router-dom'
 
 import { InfoCard } from '../../components/statusInfo/InfoCard'
+import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
 import { ConditionDetails } from '../ConditionDetails'
 import { ConditionsList } from '../ConditionsList'
 import { PositionDetails } from '../PositionDetails'
@@ -12,18 +13,35 @@ import { SplitPosition } from '../SplitPosition'
 import { RedeemPositionContainer } from '../redeem-position'
 import { ReportPayoutsContainer } from '../report-payouts'
 
+const ProtectedRoute: React.FC<RouteProps> = (props) => {
+  const { component, path } = props
+  const { status } = useWeb3Context()
+
+  return (
+    <>
+      {status._type === 'error' && (
+        <InfoCard message="Error when trying to connect..." title="Error" />
+      )}
+      {(status._type === Web3ContextStatus.Connected ||
+        status._type === Web3ContextStatus.Infura) && (
+        <Route component={component} exact path={path} />
+      )}
+    </>
+  )
+}
+
 export const Routes: React.FC = () => {
   return (
     <Switch>
-      <Route component={ConditionsList} exact path="/conditions" />
-      <Route component={ConditionDetails} exact path="/conditions/:conditionId" />
-      <Route component={PositionsList} exact path="/positions" />
-      <Route component={PositionDetails} exact path="/positions/:positionId" />
-      <Route component={PrepareCondition} path="/prepare" />
-      <Route component={SplitPosition} path="/split" />
-      <Route component={ReportPayoutsContainer} path="/report" />
-      <Route component={RedeemPositionContainer} path="/redeem" />
-      <Route component={MergePositions} path="/merge" />
+      <ProtectedRoute component={ConditionsList} exact path="/conditions" />
+      <ProtectedRoute component={ConditionDetails} exact path="/conditions/:conditionId" />
+      <ProtectedRoute component={PositionsList} exact path="/positions" />
+      <ProtectedRoute component={PositionDetails} exact path="/positions/:positionId" />
+      <ProtectedRoute component={PrepareCondition} path="/prepare" />
+      <ProtectedRoute component={SplitPosition} path="/split" />
+      <ProtectedRoute component={ReportPayoutsContainer} path="/report" />
+      <ProtectedRoute component={RedeemPositionContainer} path="/redeem" />
+      <ProtectedRoute component={MergePositions} path="/merge" />
       <Route exact path="/">
         <Redirect to="/conditions" />
       </Route>

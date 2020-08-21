@@ -4,30 +4,19 @@ import React from 'react'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
-import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 import { getLogger } from '../../util/logger'
-import { Token } from '../../util/types'
 
 import { Form } from './Form'
 
 const logger = getLogger('Form')
 
 export const SplitPosition = () => {
-  const { connect, status } = useWeb3Context()
+  const { _type: status, CTService, connect, networkConfig } = useWeb3ConnectedOrInfura()
 
-  const [collateralToken, setCollateralToken] = React.useState<string>('')
-  const [tokens, setTokens] = React.useState<Token[]>([])
+  const tokens = networkConfig.getTokens()
+  const [collateralToken, setCollateralToken] = React.useState<string>(tokens[0].address)
   const allowanceMethods = useAllowance(collateralToken)
-
-  React.useEffect(() => {
-    if (status._type === Web3ContextStatus.Infura || status._type === Web3ContextStatus.Connected) {
-      const { networkConfig } = status
-      const tokens = networkConfig.getTokens()
-
-      setCollateralToken(tokens[0].address)
-      setTokens(tokens)
-    }
-  }, [status])
 
   const splitPosition = React.useCallback(
     async (
@@ -37,9 +26,7 @@ export const SplitPosition = () => {
       partition: BigNumber[],
       amount: BigNumber
     ) => {
-      if (status._type === Web3ContextStatus.Connected) {
-        const { CTService } = status
-
+      if (status === Web3ContextStatus.Connected) {
         partition.forEach((indexSet) => {
           const collectionId = ConditionalTokensService.getCollectionId(
             parentCollection,
@@ -69,20 +56,19 @@ export const SplitPosition = () => {
         connect()
       }
     },
-    [status, connect, collateralToken]
+    [status, CTService, connect, collateralToken]
   )
 
   return (
     <>
       <PageTitle>Split Position</PageTitle>
-      {tokens.length > 0 && (
-        <Form
-          allowanceMethods={allowanceMethods}
-          onCollateralChange={setCollateralToken}
-          splitPosition={splitPosition}
-          tokens={tokens}
-        />
-      )}
+
+      <Form
+        allowanceMethods={allowanceMethods}
+        onCollateralChange={setCollateralToken}
+        splitPosition={splitPosition}
+        tokens={tokens}
+      />
     </>
   )
 }

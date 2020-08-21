@@ -18,7 +18,7 @@ import { FullLoading } from '../../components/statusInfo/FullLoading'
 import { IconTypes } from '../../components/statusInfo/common'
 import { TitleValue } from '../../components/text/TitleValue'
 import { ADDRESS_REGEX, BYTES_REGEX, MAX_OUTCOMES, MIN_OUTCOMES } from '../../config/constants'
-import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 import { ConditionalTokensService } from '../../services/conditionalTokens'
 import { isAddress } from '../../util/tools'
 
@@ -26,13 +26,13 @@ const maxOutcomesError = 'Too many outcome slots'
 const minOutcomesError = 'There should be more than one outcome slot'
 
 export const PrepareCondition = () => {
+  const { _type: status, CTService, address, connect, provider } = useWeb3ConnectedOrInfura()
+
   const [numOutcomes, setNumOutcomes] = React.useState(0)
   const [oracleAddress, setOracleAddress] = React.useState('')
   const [questionId, setQuestionId] = React.useState('')
   const [isWorking, setIsWorking] = React.useState(false)
   const [error, setError] = React.useState<Maybe<Error>>(null)
-
-  const { connect, status } = useWeb3Context()
 
   const {
     errors,
@@ -56,9 +56,7 @@ export const PrepareCondition = () => {
     setIsWorking(true)
 
     try {
-      if (status._type === Web3ContextStatus.Connected) {
-        const { CTService, provider } = status
-
+      if (status === Web3ContextStatus.Connected) {
         const conditionExists = await CTService.conditionExists(conditionId)
         if (!conditionExists) {
           const tx = await CTService.prepareCondition(questionId, oracleAddress, numOutcomes)
@@ -68,7 +66,7 @@ export const PrepareCondition = () => {
         } else {
           setError(new Error('Condition already exists'))
         }
-      } else if (status._type === Web3ContextStatus.Infura) {
+      } else if (status === Web3ContextStatus.Infura) {
         connect()
       }
     } catch (e) {
@@ -83,11 +81,10 @@ export const PrepareCondition = () => {
   }, [questionId, oracleAddress, numOutcomes])
 
   const onClickUseMyWallet = () => {
-    if (status._type === Web3ContextStatus.Connected) {
-      const { address } = status
+    if (status === Web3ContextStatus.Connected && address) {
       setValue('oracle', address, true)
       setOracleAddress(address)
-    } else if (status._type === Web3ContextStatus.Infura) {
+    } else if (status === Web3ContextStatus.Infura) {
       connect()
     }
   }

@@ -14,7 +14,7 @@ import { Partition } from '../../components/partitions/Partition'
 import { Row } from '../../components/pureStyledComponents/Row'
 import { StripedList, StripedListItem } from '../../components/pureStyledComponents/StripedList'
 import { TitleValue } from '../../components/text/TitleValue'
-import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
+import { useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 import { GetPosition_position as Position } from '../../types/generatedGQL'
 import { getLogger } from '../../util/logger'
 
@@ -56,7 +56,7 @@ interface Props {
 }
 
 export const Contents = ({ position }: Props) => {
-  const { status } = useWeb3Context()
+  const { networkConfig } = useWeb3ConnectedOrInfura()
 
   const [collateralSymbol, setCollateralSymbol] = React.useState('')
 
@@ -91,18 +91,12 @@ export const Contents = ({ position }: Props) => {
 
   React.useEffect(() => {
     try {
-      if (
-        status._type === Web3ContextStatus.Infura ||
-        status._type === Web3ContextStatus.Connected
-      ) {
-        const { networkConfig } = status
-        const tokenSymbol = networkConfig.getTokenFromAddress(collateralToken.id).symbol
-        setCollateralSymbol(tokenSymbol)
-      }
+      const tokenSymbol = networkConfig.getTokenFromAddress(collateralToken.id).symbol
+      setCollateralSymbol(tokenSymbol)
     } catch (error) {
       logger.error(error)
     }
-  }, [collateralToken.id, status])
+  }, [collateralToken.id, networkConfig])
 
   return (
     <CenteredCard
