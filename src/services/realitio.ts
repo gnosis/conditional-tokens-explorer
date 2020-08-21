@@ -3,7 +3,7 @@ import RealitioTemplateLib from '@realitio/realitio-lib/formatters/template'
 import { Contract, ethers } from 'ethers'
 import { bigNumberify } from 'ethers/utils'
 
-import { NetworkConfig, getEarliestBlockToCheck } from '../config/networkConfig'
+import { NetworkConfig } from '../config/networkConfig'
 import { getLogger } from '../util/logger'
 import { Question, QuestionLog } from '../util/types'
 
@@ -41,14 +41,12 @@ export class RealitioService {
     return this.contract.address
   }
 
-  async getQuestion(questionId: string): Promise<Question> {
+  async getQuestion(questionId: string, earliestBlockToCheck: number): Promise<Question> {
     const filter = this.contract.filters.LogNewQuestion(questionId)
-    const network = await this.provider.getNetwork()
-    const networkId = network.chainId
 
     const logs = await this.provider.getLogs({
       ...filter,
-      fromBlock: getEarliestBlockToCheck(networkId),
+      fromBlock: earliestBlockToCheck,
       toBlock: 'latest',
     })
 

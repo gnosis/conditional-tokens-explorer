@@ -3,6 +3,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 
+import { Web3ContextStatus } from '../../../contexts/Web3Context'
 import { ButtonConnect } from '../../buttons/ButtonConnect'
 import { Logo } from '../../common/Logo'
 import { UserDropdown } from '../../common/UserDropdown'
@@ -27,8 +28,9 @@ const LogoLink = styled(Link)`
 
 export const Header: React.FC = (props) => {
   const { status } = useWeb3Context()
-  const isConnecting = status._type === 'connecting' // this doesn't seem to work
-  const isDisconnected = status._type === 'notAsked' || status._type === 'infura'
+  const isConnecting = status._type === Web3ContextStatus.Connecting // this doesn't seem to work
+  const isDisconnected =
+    status._type === Web3ContextStatus.NotAsked || status._type === Web3ContextStatus.Infura
 
   return (
     <Wrapper {...props}>
@@ -36,7 +38,7 @@ export const Header: React.FC = (props) => {
         <Logo />
       </LogoLink>
       {isDisconnected && <ButtonConnect disabled={isConnecting} />}
-      {status._type === 'connected' && <UserDropdown />}
+      {status._type === Web3ContextStatus.Connected && <UserDropdown />}
     </Wrapper>
   )
 }

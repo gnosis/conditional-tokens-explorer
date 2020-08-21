@@ -1,14 +1,11 @@
-import { Remote } from 'util/remoteData'
-
 import { MockedProvider } from '@apollo/react-testing'
 import { render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ZERO_BN } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
-import { Connected, Web3Context } from 'contexts/Web3Context'
+import { Connected, Web3Context, Web3ContextStatus } from 'contexts/Web3Context'
 import { BigNumber } from 'ethers/utils'
 import React, { ReactElement } from 'react'
-import { act } from 'react-dom/test-utils'
 import { ThemeProvider } from 'styled-components'
 import theme from 'theme'
 
@@ -24,7 +21,7 @@ const CTService = jest.mock('services/conditionalTokens') as any
 const connect = jest.fn()
 const disconnect = jest.fn()
 const connectedStatus = {
-  _type: 'connected',
+  _type: Web3ContextStatus.Connected,
   address: '0x123',
   CTService,
   networkConfig,

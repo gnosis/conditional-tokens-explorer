@@ -1,13 +1,13 @@
 import { Remote } from 'util/remoteData'
 
 import { constants } from 'ethers'
-import { TransactionResponse } from 'ethers/providers'
+import { TransactionReceipt } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 import { useCallback, useEffect, useState } from 'react'
 
 export type AllowanceMethods = {
   refresh: () => Promise<BigNumber>
-  unlock: () => Promise<TransactionResponse>
+  unlock: () => Promise<TransactionReceipt | undefined>
 }
 /**
  * Return the state related to allowance permission given a pair of allowance methods
@@ -24,8 +24,7 @@ export const useAllowanceState = (allowanceMethods: AllowanceMethods, amount: Bi
   const unlockCollateral = useCallback(async () => {
     setAllowance(Remote.loading())
     try {
-      const tx = await unlock()
-      await tx.wait()
+      await unlock()
       setAllowance(Remote.success(constants.MaxUint256))
     } catch (e) {
       setAllowance(Remote.failure(e))

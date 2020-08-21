@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React from 'react'
 import { useForm } from 'react-hook-form'
 import { useHistory } from 'react-router-dom'
 
@@ -18,7 +18,7 @@ import { FullLoading } from '../../components/statusInfo/FullLoading'
 import { IconTypes } from '../../components/statusInfo/common'
 import { TitleValue } from '../../components/text/TitleValue'
 import { ADDRESS_REGEX, BYTES_REGEX, MAX_OUTCOMES, MIN_OUTCOMES } from '../../config/constants'
-import { useWeb3Connected } from '../../contexts/Web3Context'
+import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
 import { ConditionalTokensService } from '../../services/conditionalTokens'
 import { isAddress } from '../../util/tools'
 
@@ -26,13 +26,14 @@ const maxOutcomesError = 'Too many outcome slots'
 const minOutcomesError = 'There should be more than one outcome slot'
 
 export const PrepareCondition = () => {
-  const [numOutcomes, setNumOutcomes] = useState(0)
-  const [oracleAddress, setOracleAddress] = useState('')
-  const [questionId, setQuestionId] = useState('')
-  const [isWorking, setIsWorking] = useState(false)
-  const [error, setError] = useState<Maybe<Error>>(null)
+  const [numOutcomes, setNumOutcomes] = React.useState(0)
+  const [oracleAddress, setOracleAddress] = React.useState('')
+  const [questionId, setQuestionId] = React.useState('')
+  const [isWorking, setIsWorking] = React.useState(false)
+  const [error, setError] = React.useState<Maybe<Error>>(null)
 
-  const { CTService, address, provider } = useWeb3Connected()
+  const { connect, status } = useWeb3Context()
+
   const {
     errors,
     formState: { isValid },
@@ -55,14 +56,20 @@ export const PrepareCondition = () => {
     setIsWorking(true)
 
     try {
-      const conditionExists = await CTService.conditionExists(conditionId)
-      if (!conditionExists) {
-        const tx = await CTService.prepareCondition(questionId, oracleAddress, numOutcomes)
-        await provider.waitForTransaction(tx)
+      if (status._type === Web3ContextStatus.Connected) {
+        const { CTService, provider } = status
 
-        history.push(`/conditions/${conditionId}`)
-      } else {
-        setError(new Error('Condition already exists'))
+        const conditionExists = await CTService.conditionExists(conditionId)
+        if (!conditionExists) {
+          const tx = await CTService.prepareCondition(questionId, oracleAddress, numOutcomes)
+          await provider.waitForTransaction(tx)
+
+          history.push(`/conditions/${conditionId}`)
+        } else {
+          setError(new Error('Condition already exists'))
+        }
+      } else if (status._type === Web3ContextStatus.Infura) {
+        connect()
       }
     } catch (e) {
       setError(e)
@@ -71,9 +78,19 @@ export const PrepareCondition = () => {
     }
   }
 
-  useEffect(() => {
+  React.useEffect(() => {
     setError(null)
   }, [questionId, oracleAddress, numOutcomes])
+
+  const onClickUseMyWallet = () => {
+    if (status._type === Web3ContextStatus.Connected) {
+      const { address } = status
+      setValue('oracle', address, true)
+      setOracleAddress(address)
+    } else if (status._type === Web3ContextStatus.Infura) {
+      connect()
+    }
+  }
 
   const submitDisabled = !isValid || isWorking
 
@@ -97,7 +114,7 @@ export const PrepareCondition = () => {
       value: ConditionType.omen,
     },
   ]
-  const [conditionType, setConditionType] = useState(conditionTypeItems[0].value)
+  const [conditionType, setConditionType] = React.useState(conditionTypeItems[0].value)
 
   enum QuestionType {
     nuancedBinary = 'nuancedBinary',
@@ -127,7 +144,7 @@ export const PrepareCondition = () => {
       value: QuestionType.categorical,
     },
   ]
-  const [questionType, setQuestionType] = useState(questionTypeItems[0].value)
+  const [questionType, setQuestionType] = React.useState(questionTypeItems[0].value)
 
   const categoryItems = [
     {
@@ -180,7 +197,7 @@ export const PrepareCondition = () => {
       value: 6,
     },
   ]
-  const [category, setCategory] = useState(categoryItems[0].value)
+  const [category, setCategory] = React.useState(categoryItems[0].value)
 
   const arbitratorItems = [
     {
@@ -198,17 +215,17 @@ export const PrepareCondition = () => {
       value: 'kleros',
     },
   ]
-  const [arbitrator, setArbitrator] = useState(arbitratorItems[0].value)
+  const [arbitrator, setArbitrator] = React.useState(arbitratorItems[0].value)
 
-  const [outcomes, setOutcomes] = useState<Array<string | undefined>>([])
-  const [outcome, setOutcome] = useState<string | undefined>()
+  const [outcomes, setOutcomes] = React.useState<Array<string | undefined>>([])
+  const [outcome, setOutcome] = React.useState<string | undefined>()
 
-  const addOutcome = useCallback(() => {
+  const addOutcome = React.useCallback(() => {
     setOutcome('')
     setOutcomes([...outcomes, outcome])
   }, [outcome, outcomes, setOutcomes])
 
-  const removeOutcome = useCallback(
+  const removeOutcome = React.useCallback(
     (index: number) => {
       outcomes.splice(index, 1)
       setOutcomes([...outcomes])
@@ -406,16 +423,7 @@ export const PrepareCondition = () => {
           {conditionType === ConditionType.custom && (
             <TitleValue
               title="Reporting Address"
-              titleControl={
-                <TitleControl
-                  onClick={() => {
-                    setValue('oracle', address, true)
-                    setOracleAddress(address)
-                  }}
-                >
-                  Use My Wallet
-                </TitleControl>
-              }
+              titleControl={<TitleControl onClick={onClickUseMyWallet}>Use My Wallet</TitleControl>}
               value={
                 <>
                   <Textfield

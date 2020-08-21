@@ -9,18 +9,20 @@ import { act } from 'react-dom/test-utils'
 import { ThemeProvider } from 'styled-components'
 import theme from 'theme'
 
+import { Web3ContextStatus } from '../../contexts/Web3Context'
+
 import { PositionsList } from './index'
 
 const connect = jest.fn()
 const disconnect = jest.fn()
 
 const connectedStatus = {
-  _type: 'connected',
+  _type: Web3ContextStatus.Connected,
   address: '0x123',
 } as Connected
 
 const notAskedStatus = {
-  _type: 'notAsked',
+  _type: Web3ContextStatus.NotAsked,
 } as NotAsked
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

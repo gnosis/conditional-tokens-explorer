@@ -64,3 +64,10 @@ export enum Status {
   Done = 'Done',
   Error = 'Error',
 }
+
+export type Oracle = {
+  name: KnownOracle
+  description: string
+  url: string
+  address: string
+}

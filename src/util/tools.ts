@@ -4,14 +4,13 @@ import { BigNumber, formatUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
 
 import { BYTES_REGEX } from '../config/constants'
-import { getTokenFromAddress } from '../config/networkConfig'
 import {
   GetCondition_condition,
   GetMultiPositions_positions,
   GetPosition_position,
 } from '../types/generatedGQL'
 
-import { ConditionErrors } from './types'
+import { ConditionErrors, PositionErrors, Token } from './types'
 
 export const isAddress = (address: string) => {
   try {
@@ -82,17 +81,29 @@ export const formatTS = (timestamp: number): string => {
   return moment.unix(timestamp).utc().format('YYYY-MM-DD - HH:mm [UTC]')
 }
 
+export const isConditionErrorInvalid = (errors: ConditionErrors[]): boolean =>
+  errors.indexOf(ConditionErrors.INVALID_ERROR) > -1
+
+export const isConditionErrorFetching = (errors: ConditionErrors[]): boolean =>
+  errors.indexOf(ConditionErrors.FETCHING_ERROR) > -1
+
 export const isConditionErrorNotFound = (errors: ConditionErrors[]): boolean =>
   errors.indexOf(ConditionErrors.NOT_FOUND_ERROR) > -1
 
 export const isConditionErrorNotResolved = (errors: ConditionErrors[]): boolean =>
   errors.indexOf(ConditionErrors.NOT_RESOLVED_ERROR) > -1
 
-export const isConditionErrorFetching = (errors: ConditionErrors[]): boolean =>
-  errors.indexOf(ConditionErrors.FETCHING_ERROR) > -1
+export const isPositionErrorInvalid = (errors: PositionErrors[]): boolean =>
+  errors.indexOf(PositionErrors.INVALID_ERROR) > -1
 
-export const isConditionErrorInvalid = (errors: ConditionErrors[]): boolean =>
-  errors.indexOf(ConditionErrors.INVALID_ERROR) > -1
+export const isPositionErrorFetching = (errors: PositionErrors[]): boolean =>
+  errors.indexOf(PositionErrors.FETCHING_ERROR) > -1
+
+export const isPositionErrorNotFound = (errors: PositionErrors[]): boolean =>
+  errors.indexOf(PositionErrors.NOT_FOUND_ERROR) > -1
+
+export const isPositionErrorEmptyBalance = (errors: PositionErrors[]): boolean =>
+  errors.indexOf(PositionErrors.EMPTY_BALANCE_ERROR) > -1
 
 export const divBN = (a: BigNumber, b: BigNumber, scale = 10000): number => {
   return a.mul(scale).div(b).toNumber() / scale
@@ -112,11 +123,8 @@ export const positionString = (
   conditionIds: string[],
   indexSets: any[],
   balance: BigNumber,
-  networkId: number
+  token: Token
 ) => {
-  // Get the token
-  const token = getTokenFromAddress(networkId, collateralTokenId)
-
   return `[${token.symbol.toUpperCase()} ${conditionIds
     .map((conditionId, i) => {
       return `C:${truncateStringInTheMiddle(conditionId, 8, 6)} O:${outcomeString(
@@ -159,7 +167,7 @@ export const getRedeemedPreview = (
   position: GetPosition_position,
   resolvedCondition: GetCondition_condition,
   redeemedBalance: BigNumber,
-  networkId: number
+  token: Token
 ) => {
   if (position.conditions.length > 1) {
     const conditionIndex = position.conditions.findIndex(({ id }) => id === resolvedCondition.id)
@@ -171,12 +179,11 @@ export const getRedeemedPreview = (
       filteredConditionIds,
       filteredIndexSets,
       redeemedBalance,
-      networkId
+      token
     )
   }
 
-  const { decimals, symbol } = getTokenFromAddress(networkId, position.collateralToken.id)
-  return `${formatBigNumber(redeemedBalance, decimals)} ${symbol}`
+  return `${formatBigNumber(redeemedBalance, token.decimals)} ${token.symbol}`
 }
 
 export const arePositionMergeables = (positions: GetMultiPositions_positions[]) => {
@@ -196,10 +203,10 @@ export const isConditionFullIndexSet = (
   if (arePositionMergeables(positions)) {
     // check that indexSets for condition on each position sum condition outcomeSlotCont full indexSet
     const fullIndexSet = condition
-      ? parseInt(Array.from(new Array(condition.outcomeSlotCount), (_) => 1).join(''), 2)
+      ? parseInt(Array.from(new Array(condition.outcomeSlotCount), () => 1).join(''), 2)
       : 0
     const partitionIndexSet = positions.reduce((acc, position) => {
-      const conditionIndex = position.conditionIds.findIndex((id) => condition.id)
+      const conditionIndex = position.conditionIds.findIndex((id) => condition.id === id)
       return acc + Number(position.indexSets[conditionIndex])
     }, 0)
 
@@ -215,7 +222,7 @@ export const getMergePreview = (
   positions: GetPosition_position[],
   condition: GetCondition_condition,
   amount: BigNumber,
-  networkId: number
+  token: Token
 ) => {
-  return getRedeemedPreview(positions[0], condition, amount, networkId)
+  return getRedeemedPreview(positions[0], condition, amount, token)
 }
