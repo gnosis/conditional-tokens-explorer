@@ -31,4 +31,10 @@ export const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
   .web3modal-modal-lightbox {
     z-index: 10;
   }
+
+  .outerTableWrapper {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px 0 rgba(212, 213, 211, 0.7);
+  }
 `

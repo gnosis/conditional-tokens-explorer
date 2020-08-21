@@ -8,30 +8,38 @@ import { Conditions, Conditions_conditions } from 'types/generatedGQL'
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
 import { InfoCard } from '../../components/statusInfo/InfoCard'
 import { InlineLoading } from '../../components/statusInfo/InlineLoading'
+import { tableStyles } from '../../theme/tableStyles'
+import { truncateStringInTheMiddle } from '../../util/tools'
 
 const columns = [
   {
+    cell: (row: Conditions_conditions) => truncateStringInTheMiddle(row.id, 10, 8),
     name: 'Condition Id',
     selector: 'id',
     sortable: true,
   },
   {
-    name: 'Oracle',
+    cell: (row: Conditions_conditions) => truncateStringInTheMiddle(row.oracle, 10, 8),
+    name: 'Reporting Address / Oracle',
     selector: 'oracle',
     sortable: true,
   },
   {
+    cell: (row: Conditions_conditions) => truncateStringInTheMiddle(row.questionId, 10, 8),
     name: 'Question Id',
     selector: 'questionId',
     sortable: true,
   },
   {
-    name: 'Outcomes Number',
+    maxWidth: '150px',
+    name: 'Outcomes',
+    right: true,
     selector: 'outcomeSlotCount',
     sortable: true,
   },
   {
     name: 'Status',
+    center: true,
     selector: 'resolved',
     sortable: true,
     // eslint-disable-next-line react/display-name
@@ -42,15 +50,14 @@ const columns = [
       return valA - valB
     },
   },
-]
-
-const customStyles = {
-  rows: {
-    style: {
-      cursor: 'pointer',
+  {
+    name: '',
+    cell: () => {
+      return <div>x</div>
     },
+    width: '40px',
   },
-}
+]
 
 export const ConditionsList = () => {
   const { data, error, loading } = useQuery<Conditions>(ConditionsListQuery)
@@ -65,17 +72,17 @@ export const ConditionsList = () => {
       <PageTitle>Conditions</PageTitle>
       {loading && <InlineLoading />}
       {error && <InfoCard title="Error" />}
-      {data && (
+      {data && !loading && (
         <DataTable
+          className="outerTableWrapper"
           columns={columns}
-          customStyles={customStyles}
+          customStyles={tableStyles}
           data={data?.conditions || []}
           highlightOnHover
+          noHeader
           onRowClicked={handleRowClick}
           pagination={true}
-          style={{
-            width: '100%',
-          }}
+          responsive
         />
       )}
     </>
