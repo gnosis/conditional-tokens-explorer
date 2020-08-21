@@ -9,9 +9,9 @@ import { ConditionsList } from '../ConditionsList'
 import { PositionDetails } from '../PositionDetails'
 import { PositionsList } from '../PositionsList'
 import { PrepareCondition } from '../PrepareCondition'
+import { ReportPayoutsContainer } from '../ReportPayouts'
 import { SplitPosition } from '../SplitPosition'
 import { RedeemPositionContainer } from '../redeem-position'
-import { ReportPayoutsContainer } from '../report-payouts'
 
 const ProtectedRoute: React.FC<RouteProps> = (props) => {
   const { component, path } = props

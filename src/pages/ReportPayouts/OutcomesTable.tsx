@@ -1,8 +1,12 @@
 import { BigNumberInputWrapper } from 'components/form/BigNumberInputWrapper'
 import { BigNumber, formatUnits } from 'ethers/utils'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import styled from 'styled-components'
 
+import { Button } from '../../components/buttons/Button'
+import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
+import { Error, ErrorContainer } from '../../components/pureStyledComponents/Error'
 import { ZERO_BN } from '../../config/constants'
 import { useConditionContext } from '../../contexts/ConditionContext'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
@@ -11,6 +15,87 @@ import { GetCondition_condition } from '../../types/generatedGQL'
 import { getLogger } from '../../util/logger'
 import { divBN } from '../../util/tools'
 import { Status } from '../../util/types'
+
+const Wrapper = styled.form``
+
+const TableWrapper = styled.div`
+  overflow-x: auto;
+  overflow-y: none;
+  width: 100%;
+`
+
+const Table = styled.table`
+  border-collapse: initial;
+  border-radius: 4px;
+  border-spacing: 0;
+  border: solid 1px ${(props) => props.theme.border.colorDark};
+  min-width: 100%;
+`
+
+const THead = styled.thead``
+
+const TH = styled.th<{ textAlign?: string }>`
+  background-color: ${(props) => props.theme.colors.whitesmoke3};
+  border: none;
+  color: ${(props) => props.theme.colors.textColor};
+  font-size: 14px;
+  font-weight: 600;
+  height: 37px;
+  line-height: 1.2;
+  padding: 0 23px;
+  text-align: ${(props) => props.textAlign};
+  text-transform: uppercase;
+  white-space: nowrap;
+`
+
+TH.defaultProps = {
+  textAlign: 'left',
+}
+
+const TR = styled.tr``
+
+const TBody = styled.tbody``
+
+const TD = styled.td<{ textAlign?: string }>`
+  border-bottom: none;
+  border-left: none;
+  border-right: none;
+  border-top: solid 1px ${(props) => props.theme.border.colorDark};
+  color: ${(props) => props.theme.colors.textColor};
+  font-size: 15px;
+  font-weight: 400;
+  height: 39px;
+  line-height: 1.2;
+  padding: 0 23px;
+  text-align: ${(props) => props.textAlign};
+`
+
+const Textfield = styled(BigNumberInputWrapper)`
+  margin-left: auto;
+
+  input {
+    border-bottom: solid 1px ${(props) => props.theme.colors.textColor};
+    border-left: none;
+    border-radius: 0;
+    border-right: none;
+    border-top: none;
+    color: ${(props) => props.theme.colors.textColor};
+    font-size: 15px;
+    font-weight: 400;
+    height: auto;
+    padding: 0 0 2px 0;
+    text-align: right;
+    width: 70px;
+
+    &:focus {
+      border-bottom-color: ${(props) => props.theme.colors.primary};
+    }
+  }
+`
+
+TH.defaultProps = {
+  textAlign: 'left',
+}
 
 interface Props {
   condition: GetCondition_condition
@@ -32,15 +117,11 @@ const PAYOUTS_POSITIVE_ERROR = 'At least one payout must be positive'
 
 const DECIMALS = 2
 
-export const OutcomeSlotsToReport = ({ condition }: Props) => {
+export const OutcomesTable = ({ condition }: Props) => {
   const { _type: status, CTService, address, connect } = useWeb3ConnectedOrInfura()
-
   const { clearCondition } = useConditionContext()
-
   const { oracle, outcomeSlotCount, questionId } = condition
-
   const { outcomesPrettier } = useQuestion(questionId, outcomeSlotCount)
-
   const [outcomes, setOutcomes] = React.useState<Outcome[]>([])
   const [payoutEmptyError, setPayoutEmptyError] = React.useState(false)
   const [transactionStatus, setTransactionStatus] = React.useState<Maybe<Status>>(null)
@@ -48,7 +129,7 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
   const { control, getValues, handleSubmit, watch } = useForm<FormInputs>({ mode: 'onSubmit' })
 
   // Check if the sender is valid
-  React.useEffect(() => {
+  useEffect(() => {
     if (status === Web3ContextStatus.Connected && address) {
       setOracleNotValidError(oracle.toLowerCase() !== address.toLowerCase())
     } else {
@@ -56,7 +137,7 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
     }
   }, [status, address, oracle])
 
-  React.useEffect(() => {
+  useEffect(() => {
     let cancelled = false
     if (outcomes.length === 0) {
       const outcomes: Outcome[] = outcomesPrettier.map((outcome) => {
@@ -75,7 +156,7 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
   const watchPayouts = watch('payouts')
 
   // Validate payouts (positive, at least one non 0)
-  React.useEffect(() => {
+  useEffect(() => {
     if (watchPayouts && watchPayouts.length > 0) {
       const nonZero = (currentValue: BigNumber) => !currentValue.isZero()
       setPayoutEmptyError(!watchPayouts.some(nonZero))
@@ -139,26 +220,26 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
     transactionStatus === Status.Loading
 
   return (
-    <>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <table>
-          <thead>
-            <tr>
-              <th>Outcome</th>
-              <th>Probabilities</th>
-              <th>Payout</th>
-            </tr>
-          </thead>
-          <tbody>
+    <Wrapper onSubmit={handleSubmit(onSubmit)}>
+      <TableWrapper>
+        <Table>
+          <THead>
+            <TR>
+              <TH>Outcome</TH>
+              <TH textAlign="right">Probabilities</TH>
+              <TH textAlign="right">Payout</TH>
+            </TR>
+          </THead>
+          <TBody>
             {outcomes.map((outcome, index) => {
               const { name, probability } = outcome
               return (
-                <tr key={index}>
-                  <td>{name}</td>
-                  <td>{probability.toFixed(2)}%</td>
-                  <td>
+                <TR key={index}>
+                  <TD>{name}</TD>
+                  <TD textAlign="right">{probability.toFixed(2)}%</TD>
+                  <TD textAlign="right">
                     <Controller
-                      as={BigNumberInputWrapper}
+                      as={Textfield}
                       control={control}
                       decimals={DECIMALS}
                       defaultValue={new BigNumber(0)}
@@ -169,18 +250,24 @@ export const OutcomeSlotsToReport = ({ condition }: Props) => {
                       }}
                       rules={{ required: true, validate: (amount) => amount.gte(ZERO_BN) }}
                     />
-                  </td>
-                </tr>
+                  </TD>
+                </TR>
               )
             })}
-          </tbody>
-        </table>
-        {payoutEmptyError && <p>{PAYOUTS_POSITIVE_ERROR}</p>}
+          </TBody>
+        </Table>
+      </TableWrapper>
+      <ErrorContainer>
+        {payoutEmptyError && <Error>{PAYOUTS_POSITIVE_ERROR}</Error>}
         {status === Web3ContextStatus.Connected && oracleNotValidError && (
-          <p>{ORACLE_NOT_VALID_TO_REPORT_ERROR}</p>
+          <Error>{ORACLE_NOT_VALID_TO_REPORT_ERROR}</Error>
         )}
-        <input disabled={disableSubmit} type="submit" />
-      </form>
-    </>
+      </ErrorContainer>
+      <ButtonContainer>
+        <Button disabled={disableSubmit} type="submit">
+          Report
+        </Button>
+      </ButtonContainer>
+    </Wrapper>
   )
 }
