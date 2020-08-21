@@ -202,6 +202,34 @@ export interface GetMultiPositionsVariables {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL query operation: PositionsSearch
+// ====================================================
+
+export interface PositionsSearch_positions_collateralToken {
+  __typename: "CollateralToken";
+  id: string;
+}
+
+export interface PositionsSearch_positions {
+  __typename: "Position";
+  id: string;
+  collateralToken: PositionsSearch_positions_collateralToken;
+}
+
+export interface PositionsSearch {
+  positions: PositionsSearch_positions[];
+}
+
+export interface PositionsSearchVariables {
+  positionId: string;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL query operation: Positions
 // ====================================================
 

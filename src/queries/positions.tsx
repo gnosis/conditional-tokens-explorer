@@ -54,7 +54,7 @@ export const GetMultiPositionsQuery = gql`
 `
 
 export const PositionsSearchQuery = gql`
-  query Positions($positionId: String!) {
+  query PositionsSearch($positionId: String!) {
     positions(first: 1000, where: { id: $positionId }, orderDirection: desc) {
       id
       collateralToken {
