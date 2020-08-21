@@ -37,24 +37,26 @@ export const SelectPosition = () => {
   }
 
   React.useEffect(() => {
-    if (!loading && positions.length && balances.length && positionIds.length) {
+    if (!loading && positions.length && balances.length && positionIds.length > 0) {
       setPositionsToDisplay(
         positions.map((position) => {
           const i = positionIds.findIndex((id) => id === position.id)
+
+          const token = networkConfig.getTokenFromAddress(position.collateralToken.id)
 
           return positionString(
             position.collateralToken.id,
             position.conditionIds,
             position.indexSets,
             balances[i],
-            networkConfig.networkId
+            token
           )
         })
       )
     } else {
       setPositionsToDisplay([])
     }
-  }, [balances, networkConfig.networkId, positions, loading, positionIds])
+  }, [balances, networkConfig, positions, loading, positionIds])
 
   return (
     <TitleValue

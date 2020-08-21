@@ -13,7 +13,6 @@ import { Row } from '../../components/pureStyledComponents/Row'
 import { FullLoading } from '../../components/statusInfo/FullLoading'
 import { IconTypes } from '../../components/statusInfo/common'
 import { ZERO_BN } from '../../config/constants'
-import { getTokenFromAddress } from '../../config/networkConfig'
 import { useConditionContext } from '../../contexts/ConditionContext'
 import { useMultiPositionsContext } from '../../contexts/MultiPositionsContext'
 import { useWeb3Connected } from '../../contexts/Web3Context'
@@ -25,10 +24,7 @@ import { Status } from '../../util/types'
 const logger = getLogger('MergePosition')
 
 export const Contents = () => {
-  const {
-    CTService,
-    networkConfig: { networkId },
-  } = useWeb3Connected()
+  const { CTService, networkConfig } = useWeb3Connected()
 
   const {
     balances,
@@ -46,10 +42,10 @@ export const Contents = () => {
 
   const collateralToken = useMemo(() => {
     if (positions.length && isFullIndexSet) {
-      return getTokenFromAddress(networkId, positions[0].collateralToken.id)
+      return networkConfig.getTokenFromAddress(positions[0].collateralToken.id)
     }
     return null
-  }, [positions, networkId, isFullIndexSet])
+  }, [positions, networkConfig, isFullIndexSet])
 
   const maxBalance = useMemo(
     () => (isFullIndexSet && balances.length ? minBigNumber(balances) : ZERO_BN),

@@ -14,7 +14,6 @@ import { Partition } from '../../components/partitions/Partition'
 import { Row } from '../../components/pureStyledComponents/Row'
 import { StripedList, StripedListItem } from '../../components/pureStyledComponents/StripedList'
 import { TitleValue } from '../../components/text/TitleValue'
-import { getTokenFromAddress } from '../../config/networkConfig'
 import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
 import { GetPosition_position as Position } from '../../types/generatedGQL'
 import { getLogger } from '../../util/logger'
@@ -97,7 +96,7 @@ export const Contents = ({ position }: Props) => {
         status._type === Web3ContextStatus.Connected
       ) {
         const { networkConfig } = status
-        const tokenSymbol = getTokenFromAddress(networkConfig.networkId, collateralToken.id).symbol
+        const tokenSymbol = networkConfig.getTokenFromAddress(collateralToken.id).symbol
         setCollateralSymbol(tokenSymbol)
       }
     } catch (error) {

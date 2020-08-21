@@ -1,5 +1,3 @@
-import { Remote } from 'util/remoteData'
-
 import { MockedProvider } from '@apollo/react-testing'
 import { render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -8,7 +6,6 @@ import { NetworkConfig } from 'config/networkConfig'
 import { Connected, Web3Context, Web3ContextStatus } from 'contexts/Web3Context'
 import { BigNumber } from 'ethers/utils'
 import React, { ReactElement } from 'react'
-import { act } from 'react-dom/test-utils'
 import { ThemeProvider } from 'styled-components'
 import theme from 'theme'
 

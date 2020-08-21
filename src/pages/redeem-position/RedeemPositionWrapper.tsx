@@ -23,10 +23,9 @@ export const RedeemPositionWrapper = () => {
   const { clearPosition, errors: positionErrors, position } = usePositionContext()
   const [statusTransaction, setStatusTransaction] = React.useState<Maybe<Status>>(null)
 
-  let networkId = null
+  let networkConfig = null
   if (status._type === Web3ContextStatus.Connected || status._type === Web3ContextStatus.Infura) {
-    const { networkConfig } = status
-    networkId = networkConfig.networkId
+    ;({ networkConfig } = status)
   }
 
   const onRedeem = async () => {
@@ -103,7 +102,7 @@ export const RedeemPositionWrapper = () => {
       {!isRelated && position && condition && <span>Position is not related to the condition</span>}
 
       <div className="row">
-        <PositionPreview condition={condition} networkId={networkId} position={position} />
+        <PositionPreview condition={condition} networkConfig={networkConfig} position={position} />
       </div>
       <button disabled={disabled} onClick={onRedeem}>
         Redeem
