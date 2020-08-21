@@ -18,7 +18,11 @@ import { useMultiPositionsContext } from '../../contexts/MultiPositionsContext'
 import { useWeb3Connected } from '../../contexts/Web3Context'
 import { ConditionalTokensService } from '../../services/conditionalTokens'
 import { getLogger } from '../../util/logger'
-import { isConditionFullIndexSet, minBigNumber } from '../../util/tools'
+import {
+  arePositionMergeables,
+  arePositionMergeablesByCondition,
+  minBigNumber,
+} from '../../util/tools'
 import { Status } from '../../util/types'
 
 const logger = getLogger('MergePosition')
@@ -36,20 +40,24 @@ export const Contents = () => {
   const [status, setStatus] = useState<Maybe<Status>>(null)
   const [error, setError] = useState<string | undefined>()
 
-  const isFullIndexSet = useMemo(() => {
-    return condition && isConditionFullIndexSet(positions, condition)
+  const canMergePositions = useMemo(() => {
+    return condition && arePositionMergeablesByCondition(positions, condition)
   }, [positions, condition])
 
+  const mergeablePositions = useMemo(() => {
+    return arePositionMergeables(positions)
+  }, [positions])
+
   const collateralToken = useMemo(() => {
-    if (positions.length && isFullIndexSet) {
+    if (positions.length && mergeablePositions) {
       return networkConfig.getTokenFromAddress(positions[0].collateralToken.id)
     }
     return null
-  }, [positions, networkConfig, isFullIndexSet])
+  }, [positions, networkConfig, mergeablePositions])
 
   const maxBalance = useMemo(
-    () => (isFullIndexSet && balances.length ? minBigNumber(balances) : ZERO_BN),
-    [balances, isFullIndexSet]
+    () => (mergeablePositions && balances.length ? minBigNumber(balances) : ZERO_BN),
+    [balances, mergeablePositions]
   )
 
   const [amount, setAmount] = useState<BigNumber>(ZERO_BN)
@@ -57,10 +65,10 @@ export const Contents = () => {
     setAmount(value)
   }, [])
   const useWalletHandler = useCallback(() => {
-    if (isFullIndexSet && maxBalance.gt(ZERO_BN)) {
+    if (mergeablePositions && maxBalance.gt(ZERO_BN)) {
       setAmount(maxBalance)
     }
-  }, [maxBalance, isFullIndexSet])
+  }, [maxBalance, mergeablePositions])
 
   const decimals = useMemo(() => (collateralToken ? collateralToken.decimals : 0), [
     collateralToken,
@@ -71,9 +79,9 @@ export const Contents = () => {
       status === Status.Loading ||
       positionsErrors.length > 0 ||
       conditionErrors.length > 0 ||
-      !isFullIndexSet ||
+      !canMergePositions ||
       amount.isZero(),
-    [isFullIndexSet, amount, status, positionsErrors, conditionErrors]
+    [canMergePositions, amount, status, positionsErrors, conditionErrors]
   )
 
   const onMerge = useCallback(async () => {
@@ -133,11 +141,10 @@ export const Contents = () => {
           amount={amount}
           balance={maxBalance}
           decimals={decimals}
-          disabled={!isFullIndexSet}
+          disabled={!mergeablePositions}
           max={maxBalance.toString()}
           onAmountChange={amountChangeHandler}
           onUseWalletBalance={useWalletHandler}
-          tokenSymbol={collateralToken ? collateralToken.symbol : ''}
         />
       </Row>
       <Row cols="1fr">

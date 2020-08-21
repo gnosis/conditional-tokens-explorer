@@ -14,7 +14,6 @@ interface Props {
   max: string
   onAmountChange: (value: BigNumber) => void
   onUseWalletBalance: () => void
-  tokenSymbol?: string
 }
 
 export const Amount = ({
@@ -22,27 +21,24 @@ export const Amount = ({
   balance,
   decimals,
   disabled,
+  max,
   onAmountChange,
   onUseWalletBalance,
-  tokenSymbol,
 }: Props) => {
-  const disable = amount.isZero() || disabled
-
   return (
     <TitleValue
       title="Amount"
       titleControl={
-        <TitleControlButton disabled={disable} onClick={onUseWalletBalance}>
+        <TitleControlButton disabled={disabled} onClick={onUseWalletBalance}>
           Use Wallet Balance (${formatBigNumber(balance, decimals)})
         </TitleControlButton>
       }
       value={
         <BigNumberInputWrapper
           decimals={decimals}
-          disabled={disable}
-          max={`${1e18}`}
+          disabled={disabled}
+          max={max}
           onChange={onAmountChange}
-          tokenSymbol={tokenSymbol}
           value={amount}
         />
       }
