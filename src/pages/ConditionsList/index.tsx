@@ -53,16 +53,16 @@ const customStyles = {
 }
 
 export const ConditionsList = () => {
-  const [searchTerm, setSearchTerm] = React.useState('')
+  const [conditionIdToSearch, setConditionIdToSearch] = React.useState('')
   const { data, error, loading } = useQuery<Conditions>(
-    searchTerm ? ConditionsSearchQuery : ConditionsListQuery,
+    conditionIdToSearch ? ConditionsSearchQuery : ConditionsListQuery,
     {
-      variables: { conditionId: searchTerm },
+      variables: { conditionId: conditionIdToSearch },
     }
   )
   const history = useHistory()
   const handleChange = (event: { target: { value: React.SetStateAction<string> } }) => {
-    setSearchTerm(event.target.value)
+    setConditionIdToSearch(event.target.value)
   }
 
   const handleRowClick = (row: Conditions_conditions) => {
@@ -77,9 +77,9 @@ export const ConditionsList = () => {
       {
         <input
           onChange={handleChange}
-          placeholder="Search condition"
+          placeholder="Search condition..."
           type="text"
-          value={searchTerm}
+          value={conditionIdToSearch}
         />
       }
       {data && (
