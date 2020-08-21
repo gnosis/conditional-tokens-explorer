@@ -6,6 +6,7 @@ import { useHistory } from 'react-router-dom'
 import { Conditions, Conditions_conditions } from 'types/generatedGQL'
 
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
+import { Pill, PillTypes } from '../../components/pureStyledComponents/Pill'
 import { InfoCard } from '../../components/statusInfo/InfoCard'
 import { InlineLoading } from '../../components/statusInfo/InlineLoading'
 import { tableStyles } from '../../theme/tableStyles'
@@ -43,7 +44,15 @@ const columns = [
     selector: 'resolved',
     sortable: true,
     // eslint-disable-next-line react/display-name
-    cell: (row: Conditions_conditions) => <div>{row.resolved ? 'Resolved' : 'Open'}</div>,
+    cell: (row: Conditions_conditions) => (
+      <div>
+        {row.resolved ? (
+          <Pill type={PillTypes.primary}>Resolved</Pill>
+        ) : (
+          <Pill type={PillTypes.open}>Open</Pill>
+        )}
+      </div>
+    ),
     sortFunction: (a: Conditions_conditions, b: Conditions_conditions) => {
       const valA = a.resolved ? 2 : 1
       const valB = b.resolved ? 2 : 1
