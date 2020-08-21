@@ -16,13 +16,16 @@ export const usePositions = (searchPositionId: string) => {
   const [data, setData] = React.useState<Maybe<Position[]>>(null)
   const [address, setAddress] = React.useState<Maybe<string>>(null)
 
+  const options = searchPositionId
+    ? {
+        variables: {
+          positionId: searchPositionId,
+        },
+      }
+    : undefined
   const { data: positionsData, error: positionsError, loading: positionsLoading } = useQuery<
     Positions
-  >(searchPositionId ? PositionsSearchQuery : PositionsListQuery, {
-    variables: {
-      positionId: searchPositionId,
-    },
-  })
+  >(searchPositionId ? PositionsSearchQuery : PositionsListQuery, options)
 
   const { data: userData, error: userError, loading: userLoading } = useQuery<UserWithPositions>(
     UserWithPositionsQuery,

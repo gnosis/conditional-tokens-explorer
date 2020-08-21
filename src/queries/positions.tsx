@@ -1,8 +1,5 @@
 import gql from 'graphql-tag'
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const DEFAULT_ORDER_FIELD = 'resolveBlockNumber'
-
 const postitionFragment = gql`
   fragment PositionData on Position {
     id
@@ -58,12 +55,7 @@ export const GetMultiPositionsQuery = gql`
 
 export const PositionsSearchQuery = gql`
   query Positions($positionId: String!) {
-    positions(
-      first: 1000
-      where: { id: $positionId }
-      orderBy: $DEFAULT_ORDER_FIELD
-      orderDirection: desc
-    ) {
+    positions(first: 1000, where: { id: $positionId }, orderDirection: desc) {
       id
       collateralToken {
         id
