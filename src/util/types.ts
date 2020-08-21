@@ -23,8 +23,24 @@ export enum ConditionStatus {
 }
 
 export enum ConditionType {
-  Omen = 'Omen Condition',
-  Custom = 'Custom reporter',
+  omen = 'Omen Condition',
+  custom = 'Custom Reporter',
+}
+
+export enum QuestionType {
+  nuancedBinary = 'Nuanced Binary',
+  categorical = 'Categorical',
+  binary = 'Binary',
+}
+
+export enum Categories {
+  businessAndFinance = 'Business & Finance',
+  cryptocurrency = 'Cryptocurrency',
+  newsAndPolitics = 'News & Politics',
+  scienceAndTech = 'Science & Tech',
+  sports = 'Sports',
+  weather = 'Weather',
+  miscellaneous = 'Miscellaneous',
 }
 
 export enum ConditionErrors {

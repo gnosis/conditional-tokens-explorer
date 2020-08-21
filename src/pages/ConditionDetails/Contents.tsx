@@ -110,7 +110,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
       <Row marginBottomXL>
         <TitleValue
           title="Condition Type"
-          value={isConditionFromOmen ? ConditionType.Omen : ConditionType.Custom}
+          value={isConditionFromOmen ? ConditionType.omen : ConditionType.custom}
         />
         <TitleValue
           title="Condition Id"
@@ -162,10 +162,12 @@ export const Contents: React.FC<Props> = ({ condition }) => {
         </>
       )}
       <Row>
-        <TitleValue
-          title="Resolution Date"
-          value={formatTS(resolveTimestamp) || INFORMATION_NOT_AVAILABLE}
-        />
+        {isConditionFromOmen && (
+          <TitleValue
+            title="Resolution Date"
+            value={formatTS(resolveTimestamp) || INFORMATION_NOT_AVAILABLE}
+          />
+        )}
         {isConditionFromOmen && <TitleValue title="Category" value={category} />}
         <TitleValue
           title={isConditionFromOmen ? 'Oracle' : 'Reporting Address'}
