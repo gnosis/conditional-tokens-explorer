@@ -32,13 +32,16 @@ export const SelectPosition = () => {
       position
     ) {
       const { networkConfig } = status
+      // Get the token
+      const token = networkConfig.getTokenFromAddress(position.collateralToken.id)
+
       setPositionToDisplay(
         positionString(
           position.collateralToken.id,
           position.conditionIds,
           position.indexSets,
           balance,
-          networkConfig.networkId
+          token
         )
       )
     } else {

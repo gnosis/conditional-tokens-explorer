@@ -6,9 +6,6 @@ import apolloLogger from 'apollo-link-logger'
 import { WebSocketLink } from 'apollo-link-ws'
 import { getMainDefinition } from 'apollo-utilities'
 
-import { getGraphUris } from './config/networkConfig'
-import { NetworkId } from './util/types'
-
 // using the ability to split links, you can send data to each link
 // depending on what kind of operation is being sent
 // eslint-disable-next-line
@@ -23,8 +20,7 @@ const getLink = (httpLink: any, wsLink: any) =>
     httpLink
   )
 
-export const getApolloClient = (networkId: NetworkId) => {
-  const { httpUri, wsUri } = getGraphUris(networkId)
+export const getApolloClient = (httpUri: string, wsUri: string) => {
   const httpLink = new HttpLink({
     uri: httpUri,
   })
