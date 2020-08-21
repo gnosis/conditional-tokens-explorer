@@ -1,8 +1,4 @@
-import {
-  arePositionMergeablesByCondition,
-  getMergePreview,
-  isConditionFullIndexSet,
-} from 'util/tools'
+import { arePositionMergeablesByCondition, getMergePreview } from 'util/tools'
 
 import {
   StripedList,
