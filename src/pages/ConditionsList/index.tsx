@@ -77,7 +77,7 @@ export const ConditionsList = () => {
       {
         <input
           onChange={handleChange}
-          placeholder="Search condition..."
+          placeholder="Search by condition id..."
           type="text"
           value={conditionIdToSearch}
         />
