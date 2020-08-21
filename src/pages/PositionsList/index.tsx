@@ -66,7 +66,7 @@ export const PositionsList = () => {
     <>
       <PageTitle>Positions</PageTitle>
       {loading && <InlineLoading />}
-      {error && <InfoCard title="Error" />}
+      {error && <InfoCard message={error.message} title="Error" />}
       {data && (
         <DataTable
           columns={tableColumns}

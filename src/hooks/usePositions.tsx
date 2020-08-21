@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/react-hooks'
-import { PositionsListQuery } from 'queries/positions'
+import { PositionsListQuery, PositionsSearchQuery } from 'queries/positions'
 import { UserWithPositionsQuery } from 'queries/users'
 import React from 'react'
 import { Positions, UserWithPositions } from 'types/generatedGQL'
@@ -18,7 +18,11 @@ export const usePositions = () => {
 
   const { data: positionsData, error: positionsError, loading: positionsLoading } = useQuery<
     Positions
-  >(PositionsListQuery)
+  >(PositionsSearchQuery, {
+    variables: {
+      positionId: '0x0015b40bbe11a844d3f5501060b42143d59e1ac701327e9e260478e2657aab57',
+    },
+  })
 
   const { data: userData, error: userError, loading: userLoading } = useQuery<UserWithPositions>(
     UserWithPositionsQuery,
