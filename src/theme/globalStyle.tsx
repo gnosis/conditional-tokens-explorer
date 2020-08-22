@@ -47,6 +47,15 @@ export const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
       &:last-of-type {
         border-bottom: none!important;
       }
+
+      &:nth-last-of-type(1),
+      &:nth-last-of-type(2),
+      &:nth-last-of-type(3) {
+        .dropdownItems {
+          bottom: calc(100% + 10px);
+          top: auto;
+        }
+      }
     }
   }
 `

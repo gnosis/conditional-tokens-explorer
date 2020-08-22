@@ -65,10 +65,11 @@ export const ConditionsList: React.FC = () => {
       sortable: true,
     },
     {
-      name: 'Status',
       center: true,
+      name: 'Status',
       selector: 'resolved',
       sortable: true,
+      width: '150px',
       // eslint-disable-next-line react/display-name
       cell: (row: Conditions_conditions) =>
         row.resolved ? (
@@ -96,7 +97,7 @@ export const ConditionsList: React.FC = () => {
         />
       ),
       name: '',
-      maxWidth: '60px',
+      width: '60px',
       right: true,
     },
   ]
