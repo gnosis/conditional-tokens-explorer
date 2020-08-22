@@ -68,7 +68,7 @@ const columns = [
   },
 ]
 
-export const ConditionsList = () => {
+export const ConditionsList: React.FC = () => {
   const { data, error, loading } = useQuery<Conditions>(ConditionsListQuery)
   const history = useHistory()
 
