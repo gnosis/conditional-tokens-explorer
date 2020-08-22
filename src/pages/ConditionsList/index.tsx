@@ -5,6 +5,8 @@ import DataTable from 'react-data-table-component'
 import { useHistory } from 'react-router-dom'
 import { Conditions, Conditions_conditions } from 'types/generatedGQL'
 
+import { ButtonDots } from '../../components/buttons/ButtonDots'
+import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
 import { Pill, PillTypes } from '../../components/pureStyledComponents/Pill'
 import { InfoCard } from '../../components/statusInfo/InfoCard'
@@ -15,6 +17,13 @@ import { tableStyles } from '../../theme/tableStyles'
 export const ConditionsList: React.FC = () => {
   const { data, error, loading } = useQuery<Conditions>(ConditionsListQuery)
   const history = useHistory()
+
+  const dropdownItems = [
+    { text: 'Details' },
+    { text: 'Split Position' },
+    { text: 'Merge Positions' },
+    { text: 'Report Payouts' },
+  ]
 
   const handleRowClick = (row: Conditions_conditions) => {
     history.push(`/conditions/${row.id}`)
@@ -75,11 +84,20 @@ export const ConditionsList: React.FC = () => {
     },
     {
       // eslint-disable-next-line react/display-name
-      cell: () => {
-        return <div>x</div>
-      },
+      cell: (row: Conditions_conditions) => (
+        <Dropdown
+          dropdownButtonContent={<ButtonDots />}
+          dropdownPosition={DropdownPosition.right}
+          items={dropdownItems.map((item, index) => (
+            <DropdownItem key={index} onClick={() => console.log(`${item.text} for ${row.id}`)}>
+              {item.text}
+            </DropdownItem>
+          ))}
+        />
+      ),
       name: '',
-      width: '40px',
+      maxWidth: '60px',
+      right: true,
     },
   ]
 
@@ -89,17 +107,19 @@ export const ConditionsList: React.FC = () => {
       {loading && <InlineLoading />}
       {error && <InfoCard title="Error" />}
       {data && !loading && (
-        <DataTable
-          className="outerTableWrapper"
-          columns={columns}
-          customStyles={tableStyles}
-          data={data?.conditions || []}
-          highlightOnHover
-          noHeader
-          onRowClicked={handleRowClick}
-          pagination={true}
-          responsive
-        />
+        <div style={{ height: '100%' }}>
+          <DataTable
+            className="outerTableWrapper"
+            columns={columns}
+            customStyles={tableStyles}
+            data={data?.conditions || []}
+            highlightOnHover
+            noHeader
+            onRowClicked={handleRowClick}
+            pagination={true}
+            responsive
+          />
+        </div>
       )}
     </>
   )
