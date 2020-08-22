@@ -87,6 +87,7 @@ export const ConditionsList: React.FC = () => {
       // eslint-disable-next-line react/display-name
       cell: (row: Conditions_conditions) => (
         <Dropdown
+          activeItemHighlight={false}
           dropdownButtonContent={<ButtonDots />}
           dropdownPosition={DropdownPosition.right}
           items={dropdownItems.map((item, index) => (
