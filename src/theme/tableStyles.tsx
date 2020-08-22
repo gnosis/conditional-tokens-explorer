@@ -26,7 +26,6 @@ export const tableStyles: IDataTableStyles = {
   },
   cells: {
     style: {
-      color: theme.colors.textColor,
       fontSize: '15px',
       fontWeight: 400,
       lineHeight: '1.2',

@@ -40,6 +40,10 @@ export const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
     .rdt_TableRow {
       border-bottom-color: ${(props) => props.theme.colors.lightGrey}!important;
 
+      &:hover {
+        color: ${(props) => props.theme.colors.darkerGray}!important;
+      }
+
       &:last-of-type {
         border-bottom: none!important;
       }
