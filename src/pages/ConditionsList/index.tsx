@@ -61,10 +61,6 @@ export const ConditionsList = () => {
     }
   )
   const history = useHistory()
-  const handleChange = (event: { target: { value: React.SetStateAction<string> } }) => {
-    setConditionIdToSearch(event.target.value)
-  }
-
   const handleRowClick = (row: Conditions_conditions) => {
     history.push(`/conditions/${row.id}`)
   }
@@ -76,7 +72,7 @@ export const ConditionsList = () => {
       {error && <InfoCard message={error.message} title="Error" />}
       {
         <input
-          onChange={handleChange}
+          onChange={(e) => setConditionIdToSearch(e.currentTarget.value)}
           placeholder="Search by condition id..."
           type="text"
           value={conditionIdToSearch}
