@@ -48,8 +48,9 @@ const customStyles = {
 }
 
 export const PositionsList = () => {
+  const [searchPositionId, setSearchPositionId] = React.useState('')
   const { status } = useWeb3Context()
-  const { data, error, loading } = usePositions()
+  const { data, error, loading } = usePositions(searchPositionId)
   const [tableColumns, setTableColumns] = useState(getTableColumns(status))
 
   useEffect(() => {
@@ -66,7 +67,15 @@ export const PositionsList = () => {
     <>
       <PageTitle>Positions</PageTitle>
       {loading && <InlineLoading />}
-      {error && <InfoCard title="Error" />}
+      {error && <InfoCard message={error.message} title="Error" />}
+      {
+        <input
+          onChange={(e) => setSearchPositionId(e.currentTarget.value)}
+          placeholder="Search position..."
+          type="text"
+          value={searchPositionId}
+        />
+      }
       {data && (
         <DataTable
           columns={tableColumns}
