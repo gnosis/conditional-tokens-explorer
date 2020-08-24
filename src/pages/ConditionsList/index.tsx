@@ -33,7 +33,13 @@ export const ConditionsList: React.FC = () => {
     {
       // eslint-disable-next-line react/display-name
       cell: (row: Conditions_conditions) => (
-        <CellHash onClick={handleRowClick} underline value={row.id} />
+        <CellHash
+          onClick={() => {
+            handleRowClick(row)
+          }}
+          underline
+          value={row.id}
+        />
       ),
       name: 'Condition Id',
       selector: 'id',
