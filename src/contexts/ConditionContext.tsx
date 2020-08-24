@@ -45,7 +45,24 @@ export const ConditionProvider = (props: Props) => {
   const [condition, setCondition] = React.useState<Maybe<GetCondition_condition>>(null)
   const [errors, setErrors] = React.useState<ConditionErrors[]>([])
   const [validId, setValidId] = React.useState(false)
-  // const errors = []
+
+  const clearErrors = React.useCallback((): void => {
+    setErrors([])
+  }, [])
+
+  const removeError = React.useCallback((error): void => {
+    setErrors((errors) => (errors ? errors.filter((e) => e !== error) : []))
+  }, [])
+
+  const pushError = React.useCallback((newError): void => {
+    setErrors((errors) => Array.from(new Set(errors).add(newError)))
+  }, [])
+
+  const clearCondition = React.useCallback((): void => {
+    setConditionId('')
+    setCondition(null)
+    clearErrors()
+  }, [clearErrors])
 
   const setConditionIdCallback = React.useCallback(
     (conditionId: string): void => {
@@ -68,24 +85,6 @@ export const ConditionProvider = (props: Props) => {
     },
     [clearCondition]
   )
-
-  const clearCondition = React.useCallback((): void => {
-    setConditionId('')
-    setCondition(null)
-    clearErrors()
-  }, [clearErrors])
-
-  const clearErrors = React.useCallback((): void => {
-    setErrors([])
-  }, [])
-
-  const removeError = React.useCallback((error): void => {
-    setErrors((errors) => (errors ? errors.filter((e) => e !== error) : []))
-  }, [])
-
-  const pushError = React.useCallback((newError): void => {
-    setErrors((errors) => Array.from(new Set(errors).add(newError)))
-  }, [])
 
   const { data: fetchedCondition, error: errorFetchingCondition, loading } = useQuery<GetCondition>(
     GetConditionQuery,

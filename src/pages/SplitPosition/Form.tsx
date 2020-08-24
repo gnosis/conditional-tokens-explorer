@@ -175,7 +175,10 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
         <Row cols="1fr">
           <InputCondition
             formMethods={formMethods}
-            onOutcomeSlotChange={(n) => setOutcomeSlot(n)}
+            onOutcomeSlotChange={(n) => {
+              console.log('onOutcomeSlotChange', n)
+              setOutcomeSlot(n)
+            }}
           />
         </Row>
         <Row cols="1fr" marginBottomXL>

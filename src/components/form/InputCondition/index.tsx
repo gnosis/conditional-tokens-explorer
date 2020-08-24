@@ -1,13 +1,8 @@
+import { SelectCondition } from 'components/form/SelectCondition'
+import { useConditionContext } from 'contexts/ConditionContext'
+import { SplitPositionFormMethods } from 'pages/SplitPosition/Form'
 import React, { useEffect } from 'react'
 import { FormContextValues } from 'react-hook-form'
-
-import { BYTES_REGEX } from '../../../config/constants'
-import { useWeb3ConnectedOrInfura } from '../../../contexts/Web3Context'
-import { SplitPositionFormMethods } from '../../../pages/SplitPosition/Form'
-import { Error, ErrorContainer } from '../../pureStyledComponents/Error'
-import { Textfield } from '../../pureStyledComponents/Textfield'
-import { TitleControl } from '../../pureStyledComponents/TitleControl'
-import { TitleValue } from '../../text/TitleValue'
 
 interface Props {
   formMethods: FormContextValues<SplitPositionFormMethods>
@@ -15,53 +10,25 @@ interface Props {
 }
 
 export const InputCondition = ({
-  formMethods: { errors, register, watch },
+  formMethods: { register, setValue },
   onOutcomeSlotChange,
 }: Props) => {
-  const conditionIdErrors = errors.conditionId
-  const watchConditionId = watch('conditionId')
-
-  const { CTService } = useWeb3ConnectedOrInfura()
+  const { condition, errors: conditionContextErrors, loading } = useConditionContext()
 
   useEffect(() => {
-    const getOutcomeSlot = async (conditionId: string) => {
-      const outcomeSlot = await CTService.getOutcomeSlotCount(conditionId)
-      onOutcomeSlotChange(outcomeSlot.toNumber())
-    }
-    if (watchConditionId && !conditionIdErrors) {
-      getOutcomeSlot(watchConditionId)
-    }
-  }, [CTService, watchConditionId, conditionIdErrors, onOutcomeSlotChange])
+    register('conditionId', { required: true })
+  }, [register])
 
-  const validate = async (value: any) => {
-    const conditionExist = await CTService.conditionExists(value)
-    return conditionExist
-  }
+  useEffect(() => {
+    if (loading || conditionContextErrors.length || !condition) {
+      setValue('conditionId', '', true)
+    }
 
-  return (
-    <TitleValue
-      title="Condition Id"
-      titleControl={<TitleControl>Select Condition</TitleControl>}
-      value={
-        <>
-          <Textfield
-            name="conditionId"
-            placeholder="Please select a condition..."
-            ref={register({
-              required: true,
-              pattern: BYTES_REGEX,
-              validate: validate,
-            })}
-            type="text"
-          />
-          {conditionIdErrors && (
-            <ErrorContainer>
-              {conditionIdErrors.type === 'pattern' && <Error>{'Invalid bytes32 string'}</Error>}
-              {conditionIdErrors.type === 'validate' && <Error>{'Invalid condition'}</Error>}
-            </ErrorContainer>
-          )}
-        </>
-      }
-    />
-  )
+    if (!loading && !conditionContextErrors.length && condition) {
+      setValue('conditionId', condition.id, true)
+      onOutcomeSlotChange(condition.outcomeSlotCount)
+    }
+  }, [condition, conditionContextErrors, loading, onOutcomeSlotChange, setValue])
+
+  return <SelectCondition />
 }

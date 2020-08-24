@@ -1,5 +1,3 @@
-import { truncateStringInTheMiddle } from 'util/tools'
-
 import { useDebounceCallback } from '@react-hook/debounce'
 import { SelectConditionModal } from 'components/modals/SelectConditionModal'
 import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
@@ -10,7 +8,6 @@ import { TitleValue } from 'components/text/TitleValue'
 import { useConditionContext } from 'contexts/ConditionContext'
 import React, { useCallback } from 'react'
 import styled from 'styled-components'
-import { Conditions_conditions } from 'types/generatedGQL'
 
 const InfoMessage = styled.p`
   color: ${(props) => props.theme.colors.lightGrey};
@@ -26,27 +23,17 @@ const InfoMessage = styled.p`
   }
 `
 
-export const SelectCondition = () => {
+export const SelectCondition = ({ onChange }: { onChange?: (id: string) => void }) => {
   const { condition, errors, loading, setConditionId } = useConditionContext()
-  const [conditionToDisplay, setConditionToDisplay] = React.useState<string>('')
   const [conditionId, setManualConditionId] = React.useState<string>('')
   const [isModalOpen, setIsModalOpen] = React.useState(false)
 
-  const selectCondition = useCallback((condition: Conditions_conditions) => {
-    // const conditionIdFromPrompt = window.prompt(`Enter the condition: `)
-    // if (conditionIdFromPrompt) {
-    //   setConditionId(conditionIdFromPrompt)
-    // }
-  }, [])
-
   const debouncedHandler = useDebounceCallback((id) => {
-    console.log('debounced', id)
     setConditionId(id)
   }, 500)
   const imputHandler = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.currentTarget
-      console.log('change ')
       setManualConditionId(value)
       debouncedHandler(value)
     },
@@ -57,12 +44,10 @@ export const SelectCondition = () => {
   const openModal = useCallback(() => setIsModalOpen(true), [])
 
   React.useEffect(() => {
-    console.log('condition', condition)
     if (condition) {
-      setConditionToDisplay(truncateStringInTheMiddle(condition.id, 8, 6))
       setManualConditionId(condition.id)
     } else {
-      setConditionToDisplay('')
+      setManualConditionId('')
     }
   }, [condition])
 
@@ -73,13 +58,10 @@ export const SelectCondition = () => {
           title="Condition Id"
           titleControl={<TitleControl onClick={openModal}>Select Condition</TitleControl>}
           value={
-            // <WrapperDisplay errors={errors} loading={loading}>
-            //   {conditionToDisplay}
-            // </WrapperDisplay>
             <>
               <Textfield
                 error={!!errors.length}
-                name="conditionId"
+                // name="conditionId"
                 onChange={imputHandler}
                 placeholder="Please select a condition..."
                 type="text"
