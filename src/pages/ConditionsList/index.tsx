@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/react-hooks'
-import { ConditionsListQuery } from 'queries/conditions'
+import { ConditionsListQuery, ConditionsSearchQuery } from 'queries/conditions'
 import React from 'react'
 import DataTable from 'react-data-table-component'
 import { useHistory } from 'react-router-dom'
@@ -15,7 +15,13 @@ import { CellHash } from '../../components/table/CellHash'
 import { tableStyles } from '../../theme/tableStyles'
 
 export const ConditionsList: React.FC = () => {
-  const { data, error, loading } = useQuery<Conditions>(ConditionsListQuery)
+  const [conditionIdToSearch, setConditionIdToSearch] = React.useState('')
+  const { data, error, loading } = useQuery<Conditions>(
+    conditionIdToSearch ? ConditionsSearchQuery : ConditionsListQuery,
+    {
+      variables: { conditionId: conditionIdToSearch },
+    }
+  )
   const history = useHistory()
 
   const dropdownItems = [
@@ -113,7 +119,15 @@ export const ConditionsList: React.FC = () => {
     <>
       <PageTitle>Conditions</PageTitle>
       {loading && <InlineLoading />}
-      {error && <InfoCard title="Error" />}
+      {error && <InfoCard message={error.message} title="Error" />}
+      {
+        <input
+          onChange={(e) => setConditionIdToSearch(e.currentTarget.value)}
+          placeholder="Search by condition id..."
+          type="text"
+          value={conditionIdToSearch}
+        />
+      }
       {data && !loading && (
         <div style={{ height: '100%' }}>
           <DataTable
