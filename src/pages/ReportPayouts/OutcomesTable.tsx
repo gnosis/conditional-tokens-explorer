@@ -7,6 +7,7 @@ import styled from 'styled-components'
 import { Button } from '../../components/buttons/Button'
 import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
 import { Error, ErrorContainer } from '../../components/pureStyledComponents/Error'
+import { TableWrapper } from '../../components/pureStyledComponents/TableWrapper'
 import { ZERO_BN } from '../../config/constants'
 import { useConditionContext } from '../../contexts/ConditionContext'
 import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
@@ -17,12 +18,6 @@ import { divBN } from '../../util/tools'
 import { Status } from '../../util/types'
 
 const Wrapper = styled.form``
-
-const TableWrapper = styled.div`
-  overflow-x: auto;
-  overflow-y: none;
-  width: 100%;
-`
 
 const Table = styled.table`
   border-collapse: initial;

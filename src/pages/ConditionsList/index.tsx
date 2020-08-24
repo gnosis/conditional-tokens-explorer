@@ -5,78 +5,129 @@ import DataTable from 'react-data-table-component'
 import { useHistory } from 'react-router-dom'
 import { Conditions, Conditions_conditions } from 'types/generatedGQL'
 
+import { ButtonDots } from '../../components/buttons/ButtonDots'
+import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
+import { Pill, PillTypes } from '../../components/pureStyledComponents/Pill'
 import { InfoCard } from '../../components/statusInfo/InfoCard'
 import { InlineLoading } from '../../components/statusInfo/InlineLoading'
+import { CellHash } from '../../components/table/CellHash'
+import { tableStyles } from '../../theme/tableStyles'
 
-const columns = [
-  {
-    name: 'Condition Id',
-    selector: 'id',
-    sortable: true,
-  },
-  {
-    name: 'Oracle',
-    selector: 'oracle',
-    sortable: true,
-  },
-  {
-    name: 'Question Id',
-    selector: 'questionId',
-    sortable: true,
-  },
-  {
-    name: 'Outcomes Number',
-    selector: 'outcomeSlotCount',
-    sortable: true,
-  },
-  {
-    name: 'Status',
-    selector: 'resolved',
-    sortable: true,
-    // eslint-disable-next-line react/display-name
-    cell: (row: Conditions_conditions) => <div>{row.resolved ? 'Resolved' : 'Open'}</div>,
-    sortFunction: (a: Conditions_conditions, b: Conditions_conditions) => {
-      const valA = a.resolved ? 2 : 1
-      const valB = b.resolved ? 2 : 1
-      return valA - valB
-    },
-  },
-]
-
-const customStyles = {
-  rows: {
-    style: {
-      cursor: 'pointer',
-    },
-  },
-}
-
-export const ConditionsList = () => {
+export const ConditionsList: React.FC = () => {
   const { data, error, loading } = useQuery<Conditions>(ConditionsListQuery)
   const history = useHistory()
+
+  const dropdownItems = [
+    { text: 'Details' },
+    { text: 'Split Position' },
+    { text: 'Merge Positions' },
+    { text: 'Report Payouts' },
+  ]
 
   const handleRowClick = (row: Conditions_conditions) => {
     history.push(`/conditions/${row.id}`)
   }
+
+  const columns = [
+    {
+      // eslint-disable-next-line react/display-name
+      cell: (row: Conditions_conditions) => (
+        <CellHash
+          onClick={() => {
+            handleRowClick(row)
+          }}
+          underline
+          value={row.id}
+        />
+      ),
+      name: 'Condition Id',
+      selector: 'id',
+      sortable: true,
+    },
+    {
+      // eslint-disable-next-line react/display-name
+      cell: (row: Conditions_conditions) => (
+        <CellHash onClick={handleRowClick} value={row.oracle} />
+      ),
+      name: 'Reporting Address / Oracle',
+      selector: 'oracle',
+      sortable: true,
+    },
+    {
+      // eslint-disable-next-line react/display-name
+      cell: (row: Conditions_conditions) => (
+        <CellHash onClick={handleRowClick} value={row.questionId} />
+      ),
+      name: 'Question Id',
+      selector: 'questionId',
+      sortable: true,
+    },
+    {
+      maxWidth: '150px',
+      name: 'Outcomes',
+      right: true,
+      selector: 'outcomeSlotCount',
+      sortable: true,
+    },
+    {
+      center: true,
+      name: 'Status',
+      selector: 'resolved',
+      sortable: true,
+      width: '150px',
+      // eslint-disable-next-line react/display-name
+      cell: (row: Conditions_conditions) =>
+        row.resolved ? (
+          <Pill type={PillTypes.primary}>Resolved</Pill>
+        ) : (
+          <Pill type={PillTypes.open}>Open</Pill>
+        ),
+      sortFunction: (a: Conditions_conditions, b: Conditions_conditions) => {
+        const valA = a.resolved ? 2 : 1
+        const valB = b.resolved ? 2 : 1
+        return valA - valB
+      },
+    },
+    {
+      // eslint-disable-next-line react/display-name
+      cell: (row: Conditions_conditions) => (
+        <Dropdown
+          activeItemHighlight={false}
+          dropdownButtonContent={<ButtonDots />}
+          dropdownPosition={DropdownPosition.right}
+          items={dropdownItems.map((item, index) => (
+            <DropdownItem key={index} onClick={() => console.log(`${item.text} for ${row.id}`)}>
+              {item.text}
+            </DropdownItem>
+          ))}
+        />
+      ),
+      name: '',
+      width: '60px',
+      right: true,
+    },
+  ]
 
   return (
     <>
       <PageTitle>Conditions</PageTitle>
       {loading && <InlineLoading />}
       {error && <InfoCard title="Error" />}
-      {data && (
-        <DataTable
-          columns={columns}
-          customStyles={customStyles}
-          data={data?.conditions || []}
-          highlightOnHover
-          onRowClicked={handleRowClick}
-          pagination={true}
-          style={{
-            width: '100%',
-          }}
-        />
+      {data && !loading && (
+        <div style={{ height: '100%' }}>
+          <DataTable
+            className="outerTableWrapper"
+            columns={columns}
+            customStyles={tableStyles}
+            data={data?.conditions || []}
+            highlightOnHover
+            noHeader
+            onRowClicked={handleRowClick}
+            pagination={true}
+            responsive
+          />
+        </div>
       )}
     </>
   )
