@@ -1,7 +1,7 @@
 import gql from 'graphql-tag'
 
 export const ConditionsSearchQuery = gql`
-  query Conditions($conditionId: String!) {
+  query ConditionsSearch($conditionId: String!) {
     conditions(first: 1000, where: { id: $conditionId }) {
       id
       oracle
