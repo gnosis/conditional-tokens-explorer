@@ -95,26 +95,26 @@ export const PositionsList = () => {
       <PageTitle>Positions</PageTitle>
       {loading && <InlineLoading />}
       {error && <InfoCard message={error.message} title="Error" />}
-      {
-        <input
-          onChange={(e) => setSearchPositionId(e.currentTarget.value)}
-          placeholder="Search position..."
-          type="text"
-          value={searchPositionId}
-        />
-      }
       {data && !loading && (
-        <DataTable
-          className="outerTableWrapper"
-          columns={getColumns()}
-          customStyles={tableStyles}
-          data={data || []}
-          highlightOnHover
-          noHeader
-          onRowClicked={handleRowClick}
-          pagination={true}
-          responsive
-        />
+        <>
+          <input
+            onChange={(e) => setSearchPositionId(e.currentTarget.value)}
+            placeholder="Search position..."
+            type="text"
+            value={searchPositionId}
+          />
+          <DataTable
+            className="outerTableWrapper"
+            columns={getColumns()}
+            customStyles={tableStyles}
+            data={data || []}
+            highlightOnHover
+            noHeader
+            onRowClicked={handleRowClick}
+            pagination={true}
+            responsive
+          />
+        </>
       )}
     </>
   )
