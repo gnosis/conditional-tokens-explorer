@@ -7,9 +7,10 @@ import styled from 'styled-components'
 import { Button } from '../../components/buttons/Button'
 import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
 import { Error, ErrorContainer } from '../../components/pureStyledComponents/Error'
+import { TableWrapper } from '../../components/pureStyledComponents/TableWrapper'
 import { ZERO_BN } from '../../config/constants'
 import { useConditionContext } from '../../contexts/ConditionContext'
-import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 import { useQuestion } from '../../hooks/useQuestion'
 import { GetCondition_condition } from '../../types/generatedGQL'
 import { getLogger } from '../../util/logger'
@@ -17,12 +18,6 @@ import { divBN } from '../../util/tools'
 import { Status } from '../../util/types'
 
 const Wrapper = styled.form``
-
-const TableWrapper = styled.div`
-  overflow-x: auto;
-  overflow-y: none;
-  width: 100%;
-`
 
 const Table = styled.table`
   border-collapse: initial;
@@ -118,7 +113,7 @@ const PAYOUTS_POSITIVE_ERROR = 'At least one payout must be positive'
 const DECIMALS = 2
 
 export const OutcomesTable = ({ condition }: Props) => {
-  const { connect, status } = useWeb3Context()
+  const { _type: status, CTService, address, connect } = useWeb3ConnectedOrInfura()
   const { clearCondition } = useConditionContext()
   const { oracle, outcomeSlotCount, questionId } = condition
   const { outcomesPrettier } = useQuestion(questionId, outcomeSlotCount)
@@ -130,13 +125,12 @@ export const OutcomesTable = ({ condition }: Props) => {
 
   // Check if the sender is valid
   useEffect(() => {
-    if (status._type === Web3ContextStatus.Connected) {
-      const { address } = status
+    if (status === Web3ContextStatus.Connected && address) {
       setOracleNotValidError(oracle.toLowerCase() !== address.toLowerCase())
     } else {
       setOracleNotValidError(true)
     }
-  }, [status, oracle])
+  }, [status, address, oracle])
 
   useEffect(() => {
     let cancelled = false
@@ -193,9 +187,7 @@ export const OutcomesTable = ({ condition }: Props) => {
     // Validate exist at least one payout
     const { payouts } = data
     try {
-      if (status._type === Web3ContextStatus.Connected) {
-        const { CTService } = status
-
+      if (status === Web3ContextStatus.Connected) {
         setTransactionStatus(Status.Loading)
 
         const payoutsNumbered = payouts.map((payout: BigNumber) =>
@@ -207,7 +199,7 @@ export const OutcomesTable = ({ condition }: Props) => {
 
         // Setting the condition to '', update the state of the provider and reload the HOC component, works like a reload
         clearCondition()
-      } else if (status._type === Web3ContextStatus.Infura) {
+      } else if (status === Web3ContextStatus.Infura) {
         connect()
       }
     } catch (err) {
@@ -219,7 +211,7 @@ export const OutcomesTable = ({ condition }: Props) => {
   // Variable used to disable the submit button, check for payouts not empty and the oracle must be valid
   const disableSubmit =
     payoutEmptyError ||
-    (status._type === Web3ContextStatus.Connected && oracleNotValidError) ||
+    (status === Web3ContextStatus.Connected && oracleNotValidError) ||
     transactionStatus === Status.Loading
 
   return (
@@ -262,7 +254,7 @@ export const OutcomesTable = ({ condition }: Props) => {
       </TableWrapper>
       <ErrorContainer>
         {payoutEmptyError && <Error>{PAYOUTS_POSITIVE_ERROR}</Error>}
-        {status._type === Web3ContextStatus.Connected && oracleNotValidError && (
+        {status === Web3ContextStatus.Connected && oracleNotValidError && (
           <Error>{ORACLE_NOT_VALID_TO_REPORT_ERROR}</Error>
         )}
       </ErrorContainer>

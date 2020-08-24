@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { useMultiPositionsContext } from '../../../contexts/MultiPositionsContext'
-import { useWeb3Connected } from '../../../contexts/Web3Context'
+import { useWeb3ConnectedOrInfura } from '../../../contexts/Web3Context'
 import { positionString } from '../../../util/tools'
 import { Errors } from '../../../util/types'
 import { ButtonControl, ButtonControlType } from '../../buttons/ButtonControl'
@@ -16,7 +16,7 @@ import { InlineLoading } from '../../statusInfo/InlineLoading'
 import { TitleValue } from '../../text/TitleValue'
 
 export const SelectPosition = () => {
-  const { networkConfig } = useWeb3Connected()
+  const { networkConfig } = useWeb3ConnectedOrInfura()
   const {
     addPositionId,
     balances,
@@ -44,13 +44,7 @@ export const SelectPosition = () => {
 
           const token = networkConfig.getTokenFromAddress(position.collateralToken.id)
 
-          return positionString(
-            position.collateralToken.id,
-            position.conditionIds,
-            position.indexSets,
-            balances[i],
-            token
-          )
+          return positionString(position.conditionIds, position.indexSets, balances[i], token)
         })
       )
     } else {

@@ -4,11 +4,11 @@ import { WrapperDisplay } from 'components/text/WrapperDisplay'
 import React from 'react'
 
 import { usePositionContext } from '../../contexts/PositionContext'
-import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 import { useBalanceForPosition } from '../../hooks/useBalanceForPosition'
 
 export const SelectPosition = () => {
-  const { connect, status } = useWeb3Context()
+  const { _type: status, connect, networkConfig } = useWeb3ConnectedOrInfura()
 
   const { errors, loading, position, positionId, setPositionId } = usePositionContext()
   const { balance } = useBalanceForPosition(positionId)
@@ -16,38 +16,27 @@ export const SelectPosition = () => {
   const [positionToDisplay, setPositionToDisplay] = React.useState<string>('')
 
   const selectPosition = () => {
-    if (status._type === Web3ContextStatus.Connected) {
+    if (status === Web3ContextStatus.Connected) {
       const positionIdFromPrompt = window.prompt(`Enter the position: `)
       if (positionIdFromPrompt) {
         setPositionId(positionIdFromPrompt)
       }
-    } else if (status._type === Web3ContextStatus.Infura) {
+    } else if (status === Web3ContextStatus.Infura) {
       connect()
     }
   }
 
   React.useEffect(() => {
-    if (
-      (status._type === Web3ContextStatus.Connected || status._type === Web3ContextStatus.Infura) &&
-      position
-    ) {
-      const { networkConfig } = status
-      // Get the token
+    if (position) {
       const token = networkConfig.getTokenFromAddress(position.collateralToken.id)
 
       setPositionToDisplay(
-        positionString(
-          position.collateralToken.id,
-          position.conditionIds,
-          position.indexSets,
-          balance,
-          token
-        )
+        positionString(position.conditionIds, position.indexSets, balance, token)
       )
     } else {
       setPositionToDisplay('')
     }
-  }, [balance, position, status])
+  }, [balance, position, status, networkConfig])
 
   return (
     <>

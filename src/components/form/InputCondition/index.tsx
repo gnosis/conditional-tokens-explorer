@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { FormContextValues } from 'react-hook-form'
 
 import { BYTES_REGEX } from '../../../config/constants'
-import { Web3ContextStatus, useWeb3Context } from '../../../contexts/Web3Context'
+import { useWeb3ConnectedOrInfura } from '../../../contexts/Web3Context'
 import { SplitPositionFormMethods } from '../../../pages/SplitPosition/Form'
 import { Error, ErrorContainer } from '../../pureStyledComponents/Error'
 import { Textfield } from '../../pureStyledComponents/Textfield'
@@ -21,33 +21,21 @@ export const InputCondition = ({
   const conditionIdErrors = errors.conditionId
   const watchConditionId = watch('conditionId')
 
-  const { status } = useWeb3Context()
+  const { CTService } = useWeb3ConnectedOrInfura()
 
   useEffect(() => {
     const getOutcomeSlot = async (conditionId: string) => {
-      if (
-        status._type === Web3ContextStatus.Infura ||
-        status._type === Web3ContextStatus.Connected
-      ) {
-        const { CTService } = status
-
-        const outcomeSlot = await CTService.getOutcomeSlotCount(conditionId)
-        onOutcomeSlotChange(outcomeSlot.toNumber())
-      }
+      const outcomeSlot = await CTService.getOutcomeSlotCount(conditionId)
+      onOutcomeSlotChange(outcomeSlot.toNumber())
     }
     if (watchConditionId && !conditionIdErrors) {
       getOutcomeSlot(watchConditionId)
     }
-  }, [status, watchConditionId, conditionIdErrors, onOutcomeSlotChange])
+  }, [CTService, watchConditionId, conditionIdErrors, onOutcomeSlotChange])
 
   const validate = async (value: any) => {
-    if (status._type === Web3ContextStatus.Infura || status._type === Web3ContextStatus.Connected) {
-      const { CTService } = status
-      const conditionExist = await CTService.conditionExists(value)
-      return conditionExist
-    } else {
-      return false
-    }
+    const conditionExist = await CTService.conditionExists(value)
+    return conditionExist
   }
 
   return (
