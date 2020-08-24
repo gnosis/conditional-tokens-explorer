@@ -115,19 +115,17 @@ export const ConditionsList: React.FC = () => {
       {loading && <InlineLoading />}
       {error && <InfoCard title="Error" />}
       {data && !loading && (
-        <div style={{ height: '100%' }}>
-          <DataTable
-            className="outerTableWrapper"
-            columns={columns}
-            customStyles={tableStyles}
-            data={data?.conditions || []}
-            highlightOnHover
-            noHeader
-            onRowClicked={handleRowClick}
-            pagination={true}
-            responsive
-          />
-        </div>
+        <DataTable
+          className="outerTableWrapper"
+          columns={columns}
+          customStyles={tableStyles}
+          data={data?.conditions || []}
+          highlightOnHover
+          noHeader
+          onRowClicked={handleRowClick}
+          pagination={true}
+          responsive
+        />
       )}
     </>
   )

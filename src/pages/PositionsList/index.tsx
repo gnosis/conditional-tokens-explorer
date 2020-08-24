@@ -1,67 +1,95 @@
-import { Web3Status, useWeb3Context } from 'contexts/Web3Context'
+import { useWeb3Context } from 'contexts/Web3Context'
 import { Position, usePositions } from 'hooks'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useHistory } from 'react-router-dom'
 
+import { ButtonDots } from '../../components/buttons/ButtonDots'
+import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
 import { InfoCard } from '../../components/statusInfo/InfoCard'
 import { InlineLoading } from '../../components/statusInfo/InlineLoading'
+import { CellHash } from '../../components/table/CellHash'
 import { Web3ContextStatus } from '../../contexts/Web3Context'
+import { tableStyles } from '../../theme/tableStyles'
 
-const defaultColumns = [
-  {
-    name: 'Position Id',
-    selector: 'id',
-    sortable: true,
-  },
-  {
-    name: 'Collateral',
-    selector: 'collateralToken',
-    sortable: true,
-  },
+const dropdownItems = [
+  { text: 'Details' },
+  { text: 'Redeem' },
+  { text: 'Wrap ERC20' },
+  { text: 'Unwrap ERC1155' },
 ]
-
-const getTableColumns = (status: Web3Status) => {
-  if (status._type === Web3ContextStatus.Connected) {
-    return [
-      ...defaultColumns,
-      {
-        name: 'ERC1155 Amount',
-        selector: 'userBalance',
-        sortable: true,
-        // eslint-disable-next-line react/display-name
-        cell: (row: Position) => <div>{row.userBalance.toString()}</div>, // Note: Should we show this as decimal number, based on collateral decimals?
-      },
-    ]
-  }
-
-  return defaultColumns
-}
-
-const customStyles = {
-  rows: {
-    style: {
-      cursor: 'pointer',
-    },
-  },
-}
 
 export const PositionsList = () => {
   const [searchPositionId, setSearchPositionId] = React.useState('')
   const { status } = useWeb3Context()
+  // const { networkConfig } = useWeb3ConnectedOrInfura()
   const { data, error, loading } = usePositions(searchPositionId)
-  const [tableColumns, setTableColumns] = useState(getTableColumns(status))
-
-  useEffect(() => {
-    setTableColumns(getTableColumns(status))
-  }, [status])
-
   const history = useHistory()
 
   const handleRowClick = (row: Position) => {
     history.push(`/positions/${row.id}`)
   }
+
+  const defaultColumns: Array<any> = [
+    {
+      // eslint-disable-next-line react/display-name
+      cell: (row: Position) => (
+        <CellHash onClick={() => handleRowClick(row)} underline value={row.id} />
+      ),
+      name: 'Position Id',
+      selector: 'id',
+      sortable: true,
+    },
+    {
+      // eslint-disable-next-line react/display-name
+      cell: (row: Position) => {
+        console.log(row)
+        return <CellHash onClick={() => handleRowClick(row)} underline value={row.id} />
+      },
+      name: 'Collateral',
+      selector: 'collateralToken',
+      sortable: true,
+    },
+  ]
+  const [connectedItems, setConnectedItems] = useState<Array<any>>([])
+
+  useEffect(() => {
+    if (status._type === Web3ContextStatus.Connected) {
+      setConnectedItems([
+        {
+          // eslint-disable-next-line react/display-name
+          cell: (row: Position) => row.userBalance.toString(),
+          name: 'ERC1155 Amount',
+          right: true,
+          selector: 'userBalance',
+          sortable: true,
+        },
+        {
+          // eslint-disable-next-line react/display-name
+          cell: (row: Position) => (
+            <Dropdown
+              activeItemHighlight={false}
+              dropdownButtonContent={<ButtonDots />}
+              dropdownPosition={DropdownPosition.right}
+              items={dropdownItems.map((item, index) => (
+                <DropdownItem key={index} onClick={() => console.log(`${item.text} for ${row.id}`)}>
+                  {item.text}
+                </DropdownItem>
+              ))}
+            />
+          ),
+          name: '',
+          width: '60px',
+          right: true,
+        },
+      ])
+    }
+  }, [status._type])
+
+  const getColumns = useCallback(() => {
+    return [...defaultColumns, ...connectedItems]
+  }, [connectedItems, defaultColumns])
 
   return (
     <>
@@ -76,16 +104,17 @@ export const PositionsList = () => {
           value={searchPositionId}
         />
       }
-      {data && (
+      {data && !loading && (
         <DataTable
-          columns={tableColumns}
-          customStyles={customStyles}
+          className="outerTableWrapper"
+          columns={getColumns()}
+          customStyles={tableStyles}
           data={data || []}
+          highlightOnHover
+          noHeader
           onRowClicked={handleRowClick}
           pagination={true}
-          style={{
-            width: '100%',
-          }}
+          responsive
         />
       )}
     </>
