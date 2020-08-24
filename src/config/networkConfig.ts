@@ -1,12 +1,15 @@
-import { NetworkIds, Token } from '../util/types'
+import { NetworkIds, Oracle, Token } from '../util/types'
 
 import {
-  CONDITION_TOKEN_CONTRACT_ADDRESS_FOR_MAINNET,
-  CONDITION_TOKEN_CONTRACT_ADDRESS_FOR_RINKEBY,
+  CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_MAINNET,
+  CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_RINKEBY,
+  EARLIEST_GANACHE_BLOCK_TO_CHECK,
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
   EARLIEST_RINKEBY_BLOCK_TO_CHECK,
+  GRAPH_HTTP_GANACHE,
   GRAPH_HTTP_MAINNET,
   GRAPH_HTTP_RINKEBY,
+  GRAPH_WS_GANACHE,
   GRAPH_WS_MAINNET,
   GRAPH_WS_RINKEBY,
   REALITIO_CONTRACT_ADDRESS_FOR_MAINNET,
@@ -22,13 +25,14 @@ interface Network {
   tokens: Token[]
   graphHttpUri: string
   graphWsUri: string
+  oracles: Oracle[]
 }
 
 const networks: { [K in NetworkIds]: Network } = {
   [NetworkIds.MAINNET]: {
     earliestBlockToCheck: EARLIEST_MAINNET_BLOCK_TO_CHECK,
     contracts: {
-      conditionalTokensAddress: CONDITION_TOKEN_CONTRACT_ADDRESS_FOR_MAINNET,
+      conditionalTokensAddress: CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_MAINNET,
       realitioAddress: REALITIO_CONTRACT_ADDRESS_FOR_MAINNET,
     },
     tokens: [
@@ -80,11 +84,25 @@ const networks: { [K in NetworkIds]: Network } = {
     ],
     graphHttpUri: GRAPH_HTTP_MAINNET,
     graphWsUri: GRAPH_WS_MAINNET,
+    oracles: [
+      {
+        name: 'realitio',
+        description: 'Realitio Team',
+        url: 'https://realit.io/',
+        address: '0x0e414d014a77971f4eaa22ab58e6d84d16ea838e',
+      },
+      {
+        name: 'kleros',
+        description: 'Kleros',
+        url: 'https://kleros.io/',
+        address: '0x0000000000000000000000000000000000000000',
+      },
+    ],
   },
   [NetworkIds.RINKEBY]: {
     earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
     contracts: {
-      conditionalTokensAddress: CONDITION_TOKEN_CONTRACT_ADDRESS_FOR_RINKEBY,
+      conditionalTokensAddress: CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_RINKEBY,
       realitioAddress: REALITIO_CONTRACT_ADDRESS_FOR_RINKEBY,
     },
     tokens: [
@@ -121,6 +139,75 @@ const networks: { [K in NetworkIds]: Network } = {
     ],
     graphHttpUri: GRAPH_HTTP_RINKEBY,
     graphWsUri: GRAPH_WS_RINKEBY,
+    oracles: [
+      {
+        name: 'realitio',
+        description: 'Realitio Team',
+        url: 'https://realit.io/',
+        address: '0x576b76eebe6b5411c0ef310e65de9bff8a60130f',
+      },
+      {
+        name: 'kleros',
+        description: 'Kleros',
+        url: 'https://kleros.io/',
+        address: '0x0000000000000000000000000000000000000000',
+      },
+    ],
+  },
+  [NetworkIds.GANACHE]: {
+    earliestBlockToCheck: EARLIEST_GANACHE_BLOCK_TO_CHECK,
+    contracts: {
+      conditionalTokensAddress: '0xA57B8a5584442B467b4689F1144D269d096A3daF',
+      realitioAddress: '0xcfeb869f69431e42cdb54a4f4f105c19c080a601',
+    },
+    tokens: [
+      {
+        symbol: 'DAI',
+        address: '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7',
+        decimals: 18,
+      },
+      {
+        symbol: 'USDC',
+        address: '0xe982E462b094850F12AF94d21D470e21bE9D0E9C',
+        decimals: 6,
+      },
+      {
+        symbol: 'CDAI',
+        address: '0xD833215cBcc3f914bD1C9ece3EE7BF8B14f841bb',
+        decimals: 18,
+      },
+      {
+        symbol: 'WETH',
+        address: '0x0290FB167208Af455bB137780163b7B7a9a10C16',
+        decimals: 18,
+      },
+      {
+        symbol: 'OWL',
+        address: '0x59d3631c86BbE35EF041872d502F218A39FBa150',
+        decimals: 18,
+      },
+      {
+        symbol: 'GNO',
+        address: '0x9b1f7F645351AF3631a656421eD2e40f2802E6c0',
+        decimals: 18,
+      },
+    ],
+    graphHttpUri: GRAPH_HTTP_GANACHE,
+    graphWsUri: GRAPH_WS_GANACHE,
+    oracles: [
+      {
+        name: 'realitio',
+        description: 'Realitio Team',
+        url: 'https://realit.io/',
+        address: '0xDb56f2e9369E0D7bD191099125a3f6C370F8ed15',
+      },
+      {
+        name: 'kleros',
+        description: 'Kleros',
+        url: 'https://kleros.io/',
+        address: '0x0000000000000000000000000000000000000000',
+      },
+    ],
   },
 }
 
@@ -128,101 +215,59 @@ export class NetworkConfig {
   constructor(public networkId: NetworkIds) {}
 
   static isKnownNetwork(networkId: number): networkId is NetworkIds {
-    return networkId === 1 || networkId === 4
+    return networkId === 1 || networkId === 4 || networkId === 50
   }
 
-  getConditionalTokensAddress() {
+  getConditionalTokensAddress(): string {
     return networks[this.networkId].contracts.conditionalTokensAddress
   }
 
-  getRealitioAddress() {
+  getRealitioAddress(): string {
     return networks[this.networkId].contracts.realitioAddress
   }
 
-  getTokens() {
+  getTokens(): Token[] {
     return networks[this.networkId].tokens
   }
-}
 
-export const getGraphUris = (networkId: number): { httpUri: string; wsUri: string } => {
-  if (!NetworkConfig.isKnownNetwork(networkId)) {
-    throw new Error(`Unsupported network id: '${networkId}'`)
+  getGraphUris(): { httpUri: string; wsUri: string } {
+    const httpUri = networks[this.networkId].graphHttpUri
+    const wsUri = networks[this.networkId].graphWsUri
+    return { httpUri, wsUri }
   }
 
-  const httpUri = networks[networkId].graphHttpUri
-  const wsUri = networks[networkId].graphWsUri
-  return { httpUri, wsUri }
-}
-
-export const getEarliestBlockToCheck = (networkId: number): number => {
-  if (!NetworkConfig.isKnownNetwork(networkId)) {
-    throw new Error(`Unsupported network id: '${networkId}'`)
+  getEarliestBlockToCheck(): number {
+    return networks[this.networkId].earliestBlockToCheck
   }
 
-  return networks[networkId].earliestBlockToCheck
-}
+  getTokenFromAddress(address: string): Token {
+    const tokens = networks[this.networkId].tokens
 
-interface KnownOracleData {
-  name: string
-  url: string
-  addresses: {
-    [networkId: number]: string
-  }
-}
-
-export const knownOracles: { [name in KnownOracle]: KnownOracleData } = {
-  realitio: {
-    name: 'Realitio Team',
-    url: 'https://realit.io/',
-    addresses: {
-      [NetworkIds.MAINNET]: '0x0e414d014a77971f4eaa22ab58e6d84d16ea838e',
-      [NetworkIds.RINKEBY]: '0x576b76eebe6b5411c0ef310e65de9bff8a60130f',
-    },
-  },
-  kleros: {
-    name: 'Kleros',
-    url: 'https://kleros.io/',
-    addresses: {
-      [NetworkIds.MAINNET]: '0x0000000000000000000000000000000000000000',
-      [NetworkIds.RINKEBY]: '0x0000000000000000000000000000000000000000',
-    },
-  },
-  unknown: {
-    name: 'Unknown',
-    url: '',
-    addresses: {},
-  },
-}
-
-export const getKnowOracleFromAddress = (networkId: number, address: string): KnownOracle => {
-  for (const key in knownOracles) {
-    const oracleAddress = knownOracles[key as KnownOracle].addresses[networkId]
-
-    if (!oracleAddress) {
-      continue
+    for (const token of tokens) {
+      const tokenAddress = token.address
+      if (tokenAddress.toLowerCase() === address.toLowerCase()) {
+        return token
+      }
     }
 
-    if (oracleAddress.toLowerCase() === address.toLowerCase()) {
-      return key as KnownOracle
+    throw new Error(`Couldn't find token with address '${address}' in network '${this.networkId}'`)
+  }
+
+  getOracleFromAddress(address: string): Oracle {
+    const oracles = networks[this.networkId].oracles
+
+    for (const oracle of oracles) {
+      const oracleAddress = oracle.address
+      if (oracleAddress.toLowerCase() === address.toLowerCase()) {
+        return oracle
+      }
+    }
+
+    return {
+      name: 'unknown',
+      description: 'Unknown',
+      url: '',
+      address: '',
     }
   }
-
-  return 'unknown' as KnownOracle
-}
-
-export const getTokenFromAddress = (networkId: number, address: string): Token => {
-  if (!NetworkConfig.isKnownNetwork(networkId)) {
-    throw new Error(`Unsupported network id: '${networkId}'`)
-  }
-
-  const tokens = networks[networkId].tokens
-
-  for (const token of tokens) {
-    const tokenAddress = token.address
-    if (tokenAddress.toLowerCase() === address.toLowerCase()) {
-      return token
-    }
-  }
-
-  throw new Error(`Couldn't find token with address '${address}' in network '${networkId}'`)
 }

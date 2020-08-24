@@ -44,10 +44,22 @@ interface Props {
   tokenSymbol?: string
   value?: BigNumber
   placeholder?: string | undefined
+  max?: string
+  min?: string
 }
 
 export const BigNumberInputWrapper: React.FC<Props> = (props) => {
-  const { decimals = 0, disabled, onChange, placeholder, tokenSymbol, value } = props
+  const {
+    decimals = 0,
+    disabled,
+    max,
+    min,
+    onChange,
+    placeholder,
+    tokenSymbol = '',
+    value,
+    ...restProps
+  } = props
 
   const handleChange = (newValue: string) => {
     if (onChange) {
@@ -60,9 +72,11 @@ export const BigNumberInputWrapper: React.FC<Props> = (props) => {
   }
 
   return (
-    <Wrapper hasTokenSymbol={tokenSymbol !== ''}>
+    <Wrapper hasTokenSymbol={tokenSymbol !== ''} {...restProps}>
       <BigNumberInput
         decimals={decimals}
+        max={max}
+        min={min}
         onChange={handleChange}
         placeholder={placeholder}
         renderInput={(props: unknown) => {

@@ -5,13 +5,12 @@ import { ButtonCopy } from '../../components/buttons/ButtonCopy'
 import { ButtonDropdownCircle } from '../../components/buttons/ButtonDropdownCircle'
 import { CenteredCard } from '../../components/common/CenteredCard'
 import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
-import { StripedList, StripedListItem } from '../../components/common/StripedList'
 import { Pill, PillTypes } from '../../components/pureStyledComponents/Pill'
 import { Row } from '../../components/pureStyledComponents/Row'
+import { StripedList, StripedListItem } from '../../components/pureStyledComponents/StripedList'
 import { TitleValue } from '../../components/text/TitleValue'
 import { INFORMATION_NOT_AVAILABLE } from '../../config/constants'
-import { getKnowOracleFromAddress } from '../../config/networkConfig'
-import { useWeb3Context } from '../../contexts/Web3Context'
+import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
 import { useIsConditionFromOmen } from '../../hooks/useIsConditionFromOmen'
 import { useQuestion } from '../../hooks/useQuestion'
 import { GetCondition_condition } from '../../types/generatedGQL'
@@ -40,6 +39,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
     resolveTimestamp,
     resolved,
   } = condition
+
   const dropdownItems = [
     {
       onClick: () => {
@@ -67,24 +67,31 @@ export const Contents: React.FC<Props> = ({ condition }) => {
     },
   ]
 
-  let networkId = null
-  if (status._type === 'connected' || status._type === 'infura') {
-    const { networkConfig } = status
-    networkId = networkConfig.networkId
-  }
-
   const { outcomesPrettier, question } = useQuestion(questionId, outcomeSlotCount)
-  const { isConditionFromOmen } = useIsConditionFromOmen(creator, oracle, question)
+  const isConditionFromOmen = useIsConditionFromOmen(creator, oracle, question)
   const {
     templateId = null,
     title = INFORMATION_NOT_AVAILABLE,
     category = INFORMATION_NOT_AVAILABLE,
   } = question ?? {}
 
-  const oracleTitle =
-    isConditionFromOmen && networkId
-      ? getKnowOracleFromAddress(networkId, oracle)
-      : truncateStringInTheMiddle(oracle, 8, 6)
+  const oracleTitle = React.useMemo(() => {
+    const defaultOracleTitle = truncateStringInTheMiddle(oracle, 8, 6)
+    try {
+      if (
+        (status._type === Web3ContextStatus.Connected ||
+          status._type === Web3ContextStatus.Infura) &&
+        isConditionFromOmen
+      ) {
+        const { networkConfig } = status
+        return networkConfig.getOracleFromAddress(oracle).description
+      } else {
+        return defaultOracleTitle
+      }
+    } catch (err) {
+      return defaultOracleTitle
+    }
+  }, [isConditionFromOmen, status, oracle])
 
   return (
     <CenteredCard
@@ -103,7 +110,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
       <Row marginBottomXL>
         <TitleValue
           title="Condition Type"
-          value={isConditionFromOmen ? ConditionType.Omen : ConditionType.Custom}
+          value={isConditionFromOmen ? ConditionType.omen : ConditionType.custom}
         />
         <TitleValue
           title="Condition Id"
@@ -123,19 +130,17 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           }
         />
         {isConditionFromOmen && (
-          <>
-            <TitleValue title="Question Type" value={getConditionTypeTitle(templateId)} />
-            <TitleValue
-              title="Question Id"
-              value={
-                <>
-                  {truncateStringInTheMiddle(questionId, 8, 6)}
-                  <ButtonCopy value={questionId} />
-                </>
-              }
-            />
-          </>
+          <TitleValue title="Question Type" value={getConditionTypeTitle(templateId)} />
         )}
+        <TitleValue
+          title="Question Id"
+          value={
+            <>
+              {truncateStringInTheMiddle(questionId, 8, 6)}
+              <ButtonCopy value={questionId} />
+            </>
+          }
+        />
       </Row>
       {isConditionFromOmen && (
         <>
@@ -157,7 +162,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
         </>
       )}
       <Row>
-        {resolved && (
+        {isConditionFromOmen && (
           <TitleValue
             title="Resolution Date"
             value={formatTS(resolveTimestamp) || INFORMATION_NOT_AVAILABLE}
@@ -165,7 +170,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
         )}
         {isConditionFromOmen && <TitleValue title="Category" value={category} />}
         <TitleValue
-          title="Oracle"
+          title={isConditionFromOmen ? 'Oracle' : 'Reporting Address'}
           value={
             <>
               {oracleTitle}

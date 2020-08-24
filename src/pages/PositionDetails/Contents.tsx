@@ -9,13 +9,12 @@ import { ButtonDropdownCircle } from '../../components/buttons/ButtonDropdownCir
 import { CenteredCard } from '../../components/common/CenteredCard'
 import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
 import { SetAllowance } from '../../components/common/SetAllowance'
-import { StripedList, StripedListItem } from '../../components/common/StripedList'
 import { TokenIcon } from '../../components/common/TokenIcon'
 import { Partition } from '../../components/partitions/Partition'
 import { Row } from '../../components/pureStyledComponents/Row'
+import { StripedList, StripedListItem } from '../../components/pureStyledComponents/StripedList'
 import { TitleValue } from '../../components/text/TitleValue'
-import { getTokenFromAddress } from '../../config/networkConfig'
-import { useWeb3Connected } from '../../contexts/Web3Context'
+import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
 import { GetPosition_position as Position } from '../../types/generatedGQL'
 import { getLogger } from '../../util/logger'
 
@@ -57,7 +56,12 @@ interface Props {
 }
 
 export const Contents = ({ position }: Props) => {
+  const { status } = useWeb3Context()
+
+  const [collateralSymbol, setCollateralSymbol] = React.useState('')
+
   const { collateralToken, id, indexSets } = position
+
   const numberedOutcomes = indexSets.map((indexSet: string) => {
     return Number(indexSet)
       .toString(2)
@@ -80,10 +84,25 @@ export const Contents = ({ position }: Props) => {
       text: 'Split',
     },
   ]
-  const { networkConfig } = useWeb3Connected()
-  const tokenSymbol = getTokenFromAddress(networkConfig.networkId, collateralToken.id).symbol
+
+  // TODO: refactoring this to make work wrap and unwrap
   const ERC20Amount = 100
   const ERC1155Amount = 0
+
+  React.useEffect(() => {
+    try {
+      if (
+        status._type === Web3ContextStatus.Infura ||
+        status._type === Web3ContextStatus.Connected
+      ) {
+        const { networkConfig } = status
+        const tokenSymbol = networkConfig.getTokenFromAddress(collateralToken.id).symbol
+        setCollateralSymbol(tokenSymbol)
+      }
+    } catch (error) {
+      logger.error(error)
+    }
+  }, [collateralToken.id, status])
 
   return (
     <CenteredCard
@@ -109,7 +128,7 @@ export const Contents = ({ position }: Props) => {
             </>
           }
         />
-        <TitleValue title="Collateral Token" value={<TokenIcon symbol={tokenSymbol} />} />
+        <TitleValue title="Collateral Token" value={<TokenIcon symbol={collateralSymbol} />} />
         <TitleValue
           title="Contract Address"
           value={
@@ -122,8 +141,8 @@ export const Contents = ({ position }: Props) => {
       </Row>
       <SetAllowance
         collateral={collateralToken}
+        fetching={false}
         finished={false}
-        loading={false}
         onUnlock={() => {
           return 1
         }}
@@ -137,7 +156,7 @@ export const Contents = ({ position }: Props) => {
                 <CollateralText>
                   <CollateralTextStrong>ERC20:</CollateralTextStrong>{' '}
                   <CollateralTextAmount>
-                    {ERC20Amount} {tokenSymbol}
+                    {ERC20Amount} {collateralSymbol}
                   </CollateralTextAmount>
                 </CollateralText>
                 <CollateralWrapButton>Wrap</CollateralWrapButton>
@@ -147,7 +166,7 @@ export const Contents = ({ position }: Props) => {
                   <CollateralTextStrong>ERC1155:</CollateralTextStrong>{' '}
                   <CollateralTextAmount>
                     {ERC1155Amount
-                      ? `${ERC1155Amount} ${tokenSymbol}`
+                      ? `${ERC1155Amount} ${collateralSymbol}`
                       : 'No unwrapper collateral yet.'}
                   </CollateralTextAmount>
                 </CollateralText>

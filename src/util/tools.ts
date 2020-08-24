@@ -4,10 +4,13 @@ import { BigNumber, formatUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
 
 import { BYTES_REGEX } from '../config/constants'
-import { getTokenFromAddress } from '../config/networkConfig'
-import { GetCondition_condition, GetPosition_position } from '../types/generatedGQL'
+import {
+  GetCondition_condition,
+  GetMultiPositions_positions,
+  GetPosition_position,
+} from '../types/generatedGQL'
 
-import { ConditionErrors } from './types'
+import { ConditionErrors, PositionErrors, Token } from './types'
 
 export const isAddress = (address: string) => {
   try {
@@ -78,17 +81,29 @@ export const formatTS = (timestamp: number): string => {
   return moment.unix(timestamp).utc().format('YYYY-MM-DD - HH:mm [UTC]')
 }
 
+export const isConditionErrorInvalid = (errors: ConditionErrors[]): boolean =>
+  errors.indexOf(ConditionErrors.INVALID_ERROR) > -1
+
+export const isConditionErrorFetching = (errors: ConditionErrors[]): boolean =>
+  errors.indexOf(ConditionErrors.FETCHING_ERROR) > -1
+
 export const isConditionErrorNotFound = (errors: ConditionErrors[]): boolean =>
   errors.indexOf(ConditionErrors.NOT_FOUND_ERROR) > -1
 
 export const isConditionErrorNotResolved = (errors: ConditionErrors[]): boolean =>
   errors.indexOf(ConditionErrors.NOT_RESOLVED_ERROR) > -1
 
-export const isConditionErrorFetching = (errors: ConditionErrors[]): boolean =>
-  errors.indexOf(ConditionErrors.FETCHING_ERROR) > -1
+export const isPositionErrorInvalid = (errors: PositionErrors[]): boolean =>
+  errors.indexOf(PositionErrors.INVALID_ERROR) > -1
 
-export const isConditionErrorInvalid = (errors: ConditionErrors[]): boolean =>
-  errors.indexOf(ConditionErrors.INVALID_ERROR) > -1
+export const isPositionErrorFetching = (errors: PositionErrors[]): boolean =>
+  errors.indexOf(PositionErrors.FETCHING_ERROR) > -1
+
+export const isPositionErrorNotFound = (errors: PositionErrors[]): boolean =>
+  errors.indexOf(PositionErrors.NOT_FOUND_ERROR) > -1
+
+export const isPositionErrorEmptyBalance = (errors: PositionErrors[]): boolean =>
+  errors.indexOf(PositionErrors.EMPTY_BALANCE_ERROR) > -1
 
 export const divBN = (a: BigNumber, b: BigNumber, scale = 10000): number => {
   return a.mul(scale).div(b).toNumber() / scale
@@ -104,20 +119,18 @@ export const getIndexSets = (outcomesCount: number) => {
 }
 
 export const positionString = (
-  collateralTokenId: string,
   conditionIds: string[],
   indexSets: any[],
   balance: BigNumber,
-  networkId: number
+  token: Token
 ) => {
-  // Get the token
-  const token = getTokenFromAddress(networkId, collateralTokenId)
-
-  return `[${token.symbol.toUpperCase()} ${conditionIds.map((conditionId, i) => {
-    return `C:${truncateStringInTheMiddle(conditionId, 8, 6)} O:${outcomeString(
-      parseInt(indexSets[i], 10)
-    )}`
-  })}]  ${formatBigNumber(balance, token.decimals, 2)}`
+  return `[${token.symbol.toUpperCase()} ${conditionIds
+    .map((conditionId, i) => {
+      return `C:${truncateStringInTheMiddle(conditionId, 8, 6)} O:${outcomeString(
+        parseInt(indexSets[i], 10)
+      )}`
+    })
+    .join(' & ')}] x${formatBigNumber(balance, token.decimals, 2)}`
 }
 
 const outcomeString = (indexSet: number) =>
@@ -153,22 +166,137 @@ export const getRedeemedPreview = (
   position: GetPosition_position,
   resolvedCondition: GetCondition_condition,
   redeemedBalance: BigNumber,
-  networkId: number
+  token: Token
 ) => {
   if (position.conditions.length > 1) {
     const conditionIndex = position.conditions.findIndex(({ id }) => id === resolvedCondition.id)
     const filteredConditionIds = position.conditionIds.filter((_, i) => i !== conditionIndex)
     const filteredIndexSets = position.indexSets.filter((_, i) => i !== conditionIndex)
 
-    return positionString(
-      position.collateralToken.id,
-      filteredConditionIds,
-      filteredIndexSets,
-      redeemedBalance,
-      networkId
-    )
+    return positionString(filteredConditionIds, filteredIndexSets, redeemedBalance, token)
   }
 
-  const { decimals, symbol } = getTokenFromAddress(networkId, position.collateralToken.id)
-  return `${formatBigNumber(redeemedBalance, decimals)} ${symbol}`
+  return `${formatBigNumber(redeemedBalance, token.decimals)} ${token.symbol}`
+}
+
+export const positionsSameConditionsSet = (positions: GetMultiPositions_positions[]) => {
+  // all postions include same conditions set and collateral token
+  const conditionIdsSet = positions.map((position) => [...position.conditionIds].sort().join(''))
+  return conditionIdsSet.every((set) => set === conditionIdsSet[0])
+}
+
+// more than 1 position
+// same collateral
+// same conditions set
+export const arePositionMergeables = (positions: GetMultiPositions_positions[]) => {
+  return (
+    positions.length > 1 &&
+    positions.every(
+      (position) => position.collateralToken.id === positions[0].collateralToken.id
+    ) &&
+    positionsSameConditionsSet(positions)
+  )
+}
+
+// disjoint partition
+export const arePositionMergeablesByCondition = (
+  positions: GetMultiPositions_positions[],
+  condition: GetCondition_condition
+) => {
+  return arePositionMergeables(positions) && isConditionDisjoint(positions, condition)
+}
+
+export const isConditionFullIndexSet = (
+  positions: GetMultiPositions_positions[],
+  condition: GetCondition_condition
+) => {
+  const partition = positions.reduce((acc, position) => {
+    const conditionIndex = position.conditionIds.findIndex((id) => condition.id === id)
+    return [...acc, Number(position.indexSets[conditionIndex])]
+  }, [] as number[])
+
+  return isFullIndexSetPartition(partition, condition.outcomeSlotCount)
+}
+
+export const isConditionDisjoint = (
+  positions: GetMultiPositions_positions[],
+  condition: GetCondition_condition
+) => {
+  const partition = positions.reduce((acc, position) => {
+    const conditionIndex = position.conditionIds.findIndex((id) => condition.id === id)
+    return [...acc, Number(position.indexSets[conditionIndex])]
+  }, [] as number[])
+
+  return isDisjointPartition(partition, condition.outcomeSlotCount)
+}
+
+export const isDisjointPartition = (partition: number[], outcomeSlotCount: number) => {
+  if (partition.length <= 1 || outcomeSlotCount === 0) {
+    return false
+  }
+
+  let isDisjoint = true
+  const fullIndexSet = (1 << outcomeSlotCount) - 1
+  let freeIndexSet = fullIndexSet
+
+  for (let i = 0; i < partition.length; i++) {
+    const indexSet = partition[i]
+    if (indexSet === 0) {
+      isDisjoint = false
+      break
+    }
+
+    if (indexSet > fullIndexSet) {
+      isDisjoint = false
+      break
+    }
+
+    if ((indexSet & freeIndexSet) !== indexSet) {
+      isDisjoint = false
+      break
+    }
+    freeIndexSet ^= indexSet
+  }
+  return isDisjoint
+}
+
+export const isFullIndexSetPartition = (partition: number[], outcomeSlotCount: number) => {
+  if (!isDisjointPartition(partition, outcomeSlotCount)) {
+    return false
+  }
+
+  const fullIndexSet = (1 << outcomeSlotCount) - 1
+  const partitionSum = partition.reduce((acc, indexSet) => acc + indexSet, 0)
+
+  return partitionSum === fullIndexSet
+}
+
+export const minBigNumber = (values: BigNumber[]) =>
+  values.reduce((min, value) => (min.lte(value) ? min : value), values[0])
+
+export const getMergePreview = (
+  positions: GetPosition_position[],
+  condition: GetCondition_condition,
+  amount: BigNumber,
+  token: Token
+) => {
+  if (isConditionFullIndexSet(positions, condition)) {
+    return getRedeemedPreview(positions[0], condition, amount, token)
+  } else {
+    // this assumes all positions have same conditions set order
+    const newIndexSets = Array.from(new Array(positions[0].indexSets.length), (_, i) =>
+      Number(positions[0].indexSets[i])
+    )
+    for (let i = 1; i < positions.length; i++) {
+      const position = positions[i]
+      position.conditionIds.reduce((acc, id, i) => {
+        if (id === condition.id) {
+          acc[i] += Number(position.indexSets[i])
+        }
+
+        return acc
+      }, newIndexSets)
+    }
+    return positionString(positions[0].conditionIds, newIndexSets, amount, token)
+  }
 }

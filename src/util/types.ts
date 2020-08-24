@@ -23,8 +23,24 @@ export enum ConditionStatus {
 }
 
 export enum ConditionType {
-  Omen = 'Omen Condition',
-  Custom = 'Custom reporter',
+  omen = 'Omen Condition',
+  custom = 'Custom Reporter',
+}
+
+export enum QuestionType {
+  nuancedBinary = 'Nuanced Binary',
+  categorical = 'Categorical',
+  binary = 'Binary',
+}
+
+export enum Categories {
+  businessAndFinance = 'Business & Finance',
+  cryptocurrency = 'Cryptocurrency',
+  newsAndPolitics = 'News & Politics',
+  scienceAndTech = 'Science & Tech',
+  sports = 'Sports',
+  weather = 'Weather',
+  miscellaneous = 'Miscellaneous',
 }
 
 export enum ConditionErrors {
@@ -49,11 +65,12 @@ export type Token = {
   decimals: number
 }
 
-export type NetworkId = 1 | 4
+export type NetworkId = 1 | 4 | 50
 
 export enum NetworkIds {
   MAINNET = 1,
   RINKEBY = 4,
+  GANACHE = 50,
 }
 
 export enum Status {
@@ -62,4 +79,11 @@ export enum Status {
   Refreshing = 'Refreshing',
   Done = 'Done',
   Error = 'Error',
+}
+
+export type Oracle = {
+  name: KnownOracle
+  description: string
+  url: string
+  address: string
 }

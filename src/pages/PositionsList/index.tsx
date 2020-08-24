@@ -4,11 +4,12 @@ import React, { useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useHistory } from 'react-router-dom'
 
-import { InfoCard } from '../../components/common/InfoCard'
-import { InlineLoading } from '../../components/loading/InlineLoading'
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
+import { InfoCard } from '../../components/statusInfo/InfoCard'
+import { InlineLoading } from '../../components/statusInfo/InlineLoading'
+import { Web3ContextStatus } from '../../contexts/Web3Context'
 
-const dafaultColumns = [
+const defaultColumns = [
   {
     name: 'Position Id',
     selector: 'id',
@@ -22,9 +23,9 @@ const dafaultColumns = [
 ]
 
 const getTableColumns = (status: Web3Status) => {
-  if (status._type === 'connected') {
+  if (status._type === Web3ContextStatus.Connected) {
     return [
-      ...dafaultColumns,
+      ...defaultColumns,
       {
         name: 'ERC1155 Amount',
         selector: 'userBalance',
@@ -35,7 +36,7 @@ const getTableColumns = (status: Web3Status) => {
     ]
   }
 
-  return dafaultColumns
+  return defaultColumns
 }
 
 const customStyles = {
@@ -47,8 +48,9 @@ const customStyles = {
 }
 
 export const PositionsList = () => {
+  const [searchPositionId, setSearchPositionId] = React.useState('')
   const { status } = useWeb3Context()
-  const { data, error, loading } = usePositions()
+  const { data, error, loading } = usePositions(searchPositionId)
   const [tableColumns, setTableColumns] = useState(getTableColumns(status))
 
   useEffect(() => {
@@ -65,7 +67,15 @@ export const PositionsList = () => {
     <>
       <PageTitle>Positions</PageTitle>
       {loading && <InlineLoading />}
-      {error && <InfoCard title="Error" />}
+      {error && <InfoCard message={error.message} title="Error" />}
+      {
+        <input
+          onChange={(e) => setSearchPositionId(e.currentTarget.value)}
+          placeholder="Search position..."
+          type="text"
+          value={searchPositionId}
+        />
+      }
       {data && (
         <DataTable
           columns={tableColumns}

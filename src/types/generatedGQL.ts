@@ -164,6 +164,100 @@ export interface GetPositionVariables {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL query operation: GetMultiPositions
+// ====================================================
+
+export interface GetMultiPositions_positions_collateralToken {
+  __typename: "CollateralToken";
+  id: string;
+}
+
+export interface GetMultiPositions_positions_collection_conditions {
+  __typename: "Condition";
+  id: string;
+  oracle: any;
+  questionId: any;
+  outcomeSlotCount: number;
+  resolved: boolean;
+  creator: any;
+  payouts: any[] | null;
+  payoutNumerators: any[] | null;
+  payoutDenominator: any | null;
+}
+
+export interface GetMultiPositions_positions_collection_positions {
+  __typename: "Position";
+  id: string;
+}
+
+export interface GetMultiPositions_positions_collection {
+  __typename: "Collection";
+  id: string;
+  conditions: GetMultiPositions_positions_collection_conditions[];
+  conditionIds: string[];
+  indexSets: any[];
+  positions: GetMultiPositions_positions_collection_positions[] | null;
+}
+
+export interface GetMultiPositions_positions_conditions {
+  __typename: "Condition";
+  id: string;
+  outcomeSlotCount: number;
+}
+
+export interface GetMultiPositions_positions {
+  __typename: "Position";
+  id: string;
+  indexSets: any[];
+  activeValue: any;
+  collateralToken: GetMultiPositions_positions_collateralToken;
+  collection: GetMultiPositions_positions_collection;
+  conditionIds: string[];
+  conditions: GetMultiPositions_positions_conditions[];
+}
+
+export interface GetMultiPositions {
+  positions: GetMultiPositions_positions[];
+}
+
+export interface GetMultiPositionsVariables {
+  ids: string[];
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL query operation: PositionsSearch
+// ====================================================
+
+export interface PositionsSearch_positions_collateralToken {
+  __typename: "CollateralToken";
+  id: string;
+}
+
+export interface PositionsSearch_positions {
+  __typename: "Position";
+  id: string;
+  collateralToken: PositionsSearch_positions_collateralToken;
+}
+
+export interface PositionsSearch {
+  positions: PositionsSearch_positions[];
+}
+
+export interface PositionsSearchVariables {
+  positionId: string;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL query operation: Positions
 // ====================================================
 
@@ -214,6 +308,64 @@ export interface UserWithPositions {
 
 export interface UserWithPositionsVariables {
   account: string;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL fragment: PositionData
+// ====================================================
+
+export interface PositionData_collateralToken {
+  __typename: "CollateralToken";
+  id: string;
+}
+
+export interface PositionData_collection_conditions {
+  __typename: "Condition";
+  id: string;
+  oracle: any;
+  questionId: any;
+  outcomeSlotCount: number;
+  resolved: boolean;
+  creator: any;
+  payouts: any[] | null;
+  payoutNumerators: any[] | null;
+  payoutDenominator: any | null;
+}
+
+export interface PositionData_collection_positions {
+  __typename: "Position";
+  id: string;
+}
+
+export interface PositionData_collection {
+  __typename: "Collection";
+  id: string;
+  conditions: PositionData_collection_conditions[];
+  conditionIds: string[];
+  indexSets: any[];
+  positions: PositionData_collection_positions[] | null;
+}
+
+export interface PositionData_conditions {
+  __typename: "Condition";
+  id: string;
+  outcomeSlotCount: number;
+}
+
+export interface PositionData {
+  __typename: "Position";
+  id: string;
+  indexSets: any[];
+  activeValue: any;
+  collateralToken: PositionData_collateralToken;
+  collection: PositionData_collection;
+  conditionIds: string[];
+  conditions: PositionData_conditions[];
 }
 
 /* tslint:disable */

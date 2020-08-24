@@ -1,5 +1,5 @@
-import { useWeb3Connected } from 'contexts/Web3Context'
 import { BigNumber } from 'ethers/utils'
+import { AllowanceMethods, useAllowanceState } from 'hooks/useAllowanceState'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { ERC20Service } from 'services/erc20'
@@ -9,16 +9,16 @@ import { GetPosition_position } from 'types/generatedGQL'
 import { Button } from '../../components/buttons/Button'
 import { CenteredCard } from '../../components/common/CenteredCard'
 import { SetAllowance } from '../../components/common/SetAllowance'
-import { StripedList, StripedListItem } from '../../components/common/StripedList'
 import { InputAmount } from '../../components/form/InputAmount'
 import { InputCondition } from '../../components/form/InputCondition'
 import { Partition } from '../../components/partitions/Partition'
 import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
 import { Row } from '../../components/pureStyledComponents/Row'
+import { StripedList, StripedListItem } from '../../components/pureStyledComponents/StripedList'
 import { TitleControl } from '../../components/pureStyledComponents/TitleControl'
 import { TitleValue } from '../../components/text/TitleValue'
 import { NULL_PARENT_ID, ZERO_BN } from '../../config/constants'
-import { Remote } from '../../util/remoteData'
+import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
 import { trivialPartition } from '../../util/tools'
 import { Token } from '../../util/types'
 
@@ -43,8 +43,7 @@ export type SplitPositionFormMethods = {
 }
 
 interface Props {
-  allowance: Remote<BigNumber>
-  unlockCollateral: () => void
+  allowanceMethods: AllowanceMethods
   onCollateralChange: (collateral: string) => void
   splitPosition: (
     collateral: string,
@@ -53,18 +52,12 @@ interface Props {
     partition: BigNumber[],
     amount: BigNumber
   ) => void
-  hasUnlockedCollateral: boolean
   tokens: Token[]
 }
 
-export const Form = ({
-  allowance,
-  hasUnlockedCollateral,
-  onCollateralChange,
-  splitPosition,
-  tokens,
-  unlockCollateral,
-}: Props) => {
+export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, tokens }: Props) => {
+  const { status } = useWeb3Context()
+
   const DEFAULT_VALUES = useMemo(() => {
     return {
       conditionId: '',
@@ -91,7 +84,6 @@ export const Form = ({
   const [outcomeSlot, setOutcomeSlot] = useState(0)
   const [collateralToken, setCollateralToken] = useState(tokens[0])
   const [position, setPosition] = useState<Maybe<GetPosition_position>>(null)
-  const { provider, signer } = useWeb3Connected()
   const { amount, collateral, positionId, splitFrom } = getValues() as SplitPositionFormMethods
 
   watch('collateral')
@@ -133,10 +125,14 @@ export const Form = ({
     let isSubscribed = true
 
     const fetchToken = async (collateral: string) => {
-      const erc20Service = new ERC20Service(provider, signer, collateral)
-      const token = await erc20Service.getProfileSummary()
-      if (isSubscribed) {
-        setCollateralToken(token)
+      if (status._type === Web3ContextStatus.Connected) {
+        const { provider, signer } = status
+
+        const erc20Service = new ERC20Service(provider, signer, collateral)
+        const token = await erc20Service.getProfileSummary()
+        if (isSubscribed) {
+          setCollateralToken(token)
+        }
       }
     }
 
@@ -150,27 +146,14 @@ export const Form = ({
     return () => {
       isSubscribed = false
     }
-  }, [
-    splitFromPosition,
-    onCollateralChange,
-    tokens,
-    collateral,
-    splitFromCollateral,
-    provider,
-    signer,
-  ])
+  }, [splitFromPosition, onCollateralChange, tokens, collateral, splitFromCollateral, status])
 
-  const hasEnoughAllowance = allowance.map(
-    (allowance) => allowance.gte(amount) && !allowance.isZero()
+  const { allowanceFinished, fetching, showAskAllowance, unlockCollateral } = useAllowanceState(
+    allowanceMethods,
+    amount
   )
 
-  // We show the allowance component if we know the user doesn't have enough allowance
-  const showAskAllowance =
-    (hasEnoughAllowance.hasData() && !hasEnoughAllowance.get()) ||
-    hasUnlockedCollateral ||
-    allowance.isLoading()
-
-  const canSubmit = isValid && (hasEnoughAllowance.getOr(false) || hasUnlockedCollateral)
+  const canSubmit = isValid && allowanceFinished
   const mockedNumberedOutcomes = [
     [1, 4, 3],
     [6, 5],
@@ -199,13 +182,14 @@ export const Form = ({
           }
         />
       </Row>
-      <SetAllowance
-        collateral={collateralToken}
-        fetching={!showAskAllowance}
-        finished={hasUnlockedCollateral && hasEnoughAllowance.getOr(false)}
-        loading={allowance.isLoading()}
-        onUnlock={unlockCollateral}
-      />
+      {showAskAllowance && (
+        <SetAllowance
+          collateral={collateralToken}
+          fetching={fetching}
+          finished={allowanceFinished}
+          onUnlock={unlockCollateral}
+        />
+      )}
       <Row cols="1fr" marginBottomXL>
         <InputAmount
           collateral={collateralToken}
