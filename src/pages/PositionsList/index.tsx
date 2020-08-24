@@ -5,6 +5,7 @@ import { useHistory } from 'react-router-dom'
 
 import { ButtonDots } from '../../components/buttons/ButtonDots'
 import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
+import { TokenIcon } from '../../components/common/TokenIcon'
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
 import { InfoCard } from '../../components/statusInfo/InfoCard'
 import { InlineLoading } from '../../components/statusInfo/InlineLoading'
@@ -42,7 +43,8 @@ export const PositionsList = () => {
     {
       // eslint-disable-next-line react/display-name
       cell: (row: Position) => {
-        return <CellHash onClick={() => handleRowClick(row)} underline value={row.id} />
+        return <TokenIcon symbol={networkConfig.getTokenFromAddress(row.collateralToken).symbol} />
+        // return <CellHash onClick={() => handleRowClick(row)} underline value={row.id} />
       },
       name: 'Collateral',
       selector: 'collateralToken',
