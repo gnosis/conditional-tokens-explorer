@@ -7,7 +7,7 @@ import React from 'react'
 export const MergePositions = () => {
   return (
     <MultiPositionsProvider checkForEmptyBalance={true}>
-      <ConditionProvider checkForConditionNotResolved={true}>
+      <ConditionProvider>
         <PageTitle>Merge Positions</PageTitle>
         <Contents />
       </ConditionProvider>

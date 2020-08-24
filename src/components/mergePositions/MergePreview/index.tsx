@@ -1,4 +1,4 @@
-import { getMergePreview, isConditionFullIndexSet } from 'util/tools'
+import { arePositionMergeablesByCondition, getMergePreview } from 'util/tools'
 
 import {
   StripedList,
@@ -22,17 +22,17 @@ export const MergePreview = ({ amount }: Props) => {
   const { positions } = useMultiPositionsContext()
   const { condition } = useConditionContext()
 
-  const isFullIndexSet = useMemo(() => {
-    return condition && isConditionFullIndexSet(positions, condition)
+  const canMergePositions = useMemo(() => {
+    return condition && arePositionMergeablesByCondition(positions, condition)
   }, [positions, condition])
 
   const mergedPosition = useMemo(() => {
-    if (isFullIndexSet && condition && positions.length > 0) {
+    if (canMergePositions && condition && positions.length > 0) {
       const token = networkConfig.getTokenFromAddress(positions[0].collateralToken.id)
       return getMergePreview(positions, condition, amount, token)
     }
     return ''
-  }, [isFullIndexSet, condition, positions, amount, networkConfig])
+  }, [canMergePositions, condition, positions, amount, networkConfig])
 
   return (
     <TitleValue
