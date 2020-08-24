@@ -43,8 +43,11 @@ export const PositionsList = () => {
     {
       // eslint-disable-next-line react/display-name
       cell: (row: Position) => {
-        return <TokenIcon symbol={networkConfig.getTokenFromAddress(row.collateralToken).symbol} />
-        // return <CellHash onClick={() => handleRowClick(row)} underline value={row.id} />
+        return networkConfig ? (
+          <TokenIcon symbol={networkConfig.getTokenFromAddress(row.collateralToken).symbol} />
+        ) : (
+          row.collateralToken
+        )
       },
       name: 'Collateral',
       selector: 'collateralToken',
