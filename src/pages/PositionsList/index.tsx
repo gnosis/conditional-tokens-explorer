@@ -1,4 +1,3 @@
-import { Web3Status, useWeb3Context } from 'contexts/Web3Context'
 import { Position, usePositions } from 'hooks'
 import React, { useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -7,7 +6,7 @@ import { useHistory } from 'react-router-dom'
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
 import { InfoCard } from '../../components/statusInfo/InfoCard'
 import { InlineLoading } from '../../components/statusInfo/InlineLoading'
-import { Web3ContextStatus } from '../../contexts/Web3Context'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 
 const defaultColumns = [
   {
@@ -22,8 +21,8 @@ const defaultColumns = [
   },
 ]
 
-const getTableColumns = (status: Web3Status) => {
-  if (status._type === Web3ContextStatus.Connected) {
+const getTableColumns = (status: Web3ContextStatus) => {
+  if (status === Web3ContextStatus.Connected) {
     return [
       ...defaultColumns,
       {
@@ -49,7 +48,8 @@ const customStyles = {
 
 export const PositionsList = () => {
   const [searchPositionId, setSearchPositionId] = React.useState('')
-  const { status } = useWeb3Context()
+  const { _type: status } = useWeb3ConnectedOrInfura()
+
   const { data, error, loading } = usePositions(searchPositionId)
   const [tableColumns, setTableColumns] = useState(getTableColumns(status))
 

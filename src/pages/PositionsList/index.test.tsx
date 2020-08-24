@@ -21,8 +21,8 @@ const connectedStatus = {
   address: '0x123',
 } as Connected
 
-const notAskedStatus = {
-  _type: Web3ContextStatus.NotAsked,
+const infuraStatus = {
+  _type: Web3ContextStatus.Infura,
 } as NotAsked
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -39,7 +39,7 @@ const renderWithConnectedProvider = (component: any, query: any) => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const renderWithDisconnectedProvider = (component: any, query: any) => {
   return render(
-    <Web3Context.Provider value={{ status: notAskedStatus, connect, disconnect }}>
+    <Web3Context.Provider value={{ status: infuraStatus, connect, disconnect }}>
       <ThemeProvider theme={theme}>
         <MockedProvider mocks={query}>{component}</MockedProvider>
       </ThemeProvider>
