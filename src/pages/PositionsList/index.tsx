@@ -1,4 +1,3 @@
-import { useWeb3Context } from 'contexts/Web3Context'
 import { Position, usePositions } from 'hooks'
 import React, { useCallback, useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -10,7 +9,7 @@ import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
 import { InfoCard } from '../../components/statusInfo/InfoCard'
 import { InlineLoading } from '../../components/statusInfo/InlineLoading'
 import { CellHash } from '../../components/table/CellHash'
-import { Web3ContextStatus } from '../../contexts/Web3Context'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 import { tableStyles } from '../../theme/tableStyles'
 
 const dropdownItems = [
@@ -22,8 +21,7 @@ const dropdownItems = [
 
 export const PositionsList = () => {
   const [searchPositionId, setSearchPositionId] = React.useState('')
-  const { status } = useWeb3Context()
-  // const { networkConfig } = useWeb3ConnectedOrInfura()
+  const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
   const { data, error, loading } = usePositions(searchPositionId)
   const history = useHistory()
 
@@ -44,7 +42,6 @@ export const PositionsList = () => {
     {
       // eslint-disable-next-line react/display-name
       cell: (row: Position) => {
-        console.log(row)
         return <CellHash onClick={() => handleRowClick(row)} underline value={row.id} />
       },
       name: 'Collateral',
@@ -55,7 +52,7 @@ export const PositionsList = () => {
   const [connectedItems, setConnectedItems] = useState<Array<any>>([])
 
   useEffect(() => {
-    if (status._type === Web3ContextStatus.Connected) {
+    if (status === Web3ContextStatus.Connected) {
       setConnectedItems([
         {
           // eslint-disable-next-line react/display-name
@@ -85,7 +82,7 @@ export const PositionsList = () => {
         },
       ])
     }
-  }, [status._type])
+  }, [status])
 
   const getColumns = useCallback(() => {
     return [...defaultColumns, ...connectedItems]

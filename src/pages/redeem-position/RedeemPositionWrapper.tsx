@@ -5,7 +5,7 @@ import { ConditionalTokensService } from 'services/conditionalTokens'
 
 import { useConditionContext } from '../../contexts/ConditionContext'
 import { usePositionContext } from '../../contexts/PositionContext'
-import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 import { useIsPositionRelatedToCondition } from '../../hooks/useIsPositionRelatedToCondition'
 import { getLogger } from '../../util/logger'
 import { Status } from '../../util/types'
@@ -17,22 +17,15 @@ import { SelectPosition } from './SelectPosition'
 const logger = getLogger('RedeemPosition')
 
 export const RedeemPositionWrapper = () => {
-  const { connect, status } = useWeb3Context()
+  const { _type: status, CTService, connect, networkConfig } = useWeb3ConnectedOrInfura()
 
   const { clearCondition, condition, errors: conditionErrors } = useConditionContext()
   const { clearPosition, errors: positionErrors, position } = usePositionContext()
   const [statusTransaction, setStatusTransaction] = React.useState<Maybe<Status>>(null)
 
-  let networkConfig = null
-  if (status._type === Web3ContextStatus.Connected || status._type === Web3ContextStatus.Infura) {
-    ;({ networkConfig } = status)
-  }
-
   const onRedeem = async () => {
     try {
-      if (position && condition && status._type === Web3ContextStatus.Connected) {
-        const { CTService } = status
-
+      if (position && condition && status === Web3ContextStatus.Connected) {
         setStatusTransaction(Status.Loading)
 
         const { collateralToken, conditionIds, indexSets } = position
@@ -44,7 +37,7 @@ export const RedeemPositionWrapper = () => {
           new Array<{ conditionId: string; indexSet: BigNumber }>()
         )
         const parentCollectionId = newCollectionsSet.length
-          ? ConditionalTokensService.getConbinedCollectionId(newCollectionsSet)
+          ? ConditionalTokensService.getCombinedCollectionId(newCollectionsSet)
           : ethers.constants.HashZero
 
         // This UI only allows to redeem 1 position although it's possible to redeem multiple position when you the user owns different positions with the same set of conditions and several indexSets for the resolved condition.
@@ -70,7 +63,7 @@ export const RedeemPositionWrapper = () => {
         clearPosition()
 
         setStatusTransaction(Status.Ready)
-      } else if (status._type === Web3ContextStatus.Infura) {
+      } else if (status === Web3ContextStatus.Infura) {
         connect()
       }
     } catch (err) {

@@ -18,7 +18,7 @@ import { StripedList, StripedListItem } from '../../components/pureStyledCompone
 import { TitleControl } from '../../components/pureStyledComponents/TitleControl'
 import { TitleValue } from '../../components/text/TitleValue'
 import { NULL_PARENT_ID, ZERO_BN } from '../../config/constants'
-import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 import { trivialPartition } from '../../util/tools'
 import { Token } from '../../util/types'
 
@@ -56,7 +56,7 @@ interface Props {
 }
 
 export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, tokens }: Props) => {
-  const { status } = useWeb3Context()
+  const { _type: status, provider, signer } = useWeb3ConnectedOrInfura()
 
   const DEFAULT_VALUES = useMemo(() => {
     return {
@@ -125,9 +125,7 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
     let isSubscribed = true
 
     const fetchToken = async (collateral: string) => {
-      if (status._type === Web3ContextStatus.Connected) {
-        const { provider, signer } = status
-
+      if (status === Web3ContextStatus.Connected && signer) {
         const erc20Service = new ERC20Service(provider, signer, collateral)
         const token = await erc20Service.getProfileSummary()
         if (isSubscribed) {
@@ -146,7 +144,16 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
     return () => {
       isSubscribed = false
     }
-  }, [splitFromPosition, onCollateralChange, tokens, collateral, splitFromCollateral, status])
+  }, [
+    splitFromPosition,
+    provider,
+    onCollateralChange,
+    tokens,
+    collateral,
+    splitFromCollateral,
+    status,
+    signer,
+  ])
 
   const { allowanceFinished, fetching, showAskAllowance, unlockCollateral } = useAllowanceState(
     allowanceMethods,

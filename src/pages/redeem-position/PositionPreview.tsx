@@ -9,7 +9,7 @@ import { getRedeemedBalance, getRedeemedPreview } from '../../util/tools'
 interface Props {
   position: Maybe<GetPosition_position>
   condition: Maybe<GetCondition_condition>
-  networkConfig: Maybe<NetworkConfig>
+  networkConfig: NetworkConfig
 }
 
 export const PositionPreview = ({ condition, networkConfig, position }: Props) => {
@@ -20,8 +20,9 @@ export const PositionPreview = ({ condition, networkConfig, position }: Props) =
       position && condition ? getRedeemedBalance(position, condition, balance) : new BigNumber(0),
     [position, condition, balance]
   )
+
   const redeemedPreview = useMemo(() => {
-    if (position && condition && networkConfig) {
+    if (position && condition) {
       const token = networkConfig.getTokenFromAddress(position.collateralToken.id)
       return getRedeemedPreview(position, condition, redeemedBalance, token)
     }

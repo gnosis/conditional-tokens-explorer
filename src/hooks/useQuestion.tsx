@@ -1,10 +1,10 @@
 import React from 'react'
 
-import { Web3ContextStatus, useWeb3Context } from '../contexts/Web3Context'
+import { useWeb3ConnectedOrInfura } from '../contexts/Web3Context'
 import { Question } from '../util/types'
 
 export const useQuestion = (questionId: string, outcomeSlotCount: number) => {
-  const { status } = useWeb3Context()
+  const { RtioService, networkConfig } = useWeb3ConnectedOrInfura()
 
   const [question, setQuestion] = React.useState<Maybe<Question>>(null)
   const [outcomesPrettier, setOutcomesPrettier] = React.useState<string[]>([])
@@ -13,29 +13,26 @@ export const useQuestion = (questionId: string, outcomeSlotCount: number) => {
 
   React.useEffect(() => {
     let cancelled = false
-    if (status._type === Web3ContextStatus.Connected || status._type === Web3ContextStatus.Infura) {
-      if (!cancelled) setLoading(true)
+    if (!cancelled) setLoading(true)
 
-      const { RtioService, networkConfig } = status
-      const getQuestion = async (questionId: string) => {
-        try {
-          const earliestBlockToCheck = networkConfig.getEarliestBlockToCheck()
-          const question = await RtioService.getQuestion(questionId, earliestBlockToCheck)
-          if (!cancelled) setQuestion(question)
-        } catch (err) {
-          setError(err)
-        }
+    const getQuestion = async (questionId: string) => {
+      try {
+        const earliestBlockToCheck = networkConfig.getEarliestBlockToCheck()
+        const question = await RtioService.getQuestion(questionId, earliestBlockToCheck)
+        if (!cancelled) setQuestion(question)
+      } catch (err) {
+        setError(err)
       }
-
-      getQuestion(questionId)
-
-      if (!cancelled) setLoading(false)
     }
+
+    getQuestion(questionId)
+
+    if (!cancelled) setLoading(false)
 
     return () => {
       cancelled = true
     }
-  }, [status, questionId])
+  }, [RtioService, networkConfig, questionId])
 
   React.useEffect(() => {
     let cancelled = false

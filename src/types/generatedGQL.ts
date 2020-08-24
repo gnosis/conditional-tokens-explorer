@@ -4,6 +4,34 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL query operation: ConditionsSearch
+// ====================================================
+
+export interface ConditionsSearch_conditions {
+  __typename: "Condition";
+  id: string;
+  oracle: any;
+  questionId: any;
+  outcomeSlotCount: number;
+  resolved: boolean;
+  creator: any;
+  resolveBlockNumber: any | null;
+}
+
+export interface ConditionsSearch {
+  conditions: ConditionsSearch_conditions[];
+}
+
+export interface ConditionsSearchVariables {
+  conditionId: string;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL query operation: Conditions
 // ====================================================
 

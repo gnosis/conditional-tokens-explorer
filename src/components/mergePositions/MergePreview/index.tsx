@@ -8,7 +8,7 @@ import {
 import { TitleValue } from 'components/text/TitleValue'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
-import { useWeb3Connected } from 'contexts/Web3Context'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { BigNumber } from 'ethers/utils'
 import React, { useMemo } from 'react'
 
@@ -17,7 +17,7 @@ interface Props {
 }
 
 export const MergePreview = ({ amount }: Props) => {
-  const { networkConfig } = useWeb3Connected()
+  const { networkConfig } = useWeb3ConnectedOrInfura()
 
   const { positions } = useMultiPositionsContext()
   const { condition } = useConditionContext()

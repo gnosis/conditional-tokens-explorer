@@ -15,7 +15,7 @@ import { IconTypes } from '../../components/statusInfo/common'
 import { ZERO_BN } from '../../config/constants'
 import { useConditionContext } from '../../contexts/ConditionContext'
 import { useMultiPositionsContext } from '../../contexts/MultiPositionsContext'
-import { useWeb3Connected } from '../../contexts/Web3Context'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 import { ConditionalTokensService } from '../../services/conditionalTokens'
 import { getLogger } from '../../util/logger'
 import {
@@ -28,7 +28,7 @@ import { Status } from '../../util/types'
 const logger = getLogger('MergePosition')
 
 export const Contents = () => {
-  const { CTService, networkConfig } = useWeb3Connected()
+  const { _type: statusContext, CTService, connect, networkConfig } = useWeb3ConnectedOrInfura()
 
   const {
     balances,
@@ -36,6 +36,7 @@ export const Contents = () => {
     errors: positionsErrors,
     positions,
   } = useMultiPositionsContext()
+
   const { clearCondition, condition, errors: conditionErrors } = useConditionContext()
   const [status, setStatus] = useState<Maybe<Status>>(null)
   const [error, setError] = useState<string | undefined>()
@@ -86,7 +87,7 @@ export const Contents = () => {
 
   const onMerge = useCallback(async () => {
     try {
-      if (positions && condition) {
+      if (positions && condition && statusContext === Web3ContextStatus.Connected) {
         setStatus(Status.Loading)
 
         const { collateralToken, conditionIds, indexSets } = positions[0]
@@ -98,7 +99,7 @@ export const Contents = () => {
           new Array<{ conditionId: string; indexSet: BigNumber }>()
         )
         const parentCollectionId = newCollectionsSet.length
-          ? ConditionalTokensService.getConbinedCollectionId(newCollectionsSet)
+          ? ConditionalTokensService.getCombinedCollectionId(newCollectionsSet)
           : ethers.constants.HashZero
 
         // It shouldn't be able to call onMerge if positions were not mergeables, so no -1 for findIndex.
@@ -120,13 +121,24 @@ export const Contents = () => {
         clearCondition()
 
         setStatus(Status.Ready)
+      } else {
+        connect()
       }
     } catch (err) {
       setStatus(Status.Error)
       setError(err)
       logger.error(err)
     }
-  }, [positions, condition, CTService, amount, clearPositions, clearCondition])
+  }, [
+    positions,
+    condition,
+    statusContext,
+    CTService,
+    amount,
+    clearPositions,
+    clearCondition,
+    connect,
+  ])
 
   return (
     <CenteredCard>
