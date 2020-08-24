@@ -53,10 +53,6 @@ export const PositionsList = () => {
   const { data, error, loading } = usePositions(searchPositionId)
   const [tableColumns, setTableColumns] = useState(getTableColumns(status))
 
-  const handleChange = (event: { target: { value: React.SetStateAction<string> } }) => {
-    setSearchPositionId(event.target.value)
-  }
-
   useEffect(() => {
     setTableColumns(getTableColumns(status))
   }, [status])
@@ -74,7 +70,7 @@ export const PositionsList = () => {
       {error && <InfoCard message={error.message} title="Error" />}
       {
         <input
-          onChange={handleChange}
+          onChange={(e) => setSearchPositionId(e.currentTarget.value)}
           placeholder="Search position..."
           type="text"
           value={searchPositionId}
