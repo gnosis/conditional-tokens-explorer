@@ -4,12 +4,15 @@ import DataTable from 'react-data-table-component'
 import { useHistory } from 'react-router-dom'
 
 import { ButtonDots } from '../../components/buttons/ButtonDots'
+import { ButtonSelectLight } from '../../components/buttons/ButtonSelectLight'
 import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
 import { TokenIcon } from '../../components/common/TokenIcon'
+import { SearchField } from '../../components/form/SearchField'
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
 import { InfoCard } from '../../components/statusInfo/InfoCard'
 import { InlineLoading } from '../../components/statusInfo/InlineLoading'
 import { CellHash } from '../../components/table/CellHash'
+import { TableControls } from '../../components/table/TableControls'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 import { tableStyles } from '../../theme/tableStyles'
 
@@ -25,6 +28,8 @@ export const PositionsList = () => {
   const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
   const { data, error, loading } = usePositions(searchPositionId)
   const history = useHistory()
+  const isLoading = !searchPositionId && loading
+  const isSearching = searchPositionId && loading
 
   const handleRowClick = (row: Position) => {
     history.push(`/positions/${row.id}`)
@@ -93,30 +98,53 @@ export const PositionsList = () => {
     return [...defaultColumns, ...connectedItems]
   }, [connectedItems, defaultColumns])
 
+  const filterItems = [{ content: 'All Collaterals' }, { content: <div>DAI</div> }]
+
+  const [selectedFilter, setselectedFilter] = useState(0)
+
+  const filterDropdown = (
+    <Dropdown
+      dropdownButtonContent={<ButtonSelectLight content={filterItems[selectedFilter].content} />}
+      dropdownPosition={DropdownPosition.right}
+      items={filterItems.map((item, index) => (
+        <DropdownItem key={index} onClick={() => setselectedFilter(index)}>
+          {item.content}
+        </DropdownItem>
+      ))}
+    />
+  )
+
   return (
     <>
       <PageTitle>Positions</PageTitle>
-      {loading && <InlineLoading />}
+      {isLoading && <InlineLoading />}
       {error && <InfoCard message={error.message} title="Error" />}
-      {data && !loading && (
+      {data && !isLoading && (
         <>
-          <input
-            onChange={(e) => setSearchPositionId(e.currentTarget.value)}
-            placeholder="Search position..."
-            type="text"
-            value={searchPositionId}
+          <TableControls
+            end={filterDropdown}
+            start={
+              <SearchField
+                onChange={(e) => setSearchPositionId(e.currentTarget.value)}
+                placeholder="Search by position id..."
+                value={searchPositionId}
+              />
+            }
           />
-          <DataTable
-            className="outerTableWrapper"
-            columns={getColumns()}
-            customStyles={tableStyles}
-            data={data || []}
-            highlightOnHover
-            noHeader
-            onRowClicked={handleRowClick}
-            pagination={true}
-            responsive
-          />
+          {isSearching && <InlineLoading />}
+          {!isSearching && (
+            <DataTable
+              className="outerTableWrapper"
+              columns={getColumns()}
+              customStyles={tableStyles}
+              data={data || []}
+              highlightOnHover
+              noHeader
+              onRowClicked={handleRowClick}
+              pagination={true}
+              responsive
+            />
+          )}
         </>
       )}
     </>
