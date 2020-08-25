@@ -13,12 +13,16 @@ import { InputAmount } from '../../components/form/InputAmount'
 import { InputCondition } from '../../components/form/InputCondition'
 import { Partition } from '../../components/partitions/Partition'
 import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
+import { ErrorContainer, Error as ErrorMessage } from '../../components/pureStyledComponents/Error'
 import { Row } from '../../components/pureStyledComponents/Row'
 import { StripedList, StripedListItem } from '../../components/pureStyledComponents/StripedList'
 import { TitleControl } from '../../components/pureStyledComponents/TitleControl'
+import { FullLoading } from '../../components/statusInfo/FullLoading'
+import { IconTypes } from '../../components/statusInfo/common'
 import { TitleValue } from '../../components/text/TitleValue'
 import { NULL_PARENT_ID, ZERO_BN } from '../../config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
+import { getLogger } from '../../util/logger'
 import { trivialPartition } from '../../util/tools'
 import { Token } from '../../util/types'
 
@@ -55,6 +59,8 @@ interface Props {
   tokens: Token[]
 }
 
+const logger = getLogger('Form')
+
 export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, tokens }: Props) => {
   const { _type: status, provider, signer } = useWeb3ConnectedOrInfura()
 
@@ -84,6 +90,9 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
   const [outcomeSlot, setOutcomeSlot] = useState(0)
   const [collateralToken, setCollateralToken] = useState(tokens[0])
   const [position, setPosition] = useState<Maybe<GetPosition_position>>(null)
+  const [isTransactionExecuting, setIsTransactionExecuting] = useState(false)
+  const [error, setError] = useState<Maybe<Error>>(null)
+
   const { amount, collateral, positionId, splitFrom } = getValues() as SplitPositionFormMethods
 
   watch('collateral')
@@ -94,20 +103,27 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
 
   const onSubmit = useCallback(
     async ({ amount, collateral, conditionId }: SplitPositionFormMethods) => {
-      const partition = trivialPartition(outcomeSlot)
+      try {
+        setIsTransactionExecuting(true)
+        const partition = trivialPartition(outcomeSlot)
 
-      if (splitFromCollateral) {
-        splitPosition(collateral, NULL_PARENT_ID, conditionId, partition, amount)
-      } else if (splitFromPosition && position) {
-        const {
-          collateralToken: { id: collateral },
-          collection: { id: collectionId },
-        } = position
-        splitPosition(collateral, collectionId, conditionId, partition, amount)
-      } else {
-        throw Error('Invalid split origin')
+        if (splitFromCollateral) {
+          await splitPosition(collateral, NULL_PARENT_ID, conditionId, partition, amount)
+        } else if (splitFromPosition && position) {
+          const {
+            collateralToken: { id: collateral },
+            collection: { id: collectionId },
+          } = position
+          await splitPosition(collateral, collectionId, conditionId, partition, amount)
+        } else {
+          throw Error('Invalid split origin')
+        }
+      } catch (err) {
+        logger.error(err)
+        setError(err)
+      } finally {
+        setIsTransactionExecuting(false)
       }
-
       reset(DEFAULT_VALUES)
     },
     [
@@ -155,10 +171,12 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
     signer,
   ])
 
-  const { allowanceFinished, fetching, showAskAllowance, unlockCollateral } = useAllowanceState(
-    allowanceMethods,
-    amount
-  )
+  const {
+    allowanceFinished,
+    fetchingAllowance,
+    shouldDisplayAllowance,
+    unlockCollateral,
+  } = useAllowanceState(allowanceMethods, amount)
 
   const canSubmit = isValid && allowanceFinished
   const mockedNumberedOutcomes = [
@@ -189,10 +207,10 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
           }
         />
       </Row>
-      {showAskAllowance && (
+      {shouldDisplayAllowance && (
         <SetAllowance
           collateral={collateralToken}
-          fetching={fetching}
+          fetching={fetchingAllowance}
           finished={allowanceFinished}
           onUnlock={unlockCollateral}
         />
@@ -223,6 +241,21 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
           }
         />
       </Row>
+      {isTransactionExecuting && (
+        <FullLoading
+          actionButton={
+            error ? { text: 'OK', onClick: () => setIsTransactionExecuting(true) } : undefined
+          }
+          icon={error ? IconTypes.error : IconTypes.spinner}
+          message={error ? error.message : 'Waiting...'}
+          title={error ? 'Error' : 'Split position'}
+        />
+      )}
+      {error && (
+        <ErrorContainer>
+          <ErrorMessage>{error.message}</ErrorMessage>
+        </ErrorContainer>
+      )}
       <ButtonContainer>
         <Button disabled={!canSubmit} onClick={handleSubmit(onSubmit)}>
           Split

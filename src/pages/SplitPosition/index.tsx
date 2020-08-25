@@ -9,7 +9,7 @@ import { getLogger } from '../../util/logger'
 
 import { Form } from './Form'
 
-const logger = getLogger('Form')
+const logger = getLogger('SplitPositionIndex')
 
 export const SplitPosition = () => {
   const { _type: status, CTService, connect, networkConfig } = useWeb3ConnectedOrInfura()
@@ -41,17 +41,7 @@ export const SplitPosition = () => {
           logger.info(`Position: ${positionId}`)
         })
 
-        try {
-          await CTService.splitPosition(
-            collateral,
-            parentCollection,
-            conditionId,
-            partition,
-            amount
-          )
-        } catch (e) {
-          logger.error(e)
-        }
+        await CTService.splitPosition(collateral, parentCollection, conditionId, partition, amount)
       } else {
         connect()
       }
