@@ -44,7 +44,7 @@ export const useAllowanceState = (allowanceMethods: AllowanceMethods, amount: Bi
 
   useEffect(() => {
     fetchAllowance()
-  }, [fetchAllowance, amount])
+  }, [fetchAllowance])
 
   useEffect(() => {
     setHasUnlockedCollateral(false)
