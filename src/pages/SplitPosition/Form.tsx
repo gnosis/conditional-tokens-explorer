@@ -21,13 +21,13 @@ import { FullLoading } from '../../components/statusInfo/FullLoading'
 import { IconTypes } from '../../components/statusInfo/common'
 import { TitleValue } from '../../components/text/TitleValue'
 import { NULL_PARENT_ID, ZERO_BN } from '../../config/constants'
+import { useConditionContext } from '../../contexts/ConditionContext'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 import { getLogger } from '../../util/logger'
 import { trivialPartition } from '../../util/tools'
 import { Token } from '../../util/types'
 
 import { SplitFrom } from './SplitFrom'
-import { useConditionContext } from '../../contexts/ConditionContext'
 
 const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
@@ -135,12 +135,14 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
       }
     },
     [
-      position,
       outcomeSlot,
-      reset,
       splitFromCollateral,
       splitFromPosition,
+      position,
       splitPosition,
+      reset,
+      DEFAULT_VALUES,
+      clearCondition,
     ]
   )
 
@@ -249,21 +251,21 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
             }
           />
         </Row>
-      {isTransactionExecuting && (
-        <FullLoading
-          actionButton={
-            error ? { text: 'OK', onClick: () => setIsTransactionExecuting(true) } : undefined
-          }
-          icon={error ? IconTypes.error : IconTypes.spinner}
-          message={error ? error.message : 'Waiting...'}
-          title={error ? 'Error' : 'Split position'}
-        />
-      )}
-      {error && (
-        <ErrorContainer>
-          <ErrorMessage>{error.message}</ErrorMessage>
-        </ErrorContainer>
-      )}
+        {isTransactionExecuting && (
+          <FullLoading
+            actionButton={
+              error ? { text: 'OK', onClick: () => setIsTransactionExecuting(true) } : undefined
+            }
+            icon={error ? IconTypes.error : IconTypes.spinner}
+            message={error ? error.message : 'Waiting...'}
+            title={error ? 'Error' : 'Split position'}
+          />
+        )}
+        {error && (
+          <ErrorContainer>
+            <ErrorMessage>{error.message}</ErrorMessage>
+          </ErrorContainer>
+        )}
         <ButtonContainer>
           <Button disabled={!canSubmit} onClick={handleSubmit(onSubmit)}>
             Split
