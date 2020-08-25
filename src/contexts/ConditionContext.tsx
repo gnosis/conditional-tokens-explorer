@@ -104,8 +104,6 @@ export const ConditionProvider = (props: Props) => {
       setCondition(conditionFromTheGraph)
       removeError(ConditionErrors.NOT_FOUND_ERROR)
     }
-
-    console.log(fetchedCondition, validId, loading)
   }, [fetchedCondition, validId, loading, conditionId, pushError, removeError])
 
   React.useEffect(() => {

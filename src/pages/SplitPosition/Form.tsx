@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { ERC20Service } from 'services/erc20'
 import styled from 'styled-components'
-import { GetPosition_position } from 'types/generatedGQL'
+import { GetCondition_condition, GetPosition_position } from 'types/generatedGQL'
 
 import { Button } from '../../components/buttons/Button'
 import { CenteredCard } from '../../components/common/CenteredCard'
@@ -85,6 +85,10 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
   const [collateralToken, setCollateralToken] = useState(tokens[0])
   const [position, setPosition] = useState<Maybe<GetPosition_position>>(null)
   const { amount, collateral, positionId, splitFrom } = getValues() as SplitPositionFormMethods
+
+  const handleConditionChange = useCallback((condition: Maybe<GetCondition_condition>) => {
+    setOutcomeSlot(condition ? condition.outcomeSlotCount : 0)
+  }, [])
 
   watch('collateral')
   watch('splitFrom')
@@ -173,13 +177,7 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
     <>
       <CenteredCard>
         <Row cols="1fr">
-          <InputCondition
-            formMethods={formMethods}
-            onOutcomeSlotChange={(n) => {
-              console.log('onOutcomeSlotChange', n)
-              setOutcomeSlot(n)
-            }}
-          />
+          <InputCondition formMethods={formMethods} onConditionChange={handleConditionChange} />
         </Row>
         <Row cols="1fr" marginBottomXL>
           <TitleValue

@@ -3,15 +3,16 @@ import { useConditionContext } from 'contexts/ConditionContext'
 import { SplitPositionFormMethods } from 'pages/SplitPosition/Form'
 import React, { useEffect } from 'react'
 import { FormContextValues } from 'react-hook-form'
+import { GetCondition_condition } from 'types/generatedGQL'
 
 interface Props {
   formMethods: FormContextValues<SplitPositionFormMethods>
-  onOutcomeSlotChange: (n: number) => void
+  onConditionChange: (condition: Maybe<GetCondition_condition>) => void
 }
 
 export const InputCondition = ({
   formMethods: { register, setValue },
-  onOutcomeSlotChange,
+  onConditionChange,
 }: Props) => {
   const { condition, errors: conditionContextErrors, loading } = useConditionContext()
 
@@ -22,13 +23,14 @@ export const InputCondition = ({
   useEffect(() => {
     if (loading || conditionContextErrors.length || !condition) {
       setValue('conditionId', '', true)
+      onConditionChange(null)
     }
 
     if (!loading && !conditionContextErrors.length && condition) {
       setValue('conditionId', condition.id, true)
-      onOutcomeSlotChange(condition.outcomeSlotCount)
+      onConditionChange(condition)
     }
-  }, [condition, conditionContextErrors, loading, onOutcomeSlotChange, setValue])
+  }, [condition, conditionContextErrors, loading, onConditionChange, setValue])
 
   return <SelectCondition />
 }
