@@ -1,19 +1,20 @@
-import { Button } from 'components/buttons'
-import { CenteredCard } from 'components/common/CenteredCard'
-import { SelectCondition } from 'components/form/SelectCondition'
-import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
-import { Row } from 'components/pureStyledComponents/Row'
-import { SelectPosition } from 'components/redeemPosition//SelectPosition'
-import { PositionPreview } from 'components/redeemPosition/PositionPreview'
-import { useConditionContext } from 'contexts/ConditionContext'
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import React from 'react'
-import { ConditionalTokensService } from 'services/conditionalTokens'
 
+import { Button } from '../../components/buttons'
+import { CenteredCard } from '../../components/common/CenteredCard'
+import { SelectCondition } from '../../components/form/SelectCondition'
+import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
+import { Error, ErrorContainer } from '../../components/pureStyledComponents/Error'
+import { Row } from '../../components/pureStyledComponents/Row'
+import { SelectPosition } from '../../components/redeemPosition//SelectPosition'
+import { PositionPreview } from '../../components/redeemPosition/PositionPreview'
+import { useConditionContext } from '../../contexts/ConditionContext'
 import { usePositionContext } from '../../contexts/PositionContext'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 import { useIsPositionRelatedToCondition } from '../../hooks/useIsPositionRelatedToCondition'
+import { ConditionalTokensService } from '../../services/conditionalTokens'
 import { getLogger } from '../../util/logger'
 import { Status } from '../../util/types'
 
@@ -85,6 +86,8 @@ export const Contents = () => {
     !condition ||
     !isRelated
 
+  const nonRelatedPositionAndCondition = !isRelated && position && condition
+
   return (
     <CenteredCard>
       <Row cols="1fr" marginBottomXL>
@@ -93,10 +96,14 @@ export const Contents = () => {
       <Row cols="1fr">
         <SelectCondition />
       </Row>
-      {!isRelated && position && condition && <span>Position is not related to the condition</span>}
       <Row cols="1fr">
         <PositionPreview condition={condition} networkConfig={networkConfig} position={position} />
       </Row>
+      {nonRelatedPositionAndCondition && (
+        <ErrorContainer>
+          <Error>Position is not related to the condition.</Error>
+        </ErrorContainer>
+      )}
       <ButtonContainer>
         <Button disabled={disabled} onClick={onRedeem}>
           Redeem
