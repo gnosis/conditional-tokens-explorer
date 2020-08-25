@@ -34,7 +34,9 @@ const connectedStatus = {
 const renderWithConnectedProvider = (component: ReactElement) => (
   <Web3Context.Provider value={{ status: connectedStatus, connect, disconnect }}>
     <ThemeProvider theme={theme}>
-      <MockedProvider>{component}</MockedProvider>
+      <MockedProvider>
+        <div id={'root'}>{component}</div>
+      </MockedProvider>
     </ThemeProvider>
   </Web3Context.Provider>
 )

@@ -1,3 +1,4 @@
+import { ConditionProvider } from 'contexts/ConditionContext'
 import { BigNumber } from 'ethers/utils'
 import { useAllowance } from 'hooks/useAllowance'
 import React from 'react'
@@ -60,15 +61,14 @@ export const SplitPosition = () => {
   )
 
   return (
-    <>
+    <ConditionProvider>
       <PageTitle>Split Position</PageTitle>
-
       <Form
         allowanceMethods={allowanceMethods}
         onCollateralChange={setCollateralToken}
         splitPosition={splitPosition}
         tokens={tokens}
       />
-    </>
+    </ConditionProvider>
   )
 }

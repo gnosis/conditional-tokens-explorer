@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { ERC20Service } from 'services/erc20'
 import styled from 'styled-components'
-import { GetPosition_position } from 'types/generatedGQL'
+import { GetCondition_condition, GetPosition_position } from 'types/generatedGQL'
 
 import { Button } from '../../components/buttons/Button'
 import { CenteredCard } from '../../components/common/CenteredCard'
@@ -85,6 +85,10 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
   const [collateralToken, setCollateralToken] = useState(tokens[0])
   const [position, setPosition] = useState<Maybe<GetPosition_position>>(null)
   const { amount, collateral, positionId, splitFrom } = getValues() as SplitPositionFormMethods
+
+  const handleConditionChange = useCallback((condition: Maybe<GetCondition_condition>) => {
+    setOutcomeSlot(condition ? condition.outcomeSlotCount : 0)
+  }, [])
 
   watch('collateral')
   watch('splitFrom')
@@ -170,64 +174,66 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
   ]
 
   return (
-    <CenteredCard>
-      <Row cols="1fr">
-        <InputCondition formMethods={formMethods} onOutcomeSlotChange={(n) => setOutcomeSlot(n)} />
-      </Row>
-      <Row cols="1fr" marginBottomXL>
-        <TitleValue
-          title="Split From"
-          value={
-            <SplitFrom
-              formMethods={formMethods}
-              onCollateralChange={onCollateralChange}
-              onPositionChange={(p) => setPosition(p)}
-              splitFromCollateral={splitFromCollateral}
-              splitFromPosition={splitFromPosition}
-              tokens={tokens}
-            />
-          }
-        />
-      </Row>
-      {showAskAllowance && (
-        <SetAllowance
-          collateral={collateralToken}
-          fetching={fetching}
-          finished={allowanceFinished}
-          onUnlock={unlockCollateral}
-        />
-      )}
-      <Row cols="1fr" marginBottomXL>
-        <InputAmount
-          collateral={collateralToken}
-          formMethods={formMethods}
-          positionId={positionId}
-          splitFrom={splitFrom}
-        />
-      </Row>
-      <Row cols="1fr" marginBottomXL>
-        <TitleValue
-          title="Partition"
-          titleControl={<TitleControl>Edit Partition</TitleControl>}
-          value={<PartitionStyled collections={mockedNumberedOutcomes} />}
-        />
-      </Row>
-      <Row cols="1fr" marginBottomXL>
-        <TitleValue
-          title="Split Position Preview"
-          value={
-            <StripedListStyled>
-              <StripedListItem>[DAI C: 0x123 O: 0] x 10</StripedListItem>
-              <StripedListItem>[DAI C: 0x123 O: 1] x 10</StripedListItem>
-            </StripedListStyled>
-          }
-        />
-      </Row>
-      <ButtonContainer>
-        <Button disabled={!canSubmit} onClick={handleSubmit(onSubmit)}>
-          Split
-        </Button>
-      </ButtonContainer>
-    </CenteredCard>
+    <>
+      <CenteredCard>
+        <Row cols="1fr">
+          <InputCondition formMethods={formMethods} onConditionChange={handleConditionChange} />
+        </Row>
+        <Row cols="1fr" marginBottomXL>
+          <TitleValue
+            title="Split From"
+            value={
+              <SplitFrom
+                formMethods={formMethods}
+                onCollateralChange={onCollateralChange}
+                onPositionChange={(p) => setPosition(p)}
+                splitFromCollateral={splitFromCollateral}
+                splitFromPosition={splitFromPosition}
+                tokens={tokens}
+              />
+            }
+          />
+        </Row>
+        {showAskAllowance && (
+          <SetAllowance
+            collateral={collateralToken}
+            fetching={fetching}
+            finished={allowanceFinished}
+            onUnlock={unlockCollateral}
+          />
+        )}
+        <Row cols="1fr" marginBottomXL>
+          <InputAmount
+            collateral={collateralToken}
+            formMethods={formMethods}
+            positionId={positionId}
+            splitFrom={splitFrom}
+          />
+        </Row>
+        <Row cols="1fr" marginBottomXL>
+          <TitleValue
+            title="Partition"
+            titleControl={<TitleControl>Edit Partition</TitleControl>}
+            value={<PartitionStyled collections={mockedNumberedOutcomes} />}
+          />
+        </Row>
+        <Row cols="1fr" marginBottomXL>
+          <TitleValue
+            title="Split Position Preview"
+            value={
+              <StripedListStyled>
+                <StripedListItem>[DAI C: 0x123 O: 0] x 10</StripedListItem>
+                <StripedListItem>[DAI C: 0x123 O: 1] x 10</StripedListItem>
+              </StripedListStyled>
+            }
+          />
+        </Row>
+        <ButtonContainer>
+          <Button disabled={!canSubmit} onClick={handleSubmit(onSubmit)}>
+            Split
+          </Button>
+        </ButtonContainer>
+      </CenteredCard>
+    </>
   )
 }
