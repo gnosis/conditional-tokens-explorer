@@ -1,6 +1,7 @@
 import { NetworkIds, Oracle, Token } from '../util/types'
 
 import {
+  CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_GANACHE,
   CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_MAINNET,
   CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_RINKEBY,
   EARLIEST_GANACHE_BLOCK_TO_CHECK,
@@ -12,6 +13,7 @@ import {
   GRAPH_WS_GANACHE,
   GRAPH_WS_MAINNET,
   GRAPH_WS_RINKEBY,
+  REALITIO_CONTRACT_ADDRESS_FOR_GANACHE,
   REALITIO_CONTRACT_ADDRESS_FOR_MAINNET,
   REALITIO_CONTRACT_ADDRESS_FOR_RINKEBY,
 } from './constants'
@@ -157,8 +159,8 @@ const networks: { [K in NetworkIds]: Network } = {
   [NetworkIds.GANACHE]: {
     earliestBlockToCheck: EARLIEST_GANACHE_BLOCK_TO_CHECK,
     contracts: {
-      conditionalTokensAddress: '0xA57B8a5584442B467b4689F1144D269d096A3daF',
-      realitioAddress: '0xcfeb869f69431e42cdb54a4f4f105c19c080a601',
+      conditionalTokensAddress: CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_GANACHE,
+      realitioAddress: REALITIO_CONTRACT_ADDRESS_FOR_GANACHE,
     },
     tokens: [
       {

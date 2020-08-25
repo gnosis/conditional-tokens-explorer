@@ -42,7 +42,7 @@ StripedListItem.defaultProps = {
   justifyContent: 'space-between',
 }
 
-export const StripedListEmpty = styled.p`
+export const StripedListEmpty = styled.div`
   align-items: center;
   color: ${(props) => props.theme.colors.textColor};
   display: flex;
