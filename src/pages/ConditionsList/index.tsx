@@ -120,16 +120,14 @@ export const ConditionsList: React.FC = () => {
       <PageTitle>Conditions</PageTitle>
       {loading && <InlineLoading />}
       {error && <InfoCard message={error.message} title="Error" />}
-      {
-        <input
-          onChange={(e) => setConditionIdToSearch(e.currentTarget.value)}
-          placeholder="Search by condition id..."
-          type="text"
-          value={conditionIdToSearch}
-        />
-      }
       {data && !loading && (
-        <div style={{ height: '100%' }}>
+        <>
+          <input
+            onChange={(e) => setConditionIdToSearch(e.currentTarget.value)}
+            placeholder="Search by condition id..."
+            type="text"
+            value={conditionIdToSearch}
+          />
           <DataTable
             className="outerTableWrapper"
             columns={columns}
@@ -141,7 +139,7 @@ export const ConditionsList: React.FC = () => {
             pagination={true}
             responsive
           />
-        </div>
+        </>
       )}
     </>
   )

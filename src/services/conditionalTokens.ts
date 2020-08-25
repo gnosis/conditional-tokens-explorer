@@ -68,7 +68,7 @@ export class ConditionalTokensService {
     ])
   }
 
-  static getConbinedCollectionId(collections: Array<{ conditionId: string; indexSet: BigNumber }>) {
+  static getCombinedCollectionId(collections: Array<{ conditionId: string; indexSet: BigNumber }>) {
     return CTHelpers.combineCollectionIds(
       collections.map(({ conditionId, indexSet }) =>
         CTHelpers.getCollectionId(conditionId, indexSet)

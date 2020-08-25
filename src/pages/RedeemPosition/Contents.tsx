@@ -40,7 +40,7 @@ export const Contents = () => {
           new Array<{ conditionId: string; indexSet: BigNumber }>()
         )
         const parentCollectionId = newCollectionsSet.length
-          ? ConditionalTokensService.getConbinedCollectionId(newCollectionsSet)
+          ? ConditionalTokensService.getCombinedCollectionId(newCollectionsSet)
           : ethers.constants.HashZero
 
         // This UI only allows to redeem 1 position although it's possible to redeem multiple position when you the user owns different positions with the same set of conditions and several indexSets for the resolved condition.

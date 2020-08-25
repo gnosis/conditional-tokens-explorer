@@ -96,7 +96,7 @@ export const Contents = () => {
           new Array<{ conditionId: string; indexSet: BigNumber }>()
         )
         const parentCollectionId = newCollectionsSet.length
-          ? ConditionalTokensService.getConbinedCollectionId(newCollectionsSet)
+          ? ConditionalTokensService.getCombinedCollectionId(newCollectionsSet)
           : ethers.constants.HashZero
 
         // It shouldn't be able to call onMerge if positions were not mergeables, so no -1 for findIndex.
