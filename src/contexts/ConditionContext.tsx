@@ -1,5 +1,3 @@
-import { clear } from 'console'
-
 import { useQuery } from '@apollo/react-hooks'
 import React from 'react'
 

@@ -39,7 +39,7 @@ const ButtonControl = styled.button`
 
 export const SelectConditionModal: React.FC<ModalProps> = (props) => {
   const { onConfirm, ...restProps } = props
-  const { data, error, loading } = useQuery<Conditions>(ConditionsListQuery)
+  const { data } = useQuery<Conditions>(ConditionsListQuery)
   const [selectedCondition, setSelectedCondition] = useState<Maybe<GetCondition_condition>>(null)
   const { setCondition } = useConditionContext()
 
