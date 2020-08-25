@@ -1,3 +1,4 @@
+import { SelectPositionModal } from 'components/modals/SelectPositionsModal'
 import React from 'react'
 
 import { useMultiPositionsContext } from '../../../contexts/MultiPositionsContext'
@@ -17,6 +18,7 @@ import { TitleValue } from '../../text/TitleValue'
 
 export const SelectPosition = () => {
   const { networkConfig } = useWeb3ConnectedOrInfura()
+  const [isModalOpen, setIsModalOpen] = React.useState(false)
   const {
     addPositionId,
     balances,
@@ -36,6 +38,9 @@ export const SelectPosition = () => {
     }
   }
 
+  const closeModal = React.useCallback(() => setIsModalOpen(false), [])
+  const openModal = React.useCallback(() => setIsModalOpen(true), [])
+
   React.useEffect(() => {
     if (!loading && positions.length && balances.length && positionIds.length > 0) {
       setPositionsToDisplay(
@@ -53,37 +58,44 @@ export const SelectPosition = () => {
   }, [balances, networkConfig, positions, loading, positionIds])
 
   return (
-    <TitleValue
-      title="Positions"
-      titleControl={<TitleControl onClick={selectPosition}>Select Positions</TitleControl>}
-      value={
-        <>
-          <StripedList maxHeight="150px">
-            {positionsToDisplay.length ? (
-              positionsToDisplay.map((position: string, index: number) => (
-                <StripedListItem key={index}>
-                  <span>{position}</span>
-                  <ButtonControl
-                    buttonType={ButtonControlType.delete}
-                    onClick={() => removePositionId(positions[index].id)}
-                  />
-                </StripedListItem>
-              ))
-            ) : (
-              <StripedListEmpty>
-                {loading && errors.length === 0 ? <InlineLoading /> : 'No positions.'}
-              </StripedListEmpty>
+    <>
+      <TitleValue
+        title="Positions"
+        titleControl={<TitleControl onClick={openModal}>Select Positions</TitleControl>}
+        value={
+          <>
+            <StripedList maxHeight="150px">
+              {positionsToDisplay.length ? (
+                positionsToDisplay.map((position: string, index: number) => (
+                  <StripedListItem key={index}>
+                    <span>{position}</span>
+                    <ButtonControl
+                      buttonType={ButtonControlType.delete}
+                      onClick={() => removePositionId(positions[index].id)}
+                    />
+                  </StripedListItem>
+                ))
+              ) : (
+                <StripedListEmpty>
+                  {loading && errors.length === 0 ? <InlineLoading /> : 'No positions.'}
+                </StripedListEmpty>
+              )}
+            </StripedList>
+            {errors && (
+              <ErrorContainer>
+                {errors.map((error: Errors, index: number) => (
+                  <Error key={index}>{error}</Error>
+                ))}
+              </ErrorContainer>
             )}
-          </StripedList>
-          {errors && (
-            <ErrorContainer>
-              {errors.map((error: Errors, index: number) => (
-                <Error key={index}>{error}</Error>
-              ))}
-            </ErrorContainer>
-          )}
-        </>
-      }
-    />
+          </>
+        }
+      />
+      <SelectPositionModal
+        isOpen={isModalOpen}
+        onConfirm={closeModal}
+        onRequestClose={closeModal}
+      />
+    </>
   )
 }
