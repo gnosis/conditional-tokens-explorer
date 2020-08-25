@@ -100,8 +100,8 @@ export const PositionsList = () => {
 
   const filterItems = [
     { content: 'All Collaterals' },
-    ...networkConfig.getTokens().map((item, index) => {
-      return { content: <TokenIcon key={index} symbol={item.symbol} /> }
+    ...networkConfig.getTokens().map((item) => {
+      return { content: <TokenIcon symbol={item.symbol} /> }
     }),
   ]
 
