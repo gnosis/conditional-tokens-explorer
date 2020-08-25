@@ -78,7 +78,7 @@ export const InputAmount = ({
         balance && (
           <TitleControlButton
             disabled={balance.isZero()}
-            onClick={() => setValue('amount', balance)}
+            onClick={() => setValue('amount', balance, true)}
           >
             Use Wallet Balance (${formatBigNumber(balance, collateral.decimals)})
           </TitleControlButton>

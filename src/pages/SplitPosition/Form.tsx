@@ -27,6 +27,7 @@ import { trivialPartition } from '../../util/tools'
 import { Token } from '../../util/types'
 
 import { SplitFrom } from './SplitFrom'
+import { useConditionContext } from '../../contexts/ConditionContext'
 
 const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
@@ -63,6 +64,7 @@ const logger = getLogger('Form')
 
 export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, tokens }: Props) => {
   const { _type: status, provider, signer } = useWeb3ConnectedOrInfura()
+  const { clearCondition } = useConditionContext()
 
   const DEFAULT_VALUES = useMemo(() => {
     return {
@@ -127,8 +129,10 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
         setError(err)
       } finally {
         setIsTransactionExecuting(false)
+        reset(DEFAULT_VALUES)
+        // Clear condition manually, the reset doesn't work, the use of the conditionContext and react hook form is not so good
+        clearCondition()
       }
-      reset(DEFAULT_VALUES)
     },
     [
       position,
@@ -137,7 +141,6 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
       splitFromCollateral,
       splitFromPosition,
       splitPosition,
-      DEFAULT_VALUES,
     ]
   )
 
