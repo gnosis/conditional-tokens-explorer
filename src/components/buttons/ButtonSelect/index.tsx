@@ -18,6 +18,7 @@ const Wrapper = styled.div`
   justify-content: space-between;
   outline: none;
   padding: 0 ${(props) => props.theme.textField.paddingHorizontal};
+  transition: border-color 0.15s linear;
   width: 100%;
 
   .isOpen & {

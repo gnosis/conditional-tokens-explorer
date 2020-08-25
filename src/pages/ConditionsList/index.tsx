@@ -6,9 +6,10 @@ import { useHistory } from 'react-router-dom'
 import { Conditions, Conditions_conditions } from 'types/generatedGQL'
 
 import { ButtonDots } from '../../components/buttons/ButtonDots'
-import { ButtonSelect } from '../../components/buttons/ButtonSelect'
+import { ButtonSelectLight } from '../../components/buttons/ButtonSelectLight'
 import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
 import { SearchField } from '../../components/form/SearchField'
+import { EmptyContentText } from '../../components/pureStyledComponents/EmptyContentText'
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
 import { Pill, PillTypes } from '../../components/pureStyledComponents/Pill'
 import { InfoCard } from '../../components/statusInfo/InfoCard'
@@ -18,15 +19,16 @@ import { TableControls } from '../../components/table/TableControls'
 import { tableStyles } from '../../theme/tableStyles'
 
 export const ConditionsList: React.FC = () => {
-  const [conditionIdToSearch, setConditionIdToSearch] = React.useState('')
+  const [conditionIdToSearch, setConditionIdToSearch] = useState('')
   const { data, error, loading } = useQuery<Conditions>(
     conditionIdToSearch ? ConditionsSearchQuery : ConditionsListQuery,
     {
       variables: { conditionId: conditionIdToSearch },
     }
   )
+  const isLoading = !conditionIdToSearch && loading
+  const isSearching = conditionIdToSearch && loading
   const history = useHistory()
-
   const dropdownItems = [
     { text: 'Details' },
     { text: 'Split Position' },
@@ -129,7 +131,7 @@ export const ConditionsList: React.FC = () => {
 
   const filterDropdown = (
     <Dropdown
-      dropdownButtonContent={<ButtonSelect content={filterItems[selectedFilter].text} />}
+      dropdownButtonContent={<ButtonSelectLight content={filterItems[selectedFilter].text} />}
       dropdownPosition={DropdownPosition.right}
       items={filterItems.map((item, index) => (
         <DropdownItem key={index} onClick={() => setselectedFilter(index)}>
@@ -142,9 +144,9 @@ export const ConditionsList: React.FC = () => {
   return (
     <>
       <PageTitle>Conditions</PageTitle>
-      {loading && <InlineLoading />}
+      {isLoading && <InlineLoading />}
       {error && <InfoCard message={error.message} title="Error" />}
-      {data && !loading && (
+      {data && !isLoading && (
         <>
           <TableControls
             end={filterDropdown}
@@ -156,17 +158,21 @@ export const ConditionsList: React.FC = () => {
               />
             }
           />
-          <DataTable
-            className="outerTableWrapper"
-            columns={columns}
-            customStyles={tableStyles}
-            data={data?.conditions || []}
-            highlightOnHover
-            noHeader
-            onRowClicked={handleRowClick}
-            pagination={true}
-            responsive
-          />
+          {isSearching && <InlineLoading />}
+          {!isSearching && (
+            <DataTable
+              className="outerTableWrapper"
+              columns={columns}
+              customStyles={tableStyles}
+              data={data?.conditions || []}
+              highlightOnHover
+              noDataComponent={<EmptyContentText>No conditions found.</EmptyContentText>}
+              noHeader
+              onRowClicked={handleRowClick}
+              pagination={true}
+              responsive
+            />
+          )}
         </>
       )}
     </>

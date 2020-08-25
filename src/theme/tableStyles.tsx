@@ -5,6 +5,11 @@ import theme from './index'
 const horizontalPadding = '15px'
 
 export const tableStyles: IDataTableStyles = {
+  tableWrapper: {
+    style: {
+      height: '100%',
+    },
+  },
   headRow: {
     style: {
       backgroundColor: theme.colors.whitesmoke3,
