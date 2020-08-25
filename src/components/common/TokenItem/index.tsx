@@ -29,11 +29,11 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const TokenItem: React.FC<Props> = (props) => {
-  const { image, text } = props
+  const { image, text, ...restProps } = props
   const [showImage, setShowImage] = useState(true)
 
   return (
-    <Wrapper>
+    <Wrapper {...restProps}>
       {showImage && <Image onError={() => setShowImage(false)} src={image} />}
       <Text>{text}</Text>
     </Wrapper>
