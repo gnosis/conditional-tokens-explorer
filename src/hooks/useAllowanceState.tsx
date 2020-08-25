@@ -19,7 +19,7 @@ export const useAllowanceState = (allowanceMethods: AllowanceMethods, amount: Bi
   const [allowance, setAllowance] = useState<Remote<BigNumber>>(Remote.notAsked<BigNumber>())
   const [hasUnlockedCollateral, setHasUnlockedCollateral] = useState(false)
   const [allowanceFinished, setAllowanceFinished] = useState(false)
-  const [showAskAllowance, setShowAskAllowance] = useState(true)
+  const [shouldDisplayAllowance, setShouldDisplayAllowance] = useState(true)
 
   const unlockCollateral = useCallback(async () => {
     setAllowance(Remote.loading())
@@ -54,20 +54,21 @@ export const useAllowanceState = (allowanceMethods: AllowanceMethods, amount: Bi
     const hasEnoughAllowance = allowance.map(
       (allowance) => allowance.gte(amount) && !allowance.isZero()
     )
+
     const notEnoughAllowance = hasEnoughAllowance.hasData() && !hasEnoughAllowance.get()
-    setAllowanceFinished(hasEnoughAllowance.getOr(false) && hasUnlockedCollateral)
+    setAllowanceFinished(hasEnoughAllowance.getOr(false))
 
     // We show the allowance component if
     // - *We know* that the user doesn't have enough allowance
     // - The user just unlocked his collateral
     // - allowance is loading
-    setShowAskAllowance(notEnoughAllowance || hasUnlockedCollateral || allowance.isLoading())
+    setShouldDisplayAllowance(notEnoughAllowance || hasUnlockedCollateral || allowance.isLoading())
   }, [allowance, amount, hasUnlockedCollateral])
 
   return {
-    fetching: allowance.isLoading(),
-    unlockCollateral: unlockCollateral,
-    showAskAllowance: showAskAllowance,
-    allowanceFinished: allowanceFinished,
+    fetchingAllowance: allowance.isLoading(),
+    unlockCollateral,
+    shouldDisplayAllowance,
+    allowanceFinished,
   }
 }
