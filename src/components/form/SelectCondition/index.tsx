@@ -6,7 +6,7 @@ import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { TitleControl } from 'components/pureStyledComponents/TitleControl'
 import { TitleValue } from 'components/text/TitleValue'
 import { useConditionContext } from 'contexts/ConditionContext'
-import React, { useCallback } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 
 const InfoMessage = styled.p`
@@ -23,7 +23,7 @@ const InfoMessage = styled.p`
   }
 `
 
-export const SelectCondition = ({ onChange }: { onChange?: (id: string) => void }) => {
+export const SelectCondition = () => {
   const { condition, errors, loading, setConditionId } = useConditionContext()
   const [conditionId, setManualConditionId] = React.useState<string>('')
   const [isModalOpen, setIsModalOpen] = React.useState(false)
@@ -31,7 +31,7 @@ export const SelectCondition = ({ onChange }: { onChange?: (id: string) => void 
   const debouncedHandler = useDebounceCallback((id) => {
     setConditionId(id)
   }, 500)
-  const imputHandler = useCallback(
+  const imputHandler = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.currentTarget
       setManualConditionId(value)
@@ -40,8 +40,8 @@ export const SelectCondition = ({ onChange }: { onChange?: (id: string) => void 
     [debouncedHandler]
   )
 
-  const closeModal = useCallback(() => setIsModalOpen(false), [])
-  const openModal = useCallback(() => setIsModalOpen(true), [])
+  const closeModal = React.useCallback(() => setIsModalOpen(false), [])
+  const openModal = React.useCallback(() => setIsModalOpen(true), [])
 
   React.useEffect(() => {
     if (condition) {
@@ -61,7 +61,6 @@ export const SelectCondition = ({ onChange }: { onChange?: (id: string) => void 
             <>
               <Textfield
                 error={!!errors.length}
-                // name="conditionId"
                 onChange={imputHandler}
                 placeholder="Please select a condition..."
                 type="text"
