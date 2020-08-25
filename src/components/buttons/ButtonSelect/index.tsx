@@ -26,8 +26,12 @@ const Wrapper = styled.div`
   }
 `
 
+const Chevron = styled(ChevronDown)`
+  margin-left: 10px;
+`
+
 interface Props {
-  content: React.ReactNode
+  content: React.ReactNode | string
 }
 
 export const ButtonSelect: React.FC<Props> = (props) => {
@@ -36,7 +40,7 @@ export const ButtonSelect: React.FC<Props> = (props) => {
   return (
     <Wrapper {...restProps}>
       {content}
-      <ChevronDown />
+      <Chevron />
     </Wrapper>
   )
 }
