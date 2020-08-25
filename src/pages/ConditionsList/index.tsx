@@ -1,17 +1,20 @@
 import { useQuery } from '@apollo/react-hooks'
 import { ConditionsListQuery, ConditionsSearchQuery } from 'queries/conditions'
-import React from 'react'
+import React, { useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useHistory } from 'react-router-dom'
 import { Conditions, Conditions_conditions } from 'types/generatedGQL'
 
 import { ButtonDots } from '../../components/buttons/ButtonDots'
+import { ButtonSelect } from '../../components/buttons/ButtonSelect'
 import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
+import { SearchField } from '../../components/form/SearchField'
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
 import { Pill, PillTypes } from '../../components/pureStyledComponents/Pill'
 import { InfoCard } from '../../components/statusInfo/InfoCard'
 import { InlineLoading } from '../../components/statusInfo/InlineLoading'
 import { CellHash } from '../../components/table/CellHash'
+import { TableControls } from '../../components/table/TableControls'
 import { tableStyles } from '../../theme/tableStyles'
 
 export const ConditionsList: React.FC = () => {
@@ -115,6 +118,27 @@ export const ConditionsList: React.FC = () => {
     },
   ]
 
+  const filterItems = [
+    { text: 'All Reporters / Oracles' },
+    { text: 'Custom Reporters' },
+    { text: 'Realit.io' },
+    { text: 'Kleros' },
+  ]
+
+  const [selectedFilter, setselectedFilter] = useState(0)
+
+  const filterDropdown = (
+    <Dropdown
+      dropdownButtonContent={<ButtonSelect content={filterItems[selectedFilter].text} />}
+      dropdownPosition={DropdownPosition.right}
+      items={filterItems.map((item, index) => (
+        <DropdownItem key={index} onClick={() => setselectedFilter(index)}>
+          {item.text}
+        </DropdownItem>
+      ))}
+    />
+  )
+
   return (
     <>
       <PageTitle>Conditions</PageTitle>
@@ -122,11 +146,15 @@ export const ConditionsList: React.FC = () => {
       {error && <InfoCard message={error.message} title="Error" />}
       {data && !loading && (
         <>
-          <input
-            onChange={(e) => setConditionIdToSearch(e.currentTarget.value)}
-            placeholder="Search by condition id..."
-            type="text"
-            value={conditionIdToSearch}
+          <TableControls
+            end={filterDropdown}
+            start={
+              <SearchField
+                onChange={(e) => setConditionIdToSearch(e.currentTarget.value)}
+                placeholder="Search by condition id..."
+                value={conditionIdToSearch}
+              />
+            }
           />
           <DataTable
             className="outerTableWrapper"
