@@ -90,11 +90,11 @@ export const Contents = () => {
 
   return (
     <CenteredCard>
-      <Row cols="1fr" marginBottomXL>
+      <Row cols="1fr">
         <SelectPosition />
       </Row>
       <Row cols="1fr">
-        <SelectCondition />
+        <SelectCondition title="Resolved Condition Id" />
       </Row>
       <Row cols="1fr">
         <PositionPreview condition={condition} networkConfig={networkConfig} position={position} />
