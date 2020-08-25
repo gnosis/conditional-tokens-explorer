@@ -1,29 +1,26 @@
+import { getLogger } from 'util/logger'
+import { arePositionMergeables, arePositionMergeablesByCondition, minBigNumber } from 'util/tools'
+import { Status } from 'util/types'
+
+import { Button } from 'components/buttons/Button'
+import { CenteredCard } from 'components/common/CenteredCard'
+import { SelectCondition } from 'components/form/SelectCondition'
+import { Amount } from 'components/mergePositions/Amount'
+import { MergePreview } from 'components/mergePositions/MergePreview'
+import { SelectPosition } from 'components/mergePositions/SelectPosition'
+import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
+import { Row } from 'components/pureStyledComponents/Row'
+import { FullLoading } from 'components/statusInfo/FullLoading'
+import { IconTypes } from 'components/statusInfo/common'
+import { ZERO_BN } from 'config/constants'
+import { useConditionContext } from 'contexts/ConditionContext'
+import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useMemo, useState } from 'react'
+import { ConditionalTokensService } from 'services/conditionalTokens'
 
-import { Button } from '../../components/buttons/Button'
-import { CenteredCard } from '../../components/common/CenteredCard'
-import { Amount } from '../../components/mergePositions/Amount'
-import { MergePreview } from '../../components/mergePositions/MergePreview'
-import { SelectCondition } from '../../components/mergePositions/SelectCondition'
-import { SelectPosition } from '../../components/mergePositions/SelectPosition'
-import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
-import { Row } from '../../components/pureStyledComponents/Row'
-import { FullLoading } from '../../components/statusInfo/FullLoading'
-import { IconTypes } from '../../components/statusInfo/common'
-import { ZERO_BN } from '../../config/constants'
-import { useConditionContext } from '../../contexts/ConditionContext'
-import { useMultiPositionsContext } from '../../contexts/MultiPositionsContext'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
-import { ConditionalTokensService } from '../../services/conditionalTokens'
-import { getLogger } from '../../util/logger'
-import {
-  arePositionMergeables,
-  arePositionMergeablesByCondition,
-  minBigNumber,
-} from '../../util/tools'
-import { Status } from '../../util/types'
 
 const logger = getLogger('MergePosition')
 
@@ -99,7 +96,7 @@ export const Contents = () => {
           new Array<{ conditionId: string; indexSet: BigNumber }>()
         )
         const parentCollectionId = newCollectionsSet.length
-          ? ConditionalTokensService.getConbinedCollectionId(newCollectionsSet)
+          ? ConditionalTokensService.getCombinedCollectionId(newCollectionsSet)
           : ethers.constants.HashZero
 
         // It shouldn't be able to call onMerge if positions were not mergeables, so no -1 for findIndex.
