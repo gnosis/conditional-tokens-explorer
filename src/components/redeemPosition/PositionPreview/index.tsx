@@ -1,10 +1,16 @@
+import { getRedeemedBalance, getRedeemedPreview } from 'util/tools'
+
+import {
+  StripedList,
+  StripedListEmpty,
+  StripedListItem,
+} from 'components/pureStyledComponents/StripedList'
+import { TitleValue } from 'components/text/TitleValue'
+import { NetworkConfig } from 'config/networkConfig'
 import { BigNumber } from 'ethers/utils'
+import { useBalanceForPosition } from 'hooks/useBalanceForPosition'
 import React, { useMemo } from 'react'
 import { GetCondition_condition, GetPosition_position } from 'types/generatedGQL'
-
-import { NetworkConfig } from '../../config/networkConfig'
-import { useBalanceForPosition } from '../../hooks/useBalanceForPosition'
-import { getRedeemedBalance, getRedeemedPreview } from '../../util/tools'
 
 interface Props {
   position: Maybe<GetPosition_position>
@@ -30,9 +36,19 @@ export const PositionPreview = ({ condition, networkConfig, position }: Props) =
   }, [position, condition, redeemedBalance, networkConfig])
 
   return (
-    <>
-      <label>Redeemed position preview </label>
-      <span>{redeemedPreview}</span>
-    </>
+    <TitleValue
+      title="Redeemed Position Preview"
+      value={
+        <StripedList maxHeight="41px">
+          {redeemedPreview ? (
+            <StripedListItem>
+              <strong>{redeemedPreview}</strong>
+            </StripedListItem>
+          ) : (
+            <StripedListEmpty>No redeemed preview yet.</StripedListEmpty>
+          )}
+        </StripedList>
+      }
+    />
   )
 }
