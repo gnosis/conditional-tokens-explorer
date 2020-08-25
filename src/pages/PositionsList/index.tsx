@@ -98,7 +98,12 @@ export const PositionsList = () => {
     return [...defaultColumns, ...connectedItems]
   }, [connectedItems, defaultColumns])
 
-  const filterItems = [{ content: 'All Collaterals' }, { content: <div>DAI</div> }]
+  const filterItems = [
+    { content: 'All Collaterals' },
+    ...networkConfig.getTokens().map((item, index) => {
+      return { content: <TokenIcon key={index} symbol={item.symbol} /> }
+    }),
+  ]
 
   const [selectedFilter, setselectedFilter] = useState(0)
 
