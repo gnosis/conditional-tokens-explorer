@@ -25,19 +25,23 @@ export const Wrapper = (props: WrapperProps) => {
     setConditionId(conditionId)
   }, [conditionId, setConditionId])
 
+  const DisplayErrors = (): JSX.Element => {
+    if (!loading && !condition && isConditionErrorNotFound(errors)) {
+      return <InfoCard message="We couldn't find this condition..." title="Not Found" />
+    } else if (!loading && !condition && isConditionErrorInvalid(errors)) {
+      return <InfoCard message="Condition not valid..." title="Error" />
+    } else if (!loading && !condition && isConditionErrorFetching(errors)) {
+      return <InfoCard message="We couldn't fetch the data for this condition..." title="Error" />
+    } else {
+      return <></>
+    }
+  }
+
   return (
     <>
       <PageTitle>Condition Details</PageTitle>
       {loading && <InlineLoading />}
-      {!loading && !condition && isConditionErrorNotFound(errors) && (
-        <InfoCard message="We couldn't find this condition..." title="Not Found" />
-      )}
-      {!loading && !condition && isConditionErrorInvalid(errors) && (
-        <InfoCard message="Condition not valid..." title="Error" />
-      )}
-      {!loading && !condition && isConditionErrorFetching(errors) && (
-        <InfoCard message="We couldn't fetch the data for this condition..." title="Error" />
-      )}
+      {<DisplayErrors />}
       {condition && <Contents condition={condition} />}
     </>
   )

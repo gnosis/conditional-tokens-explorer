@@ -18,6 +18,7 @@ const Wrapper = styled.div`
   justify-content: space-between;
   outline: none;
   padding: 0 ${(props) => props.theme.textField.paddingHorizontal};
+  transition: border-color 0.15s linear;
   width: 100%;
 
   .isOpen & {
@@ -26,8 +27,12 @@ const Wrapper = styled.div`
   }
 `
 
+const Chevron = styled(ChevronDown)`
+  margin-left: 10px;
+`
+
 interface Props {
-  content: React.ReactNode
+  content: React.ReactNode | string
 }
 
 export const ButtonSelect: React.FC<Props> = (props) => {
@@ -36,7 +41,7 @@ export const ButtonSelect: React.FC<Props> = (props) => {
   return (
     <Wrapper {...restProps}>
       {content}
-      <ChevronDown />
+      <Chevron />
     </Wrapper>
   )
 }

@@ -21,8 +21,8 @@ const connectedStatus = {
   address: '0x123',
 } as Connected
 
-const notAskedStatus = {
-  _type: Web3ContextStatus.NotAsked,
+const infuraStatus = {
+  _type: Web3ContextStatus.Infura,
 } as NotAsked
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -39,7 +39,7 @@ const renderWithConnectedProvider = (component: any, query: any) => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const renderWithDisconnectedProvider = (component: any, query: any) => {
   return render(
-    <Web3Context.Provider value={{ status: notAskedStatus, connect, disconnect }}>
+    <Web3Context.Provider value={{ status: infuraStatus, connect, disconnect }}>
       <ThemeProvider theme={theme}>
         <MockedProvider mocks={query}>{component}</MockedProvider>
       </ThemeProvider>
@@ -47,7 +47,7 @@ const renderWithDisconnectedProvider = (component: any, query: any) => {
   )
 }
 
-test('position list shold show right columns when the user is connected', async () => {
+test('position list should show right columns when the user is connected', async () => {
   const mockQueryResult = [
     {
       request: {
@@ -116,8 +116,8 @@ test('position list shold show right columns when the user is connected', async 
     const positinIdColumn = await findByText(/Position Id/i)
     expect(positinIdColumn).toBeInTheDocument()
 
-    const collateralColumn = await findByText(/Collateral/i)
-    expect(collateralColumn).toBeInTheDocument()
+    // const collateralColumn = await findByText(/Collateral/i)
+    // expect(collateralColumn).toBeInTheDocument()
 
     const erc1155Column = await findByText(/ERC1155 Amount/i)
     expect(erc1155Column).toBeInTheDocument()
@@ -166,9 +166,9 @@ test('position list shold show right columns when the user is not connected', as
 
     const positinIdColumn = await findByText(/Position Id/i)
     expect(positinIdColumn).toBeInTheDocument()
-
-    const collateralColumn = await findByText(/Collateral/i)
-    expect(collateralColumn).toBeInTheDocument()
+    //
+    // const collateralColumn = await findByText(/Collateral/i)
+    // expect(collateralColumn).toBeInTheDocument()
 
     expect(queryByText(/ERC1155 Amount/i)).toBeNull()
   })

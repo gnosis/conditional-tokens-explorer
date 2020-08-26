@@ -1,4 +1,4 @@
-import { getMergePreview, isConditionFullIndexSet } from 'util/tools'
+import { arePositionMergeablesByCondition, getMergePreview } from 'util/tools'
 
 import {
   StripedList,
@@ -8,9 +8,8 @@ import {
 import { TitleValue } from 'components/text/TitleValue'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
-import { useWeb3Connected } from 'contexts/Web3Context'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { BigNumber } from 'ethers/utils'
-import { position } from 'polished'
 import React, { useMemo } from 'react'
 
 interface Props {
@@ -18,24 +17,22 @@ interface Props {
 }
 
 export const MergePreview = ({ amount }: Props) => {
-  const {
-    networkConfig: { networkId },
-  } = useWeb3Connected()
+  const { networkConfig } = useWeb3ConnectedOrInfura()
 
   const { positions } = useMultiPositionsContext()
   const { condition } = useConditionContext()
 
-  const isFullIndexSet = useMemo(() => {
-    return condition && isConditionFullIndexSet(positions, condition)
+  const canMergePositions = useMemo(() => {
+    return condition && arePositionMergeablesByCondition(positions, condition)
   }, [positions, condition])
 
-  const mergedPosition = useMemo(
-    () =>
-      isFullIndexSet && condition && position.length
-        ? getMergePreview(positions, condition, amount, networkId)
-        : '',
-    [isFullIndexSet, condition, positions, amount, networkId]
-  )
+  const mergedPosition = useMemo(() => {
+    if (canMergePositions && condition && positions.length > 0) {
+      const token = networkConfig.getTokenFromAddress(positions[0].collateralToken.id)
+      return getMergePreview(positions, condition, amount, token)
+    }
+    return ''
+  }, [canMergePositions, condition, positions, amount, networkConfig])
 
   return (
     <TitleValue

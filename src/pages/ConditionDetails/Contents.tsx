@@ -10,8 +10,7 @@ import { Row } from '../../components/pureStyledComponents/Row'
 import { StripedList, StripedListItem } from '../../components/pureStyledComponents/StripedList'
 import { TitleValue } from '../../components/text/TitleValue'
 import { INFORMATION_NOT_AVAILABLE } from '../../config/constants'
-import { getKnowOracleFromAddress } from '../../config/networkConfig'
-import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
+import { useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 import { useIsConditionFromOmen } from '../../hooks/useIsConditionFromOmen'
 import { useQuestion } from '../../hooks/useQuestion'
 import { GetCondition_condition } from '../../types/generatedGQL'
@@ -30,7 +29,8 @@ interface Props {
 }
 
 export const Contents: React.FC<Props> = ({ condition }) => {
-  const { status } = useWeb3Context()
+  const { networkConfig } = useWeb3ConnectedOrInfura()
+
   const {
     creator,
     id: conditionId,
@@ -40,6 +40,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
     resolveTimestamp,
     resolved,
   } = condition
+
   const dropdownItems = [
     {
       onClick: () => {
@@ -67,24 +68,17 @@ export const Contents: React.FC<Props> = ({ condition }) => {
     },
   ]
 
-  let networkId = null
-  if (status._type === Web3ContextStatus.Connected || status._type === Web3ContextStatus.Infura) {
-    const { networkConfig } = status
-    networkId = networkConfig.networkId
-  }
-
   const { outcomesPrettier, question } = useQuestion(questionId, outcomeSlotCount)
-  const { isConditionFromOmen } = useIsConditionFromOmen(creator, oracle, question)
+  const isConditionFromOmen = useIsConditionFromOmen(creator, oracle, question)
   const {
     templateId = null,
     title = INFORMATION_NOT_AVAILABLE,
     category = INFORMATION_NOT_AVAILABLE,
   } = question ?? {}
 
-  const oracleTitle =
-    isConditionFromOmen && networkId
-      ? getKnowOracleFromAddress(networkId, oracle)
-      : truncateStringInTheMiddle(oracle, 8, 6)
+  const oracleTitle = isConditionFromOmen
+    ? networkConfig.getOracleFromAddress(oracle).description
+    : truncateStringInTheMiddle(oracle, 8, 6)
 
   return (
     <CenteredCard
@@ -103,7 +97,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
       <Row marginBottomXL>
         <TitleValue
           title="Condition Type"
-          value={isConditionFromOmen ? ConditionType.Omen : ConditionType.Custom}
+          value={isConditionFromOmen ? ConditionType.omen : ConditionType.custom}
         />
         <TitleValue
           title="Condition Id"
@@ -155,10 +149,12 @@ export const Contents: React.FC<Props> = ({ condition }) => {
         </>
       )}
       <Row>
-        <TitleValue
-          title="Resolution Date"
-          value={formatTS(resolveTimestamp) || INFORMATION_NOT_AVAILABLE}
-        />
+        {isConditionFromOmen && (
+          <TitleValue
+            title="Resolution Date"
+            value={formatTS(resolveTimestamp) || INFORMATION_NOT_AVAILABLE}
+          />
+        )}
         {isConditionFromOmen && <TitleValue title="Category" value={category} />}
         <TitleValue
           title={isConditionFromOmen ? 'Oracle' : 'Reporting Address'}

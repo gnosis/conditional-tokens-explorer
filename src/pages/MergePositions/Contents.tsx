@@ -1,34 +1,31 @@
+import { getLogger } from 'util/logger'
+import { arePositionMergeables, arePositionMergeablesByCondition, minBigNumber } from 'util/tools'
+import { Status } from 'util/types'
+
+import { Button } from 'components/buttons/Button'
+import { CenteredCard } from 'components/common/CenteredCard'
+import { SelectCondition } from 'components/form/SelectCondition'
+import { Amount } from 'components/mergePositions/Amount'
+import { MergePreview } from 'components/mergePositions/MergePreview'
+import { SelectPositions } from 'components/mergePositions/SelectPositions'
+import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
+import { Row } from 'components/pureStyledComponents/Row'
+import { FullLoading } from 'components/statusInfo/FullLoading'
+import { IconTypes } from 'components/statusInfo/common'
+import { ZERO_BN } from 'config/constants'
+import { useConditionContext } from 'contexts/ConditionContext'
+import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useMemo, useState } from 'react'
+import { ConditionalTokensService } from 'services/conditionalTokens'
 
-import { Button } from '../../components/buttons/Button'
-import { CenteredCard } from '../../components/common/CenteredCard'
-import { Amount } from '../../components/mergePositions/Amount'
-import { MergePreview } from '../../components/mergePositions/MergePreview'
-import { SelectCondition } from '../../components/mergePositions/SelectCondition'
-import { SelectPosition } from '../../components/mergePositions/SelectPosition'
-import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
-import { Row } from '../../components/pureStyledComponents/Row'
-import { FullLoading } from '../../components/statusInfo/FullLoading'
-import { IconTypes } from '../../components/statusInfo/common'
-import { ZERO_BN } from '../../config/constants'
-import { getTokenFromAddress } from '../../config/networkConfig'
-import { useConditionContext } from '../../contexts/ConditionContext'
-import { useMultiPositionsContext } from '../../contexts/MultiPositionsContext'
-import { useWeb3Connected } from '../../contexts/Web3Context'
-import { ConditionalTokensService } from '../../services/conditionalTokens'
-import { getLogger } from '../../util/logger'
-import { isConditionFullIndexSet, minBigNumber } from '../../util/tools'
-import { Status } from '../../util/types'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 
 const logger = getLogger('MergePosition')
 
 export const Contents = () => {
-  const {
-    CTService,
-    networkConfig: { networkId },
-  } = useWeb3Connected()
+  const { _type: statusContext, CTService, connect, networkConfig } = useWeb3ConnectedOrInfura()
 
   const {
     balances,
@@ -36,24 +33,29 @@ export const Contents = () => {
     errors: positionsErrors,
     positions,
   } = useMultiPositionsContext()
+
   const { clearCondition, condition, errors: conditionErrors } = useConditionContext()
   const [status, setStatus] = useState<Maybe<Status>>(null)
   const [error, setError] = useState<string | undefined>()
 
-  const isFullIndexSet = useMemo(() => {
-    return condition && isConditionFullIndexSet(positions, condition)
+  const canMergePositions = useMemo(() => {
+    return condition && arePositionMergeablesByCondition(positions, condition)
   }, [positions, condition])
 
+  const mergeablePositions = useMemo(() => {
+    return arePositionMergeables(positions)
+  }, [positions])
+
   const collateralToken = useMemo(() => {
-    if (positions.length && isFullIndexSet) {
-      return getTokenFromAddress(networkId, positions[0].collateralToken.id)
+    if (positions.length && mergeablePositions) {
+      return networkConfig.getTokenFromAddress(positions[0].collateralToken.id)
     }
     return null
-  }, [positions, networkId, isFullIndexSet])
+  }, [positions, networkConfig, mergeablePositions])
 
   const maxBalance = useMemo(
-    () => (isFullIndexSet && balances.length ? minBigNumber(balances) : ZERO_BN),
-    [balances, isFullIndexSet]
+    () => (mergeablePositions && balances.length ? minBigNumber(balances) : ZERO_BN),
+    [balances, mergeablePositions]
   )
 
   const [amount, setAmount] = useState<BigNumber>(ZERO_BN)
@@ -61,10 +63,10 @@ export const Contents = () => {
     setAmount(value)
   }, [])
   const useWalletHandler = useCallback(() => {
-    if (isFullIndexSet && maxBalance.gt(ZERO_BN)) {
+    if (mergeablePositions && maxBalance.gt(ZERO_BN)) {
       setAmount(maxBalance)
     }
-  }, [maxBalance, isFullIndexSet])
+  }, [maxBalance, mergeablePositions])
 
   const decimals = useMemo(() => (collateralToken ? collateralToken.decimals : 0), [
     collateralToken,
@@ -75,14 +77,14 @@ export const Contents = () => {
       status === Status.Loading ||
       positionsErrors.length > 0 ||
       conditionErrors.length > 0 ||
-      !isFullIndexSet ||
+      !canMergePositions ||
       amount.isZero(),
-    [isFullIndexSet, amount, status, positionsErrors, conditionErrors]
+    [canMergePositions, amount, status, positionsErrors, conditionErrors]
   )
 
   const onMerge = useCallback(async () => {
     try {
-      if (positions && condition) {
+      if (positions && condition && statusContext === Web3ContextStatus.Connected) {
         setStatus(Status.Loading)
 
         const { collateralToken, conditionIds, indexSets } = positions[0]
@@ -94,7 +96,7 @@ export const Contents = () => {
           new Array<{ conditionId: string; indexSet: BigNumber }>()
         )
         const parentCollectionId = newCollectionsSet.length
-          ? ConditionalTokensService.getConbinedCollectionId(newCollectionsSet)
+          ? ConditionalTokensService.getCombinedCollectionId(newCollectionsSet)
           : ethers.constants.HashZero
 
         // It shouldn't be able to call onMerge if positions were not mergeables, so no -1 for findIndex.
@@ -116,18 +118,29 @@ export const Contents = () => {
         clearCondition()
 
         setStatus(Status.Ready)
+      } else {
+        connect()
       }
     } catch (err) {
       setStatus(Status.Error)
       setError(err)
       logger.error(err)
     }
-  }, [positions, condition, CTService, amount, clearPositions, clearCondition])
+  }, [
+    positions,
+    condition,
+    statusContext,
+    CTService,
+    amount,
+    clearPositions,
+    clearCondition,
+    connect,
+  ])
 
   return (
     <CenteredCard>
       <Row cols="1fr" marginBottomXL>
-        <SelectPosition />
+        <SelectPositions />
       </Row>
       <Row cols="1fr">
         <SelectCondition />
@@ -137,11 +150,10 @@ export const Contents = () => {
           amount={amount}
           balance={maxBalance}
           decimals={decimals}
-          disabled={!isFullIndexSet}
+          disabled={!mergeablePositions}
           max={maxBalance.toString()}
           onAmountChange={amountChangeHandler}
           onUseWalletBalance={useWalletHandler}
-          tokenSymbol={collateralToken ? collateralToken.symbol : ''}
         />
       </Row>
       <Row cols="1fr">

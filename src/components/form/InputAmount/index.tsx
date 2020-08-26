@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react'
 import { Controller, FormContextValues } from 'react-hook-form'
 import { ERC20Service } from 'services/erc20'
 
-import { Web3ContextStatus, useWeb3Context } from '../../../contexts/Web3Context'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../../contexts/Web3Context'
 import { SplitFrom, SplitPositionFormMethods } from '../../../pages/SplitPosition/Form'
 import { Token } from '../../../util/types'
 import { TitleControlButton } from '../../pureStyledComponents/TitleControl'
@@ -26,7 +26,7 @@ export const InputAmount = ({
   positionId,
   splitFrom,
 }: Props) => {
-  const { status } = useWeb3Context()
+  const { _type: status, CTService, address, provider, signer } = useWeb3ConnectedOrInfura()
 
   const [balance, setBalance] = useState<Maybe<BigNumber>>(null)
   const regexpPosition: RegExp = BYTES_REGEX
@@ -37,16 +37,14 @@ export const InputAmount = ({
 
   useEffect(() => {
     let isSubscribed = true
-    if (status._type === Web3ContextStatus.Connected) {
-      const { CTService, address, provider, signer } = status
-
+    if (status === Web3ContextStatus.Connected && address && signer) {
       const fetchBalance = async () => {
         if (splitFrom === 'position' && regexpPosition.test(positionId)) {
           const balance = await CTService.balanceOf(positionId)
           if (isSubscribed) {
             setBalance(balance)
           }
-        } else if (splitFrom === 'collateral' && provider && signer) {
+        } else if (splitFrom === 'collateral' && signer) {
           const erc20Service = new ERC20Service(provider, signer, collateral.address)
           const balance = await erc20Service.balanceOf(address)
           if (isSubscribed) {
@@ -61,7 +59,17 @@ export const InputAmount = ({
     return () => {
       isSubscribed = false
     }
-  }, [status, positionId, collateral, splitFrom, regexpPosition])
+  }, [
+    status,
+    address,
+    signer,
+    provider,
+    CTService,
+    positionId,
+    collateral,
+    splitFrom,
+    regexpPosition,
+  ])
 
   return (
     <TitleValue
@@ -70,7 +78,7 @@ export const InputAmount = ({
         balance && (
           <TitleControlButton
             disabled={balance.isZero()}
-            onClick={() => setValue('amount', balance)}
+            onClick={() => setValue('amount', balance, true)}
           >
             Use Wallet Balance (${formatBigNumber(balance, collateral.decimals)})
           </TitleControlButton>

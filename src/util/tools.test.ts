@@ -1,35 +1,27 @@
-// positionString
-
-// getRedeemedBalance
-
-// getRedeemedPreview
-
-// arePositionMergeables
-
-// isConditionFullIndexSet
-
-// getMergePreview
 import { BigNumber } from 'ethers/utils'
 import { GetCondition_condition, GetPosition_position } from 'types/generatedGQL'
 
 import {
   arePositionMergeables,
+  arePositionMergeablesByCondition,
   getMergePreview,
   getRedeemedBalance,
   getRedeemedPreview,
   isConditionFullIndexSet,
+  isDisjointPartition,
+  isFullIndexSetPartition,
   positionString,
+  positionsSameConditionsSet,
 } from './tools'
+import { Token } from './types'
 
 test('positionString should return the rigth Positions string', async () => {
   expect(
-    positionString(
-      '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-      ['0x123', '0x345'],
-      [1, 5],
-      new BigNumber(`${1e19}`),
-      4
-    )
+    positionString(['0x123', '0x345'], [1, 5], new BigNumber(`${1e19}`), {
+      symbol: 'DAI',
+      address: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      decimals: 18,
+    } as Token)
   ).toStrictEqual('[DAI C:0x123 O:0 & C:0x345 O:0|2] x10.00')
 })
 
@@ -634,14 +626,33 @@ test('getRedeemedBalance should return the balance for multi outcome position', 
 
 test('getRedeemedPreview should return new position to redeem', async () => {
   expect(
-    getRedeemedPreview(positions[2], resolvedConditions[0], new BigNumber(`${1e19}`), 4)
+    getRedeemedPreview(positions[2], resolvedConditions[0], new BigNumber(`${1e19}`), {
+      symbol: 'DAI',
+      address: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      decimals: 18,
+    } as Token)
   ).toStrictEqual('[DAI C:0xf583ac...20856f O:0|2] x10.00')
 })
 
 test('getRedeemedPreview should return new collateral to redeem', async () => {
   expect(
-    getRedeemedPreview(positions[1], resolvedConditions[1], new BigNumber(`${1e19}`), 4)
+    getRedeemedPreview(positions[1], resolvedConditions[1], new BigNumber(`${1e19}`), {
+      symbol: 'DAI',
+      address: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      decimals: 18,
+    } as Token)
   ).toStrictEqual('10.00 DAI')
+})
+
+test('#positionsSameConditionsSet - should work', async () => {
+  expect(positionsSameConditionsSet(positions)).toEqual(false)
+  expect(positionsSameConditionsSet([positions[0], positions[1]])).toEqual(true)
+  expect(positionsSameConditionsSet([positions[2], positions[3]])).toEqual(true)
+  expect(positionsSameConditionsSet([positionsUSDC[0], positionsUSDC[1]])).toEqual(true)
+})
+
+test('#arePositionMergeables - positions should not be mergeable with only 1 position', async () => {
+  expect(arePositionMergeables([positions[0]])).toEqual(false)
 })
 
 test('#arePositionMergeables - positions should not be mergeable when containing different collateral', async () => {
@@ -655,6 +666,22 @@ test('#arePositionMergeables - positions should not be mergeable when containing
 test('#arePositionMergeables - positions should be mergeable', async () => {
   expect(arePositionMergeables([positions[0], positions[1]])).toEqual(true)
   expect(arePositionMergeables([positions[2], positions[3]])).toEqual(true)
+  expect(arePositionMergeables([positionsUSDC[0], positionsUSDC[1]])).toEqual(true)
+})
+
+test('#arePositionMergeablesByCondition - positions should be mergeable by condition when fillIndexSet partition', async () => {
+  expect(
+    arePositionMergeablesByCondition([positions[0], positions[1]], resolvedConditions[1])
+  ).toEqual(true)
+  expect(
+    arePositionMergeablesByCondition([positions[2], positions[3]], resolvedConditions[0])
+  ).toEqual(true)
+})
+
+test('#arePositionMergeablesByCondition - positions should be mergeable by condition when disjoint not fillIndexSet partition', async () => {
+  expect(
+    arePositionMergeablesByCondition([positionsUSDC[0], positionsUSDC[1]], resolvedConditions[1])
+  ).toEqual(true)
 })
 
 test('#isConditionFullIndexSet - should be false when positions are not mergeable', async () => {
@@ -686,24 +713,69 @@ test('#isConditionFullIndexSet - should be true', async () => {
   ).toEqual(true)
 })
 
-test('getMergePreview should return new position', async () => {
+test('isDisjointPartition should work', async () => {
+  expect(isDisjointPartition([0b001], 3)).toEqual(false)
+
+  expect(isDisjointPartition([0b001, 0b100], 0)).toEqual(false)
+
+  expect(isDisjointPartition([0b101, 0b01, 0b10], 2)).toEqual(false)
+
+  expect(isDisjointPartition([0b00, 0b01, 0b10], 2)).toEqual(false)
+
+  expect(isDisjointPartition([0b101, 0b001], 3)).toEqual(false)
+
+  expect(isDisjointPartition([0b100, 0b001], 3)).toEqual(true)
+})
+
+test('isFullIndexSetPartition should work', async () => {
+  expect(isFullIndexSetPartition([0b001], 3)).toEqual(false)
+
+  expect(isFullIndexSetPartition([0b001, 0b100], 0)).toEqual(false)
+
+  expect(isFullIndexSetPartition([0b101, 0b01, 0b10], 2)).toEqual(false)
+
+  expect(isFullIndexSetPartition([0b00, 0b01, 0b10], 2)).toEqual(false)
+
+  expect(isFullIndexSetPartition([0b101, 0b001], 3)).toEqual(false)
+
+  expect(isFullIndexSetPartition([0b100, 0b001], 3)).toEqual(false)
+
+  expect(isFullIndexSetPartition([0b100, 0b001, 0b010], 3)).toEqual(true)
+
+  expect(isFullIndexSetPartition([0b110, 0b001], 3)).toEqual(true)
+})
+
+test('getMergePreview should return new position when merging fullIndexSet partition', async () => {
   expect(
-    getMergePreview(
-      [positions[2], positions[3]],
-      resolvedConditions[0],
-      new BigNumber(`${1e19}`),
-      4
-    )
+    getMergePreview([positions[2], positions[3]], resolvedConditions[0], new BigNumber(`${1e19}`), {
+      symbol: 'DAI',
+      address: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      decimals: 18,
+    } as Token)
   ).toStrictEqual('[DAI C:0xf583ac...20856f O:0|2] x10.00')
 })
 
-test('getMergePreview should return collateral', async () => {
+test('getMergePreview should return collateral when merging fullIndexSet partition', async () => {
+  expect(
+    getMergePreview([positions[0], positions[2]], resolvedConditions[1], new BigNumber(`${1e19}`), {
+      symbol: 'DAI',
+      address: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      decimals: 18,
+    } as Token)
+  ).toStrictEqual('10.00 DAI')
+})
+
+test('getMergePreview should return new position when merging non fullIndexSet partition', async () => {
   expect(
     getMergePreview(
-      [positions[0], positions[2]],
+      [positionsUSDC[0], positionsUSDC[1]],
       resolvedConditions[1],
-      new BigNumber(`${1e19}`),
-      4
+      new BigNumber(`${1e7}`),
+      {
+        symbol: 'USDC',
+        address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+        decimals: 6,
+      } as Token
     )
-  ).toStrictEqual('10.00 DAI')
+  ).toStrictEqual('[USDC C:0xf583ac...20856f O:1|2] x10.00')
 })

@@ -52,6 +52,7 @@ export type Infura = {
   networkConfig: NetworkConfig
   CTService: ConditionalTokensService
   RtioService: RealitioService
+  connect: () => void
 }
 
 export type Web3Status = NotAsked | WaitingForUser | Connecting | Connected | ErrorWeb3 | Infura
@@ -92,10 +93,13 @@ export const Web3ContextProvider = ({ children }: Props) => {
     }
 
     try {
+      // See example in this link https://github.com/Web3Modal/web3modal/blob/master/example/src/App.tsx#L533
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const provider = web3Status.provider as any
       if (provider && provider.close) {
         provider.close()
       }
+
       await web3Modal.clearCachedProvider()
       setWeb3Status({ _type: Web3ContextStatus.NotAsked } as Web3Status)
     } catch (error) {
@@ -209,6 +213,21 @@ export const useWeb3Connected = () => {
     return { ...status, disconnect }
   }
   throw new Error('[useWeb3Connected] Hook not used under a connected context')
+}
+
+export const useWeb3ConnectedOrInfura = () => {
+  const { connect, disconnect, status } = useWeb3Context()
+  if (status._type === Web3ContextStatus.Connected || status._type === Web3ContextStatus.Infura) {
+    return {
+      ...status,
+      address: status._type === Web3ContextStatus.Connected ? status.address : null,
+      signer: status._type === Web3ContextStatus.Connected ? status.signer : null,
+      connect,
+      disconnect,
+    }
+  }
+
+  throw new Error('[useWeb3Connected] Hook not used under a connected or infura context')
 }
 
 export const useWeb3Disconnected = () => {
