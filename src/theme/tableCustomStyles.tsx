@@ -4,7 +4,7 @@ import theme from './index'
 
 const horizontalPadding = '15px'
 
-export const tableStyles: IDataTableStyles = {
+export const customStyles: IDataTableStyles = {
   tableWrapper: {
     style: {
       display: 'flex',

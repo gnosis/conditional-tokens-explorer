@@ -16,7 +16,7 @@ import { InfoCard } from '../../components/statusInfo/InfoCard'
 import { InlineLoading } from '../../components/statusInfo/InlineLoading'
 import { CellHash } from '../../components/table/CellHash'
 import { TableControls } from '../../components/table/TableControls'
-import { tableStyles } from '../../theme/tableStyles'
+import { customStyles } from '../../theme/tableCustomStyles'
 
 export const ConditionsList: React.FC = () => {
   const [conditionIdToSearch, setConditionIdToSearch] = useState('')
@@ -163,7 +163,7 @@ export const ConditionsList: React.FC = () => {
             <DataTable
               className="outerTableWrapper"
               columns={columns}
-              customStyles={tableStyles}
+              customStyles={customStyles}
               data={data?.conditions || []}
               highlightOnHover
               noDataComponent={<EmptyContentText>No conditions found.</EmptyContentText>}
