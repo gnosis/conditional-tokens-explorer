@@ -76,7 +76,7 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
         cell: (row: Conditions_conditions) => truncateStringInTheMiddle(row.id, 8, 6),
       },
       {
-        name: 'Oracle',
+        name: 'R. Address / Oracle',
         selector: 'oracle',
         sortable: true,
         // eslint-disable-next-line react/display-name
