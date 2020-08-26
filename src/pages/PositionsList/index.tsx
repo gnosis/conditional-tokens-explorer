@@ -1,3 +1,4 @@
+import { useDebounceCallback } from '@react-hook/debounce'
 import { Position, usePositions } from 'hooks'
 import React, { useCallback, useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -24,12 +25,24 @@ const dropdownItems = [
 ]
 
 export const PositionsList = () => {
-  const [searchPositionId, setSearchPositionId] = React.useState('')
+  const [positionIdToSearch, setPositionIdToSearch] = useState<string>('')
+  const [positionIdToShow, setPositionIdToShow] = useState<string>('')
+  const debouncedHandler = useDebounceCallback((positionIdToSearch) => {
+    setPositionIdToSearch(positionIdToSearch)
+  }, 500)
+  const inputHandler = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { value } = event.currentTarget
+      setPositionIdToShow(value)
+      debouncedHandler(value)
+    },
+    [debouncedHandler]
+  )
   const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
-  const { data, error, loading } = usePositions(searchPositionId)
+  const { data, error, loading } = usePositions(positionIdToSearch)
   const history = useHistory()
-  const isLoading = !searchPositionId && loading
-  const isSearching = searchPositionId && loading
+  const isLoading = !positionIdToSearch && loading
+  const isSearching = positionIdToSearch && loading
 
   const handleRowClick = (row: Position) => {
     history.push(`/positions/${row.id}`)
@@ -133,9 +146,9 @@ export const PositionsList = () => {
             end={filterDropdown}
             start={
               <SearchField
-                onChange={(e) => setSearchPositionId(e.currentTarget.value)}
+                onChange={inputHandler}
                 placeholder="Search by position id..."
-                value={searchPositionId}
+                value={positionIdToShow}
               />
             }
           />
