@@ -116,7 +116,7 @@ const theme = {
     backgroundColor: '#fff',
     backgroundColorActive: '#fff',
     borderColor: mediumGrey,
-    borderColorActive: darkGrey,
+    borderColorActive: '#aaa',
     borderRadius: '4px',
     borderStyle: 'solid',
     borderWidth: '1px',

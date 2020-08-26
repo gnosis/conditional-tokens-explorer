@@ -3,9 +3,9 @@ import styled from 'styled-components'
 
 const Wrapper = styled.svg``
 
-export const IconDelete: React.FC = (props) => (
+export const IconDelete: React.FC<{ className?: string }> = (props) => (
   <Wrapper
-    className="iconDelete"
+    className={`iconDelete ${props.className}`}
     height="20"
     viewBox="0 0 20 20"
     width="20"

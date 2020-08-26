@@ -100,11 +100,11 @@ interface Props {
 }
 
 export const TokenIcon: React.FC<Props> = (props) => {
-  const { symbol } = props
+  const { symbol, ...restProps } = props
   const data = getTokenData(symbol)
 
   return (
-    <Wrapper>
+    <Wrapper {...restProps}>
       {data.length > 0 ? (
         <>
           <Icon>{data[0].icon}</Icon> <Symbol>{symbol}</Symbol>

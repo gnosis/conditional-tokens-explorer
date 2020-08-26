@@ -5,6 +5,13 @@ import theme from './index'
 const horizontalPadding = '15px'
 
 export const tableStyles: IDataTableStyles = {
+  tableWrapper: {
+    style: {
+      display: 'flex',
+      flexDirection: 'column',
+      flexGrow: 1,
+    },
+  },
   headRow: {
     style: {
       backgroundColor: theme.colors.whitesmoke3,
