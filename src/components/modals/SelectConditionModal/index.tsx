@@ -83,11 +83,15 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
         name: '',
         // eslint-disable-next-line react/display-name
         cell: (row: Conditions_conditions) => (
-          <ButtonControl buttonType={ButtonControlType.add} onClick={() => handleAddClick(row)} />
+          <ButtonControl
+            buttonType={ButtonControlType.add}
+            disabled={!!selectedCondition}
+            onClick={() => handleAddClick(row)}
+          />
         ),
       },
     ],
-    [handleAddClick]
+    [handleAddClick, selectedCondition]
   )
 
   const handleDone = useCallback(() => {
@@ -125,7 +129,6 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
             columns={columns}
             customStyles={customStyles}
             data={data?.conditions || []}
-            highlightOnHover
             noHeader
             pagination
             paginationPerPage={5}
@@ -133,10 +136,14 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
           <TitleValue
             title="Selected Condition"
             value={
-              <StripedList maxHeight={'160px'}>
+              <StripedList maxHeight={selectedCondition ? 'auto' : '44px'}>
                 {selectedCondition ? (
                   <StripedListItem>
                     {truncateStringInTheMiddle(selectedCondition.id, 8, 6)}
+                    <ButtonControl
+                      buttonType={ButtonControlType.delete}
+                      onClick={() => setSelectedCondition(null)}
+                    />
                   </StripedListItem>
                 ) : (
                   <StripedListEmpty>No condition selected.</StripedListEmpty>
