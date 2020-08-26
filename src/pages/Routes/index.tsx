@@ -9,9 +9,9 @@ import { ConditionsList } from '../ConditionsList'
 import { PositionDetails } from '../PositionDetails'
 import { PositionsList } from '../PositionsList'
 import { PrepareCondition } from '../PrepareCondition'
+import { RedeemPosition } from '../RedeemPosition'
 import { ReportPayoutsContainer } from '../ReportPayouts'
 import { SplitPosition } from '../SplitPosition'
-import { RedeemPositionContainer } from '../redeem-position'
 
 const ProtectedRoute: React.FC<RouteProps> = (props) => {
   const { component, path } = props
@@ -40,7 +40,7 @@ export const Routes: React.FC = () => {
       <ProtectedRoute component={PrepareCondition} path="/prepare" />
       <ProtectedRoute component={SplitPosition} path="/split/:conditionId?" />
       <ProtectedRoute component={ReportPayoutsContainer} path="/report/:conditionId?" />
-      <ProtectedRoute component={RedeemPositionContainer} path="/redeem" />
+      <ProtectedRoute component={RedeemPosition} path="/redeem" />
       <ProtectedRoute component={MergePositions} path="/merge/:conditionId?" />
       <Route exact path="/">
         <Redirect to="/conditions" />

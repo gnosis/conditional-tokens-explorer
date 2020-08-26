@@ -1,28 +1,34 @@
 import { useQuery } from '@apollo/react-hooks'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { ConditionsListQuery, ConditionsSearchQuery } from 'queries/conditions'
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useHistory } from 'react-router-dom'
 import { Conditions, Conditions_conditions } from 'types/generatedGQL'
 
 import { ButtonDots } from '../../components/buttons/ButtonDots'
+import { ButtonSelectLight } from '../../components/buttons/ButtonSelectLight'
 import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
+import { SearchField } from '../../components/form/SearchField'
+import { EmptyContentText } from '../../components/pureStyledComponents/EmptyContentText'
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
 import { Pill, PillTypes } from '../../components/pureStyledComponents/Pill'
 import { InfoCard } from '../../components/statusInfo/InfoCard'
 import { InlineLoading } from '../../components/statusInfo/InlineLoading'
 import { CellHash } from '../../components/table/CellHash'
+import { TableControls } from '../../components/table/TableControls'
 import { tableStyles } from '../../theme/tableStyles'
 
 export const ConditionsList: React.FC = () => {
-  const [conditionIdToSearch, setConditionIdToSearch] = React.useState('')
+  const [conditionIdToSearch, setConditionIdToSearch] = useState('')
   const { data, error, loading } = useQuery<Conditions>(
     conditionIdToSearch ? ConditionsSearchQuery : ConditionsListQuery,
     {
       variables: { conditionId: conditionIdToSearch },
     }
   )
+  const isLoading = !conditionIdToSearch && loading
+  const isSearching = conditionIdToSearch && loading
   const history = useHistory()
   const { _type, address } = useWeb3ConnectedOrInfura()
   const isConnected = _type === 'connected' && address
@@ -144,30 +150,59 @@ export const ConditionsList: React.FC = () => {
     },
   ]
 
+  const filterItems = [
+    { text: 'All Reporters / Oracles' },
+    { text: 'Custom Reporters' },
+    { text: 'Realit.io' },
+    { text: 'Kleros' },
+  ]
+
+  const [selectedFilter, setselectedFilter] = useState(0)
+
+  const filterDropdown = (
+    <Dropdown
+      dropdownButtonContent={<ButtonSelectLight content={filterItems[selectedFilter].text} />}
+      dropdownPosition={DropdownPosition.right}
+      items={filterItems.map((item, index) => (
+        <DropdownItem key={index} onClick={() => setselectedFilter(index)}>
+          {item.text}
+        </DropdownItem>
+      ))}
+    />
+  )
+
   return (
     <>
       <PageTitle>Conditions</PageTitle>
-      {loading && <InlineLoading />}
+      {isLoading && <InlineLoading />}
       {error && <InfoCard message={error.message} title="Error" />}
-      {data && !loading && (
+      {data && !isLoading && (
         <>
-          <input
-            onChange={(e) => setConditionIdToSearch(e.currentTarget.value)}
-            placeholder="Search by condition id..."
-            type="text"
-            value={conditionIdToSearch}
+          <TableControls
+            end={filterDropdown}
+            start={
+              <SearchField
+                onChange={(e) => setConditionIdToSearch(e.currentTarget.value)}
+                placeholder="Search by condition id..."
+                value={conditionIdToSearch}
+              />
+            }
           />
-          <DataTable
-            className="outerTableWrapper"
-            columns={columns}
-            customStyles={tableStyles}
-            data={data?.conditions || []}
-            highlightOnHover
-            noHeader
-            onRowClicked={handleRowClick}
-            pagination={true}
-            responsive
-          />
+          {isSearching && <InlineLoading />}
+          {!isSearching && (
+            <DataTable
+              className="outerTableWrapper"
+              columns={columns}
+              customStyles={tableStyles}
+              data={data?.conditions || []}
+              highlightOnHover
+              noDataComponent={<EmptyContentText>No conditions found.</EmptyContentText>}
+              noHeader
+              onRowClicked={handleRowClick}
+              pagination={true}
+              responsive
+            />
+          )}
         </>
       )}
     </>

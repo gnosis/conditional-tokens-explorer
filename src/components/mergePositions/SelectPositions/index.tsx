@@ -1,21 +1,21 @@
-import React from 'react'
+import { positionString } from 'util/tools'
+import { Errors } from 'util/types'
 
-import { useMultiPositionsContext } from '../../../contexts/MultiPositionsContext'
-import { useWeb3ConnectedOrInfura } from '../../../contexts/Web3Context'
-import { positionString } from '../../../util/tools'
-import { Errors } from '../../../util/types'
-import { ButtonControl, ButtonControlType } from '../../buttons/ButtonControl'
-import { Error, ErrorContainer } from '../../pureStyledComponents/Error'
+import { ButtonControl, ButtonControlType } from 'components/buttons/ButtonControl'
+import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
 import {
   StripedList,
   StripedListEmpty,
   StripedListItem,
-} from '../../pureStyledComponents/StripedList'
-import { TitleControl } from '../../pureStyledComponents/TitleControl'
-import { InlineLoading } from '../../statusInfo/InlineLoading'
-import { TitleValue } from '../../text/TitleValue'
+} from 'components/pureStyledComponents/StripedList'
+import { TitleControl } from 'components/pureStyledComponents/TitleControl'
+import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { TitleValue } from 'components/text/TitleValue'
+import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import React from 'react'
 
-export const SelectPosition = () => {
+export const SelectPositions = () => {
   const { networkConfig } = useWeb3ConnectedOrInfura()
   const {
     addPositionId,

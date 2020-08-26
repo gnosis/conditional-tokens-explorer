@@ -7,7 +7,7 @@ import { CenteredCard } from 'components/common/CenteredCard'
 import { SelectCondition } from 'components/form/SelectCondition'
 import { Amount } from 'components/mergePositions/Amount'
 import { MergePreview } from 'components/mergePositions/MergePreview'
-import { SelectPosition } from 'components/mergePositions/SelectPosition'
+import { SelectPositions } from 'components/mergePositions/SelectPositions'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { Row } from 'components/pureStyledComponents/Row'
 import { FullLoading } from 'components/statusInfo/FullLoading'
@@ -140,7 +140,7 @@ export const Contents = () => {
   return (
     <CenteredCard>
       <Row cols="1fr" marginBottomXL>
-        <SelectPosition />
+        <SelectPositions />
       </Row>
       <Row cols="1fr">
         <SelectCondition />
