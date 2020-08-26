@@ -16,20 +16,50 @@ import { TableControls } from '../../components/table/TableControls'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 import { tableStyles } from '../../theme/tableStyles'
 
-const dropdownItems = [
-  { text: 'Details' },
-  { text: 'Redeem' },
-  { text: 'Wrap ERC20' },
-  { text: 'Unwrap ERC1155' },
-]
-
 export const PositionsList = () => {
   const [searchPositionId, setSearchPositionId] = React.useState('')
   const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
   const { data, error, loading } = usePositions(searchPositionId)
   const history = useHistory()
+
+  const isConnected = status === 'connected'
   const isLoading = !searchPositionId && loading
   const isSearching = searchPositionId && loading
+
+  const buildMenuForRow = useCallback(
+    ({ id }) => {
+      const detailsOption = {
+        text: 'Details',
+        onClick: () => history.push(`/positions/${id}`),
+      }
+
+      const redeemOption = {
+        text: 'Redeem',
+        onClick: () => history.push(`/redeem/${id}`),
+      }
+
+      const wrapERC20Option = {
+        text: 'Wrap ERC20',
+        onClick: () => {
+          console.log('wrap not implemented yet')
+        },
+      }
+
+      const unwrapOption = {
+        text: 'Unwrap ERC1155',
+        onClick: () => {
+          console.log('unwrap not implemented yet')
+        },
+      }
+
+      if (!isConnected) {
+        return [detailsOption]
+      } else {
+        return [detailsOption, redeemOption, wrapERC20Option, unwrapOption]
+      }
+    },
+    [isConnected, history]
+  )
 
   const handleRowClick = (row: Position) => {
     history.push(`/positions/${row.id}`)
@@ -79,8 +109,8 @@ export const PositionsList = () => {
               activeItemHighlight={false}
               dropdownButtonContent={<ButtonDots />}
               dropdownPosition={DropdownPosition.right}
-              items={dropdownItems.map((item, index) => (
-                <DropdownItem key={index} onClick={() => console.log(`${item.text} for ${row.id}`)}>
+              items={buildMenuForRow(row).map((item, index) => (
+                <DropdownItem key={index} onClick={item.onClick}>
                   {item.text}
                 </DropdownItem>
               ))}
@@ -92,7 +122,7 @@ export const PositionsList = () => {
         },
       ])
     }
-  }, [status])
+  }, [status, buildMenuForRow])
 
   const getColumns = useCallback(() => {
     return [...defaultColumns, ...connectedItems]

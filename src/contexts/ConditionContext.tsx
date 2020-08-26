@@ -127,7 +127,7 @@ export const ConditionProvider = (props: Props) => {
     if (conditionIdFromParams) {
       setConditionIdCallback(conditionIdFromParams)
     }
-  }, [conditionIdFromParams, setConditionIdCallback, conditionId])
+  }, [conditionIdFromParams, setConditionIdCallback])
 
   const value = {
     condition,

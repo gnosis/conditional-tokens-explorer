@@ -30,11 +30,11 @@ export const ConditionsList: React.FC = () => {
   const isLoading = !conditionIdToSearch && loading
   const isSearching = conditionIdToSearch && loading
   const history = useHistory()
-  const { _type, address } = useWeb3ConnectedOrInfura()
-  const isConnected = _type === 'connected' && address
+  const { _type: status, address } = useWeb3ConnectedOrInfura()
+  const isConnected = status === 'connected'
 
   const buildMenuForRow = useCallback(
-    ({ id, oracle, resolved }) => {
+    ({ id, oracle }) => {
       const detailsOption = {
         text: 'Details',
         onClick: () => history.push(`/conditions/${id}`),
