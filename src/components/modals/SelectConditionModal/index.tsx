@@ -2,7 +2,7 @@ import { truncateStringInTheMiddle } from 'util/tools'
 
 import { useQuery } from '@apollo/react-hooks'
 import { Button } from 'components/buttons'
-import { Modal, ModalBasicProps } from 'components/common/Modal'
+import { Modal, ModalProps } from 'components/modal'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { Row } from 'components/pureStyledComponents/Row'
 import {
@@ -20,12 +20,6 @@ import { Conditions, Conditions_conditions, GetCondition_condition } from 'types
 
 import { IconPlus } from './img/IconPlus'
 
-interface ModalProps extends ModalBasicProps {
-  isOpen: boolean
-  onConfirm?: (condition: Conditions_conditions) => void
-  onRequestClose?: () => void
-}
-
 const ButtonControl = styled.button`
   background-color: transparent;
   border: none;
@@ -37,7 +31,11 @@ const ButtonControl = styled.button`
   width: 20px;
 `
 
-export const SelectConditionModal: React.FC<ModalProps> = (props) => {
+interface Props extends ModalProps {
+  onConfirm?: (condition: Conditions_conditions) => void
+}
+
+export const SelectConditionModal: React.FC<Props> = (props) => {
   const { onConfirm, ...restProps } = props
   const { data } = useQuery<Conditions>(ConditionsListQuery)
   const [selectedCondition, setSelectedCondition] = useState<Maybe<GetCondition_condition>>(null)
