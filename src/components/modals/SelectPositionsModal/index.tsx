@@ -1,28 +1,18 @@
-import { truncateStringInTheMiddle } from 'util/tools'
-
-import { useQuery } from '@apollo/react-hooks'
 import { Button } from 'components/buttons'
 import { Modal, ModalBasicProps } from 'components/common/Modal'
 import { TokenIcon } from 'components/common/TokenIcon'
+import { IconDelete } from 'components/icons/IconDelete'
+import { IconPlusDark } from 'components/icons/IconPlusDark'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { Row } from 'components/pureStyledComponents/Row'
-import {
-  StripedList,
-  StripedListEmpty,
-  StripedListItem,
-} from 'components/pureStyledComponents/StripedList'
+import { StripedList, StripedListEmpty } from 'components/pureStyledComponents/StripedList'
 import { CellHash } from 'components/table/CellHash'
 import { TitleValue } from 'components/text/TitleValue'
-import { useConditionContext } from 'contexts/ConditionContext'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { Position, usePositions } from 'hooks'
-import { ConditionsListQuery } from 'queries/conditions'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import styled from 'styled-components'
-import { Conditions, Conditions_conditions, GetCondition_condition } from 'types/generatedGQL'
-
-import { IconPlus } from '../SelectConditionModal/img/IconPlus'
 
 interface ModalProps extends ModalBasicProps {
   isOpen: boolean
@@ -36,10 +26,10 @@ const ButtonControl = styled.button`
   border: none;
   cursor: pointer;
   display: flex;
-  height: 20px;
+  /* height: 20px; */
   outline: none;
-  padding: 0;
-  width: 20px;
+  padding: 0 24px 0 0;
+  /* width: 20px; */
 `
 
 export const SelectPositionModal: React.FC<ModalProps> = (props) => {
@@ -48,8 +38,21 @@ export const SelectPositionModal: React.FC<ModalProps> = (props) => {
   const { data, error, loading } = usePositions('')
   const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
 
-  const handleAddClick = useCallback((selected) => {
-    setSelectedPositions((current) => [...current, selected])
+  const handleMultiAddClick = useCallback((position: Position) => {
+    setSelectedPositions((current) => {
+      const included = current.find((selected) => selected.id === position.id)
+      return included ? current : [...current, position]
+    })
+  }, [])
+
+  const handleSingleAddClick = useCallback((position: Position) => {
+    setSelectedPositions([position])
+  }, [])
+
+  const handleRemoveClick = useCallback((position: Position) => {
+    setSelectedPositions((current) => {
+      return current.filter((selected) => selected.id !== position.id)
+    })
   }, [])
 
   const defaultColumns: Array<any> = useMemo(
@@ -73,26 +76,47 @@ export const SelectPositionModal: React.FC<ModalProps> = (props) => {
         name: 'Collateral',
         selector: 'collateralToken',
         sortable: true,
+        maxWidth: '150px',
+        minWidth: '150px',
       },
     ],
     [networkConfig]
   )
 
-  const buttonCell = useMemo(
+  const addCell = useMemo(
     () => ({
       name: '',
       button: true,
       ignoreRowClick: true,
-      maxWidth: '24px',
-      minWidth: '24px',
+      maxWidth: '48px',
+      minWidth: '48px',
       // eslint-disable-next-line react/display-name
-      cell: (row: Conditions_conditions) => (
-        <ButtonControl onClick={() => handleAddClick(row)}>
-          <IconPlus />
+      cell: (row: Position) => (
+        <ButtonControl
+          onClick={() => (singlePosition ? handleSingleAddClick(row) : handleMultiAddClick(row))}
+        >
+          <IconPlusDark />
         </ButtonControl>
       ),
     }),
-    [handleAddClick]
+    [singlePosition, handleSingleAddClick, handleMultiAddClick]
+  )
+
+  const deleteCell = useMemo(
+    () => ({
+      name: '',
+      button: true,
+      ignoreRowClick: true,
+      maxWidth: '48px',
+      minWidth: '48px',
+      // eslint-disable-next-line react/display-name
+      cell: (row: Position) => (
+        <ButtonControl onClick={() => handleRemoveClick(row)}>
+          <IconDelete />
+        </ButtonControl>
+      ),
+    }),
+    [handleRemoveClick]
   )
 
   const [connectedItems, setConnectedItems] = useState<Array<any>>([])
@@ -107,14 +131,32 @@ export const SelectPositionModal: React.FC<ModalProps> = (props) => {
           right: true,
           selector: 'userBalance',
           sortable: true,
+          maxWidth: '100px',
+          minWidth: '100px',
         },
       ])
     }
   }, [status])
 
-  const getColumns = useCallback(() => {
-    return [...defaultColumns, ...connectedItems, buttonCell]
-  }, [connectedItems, defaultColumns, buttonCell])
+  const getPositionsColumns = useCallback(() => {
+    return [...defaultColumns, ...connectedItems, addCell]
+  }, [connectedItems, defaultColumns, addCell])
+
+  const getSelectedColumns = useCallback(() => {
+    return [
+      ...defaultColumns.map((col) => ({ ...col, sortable: false })),
+      ...connectedItems.map((col) => ({ ...col, sortable: false })),
+      deleteCell,
+    ]
+  }, [defaultColumns, connectedItems, deleteCell])
+
+  const handleDone = useCallback(() => {
+    if (selectedPositions.length) {
+      if (onConfirm && typeof onConfirm === 'function') {
+        onConfirm(selectedPositions)
+      }
+    }
+  }, [onConfirm, selectedPositions])
 
   return (
     <Modal
@@ -124,7 +166,7 @@ export const SelectPositionModal: React.FC<ModalProps> = (props) => {
     >
       <Row cols="1fr">
         <DataTable
-          columns={getColumns()}
+          columns={getPositionsColumns()}
           data={data || []}
           noHeader={true}
           pagination={true}
@@ -140,7 +182,7 @@ export const SelectPositionModal: React.FC<ModalProps> = (props) => {
           value={
             selectedPositions.length ? (
               <DataTable
-                columns={getColumns()}
+                columns={getSelectedColumns()}
                 data={selectedPositions}
                 noHeader={true}
                 pagination={false}
@@ -156,6 +198,11 @@ export const SelectPositionModal: React.FC<ModalProps> = (props) => {
           }
         />
       </Row>
+      <ButtonContainer>
+        <Button disabled={!selectedPositions.length} onClick={handleDone}>
+          Done
+        </Button>
+      </ButtonContainer>
     </Modal>
   )
 }

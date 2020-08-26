@@ -1,12 +1,15 @@
+import { isPositionIdValid } from 'util/tools'
+import { BalanceErrors, Errors, PositionErrors } from 'util/types'
+
 import { useQuery } from '@apollo/react-hooks'
+import { BatchBalanceProvider, useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { BigNumber } from 'ethers/utils'
+import { useBalanceForBatchPosition } from 'hooks/useBalanceForBatchPosition'
+import { useErrors } from 'hooks/useErrors'
+import { GetMultiPositionsQuery } from 'queries/positions'
 import React, { useCallback, useEffect, useState } from 'react'
 
-import { useBalanceForBatchPosition } from '../hooks/useBalanceForBatchPosition'
-import { GetMultiPositionsQuery } from '../queries/positions'
 import { GetMultiPositions, GetMultiPositions_positions } from '../types/generatedGQL'
-import { isPositionIdValid } from '../util/tools'
-import { PositionErrors } from '../util/types'
 
 const BIG_ZERO = new BigNumber(0)
 
@@ -14,7 +17,7 @@ export interface MultiPositionsContext {
   positions: Array<GetMultiPositions_positions>
   positionIds: Array<string>
   loading: boolean
-  errors: PositionErrors[]
+  errors: Errors[]
   balances: BigNumber[]
   addPositionId: (positionId: string) => void
   removePositionId: (positionId: string) => void
@@ -48,15 +51,30 @@ export const MultiPositionsProvider = (props: Props) => {
   const { checkForEmptyBalance } = props
   const [positionIds, setPositionIds] = useState<Array<string>>([])
   const [positions, setPositions] = useState<Array<GetMultiPositions_positions>>([])
+  const {
+    balances,
+    errors: balanceErrors,
+    loading: loadingBalances,
+    positionIds: balancePositionIds,
+    updateBalaces,
+  } = useBatchBalanceContext()
 
-  const errors: any[] = []
+  // const errors: any[] = []
+  const { clearErrors, errors, pushError, removeError } = useErrors()
 
-  const addPositionId = useCallback((positionId: string): void => {
-    const positionIdLc = positionId.toLowerCase()
-    setPositionIds((current) => {
-      return current.includes(positionIdLc) ? current : [...current, positionIdLc]
-    })
-  }, [])
+  const addPositionId = useCallback(
+    (positionId: string): void => {
+      clearErrors()
+      if (!isPositionIdValid(positionId)) {
+        pushError(PositionErrors.INVALID_ERROR)
+      }
+      const positionIdLc = positionId.toLowerCase()
+      setPositionIds((current) => {
+        return current.includes(positionIdLc) ? current : [...current, positionIdLc]
+      })
+    },
+    [clearErrors, pushError]
+  )
 
   const removePositionId = useCallback((positionId: string): void => {
     let clearPositions = false
@@ -73,9 +91,10 @@ export const MultiPositionsProvider = (props: Props) => {
   }, [])
 
   const clearPositions = useCallback((): void => {
+    clearErrors()
     setPositionIds([])
     setPositions([])
-  }, [])
+  }, [clearErrors])
 
   const { data: fetchedPositions, error: errorFetchingPositions, loading: loadingQuery } = useQuery<
     GetMultiPositions
@@ -86,6 +105,7 @@ export const MultiPositionsProvider = (props: Props) => {
   })
 
   useEffect(() => {
+    removeError(PositionErrors.NOT_FOUND_ERROR)
     const { positions: positionsFromTheGraph } = fetchedPositions ?? { positions: [] }
     if (!loadingQuery && positionsFromTheGraph.length) {
       setPositions(positionsFromTheGraph)
@@ -93,28 +113,49 @@ export const MultiPositionsProvider = (props: Props) => {
 
     // Validate all positions exist
     if (positionIds.length && !loadingQuery && positionsFromTheGraph.length < positionIds.length) {
-      errors.push(PositionErrors.NOT_FOUND_ERROR)
+      pushError(PositionErrors.NOT_FOUND_ERROR)
     }
-  }, [fetchedPositions, positionIds, loadingQuery, errors])
+  }, [fetchedPositions, positionIds, loadingQuery, errors, removeError, pushError])
 
-  const { balances, loading: loadingBalances } = useBalanceForBatchPosition(positionIds)
-  if (checkForEmptyBalance && positionIds.length && balances.length) {
-    if (balances.includes(BIG_ZERO)) {
-      errors.push(PositionErrors.EMPTY_BALANCE_ERROR)
+  useEffect(() => {
+    updateBalaces(positionIds)
+  }, [positionIds, updateBalaces])
+
+  useEffect(() => {
+    if (checkForEmptyBalance && positionIds.length && balances.length) {
+      removeError(PositionErrors.EMPTY_BALANCE_ERROR)
+      if (balances.includes(BIG_ZERO)) {
+        pushError(PositionErrors.EMPTY_BALANCE_ERROR)
+      }
     }
-  }
+  }, [balances, positionIds, checkForEmptyBalance, removeError, pushError])
+
+  useEffect(() => {
+    removeError(PositionErrors.FETCHING_ERROR)
+    if (errorFetchingPositions) {
+      pushError(PositionErrors.FETCHING_ERROR)
+    }
+  }, [errorFetchingPositions, pushError, removeError])
+
+  useEffect(() => {
+    removeError(BalanceErrors.INVALID_ERROR)
+    removeError(BalanceErrors.FETCHING_ERROR)
+    if (errorFetchingPositions) {
+      pushError(PositionErrors.FETCHING_ERROR)
+    }
+  }, [balanceErrors, errorFetchingPositions, pushError, removeError])
 
   // Validate string position
-  const hasError: boolean =
-    !!positionIds.length && positionIds.map((id) => isPositionIdValid(id)).includes(false)
-  if (hasError) {
-    errors.push(PositionErrors.INVALID_ERROR)
-  }
+  // const hasError: boolean =
+  //   !!positionIds.length && positionIds.map((id) => isPositionIdValid(id)).includes(false)
+  // if (hasError) {
+  //   pushError(PositionErrors.INVALID_ERROR)
+  // }
 
   // Validate error position from theGraph
-  if (errorFetchingPositions) {
-    errors.push(PositionErrors.FETCHING_ERROR)
-  }
+  // if (errorFetchingPositions) {
+  //   pushError(PositionErrors.FETCHING_ERROR)
+  // }
 
   const value = {
     positions,
@@ -125,10 +166,15 @@ export const MultiPositionsProvider = (props: Props) => {
     addPositionId,
     removePositionId,
     clearPositions,
+    setPositions,
   }
 
   return (
-    <MultiPositionsContext.Provider value={value}>{props.children}</MultiPositionsContext.Provider>
+    <BatchBalanceProvider>
+      <MultiPositionsContext.Provider value={value}>
+        {props.children}
+      </MultiPositionsContext.Provider>
+    </BatchBalanceProvider>
   )
 }
 

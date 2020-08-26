@@ -57,7 +57,12 @@ export enum PositionErrors {
   EMPTY_BALANCE_ERROR = `User doesn't had position balance`,
 }
 
-export type Errors = ConditionErrors | PositionErrors
+export enum BalanceErrors {
+  INVALID_ERROR = `Invalid position`,
+  FETCHING_ERROR = `Error fetching balance`,
+}
+
+export type Errors = ConditionErrors | PositionErrors | BalanceErrors
 
 export type Token = {
   symbol: string
