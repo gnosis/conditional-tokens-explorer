@@ -18,9 +18,14 @@ export const Contents: React.FC = () => {
         <SelectCondition />
       </Row>
       {condition && !isConditionResolved && <OutcomesTable condition={condition} />}
-      {(!condition || isConditionResolved) && (
+      {!condition && (
         <StripedList>
           <StripedListEmpty>Please select a condition to report.</StripedListEmpty>
+        </StripedList>
+      )}
+      {isConditionResolved && (
+        <StripedList>
+          <StripedListEmpty>The condition is already resolved.</StripedListEmpty>
         </StripedList>
       )}
     </CenteredCard>
