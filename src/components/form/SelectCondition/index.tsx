@@ -21,7 +21,7 @@ export const SelectCondition: React.FC<Props> = (props) => {
   const debouncedHandler = useDebounceCallback((id) => {
     setConditionId(id)
   }, 500)
-  const imputHandler = React.useCallback(
+  const inputHandler = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.currentTarget
       setManualConditionId(value)
@@ -50,7 +50,7 @@ export const SelectCondition: React.FC<Props> = (props) => {
           <>
             <Textfield
               error={!!errors.length}
-              onChange={imputHandler}
+              onChange={inputHandler}
               placeholder={loading ? 'Loading...' : 'Please select a condition...'}
               type="text"
               value={conditionId}
