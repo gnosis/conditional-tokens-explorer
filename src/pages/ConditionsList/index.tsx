@@ -20,25 +20,19 @@ import { TableControls } from '../../components/table/TableControls'
 import { tableStyles } from '../../theme/tableStyles'
 
 export const ConditionsList: React.FC = () => {
-  const [conditionIdToSearch, setManualConditionIdToSearch] = useState<string>('')
+  const [conditionIdToSearch, setConditionIdToSearch] = useState<string>('')
+  const [conditionIdToShow, setConditionIdToShow] = useState<string>('')
   const debouncedHandler = useDebounceCallback((conditionIdToSearch) => {
-    setManualConditionIdToSearch(conditionIdToSearch)
+    setConditionIdToSearch(conditionIdToSearch)
   }, 500)
   const inputHandler = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.currentTarget
+      setConditionIdToShow(value)
       debouncedHandler(value)
     },
     [debouncedHandler]
   )
-
-  React.useEffect(() => {
-    if (conditionIdToSearch) {
-      setManualConditionIdToSearch(conditionIdToSearch)
-    } else {
-      setManualConditionIdToSearch('')
-    }
-  }, [conditionIdToSearch])
 
   const { data, error, loading } = useQuery<Conditions>(
     conditionIdToSearch ? ConditionsSearchQuery : ConditionsListQuery,
@@ -175,7 +169,7 @@ export const ConditionsList: React.FC = () => {
               <SearchField
                 onChange={inputHandler}
                 placeholder="Search by condition id..."
-                value={conditionIdToSearch}
+                value={conditionIdToShow}
               />
             }
           />
