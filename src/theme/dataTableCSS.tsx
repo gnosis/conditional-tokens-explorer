@@ -24,6 +24,7 @@ export const dataTableCSS = css`
       }
 
       .rdt_Pagination {
+        max-height: 39px;
         min-height: 39px;
       }
     }
