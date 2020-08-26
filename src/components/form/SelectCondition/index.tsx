@@ -31,7 +31,7 @@ export const SelectCondition = () => {
   const debouncedHandler = useDebounceCallback((id) => {
     setConditionId(id)
   }, 500)
-  const imputHandler = React.useCallback(
+  const inputHandler = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.currentTarget
       setManualConditionId(value)
@@ -61,7 +61,7 @@ export const SelectCondition = () => {
             <>
               <Textfield
                 error={!!errors.length}
-                onChange={imputHandler}
+                onChange={inputHandler}
                 placeholder="Please select a condition..."
                 type="text"
                 value={conditionId}
