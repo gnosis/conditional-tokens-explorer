@@ -1,10 +1,9 @@
 import { css } from 'styled-components'
 
 /** Sorry, I have to do this 'cause it's impossible to style this using what's
- * available in "tableCustomStyles"
+ * available in "tableCustomStyles". This is kinda ugly, I know.
  * */
 export const dataTableCSS = css`
-  /* Data Table CSS */
   .outerTableWrapper {
     background-color: #fff;
     border-radius: 8px;
@@ -13,6 +12,17 @@ export const dataTableCSS = css`
     flex-direction: column;
     flex-grow: 1;
     min-height: 400px;
+
+    &.inlineTable {
+      border: 1px solid ${(props) => props.theme.colors.lightGrey};
+      box-shadow: none;
+      margin-bottom: 32px;
+      min-height: 0;
+
+      .rdt_TableHeadRow {
+        max-height: 38px;
+      }
+    }
 
     .rdt_TableRow {
       border-bottom-color: ${(props) => props.theme.colors.lightGrey}!important;

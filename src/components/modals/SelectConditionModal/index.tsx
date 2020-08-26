@@ -103,7 +103,7 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
   return (
     <Modal {...restProps} subTitle={'Select one condition.'} title={'Select Condition'}>
       <DataTable
-        className="outerTableWrapper"
+        className="outerTableWrapper inlineTable"
         columns={columns}
         customStyles={customStyles}
         data={data?.conditions || []}
