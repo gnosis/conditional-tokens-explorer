@@ -3,9 +3,9 @@ import styled from 'styled-components'
 
 const Wrapper = styled.svg``
 
-export const IconPlus: React.FC = (props) => (
+export const IconPlus: React.FC<{ className?: string }> = (props) => (
   <Wrapper
-    className="iconPlus"
+    className={`iconPlus ${props.className}`}
     height="12"
     viewBox="0 0 12 12"
     width="12"

@@ -8,21 +8,6 @@ import { usePositionContext } from 'contexts/PositionContext'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useBalanceForPosition } from 'hooks/useBalanceForPosition'
 import React from 'react'
-import styled from 'styled-components'
-
-const InfoMessage = styled.p`
-  color: ${(props) => props.theme.colors.lightGrey};
-  font-size: 14px;
-  font-weight: 400;
-  font-style: italic;
-  line-height: 1.4;
-  margin: 0 0 5px 0;
-  text-align: left;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`
 
 export const SelectPosition = () => {
   const { _type: status, connect, networkConfig } = useWeb3ConnectedOrInfura()
@@ -64,15 +49,10 @@ export const SelectPosition = () => {
           <Textfield
             disabled={true}
             error={!!errors.length}
-            placeholder="Please select a position..."
+            placeholder={loading ? 'Loading...' : 'Please select a position...'}
             type="text"
             value={positionToDisplay}
           />
-          {loading && (
-            <ErrorContainer>
-              <InfoMessage>Loading...</InfoMessage>
-            </ErrorContainer>
-          )}
           {!!errors.length && (
             <ErrorContainer>
               {errors.map((error, i) => (
