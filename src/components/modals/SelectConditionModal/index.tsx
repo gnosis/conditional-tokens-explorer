@@ -4,7 +4,7 @@ import DataTable from 'react-data-table-component'
 import styled from 'styled-components'
 
 import { useConditionContext } from '../../../contexts/ConditionContext'
-import { ConditionsListQuery } from '../../../queries/conditions'
+import { ConditionsListQuery, ConditionsSearchQuery } from '../../../queries/conditions'
 import { customStyles } from '../../../theme/tableCustomStyles'
 import {
   Conditions,
@@ -17,6 +17,7 @@ import { ButtonControl, ButtonControlType } from '../../buttons/ButtonControl'
 import { Modal, ModalProps } from '../../common/Modal'
 import { SearchField } from '../../form/SearchField'
 import { ButtonContainer } from '../../pureStyledComponents/ButtonContainer'
+import { EmptyContentText } from '../../pureStyledComponents/EmptyContentText'
 import {
   StripedList,
   StripedListEmpty,
@@ -34,19 +35,32 @@ const LoadingWrapper = styled.div`
   min-height: 400px;
 `
 
+const SearchingWrapper = styled(LoadingWrapper)`
+  min-height: 348px;
+`
+
+const Search = styled(SearchField)`
+  max-width: 210px;
+`
+
 interface Props extends ModalProps {
   onConfirm?: (condition: Conditions_conditions) => void
 }
 
 export const SelectConditionModal: React.FC<Props> = (props) => {
   const { onConfirm, ...restProps } = props
-  const { data, error, loading } = useQuery<Conditions>(ConditionsListQuery)
+  const [conditionIdToSearch, setConditionIdToSearch] = useState('')
+  const { data, error, loading } = useQuery<Conditions>(
+    conditionIdToSearch ? ConditionsSearchQuery : ConditionsListQuery,
+    {
+      variables: { conditionId: conditionIdToSearch },
+    }
+  )
   const [selectedCondition, setSelectedCondition] = useState<Maybe<GetCondition_condition>>(null)
   const { setCondition } = useConditionContext()
 
-  const isLoading = loading && !data
-  // const isLoading = !conditionIdToSearch && loading
-  // const isSearching = conditionIdToSearch && loading
+  const isLoading = !conditionIdToSearch && loading
+  const isSearching = conditionIdToSearch && loading
 
   const handleAddClick = useCallback((selected) => {
     setSelectedCondition(selected)
@@ -116,23 +130,30 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
         <>
           <TableControls
             start={
-              <SearchField
-                onChange={() => {
-                  /**/
-                }}
-                value={0}
+              <Search
+                onChange={(e) => setConditionIdToSearch(e.currentTarget.value)}
+                placeholder="Search condition id..."
+                value={conditionIdToSearch}
               />
             }
           />
-          <DataTable
-            className="outerTableWrapper inlineTable"
-            columns={columns}
-            customStyles={customStyles}
-            data={data?.conditions || []}
-            noHeader
-            pagination
-            paginationPerPage={5}
-          />
+          {isSearching && (
+            <SearchingWrapper>
+              <InlineLoading />
+            </SearchingWrapper>
+          )}
+          {!isSearching && (
+            <DataTable
+              className="outerTableWrapper inlineTable"
+              columns={columns}
+              customStyles={customStyles}
+              data={data?.conditions || []}
+              noDataComponent={<EmptyContentText>No conditions found.</EmptyContentText>}
+              noHeader
+              pagination
+              paginationPerPage={5}
+            />
+          )}
           <TitleValue
             title="Selected Condition"
             value={

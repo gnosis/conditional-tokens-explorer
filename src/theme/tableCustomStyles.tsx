@@ -5,6 +5,11 @@ import theme from './index'
 const horizontalPadding = '15px'
 
 export const customStyles: IDataTableStyles = {
+  table: {
+    style: {
+      flexGrow: 1,
+    },
+  },
   tableWrapper: {
     style: {
       display: 'flex',
@@ -74,6 +79,11 @@ export const customStyles: IDataTableStyles = {
       color: theme.colors.textColor,
       fontSize: '13px',
       minHeight: '63px',
+    },
+  },
+  noData: {
+    style: {
+      flexGrow: 1,
     },
   },
 }
