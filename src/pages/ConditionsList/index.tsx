@@ -169,7 +169,7 @@ export const ConditionsList: React.FC = () => {
               noDataComponent={<EmptyContentText>No conditions found.</EmptyContentText>}
               noHeader
               onRowClicked={handleRowClick}
-              pagination={true}
+              pagination
               responsive
             />
           )}

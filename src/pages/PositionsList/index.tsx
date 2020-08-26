@@ -149,7 +149,7 @@ export const PositionsList = () => {
               highlightOnHover
               noHeader
               onRowClicked={handleRowClick}
-              pagination={true}
+              pagination
               responsive
             />
           )}
