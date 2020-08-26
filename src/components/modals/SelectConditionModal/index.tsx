@@ -12,28 +12,26 @@ import {
   GetCondition_condition,
 } from '../../../types/generatedGQL'
 import { truncateStringInTheMiddle } from '../../../util/tools'
-import { Button } from '../../buttons'
+import { Button } from '../../buttons/Button'
+import { ButtonControl, ButtonControlType } from '../../buttons/ButtonControl'
 import { Modal, ModalProps } from '../../common/Modal'
+import { SearchField } from '../../form/SearchField'
 import { ButtonContainer } from '../../pureStyledComponents/ButtonContainer'
-import { Row } from '../../pureStyledComponents/Row'
 import {
   StripedList,
   StripedListEmpty,
   StripedListItem,
 } from '../../pureStyledComponents/StripedList'
+import { InfoCard } from '../../statusInfo/InfoCard'
+import { InlineLoading } from '../../statusInfo/InlineLoading'
+import { TableControls } from '../../table/TableControls'
 import { TitleValue } from '../../text/TitleValue'
 
-import { IconPlus } from './img/IconPlus'
-
-const ButtonControl = styled.button`
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
+const LoadingWrapper = styled.div`
+  align-items: center;
   display: flex;
-  height: 20px;
-  outline: none;
-  padding: 0;
-  width: 20px;
+  justify-content: center;
+  min-height: 400px;
 `
 
 interface Props extends ModalProps {
@@ -42,9 +40,13 @@ interface Props extends ModalProps {
 
 export const SelectConditionModal: React.FC<Props> = (props) => {
   const { onConfirm, ...restProps } = props
-  const { data } = useQuery<Conditions>(ConditionsListQuery)
+  const { data, error, loading } = useQuery<Conditions>(ConditionsListQuery)
   const [selectedCondition, setSelectedCondition] = useState<Maybe<GetCondition_condition>>(null)
   const { setCondition } = useConditionContext()
+
+  const isLoading = loading && !data
+  // const isLoading = !conditionIdToSearch && loading
+  // const isSearching = conditionIdToSearch && loading
 
   const handleAddClick = useCallback((selected) => {
     setSelectedCondition(selected)
@@ -81,9 +83,7 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
         name: '',
         // eslint-disable-next-line react/display-name
         cell: (row: Conditions_conditions) => (
-          <ButtonControl onClick={() => handleAddClick(row)}>
-            <IconPlus />
-          </ButtonControl>
+          <ButtonControl buttonType={ButtonControlType.add} onClick={() => handleAddClick(row)} />
         ),
       },
     ],
@@ -101,39 +101,56 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
   }, [onConfirm, selectedCondition, setCondition])
 
   return (
-    <Modal {...restProps} subTitle={'Select one condition.'} title={'Select Condition'}>
-      <DataTable
-        className="outerTableWrapper inlineTable"
-        columns={columns}
-        customStyles={customStyles}
-        data={data?.conditions || []}
-        highlightOnHover
-        noHeader
-        pagination
-        paginationPerPage={5}
-      />
-
-      <Row cols="1fr">
-        <TitleValue
-          title="Selected Condition"
-          value={
-            <StripedList maxHeight={'160px'}>
-              {selectedCondition ? (
-                <StripedListItem>
-                  {truncateStringInTheMiddle(selectedCondition.id, 8, 6)}
-                </StripedListItem>
-              ) : (
-                <StripedListEmpty>No condition selected.</StripedListEmpty>
-              )}
-            </StripedList>
-          }
-        />
-      </Row>
-      <ButtonContainer>
-        <Button disabled={!selectedCondition} onClick={handleDone}>
-          Done
-        </Button>
-      </ButtonContainer>
+    <Modal subTitle={'Select one condition.'} title={'Select Condition'} {...restProps}>
+      {isLoading && (
+        <LoadingWrapper>
+          <InlineLoading message="Loading conditions..." />
+        </LoadingWrapper>
+      )}
+      {error && <InfoCard message={error.message} title="Error" />}
+      {data && !isLoading && (
+        <>
+          <TableControls
+            start={
+              <SearchField
+                onChange={() => {
+                  /**/
+                }}
+                value={0}
+              />
+            }
+          />
+          <DataTable
+            className="outerTableWrapper inlineTable"
+            columns={columns}
+            customStyles={customStyles}
+            data={data?.conditions || []}
+            highlightOnHover
+            noHeader
+            pagination
+            paginationPerPage={5}
+          />
+          <TitleValue
+            title="Selected Condition"
+            value={
+              <StripedList maxHeight={'160px'}>
+                {selectedCondition ? (
+                  <StripedListItem>
+                    {truncateStringInTheMiddle(selectedCondition.id, 8, 6)}
+                  </StripedListItem>
+                ) : (
+                  <StripedListEmpty>No condition selected.</StripedListEmpty>
+                )}
+              </StripedList>
+            }
+          />
+          <ButtonContainer>
+            <Button disabled={!selectedCondition} onClick={handleDone}>
+              Done
+            </Button>
+          </ButtonContainer>
+        </>
+      )}
     </Modal>
   )
 }

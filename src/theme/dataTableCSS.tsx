@@ -20,7 +20,11 @@ export const dataTableCSS = css`
       min-height: 0;
 
       .rdt_TableHeadRow {
-        max-height: 38px;
+        min-height: 38px;
+      }
+
+      .rdt_Pagination {
+        min-height: 39px;
       }
     }
 
