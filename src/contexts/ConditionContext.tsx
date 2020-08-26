@@ -1,5 +1,6 @@
 import { useQuery } from '@apollo/react-hooks'
 import React from 'react'
+import { useParams } from 'react-router-dom'
 
 import { GetConditionQuery } from '../queries/conditions'
 import { GetCondition, GetCondition_condition } from '../types/generatedGQL'
@@ -43,6 +44,7 @@ export const ConditionProvider = (props: Props) => {
   const [condition, setCondition] = React.useState<Maybe<GetCondition_condition>>(null)
   const [errors, setErrors] = React.useState<ConditionErrors[]>([])
   const [validId, setValidId] = React.useState(false)
+  const { conditionId: conditionIdFromParams } = useParams() as { conditionId?: string }
 
   const clearErrors = React.useCallback((): void => {
     setErrors([])
@@ -120,6 +122,12 @@ export const ConditionProvider = (props: Props) => {
       removeError(ConditionErrors.FETCHING_ERROR)
     }
   }, [errorFetchingCondition, pushError, removeError])
+
+  React.useEffect(() => {
+    if (conditionIdFromParams) {
+      setConditionIdCallback(conditionIdFromParams)
+    }
+  }, [conditionIdFromParams, setConditionIdCallback, conditionId])
 
   const value = {
     condition,

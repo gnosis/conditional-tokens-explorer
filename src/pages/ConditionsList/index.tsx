@@ -1,6 +1,7 @@
 import { useQuery } from '@apollo/react-hooks'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { ConditionsListQuery, ConditionsSearchQuery } from 'queries/conditions'
-import React from 'react'
+import React, { useCallback } from 'react'
 import DataTable from 'react-data-table-component'
 import { useHistory } from 'react-router-dom'
 import { Conditions, Conditions_conditions } from 'types/generatedGQL'
@@ -23,13 +24,41 @@ export const ConditionsList: React.FC = () => {
     }
   )
   const history = useHistory()
+  const { _type, address } = useWeb3ConnectedOrInfura()
+  const isConnected = _type === 'connected' && address
 
-  const dropdownItems = [
-    { text: 'Details' },
-    { text: 'Split Position' },
-    { text: 'Merge Positions' },
-    { text: 'Report Payouts' },
-  ]
+  const buildMenuForRow = useCallback(
+    ({ id, oracle, resolved }) => {
+      const detailsOption = {
+        text: 'Details',
+        onClick: () => history.push(`/conditions/${id}`),
+      }
+
+      const splitOption = {
+        text: 'Split Position',
+        onClick: () => history.push(`/split/${id}`),
+      }
+
+      const mergeOption = {
+        text: 'Merge Positions',
+        onClick: () => history.push(`/merge/${id}`),
+      }
+
+      const reportOption = {
+        text: 'Report Payouts',
+        onClick: () => history.push(`/report/${id}`),
+      }
+
+      if (!isConnected) {
+        return [detailsOption]
+      }
+
+      return address && oracle.toLowerCase() === address.toLowerCase()
+        ? [detailsOption, splitOption, mergeOption, reportOption]
+        : [detailsOption, splitOption, mergeOption]
+    },
+    [isConnected, address, history]
+  )
 
   const handleRowClick = (row: Conditions_conditions) => {
     history.push(`/conditions/${row.id}`)
@@ -102,8 +131,8 @@ export const ConditionsList: React.FC = () => {
           activeItemHighlight={false}
           dropdownButtonContent={<ButtonDots />}
           dropdownPosition={DropdownPosition.right}
-          items={dropdownItems.map((item, index) => (
-            <DropdownItem key={index} onClick={() => console.log(`${item.text} for ${row.id}`)}>
+          items={buildMenuForRow(row).map((item, index) => (
+            <DropdownItem key={index} onClick={item.onClick}>
               {item.text}
             </DropdownItem>
           ))}
