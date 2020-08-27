@@ -77,6 +77,7 @@ export const customStyles: IDataTableStyles = {
       borderTopStyle: 'solid',
       borderTopWidth: '1px',
       color: theme.colors.textColor,
+      flexGrow: 0,
       fontSize: '13px',
       minHeight: '63px',
     },

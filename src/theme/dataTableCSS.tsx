@@ -10,7 +10,7 @@ export const dataTableCSS = css`
     box-shadow: 0 2px 8px 0 rgba(212, 213, 211, 0.7);
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
+    flex-grow: 0;
     min-height: 400px;
 
     &.inlineTable {
