@@ -89,7 +89,7 @@ export const PrepareCondition = () => {
         logger.log(`Condition ID ${conditionId}`)
         if (!conditionExists) {
           const tx = await CTService.prepareCondition(questionId, oracleAddress, numOutcomes)
-          await provider.waitForTransaction(tx)
+          await provider.waitForTransaction(tx, 4)
 
           history.push(`/conditions/${conditionId}`)
         } else {
