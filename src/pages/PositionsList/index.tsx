@@ -1,3 +1,4 @@
+import { useDebounceCallback } from '@react-hook/debounce'
 import { Position, usePositions } from 'hooks'
 import React, { useCallback, useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -14,7 +15,7 @@ import { InlineLoading } from '../../components/statusInfo/InlineLoading'
 import { CellHash } from '../../components/table/CellHash'
 import { TableControls } from '../../components/table/TableControls'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
-import { tableStyles } from '../../theme/tableStyles'
+import { customStyles } from '../../theme/tableCustomStyles'
 import { getLogger } from '../../util/logger'
 
 const logger = getLogger('PositionsList')
@@ -27,12 +28,24 @@ const dropdownItems = [
 ]
 
 export const PositionsList = () => {
-  const [searchPositionId, setSearchPositionId] = React.useState('')
+  const [positionIdToSearch, setPositionIdToSearch] = useState<string>('')
+  const [positionIdToShow, setPositionIdToShow] = useState<string>('')
+  const debouncedHandler = useDebounceCallback((positionIdToSearch) => {
+    setPositionIdToSearch(positionIdToSearch)
+  }, 500)
+  const inputHandler = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { value } = event.currentTarget
+      setPositionIdToShow(value)
+      debouncedHandler(value)
+    },
+    [debouncedHandler]
+  )
   const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
-  const { data, error, loading } = usePositions(searchPositionId)
+  const { data, error, loading } = usePositions(positionIdToSearch)
   const history = useHistory()
-  const isLoading = !searchPositionId && loading
-  const isSearching = searchPositionId && loading
+  const isLoading = !positionIdToSearch && loading
+  const isSearching = positionIdToSearch && loading
 
   const handleRowClick = (row: Position) => {
     history.push(`/positions/${row.id}`)
@@ -138,9 +151,9 @@ export const PositionsList = () => {
             end={filterDropdown}
             start={
               <SearchField
-                onChange={(e) => setSearchPositionId(e.currentTarget.value)}
+                onChange={inputHandler}
                 placeholder="Search by position id..."
-                value={searchPositionId}
+                value={positionIdToShow}
               />
             }
           />
@@ -149,12 +162,12 @@ export const PositionsList = () => {
             <DataTable
               className="outerTableWrapper"
               columns={getColumns()}
-              customStyles={tableStyles}
+              customStyles={customStyles}
               data={data || []}
               highlightOnHover
               noHeader
               onRowClicked={handleRowClick}
-              pagination={true}
+              pagination
               responsive
             />
           )}

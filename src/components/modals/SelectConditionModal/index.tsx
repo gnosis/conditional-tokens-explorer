@@ -1,47 +1,79 @@
-import { truncateStringInTheMiddle } from 'util/tools'
-
 import { useQuery } from '@apollo/react-hooks'
-import { Button } from 'components/buttons'
-import { Modal, ModalBasicProps } from 'components/common/Modal'
-import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
-import { Row } from 'components/pureStyledComponents/Row'
+import { useDebounceCallback } from '@react-hook/debounce'
+import React, { useCallback, useMemo, useState } from 'react'
+import DataTable from 'react-data-table-component'
+import styled from 'styled-components'
+
+import { useConditionContext } from '../../../contexts/ConditionContext'
+import { ConditionsListQuery, ConditionsSearchQuery } from '../../../queries/conditions'
+import { customStyles } from '../../../theme/tableCustomStyles'
+import {
+  Conditions,
+  Conditions_conditions,
+  GetCondition_condition,
+} from '../../../types/generatedGQL'
+import { truncateStringInTheMiddle } from '../../../util/tools'
+import { Button } from '../../buttons/Button'
+import { ButtonControl, ButtonControlType } from '../../buttons/ButtonControl'
+import { Modal, ModalProps } from '../../common/Modal'
+import { SearchField } from '../../form/SearchField'
+import { ButtonContainer } from '../../pureStyledComponents/ButtonContainer'
+import { EmptyContentText } from '../../pureStyledComponents/EmptyContentText'
 import {
   StripedList,
   StripedListEmpty,
   StripedListItem,
-} from 'components/pureStyledComponents/StripedList'
-import { TitleValue } from 'components/text/TitleValue'
-import { useConditionContext } from 'contexts/ConditionContext'
-import { ConditionsListQuery } from 'queries/conditions'
-import React, { useCallback, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
-import styled from 'styled-components'
-import { Conditions, Conditions_conditions, GetCondition_condition } from 'types/generatedGQL'
+} from '../../pureStyledComponents/StripedList'
+import { InfoCard } from '../../statusInfo/InfoCard'
+import { InlineLoading } from '../../statusInfo/InlineLoading'
+import { TableControls } from '../../table/TableControls'
+import { TitleValue } from '../../text/TitleValue'
 
-import { IconPlus } from './img/IconPlus'
-
-interface ModalProps extends ModalBasicProps {
-  isOpen: boolean
-  onConfirm?: (condition: Conditions_conditions) => void
-  onRequestClose?: () => void
-}
-
-const ButtonControl = styled.button`
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
+const LoadingWrapper = styled.div`
+  align-items: center;
   display: flex;
-  height: 20px;
-  outline: none;
-  padding: 0;
-  width: 20px;
+  justify-content: center;
+  min-height: 400px;
 `
 
-export const SelectConditionModal: React.FC<ModalProps> = (props) => {
+const SearchingWrapper = styled(LoadingWrapper)`
+  min-height: 348px;
+`
+
+const Search = styled(SearchField)`
+  max-width: 210px;
+`
+
+interface Props extends ModalProps {
+  onConfirm?: (condition: Conditions_conditions) => void
+}
+
+export const SelectConditionModal: React.FC<Props> = (props) => {
   const { onConfirm, ...restProps } = props
-  const { data } = useQuery<Conditions>(ConditionsListQuery)
+  const [conditionIdToSearch, setConditionIdToSearch] = useState<string>('')
+  const [conditionIdToShow, setConditionIdToShow] = useState<string>('')
+  const debouncedHandler = useDebounceCallback((conditionIdToSearch) => {
+    setConditionIdToSearch(conditionIdToSearch)
+  }, 500)
+  const inputHandler = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { value } = event.currentTarget
+      setConditionIdToShow(value)
+      debouncedHandler(value)
+    },
+    [debouncedHandler]
+  )
+  const { data, error, loading } = useQuery<Conditions>(
+    conditionIdToSearch ? ConditionsSearchQuery : ConditionsListQuery,
+    {
+      variables: { conditionId: conditionIdToSearch },
+    }
+  )
   const [selectedCondition, setSelectedCondition] = useState<Maybe<GetCondition_condition>>(null)
   const { setCondition } = useConditionContext()
+
+  const isLoading = !conditionIdToSearch && loading
+  const isSearching = conditionIdToSearch && loading
 
   const handleAddClick = useCallback((selected) => {
     setSelectedCondition(selected)
@@ -50,45 +82,43 @@ export const SelectConditionModal: React.FC<ModalProps> = (props) => {
   const columns = useMemo(
     () => [
       {
-        name: 'Id',
+        name: 'Condition Id',
         selector: 'id',
         sortable: true,
         // eslint-disable-next-line react/display-name
-        cell: (row: Conditions_conditions) => <div>{truncateStringInTheMiddle(row.id, 8, 6)}</div>,
+        cell: (row: Conditions_conditions) => truncateStringInTheMiddle(row.id, 8, 6),
       },
       {
-        name: 'Oracle',
+        name: 'R. Address / Oracle',
         selector: 'oracle',
         sortable: true,
         // eslint-disable-next-line react/display-name
-        cell: (row: Conditions_conditions) => (
-          <div>{truncateStringInTheMiddle(row.oracle, 8, 6)}</div>
-        ),
+        cell: (row: Conditions_conditions) => truncateStringInTheMiddle(row.oracle, 8, 6),
       },
       {
         name: 'Question Id',
         selector: 'questionId',
         sortable: true,
         // eslint-disable-next-line react/display-name
-        cell: (row: Conditions_conditions) => (
-          <div>{truncateStringInTheMiddle(row.questionId, 8, 6)}</div>
-        ),
+        cell: (row: Conditions_conditions) => truncateStringInTheMiddle(row.questionId, 8, 6),
       },
       {
-        name: '',
         button: true,
         ignoreRowClick: true,
         maxWidth: '24px',
         minWidth: '24px',
+        name: '',
         // eslint-disable-next-line react/display-name
         cell: (row: Conditions_conditions) => (
-          <ButtonControl onClick={() => handleAddClick(row)}>
-            <IconPlus />
-          </ButtonControl>
+          <ButtonControl
+            buttonType={ButtonControlType.add}
+            disabled={!!selectedCondition}
+            onClick={() => handleAddClick(row)}
+          />
         ),
       },
     ],
-    [handleAddClick]
+    [handleAddClick, selectedCondition]
   )
 
   const handleDone = useCallback(() => {
@@ -102,40 +132,66 @@ export const SelectConditionModal: React.FC<ModalProps> = (props) => {
   }, [onConfirm, selectedCondition, setCondition])
 
   return (
-    <Modal {...restProps} subTitle={'Select one condition.'} title={'Select Condition'}>
-      <Row cols="1fr">
-        <DataTable
-          columns={columns}
-          data={data?.conditions || []}
-          noHeader={true}
-          pagination={true}
-          paginationPerPage={5}
-          style={{
-            width: '100%',
-          }}
-        />
-      </Row>
-      <Row cols="1fr">
-        <TitleValue
-          title="Selected Condition"
-          value={
-            <StripedList maxHeight={'160px'}>
-              {selectedCondition ? (
-                <StripedListItem>
-                  {truncateStringInTheMiddle(selectedCondition.id, 8, 6)}
-                </StripedListItem>
-              ) : (
-                <StripedListEmpty>No condition selected.</StripedListEmpty>
-              )}
-            </StripedList>
-          }
-        />
-      </Row>
-      <ButtonContainer>
-        <Button disabled={!selectedCondition} onClick={handleDone}>
-          Done
-        </Button>
-      </ButtonContainer>
+    <Modal subTitle={'Select one condition.'} title={'Select Condition'} {...restProps}>
+      {isLoading && (
+        <LoadingWrapper>
+          <InlineLoading message="Loading conditions..." />
+        </LoadingWrapper>
+      )}
+      {error && <InfoCard message={error.message} title="Error" />}
+      {data && !isLoading && (
+        <>
+          <TableControls
+            start={
+              <Search
+                onChange={inputHandler}
+                placeholder="Search condition id..."
+                value={conditionIdToShow}
+              />
+            }
+          />
+          {isSearching && (
+            <SearchingWrapper>
+              <InlineLoading />
+            </SearchingWrapper>
+          )}
+          {!isSearching && (
+            <DataTable
+              className="outerTableWrapper inlineTable"
+              columns={columns}
+              customStyles={customStyles}
+              data={data?.conditions || []}
+              noDataComponent={<EmptyContentText>No conditions found.</EmptyContentText>}
+              noHeader
+              pagination
+              paginationPerPage={5}
+            />
+          )}
+          <TitleValue
+            title="Selected Condition"
+            value={
+              <StripedList maxHeight={selectedCondition ? 'auto' : '44px'}>
+                {selectedCondition ? (
+                  <StripedListItem>
+                    {truncateStringInTheMiddle(selectedCondition.id, 8, 6)}
+                    <ButtonControl
+                      buttonType={ButtonControlType.delete}
+                      onClick={() => setSelectedCondition(null)}
+                    />
+                  </StripedListItem>
+                ) : (
+                  <StripedListEmpty>No condition selected.</StripedListEmpty>
+                )}
+              </StripedList>
+            }
+          />
+          <ButtonContainer>
+            <Button disabled={!selectedCondition} onClick={handleDone}>
+              Done
+            </Button>
+          </ButtonContainer>
+        </>
+      )}
     </Modal>
   )
 }
