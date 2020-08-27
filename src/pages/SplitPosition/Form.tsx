@@ -11,6 +11,7 @@ import { CenteredCard } from '../../components/common/CenteredCard'
 import { SetAllowance } from '../../components/common/SetAllowance'
 import { InputAmount } from '../../components/form/InputAmount'
 import { InputCondition } from '../../components/form/InputCondition'
+import { EditPartitionModal } from '../../components/modals/EditPartitionModal'
 import { Partition } from '../../components/partitions/Partition'
 import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
 import { ErrorContainer, Error as ErrorMessage } from '../../components/pureStyledComponents/Error'
@@ -190,86 +191,97 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
   const canSubmit = isValid && allowanceFinished
   const mockedNumberedOutcomes = [
     [1, 4, 3],
-    [6, 5],
-    [9, 7, 10],
-    [2, 8],
-    [12, 13, 14, 15],
+    [2, 5],
   ]
 
+  const [isEditPartitionModalOpen, setIsEditPartitionModalOpen] = useState(false)
+
   return (
-    <CenteredCard>
-      <Row cols="1fr">
-        <InputCondition formMethods={formMethods} onConditionChange={handleConditionChange} />
-      </Row>
-      <Row cols="1fr" marginBottomXL>
-        <TitleValue
-          title="Split From"
-          value={
-            <SplitFrom
-              formMethods={formMethods}
-              onCollateralChange={onCollateralChange}
-              onPositionChange={(p) => setPosition(p)}
-              splitFromCollateral={splitFromCollateral}
-              splitFromPosition={splitFromPosition}
-              tokens={tokens}
-            />
-          }
-        />
-      </Row>
-      {shouldDisplayAllowance && (
-        <SetAllowance
-          collateral={collateralToken}
-          fetching={fetchingAllowance}
-          finished={allowanceFinished}
-          onUnlock={unlockCollateral}
+    <>
+      <CenteredCard>
+        <Row cols="1fr">
+          <InputCondition formMethods={formMethods} onConditionChange={handleConditionChange} />
+        </Row>
+        <Row cols="1fr" marginBottomXL>
+          <TitleValue
+            title="Split From"
+            value={
+              <SplitFrom
+                formMethods={formMethods}
+                onCollateralChange={onCollateralChange}
+                onPositionChange={(p) => setPosition(p)}
+                splitFromCollateral={splitFromCollateral}
+                splitFromPosition={splitFromPosition}
+                tokens={tokens}
+              />
+            }
+          />
+        </Row>
+        {shouldDisplayAllowance && (
+          <SetAllowance
+            collateral={collateralToken}
+            fetching={fetchingAllowance}
+            finished={allowanceFinished}
+            onUnlock={unlockCollateral}
+          />
+        )}
+        <Row cols="1fr" marginBottomXL>
+          <InputAmount
+            collateral={collateralToken}
+            formMethods={formMethods}
+            positionId={positionId}
+            splitFrom={splitFrom}
+          />
+        </Row>
+        <Row cols="1fr" marginBottomXL>
+          <TitleValue
+            title="Partition"
+            titleControl={
+              <TitleControl onClick={() => setIsEditPartitionModalOpen(true)}>
+                Edit Partition
+              </TitleControl>
+            }
+            value={<PartitionStyled collections={mockedNumberedOutcomes} />}
+          />
+        </Row>
+        <Row cols="1fr" marginBottomXL>
+          <TitleValue
+            title="Split Position Preview"
+            value={
+              <StripedListStyled>
+                <StripedListItem>[DAI C: 0x123 O: 0] x 10</StripedListItem>
+                <StripedListItem>[DAI C: 0x123 O: 1] x 10</StripedListItem>
+              </StripedListStyled>
+            }
+          />
+        </Row>
+        {isTransactionExecuting && (
+          <FullLoading
+            actionButton={
+              error ? { text: 'OK', onClick: () => setIsTransactionExecuting(true) } : undefined
+            }
+            icon={error ? IconTypes.error : IconTypes.spinner}
+            message={error ? error.message : 'Waiting...'}
+            title={error ? 'Error' : 'Split position'}
+          />
+        )}
+        {error && (
+          <ErrorContainer>
+            <ErrorMessage>{error.message}</ErrorMessage>
+          </ErrorContainer>
+        )}
+        <ButtonContainer>
+          <Button disabled={!canSubmit} onClick={handleSubmit(onSubmit)}>
+            Split
+          </Button>
+        </ButtonContainer>
+      </CenteredCard>
+      {isEditPartitionModalOpen && (
+        <EditPartitionModal
+          isOpen={isEditPartitionModalOpen}
+          onRequestClose={() => setIsEditPartitionModalOpen(false)}
         />
       )}
-      <Row cols="1fr" marginBottomXL>
-        <InputAmount
-          collateral={collateralToken}
-          formMethods={formMethods}
-          positionId={positionId}
-          splitFrom={splitFrom}
-        />
-      </Row>
-      <Row cols="1fr" marginBottomXL>
-        <TitleValue
-          title="Partition"
-          titleControl={<TitleControl>Edit Partition</TitleControl>}
-          value={<PartitionStyled collections={mockedNumberedOutcomes} />}
-        />
-      </Row>
-      <Row cols="1fr" marginBottomXL>
-        <TitleValue
-          title="Split Position Preview"
-          value={
-            <StripedListStyled>
-              <StripedListItem>[DAI C: 0x123 O: 0] x 10</StripedListItem>
-              <StripedListItem>[DAI C: 0x123 O: 1] x 10</StripedListItem>
-            </StripedListStyled>
-          }
-        />
-      </Row>
-      {isTransactionExecuting && (
-        <FullLoading
-          actionButton={
-            error ? { text: 'OK', onClick: () => setIsTransactionExecuting(true) } : undefined
-          }
-          icon={error ? IconTypes.error : IconTypes.spinner}
-          message={error ? error.message : 'Waiting...'}
-          title={error ? 'Error' : 'Split position'}
-        />
-      )}
-      {error && (
-        <ErrorContainer>
-          <ErrorMessage>{error.message}</ErrorMessage>
-        </ErrorContainer>
-      )}
-      <ButtonContainer>
-        <Button disabled={!canSubmit} onClick={handleSubmit(onSubmit)}>
-          Split
-        </Button>
-      </ButtonContainer>
-    </CenteredCard>
+    </>
   )
 }
