@@ -16,6 +16,9 @@ import { CellHash } from '../../components/table/CellHash'
 import { TableControls } from '../../components/table/TableControls'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 import { customStyles } from '../../theme/tableCustomStyles'
+import { getLogger } from '../../util/logger'
+
+const logger = getLogger('PositionsList')
 
 const dropdownItems = [
   { text: 'Details' },
@@ -61,11 +64,13 @@ export const PositionsList = () => {
     {
       // eslint-disable-next-line react/display-name
       cell: (row: Position) => {
-        return networkConfig ? (
-          <TokenIcon symbol={networkConfig.getTokenFromAddress(row.collateralToken).symbol} />
-        ) : (
-          row.collateralToken
-        )
+        try {
+          const token = networkConfig && networkConfig.getTokenFromAddress(row.collateralToken)
+          return <TokenIcon symbol={token.symbol} />
+        } catch (error) {
+          logger.error(error)
+          return row.collateralToken
+        }
       },
       name: 'Collateral',
       selector: 'collateralToken',
