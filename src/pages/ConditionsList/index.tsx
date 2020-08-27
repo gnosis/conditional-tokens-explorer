@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/react-hooks'
+import { useDebounceCallback } from '@react-hook/debounce'
 import { ConditionsListQuery, ConditionsSearchQuery } from 'queries/conditions'
 import React, { useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -19,13 +20,27 @@ import { TableControls } from '../../components/table/TableControls'
 import { tableStyles } from '../../theme/tableStyles'
 
 export const ConditionsList: React.FC = () => {
-  const [conditionIdToSearch, setConditionIdToSearch] = useState('')
+  const [conditionIdToSearch, setConditionIdToSearch] = useState<string>('')
+  const [conditionIdToShow, setConditionIdToShow] = useState<string>('')
+  const debouncedHandler = useDebounceCallback((conditionIdToSearch) => {
+    setConditionIdToSearch(conditionIdToSearch)
+  }, 500)
+  const inputHandler = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { value } = event.currentTarget
+      setConditionIdToShow(value)
+      debouncedHandler(value)
+    },
+    [debouncedHandler]
+  )
+
   const { data, error, loading } = useQuery<Conditions>(
     conditionIdToSearch ? ConditionsSearchQuery : ConditionsListQuery,
     {
       variables: { conditionId: conditionIdToSearch },
     }
   )
+
   const isLoading = !conditionIdToSearch && loading
   const isSearching = conditionIdToSearch && loading
   const history = useHistory()
@@ -152,9 +167,9 @@ export const ConditionsList: React.FC = () => {
             end={filterDropdown}
             start={
               <SearchField
-                onChange={(e) => setConditionIdToSearch(e.currentTarget.value)}
+                onChange={inputHandler}
                 placeholder="Search by condition id..."
-                value={conditionIdToSearch}
+                value={conditionIdToShow}
               />
             }
           />
