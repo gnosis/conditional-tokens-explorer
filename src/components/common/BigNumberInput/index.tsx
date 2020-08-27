@@ -28,7 +28,7 @@ export function BigNumberInput({
 
   // update current value
   React.useEffect(() => {
-    if (!value) {
+    if (!value || value == '0') {
       setInputvalue('')
     } else if (!parseUnits(inputValue || '0', decimals).eq(value)) {
       setInputvalue(formatUnits(value, decimals))
