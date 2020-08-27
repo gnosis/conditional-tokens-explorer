@@ -15,7 +15,7 @@ import { InlineLoading } from '../../components/statusInfo/InlineLoading'
 import { CellHash } from '../../components/table/CellHash'
 import { TableControls } from '../../components/table/TableControls'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
-import { tableStyles } from '../../theme/tableStyles'
+import { customStyles } from '../../theme/tableCustomStyles'
 
 const dropdownItems = [
   { text: 'Details' },
@@ -157,12 +157,12 @@ export const PositionsList = () => {
             <DataTable
               className="outerTableWrapper"
               columns={getColumns()}
-              customStyles={tableStyles}
+              customStyles={customStyles}
               data={data || []}
               highlightOnHover
               noHeader
               onRowClicked={handleRowClick}
-              pagination={true}
+              pagination
               responsive
             />
           )}

@@ -39,7 +39,7 @@ export const PositionPreview = ({ condition, networkConfig, position }: Props) =
     <TitleValue
       title="Redeemed Position Preview"
       value={
-        <StripedList maxHeight="41px">
+        <StripedList maxHeight={redeemedPreview ? 'auto' : '44px'}>
           {redeemedPreview ? (
             <StripedListItem>
               <strong>{redeemedPreview}</strong>
