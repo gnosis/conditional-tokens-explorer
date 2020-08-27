@@ -15,6 +15,9 @@ import { CellHash } from '../../components/table/CellHash'
 import { TableControls } from '../../components/table/TableControls'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 import { tableStyles } from '../../theme/tableStyles'
+import { getLogger } from '../../util/logger'
+
+const logger = getLogger('PositionsList')
 
 const dropdownItems = [
   { text: 'Details' },
@@ -51,7 +54,8 @@ export const PositionsList = () => {
         try {
           const token = networkConfig && networkConfig.getTokenFromAddress(row.collateralToken)
           return <TokenIcon symbol={token.symbol} />
-        } catch {
+        } catch (error) {
+          logger.error(error)
           return row.collateralToken
         }
       },
