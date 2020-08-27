@@ -63,17 +63,20 @@ export const MultiPositionsProvider = (props: Props) => {
     setPositions([])
   }, [])
 
-  const removePositionId = useCallback((positionId: string): void => {
-    let clearPositionsFlag = false
-    setPositionIds((current) => {
-      const next = current.filter((id) => id.toLowerCase() !== positionId.toLowerCase())
-      clearPositionsFlag = next.length === 0
-      return next
-    })
-    if (clearPositionsFlag) {
-      clearPositions()
-    }
-  }, [clearPositions])
+  const removePositionId = useCallback(
+    (positionId: string): void => {
+      let clearPositionsFlag = false
+      setPositionIds((current) => {
+        const next = current.filter((id) => id.toLowerCase() !== positionId.toLowerCase())
+        clearPositionsFlag = next.length === 0
+        return next
+      })
+      if (clearPositionsFlag) {
+        clearPositions()
+      }
+    },
+    [clearPositions]
+  )
 
   const { data: fetchedPositions, error: errorFetchingPositions, loading: loadingQuery } = useQuery<
     GetMultiPositions
@@ -113,7 +116,6 @@ export const MultiPositionsProvider = (props: Props) => {
   if (errorFetchingPositions) {
     errors.push(PositionErrors.FETCHING_ERROR)
   }
-
 
   const value = {
     positions,

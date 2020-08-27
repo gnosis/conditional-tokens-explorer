@@ -42,7 +42,12 @@ export const SelectPositions = (props: Props) => {
   }
 
   React.useEffect(() => {
-    if (!loading && positions.length === balances.length && balances.length === positionIds.length && positions.length === positionIds.length) {
+    if (
+      !loading &&
+      positions.length === balances.length &&
+      balances.length === positionIds.length &&
+      positions.length === positionIds.length
+    ) {
       setPositionsToDisplay(
         positions.map((position) => {
           const i = positionIds.findIndex((id) => id.toLowerCase() === position.id.toLowerCase())

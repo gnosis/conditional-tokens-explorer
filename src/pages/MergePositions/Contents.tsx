@@ -140,7 +140,11 @@ export const Contents = () => {
   return (
     <CenteredCard>
       <Row cols="1fr" marginBottomXL>
-        <SelectPositions callbackToBeExecutedOnRemoveAction={() => { setAmount(ZERO_BN)}} />
+        <SelectPositions
+          callbackToBeExecutedOnRemoveAction={() => {
+            setAmount(ZERO_BN)
+          }}
+        />
       </Row>
       <Row cols="1fr">
         <SelectCondition />

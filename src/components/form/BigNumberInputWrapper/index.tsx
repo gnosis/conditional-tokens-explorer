@@ -1,9 +1,9 @@
-import { BigNumberInput } from '../../common/BigNumberInput'
 import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
 import { ZERO_BN } from '../../../config/constants'
+import { BigNumberInput } from '../../common/BigNumberInput'
 import { Textfield } from '../../pureStyledComponents/Textfield'
 
 const Wrapper = styled.span<{ hasTokenSymbol?: boolean }>`
