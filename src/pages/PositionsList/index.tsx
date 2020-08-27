@@ -66,7 +66,7 @@ export const PositionsList = () => {
       cell: (row: Position) => {
         try {
           const token = networkConfig && networkConfig.getTokenFromAddress(row.collateralToken)
-          return <TokenIcon symbol={token.symbol} />
+          return <TokenIcon symbol={token && token.symbol || ''} />
         } catch (error) {
           logger.error(error)
           return row.collateralToken
