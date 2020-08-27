@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/react-hooks'
+import { useDebounceCallback } from '@react-hook/debounce'
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import styled from 'styled-components'
@@ -49,7 +50,19 @@ interface Props extends ModalProps {
 
 export const SelectConditionModal: React.FC<Props> = (props) => {
   const { onConfirm, ...restProps } = props
-  const [conditionIdToSearch, setConditionIdToSearch] = useState('')
+  const [conditionIdToSearch, setConditionIdToSearch] = useState<string>('')
+  const [conditionIdToShow, setConditionIdToShow] = useState<string>('')
+  const debouncedHandler = useDebounceCallback((conditionIdToSearch) => {
+    setConditionIdToSearch(conditionIdToSearch)
+  }, 500)
+  const inputHandler = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { value } = event.currentTarget
+      setConditionIdToShow(value)
+      debouncedHandler(value)
+    },
+    [debouncedHandler]
+  )
   const { data, error, loading } = useQuery<Conditions>(
     conditionIdToSearch ? ConditionsSearchQuery : ConditionsListQuery,
     {
@@ -131,9 +144,9 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
           <TableControls
             start={
               <Search
-                onChange={(e) => setConditionIdToSearch(e.currentTarget.value)}
+                onChange={inputHandler}
                 placeholder="Search condition id..."
-                value={conditionIdToSearch}
+                value={conditionIdToShow}
               />
             }
           />
