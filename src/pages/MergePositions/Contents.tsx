@@ -13,6 +13,7 @@ import { Row } from 'components/pureStyledComponents/Row'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
 import { ZERO_BN } from 'config/constants'
+import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { ethers } from 'ethers'
@@ -27,12 +28,9 @@ const logger = getLogger('MergePosition')
 export const Contents = () => {
   const { _type: statusContext, CTService, connect, networkConfig } = useWeb3ConnectedOrInfura()
 
-  const {
-    balances,
-    clearPositions,
-    errors: positionsErrors,
-    positions,
-  } = useMultiPositionsContext()
+  const { clearPositions, errors: positionsErrors, positions } = useMultiPositionsContext()
+
+  const { balances, errors: balancesErrors, updateBalaces } = useBatchBalanceContext()
 
   const { clearCondition, condition, errors: conditionErrors } = useConditionContext()
   const [status, setStatus] = useState<Maybe<Status>>(null)
@@ -116,6 +114,7 @@ export const Contents = () => {
         setAmount(ZERO_BN)
         clearPositions()
         clearCondition()
+        updateBalaces([])
 
         setStatus(Status.Ready)
       } else {
@@ -134,6 +133,7 @@ export const Contents = () => {
     amount,
     clearPositions,
     clearCondition,
+    updateBalaces,
     connect,
   ])
 

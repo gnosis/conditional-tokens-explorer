@@ -18,6 +18,7 @@ export const useBalanceForBatchPosition = (positionIds: Array<string>) => {
 
     const getBalance = async (positionIds: Array<string>) => {
       try {
+        setBalances([])
         if (positionIds.length > 0) {
           const balances = await CTService.balanceOfBatch(positionIds)
           setBalances(balances)

@@ -29,10 +29,11 @@ const BatchBalanceContext = React.createContext<BatchBalanceContext>(
 
 interface Props {
   children: React.ReactNode
+  checkForEmptyBalance?: boolean
 }
 
 export const BatchBalanceProvider = (props: Props) => {
-  const { children } = props
+  const { checkForEmptyBalance, children } = props
   const [positionIds, setPositionIds] = useState<Array<string>>([])
   const { clearErrors, errors, pushError, removeError } = useErrors()
   const { balances, loading } = useBalanceForBatchPosition(positionIds)
@@ -40,9 +41,9 @@ export const BatchBalanceProvider = (props: Props) => {
   const updateBalaces = useCallback(
     (positionIds: Array<string>) => {
       clearErrors()
-      const validPositions: boolean =
-        positionIds.length > 0 &&
-        positionIds.map((id) => isPositionIdValid(id)).every((valid) => valid)
+      const validPositions: boolean = positionIds
+        .map((id) => isPositionIdValid(id))
+        .every((valid) => valid)
       if (!validPositions) {
         pushError(BalanceErrors.INVALID_ERROR)
         return
@@ -52,6 +53,15 @@ export const BatchBalanceProvider = (props: Props) => {
     },
     [clearErrors, pushError, setPositionIds]
   )
+
+  useEffect(() => {
+    if (checkForEmptyBalance && positionIds.length && balances.length) {
+      removeError(BalanceErrors.EMPTY_BALANCE_ERROR)
+      if (balances.some((balance) => balance.isZero())) {
+        pushError(BalanceErrors.EMPTY_BALANCE_ERROR)
+      }
+    }
+  }, [balances, positionIds, checkForEmptyBalance, removeError, pushError])
 
   const value = {
     positionIds,

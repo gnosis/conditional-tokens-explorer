@@ -8,6 +8,8 @@ import { Row } from 'components/pureStyledComponents/Row'
 import { StripedList, StripedListEmpty } from 'components/pureStyledComponents/StripedList'
 import { CellHash } from 'components/table/CellHash'
 import { TitleValue } from 'components/text/TitleValue'
+import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
+import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { Position, usePositions } from 'hooks'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
@@ -37,22 +39,26 @@ export const SelectPositionModal: React.FC<ModalProps> = (props) => {
   const [selectedPositions, setSelectedPositions] = useState<Array<Position>>([])
   const { data, error, loading } = usePositions('')
   const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
+  // const { addPositionId, removePositionId } = useMultiPositionsContext()
 
   const handleMultiAddClick = useCallback((position: Position) => {
     setSelectedPositions((current) => {
       const included = current.find((selected) => selected.id === position.id)
       return included ? current : [...current, position]
     })
+    // addPositionId(position.id)
   }, [])
 
   const handleSingleAddClick = useCallback((position: Position) => {
     setSelectedPositions([position])
+    // addPositionId(position.id)
   }, [])
 
   const handleRemoveClick = useCallback((position: Position) => {
     setSelectedPositions((current) => {
       return current.filter((selected) => selected.id !== position.id)
     })
+    // removePositionId(position.id)
   }, [])
 
   const defaultColumns: Array<any> = useMemo(
