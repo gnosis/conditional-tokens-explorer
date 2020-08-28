@@ -45,6 +45,7 @@ const Search = styled(SearchField)`
 `
 
 interface Props extends ModalProps {
+  isOpen: boolean
   onConfirm?: (condition: Conditions_conditions) => void
 }
 

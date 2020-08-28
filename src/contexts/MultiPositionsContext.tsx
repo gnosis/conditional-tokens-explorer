@@ -132,7 +132,6 @@ export const MultiPositionsProvider = (props: Props) => {
     updatePositionIds,
     removePositionId,
     clearPositions,
-    setPositions,
   }
 
   return (

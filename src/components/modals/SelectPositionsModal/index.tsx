@@ -1,20 +1,37 @@
+import { useDebounceCallback } from '@react-hook/debounce'
 import { Button } from 'components/buttons'
+import { ButtonControl, ButtonControlType } from 'components/buttons/ButtonControl'
 import { Modal, ModalProps } from 'components/common/Modal'
 import { TokenIcon } from 'components/common/TokenIcon'
-import { IconDelete } from 'components/icons/IconDelete'
-import { IconPlusDark } from 'components/icons/IconPlusDark'
+import { SearchField } from 'components/form/SearchField'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
-import { Row } from 'components/pureStyledComponents/Row'
-import { StripedList, StripedListEmpty } from 'components/pureStyledComponents/StripedList'
+import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
+import { InfoCard } from 'components/statusInfo/InfoCard'
+import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { CellHash } from 'components/table/CellHash'
+import { TableControls } from 'components/table/TableControls'
 import { TitleValue } from 'components/text/TitleValue'
-import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
-import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { Position, usePositions } from 'hooks'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import styled from 'styled-components'
+import { customStyles } from 'theme/tableCustomStyles'
+
+const LoadingWrapper = styled.div`
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-height: 400px;
+`
+
+const SearchingWrapper = styled(LoadingWrapper)`
+  min-height: 348px;
+`
+
+const Search = styled(SearchField)`
+  max-width: 210px;
+`
 
 interface Props extends ModalProps {
   isOpen: boolean
@@ -23,23 +40,27 @@ interface Props extends ModalProps {
   onRequestClose?: () => void
 }
 
-const ButtonControl = styled.button`
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  /* height: 20px; */
-  outline: none;
-  padding: 0 24px 0 0;
-  /* width: 20px; */
-`
-
 export const SelectPositionModal: React.FC<Props> = (props) => {
   const { onConfirm, singlePosition, ...restProps } = props
-  const [selectedPositions, setSelectedPositions] = useState<Array<Position>>([])
-  const { data, error, loading } = usePositions('')
   const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
-  // const { addPositionId, removePositionId } = useMultiPositionsContext()
+  const [selectedPositions, setSelectedPositions] = useState<Array<Position>>([])
+  const [positionIdToSearch, setPositionIdToSearch] = useState<string>('')
+  const [positionIdToShow, setPositionIdToShow] = useState<string>('')
+
+  const debouncedHandler = useDebounceCallback((positionIdToSearch) => {
+    setPositionIdToSearch(positionIdToSearch)
+  }, 500)
+
+  const inputHandler = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { value } = event.currentTarget
+      setPositionIdToShow(value)
+      debouncedHandler(value)
+    },
+    [debouncedHandler]
+  )
+
+  const { data, error, loading } = usePositions(positionIdToSearch)
 
   const handleMultiAddClick = useCallback((position: Position) => {
     setSelectedPositions((current) => {
@@ -94,15 +115,14 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
       name: '',
       button: true,
       ignoreRowClick: true,
-      maxWidth: '48px',
-      minWidth: '48px',
+      maxWidth: '36px',
+      minWidth: '36px',
       // eslint-disable-next-line react/display-name
       cell: (row: Position) => (
         <ButtonControl
+          buttonType={ButtonControlType.add}
           onClick={() => (singlePosition ? handleSingleAddClick(row) : handleMultiAddClick(row))}
-        >
-          <IconPlusDark />
-        </ButtonControl>
+        />
       ),
     }),
     [singlePosition, handleSingleAddClick, handleMultiAddClick]
@@ -113,13 +133,14 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
       name: '',
       button: true,
       ignoreRowClick: true,
-      maxWidth: '48px',
-      minWidth: '48px',
+      maxWidth: '36px',
+      minWidth: '36px',
       // eslint-disable-next-line react/display-name
       cell: (row: Position) => (
-        <ButtonControl onClick={() => handleRemoveClick(row)}>
-          <IconDelete />
-        </ButtonControl>
+        <ButtonControl
+          buttonType={ButtonControlType.delete}
+          onClick={() => handleRemoveClick(row)}
+        />
       ),
     }),
     [handleRemoveClick]
@@ -137,8 +158,6 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
           right: true,
           selector: 'userBalance',
           sortable: true,
-          maxWidth: '100px',
-          minWidth: '100px',
         },
       ])
     }
@@ -164,51 +183,74 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
     }
   }, [onConfirm, selectedPositions])
 
+  const isLoading = !positionIdToSearch && loading
+  const isSearching = positionIdToSearch && loading
+
   return (
     <Modal
       {...restProps}
       subTitle={singlePosition ? 'Select one Position.' : 'Select multiple Positions.'}
       title={'Select Position'}
     >
-      <Row cols="1fr">
-        <DataTable
-          columns={getPositionsColumns()}
-          data={data || []}
-          noHeader={true}
-          pagination={true}
-          paginationPerPage={5}
-          style={{
-            width: '100%',
-          }}
-        />
-      </Row>
-      <Row cols="1fr">
-        <TitleValue
-          title={singlePosition ? 'Selected Position' : 'Selected Positions'}
-          value={
-            selectedPositions.length ? (
+      {isLoading && (
+        <LoadingWrapper>
+          <InlineLoading message="Loading conditions..." />
+        </LoadingWrapper>
+      )}
+      {error && <InfoCard message={error.message} title="Error" />}
+      {data && !isLoading && (
+        <>
+          <TableControls
+            start={
+              <Search
+                onChange={inputHandler}
+                placeholder="Search condition id..."
+                value={positionIdToShow}
+              />
+            }
+          />
+          {isSearching ? (
+            <SearchingWrapper>
+              <InlineLoading />
+            </SearchingWrapper>
+          ) : (
+            <DataTable
+              className="outerTableWrapper inlineTable"
+              columns={getPositionsColumns()}
+              customStyles={customStyles}
+              data={data || []}
+              noDataComponent={<EmptyContentText>No positions found.</EmptyContentText>}
+              noHeader
+              pagination
+              paginationPerPage={5}
+              style={{
+                width: '100%',
+              }}
+            />
+          )}
+          <TitleValue
+            title={singlePosition ? 'Selected Position' : 'Selected Positions'}
+            value={
               <DataTable
+                className="outerTableWrapper inlineTable"
                 columns={getSelectedColumns()}
+                customStyles={customStyles}
                 data={selectedPositions}
-                noHeader={true}
-                pagination={false}
+                noDataComponent={<EmptyContentText>No positions selected.</EmptyContentText>}
+                noHeader
                 style={{
                   width: '100%',
                 }}
               />
-            ) : (
-              <StripedList maxHeight={'160px'}>
-                <StripedListEmpty>No positions selected.</StripedListEmpty>
-              </StripedList>
-            )
-          }
-        />
-      </Row>
-      <ButtonContainer>
-        <Button disabled={!selectedPositions.length} onClick={handleDone}>
-          Done
-        </Button>
-      </ButtonContainer>
+            }
+          />
+          <ButtonContainer>
+            <Button disabled={!selectedPositions.length} onClick={handleDone}>
+              Done
+            </Button>
+          </ButtonContainer>
+        </>
+      )}
     </Modal>
   )
 }

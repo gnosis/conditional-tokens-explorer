@@ -18,7 +18,11 @@ import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { Position } from 'hooks'
 import React from 'react'
 
-export const SelectPositions = () => {
+interface Props {
+  singlePosition?: boolean
+}
+
+export const SelectPositions = ({ singlePosition }: Props) => {
   const { networkConfig } = useWeb3ConnectedOrInfura()
   const [isModalOpen, setIsModalOpen] = React.useState(false)
 
@@ -38,16 +42,7 @@ export const SelectPositions = () => {
     updateBalaces,
   } = useBatchBalanceContext()
 
-  console.log('balances', balances)
-
   const [positionsToDisplay, setPositionsToDisplay] = React.useState<Array<string>>([])
-
-  // const selectPosition = () => {
-  //   const positionIdFromPrompt = window.prompt(`Enter the position: `)
-  //   if (positionIdFromPrompt) {
-  //     addPositionId(positionIdFromPrompt)
-  //   }
-  // }
 
   const closeModal = React.useCallback(() => setIsModalOpen(false), [])
   const openModal = React.useCallback(() => setIsModalOpen(true), [])
@@ -148,6 +143,7 @@ export const SelectPositions = () => {
           isOpen={isModalOpen}
           onConfirm={onModalConfirm}
           onRequestClose={closeModal}
+          singlePosition={singlePosition}
         />
       )}
     </>
