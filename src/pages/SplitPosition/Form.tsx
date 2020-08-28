@@ -12,11 +12,16 @@ import { SetAllowance } from '../../components/common/SetAllowance'
 import { InputAmount } from '../../components/form/InputAmount'
 import { InputCondition } from '../../components/form/InputCondition'
 import { EditPartitionModal } from '../../components/modals/EditPartitionModal'
-import { Partition } from '../../components/partitions/Partition'
+import { Outcome } from '../../components/partitions/Outcome'
 import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
+import { CardTextSm } from '../../components/pureStyledComponents/CardText'
 import { ErrorContainer, Error as ErrorMessage } from '../../components/pureStyledComponents/Error'
 import { Row } from '../../components/pureStyledComponents/Row'
-import { StripedList, StripedListItem } from '../../components/pureStyledComponents/StripedList'
+import {
+  StripedList,
+  StripedListItem,
+  StripedListItemLessPadding,
+} from '../../components/pureStyledComponents/StripedList'
 import { TitleControl } from '../../components/pureStyledComponents/TitleControl'
 import { FullLoading } from '../../components/statusInfo/FullLoading'
 import { IconTypes } from '../../components/statusInfo/common'
@@ -31,10 +36,6 @@ import { Token } from '../../util/types'
 import { SplitFrom } from './SplitFrom'
 
 const StripedListStyled = styled(StripedList)`
-  margin-top: 6px;
-`
-
-const PartitionStyled = styled(Partition)`
   margin-top: 6px;
 `
 
@@ -241,7 +242,24 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
                 Edit Partition
               </TitleControl>
             }
-            value={<PartitionStyled collections={mockedNumberedOutcomes} />}
+            value={
+              <>
+                <CardTextSm>Collections</CardTextSm>
+                <StripedListStyled>
+                  {mockedNumberedOutcomes.map(
+                    (outcomeList: unknown | any, outcomeListIndex: number) => {
+                      return (
+                        <StripedListItemLessPadding key={outcomeListIndex}>
+                          {outcomeList.map((outcome: string, outcomeIndex: number) => (
+                            <Outcome key={outcomeIndex} outcome={outcome} />
+                          ))}
+                        </StripedListItemLessPadding>
+                      )
+                    }
+                  )}
+                </StripedListStyled>
+              </>
+            }
           />
         </Row>
         <Row cols="1fr" marginBottomXL>

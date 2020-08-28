@@ -1,14 +1,19 @@
 import styled from 'styled-components'
 
-export const StripedList = styled.div<{ maxHeight?: string }>`
+export const StripedList = styled.div<{ maxHeight?: string; minHeight?: string }>`
   border-radius: 4px;
   border: solid 1px ${(props) => props.theme.border.colorDark};
-  height: ${(props) => props.maxHeight};
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  max-height: ${(props) => props.maxHeight};
+  min-height: ${(props) => props.minHeight};
   overflow: auto;
 `
 
 StripedList.defaultProps = {
   maxHeight: '300px',
+  minHeight: '41px',
 }
 
 export const StripedListItem = styled.div<{ justifyContent?: string }>`
@@ -38,6 +43,10 @@ export const StripedListItem = styled.div<{ justifyContent?: string }>`
   }
 `
 
+export const StripedListItemLessPadding = styled(StripedListItem)`
+  padding: 8px 12px;
+`
+
 StripedListItem.defaultProps = {
   justifyContent: 'space-between',
 }
@@ -46,6 +55,7 @@ export const StripedListEmpty = styled.div`
   align-items: center;
   color: ${(props) => props.theme.colors.textColor};
   display: flex;
+  flex-grow: 1;
   font-size: 15px;
   height: 100%;
   justify-content: center;

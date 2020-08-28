@@ -11,14 +11,21 @@ import {
   StripedListEmpty,
   StripedListItem,
 } from '../../pureStyledComponents/StripedList'
+import { TitleControlButton } from '../../pureStyledComponents/TitleControl'
 import { InfoCard } from '../../statusInfo/InfoCard'
 import { InlineLoading } from '../../statusInfo/InlineLoading'
+import { TitleValue } from '../../text/TitleValue'
 
 export const EditPartitionModal: React.FC<ModalProps> = (props) => {
   const { ...restProps } = props
 
   // const isLoading = !conditionIdToSearch && loading
   // const isSearching = conditionIdToSearch && loading
+
+  const mockedNumberedOutcomes = [
+    [1, 4, 3],
+    [2, 5],
+  ]
 
   return (
     <Modal title="Edit Partition" {...restProps}>
@@ -31,6 +38,19 @@ export const EditPartitionModal: React.FC<ModalProps> = (props) => {
       {/* {!isLoading && ( */}
       <>
         {/* Stuff */}
+        <TitleValue
+          title="Collections"
+          titleControl={
+            <TitleControlButton
+              onClick={() => {
+                console.error('Delete allllll')
+              }}
+            >
+              Edit Partition
+            </TitleControlButton>
+          }
+          value={<div>asdg</div>}
+        />
         <ButtonContainer>
           <Button>Save</Button>
         </ButtonContainer>
