@@ -18,7 +18,7 @@ import { TitleControl } from '../../components/pureStyledComponents/TitleControl
 import { FullLoading } from '../../components/statusInfo/FullLoading'
 import { IconTypes } from '../../components/statusInfo/common'
 import { TitleValue } from '../../components/text/TitleValue'
-import { ADDRESS_REGEX, BYTES_REGEX, MAX_OUTCOMES, MIN_OUTCOMES } from '../../config/constants'
+import { ADDRESS_REGEX, BYTES_REGEX, CONFIRMATIONS_TO_WAIT, MAX_OUTCOMES, MIN_OUTCOMES } from '../../config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 import { ConditionalTokensService } from '../../services/conditionalTokens'
 import { getLogger } from '../../util/logger'
@@ -89,7 +89,7 @@ export const PrepareCondition = () => {
         logger.log(`Condition ID ${conditionId}`)
         if (!conditionExists) {
           const tx = await CTService.prepareCondition(questionId, oracleAddress, numOutcomes)
-          await provider.waitForTransaction(tx)
+          await provider.waitForTransaction(tx, CONFIRMATIONS_TO_WAIT)
 
           history.push(`/conditions/${conditionId}`)
         } else {

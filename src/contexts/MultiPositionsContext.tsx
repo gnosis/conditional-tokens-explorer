@@ -58,24 +58,25 @@ export const MultiPositionsProvider = (props: Props) => {
     })
   }, [])
 
-  const removePositionId = useCallback((positionId: string): void => {
-    let clearPositions = false
-    setPositionIds((current) => {
-      const next = current.filter((id) => id !== positionId.toLowerCase())
-      if (!next.length) {
-        clearPositions = true
-      }
-      return next
-    })
-    if (clearPositions) {
-      setPositions([])
-    }
-  }, [])
-
   const clearPositions = useCallback((): void => {
     setPositionIds([])
     setPositions([])
   }, [])
+
+  const removePositionId = useCallback(
+    (positionId: string): void => {
+      let clearPositionsFlag = false
+      setPositionIds((current) => {
+        const next = current.filter((id) => id.toLowerCase() !== positionId.toLowerCase())
+        clearPositionsFlag = next.length === 0
+        return next
+      })
+      if (clearPositionsFlag) {
+        clearPositions()
+      }
+    },
+    [clearPositions]
+  )
 
   const { data: fetchedPositions, error: errorFetchingPositions, loading: loadingQuery } = useQuery<
     GetMultiPositions
