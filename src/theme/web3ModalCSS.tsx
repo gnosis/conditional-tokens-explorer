@@ -11,4 +11,20 @@ export const web3ModalCSS = css`
     border-radius: ${(props) => props.theme.modalStyle.content.borderRadius};
     box-shadow: ${(props) => props.theme.modalStyle.content.boxShadow};
   }
+  .web3modal-provider-icon {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    box-shadow: none;
+    -webkit-box-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    align-items: center;
+    border-radius: 50%;
+    overflow: visible;
+    > img {
+      height: 45px;
+      width: 45px;
+    }
+  }
 `
