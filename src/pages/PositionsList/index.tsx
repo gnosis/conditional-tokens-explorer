@@ -1,6 +1,6 @@
 import { useDebounceCallback } from '@react-hook/debounce'
 import { Position, usePositions } from 'hooks'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useHistory } from 'react-router-dom'
 
@@ -109,6 +109,29 @@ export const PositionsList = () => {
   ]
   const [connectedItems, setConnectedItems] = useState<Array<any>>([])
 
+  const menu = useMemo(() => {
+    return [
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: Position) => (
+          <Dropdown
+            activeItemHighlight={false}
+            dropdownButtonContent={<ButtonDots />}
+            dropdownPosition={DropdownPosition.right}
+            items={buildMenuForRow(row).map((item, index) => (
+              <DropdownItem key={index} onClick={item.onClick}>
+                {item.text}
+              </DropdownItem>
+            ))}
+          />
+        ),
+        name: '',
+        width: '60px',
+        right: true,
+      },
+    ]
+  }, [buildMenuForRow])
+
   useEffect(() => {
     if (status === Web3ContextStatus.Connected) {
       setConnectedItems([
@@ -120,31 +143,13 @@ export const PositionsList = () => {
           selector: 'userBalance',
           sortable: true,
         },
-        {
-          // eslint-disable-next-line react/display-name
-          cell: (row: Position) => (
-            <Dropdown
-              activeItemHighlight={false}
-              dropdownButtonContent={<ButtonDots />}
-              dropdownPosition={DropdownPosition.right}
-              items={buildMenuForRow(row).map((item, index) => (
-                <DropdownItem key={index} onClick={item.onClick}>
-                  {item.text}
-                </DropdownItem>
-              ))}
-            />
-          ),
-          name: '',
-          width: '60px',
-          right: true,
-        },
       ])
     }
   }, [status, buildMenuForRow])
 
   const getColumns = useCallback(() => {
-    return [...defaultColumns, ...connectedItems]
-  }, [connectedItems, defaultColumns])
+    return [...defaultColumns, ...connectedItems, ...menu]
+  }, [connectedItems, defaultColumns, menu])
 
   const tokensList = networkConfig
     ? [
