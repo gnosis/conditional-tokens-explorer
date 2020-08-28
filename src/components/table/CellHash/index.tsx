@@ -1,8 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { truncateStringInTheMiddle } from '../../util/tools'
-import { ButtonCopy } from '../buttons/ButtonCopy'
+import { truncateStringInTheMiddle } from '../../../util/tools'
+import { ButtonCopy } from '../../buttons/ButtonCopy'
 
 const Wrapper = styled.span`
   font-family: monospace;

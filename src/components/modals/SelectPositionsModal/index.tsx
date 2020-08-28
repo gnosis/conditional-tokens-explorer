@@ -1,5 +1,5 @@
 import { Button } from 'components/buttons'
-import { Modal, ModalBasicProps } from 'components/common/Modal'
+import { Modal, ModalProps } from 'components/common/Modal'
 import { TokenIcon } from 'components/common/TokenIcon'
 import { IconDelete } from 'components/icons/IconDelete'
 import { IconPlusDark } from 'components/icons/IconPlusDark'
@@ -16,7 +16,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import styled from 'styled-components'
 
-interface ModalProps extends ModalBasicProps {
+interface Props extends ModalProps {
   isOpen: boolean
   singlePosition?: boolean
   onConfirm?: (positions: Array<Position>) => void
@@ -34,7 +34,7 @@ const ButtonControl = styled.button`
   /* width: 20px; */
 `
 
-export const SelectPositionModal: React.FC<ModalProps> = (props) => {
+export const SelectPositionModal: React.FC<Props> = (props) => {
   const { onConfirm, singlePosition, ...restProps } = props
   const [selectedPositions, setSelectedPositions] = useState<Array<Position>>([])
   const { data, error, loading } = usePositions('')

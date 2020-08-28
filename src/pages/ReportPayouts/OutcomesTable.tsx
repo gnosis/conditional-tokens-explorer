@@ -1,6 +1,6 @@
 import { BigNumberInputWrapper } from 'components/form/BigNumberInputWrapper'
 import { BigNumber, formatUnits } from 'ethers/utils'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import styled from 'styled-components'
 
@@ -8,6 +8,8 @@ import { Button } from '../../components/buttons/Button'
 import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
 import { Error, ErrorContainer } from '../../components/pureStyledComponents/Error'
 import { TableWrapper } from '../../components/pureStyledComponents/TableWrapper'
+import { FullLoading } from '../../components/statusInfo/FullLoading'
+import { IconTypes } from '../../components/statusInfo/common'
 import { ZERO_BN } from '../../config/constants'
 import { useConditionContext } from '../../contexts/ConditionContext'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
@@ -117,11 +119,19 @@ export const OutcomesTable = ({ condition }: Props) => {
   const { clearCondition } = useConditionContext()
   const { oracle, outcomeSlotCount, questionId } = condition
   const { outcomesPrettier } = useQuestion(questionId, outcomeSlotCount)
-  const [outcomes, setOutcomes] = React.useState<Outcome[]>([])
-  const [payoutEmptyError, setPayoutEmptyError] = React.useState(false)
-  const [transactionStatus, setTransactionStatus] = React.useState<Maybe<Status>>(null)
-  const [oracleNotValidError, setOracleNotValidError] = React.useState(true)
-  const { control, getValues, handleSubmit, watch } = useForm<FormInputs>({ mode: 'onSubmit' })
+  const [outcomes, setOutcomes] = useState<Outcome[]>([])
+  const [payoutEmptyError, setPayoutEmptyError] = useState(false)
+  const [transactionStatus, setTransactionStatus] = useState<Maybe<Status>>(null)
+  const [oracleNotValidError, setOracleNotValidError] = useState(true)
+  const [error, setError] = useState<Maybe<Error>>(null)
+
+  const {
+    control,
+    formState: { dirty },
+    getValues,
+    handleSubmit,
+    watch,
+  } = useForm<FormInputs>({ mode: 'onSubmit' })
 
   // Check if the sender is valid
   useEffect(() => {
@@ -152,11 +162,11 @@ export const OutcomesTable = ({ condition }: Props) => {
 
   // Validate payouts (positive, at least one non 0)
   useEffect(() => {
-    if (watchPayouts && watchPayouts.length > 0) {
+    if (watchPayouts && watchPayouts.length > 0 && dirty) {
       const nonZero = (currentValue: BigNumber) => !currentValue.isZero()
       setPayoutEmptyError(!watchPayouts.some(nonZero))
     }
-  }, [watchPayouts])
+  }, [watchPayouts, dirty])
 
   const onChange = (value: BigNumber, index: number) => {
     const values = Object.values(getValues())
@@ -203,13 +213,16 @@ export const OutcomesTable = ({ condition }: Props) => {
         connect()
       }
     } catch (err) {
-      setTransactionStatus(Status.Error)
+      setError(err)
       logger.error(err)
+    } finally {
+      setTransactionStatus(Status.Ready)
     }
   }
 
   // Variable used to disable the submit button, check for payouts not empty and the oracle must be valid
   const disableSubmit =
+    !dirty ||
     payoutEmptyError ||
     (status === Web3ContextStatus.Connected && oracleNotValidError) ||
     transactionStatus === Status.Loading
@@ -252,6 +265,16 @@ export const OutcomesTable = ({ condition }: Props) => {
           </TBody>
         </Table>
       </TableWrapper>
+      {transactionStatus === Status.Loading && (
+        <FullLoading
+          actionButton={
+            error ? { text: 'OK', onClick: () => setTransactionStatus(Status.Ready) } : undefined
+          }
+          icon={error ? IconTypes.error : IconTypes.spinner}
+          message={error ? error.message : 'Waiting...'}
+          title={error ? 'Error' : 'Report payout'}
+        />
+      )}
       <ErrorContainer>
         {payoutEmptyError && <Error>{PAYOUTS_POSITIVE_ERROR}</Error>}
         {status === Web3ContextStatus.Connected && oracleNotValidError && (

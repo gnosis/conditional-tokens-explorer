@@ -4,7 +4,19 @@ import theme from './index'
 
 const horizontalPadding = '15px'
 
-export const tableStyles: IDataTableStyles = {
+export const customStyles: IDataTableStyles = {
+  table: {
+    style: {
+      flexGrow: 1,
+    },
+  },
+  tableWrapper: {
+    style: {
+      display: 'flex',
+      flexDirection: 'column',
+      flexGrow: 1,
+    },
+  },
   headRow: {
     style: {
       backgroundColor: theme.colors.whitesmoke3,
@@ -65,8 +77,14 @@ export const tableStyles: IDataTableStyles = {
       borderTopStyle: 'solid',
       borderTopWidth: '1px',
       color: theme.colors.textColor,
+      flexGrow: 0,
       fontSize: '13px',
       minHeight: '63px',
+    },
+  },
+  noData: {
+    style: {
+      flexGrow: 1,
     },
   },
 }

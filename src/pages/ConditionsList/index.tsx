@@ -1,29 +1,49 @@
 import { useQuery } from '@apollo/react-hooks'
+import { useDebounceCallback } from '@react-hook/debounce'
 import { ConditionsListQuery, ConditionsSearchQuery } from 'queries/conditions'
-import React from 'react'
+import React, { useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useHistory } from 'react-router-dom'
 import { Conditions, Conditions_conditions } from 'types/generatedGQL'
 
 import { ButtonDots } from '../../components/buttons/ButtonDots'
+import { ButtonSelectLight } from '../../components/buttons/ButtonSelectLight'
 import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
+import { SearchField } from '../../components/form/SearchField'
+import { EmptyContentText } from '../../components/pureStyledComponents/EmptyContentText'
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
 import { Pill, PillTypes } from '../../components/pureStyledComponents/Pill'
 import { InfoCard } from '../../components/statusInfo/InfoCard'
 import { InlineLoading } from '../../components/statusInfo/InlineLoading'
 import { CellHash } from '../../components/table/CellHash'
-import { tableStyles } from '../../theme/tableStyles'
+import { TableControls } from '../../components/table/TableControls'
+import { customStyles } from '../../theme/tableCustomStyles'
 
 export const ConditionsList: React.FC = () => {
-  const [conditionIdToSearch, setConditionIdToSearch] = React.useState('')
+  const [conditionIdToSearch, setConditionIdToSearch] = useState<string>('')
+  const [conditionIdToShow, setConditionIdToShow] = useState<string>('')
+  const debouncedHandler = useDebounceCallback((conditionIdToSearch) => {
+    setConditionIdToSearch(conditionIdToSearch)
+  }, 500)
+  const inputHandler = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { value } = event.currentTarget
+      setConditionIdToShow(value)
+      debouncedHandler(value)
+    },
+    [debouncedHandler]
+  )
+
   const { data, error, loading } = useQuery<Conditions>(
     conditionIdToSearch ? ConditionsSearchQuery : ConditionsListQuery,
     {
       variables: { conditionId: conditionIdToSearch },
     }
   )
-  const history = useHistory()
 
+  const isLoading = !conditionIdToSearch && loading
+  const isSearching = conditionIdToSearch && loading
+  const history = useHistory()
   const dropdownItems = [
     { text: 'Details' },
     { text: 'Split Position' },
@@ -115,30 +135,59 @@ export const ConditionsList: React.FC = () => {
     },
   ]
 
+  const filterItems = [
+    { text: 'All Reporters / Oracles' },
+    { text: 'Custom Reporters' },
+    { text: 'Realit.io' },
+    { text: 'Kleros' },
+  ]
+
+  const [selectedFilter, setselectedFilter] = useState(0)
+
+  const filterDropdown = (
+    <Dropdown
+      dropdownButtonContent={<ButtonSelectLight content={filterItems[selectedFilter].text} />}
+      dropdownPosition={DropdownPosition.right}
+      items={filterItems.map((item, index) => (
+        <DropdownItem key={index} onClick={() => setselectedFilter(index)}>
+          {item.text}
+        </DropdownItem>
+      ))}
+    />
+  )
+
   return (
     <>
       <PageTitle>Conditions</PageTitle>
-      {loading && <InlineLoading />}
+      {isLoading && <InlineLoading />}
       {error && <InfoCard message={error.message} title="Error" />}
-      {data && !loading && (
+      {data && !isLoading && (
         <>
-          <input
-            onChange={(e) => setConditionIdToSearch(e.currentTarget.value)}
-            placeholder="Search by condition id..."
-            type="text"
-            value={conditionIdToSearch}
+          <TableControls
+            end={filterDropdown}
+            start={
+              <SearchField
+                onChange={inputHandler}
+                placeholder="Search by condition id..."
+                value={conditionIdToShow}
+              />
+            }
           />
-          <DataTable
-            className="outerTableWrapper"
-            columns={columns}
-            customStyles={tableStyles}
-            data={data?.conditions || []}
-            highlightOnHover
-            noHeader
-            onRowClicked={handleRowClick}
-            pagination={true}
-            responsive
-          />
+          {isSearching && <InlineLoading />}
+          {!isSearching && (
+            <DataTable
+              className="outerTableWrapper"
+              columns={columns}
+              customStyles={customStyles}
+              data={data?.conditions || []}
+              highlightOnHover
+              noDataComponent={<EmptyContentText>No conditions found.</EmptyContentText>}
+              noHeader
+              onRowClicked={handleRowClick}
+              pagination
+              responsive
+            />
+          )}
         </>
       )}
     </>

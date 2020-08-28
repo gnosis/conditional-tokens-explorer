@@ -1,17 +1,24 @@
+import { useDebounceCallback } from '@react-hook/debounce'
 import { Position, usePositions } from 'hooks'
 import React, { useCallback, useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useHistory } from 'react-router-dom'
 
 import { ButtonDots } from '../../components/buttons/ButtonDots'
+import { ButtonSelectLight } from '../../components/buttons/ButtonSelectLight'
 import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
 import { TokenIcon } from '../../components/common/TokenIcon'
+import { SearchField } from '../../components/form/SearchField'
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
 import { InfoCard } from '../../components/statusInfo/InfoCard'
 import { InlineLoading } from '../../components/statusInfo/InlineLoading'
 import { CellHash } from '../../components/table/CellHash'
+import { TableControls } from '../../components/table/TableControls'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
-import { tableStyles } from '../../theme/tableStyles'
+import { customStyles } from '../../theme/tableCustomStyles'
+import { getLogger } from '../../util/logger'
+
+const logger = getLogger('PositionsList')
 
 const dropdownItems = [
   { text: 'Details' },
@@ -21,10 +28,24 @@ const dropdownItems = [
 ]
 
 export const PositionsList = () => {
-  const [searchPositionId, setSearchPositionId] = React.useState('')
+  const [positionIdToSearch, setPositionIdToSearch] = useState<string>('')
+  const [positionIdToShow, setPositionIdToShow] = useState<string>('')
+  const debouncedHandler = useDebounceCallback((positionIdToSearch) => {
+    setPositionIdToSearch(positionIdToSearch)
+  }, 500)
+  const inputHandler = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { value } = event.currentTarget
+      setPositionIdToShow(value)
+      debouncedHandler(value)
+    },
+    [debouncedHandler]
+  )
   const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
-  const { data, error, loading } = usePositions(searchPositionId)
+  const { data, error, loading } = usePositions(positionIdToSearch)
   const history = useHistory()
+  const isLoading = !positionIdToSearch && loading
+  const isSearching = positionIdToSearch && loading
 
   const handleRowClick = (row: Position) => {
     history.push(`/positions/${row.id}`)
@@ -43,11 +64,13 @@ export const PositionsList = () => {
     {
       // eslint-disable-next-line react/display-name
       cell: (row: Position) => {
-        return networkConfig ? (
-          <TokenIcon symbol={networkConfig.getTokenFromAddress(row.collateralToken).symbol} />
-        ) : (
-          row.collateralToken
-        )
+        try {
+          const token = networkConfig && networkConfig.getTokenFromAddress(row.collateralToken)
+          return <TokenIcon symbol={token.symbol} />
+        } catch (error) {
+          logger.error(error)
+          return row.collateralToken
+        }
       },
       name: 'Collateral',
       selector: 'collateralToken',
@@ -93,30 +116,61 @@ export const PositionsList = () => {
     return [...defaultColumns, ...connectedItems]
   }, [connectedItems, defaultColumns])
 
+  const tokensList = networkConfig
+    ? [
+        ...networkConfig.getTokens().map((item) => {
+          return { content: <TokenIcon symbol={item.symbol} /> }
+        }),
+      ]
+    : []
+
+  const filterItems = [{ content: 'All Collaterals' }, ...tokensList]
+
+  const [selectedFilter, setselectedFilter] = useState(0)
+
+  const filterDropdown = (
+    <Dropdown
+      dropdownButtonContent={<ButtonSelectLight content={filterItems[selectedFilter].content} />}
+      dropdownPosition={DropdownPosition.right}
+      items={filterItems.map((item, index) => (
+        <DropdownItem key={index} onClick={() => setselectedFilter(index)}>
+          {item.content}
+        </DropdownItem>
+      ))}
+    />
+  )
+
   return (
     <>
       <PageTitle>Positions</PageTitle>
-      {loading && <InlineLoading />}
+      {isLoading && <InlineLoading />}
       {error && <InfoCard message={error.message} title="Error" />}
-      {data && !loading && (
+      {data && !isLoading && (
         <>
-          <input
-            onChange={(e) => setSearchPositionId(e.currentTarget.value)}
-            placeholder="Search position..."
-            type="text"
-            value={searchPositionId}
+          <TableControls
+            end={filterDropdown}
+            start={
+              <SearchField
+                onChange={inputHandler}
+                placeholder="Search by position id..."
+                value={positionIdToShow}
+              />
+            }
           />
-          <DataTable
-            className="outerTableWrapper"
-            columns={getColumns()}
-            customStyles={tableStyles}
-            data={data || []}
-            highlightOnHover
-            noHeader
-            onRowClicked={handleRowClick}
-            pagination={true}
-            responsive
-          />
+          {isSearching && <InlineLoading />}
+          {!isSearching && (
+            <DataTable
+              className="outerTableWrapper"
+              columns={getColumns()}
+              customStyles={customStyles}
+              data={data || []}
+              highlightOnHover
+              noHeader
+              onRowClicked={handleRowClick}
+              pagination
+              responsive
+            />
+          )}
         </>
       )}
     </>

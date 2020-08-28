@@ -3,11 +3,10 @@ import styled from 'styled-components'
 
 const Wrapper = styled.svg``
 
-export const IconEdit: React.FC = (props) => (
+export const IconEdit: React.FC<{ className?: string }> = (props) => (
   <Wrapper
-    className="iconEdit"
+    className={`iconEdit ${props.className}`}
     height="20"
-    id="edit_icon"
     viewBox="0 0 20 20"
     width="20"
     xmlns="http://www.w3.org/2000/svg"

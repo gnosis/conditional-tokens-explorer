@@ -92,7 +92,7 @@ export const DropdownItem = styled.div<{ active?: boolean }>`
   line-height: 1.4;
   min-height: ${(props) => props.theme.dropdown.item.height};
   overflow: hidden;
-  padding: 0 ${(props) => props.theme.dropdown.item.paddingHorizontal};
+  padding: 10px ${(props) => props.theme.dropdown.item.paddingHorizontal};
 
   &:first-child {
     border-top-left-radius: ${(props) => props.theme.cards.borderRadius};

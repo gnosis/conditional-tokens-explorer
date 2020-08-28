@@ -3,13 +3,13 @@ import React from 'react'
 import { ConditionProvider } from '../../contexts/ConditionContext'
 import { PositionProvider } from '../../contexts/PositionContext'
 
-import { RedeemPositionWrapper } from './RedeemPositionWrapper'
+import { Contents } from './Contents'
 
-export const RedeemPositionContainer = () => {
+export const RedeemPosition = () => {
   return (
     <PositionProvider checkForEmptyBalance={true}>
       <ConditionProvider checkForConditionNotResolved={true}>
-        <RedeemPositionWrapper />
+        <Contents />
       </ConditionProvider>
     </PositionProvider>
   )

@@ -18,7 +18,7 @@ import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { Position } from 'hooks'
 import React from 'react'
 
-export const SelectPosition = () => {
+export const SelectPositions = () => {
   const { networkConfig } = useWeb3ConnectedOrInfura()
   const [isModalOpen, setIsModalOpen] = React.useState(false)
 

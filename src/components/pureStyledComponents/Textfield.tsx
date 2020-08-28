@@ -14,13 +14,14 @@ export const TextfieldCSS = css<{ error?: boolean }>`
   height: ${(props) => props.theme.textField.height};
   outline: none;
   padding: 0 ${(props) => props.theme.textField.paddingHorizontal};
+  transition: border-color 0.15s linear;
   width: 100%;
 
   &:active,
   &:focus {
     background-color: ${(props) => props.theme.textField.backgroundColorActive};
     border-color: ${(props) =>
-      props.error ? props.theme.textField.errorColor : props.theme.textField.borderColor};
+      props.error ? props.theme.textField.errorColor : props.theme.textField.borderColorActive};
   }
 
   &::placeholder {
