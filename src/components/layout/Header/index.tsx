@@ -18,8 +18,6 @@ const Wrapper = styled.header`
   justify-content: space-between;
   padding-left: ${(props) => props.theme.layout.horizontalPadding};
   padding-right: ${(props) => props.theme.layout.horizontalPadding};
-  position: relative;
-  z-index: 5;
 `
 
 const LogoLink = styled(Link)`

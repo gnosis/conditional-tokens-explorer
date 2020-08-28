@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { IconDelete } from '../../icons/IconDelete'
 import { IconEdit } from '../../icons/IconEdit'
 import { IconOk } from '../../icons/IconOk'
+import { IconPlus } from '../../icons/IconPlus'
 
 const Wrapper = styled.button`
   background-color: transparent;
@@ -15,12 +16,13 @@ const Wrapper = styled.button`
   padding: 0;
   width: 20px;
 
+  path {
+    fill: ${(props) => props.theme.colors.darkGrey};
+  }
+
   &:hover {
-    .iconEdit,
-    .iconOk {
-      path {
-        fill: ${(props) => props.theme.colors.primary};
-      }
+    path {
+      fill: ${(props) => props.theme.colors.primary};
     }
 
     .iconDelete {
@@ -51,6 +53,7 @@ export enum ButtonControlType {
   ok = 1,
   delete = 2,
   edit = 3,
+  add = 4,
 }
 
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -64,6 +67,7 @@ export const ButtonControl: React.FC<Props> = (props) => {
       {buttonType === ButtonControlType.delete && <IconDelete />}
       {buttonType === ButtonControlType.ok && <IconOk />}
       {buttonType === ButtonControlType.edit && <IconEdit />}
+      {buttonType === ButtonControlType.add && <IconPlus />}
     </Wrapper>
   )
 }

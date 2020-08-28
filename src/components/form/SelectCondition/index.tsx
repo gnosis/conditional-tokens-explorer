@@ -66,11 +66,13 @@ export const SelectCondition: React.FC<Props> = (props) => {
         }
         {...restProps}
       />
-      <SelectConditionModal
-        isOpen={isModalOpen}
-        onConfirm={closeModal}
-        onRequestClose={closeModal}
-      />
+      {isModalOpen && (
+        <SelectConditionModal
+          isOpen={isModalOpen}
+          onConfirm={closeModal}
+          onRequestClose={closeModal}
+        />
+      )}
     </>
   )
 }

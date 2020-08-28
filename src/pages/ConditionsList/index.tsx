@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/react-hooks'
+import { useDebounceCallback } from '@react-hook/debounce'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { ConditionsListQuery, ConditionsSearchQuery } from 'queries/conditions'
 import React, { useCallback, useState } from 'react'
@@ -17,16 +18,30 @@ import { InfoCard } from '../../components/statusInfo/InfoCard'
 import { InlineLoading } from '../../components/statusInfo/InlineLoading'
 import { CellHash } from '../../components/table/CellHash'
 import { TableControls } from '../../components/table/TableControls'
-import { tableStyles } from '../../theme/tableStyles'
+import { customStyles } from '../../theme/tableCustomStyles'
 
 export const ConditionsList: React.FC = () => {
-  const [conditionIdToSearch, setConditionIdToSearch] = useState('')
+  const [conditionIdToSearch, setConditionIdToSearch] = useState<string>('')
+  const [conditionIdToShow, setConditionIdToShow] = useState<string>('')
+  const debouncedHandler = useDebounceCallback((conditionIdToSearch) => {
+    setConditionIdToSearch(conditionIdToSearch)
+  }, 500)
+  const inputHandler = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { value } = event.currentTarget
+      setConditionIdToShow(value)
+      debouncedHandler(value)
+    },
+    [debouncedHandler]
+  )
+
   const { data, error, loading } = useQuery<Conditions>(
     conditionIdToSearch ? ConditionsSearchQuery : ConditionsListQuery,
     {
       variables: { conditionId: conditionIdToSearch },
     }
   )
+
   const isLoading = !conditionIdToSearch && loading
   const isSearching = conditionIdToSearch && loading
   const history = useHistory()
@@ -182,9 +197,9 @@ export const ConditionsList: React.FC = () => {
             end={filterDropdown}
             start={
               <SearchField
-                onChange={(e) => setConditionIdToSearch(e.currentTarget.value)}
+                onChange={inputHandler}
                 placeholder="Search by condition id..."
-                value={conditionIdToSearch}
+                value={conditionIdToShow}
               />
             }
           />
@@ -193,13 +208,13 @@ export const ConditionsList: React.FC = () => {
             <DataTable
               className="outerTableWrapper"
               columns={columns}
-              customStyles={tableStyles}
+              customStyles={customStyles}
               data={data?.conditions || []}
               highlightOnHover
               noDataComponent={<EmptyContentText>No conditions found.</EmptyContentText>}
               noHeader
               onRowClicked={handleRowClick}
-              pagination={true}
+              pagination
               responsive
             />
           )}
