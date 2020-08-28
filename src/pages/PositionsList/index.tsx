@@ -47,36 +47,13 @@ export const PositionsList = () => {
   const isLoading = !positionIdToSearch && loading
   const isSearching = positionIdToSearch && loading
 
-  const handleRowClick = (row: Position) => {
-    history.push(`/positions/${row.id}`)
-  }
+  const handleRowClick = React.useCallback(
+    (row: Position) => {
+      history.push(`/positions/${row.id}`)
+    },
+    [history]
+  )
 
-  const defaultColumns: Array<any> = [
-    {
-      // eslint-disable-next-line react/display-name
-      cell: (row: Position) => (
-        <CellHash onClick={() => handleRowClick(row)} underline value={row.id} />
-      ),
-      name: 'Position Id',
-      selector: 'id',
-      sortable: true,
-    },
-    {
-      // eslint-disable-next-line react/display-name
-      cell: (row: Position) => {
-        try {
-          const token = networkConfig && networkConfig.getTokenFromAddress(row.collateralToken)
-          return <TokenIcon symbol={(token && token.symbol) || ''} />
-        } catch (error) {
-          logger.error(error)
-          return row.collateralToken
-        }
-      },
-      name: 'Collateral',
-      selector: 'collateralToken',
-      sortable: true,
-    },
-  ]
   const [connectedItems, setConnectedItems] = useState<Array<any>>([])
 
   useEffect(() => {
@@ -113,8 +90,36 @@ export const PositionsList = () => {
   }, [status])
 
   const getColumns = useCallback(() => {
+    // If you move this outside of the useCallback, can cause performance issues as a dep of this useCallback
+    const defaultColumns: Array<any> = [
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: Position) => (
+          <CellHash onClick={() => handleRowClick(row)} underline value={row.id} />
+        ),
+        name: 'Position Id',
+        selector: 'id',
+        sortable: true,
+      },
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: Position) => {
+          try {
+            const token = networkConfig && networkConfig.getTokenFromAddress(row.collateralToken)
+            return <TokenIcon symbol={(token && token.symbol) || ''} />
+          } catch (error) {
+            logger.error(error)
+            return row.collateralToken
+          }
+        },
+        name: 'Collateral',
+        selector: 'collateralToken',
+        sortable: true,
+      },
+    ]
+
     return [...defaultColumns, ...connectedItems]
-  }, [connectedItems, defaultColumns])
+  }, [connectedItems, handleRowClick, networkConfig])
 
   const tokensList = networkConfig
     ? [
