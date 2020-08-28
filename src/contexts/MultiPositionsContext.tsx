@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/react-hooks'
 import { BigNumber } from 'ethers/utils'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useBalanceForBatchPosition } from '../hooks/useBalanceForBatchPosition'
 import { GetMultiPositionsQuery } from '../queries/positions'
@@ -49,7 +49,8 @@ export const MultiPositionsProvider = (props: Props) => {
   const [positionIds, setPositionIds] = useState<Array<string>>([])
   const [positions, setPositions] = useState<Array<GetMultiPositions_positions>>([])
 
-  const errors: any[] = []
+  // Don't remove the useMemo, can cause performance issues
+  const errors: PositionErrors[] = useMemo(() => [], [])
 
   const addPositionId = useCallback((positionId: string): void => {
     const positionIdLc = positionId.toLowerCase()
