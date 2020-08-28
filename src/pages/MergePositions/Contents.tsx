@@ -139,7 +139,7 @@ export const Contents = () => {
   return (
     <CenteredCard>
       <Row cols="1fr" marginBottomXL>
-        <SelectPositions />
+        <SelectPositions title="Positions" />
       </Row>
       <Row cols="1fr">
         <SelectCondition />

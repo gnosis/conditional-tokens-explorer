@@ -1,16 +1,18 @@
+import { BatchBalanceProvider } from 'contexts/BatchBalanceContext'
+import { ConditionProvider } from 'contexts/ConditionContext'
+import { MultiPositionsProvider } from 'contexts/MultiPositionsContext'
 import React from 'react'
-
-import { ConditionProvider } from '../../contexts/ConditionContext'
-import { PositionProvider } from '../../contexts/PositionContext'
 
 import { Contents } from './Contents'
 
 export const RedeemPosition = () => {
   return (
-    <PositionProvider checkForEmptyBalance={true}>
-      <ConditionProvider checkForConditionNotResolved={true}>
-        <Contents />
-      </ConditionProvider>
-    </PositionProvider>
+    <MultiPositionsProvider>
+      <BatchBalanceProvider checkForEmptyBalance={true}>
+        <ConditionProvider checkForConditionNotResolved={true}>
+          <Contents />
+        </ConditionProvider>
+      </BatchBalanceProvider>
+    </MultiPositionsProvider>
   )
 }

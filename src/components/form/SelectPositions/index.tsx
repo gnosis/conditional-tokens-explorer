@@ -9,6 +9,7 @@ import {
   StripedListEmpty,
   StripedListItem,
 } from 'components/pureStyledComponents/StripedList'
+import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { TitleControl } from 'components/pureStyledComponents/TitleControl'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { TitleValue } from 'components/text/TitleValue'
@@ -19,10 +20,11 @@ import { Position } from 'hooks'
 import React from 'react'
 
 interface Props {
+  title: string
   singlePosition?: boolean
 }
 
-export const SelectPositions = ({ singlePosition }: Props) => {
+export const SelectPositions = ({ singlePosition, title }: Props) => {
   const { networkConfig } = useWeb3ConnectedOrInfura()
   const [isModalOpen, setIsModalOpen] = React.useState(false)
 
@@ -107,28 +109,42 @@ export const SelectPositions = ({ singlePosition }: Props) => {
   return (
     <>
       <TitleValue
-        title="Positions"
-        titleControl={<TitleControl onClick={openModal}>Select Positions</TitleControl>}
+        title={title}
+        titleControl={
+          <TitleControl onClick={openModal}>
+            {singlePosition ? 'Select Position' : 'Select Positions'}
+          </TitleControl>
+        }
         value={
           <>
-            <StripedList maxHeight="150px">
-              {positionsToDisplay.length ? (
-                positionsToDisplay.map((position: string, index: number) => (
-                  <StripedListItem key={index}>
-                    <span>{position}</span>
-                    <ButtonControl
-                      buttonType={ButtonControlType.delete}
-                      onClick={() => onRemovePosition(positions[index].id)}
-                    />
-                  </StripedListItem>
-                ))
-              ) : (
-                <StripedListEmpty>
-                  {isLoading && errors.length === 0 ? <InlineLoading /> : 'No positions.'}
-                </StripedListEmpty>
-              )}
-            </StripedList>
-            {errors && (
+            {singlePosition ? (
+              <Textfield
+                disabled={true}
+                error={!!errors.length}
+                placeholder={'Please select a position...'}
+                type="text"
+                value={positionsToDisplay.length ? positionsToDisplay[0] : ''}
+              />
+            ) : (
+              <StripedList maxHeight="150px">
+                {positionsToDisplay.length ? (
+                  positionsToDisplay.map((position: string, index: number) => (
+                    <StripedListItem key={index}>
+                      <span>{position}</span>
+                      <ButtonControl
+                        buttonType={ButtonControlType.delete}
+                        onClick={() => onRemovePosition(positions[index].id)}
+                      />
+                    </StripedListItem>
+                  ))
+                ) : (
+                  <StripedListEmpty>
+                    {isLoading && errors.length === 0 ? <InlineLoading /> : 'No positions.'}
+                  </StripedListEmpty>
+                )}
+              </StripedList>
+            )}
+            {!!errors && (
               <ErrorContainer>
                 {errors.map((error: Errors, index: number) => (
                   <Error key={index}>{error}</Error>

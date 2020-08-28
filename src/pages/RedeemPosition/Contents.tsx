@@ -1,17 +1,18 @@
+import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
+import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
-import React from 'react'
+import React, { useCallback } from 'react'
 
 import { Button } from '../../components/buttons'
 import { CenteredCard } from '../../components/common/CenteredCard'
 import { SelectCondition } from '../../components/form/SelectCondition'
+import { SelectPositions } from '../../components/form/SelectPositions'
 import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
 import { Error, ErrorContainer } from '../../components/pureStyledComponents/Error'
 import { Row } from '../../components/pureStyledComponents/Row'
-import { SelectPosition } from '../../components/redeemPosition//SelectPosition'
 import { PositionPreview } from '../../components/redeemPosition/PositionPreview'
 import { useConditionContext } from '../../contexts/ConditionContext'
-import { usePositionContext } from '../../contexts/PositionContext'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 import { useIsPositionRelatedToCondition } from '../../hooks/useIsPositionRelatedToCondition'
 import { ConditionalTokensService } from '../../services/conditionalTokens'
@@ -22,17 +23,16 @@ const logger = getLogger('RedeemPosition')
 
 export const Contents = () => {
   const { _type: status, CTService, connect, networkConfig } = useWeb3ConnectedOrInfura()
-
+  const { clearPositions, errors: positionsErrors, positions } = useMultiPositionsContext()
   const { clearCondition, condition, errors: conditionErrors } = useConditionContext()
-  const { clearPosition, errors: positionErrors, position } = usePositionContext()
   const [statusTransaction, setStatusTransaction] = React.useState<Maybe<Status>>(null)
 
-  const onRedeem = async () => {
+  const onRedeem = useCallback(async () => {
     try {
-      if (position && condition && status === Web3ContextStatus.Connected) {
+      if (positions.length && condition && status === Web3ContextStatus.Connected) {
         setStatusTransaction(Status.Loading)
 
-        const { collateralToken, conditionIds, indexSets } = position
+        const { collateralToken, conditionIds, indexSets } = positions[0]
         const newCollectionsSet = conditionIds.reduce(
           (acc, conditionId, i) =>
             conditionId !== condition.id
@@ -64,7 +64,7 @@ export const Contents = () => {
         )
 
         clearCondition()
-        clearPosition()
+        clearPositions()
 
         setStatusTransaction(Status.Ready)
       } else if (status === Web3ContextStatus.Infura) {
@@ -74,30 +74,37 @@ export const Contents = () => {
       setStatusTransaction(Status.Error)
       logger.error(err)
     }
-  }
+  }, [positions, condition, status, CTService, clearCondition, clearPositions, connect])
 
-  const { isRelated } = useIsPositionRelatedToCondition(position?.id || '', condition?.id || '')
+  const { isRelated } = useIsPositionRelatedToCondition(
+    positions.length ? positions[0].id : '',
+    condition?.id || ''
+  )
 
   const disabled =
     statusTransaction === Status.Loading ||
-    positionErrors.length > 0 ||
+    positionsErrors.length > 0 ||
     conditionErrors.length > 0 ||
-    !position ||
+    !positions.length ||
     !condition ||
     !isRelated
 
-  const nonRelatedPositionAndCondition = !isRelated && position && condition
+  const nonRelatedPositionAndCondition = !isRelated && !!positions.length && condition
 
   return (
     <CenteredCard>
       <Row cols="1fr">
-        <SelectPosition />
+        <SelectPositions singlePosition title="Positions" />
       </Row>
       <Row cols="1fr">
         <SelectCondition title="Resolved Condition Id" />
       </Row>
       <Row cols="1fr">
-        <PositionPreview condition={condition} networkConfig={networkConfig} position={position} />
+        <PositionPreview
+          condition={condition}
+          networkConfig={networkConfig}
+          position={positions.length ? positions[0] : null}
+        />
       </Row>
       {nonRelatedPositionAndCondition && (
         <ErrorContainer>
