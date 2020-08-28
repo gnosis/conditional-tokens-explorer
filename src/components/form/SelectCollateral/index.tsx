@@ -10,18 +10,17 @@ import { SelectItem } from '../../form/SelectItem'
 
 export interface SelectCollateralProps {
   formMethods: FormContextValues<SplitPositionFormMethods>
-  onCollateralChange: (c: string) => void
   splitFromCollateral: boolean
   tokens: Token[]
 }
 
 export const SelectCollateral = ({
-  formMethods: { register, watch },
-  onCollateralChange,
+  formMethods,
   splitFromCollateral,
   tokens,
   ...restProps
 }: SelectCollateralProps) => {
+  const { register, setValue, watch } = formMethods
   const watchCollateral = watch('collateral')
   const [collateral, setCollateral] = useState(tokens[0].symbol)
   const button = <ButtonSelect content={<TokenIcon symbol={collateral} />} />
@@ -32,7 +31,7 @@ export const SelectCollateral = ({
         key={address}
         name="collateral"
         onClick={() => {
-          setCollateral(symbol)
+          setValue('collateral', address, true)
         }}
         radioRef={register({ required: splitFromCollateral })}
         value={address}
@@ -41,8 +40,13 @@ export const SelectCollateral = ({
   })
 
   useEffect(() => {
-    onCollateralChange(watchCollateral)
-  }, [watchCollateral, onCollateralChange])
+    const token = tokens.find((t) => t.address === watchCollateral)
+    if (token) {
+      setCollateral(token.symbol)
+    } else {
+      console.error('Unknown token', watchCollateral)
+    }
+  }, [tokens, watchCollateral])
 
   return (
     <Dropdown

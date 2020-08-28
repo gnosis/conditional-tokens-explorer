@@ -1,7 +1,8 @@
 import { ConditionProvider } from 'contexts/ConditionContext'
 import { BigNumber } from 'ethers/utils'
 import { useAllowance } from 'hooks/useAllowance'
-import React from 'react'
+import { useCollateral } from 'hooks/useCollateral'
+import React, { useState } from 'react'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
@@ -16,8 +17,9 @@ export const SplitPosition = () => {
   const { _type: status, CTService, connect, networkConfig } = useWeb3ConnectedOrInfura()
 
   const tokens = networkConfig.getTokens()
-  const [collateralToken, setCollateralToken] = React.useState<string>(tokens[0].address)
-  const allowanceMethods = useAllowance(collateralToken)
+  const [collateral, setCollateral] = useState<string>(tokens[0].address)
+  const allowanceMethods = useAllowance(collateral)
+  const collateralToken = useCollateral(collateral)
 
   const splitPosition = React.useCallback(
     async (
@@ -27,7 +29,7 @@ export const SplitPosition = () => {
       partition: BigNumber[],
       amount: BigNumber
     ) => {
-      if (status === Web3ContextStatus.Connected) {
+      if (status === Web3ContextStatus.Connected && collateral) {
         partition.forEach((indexSet) => {
           const collectionId = ConditionalTokensService.getCollectionId(
             parentCollection,
@@ -35,7 +37,7 @@ export const SplitPosition = () => {
             indexSet
           )
 
-          const positionId = ConditionalTokensService.getPositionId(collateralToken, collectionId)
+          const positionId = ConditionalTokensService.getPositionId(collateral, collectionId)
           logger.info(
             `conditionId: ${conditionId} / parentCollection: ${parentCollection} / indexSet: ${indexSet.toString()}`
           )
@@ -47,15 +49,23 @@ export const SplitPosition = () => {
         connect()
       }
     },
-    [status, CTService, connect, collateralToken]
+    [status, CTService, connect]
   )
+
+  // TODO Fix this
+  if (!collateralToken) {
+    return null
+  }
 
   return (
     <ConditionProvider>
       <PageTitle>Split Position</PageTitle>
       <Form
         allowanceMethods={allowanceMethods}
-        onCollateralChange={setCollateralToken}
+        collateral={collateralToken}
+        onCollateralChange={(t: string) => {
+          setCollateral(t)
+        }}
         splitPosition={splitPosition}
         tokens={tokens}
       />
