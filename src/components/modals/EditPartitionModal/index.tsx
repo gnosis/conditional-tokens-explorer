@@ -5,11 +5,14 @@ import styled from 'styled-components'
 import { Button } from '../../buttons/Button'
 import { ButtonControl, ButtonControlType } from '../../buttons/ButtonControl'
 import { Modal, ModalProps } from '../../common/Modal'
+import { Outcome } from '../../partitions/Outcome'
 import { ButtonContainer } from '../../pureStyledComponents/ButtonContainer'
+import { CardSubtitle } from '../../pureStyledComponents/CardSubtitle'
+import { CardText } from '../../pureStyledComponents/CardText'
 import {
   StripedList,
   StripedListEmpty,
-  StripedListItem,
+  StripedListItemLessPadding,
 } from '../../pureStyledComponents/StripedList'
 import { TitleControlButton } from '../../pureStyledComponents/TitleControl'
 import { InfoCard } from '../../statusInfo/InfoCard'
@@ -22,10 +25,7 @@ export const EditPartitionModal: React.FC<ModalProps> = (props) => {
   // const isLoading = !conditionIdToSearch && loading
   // const isSearching = conditionIdToSearch && loading
 
-  const mockedNumberedOutcomes = [
-    [1, 4, 3],
-    [2, 5],
-  ]
+  const mockedNumberedOutcomes = [[1, 4, 3], [2, 5], [10, 11], [6, 8, 9], [7]]
 
   return (
     <Modal title="Edit Partition" {...restProps}>
@@ -37,7 +37,12 @@ export const EditPartitionModal: React.FC<ModalProps> = (props) => {
       {error && <InfoCard message={error.message} title="Error" />} */}
       {/* {!isLoading && ( */}
       <>
-        {/* Stuff */}
+        <CardSubtitle>Add Outcomes To Collection</CardSubtitle>
+        <CardText>
+          No outcomes available. You can make them available by removing them from collections
+          below.
+        </CardText>
+        <CardSubtitle>New Collection</CardSubtitle>
         <TitleValue
           title="Collections"
           titleControl={
@@ -49,7 +54,27 @@ export const EditPartitionModal: React.FC<ModalProps> = (props) => {
               Edit Partition
             </TitleControlButton>
           }
-          value={<div>asdg</div>}
+          value={
+            <>
+              <CardText>
+                Click on an outcome to remove it from a collection. You can also drag outcomes
+                across collections.
+              </CardText>
+              <StripedList>
+                {mockedNumberedOutcomes.map(
+                  (outcomeList: unknown | any, outcomeListIndex: number) => {
+                    return (
+                      <StripedListItemLessPadding key={outcomeListIndex}>
+                        {outcomeList.map((outcome: string, outcomeIndex: number) => (
+                          <Outcome key={outcomeIndex} outcome={outcome} />
+                        ))}
+                      </StripedListItemLessPadding>
+                    )
+                  }
+                )}
+              </StripedList>
+            </>
+          }
         />
         <ButtonContainer>
           <Button>Save</Button>
