@@ -268,7 +268,13 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
       <Row cols="1fr" marginBottomXL>
         <TitleValue
           title="Split Position Preview"
-          value={splitPositionPreview.map((preview) => '\n' + preview)}
+          value={
+            <StripedListStyled>
+              {splitPositionPreview.map((preview, i) => (
+                <StripedListItem key={`preview-${i}`}>{preview}</StripedListItem>
+              ))}
+            </StripedListStyled>
+          }
         />
       </Row>
       {isTransactionExecuting && (
