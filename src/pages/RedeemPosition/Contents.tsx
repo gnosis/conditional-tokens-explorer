@@ -1,4 +1,3 @@
-import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'

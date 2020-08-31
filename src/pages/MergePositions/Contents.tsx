@@ -75,6 +75,7 @@ export const Contents = () => {
       status === Status.Loading ||
       positionsErrors.length > 0 ||
       conditionErrors.length > 0 ||
+      balancesErrors.length > 0 ||
       !canMergePositions ||
       amount.isZero(),
     [canMergePositions, amount, status, positionsErrors, conditionErrors]

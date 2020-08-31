@@ -58,7 +58,6 @@ export const SelectPositions = ({
     loading: positionsLoading,
     positionIds,
     positions,
-    removePositionId,
     updatePositionIds,
   } = useMultiPositionsContext()
 
@@ -96,7 +95,7 @@ export const SelectPositions = ({
       updatePositionIds(ids)
       updateBalaces(ids)
     },
-    [positionIds, updateBalaces, updatePositionIds]
+    [positionIds, updateBalaces, updatePositionIds, callbackToBeExecutedOnRemoveAction]
   )
 
   React.useEffect(() => {
