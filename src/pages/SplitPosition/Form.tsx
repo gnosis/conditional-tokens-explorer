@@ -90,6 +90,7 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
   } = formMethods
 
   const [outcomeSlot, setOutcomeSlot] = useState(0)
+  const [conditionIdToPreviewShow, setConditionIdToPreviewShow] = useState('')
   const [collateralToken, setCollateralToken] = useState(tokens[0])
   const [position, setPosition] = useState<Maybe<GetPosition_position>>(null)
   const [isTransactionExecuting, setIsTransactionExecuting] = useState(false)
@@ -99,6 +100,7 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
 
   const handleConditionChange = useCallback((condition: Maybe<GetCondition_condition>) => {
     setOutcomeSlot(condition ? condition.outcomeSlotCount : 0)
+    setConditionIdToPreviewShow(condition ? condition.id : '')
   }, [])
 
   watch('collateral')
@@ -196,6 +198,21 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
     [12, 13, 14, 15],
   ]
 
+  const mockedCollection = [collateralToken.symbol]
+
+  let splitPositionPreview = ''
+  if (conditionIdToPreviewShow) {
+    splitPositionPreview =
+      '[' +
+      collateralToken.symbol +
+      ' C: ' +
+      conditionIdToPreviewShow +
+      'O: ' +
+      outcomeSlot +
+      '] x ' +
+      amount
+  }
+
   return (
     <CenteredCard>
       <Row cols="1fr">
@@ -240,15 +257,7 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
         />
       </Row>
       <Row cols="1fr" marginBottomXL>
-        <TitleValue
-          title="Split Position Preview"
-          value={
-            <StripedListStyled>
-              <StripedListItem>[DAI C: 0x123 O: 0] x 10</StripedListItem>
-              <StripedListItem>[DAI C: 0x123 O: 1] x 10</StripedListItem>
-            </StripedListStyled>
-          }
-        />
+        <TitleValue title="Split Position Preview" value={splitPositionPreview} />
       </Row>
       {isTransactionExecuting && (
         <FullLoading
