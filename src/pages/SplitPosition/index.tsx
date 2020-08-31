@@ -54,6 +54,7 @@ export const SplitPosition = () => {
 
   // TODO Fix this
   if (!collateralToken) {
+    logger.error(`Collateral ${collateral} doesn't exist`)
     return null
   }
 
