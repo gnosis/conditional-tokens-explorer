@@ -45,7 +45,6 @@ interface Props {
 export const MultiPositionsProvider = (props: Props) => {
   const [positionIds, setPositionIds] = useState<Array<string>>([])
   const [positions, setPositions] = useState<Array<GetMultiPositions_positions>>([])
-
   const { clearErrors, errors, pushError, removeError } = useErrors()
 
   const updatePositionIds = useCallback(
@@ -62,7 +61,6 @@ export const MultiPositionsProvider = (props: Props) => {
 
   const addPositionId = useCallback(
     (positionId: string): void => {
-      console.log('positionId', positionId)
       clearErrors()
       if (!isPositionIdValid(positionId)) {
         pushError(PositionErrors.INVALID_ERROR)
@@ -75,25 +73,26 @@ export const MultiPositionsProvider = (props: Props) => {
     [clearErrors, pushError]
   )
 
-  const removePositionId = useCallback((positionId: string): void => {
-    let clearPositions = false
-    setPositionIds((current) => {
-      const next = current.filter((id) => id !== positionId.toLowerCase())
-      if (!next.length) {
-        clearPositions = true
-      }
-      return next
-    })
-    if (clearPositions) {
-      setPositions([])
-    }
-  }, [])
-
   const clearPositions = useCallback((): void => {
     clearErrors()
     setPositionIds([])
     setPositions([])
   }, [clearErrors])
+
+  const removePositionId = useCallback(
+    (positionId: string): void => {
+      let clearPositionsFlag = false
+      setPositionIds((current) => {
+        const next = current.filter((id) => id.toLowerCase() !== positionId.toLowerCase())
+        clearPositionsFlag = next.length === 0
+        return next
+      })
+      if (clearPositionsFlag) {
+        clearPositions()
+      }
+    },
+    [clearPositions]
+  )
 
   const { data: fetchedPositions, error: errorFetchingPositions, loading: loadingQuery } = useQuery<
     GetMultiPositions

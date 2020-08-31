@@ -36,12 +36,13 @@ const Search = styled(SearchField)`
 interface Props extends ModalProps {
   isOpen: boolean
   singlePosition?: boolean
+  preSelectedPositions?: string[]
   onConfirm?: (positions: Array<Position>) => void
   onRequestClose?: () => void
 }
 
 export const SelectPositionModal: React.FC<Props> = (props) => {
-  const { onConfirm, singlePosition, ...restProps } = props
+  const { onConfirm, preSelectedPositions, singlePosition, ...restProps } = props
   const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
   const [selectedPositions, setSelectedPositions] = useState<Array<Position>>([])
   const [positionIdToSearch, setPositionIdToSearch] = useState<string>('')
@@ -62,17 +63,25 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
 
   const { data, error, loading } = usePositions(positionIdToSearch)
 
+  useEffect(() => {
+    if (data && data.length && preSelectedPositions && preSelectedPositions.length) {
+      setSelectedPositions((current) => {
+        const currentIds = current.map(({ id }) => id)
+        const filteredPre = preSelectedPositions.filter((pre) => !currentIds.includes(pre))
+        return [...current, ...data.filter(({ id }) => filteredPre.includes(id))]
+      })
+    }
+  }, [preSelectedPositions, data])
+
   const handleMultiAddClick = useCallback((position: Position) => {
     setSelectedPositions((current) => {
       const included = current.find((selected) => selected.id === position.id)
       return included ? current : [...current, position]
     })
-    // addPositionId(position.id)
   }, [])
 
   const handleSingleAddClick = useCallback((position: Position) => {
     setSelectedPositions([position])
-    // addPositionId(position.id)
   }, [])
 
   const handleRemoveClick = useCallback((position: Position) => {

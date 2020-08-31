@@ -16,15 +16,40 @@ import { TitleValue } from 'components/text/TitleValue'
 import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { BigNumber } from 'ethers/utils'
 import { Position } from 'hooks'
 import React from 'react'
+import { GetMultiPositions_positions } from 'types/generatedGQL'
 
 interface Props {
   title: string
   singlePosition?: boolean
+  callbackToBeExecutedOnRemoveAction?: () => void
 }
 
-export const SelectPositions = ({ singlePosition, title }: Props) => {
+const canCanculatePositionToDisplay = (
+  positionsLoading: boolean,
+  balancesLoading: boolean,
+  positions: GetMultiPositions_positions[],
+  balances: BigNumber[],
+  positionIds: string[]
+) => {
+  return (
+    !positionsLoading &&
+    !balancesLoading &&
+    positions.length &&
+    balances.length &&
+    balances.length === positionIds.length &&
+    positions.length === positionIds.length &&
+    JSON.stringify(positions.map(({ id }) => id).sort()) === JSON.stringify([...positionIds].sort())
+  )
+}
+
+export const SelectPositions = ({
+  callbackToBeExecutedOnRemoveAction,
+  singlePosition,
+  title,
+}: Props) => {
   const { networkConfig } = useWeb3ConnectedOrInfura()
   const [isModalOpen, setIsModalOpen] = React.useState(false)
 
@@ -61,6 +86,12 @@ export const SelectPositions = ({ singlePosition, title }: Props) => {
 
   const onRemovePosition = React.useCallback(
     (positionId: string) => {
+      if (
+        callbackToBeExecutedOnRemoveAction &&
+        typeof callbackToBeExecutedOnRemoveAction === 'function'
+      ) {
+        callbackToBeExecutedOnRemoveAction()
+      }
       const ids = positionIds.filter((id) => id !== positionId)
       updatePositionIds(ids)
       updateBalaces(ids)
@@ -71,17 +102,17 @@ export const SelectPositions = ({ singlePosition, title }: Props) => {
   React.useEffect(() => {
     if (positionIds.length > 0) {
       if (
-        !positionsLoading &&
-        !balancesLoading &&
-        positions.length &&
-        balances.length &&
-        balances.length === positionIds.length &&
-        positions.length === positionIds.length
+        canCanculatePositionToDisplay(
+          positionsLoading,
+          balancesLoading,
+          positions,
+          balances,
+          positionIds
+        )
       ) {
         setPositionsToDisplay(
           positions.map((position) => {
             const i = positionIds.findIndex((id) => id === position.id)
-
             const token = networkConfig.getTokenFromAddress(position.collateralToken.id)
 
             return positionString(position.conditionIds, position.indexSets, balances[i], token)
@@ -159,6 +190,7 @@ export const SelectPositions = ({ singlePosition, title }: Props) => {
           isOpen={isModalOpen}
           onConfirm={onModalConfirm}
           onRequestClose={closeModal}
+          preSelectedPositions={positionIds}
           singlePosition={singlePosition}
         />
       )}
