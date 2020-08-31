@@ -1,5 +1,9 @@
 import { CustomCollateralModal } from 'components/form/CustomCollateralModal'
-import React, { useState } from 'react'
+import { SelectPositionModal } from 'components/modals/SelectPositionsModal'
+import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
+import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
+import { Position } from 'hooks'
+import React, { useCallback, useState } from 'react'
 import styled from 'styled-components'
 
 import { InputPosition, InputPositionProps } from '../../components/form/InputPosition'
@@ -75,7 +79,25 @@ export const SplitFrom: React.FC<Props> = (props) => {
     tokens,
   } = props
 
+  const { updatePositionIds } = useMultiPositionsContext()
+  const { updateBalaces } = useBatchBalanceContext()
+
   const [showCustomCollateralModal, setShowCustomCollateralModal] = useState(false)
+  const [showSelectPositionModal, setShowSelectPositionModal] = useState(false)
+
+  const openSelectPositinModal = useCallback(() => setShowSelectPositionModal(true), [])
+  const closeSelectPositinModal = useCallback(() => setShowSelectPositionModal(false), [])
+
+  const onSelectPosidionModalConfirm = React.useCallback(
+    (positions: Array<Position>) => {
+      console.log('onSelectPosidionModalConfirm', positions)
+      const ids = positions.map((position) => position.id)
+      updatePositionIds(ids)
+      updateBalaces(ids)
+      closeSelectPositinModal()
+    },
+    [closeSelectPositinModal, updateBalaces, updatePositionIds]
+  )
 
   return (
     <>
@@ -97,7 +119,9 @@ export const SplitFrom: React.FC<Props> = (props) => {
         >
           Add Custom Collateral
         </ToggleableTitleControl>
-        <ToggleableTitleControl visible={splitFromPosition}>Select Position</ToggleableTitleControl>
+        <ToggleableTitleControl onClick={openSelectPositinModal} visible={splitFromPosition}>
+          Select Position
+        </ToggleableTitleControl>
       </Controls>
       <ToggleableSelectCollateral
         formMethods={formMethods}
@@ -121,6 +145,15 @@ export const SplitFrom: React.FC<Props> = (props) => {
           onClose={() => {
             setShowCustomCollateralModal(false)
           }}
+        />
+      )}
+      {showSelectPositionModal && (
+        <SelectPositionModal
+          isOpen={showSelectPositionModal}
+          onConfirm={onSelectPosidionModalConfirm}
+          onRequestClose={closeSelectPositinModal}
+          preSelectedPositions={[]}
+          singlePosition
         />
       )}
     </>

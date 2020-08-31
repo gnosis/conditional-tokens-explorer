@@ -1,93 +1,121 @@
-import { useQuery } from '@apollo/react-hooks'
-import { GetPositionQuery } from 'queries/positions'
+import { positionString } from 'util/tools'
+import { Errors } from 'util/types'
+
+import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
+import { Textfield } from 'components/pureStyledComponents/Textfield'
+import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
+import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { BigNumber } from 'ethers/utils'
+import { SplitPositionFormMethods } from 'pages/SplitPosition/Form'
 import React, { useEffect } from 'react'
 import { FormContextValues } from 'react-hook-form'
-import styled from 'styled-components'
-import { GetPosition, GetPositionVariables, GetPosition_position } from 'types/generatedGQL'
+import { GetMultiPositions_positions } from 'types/generatedGQL'
 
-import { BYTES_REGEX } from '../../../config/constants'
-import { SplitPositionFormMethods } from '../../../pages/SplitPosition/Form'
-import { Error, ErrorContainer } from '../../pureStyledComponents/Error'
-import { Textfield } from '../../pureStyledComponents/Textfield'
-import { TitleControl } from '../../pureStyledComponents/TitleControl'
-import { TitleValue } from '../../text/TitleValue'
-
-const Span = styled.span``
+const canCanculatePositionToDisplay = (
+  positionsLoading: boolean,
+  balancesLoading: boolean,
+  positions: GetMultiPositions_positions[],
+  balances: BigNumber[],
+  positionIds: string[]
+) => {
+  return (
+    !positionsLoading &&
+    !balancesLoading &&
+    positions.length &&
+    balances.length &&
+    balances.length === positionIds.length &&
+    positions.length === positionIds.length &&
+    JSON.stringify(positions.map(({ id }) => id).sort()) === JSON.stringify([...positionIds].sort())
+  )
+}
 
 export interface InputPositionProps {
   barebones?: boolean
   formMethods: FormContextValues<SplitPositionFormMethods>
-  onPositionChange: (position: GetPosition_position) => void
+  onPositionChange: (position: Maybe<GetMultiPositions_positions>) => void
   splitFromPosition: boolean
 }
 
 export const InputPosition = ({
   barebones = false,
-  formMethods: { errors, register, setError, watch },
+  formMethods: { register, setError, setValue, watch },
   onPositionChange,
   splitFromPosition,
   ...restProps
 }: InputPositionProps) => {
-  const watchPositionId = watch('positionId')
-  const errorPositionId = errors.positionId
-  const skipFetchPosition = watchPositionId === '' || !splitFromPosition || !!errorPositionId
+  const { networkConfig } = useWeb3ConnectedOrInfura()
+  const {
+    errors: positionsErrors,
+    loading: positionsLoading,
+    positionIds,
+    positions,
+  } = useMultiPositionsContext()
 
-  const { data: fetchedPosition, error: errorFetchingPosition, loading } = useQuery<
-    GetPosition,
-    GetPositionVariables
-  >(GetPositionQuery, {
-    variables: { id: watchPositionId },
-    skip: skipFetchPosition,
-  })
+  const { balances, errors: balancesErrors, loading: balancesLoading } = useBatchBalanceContext()
 
-  const queryUsed = !(loading || skipFetchPosition || errorFetchingPosition)
+  const [positionToDisplay, setPositionToDisplay] = React.useState('')
 
   useEffect(() => {
-    if (queryUsed && fetchedPosition) {
-      const { position } = fetchedPosition
-      if (position) {
-        onPositionChange(position)
-      } else {
-        setError('positionId', 'validate', "position doesn't exist")
+    register('positionId', { required: true })
+  }, [register])
+
+  React.useEffect(() => {
+    if (positionIds.length > 0) {
+      if (
+        canCanculatePositionToDisplay(
+          positionsLoading,
+          balancesLoading,
+          positions,
+          balances,
+          positionIds
+        )
+      ) {
+        const token = networkConfig.getTokenFromAddress(positions[0].collateralToken.id)
+        setPositionToDisplay(
+          positionString(positions[0].conditionIds, positions[0].indexSets, balances[0], token)
+        )
+        onPositionChange(positions[0])
+        setValue('positionId', positions[0].id, true)
       }
+    } else {
+      setPositionToDisplay('')
+      onPositionChange(null)
+      setValue('positionId', '', true)
     }
-  }, [fetchedPosition, onPositionChange, queryUsed, setError])
+  }, [
+    balances,
+    networkConfig,
+    positions,
+    positionsLoading,
+    balancesLoading,
+    positionIds,
+    onPositionChange,
+    setValue,
+  ])
 
-  useEffect(() => {
-    if (errorFetchingPosition) {
-      setError('positionId', 'validate', 'error fetching position')
-    }
-  }, [errorFetchingPosition, setError])
+  const errors = React.useMemo(() => [...positionsErrors, ...balancesErrors], [
+    positionsErrors,
+    balancesErrors,
+  ])
 
-  const value = (
-    <Span {...restProps}>
+  return (
+    <>
       <Textfield
-        disabled={!splitFromPosition}
-        name="positionId"
-        placeholder="Please select a position..."
-        ref={register({
-          required: splitFromPosition,
-          pattern: BYTES_REGEX,
-        })}
+        disabled={true}
+        error={!!errors.length}
+        placeholder={'Please select a position...'}
         type="text"
+        value={positionToDisplay}
+        {...restProps}
       />
-      {errorPositionId && (
+      {!!errors && (
         <ErrorContainer>
-          {errorPositionId.type === 'pattern' && <Error>{'Invalid bytes32 string'}</Error>}
-          {errorPositionId.type === 'validate' && <Error>{errorPositionId.message}</Error>}
+          {errors.map((error: Errors, index: number) => (
+            <Error key={index}>{error}</Error>
+          ))}
         </ErrorContainer>
       )}
-    </Span>
-  )
-
-  return barebones ? (
-    value
-  ) : (
-    <TitleValue
-      title="Position Id"
-      titleControl={<TitleControl>Select Position</TitleControl>}
-      value={value}
-      {...restProps}
-    />
+    </>
   )
 }
