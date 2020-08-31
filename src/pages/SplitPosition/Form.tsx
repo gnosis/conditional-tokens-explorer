@@ -1,3 +1,5 @@
+import { positionString } from 'util/tools'
+
 import { BigNumber } from 'ethers/utils'
 import { AllowanceMethods, useAllowanceState } from 'hooks/useAllowanceState'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
@@ -198,19 +200,26 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
     [12, 13, 14, 15],
   ]
 
-  const mockedCollection = [collateralToken.symbol]
-
-  let splitPositionPreview = ''
+  const splitPositionPreview = new Array<string>()
   if (conditionIdToPreviewShow) {
-    splitPositionPreview =
-      '[' +
-      collateralToken.symbol +
-      ' C: ' +
-      conditionIdToPreviewShow +
-      ' O: ' +
-      outcomeSlot +
-      '] x ' +
-      amount
+    splitPositionPreview.length = 0
+
+    trivialPartition(outcomeSlot).map((indexSet) =>
+      splitPositionPreview.push(
+        positionString([conditionIdToPreviewShow], [indexSet], amount, collateralToken)
+      )
+    )
+
+    if (position) {
+      trivialPartition(outcomeSlot).map((indexSet) => {
+        const conditionsIds = new Array<string>()
+        conditionsIds.push.apply(position.conditionIds)
+        conditionsIds.push(conditionIdToPreviewShow)
+        splitPositionPreview.push(
+          positionString(conditionsIds, [position.indexSets, indexSet], amount, collateralToken)
+        )
+      })
+    }
   }
 
   return (
@@ -257,7 +266,10 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
         />
       </Row>
       <Row cols="1fr" marginBottomXL>
-        <TitleValue title="Split Position Preview" value={splitPositionPreview} />
+        <TitleValue
+          title="Split Position Preview"
+          value={splitPositionPreview.map((preview) => '\n' + preview)}
+        />
       </Row>
       {isTransactionExecuting && (
         <FullLoading
