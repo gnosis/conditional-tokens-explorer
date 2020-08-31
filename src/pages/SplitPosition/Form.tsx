@@ -207,7 +207,7 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
       collateralToken.symbol +
       ' C: ' +
       conditionIdToPreviewShow +
-      'O: ' +
+      ' O: ' +
       outcomeSlot +
       '] x ' +
       amount
