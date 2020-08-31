@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
+import { ButtonAdd } from '../../buttons/ButtonAdd'
 import { ButtonControl, ButtonControlType } from '../../buttons/ButtonControl'
-import { IconPlus } from '../../icons/IconPlus'
 import { Row } from '../../pureStyledComponents/Row'
 import {
   StripedList,
@@ -11,33 +11,6 @@ import {
 } from '../../pureStyledComponents/StripedList'
 import { Textfield } from '../../pureStyledComponents/Textfield'
 import { TitleValue } from '../../text/TitleValue'
-
-const ButtonAdd = styled.button`
-  align-items: center;
-  background-color: ${(props) => props.theme.buttonPrimary.backgroundColor};
-  border-radius: 50%;
-  border: 1px solid ${(props) => props.theme.buttonPrimary.borderColor};
-  cursor: pointer;
-  display: flex;
-  height: 36px;
-  justify-content: center;
-  outline: none;
-  padding: 0;
-  transition: all 0.15s ease-out;
-  width: 36px;
-
-  &:hover {
-    border-color: ${(props) => props.theme.buttonPrimary.borderColorHover};
-    background-color: ${(props) => props.theme.buttonPrimary.backgroundColorHover};
-  }
-
-  &[disabled] {
-    background-color: ${(props) => props.theme.buttonPrimary.borderColor};
-    border-color: ${(props) => props.theme.buttonPrimary.borderColor};
-    cursor: not-allowed;
-    opacity: 0.5;
-  }
-`
 
 const NewOutcomeWrapper = styled.div`
   column-gap: 12px;
@@ -155,9 +128,7 @@ export const AddOutcome: React.FC<Props> = (props) => {
               type="text"
               value={outcome}
             />
-            <ButtonAdd disabled={buttonAddDisabled} onClick={addOutcome}>
-              <IconPlus />
-            </ButtonAdd>
+            <ButtonAdd disabled={buttonAddDisabled} onClick={addOutcome} />
           </NewOutcomeWrapper>
         }
       />

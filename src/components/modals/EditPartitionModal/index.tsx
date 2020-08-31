@@ -3,6 +3,7 @@ import React, { useCallback, useState } from 'react'
 import styled from 'styled-components'
 
 import { Button } from '../../buttons/Button'
+import { ButtonAdd } from '../../buttons/ButtonAdd'
 import { ButtonControl, ButtonControlType } from '../../buttons/ButtonControl'
 import { Modal, ModalProps } from '../../common/Modal'
 import { Outcome } from '../../partitions/Outcome'
@@ -35,6 +36,14 @@ const DraggableCollectionInner = styled.div`
 const DraggableOutcome = styled(Outcome)`
   cursor: pointer;
 
+  .outcomeCircle {
+    &:hover {
+      background-color: ${(props) => props.theme.colors.error};
+      border-color: ${(props) => props.theme.colors.error};
+      color: #fff;
+    }
+  }
+
   &.isDragging {
     cursor: move;
 
@@ -44,14 +53,60 @@ const DraggableOutcome = styled(Outcome)`
   }
 `
 
-const AddableOutcome = styled(Outcome)`
+const EditableOutcome = styled(Outcome)`
   cursor: pointer;
-  height: 28px;
-  width: 28px;
+
+  .outcomeCircle {
+    background-color: #fff;
+    border-style: solid;
+    border-width: 2px;
+    font-size: 16px;
+    height: 28px;
+    transition: all 0.15s ease-out;
+    width: 28px;
+  }
 
   .outcomeHorizontalLine {
     display: none;
   }
+`
+
+const AddableOutcome = styled(EditableOutcome)`
+  .outcomeCircle {
+    border-color: solid 2px ${(props) => props.theme.colors.mediumGrey};
+    color: ${(props) => props.theme.colors.mediumGrey};
+
+    &:hover {
+      border-color: ${(props) => props.theme.colors.primary};
+      color: ${(props) => props.theme.colors.primary};
+    }
+  }
+`
+
+const RemovableOutcome = styled(EditableOutcome)`
+  .outcomeCircle {
+    border-color: solid 2px ${(props) => props.theme.colors.primary};
+    color: ${(props) => props.theme.colors.primary};
+
+    &:hover {
+      background-color: ${(props) => props.theme.colors.error};
+      border-color: ${(props) => props.theme.colors.error};
+      color: #fff;
+    }
+  }
+`
+
+const EditableOutcomesWrapper = styled.div`
+  display: grid;
+  grid-column-gap: 12px;
+  grid-template-columns: 1fr 36px;
+  margin-bottom: 24px;
+`
+
+const EditableOutcomes = styled.div`
+  align-items: center;
+  display: flex;
+  flex-grow: 1;
 `
 
 export const EditPartitionModal: React.FC<ModalProps> = (props) => {
@@ -165,25 +220,28 @@ export const EditPartitionModal: React.FC<ModalProps> = (props) => {
   const notEnoughCollections = allCollections.length < 2
 
   return (
-    <Modal title="Edit Partition" {...restProps}>
+    <Modal onRequestClose={onRequestClose} title="Edit Partition" {...restProps}>
       <>
-        <CardSubtitle>Add Outcomes To Collection</CardSubtitle>
+        <CardSubtitle>Add Outcomes To New Collection</CardSubtitle>
         {availableOutcomes.length ? (
           <>
             <CardText>Click on an outcome to add it to the collection.</CardText>
-            <div>
-              {availableOutcomes.map((outcome: unknown | any, outcomeIndex: number) => {
-                return (
-                  <AddableOutcome
-                    key={outcomeIndex}
-                    onClick={() => {
-                      addOutcomeToNewCollection(outcomeIndex)
-                    }}
-                    outcome={outcome}
-                  />
-                )
-              })}
-            </div>
+            <EditableOutcomesWrapper>
+              <EditableOutcomes>
+                {availableOutcomes.map((outcome: unknown | any, outcomeIndex: number) => {
+                  return (
+                    <AddableOutcome
+                      key={outcomeIndex}
+                      onClick={() => {
+                        addOutcomeToNewCollection(outcomeIndex)
+                      }}
+                      outcome={outcome}
+                    />
+                  )
+                })}
+              </EditableOutcomes>
+              <div />
+            </EditableOutcomesWrapper>
           </>
         ) : (
           <CardText>
@@ -192,28 +250,27 @@ export const EditPartitionModal: React.FC<ModalProps> = (props) => {
           </CardText>
         )}
         <CardSubtitle>New Collection</CardSubtitle>
-        <div>
-          {newCollection.map((outcome: unknown | any, outcomeIndex: number) => {
-            return (
-              <DraggableOutcome
-                key={outcomeIndex}
-                onClick={() => {
-                  removeOutcomeFromNewCollection(outcomeIndex)
-                }}
-                outcome={outcome}
-              />
-            )
-          })}
-        </div>
-        <Button
-          disabled={newCollection.length === 0}
-          onClick={() => {
-            addNewCollection()
-          }}
-          style={{ marginTop: 'auto' }}
-        >
-          Add
-        </Button>
+        <EditableOutcomesWrapper>
+          <EditableOutcomes>
+            {newCollection.map((outcome: unknown | any, outcomeIndex: number) => {
+              return (
+                <RemovableOutcome
+                  key={outcomeIndex}
+                  onClick={() => {
+                    removeOutcomeFromNewCollection(outcomeIndex)
+                  }}
+                  outcome={outcome}
+                />
+              )
+            })}
+          </EditableOutcomes>
+          <ButtonAdd
+            disabled={newCollection.length === 0}
+            onClick={() => {
+              addNewCollection()
+            }}
+          />
+        </EditableOutcomesWrapper>
         <TitleValue
           title="Collections"
           titleControl={
