@@ -200,27 +200,24 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
     [12, 13, 14, 15],
   ]
 
-  const splitPositionPreview = new Array<string>()
-  if (conditionIdToPreviewShow) {
-    splitPositionPreview.length = 0
-
-    trivialPartition(outcomeSlot).map((indexSet) =>
-      splitPositionPreview.push(
-        positionString([conditionIdToPreviewShow], [indexSet], amount, collateralToken)
-      )
-    )
-
+  const splitPositionPreview = useMemo(() => {
     if (position) {
-      trivialPartition(outcomeSlot).map((indexSet) => {
-        const conditionsIds = new Array<string>()
-        conditionsIds.push.apply(position.conditionIds)
-        conditionsIds.push(conditionIdToPreviewShow)
-        splitPositionPreview.push(
-          positionString(conditionsIds, [position.indexSets, indexSet], amount, collateralToken)
+      return trivialPartition(outcomeSlot).map((indexSet) => {
+        return positionString(
+          [...position.conditionIds, conditionIdToPreviewShow],
+          [...[position.indexSets], indexSet],
+          amount,
+          collateralToken
         )
       })
+    } else if (conditionIdToPreviewShow) {
+      return trivialPartition(outcomeSlot).map((indexSet) => {
+        return positionString([conditionIdToPreviewShow], [indexSet], amount, collateralToken)
+      })
+    } else {
+      return []
     }
-  }
+  }, [position, outcomeSlot, amount, collateralToken]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <CenteredCard>
