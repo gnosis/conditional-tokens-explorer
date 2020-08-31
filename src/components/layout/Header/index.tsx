@@ -9,19 +9,23 @@ import { Logo } from '../../common/Logo'
 import { UserDropdown } from '../../common/UserDropdown'
 
 const Wrapper = styled.header`
-  align-items: center;
-  background-color: ${(props) => props.theme.header.backgroundColor};
-  border-bottom: solid 1px #e8e7e6;
-  display: flex;
-  flex-shrink: 0;
-  height: ${(props) => props.theme.header.height};
-  justify-content: space-between;
-  padding-left: ${(props) => props.theme.layout.horizontalPadding};
-  padding-right: ${(props) => props.theme.layout.horizontalPadding};
+  &.siteHeader {
+    align-items: center;
+    background-color: ${(props) => props.theme.header.backgroundColor};
+    border-bottom: solid 1px #e8e7e6;
+    display: flex;
+    flex-shrink: 0;
+    height: ${(props) => props.theme.header.height};
+    justify-content: space-between;
+    padding-left: ${(props) => props.theme.layout.horizontalPadding};
+    padding-right: ${(props) => props.theme.layout.horizontalPadding};
+  }
 `
 
 const LogoLink = styled(Link)`
-  text-decoration: none;
+  &.logoLink {
+    text-decoration: none;
+  }
 `
 
 export const Header: React.FC = (props) => {
@@ -31,8 +35,8 @@ export const Header: React.FC = (props) => {
     status._type === Web3ContextStatus.NotAsked || status._type === Web3ContextStatus.Infura
 
   return (
-    <Wrapper {...props}>
-      <LogoLink to="/">
+    <Wrapper className="siteHeader" {...props}>
+      <LogoLink className="logoLink" to="/">
         <Logo />
       </LogoLink>
       {isDisconnected && <ButtonConnect disabled={isConnecting} />}
