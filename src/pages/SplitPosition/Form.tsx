@@ -201,7 +201,7 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
   ]
 
   const splitPositionPreview = useMemo(() => {
-    if (position) {
+    if (splitFromPosition && position) {
       return trivialPartition(outcomeSlot).map((indexSet) => {
         return positionString(
           [...position.conditionIds, conditionIdToPreviewShow],
@@ -217,7 +217,7 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
     } else {
       return []
     }
-  }, [position, outcomeSlot, amount, collateralToken]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [position, outcomeSlot, amount, collateralToken, splitFromPosition]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <CenteredCard>
