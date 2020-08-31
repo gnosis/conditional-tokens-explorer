@@ -107,6 +107,7 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
 
   watch('collateral')
   watch('splitFrom')
+  watch('amount')
 
   const splitFromCollateral = splitFrom === 'collateral'
   const splitFromPosition = splitFrom === 'position'
