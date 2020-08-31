@@ -62,6 +62,7 @@ export const Contents = () => {
   const amountChangeHandler = useCallback((value: BigNumber) => {
     setAmount(value)
   }, [])
+
   const useWalletHandler = useCallback(() => {
     if (mergeablePositions && maxBalance.gt(ZERO_BN)) {
       setAmount(maxBalance)
@@ -140,7 +141,11 @@ export const Contents = () => {
   return (
     <CenteredCard>
       <Row cols="1fr" marginBottomXL>
-        <SelectPositions />
+        <SelectPositions
+          callbackToBeExecutedOnRemoveAction={() => {
+            setAmount(ZERO_BN)
+          }}
+        />
       </Row>
       <Row cols="1fr">
         <SelectCondition />
@@ -165,7 +170,7 @@ export const Contents = () => {
             status === Status.Error ? { text: 'OK', onClick: () => setStatus(null) } : undefined
           }
           icon={status === Status.Error ? IconTypes.error : IconTypes.spinner}
-          message={status === Status.Error ? error : 'Working...'}
+          message={status === Status.Error ? error : 'Waiting...'}
           title={status === Status.Error ? 'Error' : 'Merge Positions'}
         />
       )}

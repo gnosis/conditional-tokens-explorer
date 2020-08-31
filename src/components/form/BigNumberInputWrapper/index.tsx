@@ -82,7 +82,7 @@ export const BigNumberInputWrapper: React.FC<Props> = (props) => {
         renderInput={(props: unknown) => {
           return <Textfield disabled={disabled} {...props} />
         }}
-        value={value ? value.toString() : ''}
+        value={value && !value.isZero() ? value.toString() : ''}
       />
       {tokenSymbol && <TokenSymbol>{tokenSymbol}</TokenSymbol>}
     </Wrapper>
