@@ -1,5 +1,6 @@
 import { useDebounceCallback } from '@react-hook/debounce'
 import { Position, usePositions } from 'hooks'
+import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useHistory } from 'react-router-dom'
@@ -37,13 +38,14 @@ export const PositionsList = () => {
   const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
   const { data, error, loading } = usePositions(positionIdToSearch)
   const history = useHistory()
+  const { setValue } = useLocalStorage('positionid')
 
   const isConnected = status === 'connected'
   const isLoading = !positionIdToSearch && loading
   const isSearching = positionIdToSearch && loading
 
   const buildMenuForRow = useCallback(
-    ({ id }) => {
+    ({ id, userBalance }) => {
       const detailsOption = {
         text: 'Details',
         onClick: () => history.push(`/positions/${id}`),
@@ -51,7 +53,10 @@ export const PositionsList = () => {
 
       const redeemOption = {
         text: 'Redeem',
-        onClick: () => history.push(`/redeem/${id}`),
+        onClick: () => {
+          setValue(id)
+          history.push(`/redeem`)
+        },
       }
 
       const wrapERC20Option = {
@@ -71,10 +76,14 @@ export const PositionsList = () => {
       if (!isConnected) {
         return [detailsOption]
       } else {
-        return [detailsOption, redeemOption, wrapERC20Option, unwrapOption]
+        if (userBalance.gt(0)) {
+          return [detailsOption, redeemOption, wrapERC20Option, unwrapOption]
+        } else {
+          return [detailsOption, wrapERC20Option, unwrapOption]
+        }
       }
     },
-    [isConnected, history]
+    [isConnected, history, setValue]
   )
 
   const handleRowClick = useCallback(
@@ -125,6 +134,7 @@ export const PositionsList = () => {
   }, [status, buildMenuForRow])
 
   const getColumns = useCallback(() => {
+    // If you move this outside of the useCallback, can cause performance issues as a dep of this useCallback
     const defaultColumns: Array<any> = [
       {
         // eslint-disable-next-line react/display-name
@@ -153,7 +163,7 @@ export const PositionsList = () => {
     ]
 
     return [...defaultColumns, ...connectedItems, ...menu]
-  }, [connectedItems, menu])
+  }, [connectedItems, menu, handleRowClick, networkConfig])
 
   const tokensList = networkConfig
     ? [

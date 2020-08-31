@@ -1,6 +1,7 @@
 import { useQuery } from '@apollo/react-hooks'
 import { useDebounceCallback } from '@react-hook/debounce'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { ConditionsListQuery, ConditionsSearchQuery } from 'queries/conditions'
 import React, { useCallback, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -23,6 +24,7 @@ import { customStyles } from '../../theme/tableCustomStyles'
 export const ConditionsList: React.FC = () => {
   const [conditionIdToSearch, setConditionIdToSearch] = useState<string>('')
   const [conditionIdToShow, setConditionIdToShow] = useState<string>('')
+  const { setValue } = useLocalStorage('conditionid')
   const debouncedHandler = useDebounceCallback((conditionIdToSearch) => {
     setConditionIdToSearch(conditionIdToSearch)
   }, 500)
@@ -57,17 +59,26 @@ export const ConditionsList: React.FC = () => {
 
       const splitOption = {
         text: 'Split Position',
-        onClick: () => history.push(`/split/${id}`),
+        onClick: () => {
+          setValue(id)
+          history.push(`/split/`)
+        },
       }
 
       const mergeOption = {
         text: 'Merge Positions',
-        onClick: () => history.push(`/merge/${id}`),
+        onClick: () => {
+          setValue(id)
+          history.push(`/merge/`)
+        },
       }
 
       const reportOption = {
         text: 'Report Payouts',
-        onClick: () => history.push(`/report/${id}`),
+        onClick: () => {
+          setValue(id)
+          history.push(`/report/`)
+        },
       }
 
       if (!isConnected) {
@@ -78,7 +89,7 @@ export const ConditionsList: React.FC = () => {
         ? [detailsOption, splitOption, mergeOption, reportOption]
         : [detailsOption, splitOption, mergeOption]
     },
-    [isConnected, address, history]
+    [isConnected, address, history, setValue]
   )
 
   const handleRowClick = (row: Conditions_conditions) => {

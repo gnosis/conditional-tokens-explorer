@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/react-hooks'
+import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import React, { useContext, useState } from 'react'
-import { useParams } from 'react-router-dom'
 
 import { useBalanceForPosition } from '../hooks/useBalanceForPosition'
 import { GetPositionQuery } from '../queries/positions'
@@ -38,7 +38,7 @@ interface Props {
 export const PositionProvider = (props: Props) => {
   const { checkForEmptyBalance } = props
   const [positionId, setPositionId] = useState('')
-  const { positionId: positionIdFromParams } = useParams() as { positionId?: string }
+  const { getValue } = useLocalStorage('positionid')
 
   const errors = []
   let position: Maybe<GetPosition_position> = null
@@ -89,10 +89,11 @@ export const PositionProvider = (props: Props) => {
   }
 
   React.useEffect(() => {
-    if (positionIdFromParams) {
-      setPositionIdCallback(positionIdFromParams)
+    const localStoragePosition = getValue()
+    if (localStoragePosition) {
+      setPositionIdCallback(localStoragePosition)
     }
-  }, [positionIdFromParams, setPositionIdCallback])
+  }, [getValue, setPositionIdCallback])
 
   const value = {
     position,
