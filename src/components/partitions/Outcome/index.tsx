@@ -36,14 +36,24 @@ export const OutcomeHorizontalLine = styled.div`
 `
 
 interface Props {
+  draggable?: boolean
+  onClick?: () => void
+  onDragStart?: (e: any) => void
+  onDragEnd?: (e: any) => void
   outcome: string
 }
 
 export const Outcome: React.FC<Props> = (props) => {
-  const { outcome, ...restProps } = props
+  const { draggable, onClick, onDragEnd, onDragStart, outcome, ...restProps } = props
 
   return (
-    <Wrapper {...restProps}>
+    <Wrapper
+      draggable={draggable}
+      onClick={onClick}
+      onDragEnd={onDragEnd}
+      onDragStart={onDragStart}
+      {...restProps}
+    >
       <OutcomeCircle className="outcomeCircle">{outcome}</OutcomeCircle>
       <OutcomeHorizontalLine className="outcomeHorizontalLine" />
     </Wrapper>
