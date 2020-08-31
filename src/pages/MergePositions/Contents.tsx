@@ -78,7 +78,7 @@ export const Contents = () => {
       balancesErrors.length > 0 ||
       !canMergePositions ||
       amount.isZero(),
-    [canMergePositions, amount, status, positionsErrors, conditionErrors]
+    [canMergePositions, amount, status, positionsErrors, conditionErrors, balancesErrors]
   )
 
   const onMerge = useCallback(async () => {
