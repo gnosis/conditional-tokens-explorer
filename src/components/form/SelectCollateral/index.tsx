@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { FormContextValues } from 'react-hook-form'
 
 import { SplitPositionFormMethods } from '../../../pages/SplitPosition/Form'
+import { getLogger } from '../../../util/logger'
 import { Token } from '../../../util/types'
 import { ButtonSelect } from '../../buttons/ButtonSelect'
 import { Dropdown, DropdownPosition } from '../../common/Dropdown'
@@ -13,6 +14,8 @@ export interface SelectCollateralProps {
   splitFromCollateral: boolean
   tokens: Token[]
 }
+
+const logger = getLogger('SelectCollateral')
 
 export const SelectCollateral = ({
   formMethods,
@@ -44,7 +47,7 @@ export const SelectCollateral = ({
     if (token) {
       setCollateral(token.symbol)
     } else {
-      console.error('Unknown token', watchCollateral)
+      logger.error('Unknown token', watchCollateral)
     }
   }, [tokens, watchCollateral])
 
