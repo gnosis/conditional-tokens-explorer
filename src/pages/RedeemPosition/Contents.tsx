@@ -93,7 +93,7 @@ export const Contents = () => {
   return (
     <CenteredCard>
       <Row cols="1fr">
-        <SelectPositions singlePosition title="Positions" />
+        <SelectPositions showOnlyPositionsWithBalance singlePosition title="Positions" />
       </Row>
       <Row cols="1fr">
         <SelectCondition title="Resolved Condition Id" />

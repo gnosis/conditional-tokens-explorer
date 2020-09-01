@@ -24,6 +24,7 @@ import { GetMultiPositions_positions } from 'types/generatedGQL'
 interface Props {
   title: string
   singlePosition?: boolean
+  showOnlyPositionsWithBalance?: boolean
   callbackToBeExecutedOnRemoveAction?: () => void
 }
 
@@ -47,6 +48,7 @@ const canCanculatePositionToDisplay = (
 
 export const SelectPositions = ({
   callbackToBeExecutedOnRemoveAction,
+  showOnlyPositionsWithBalance,
   singlePosition,
   title,
 }: Props) => {
@@ -190,6 +192,7 @@ export const SelectPositions = ({
           onConfirm={onModalConfirm}
           onRequestClose={closeModal}
           preSelectedPositions={positionIds}
+          showOnlyPositionsWithBalance={showOnlyPositionsWithBalance}
           singlePosition={singlePosition}
         />
       )}

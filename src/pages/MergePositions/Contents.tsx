@@ -145,6 +145,7 @@ export const Contents = () => {
           callbackToBeExecutedOnRemoveAction={() => {
             setAmount(ZERO_BN)
           }}
+          showOnlyPositionsWithBalance
           title="Positions"
         />
       </Row>
