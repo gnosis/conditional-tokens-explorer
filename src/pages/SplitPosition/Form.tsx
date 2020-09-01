@@ -2,7 +2,6 @@ import { BigNumber } from 'ethers/utils'
 import { AllowanceMethods, useAllowanceState } from 'hooks/useAllowanceState'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { ERC20Service } from 'services/erc20'
 import styled from 'styled-components'
 import { GetCondition_condition, GetPosition_position } from 'types/generatedGQL'
 
@@ -22,7 +21,6 @@ import { IconTypes } from '../../components/statusInfo/common'
 import { TitleValue } from '../../components/text/TitleValue'
 import { NULL_PARENT_ID, ZERO_BN } from '../../config/constants'
 import { useConditionContext } from '../../contexts/ConditionContext'
-import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 import { getLogger } from '../../util/logger'
 import { trivialPartition } from '../../util/tools'
 import { Token } from '../../util/types'
@@ -49,6 +47,7 @@ export type SplitPositionFormMethods = {
 
 interface Props {
   allowanceMethods: AllowanceMethods
+  collateral: Token
   onCollateralChange: (collateral: string) => void
   splitPosition: (
     collateral: string,
@@ -62,8 +61,13 @@ interface Props {
 
 const logger = getLogger('Form')
 
-export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, tokens }: Props) => {
-  const { _type: status, provider, signer } = useWeb3ConnectedOrInfura()
+export const Form = ({
+  allowanceMethods,
+  collateral,
+  onCollateralChange,
+  splitPosition,
+  tokens,
+}: Props) => {
   const { clearCondition } = useConditionContext()
 
   const DEFAULT_VALUES = useMemo(() => {
@@ -90,22 +94,27 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
   } = formMethods
 
   const [outcomeSlot, setOutcomeSlot] = useState(0)
-  const [collateralToken, setCollateralToken] = useState(tokens[0])
   const [position, setPosition] = useState<Maybe<GetPosition_position>>(null)
   const [isTransactionExecuting, setIsTransactionExecuting] = useState(false)
   const [error, setError] = useState<Maybe<Error>>(null)
 
-  const { amount, collateral, positionId, splitFrom } = getValues() as SplitPositionFormMethods
+  const { amount, positionId, splitFrom } = getValues() as SplitPositionFormMethods
 
   const handleConditionChange = useCallback((condition: Maybe<GetCondition_condition>) => {
     setOutcomeSlot(condition ? condition.outcomeSlotCount : 0)
   }, [])
 
-  watch('collateral')
+  const watchCollateralAddress = watch('collateral')
   watch('splitFrom')
 
   const splitFromCollateral = splitFrom === 'collateral'
   const splitFromPosition = splitFrom === 'position'
+
+  useEffect(() => {
+    if (watchCollateralAddress) {
+      onCollateralChange(getValues('collateral'))
+    }
+  }, [getValues, onCollateralChange, watchCollateralAddress])
 
   const onSubmit = useCallback(
     async ({ amount, collateral, conditionId }: SplitPositionFormMethods) => {
@@ -146,40 +155,6 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
     ]
   )
 
-  useEffect(() => {
-    let isSubscribed = true
-
-    const fetchToken = async (collateral: string) => {
-      if (status === Web3ContextStatus.Connected && signer) {
-        const erc20Service = new ERC20Service(provider, signer, collateral)
-        const token = await erc20Service.getProfileSummary()
-        if (isSubscribed) {
-          setCollateralToken(token)
-        }
-      }
-    }
-
-    if (splitFromCollateral) {
-      const collateralToken = tokens.find((t) => t.address === collateral) || tokens[0]
-      setCollateralToken(collateralToken)
-    } else if (splitFromPosition) {
-      fetchToken(collateral)
-    }
-
-    return () => {
-      isSubscribed = false
-    }
-  }, [
-    splitFromPosition,
-    provider,
-    onCollateralChange,
-    tokens,
-    collateral,
-    splitFromCollateral,
-    status,
-    signer,
-  ])
-
   const {
     allowanceFinished,
     fetchingAllowance,
@@ -207,7 +182,6 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
           value={
             <SplitFrom
               formMethods={formMethods}
-              onCollateralChange={onCollateralChange}
               onPositionChange={(p) => setPosition(p)}
               splitFromCollateral={splitFromCollateral}
               splitFromPosition={splitFromPosition}
@@ -218,7 +192,7 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
       </Row>
       {shouldDisplayAllowance && (
         <SetAllowance
-          collateral={collateralToken}
+          collateral={collateral}
           fetching={fetchingAllowance}
           finished={allowanceFinished}
           onUnlock={unlockCollateral}
@@ -226,7 +200,7 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
       )}
       <Row cols="1fr" marginBottomXL>
         <InputAmount
-          collateral={collateralToken}
+          collateral={collateral}
           formMethods={formMethods}
           positionId={positionId}
           splitFrom={splitFrom}
