@@ -1,7 +1,8 @@
 import { useQuery } from '@apollo/react-hooks'
 import { useDebounceCallback } from '@react-hook/debounce'
+import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { ConditionsListQuery, ConditionsSearchQuery } from 'queries/conditions'
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useHistory } from 'react-router-dom'
 import { Conditions, Conditions_conditions } from 'types/generatedGQL'
@@ -22,6 +23,7 @@ import { customStyles } from '../../theme/tableCustomStyles'
 export const ConditionsList: React.FC = () => {
   const [conditionIdToSearch, setConditionIdToSearch] = useState<string>('')
   const [conditionIdToShow, setConditionIdToShow] = useState<string>('')
+  const { setValue } = useLocalStorage('conditionid')
   const debouncedHandler = useDebounceCallback((conditionIdToSearch) => {
     setConditionIdToSearch(conditionIdToSearch)
   }, 500)
@@ -44,12 +46,42 @@ export const ConditionsList: React.FC = () => {
   const isLoading = !conditionIdToSearch && loading
   const isSearching = conditionIdToSearch && loading
   const history = useHistory()
-  const dropdownItems = [
-    { text: 'Details' },
-    { text: 'Split Position' },
-    { text: 'Merge Positions' },
-    { text: 'Report Payouts' },
-  ]
+
+  const buildMenuForRow = useCallback(
+    ({ id, oracle }) => {
+      const detailsOption = {
+        text: 'Details',
+        onClick: () => history.push(`/conditions/${id}`),
+      }
+
+      const splitOption = {
+        text: 'Split Position',
+        onClick: () => {
+          setValue(id)
+          history.push(`/split/`)
+        },
+      }
+
+      const mergeOption = {
+        text: 'Merge Positions',
+        onClick: () => {
+          setValue(id)
+          history.push(`/merge/`)
+        },
+      }
+
+      const reportOption = {
+        text: 'Report Payouts',
+        onClick: () => {
+          setValue(id)
+          history.push(`/report/`)
+        },
+      }
+
+      return [detailsOption, splitOption, mergeOption, reportOption]
+    },
+    [history, setValue]
+  )
 
   const handleRowClick = (row: Conditions_conditions) => {
     history.push(`/conditions/${row.id}`)
@@ -122,8 +154,8 @@ export const ConditionsList: React.FC = () => {
           activeItemHighlight={false}
           dropdownButtonContent={<ButtonDots />}
           dropdownPosition={DropdownPosition.right}
-          items={dropdownItems.map((item, index) => (
-            <DropdownItem key={index} onClick={() => console.log(`${item.text} for ${row.id}`)}>
+          items={buildMenuForRow(row).map((item, index) => (
+            <DropdownItem key={index} onClick={item.onClick}>
               {item.text}
             </DropdownItem>
           ))}
