@@ -142,7 +142,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
         />
       ),
     }),
-    [singlePosition, handleSingleAddClick, handleMultiAddClick, singlePosition, selectedPositions]
+    [singlePosition, handleSingleAddClick, handleMultiAddClick, selectedPositions]
   )
 
   const deleteCell = useMemo(
