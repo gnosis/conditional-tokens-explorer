@@ -15,7 +15,12 @@ import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import React from 'react'
 
-export const SelectPositions = () => {
+interface Props {
+  callbackToBeExecutedOnRemoveAction: () => void
+}
+
+export const SelectPositions = (props: Props) => {
+  const { callbackToBeExecutedOnRemoveAction } = props
   const { networkConfig } = useWeb3ConnectedOrInfura()
   const {
     addPositionId,
@@ -37,10 +42,15 @@ export const SelectPositions = () => {
   }
 
   React.useEffect(() => {
-    if (!loading && positions.length && balances.length && positionIds.length > 0) {
+    if (
+      !loading &&
+      positions.length === balances.length &&
+      balances.length === positionIds.length &&
+      positions.length === positionIds.length
+    ) {
       setPositionsToDisplay(
         positions.map((position) => {
-          const i = positionIds.findIndex((id) => id === position.id)
+          const i = positionIds.findIndex((id) => id.toLowerCase() === position.id.toLowerCase())
 
           const token = networkConfig.getTokenFromAddress(position.collateralToken.id)
 
@@ -65,7 +75,10 @@ export const SelectPositions = () => {
                   <span>{position}</span>
                   <ButtonControl
                     buttonType={ButtonControlType.delete}
-                    onClick={() => removePositionId(positions[index].id)}
+                    onClick={() => {
+                      callbackToBeExecutedOnRemoveAction()
+                      removePositionId(positions[index].id)
+                    }}
                   />
                 </StripedListItem>
               ))

@@ -4,6 +4,7 @@ import { TransactionReceipt } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 import Web3Utils from 'web3-utils'
 
+import { CONFIRMATIONS_TO_WAIT } from '../config/constants'
 import { NetworkConfig } from '../config/networkConfig'
 
 const CTHelpers = CTHelpersConstructor(Web3Utils)
@@ -115,7 +116,7 @@ export class ConditionalTokensService {
         gasLimit: 1750000,
       }
     )
-    return this.provider.waitForTransaction(tx.hash)
+    return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
   }
 
   redeemPositions = async (
@@ -130,7 +131,7 @@ export class ConditionalTokensService {
       conditionId,
       indexSets
     )
-    return this.provider.waitForTransaction(tx.hash)
+    return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
   }
 
   mergePositions = async (
@@ -147,7 +148,7 @@ export class ConditionalTokensService {
       partition,
       amount
     )
-    return this.provider.waitForTransaction(tx.hash)
+    return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
   }
 
   async getOutcomeSlotCount(conditionId: string): Promise<BigNumber> {
@@ -179,6 +180,6 @@ export class ConditionalTokensService {
 
   async reportPayouts(questionId: string, payouts: number[]): Promise<TransactionReceipt> {
     const tx = await this.contract.reportPayouts(questionId, payouts)
-    return this.provider.waitForTransaction(tx.hash)
+    return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
   }
 }

@@ -20,7 +20,7 @@ export const useAllowance = (tokenAddress: Maybe<string>) => {
       const conditionalTokensAddress = networkConfig.getConditionalTokensAddress()
       const provider = signer.provider
 
-      const erc20Service = new ERC20Service(provider, signer, tokenAddress)
+      const erc20Service = new ERC20Service(provider, tokenAddress, signer)
       const allowance = await erc20Service.allowance(account, conditionalTokensAddress)
       return allowance
     } else {
@@ -33,7 +33,7 @@ export const useAllowance = (tokenAddress: Maybe<string>) => {
       const conditionalTokensAddress = networkConfig.getConditionalTokensAddress()
       const provider = signer.provider
 
-      const erc20Service = new ERC20Service(provider, signer, tokenAddress)
+      const erc20Service = new ERC20Service(provider, tokenAddress, signer)
       const tx = await erc20Service.approveUnlimited(conditionalTokensAddress)
       return tx.wait()
     } else {
