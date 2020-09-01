@@ -1,6 +1,5 @@
 import { useQuery } from '@apollo/react-hooks'
 import { useDebounceCallback } from '@react-hook/debounce'
-import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { ConditionsListQuery, ConditionsSearchQuery } from 'queries/conditions'
 import React, { useCallback, useState } from 'react'
@@ -47,8 +46,8 @@ export const ConditionsList: React.FC = () => {
   const isLoading = !conditionIdToSearch && loading
   const isSearching = conditionIdToSearch && loading
   const history = useHistory()
-  const { _type: status, address } = useWeb3ConnectedOrInfura()
-  const isConnected = status === 'connected'
+  //const { _type: status, address } = useWeb3ConnectedOrInfura()
+  //const isConnected = status === 'connected'
 
   const buildMenuForRow = useCallback(
     ({ id, oracle }) => {
@@ -81,15 +80,16 @@ export const ConditionsList: React.FC = () => {
         },
       }
 
-      if (!isConnected) {
-        return [detailsOption]
-      }
+      // if (!isConnected) {
+      //   return [detailsOption]
+      // }
 
-      return address && oracle.toLowerCase() === address.toLowerCase()
-        ? [detailsOption, splitOption, mergeOption, reportOption]
-        : [detailsOption, splitOption, mergeOption]
+      // return address && oracle.toLowerCase() === address.toLowerCase()
+      //   ? [detailsOption, splitOption, mergeOption, reportOption]
+      //   : [detailsOption, splitOption, mergeOption]
+      return [detailsOption, splitOption, mergeOption, reportOption]
     },
-    [isConnected, address, history, setValue]
+    [history, setValue]
   )
 
   const handleRowClick = (row: Conditions_conditions) => {
