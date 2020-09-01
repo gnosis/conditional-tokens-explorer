@@ -1,3 +1,5 @@
+import { positionString } from 'util/tools'
+
 import { BigNumber } from 'ethers/utils'
 import { AllowanceMethods, useAllowanceState } from 'hooks/useAllowanceState'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
@@ -94,6 +96,7 @@ export const Form = ({
   } = formMethods
 
   const [outcomeSlot, setOutcomeSlot] = useState(0)
+  const [conditionIdToPreviewShow, setConditionIdToPreviewShow] = useState('')
   const [position, setPosition] = useState<Maybe<GetPosition_position>>(null)
   const [isTransactionExecuting, setIsTransactionExecuting] = useState(false)
   const [error, setError] = useState<Maybe<Error>>(null)
@@ -102,10 +105,12 @@ export const Form = ({
 
   const handleConditionChange = useCallback((condition: Maybe<GetCondition_condition>) => {
     setOutcomeSlot(condition ? condition.outcomeSlotCount : 0)
+    setConditionIdToPreviewShow(condition ? condition.id : '')
   }, [])
 
   const watchCollateralAddress = watch('collateral')
   watch('splitFrom')
+  watch('amount')
 
   const splitFromCollateral = splitFrom === 'collateral'
   const splitFromPosition = splitFrom === 'position'
@@ -171,6 +176,27 @@ export const Form = ({
     [12, 13, 14, 15],
   ]
 
+  const splitPositionPreview = useMemo(() => {
+    if (!conditionIdToPreviewShow || (splitFromPosition && !position)) {
+      return []
+    }
+
+    if (splitFromPosition && position) {
+      return trivialPartition(outcomeSlot).map((indexSet) => {
+        return positionString(
+          [...position.conditionIds, conditionIdToPreviewShow],
+          [...[position.indexSets], indexSet],
+          amount,
+          collateral
+        )
+      })
+    } else {
+      return trivialPartition(outcomeSlot).map((indexSet) => {
+        return positionString([conditionIdToPreviewShow], [indexSet], amount, collateral)
+      })
+    }
+  }, [conditionIdToPreviewShow, position, outcomeSlot, amount, collateral, splitFromPosition])
+
   return (
     <CenteredCard>
       <Row cols="1fr">
@@ -218,8 +244,9 @@ export const Form = ({
           title="Split Position Preview"
           value={
             <StripedListStyled>
-              <StripedListItem>[DAI C: 0x123 O: 0] x 10</StripedListItem>
-              <StripedListItem>[DAI C: 0x123 O: 1] x 10</StripedListItem>
+              {splitPositionPreview.map((preview, i) => (
+                <StripedListItem key={`preview-${i}`}>{preview}</StripedListItem>
+              ))}
             </StripedListStyled>
           }
         />
