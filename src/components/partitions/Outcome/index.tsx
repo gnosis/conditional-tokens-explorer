@@ -68,6 +68,8 @@ export const DraggableOutcome = styled(Outcome)`
   cursor: pointer;
 
   .outcomeCircle {
+    transition: all 0.15s ease-out;
+
     &:hover {
       background-color: ${(props) => props.theme.colors.error};
       border-color: ${(props) => props.theme.colors.error};
@@ -103,6 +105,7 @@ export const PlaceholderOutcome = styled(Outcome)`
 
 export const EditableOutcome = styled(Outcome)`
   cursor: pointer;
+  margin-right: 10px;
 
   .outcomeCircle {
     background-color: #fff;

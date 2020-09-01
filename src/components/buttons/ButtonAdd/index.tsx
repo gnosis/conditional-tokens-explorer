@@ -10,12 +10,12 @@ const Wrapper = styled.button`
   border: 1px solid ${(props) => props.theme.buttonPrimary.borderColor};
   cursor: pointer;
   display: flex;
-  height: 36px;
+  height: 38px;
   justify-content: center;
   outline: none;
   padding: 0;
   transition: all 0.15s ease-out;
-  width: 36px;
+  width: 38px;
 
   &:hover {
     border-color: ${(props) => props.theme.buttonPrimary.borderColorHover};

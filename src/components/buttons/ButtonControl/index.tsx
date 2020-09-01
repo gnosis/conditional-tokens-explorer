@@ -58,12 +58,14 @@ export enum ButtonControlType {
 
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   buttonType?: ButtonControlType
+  className?: string
 }
 
 export const ButtonControl: React.FC<Props> = (props) => {
-  const { buttonType = ButtonControlType.ok, ...restProps } = props
+  const { className, buttonType = ButtonControlType.ok, ...restProps } = props
+
   return (
-    <Wrapper {...restProps}>
+    <Wrapper className={`${className} buttonControl`} {...restProps}>
       {buttonType === ButtonControlType.delete && <IconDelete />}
       {buttonType === ButtonControlType.ok && <IconOk />}
       {buttonType === ButtonControlType.edit && <IconEdit />}
