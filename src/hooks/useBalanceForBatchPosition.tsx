@@ -14,10 +14,9 @@ export const useBalanceForBatchPosition = (positionIds: Array<string>) => {
   const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
-    setLoading(true)
-
     const getBalance = async (positionIds: Array<string>) => {
       try {
+        setLoading(true)
         if (positionIds.length > 0) {
           const balances = await CTService.balanceOfBatch(positionIds)
           setBalances(balances)
@@ -26,13 +25,14 @@ export const useBalanceForBatchPosition = (positionIds: Array<string>) => {
         }
       } catch (err) {
         logger.error(err)
+        setBalances([])
         setError(err)
+      } finally {
+        setLoading(false)
       }
     }
 
     getBalance(positionIds)
-
-    setLoading(false)
   }, [CTService, positionIds, setBalances, setError, setLoading])
 
   return {

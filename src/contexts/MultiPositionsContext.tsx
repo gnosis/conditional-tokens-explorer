@@ -1,22 +1,20 @@
+import { isPositionIdValid } from 'util/tools'
+import { Errors, PositionErrors } from 'util/types'
+
 import { useQuery } from '@apollo/react-hooks'
-import { BigNumber } from 'ethers/utils'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { useErrors } from 'hooks/useErrors'
+import { GetMultiPositionsQuery } from 'queries/positions'
+import React, { useCallback, useEffect, useState } from 'react'
 
-import { useBalanceForBatchPosition } from '../hooks/useBalanceForBatchPosition'
-import { GetMultiPositionsQuery } from '../queries/positions'
 import { GetMultiPositions, GetMultiPositions_positions } from '../types/generatedGQL'
-import { isPositionIdValid } from '../util/tools'
-import { PositionErrors } from '../util/types'
-
-const BIG_ZERO = new BigNumber(0)
 
 export interface MultiPositionsContext {
   positions: Array<GetMultiPositions_positions>
   positionIds: Array<string>
   loading: boolean
-  errors: PositionErrors[]
-  balances: BigNumber[]
+  errors: Errors[]
   addPositionId: (positionId: string) => void
+  updatePositionIds: (positionIds: Array<string>) => void
   removePositionId: (positionId: string) => void
   clearPositions: () => void
 }
@@ -26,9 +24,10 @@ export const MULTI_POSITION_CONTEXT_DEFAULT_VALUE = {
   positionIds: [],
   loading: false,
   errors: [],
-  balances: [],
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   addPositionId: () => {},
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  updatePositionIds: () => {},
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   clearPositions: () => {},
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -40,29 +39,45 @@ const MultiPositionsContext = React.createContext<MultiPositionsContext>(
 )
 
 interface Props {
-  checkForEmptyBalance?: boolean
   children: React.ReactNode
 }
 
 export const MultiPositionsProvider = (props: Props) => {
-  const { checkForEmptyBalance } = props
   const [positionIds, setPositionIds] = useState<Array<string>>([])
   const [positions, setPositions] = useState<Array<GetMultiPositions_positions>>([])
+  const { clearErrors, errors, pushError, removeError } = useErrors()
 
-  // Don't remove the useMemo, can cause performance issues
-  const errors: PositionErrors[] = useMemo(() => [], [])
+  const updatePositionIds = useCallback(
+    (positionIds: Array<string>): void => {
+      clearErrors()
+      if (!positionIds.every((positionId) => isPositionIdValid(positionId))) {
+        pushError(PositionErrors.INVALID_ERROR)
+      }
 
-  const addPositionId = useCallback((positionId: string): void => {
-    const positionIdLc = positionId.toLowerCase()
-    setPositionIds((current) => {
-      return current.includes(positionIdLc) ? current : [...current, positionIdLc]
-    })
-  }, [])
+      setPositionIds(positionIds)
+    },
+    [clearErrors, pushError]
+  )
+
+  const addPositionId = useCallback(
+    (positionId: string): void => {
+      clearErrors()
+      if (!isPositionIdValid(positionId)) {
+        pushError(PositionErrors.INVALID_ERROR)
+      }
+      const positionIdLc = positionId.toLowerCase()
+      setPositionIds((current) => {
+        return current.includes(positionIdLc) ? current : [...current, positionIdLc]
+      })
+    },
+    [clearErrors, pushError]
+  )
 
   const clearPositions = useCallback((): void => {
+    clearErrors()
     setPositionIds([])
     setPositions([])
-  }, [])
+  }, [clearErrors])
 
   const removePositionId = useCallback(
     (positionId: string): void => {
@@ -88,6 +103,7 @@ export const MultiPositionsProvider = (props: Props) => {
   })
 
   useEffect(() => {
+    removeError(PositionErrors.NOT_FOUND_ERROR)
     const { positions: positionsFromTheGraph } = fetchedPositions ?? { positions: [] }
     if (!loadingQuery && positionsFromTheGraph.length) {
       setPositions(positionsFromTheGraph)
@@ -95,36 +111,24 @@ export const MultiPositionsProvider = (props: Props) => {
 
     // Validate all positions exist
     if (positionIds.length && !loadingQuery && positionsFromTheGraph.length < positionIds.length) {
-      errors.push(PositionErrors.NOT_FOUND_ERROR)
+      pushError(PositionErrors.NOT_FOUND_ERROR)
     }
-  }, [fetchedPositions, positionIds, loadingQuery, errors])
+  }, [fetchedPositions, positionIds, loadingQuery, removeError, pushError])
 
-  const { balances, loading: loadingBalances } = useBalanceForBatchPosition(positionIds)
-  if (checkForEmptyBalance && positionIds.length && balances.length) {
-    if (balances.includes(BIG_ZERO)) {
-      errors.push(PositionErrors.EMPTY_BALANCE_ERROR)
+  useEffect(() => {
+    removeError(PositionErrors.FETCHING_ERROR)
+    if (errorFetchingPositions) {
+      pushError(PositionErrors.FETCHING_ERROR)
     }
-  }
-
-  // Validate string position
-  const hasError: boolean =
-    !!positionIds.length && positionIds.map((id) => isPositionIdValid(id)).includes(false)
-  if (hasError) {
-    errors.push(PositionErrors.INVALID_ERROR)
-  }
-
-  // Validate error position from theGraph
-  if (errorFetchingPositions) {
-    errors.push(PositionErrors.FETCHING_ERROR)
-  }
+  }, [errorFetchingPositions, pushError, removeError])
 
   const value = {
     positions,
     positionIds,
     errors,
-    loading: loadingBalances || loadingQuery || balances.length !== positions.length,
-    balances,
+    loading: loadingQuery,
     addPositionId,
+    updatePositionIds,
     removePositionId,
     clearPositions,
   }
