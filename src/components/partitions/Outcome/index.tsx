@@ -42,7 +42,7 @@ interface Props {
   onClick?: () => void
   onDragEnd?: (e: any) => void
   onDragStart?: (e: any) => void
-  outcome: string
+  outcome: string | number
 }
 
 export const Outcome: React.FC<Props> = (props) => {

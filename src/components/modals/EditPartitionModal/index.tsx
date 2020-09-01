@@ -68,10 +68,14 @@ const EditableOutcomes = styled.div`
   flex-grow: 1;
 `
 
-interface DraggedOutcome {
+interface OutcomeProps {
+  id: string
+  value: number
+}
+
+interface DraggedOutcomeProps extends OutcomeProps {
   collectionFromIndex: number
   outcomeIndex: number
-  value: number
 }
 
 export const EditPartitionModal: React.FC<ModalProps> = (props) => {
@@ -82,16 +86,35 @@ export const EditPartitionModal: React.FC<ModalProps> = (props) => {
 
   // const isLoading = !conditionIdToSearch && loading
   // const isSearching = conditionIdToSearch && loading
-
-  const mockedNumberedOutcomes = [[1, 4, 3], [2, 5], [10, 11], [6, 8, 9], [7]]
-  const [allCollections, setAllCollections] = useState(mockedNumberedOutcomes)
+  const mockedNumberedOutcomes = [
+    [
+      { value: 1, id: '0x1234567' },
+      { value: 4, id: '0x2345678' },
+      { value: 3, id: '0x3456789' },
+    ],
+    [
+      { value: 2, id: '0x4567890' },
+      { value: 5, id: '0x5678901' },
+    ],
+    [
+      { value: 10, id: '0x6789012' },
+      { value: 11, id: '0x7890123' },
+    ],
+    [
+      { value: 6, id: '0x8901234' },
+      { value: 8, id: '0x9012345' },
+      { value: 9, id: '0x0123456' },
+    ],
+    [{ value: 7, id: '0x6543210' }],
+  ]
+  const [allCollections, setAllCollections] = useState<any>(mockedNumberedOutcomes)
   const [newCollection, setNewCollection] = useState<any>([])
   const [availableOutcomes, setAvailableOutcomes] = useState<any>([])
   const [removeCollectionsQueue, setRemoveCollectionsQueue] = useState([])
-  const [draggedOutcome, setDraggedOutcome] = useState<DraggedOutcome | null>(null)
+  const [draggedOutcome, setDraggedOutcome] = useState<DraggedOutcomeProps | null>(null)
 
-  const resetClassName = (element: any, className: string) =>
-    element.currentTarget.className.replace(className, '')
+  const resetClassName = (e: any, className: string) =>
+    e.currentTarget.className.replace(className, '')
 
   const removeOutcomeFromCollection = useCallback(
     (collectionIndex: number, outcomeIndex: number) => {
@@ -100,7 +123,7 @@ export const EditPartitionModal: React.FC<ModalProps> = (props) => {
       allCollections[collectionIndex].splice(outcomeIndex, 1)
 
       setAllCollections([
-        ...allCollections.filter((item) => {
+        ...allCollections.filter((item: any) => {
           return item.length > 0
         }),
       ])
@@ -109,7 +132,7 @@ export const EditPartitionModal: React.FC<ModalProps> = (props) => {
   )
 
   const onDragStart = useCallback(
-    (e: any, collectionFromIndex: number, outcome: any, outcomeIndex: number) => {
+    (e: any, collectionFromIndex: number, outcome: OutcomeProps, outcomeIndex: number) => {
       const placeholderOutcome = document.getElementById(placeholderOutcomeId)
 
       if (e.currentTarget.className.search(draggingClass) === -1) {
@@ -118,8 +141,9 @@ export const EditPartitionModal: React.FC<ModalProps> = (props) => {
 
       setDraggedOutcome({
         collectionFromIndex: collectionFromIndex,
+        id: outcome.id,
         outcomeIndex: outcomeIndex,
-        value: outcome,
+        value: outcome.value,
       })
 
       if (placeholderOutcome) {
@@ -155,8 +179,8 @@ export const EditPartitionModal: React.FC<ModalProps> = (props) => {
         return
 
       allCollections[draggedOutcome.collectionFromIndex].splice(draggedOutcome.outcomeIndex, 1)
-      allCollections[collectionToIndex].push(draggedOutcome.value)
-      setAllCollections([...allCollections.filter((collection) => collection.length > 0)])
+      allCollections[collectionToIndex].push({ value: draggedOutcome.value, id: draggedOutcome.id })
+      setAllCollections([...allCollections.filter((collection: any) => collection.length > 0)])
     },
     [allCollections, draggedOutcome]
   )
@@ -277,7 +301,7 @@ export const EditPartitionModal: React.FC<ModalProps> = (props) => {
                       onDrop={(e) => onDrop(e, collectionIndex)}
                     >
                       <DraggableCollectionInner>
-                        {outcomeList.map((outcome: string, outcomeIndex: number) => (
+                        {outcomeList.map((outcome: OutcomeProps, outcomeIndex: number) => (
                           <DraggableOutcome
                             key={outcomeIndex}
                             makeDraggable
@@ -288,7 +312,7 @@ export const EditPartitionModal: React.FC<ModalProps> = (props) => {
                             onDragStart={(e: any) => {
                               onDragStart(e, collectionIndex, outcome, outcomeIndex)
                             }}
-                            outcome={outcome}
+                            outcome={outcome.value}
                           />
                         ))}
                       </DraggableCollectionInner>
