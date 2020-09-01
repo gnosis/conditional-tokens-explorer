@@ -13,6 +13,7 @@ import { Outcome } from '../../components/partitions/Outcome'
 import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
 import { CardTextSm } from '../../components/pureStyledComponents/CardText'
 import { ErrorContainer, Error as ErrorMessage } from '../../components/pureStyledComponents/Error'
+import { OutcomesContainer } from '../../components/pureStyledComponents/OutcomesContainer'
 import { Row } from '../../components/pureStyledComponents/Row'
 import {
   StripedList,
@@ -185,9 +186,30 @@ export const Form = ({
       { value: 9, id: '0x0123456' },
     ],
     [{ value: 7, id: '0x6543210' }],
+    [
+      { value: 12, id: '0x1234567' },
+      { value: 13, id: '0x2345678' },
+      { value: 14, id: '0x3456789' },
+      { value: 15, id: '0x1234567' },
+      { value: 16, id: '0x2345678' },
+      { value: 17, id: '0x3456789' },
+      { value: 18, id: '0x1234567' },
+      { value: 19, id: '0x2345678' },
+      { value: 20, id: '0x3456789' },
+      { value: 21, id: '0x1234567' },
+      { value: 22, id: '0x2345678' },
+      { value: 23, id: '0x3456789' },
+      { value: 24, id: '0x1234567' },
+      { value: 25, id: '0x2345678' },
+      { value: 26, id: '0x3456789' },
+      { value: 27, id: '0x1234567' },
+      { value: 28, id: '0x2345678' },
+      { value: 29, id: '0x3456789' },
+    ],
   ]
 
   const [isEditPartitionModalOpen, setIsEditPartitionModalOpen] = useState(false)
+  const outcomesByRow = '15'
 
   return (
     <CenteredCard>
@@ -240,9 +262,15 @@ export const Form = ({
                   (outcomeList: unknown | any, outcomeListIndex: number) => {
                     return (
                       <StripedListItemLessPadding key={outcomeListIndex}>
-                        {outcomeList.map((outcome: OutcomeProps, outcomeIndex: number) => (
-                          <Outcome key={outcomeIndex} outcome={outcome.value} />
-                        ))}
+                        <OutcomesContainer columnGap="0" columns={outcomesByRow}>
+                          {outcomeList.map((outcome: OutcomeProps, outcomeIndex: number) => (
+                            <Outcome
+                              key={outcomeIndex}
+                              lastInRow={outcomesByRow}
+                              outcome={outcome.value}
+                            />
+                          ))}
+                        </OutcomesContainer>
                       </StripedListItemLessPadding>
                     )
                   }

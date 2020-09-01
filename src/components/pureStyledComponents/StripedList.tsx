@@ -21,6 +21,7 @@ export const StripedListItem = styled.div<{ justifyContent?: string }>`
   background-color: ${(props) => props.theme.colors.whitesmoke3};
   color: ${(props) => props.theme.colors.darkerGray};
   display: flex;
+  flex-wrap: wrap;
   font-size: 15px;
   font-weight: 400;
   justify-content: ${(props) => props.justifyContent};

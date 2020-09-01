@@ -1,15 +1,27 @@
 import React from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 const outcomeDimensions = '24px'
 
-export const Wrapper = styled.div`
+const hideHorizontalLineCSS = css`
+  .outcomeHorizontalLine {
+    display: none;
+  }
+`
+
+export const Wrapper = styled.div<{ lastInRow?: string }>`
   align-items: center;
   display: flex;
+  position: relative;
 
+  &:nth-child(${(props) => props.lastInRow && `${props.lastInRow}n`}),
   &:last-child {
-    .outcomeHorizontalLine {
-      display: none;
+    ${hideHorizontalLineCSS}
+  }
+
+  &:nth-child(${(props) => props.lastInRow && `n+${parseInt(props.lastInRow) + 1}`}) {
+    .outcomeVerticalLine {
+      display: block;
     }
   }
 `
@@ -31,14 +43,28 @@ export const OutcomeCircle = styled.div`
   width: ${outcomeDimensions};
 `
 
-export const OutcomeHorizontalLine = styled.div`
+const OutcomeHorizontalLine = styled.div`
   background-color: ${(props) => props.theme.colors.darkerGray};
+  flex-grow: 1;
+  flex-shrink: 1;
   height: 2px;
-  width: 12px;
+  width: 10px;
+`
+
+const OutcomeVerticalLine = styled.div`
+  background-color: ${(props) => props.theme.colors.darkerGray};
+  display: none;
+  height: 10px;
+  left: 50%;
+  position: absolute;
+  top: -12px;
+  transform: translateX(-50%);
+  width: 2px;
 `
 
 interface Props {
   id?: string
+  lastInRow?: string
   makeDraggable?: boolean
   onClick?: () => void
   onDragEnd?: (e: any) => void
@@ -47,10 +73,19 @@ interface Props {
 }
 
 export const Outcome: React.FC<Props> = (props) => {
-  const { id, makeDraggable, onClick, onDragEnd, onDragStart, outcome, ...restProps } = props
+  const {
+    id,
+    lastInRow,
+    makeDraggable,
+    onClick,
+    onDragEnd,
+    onDragStart,
+    outcome,
+    ...restProps
+  } = props
 
   return (
-    <Wrapper id={id} onClick={onClick} {...restProps}>
+    <Wrapper id={id} lastInRow={lastInRow} onClick={onClick} {...restProps}>
       <OutcomeCircle
         className="outcomeCircle"
         draggable={makeDraggable}
@@ -58,6 +93,7 @@ export const Outcome: React.FC<Props> = (props) => {
         onDragStart={onDragStart}
       >
         {outcome}
+        <OutcomeVerticalLine className="outcomeVerticalLine" />
       </OutcomeCircle>
       <OutcomeHorizontalLine className="outcomeHorizontalLine" />
     </Wrapper>
@@ -98,14 +134,11 @@ export const PlaceholderOutcome = styled(Outcome)`
     color: #fff;
   }
 
-  .outcomeHorizontalLine {
-    display: none;
-  }
+  ${hideHorizontalLineCSS}
 `
 
 export const EditableOutcome = styled(Outcome)`
   cursor: pointer;
-  margin-right: 10px;
 
   .outcomeCircle {
     background-color: #fff;
@@ -117,9 +150,7 @@ export const EditableOutcome = styled(Outcome)`
     width: 28px;
   }
 
-  .outcomeHorizontalLine {
-    display: none;
-  }
+  ${hideHorizontalLineCSS}
 `
 
 export const AddableOutcome = styled(EditableOutcome)`

@@ -20,6 +20,7 @@ import {
 import { ButtonContainer } from '../../pureStyledComponents/ButtonContainer'
 import { CardSubtitle } from '../../pureStyledComponents/CardSubtitle'
 import { CardText } from '../../pureStyledComponents/CardText'
+import { OutcomesContainer } from '../../pureStyledComponents/OutcomesContainer'
 import {
   StripedList,
   StripedListEmpty,
@@ -30,24 +31,19 @@ import { InfoCard } from '../../statusInfo/InfoCard'
 import { InlineLoading } from '../../statusInfo/InlineLoading'
 import { TitleValue } from '../../text/TitleValue'
 
-const DraggableCollection = styled(StripedListItemLessPadding)`
+const Collection = styled(StripedListItemLessPadding)`
+  flex-wrap: nowrap;
+
   &.dragOver {
     background-color: rgba(0, 156, 180, 0.15);
   }
-`
-
-const DraggableCollectionInner = styled.div`
-  align-items: center;
-  display: flex;
-  flex-grow: 1;
-  padding-right: 15px;
 `
 
 const EditableOutcomesWrapper = styled.div`
   align-items: center;
   display: grid;
   grid-column-gap: 12px;
-  grid-template-columns: 1fr 36px;
+  grid-template-columns: 1fr 46px;
   margin-bottom: 24px;
 
   &:last-child {
@@ -67,18 +63,17 @@ const EditableOutcomes = styled.div<{ borderColor?: 'primary' | 'error' }>`
   border-width: 2px;
   display: flex;
   flex-grow: 1;
-  height: 45px;
-  padding: 0 8px;
+  min-height: 45px;
+  padding: 6px 8px;
 
   ${(props) =>
     props.borderColor === 'primary' && `border-bottom-color: ${props.theme.colors.primary};`}
 `
 
-const EditableOutcomesInner = styled.div`
-  align-items: center;
-  display: flex;
+const OutcomesInner = styled(OutcomesContainer)`
   flex-grow: 1;
   height: 100%;
+  margin: 0 15px 0 0;
 `
 
 const TitleValueExtraMargin = styled(TitleValue)`
@@ -86,8 +81,27 @@ const TitleValueExtraMargin = styled(TitleValue)`
 `
 
 const CardTextPlaceholder = styled(CardText)`
-  margin: 0;
+  flex-grow: 1;
+  margin: 0 15px 0 0;
   opacity: 0.7;
+`
+
+const ButtonBulk = styled(ButtonBulkMove)`
+  margin-top: auto;
+`
+
+const ButtonAddNewCollection = styled(ButtonAdd)`
+  border-width: 4px;
+  border-style: solid;
+  margin-top: auto;
+  box-sizing: content-box;
+
+  &,
+  &:hover,
+  &[disabled],
+  &[disabled]:hover {
+    border-color: #fff;
+  }
 `
 
 interface DraggedOutcomeProps extends OutcomeProps {
@@ -104,11 +118,11 @@ export const EditPartitionModal: React.FC<EditPartitionModalProps> = (props) => 
   const dragOverClass = 'dragOver'
   const draggingClass = 'isDragging'
   const placeholderOutcomeId = 'placeholderOutcome'
+  const outcomesByRow = '13'
 
   const [allCollections, setAllCollections] = useState<any>(outcomes)
   const [newCollection, setNewCollection] = useState<any>([])
   const [availableOutcomes, setAvailableOutcomes] = useState<any>([])
-  const [removeCollectionsQueue, setRemoveCollectionsQueue] = useState([])
   const [draggedOutcome, setDraggedOutcome] = useState<DraggedOutcomeProps | null>(null)
 
   const resetClassName = (e: any, className: string) =>
@@ -255,9 +269,9 @@ export const EditPartitionModal: React.FC<EditPartitionModalProps> = (props) => 
             <CardSubtitle>Outcomes</CardSubtitle>
             <EditableOutcomesWrapper>
               <EditableOutcomes>
-                <EditableOutcomesInner>
-                  {availableOutcomes.length ? (
-                    availableOutcomes.map((outcome: OutcomeProps, outcomeIndex: number) => {
+                {availableOutcomes.length ? (
+                  <OutcomesInner columns="12">
+                    {availableOutcomes.map((outcome: OutcomeProps, outcomeIndex: number) => {
                       return (
                         <AddableOutcome
                           key={outcomeIndex}
@@ -267,28 +281,27 @@ export const EditPartitionModal: React.FC<EditPartitionModalProps> = (props) => 
                           outcome={outcome.value}
                         />
                       )
-                    })
-                  ) : (
-                    <CardTextPlaceholder>
-                      Outcomes removed from collections will be available here.
-                    </CardTextPlaceholder>
-                  )}
-                </EditableOutcomesInner>
-                <ButtonBulkMove
+                    })}
+                  </OutcomesInner>
+                ) : (
+                  <CardTextPlaceholder>
+                    Outcomes removed from collections will be available here.
+                  </CardTextPlaceholder>
+                )}
+                <ButtonBulk
                   action={ButtonBulkMoveActions.add}
                   direction={ButtonBulkMoveDirection.down}
                   disabled={availableOutcomes.length === 0}
                   onClick={addAllAvailableOutcomesToNewCollection}
                 />
               </EditableOutcomes>
-              <div />
             </EditableOutcomesWrapper>
             <CardSubtitle>New Collection Preview</CardSubtitle>
             <EditableOutcomesWrapper>
               <EditableOutcomes borderColor="primary">
-                <EditableOutcomesInner>
-                  {newCollection.length ? (
-                    newCollection.map((outcome: OutcomeProps, outcomeIndex: number) => {
+                {newCollection.length ? (
+                  <OutcomesInner columns="12">
+                    {newCollection.map((outcome: OutcomeProps, outcomeIndex: number) => {
                       return (
                         <RemovableOutcome
                           key={outcomeIndex}
@@ -298,21 +311,21 @@ export const EditPartitionModal: React.FC<EditPartitionModalProps> = (props) => 
                           outcome={outcome.value}
                         />
                       )
-                    })
-                  ) : (
-                    <CardTextPlaceholder>
-                      Add at least one outcome to create a new collection.
-                    </CardTextPlaceholder>
-                  )}
-                </EditableOutcomesInner>
-                <ButtonBulkMove
+                    })}
+                  </OutcomesInner>
+                ) : (
+                  <CardTextPlaceholder>
+                    Add at least one outcome to create a new collection.
+                  </CardTextPlaceholder>
+                )}
+                <ButtonBulk
                   action={ButtonBulkMoveActions.remove}
                   direction={ButtonBulkMoveDirection.up}
                   disabled={newCollection.length === 0}
                   onClick={clearOutcomesFromNewCollection}
                 />
               </EditableOutcomes>
-              <ButtonAdd
+              <ButtonAddNewCollection
                 disabled={newCollection.length === 0}
                 onClick={() => {
                   addNewCollection()
@@ -338,16 +351,17 @@ export const EditPartitionModal: React.FC<EditPartitionModalProps> = (props) => 
               {allCollections.length > 0 ? (
                 allCollections.map((outcomeList: Array<OutcomeProps>, collectionIndex: number) => {
                   return (
-                    <DraggableCollection
+                    <Collection
                       key={collectionIndex}
                       onDragLeave={onDragLeave}
                       onDragOver={(e) => onDragOver(e, collectionIndex)}
                       onDrop={(e) => onDrop(e, collectionIndex)}
                     >
-                      <DraggableCollectionInner>
+                      <OutcomesInner columnGap="0" columns="13">
                         {outcomeList.map((outcome: OutcomeProps, outcomeIndex: number) => (
                           <DraggableOutcome
                             key={outcomeIndex}
+                            lastInRow={outcomesByRow}
                             makeDraggable
                             onClick={() => {
                               removeOutcomeFromCollection(collectionIndex, outcomeIndex)
@@ -359,14 +373,14 @@ export const EditPartitionModal: React.FC<EditPartitionModalProps> = (props) => 
                             outcome={outcome.value}
                           />
                         ))}
-                      </DraggableCollectionInner>
+                      </OutcomesInner>
                       <ButtonControl
                         buttonType={ButtonControlType.delete}
                         onClick={() => {
                           removeCollection(collectionIndex)
                         }}
                       />
-                    </DraggableCollection>
+                    </Collection>
                   )
                 })
               ) : (

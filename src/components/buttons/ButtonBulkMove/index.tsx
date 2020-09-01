@@ -19,7 +19,7 @@ const Wrapper = styled.button<{ action: ButtonBulkMoveActions }>`
   background: transparent;
   border-radius: 50%;
   border: none;
-  border: solid 2px ${(props) => props.theme.colors.mediumGrey};
+  border: solid 2px ${(props) => props.theme.colors.darkGrey};
   cursor: pointer;
   display: flex;
   flex-grow: 0;
@@ -35,37 +35,59 @@ const Wrapper = styled.button<{ action: ButtonBulkMoveActions }>`
   width: 30px;
 
   path {
+    fill: ${(props) => props.theme.colors.darkGrey};
     transition: all 0.15s ease-out;
   }
 
-  &:hover {
-    ${(props) =>
-      props.action === ButtonBulkMoveActions.add &&
-      `
+  ${(props) =>
+    props.action === ButtonBulkMoveActions.add &&
+    `
         border-color: ${props.theme.colors.primary};
         path {
           fill: ${props.theme.colors.primary};
         }
       `}
 
-    ${(props) =>
-      props.action === ButtonBulkMoveActions.remove &&
-      `
+  ${(props) =>
+    props.action === ButtonBulkMoveActions.remove &&
+    `
         border-color: ${props.theme.colors.error};
         path {
           fill: ${props.theme.colors.error};
+        }
+      `}
+
+  &:hover {
+    ${(props) =>
+      props.action === ButtonBulkMoveActions.add &&
+      `
+        background-color: ${props.theme.colors.primary};
+        border-color: ${props.theme.colors.primary};
+        path {
+          fill: #fff;
+        }
+      `}
+
+    ${(props) =>
+      props.action === ButtonBulkMoveActions.remove &&
+      `
+        background-color: ${props.theme.colors.error};
+        border-color: ${props.theme.colors.error};
+        path {
+          fill: #fff;
         }
       `}
   }
 
   &[disabled],
   &[disabled]:hover {
-    border-color: ${(props) => props.theme.colors.mediumGrey};
+    background: transparent;
+    border-color: ${(props) => props.theme.colors.darkGrey};
     cursor: not-allowed;
     opacity: 0.5;
 
     path {
-      fill: ${(props) => props.theme.colors.mediumGrey};
+      fill: ${(props) => props.theme.colors.darkGrey};
     }
   }
 `
