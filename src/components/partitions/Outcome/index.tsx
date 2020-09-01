@@ -18,6 +18,7 @@ export const OutcomeCircle = styled.div`
   align-items: center;
   background-color: ${(props) => props.theme.colors.darkerGray};
   border-radius: 50%;
+  border: 2px solid ${(props) => props.theme.colors.darkerGray};
   color: #fff;
   display: flex;
   font-size: 15px;
@@ -36,26 +37,82 @@ export const OutcomeHorizontalLine = styled.div`
 `
 
 interface Props {
-  draggable?: boolean
+  id?: string
+  makeDraggable?: boolean
   onClick?: () => void
-  onDragStart?: (e: any) => void
   onDragEnd?: (e: any) => void
+  onDragStart?: (e: any) => void
   outcome: string
 }
 
 export const Outcome: React.FC<Props> = (props) => {
-  const { draggable, onClick, onDragEnd, onDragStart, outcome, ...restProps } = props
+  const { id, makeDraggable, onClick, onDragEnd, onDragStart, outcome, ...restProps } = props
 
   return (
-    <Wrapper
-      draggable={draggable}
-      onClick={onClick}
-      onDragEnd={onDragEnd}
-      onDragStart={onDragStart}
-      {...restProps}
-    >
-      <OutcomeCircle className="outcomeCircle">{outcome}</OutcomeCircle>
+    <Wrapper id={id} onClick={onClick} {...restProps}>
+      <OutcomeCircle
+        className="outcomeCircle"
+        draggable={makeDraggable}
+        onDragEnd={onDragEnd}
+        onDragStart={onDragStart}
+      >
+        {outcome}
+      </OutcomeCircle>
       <OutcomeHorizontalLine className="outcomeHorizontalLine" />
     </Wrapper>
   )
 }
+
+export const PlaceholderOutcome = styled(Outcome)`
+  left: -100vw;
+  position: absolute;
+  top: -100vh;
+  z-index: -12345;
+
+  .outcomeHorizontalLine {
+    display: none;
+  }
+`
+
+export const EditableOutcome = styled(Outcome)`
+  cursor: pointer;
+
+  .outcomeCircle {
+    background-color: #fff;
+    border-style: solid;
+    border-width: 2px;
+    font-size: 16px;
+    height: 28px;
+    transition: all 0.15s ease-out;
+    width: 28px;
+  }
+
+  .outcomeHorizontalLine {
+    display: none;
+  }
+`
+
+export const AddableOutcome = styled(EditableOutcome)`
+  .outcomeCircle {
+    border-color: solid 2px ${(props) => props.theme.colors.mediumGrey};
+    color: ${(props) => props.theme.colors.mediumGrey};
+
+    &:hover {
+      border-color: ${(props) => props.theme.colors.primary};
+      color: ${(props) => props.theme.colors.primary};
+    }
+  }
+`
+
+export const RemovableOutcome = styled(EditableOutcome)`
+  .outcomeCircle {
+    border-color: solid 2px ${(props) => props.theme.colors.primary};
+    color: ${(props) => props.theme.colors.primary};
+
+    &:hover {
+      background-color: ${(props) => props.theme.colors.error};
+      border-color: ${(props) => props.theme.colors.error};
+      color: #fff;
+    }
+  }
+`
