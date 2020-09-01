@@ -153,7 +153,7 @@ export const EditableOutcome = styled(Outcome)`
   ${hideHorizontalLineCSS}
 `
 
-export const AddableOutcome = styled(EditableOutcome)`
+export const AddableOutcome = styled(EditableOutcome)<{ active?: boolean }>`
   .outcomeCircle {
     border-color: ${(props) => props.theme.colors.mediumGrey};
     color: ${(props) => props.theme.colors.mediumGrey};
@@ -162,10 +162,17 @@ export const AddableOutcome = styled(EditableOutcome)`
       border-color: ${(props) => props.theme.colors.primary};
       color: ${(props) => props.theme.colors.primary};
     }
+
+    ${(props) =>
+      props.active &&
+      `
+        border-color: ${props.theme.colors.primary};
+        color: ${props.theme.colors.primary};
+    `}
   }
 `
 
-export const RemovableOutcome = styled(EditableOutcome)`
+export const RemovableOutcome = styled(EditableOutcome)<{ active?: boolean }>`
   .outcomeCircle {
     border-color: ${(props) => props.theme.colors.primary};
     color: ${(props) => props.theme.colors.primary};
@@ -175,5 +182,13 @@ export const RemovableOutcome = styled(EditableOutcome)`
       border-color: ${(props) => props.theme.colors.error};
       color: #fff;
     }
+
+    ${(props) =>
+      props.active &&
+      `
+        background-color: ${props.theme.colors.error};
+        border-color: ${props.theme.colors.error};
+        color: #fff;
+      `}
   }
 `

@@ -283,13 +283,13 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
               <EditableOutcomes
                 borderBottomColor={theme.colors.mediumGrey}
                 fullBorderColor={addAll}
-                // onMouseLeave={() => setAddAll(undefined)}
               >
                 {availableOutcomes.length ? (
                   <OutcomesInner columnGap="8px" columns="12" rowGap="8px">
                     {availableOutcomes.map((outcome: OutcomeProps, outcomeIndex: number) => {
                       return (
                         <AddableOutcome
+                          active={addAll}
                           key={outcomeIndex}
                           onClick={() => {
                             addOutcomeToNewCollection(outcomeIndex)
@@ -322,13 +322,13 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
               <EditableOutcomes
                 borderBottomColor={theme.colors.primary}
                 fullBorderColor={removeAll}
-                // onMouseLeave={() => setRemoveAll(undefined)}
               >
                 {newCollection.length ? (
                   <OutcomesInner columnGap="8px" columns="12" rowGap="8px">
                     {newCollection.map((outcome: OutcomeProps, outcomeIndex: number) => {
                       return (
                         <RemovableOutcome
+                          active={removeAll}
                           key={outcomeIndex}
                           onClick={() => {
                             removeOutcomeFromNewCollection(outcomeIndex)
