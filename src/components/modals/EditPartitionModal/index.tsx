@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react'
-import styled from 'styled-components'
+import styled, { withTheme } from 'styled-components'
 
 import { OutcomeProps } from '../../../util/types'
 import { Button } from '../../buttons/Button'
@@ -51,12 +51,14 @@ const EditableOutcomesWrapper = styled.div`
   }
 `
 
-const EditableOutcomes = styled.div<{ borderColor?: 'primary' | 'error' }>`
+const EditableOutcomes = styled.div<{
+  borderBottomColor?: string
+  fullBorderColor?: string
+}>`
   align-items: center;
   background-color: #fff;
-  border-bottom-color: ${(props) => props.theme.colors.mediumGrey};
+  border-bottom-color: ${(props) => props.borderBottomColor};
   border-left-color: transparent;
-  /* border-radius: 8px; */
   border-right-color: transparent;
   border-style: solid;
   border-top-color: transparent;
@@ -65,10 +67,16 @@ const EditableOutcomes = styled.div<{ borderColor?: 'primary' | 'error' }>`
   flex-grow: 1;
   min-height: 45px;
   padding: 6px 8px;
+  transition: all 0.15s ease-out;
 
-  ${(props) =>
-    props.borderColor === 'primary' && `border-bottom-color: ${props.theme.colors.primary};`}
+  ${(props) => props.fullBorderColor && `border-radius: 8px;`}
+
+  ${(props) => props.fullBorderColor && `border-color: ${props.fullBorderColor};`}
 `
+
+EditableOutcomes.defaultProps = {
+  borderBottomColor: '#b2b5b2',
+}
 
 const OutcomesInner = styled(OutcomesContainer)`
   flex-grow: 1;
@@ -111,10 +119,11 @@ interface DraggedOutcomeProps extends OutcomeProps {
 
 interface EditPartitionModalProps extends ModalProps {
   outcomes: Array<any>
+  theme?: any
 }
 
-export const EditPartitionModal: React.FC<EditPartitionModalProps> = (props) => {
-  const { onRequestClose, outcomes, ...restProps } = props
+const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
+  const { onRequestClose, outcomes, theme, ...restProps } = props
   const dragOverClass = 'dragOver'
   const draggingClass = 'isDragging'
   const placeholderOutcomeId = 'placeholderOutcome'
@@ -256,6 +265,9 @@ export const EditPartitionModal: React.FC<EditPartitionModalProps> = (props) => 
     [availableOutcomes, allCollections]
   )
 
+  const [removeAll, setRemoveAll] = useState(undefined)
+  const [addAll, setAddAll] = useState(undefined)
+
   const notEnoughCollections = allCollections.length < 2
   const orphanedOutcomes = availableOutcomes.length > 0 || newCollection.length > 0
   const disableButton = notEnoughCollections || orphanedOutcomes
@@ -268,9 +280,13 @@ export const EditPartitionModal: React.FC<EditPartitionModalProps> = (props) => 
           <>
             <CardSubtitle>Outcomes</CardSubtitle>
             <EditableOutcomesWrapper>
-              <EditableOutcomes>
+              <EditableOutcomes
+                borderBottomColor={theme.colors.mediumGrey}
+                fullBorderColor={addAll}
+                // onMouseLeave={() => setAddAll(undefined)}
+              >
                 {availableOutcomes.length ? (
-                  <OutcomesInner columns="12">
+                  <OutcomesInner columnGap="8px" columns="12" rowGap="8px">
                     {availableOutcomes.map((outcome: OutcomeProps, outcomeIndex: number) => {
                       return (
                         <AddableOutcome
@@ -292,15 +308,24 @@ export const EditPartitionModal: React.FC<EditPartitionModalProps> = (props) => 
                   action={ButtonBulkMoveActions.add}
                   direction={ButtonBulkMoveDirection.down}
                   disabled={availableOutcomes.length === 0}
-                  onClick={addAllAvailableOutcomesToNewCollection}
+                  onClick={() => {
+                    addAllAvailableOutcomesToNewCollection()
+                    setAddAll(undefined)
+                  }}
+                  onMouseEnter={() => setAddAll(theme.colors.primary)}
+                  onMouseLeave={() => setAddAll(undefined)}
                 />
               </EditableOutcomes>
             </EditableOutcomesWrapper>
             <CardSubtitle>New Collection Preview</CardSubtitle>
             <EditableOutcomesWrapper>
-              <EditableOutcomes borderColor="primary">
+              <EditableOutcomes
+                borderBottomColor={theme.colors.primary}
+                fullBorderColor={removeAll}
+                // onMouseLeave={() => setRemoveAll(undefined)}
+              >
                 {newCollection.length ? (
-                  <OutcomesInner columns="12">
+                  <OutcomesInner columnGap="8px" columns="12" rowGap="8px">
                     {newCollection.map((outcome: OutcomeProps, outcomeIndex: number) => {
                       return (
                         <RemovableOutcome
@@ -322,7 +347,12 @@ export const EditPartitionModal: React.FC<EditPartitionModalProps> = (props) => 
                   action={ButtonBulkMoveActions.remove}
                   direction={ButtonBulkMoveDirection.up}
                   disabled={newCollection.length === 0}
-                  onClick={clearOutcomesFromNewCollection}
+                  onClick={() => {
+                    clearOutcomesFromNewCollection()
+                    setRemoveAll(undefined)
+                  }}
+                  onMouseEnter={() => setRemoveAll(theme.colors.error)}
+                  onMouseLeave={() => setRemoveAll(undefined)}
                 />
               </EditableOutcomes>
               <ButtonAddNewCollection
@@ -402,3 +432,5 @@ export const EditPartitionModal: React.FC<EditPartitionModalProps> = (props) => 
     </Modal>
   )
 }
+
+export const EditPartitionModal = withTheme(PartitionModal)
