@@ -95,7 +95,6 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
     setSelectedPositions((current) => {
       return current.filter((selected) => selected.id !== position.id)
     })
-    // removePositionId(position.id)
   }, [])
 
   const defaultColumns: Array<any> = useMemo(
@@ -193,10 +192,8 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
   }, [defaultColumns, connectedItems, deleteCell])
 
   const handleDone = useCallback(() => {
-    if (selectedPositions.length) {
-      if (onConfirm && typeof onConfirm === 'function') {
-        onConfirm(selectedPositions)
-      }
+    if (selectedPositions.length && onConfirm && typeof onConfirm === 'function') {
+      onConfirm(selectedPositions)
     }
   }, [onConfirm, selectedPositions])
 
