@@ -231,6 +231,17 @@ export const EditPartitionModal: React.FC<EditPartitionModalProps> = (props) => 
     allCollections.length = 0
   }, [allCollections, availableOutcomes])
 
+  const removeCollection = useCallback(
+    (collectionIndex: number) => {
+      setAvailableOutcomes([...availableOutcomes, ...allCollections[collectionIndex]])
+      allCollections[collectionIndex].length = 0
+      setAllCollections([
+        ...allCollections.filter((collection: Array<OutcomeProps>) => collection.length > 0),
+      ])
+    },
+    [availableOutcomes, allCollections]
+  )
+
   const notEnoughCollections = allCollections.length < 2
   const orphanedOutcomes = availableOutcomes.length > 0 || newCollection.length > 0
   const disableButton = notEnoughCollections || orphanedOutcomes
@@ -325,7 +336,7 @@ export const EditPartitionModal: React.FC<EditPartitionModalProps> = (props) => 
             </CardText>
             <StripedList minHeight="200px">
               {allCollections.length > 0 ? (
-                allCollections.map((outcomeList: unknown | any, collectionIndex: number) => {
+                allCollections.map((outcomeList: Array<OutcomeProps>, collectionIndex: number) => {
                   return (
                     <DraggableCollection
                       key={collectionIndex}
@@ -349,7 +360,12 @@ export const EditPartitionModal: React.FC<EditPartitionModalProps> = (props) => 
                           />
                         ))}
                       </DraggableCollectionInner>
-                      <ButtonControl buttonType={ButtonControlType.delete} />
+                      <ButtonControl
+                        buttonType={ButtonControlType.delete}
+                        onClick={() => {
+                          removeCollection(collectionIndex)
+                        }}
+                      />
                     </DraggableCollection>
                   )
                 })
