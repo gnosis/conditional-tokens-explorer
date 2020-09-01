@@ -97,7 +97,6 @@ export const Form = ({
 
   const [outcomeSlot, setOutcomeSlot] = useState(0)
   const [conditionIdToPreviewShow, setConditionIdToPreviewShow] = useState('')
-  const [collateralToken, setCollateralToken] = useState(tokens[0])
   const [position, setPosition] = useState<Maybe<GetPosition_position>>(null)
   const [isTransactionExecuting, setIsTransactionExecuting] = useState(false)
   const [error, setError] = useState<Maybe<Error>>(null)
@@ -188,15 +187,15 @@ export const Form = ({
           [...position.conditionIds, conditionIdToPreviewShow],
           [...[position.indexSets], indexSet],
           amount,
-          collateralToken
+          collateral
         )
       })
     } else {
       return trivialPartition(outcomeSlot).map((indexSet) => {
-        return positionString([conditionIdToPreviewShow], [indexSet], amount, collateralToken)
+        return positionString([conditionIdToPreviewShow], [indexSet], amount, collateral)
       })
     }
-  }, [conditionIdToPreviewShow, position, outcomeSlot, amount, collateralToken, splitFromPosition])
+  }, [conditionIdToPreviewShow, position, outcomeSlot, amount, collateral, splitFromPosition])
 
   return (
     <CenteredCard>
