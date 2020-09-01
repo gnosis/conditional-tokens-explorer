@@ -150,7 +150,7 @@ export const PositionsList = () => {
       <PageTitle>Positions</PageTitle>
       {isLoading && <InlineLoading />}
       {error && <InfoCard message={error.message} title="Error" />}
-      {data && !isLoading && (
+      {data && !isLoading && !error && (
         <>
           <TableControls
             end={filterDropdown}
