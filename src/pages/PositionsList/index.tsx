@@ -40,7 +40,6 @@ export const PositionsList = () => {
   const history = useHistory()
   const { setValue } = useLocalStorage('positionid')
 
-  //const isConnected = status === 'connected'
   const isLoading = !positionIdToSearch && loading
   const isSearching = positionIdToSearch && loading
 
@@ -73,15 +72,6 @@ export const PositionsList = () => {
         },
       }
 
-      // if (!isConnected) {
-      //   return [detailsOption]
-      // } else {
-      //   if (userBalance.gt(0)) {
-      //     return [detailsOption, redeemOption, wrapERC20Option, unwrapOption]
-      //   } else {
-      //     return [detailsOption, wrapERC20Option, unwrapOption]
-      //   }
-      // }
       return [detailsOption, redeemOption, wrapERC20Option, unwrapOption]
     },
     [history, setValue]

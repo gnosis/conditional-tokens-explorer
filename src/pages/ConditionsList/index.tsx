@@ -46,8 +46,6 @@ export const ConditionsList: React.FC = () => {
   const isLoading = !conditionIdToSearch && loading
   const isSearching = conditionIdToSearch && loading
   const history = useHistory()
-  //const { _type: status, address } = useWeb3ConnectedOrInfura()
-  //const isConnected = status === 'connected'
 
   const buildMenuForRow = useCallback(
     ({ id, oracle }) => {
@@ -80,13 +78,6 @@ export const ConditionsList: React.FC = () => {
         },
       }
 
-      // if (!isConnected) {
-      //   return [detailsOption]
-      // }
-
-      // return address && oracle.toLowerCase() === address.toLowerCase()
-      //   ? [detailsOption, splitOption, mergeOption, reportOption]
-      //   : [detailsOption, splitOption, mergeOption]
       return [detailsOption, splitOption, mergeOption, reportOption]
     },
     [history, setValue]
