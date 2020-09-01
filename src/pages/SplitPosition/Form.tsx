@@ -218,7 +218,7 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
     } else {
       return []
     }
-  }, [position, outcomeSlot, amount, collateralToken, splitFromPosition]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [conditionIdToPreviewShow, position, outcomeSlot, amount, collateralToken, splitFromPosition])
 
   return (
     <CenteredCard>
