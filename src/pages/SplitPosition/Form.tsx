@@ -202,6 +202,10 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
   ]
 
   const splitPositionPreview = useMemo(() => {
+    if (!conditionIdToPreviewShow || (splitFromPosition && !position)) {
+      return []
+    }
+
     if (splitFromPosition && position) {
       return trivialPartition(outcomeSlot).map((indexSet) => {
         return positionString(
@@ -211,12 +215,10 @@ export const Form = ({ allowanceMethods, onCollateralChange, splitPosition, toke
           collateralToken
         )
       })
-    } else if (conditionIdToPreviewShow) {
+    } else {
       return trivialPartition(outcomeSlot).map((indexSet) => {
         return positionString([conditionIdToPreviewShow], [indexSet], amount, collateralToken)
       })
-    } else {
-      return []
     }
   }, [conditionIdToPreviewShow, position, outcomeSlot, amount, collateralToken, splitFromPosition])
 
