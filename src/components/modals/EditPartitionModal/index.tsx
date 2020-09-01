@@ -1,13 +1,14 @@
 import React, { useCallback, useState } from 'react'
 import styled from 'styled-components'
 
+import { OutcomeProps } from '../../../util/types'
 import { Button } from '../../buttons/Button'
 import { ButtonAdd } from '../../buttons/ButtonAdd'
 import { ButtonControl, ButtonControlType } from '../../buttons/ButtonControl'
 import { Modal, ModalProps } from '../../common/Modal'
 import {
   AddableOutcome,
-  Outcome,
+  DraggableOutcome,
   PlaceholderOutcome,
   RemovableOutcome,
 } from '../../partitions/Outcome'
@@ -37,24 +38,6 @@ const DraggableCollectionInner = styled.div`
   padding-right: 15px;
 `
 
-const DraggableOutcome = styled(Outcome)`
-  cursor: pointer;
-
-  .outcomeCircle {
-    &:hover {
-      background-color: ${(props) => props.theme.colors.error};
-      border-color: ${(props) => props.theme.colors.error};
-      color: #fff;
-    }
-
-    &.isDragging {
-      background-color: #fff;
-      border-color: ${(props) => props.theme.colors.darkerGray};
-      cursor: move;
-    }
-  }
-`
-
 const EditableOutcomesWrapper = styled.div`
   display: grid;
   grid-column-gap: 12px;
@@ -68,46 +51,22 @@ const EditableOutcomes = styled.div`
   flex-grow: 1;
 `
 
-interface OutcomeProps {
-  id: string
-  value: number
-}
-
 interface DraggedOutcomeProps extends OutcomeProps {
   collectionFromIndex: number
   outcomeIndex: number
 }
 
-export const EditPartitionModal: React.FC<ModalProps> = (props) => {
-  const { onRequestClose, ...restProps } = props
+interface EditPartitionModalProps extends ModalProps {
+  outcomes: Array<any>
+}
+
+export const EditPartitionModal: React.FC<EditPartitionModalProps> = (props) => {
+  const { onRequestClose, outcomes, ...restProps } = props
   const dragOverClass = 'dragOver'
   const draggingClass = 'isDragging'
   const placeholderOutcomeId = 'placeholderOutcome'
 
-  // const isLoading = !conditionIdToSearch && loading
-  // const isSearching = conditionIdToSearch && loading
-  const mockedNumberedOutcomes = [
-    [
-      { value: 1, id: '0x1234567' },
-      { value: 4, id: '0x2345678' },
-      { value: 3, id: '0x3456789' },
-    ],
-    [
-      { value: 2, id: '0x4567890' },
-      { value: 5, id: '0x5678901' },
-    ],
-    [
-      { value: 10, id: '0x6789012' },
-      { value: 11, id: '0x7890123' },
-    ],
-    [
-      { value: 6, id: '0x8901234' },
-      { value: 8, id: '0x9012345' },
-      { value: 9, id: '0x0123456' },
-    ],
-    [{ value: 7, id: '0x6543210' }],
-  ]
-  const [allCollections, setAllCollections] = useState<any>(mockedNumberedOutcomes)
+  const [allCollections, setAllCollections] = useState<any>(outcomes)
   const [newCollection, setNewCollection] = useState<any>([])
   const [availableOutcomes, setAvailableOutcomes] = useState<any>([])
   const [removeCollectionsQueue, setRemoveCollectionsQueue] = useState([])
@@ -226,52 +185,60 @@ export const EditPartitionModal: React.FC<ModalProps> = (props) => {
 
   return (
     <Modal onRequestClose={onRequestClose} title="Edit Partition" {...restProps}>
-      <CardSubtitle>Available Outcomes</CardSubtitle>
-      {availableOutcomes.length ? (
-        <>
-          <CardText>Click on an outcome to add it to the new collection.</CardText>
-          <EditableOutcomesWrapper>
-            <EditableOutcomes>
-              {availableOutcomes.map((outcome: OutcomeProps, outcomeIndex: number) => {
-                return (
-                  <AddableOutcome
-                    key={outcomeIndex}
-                    onClick={() => {
-                      addOutcomeToNewCollection(outcomeIndex)
-                    }}
-                    outcome={outcome.value}
-                  />
-                )
-              })}
-            </EditableOutcomes>
-            <div />
-          </EditableOutcomesWrapper>
-        </>
-      ) : (
-        <CardText>Outcomes removed from collections will be placed here.</CardText>
-      )}
-      <CardSubtitle>New Collection</CardSubtitle>
-      <EditableOutcomesWrapper>
-        <EditableOutcomes>
-          {newCollection.map((outcome: OutcomeProps, outcomeIndex: number) => {
-            return (
-              <RemovableOutcome
-                key={outcomeIndex}
+      <TitleValue
+        title="New Collection"
+        value={
+          <>
+            <CardSubtitle>Available Outcomes</CardSubtitle>
+            {availableOutcomes.length ? (
+              <>
+                <CardText>Click on an outcome to add it to the new collection.</CardText>
+                <EditableOutcomesWrapper>
+                  <EditableOutcomes>
+                    {availableOutcomes.map((outcome: OutcomeProps, outcomeIndex: number) => {
+                      return (
+                        <AddableOutcome
+                          key={outcomeIndex}
+                          onClick={() => {
+                            addOutcomeToNewCollection(outcomeIndex)
+                          }}
+                          outcome={outcome.value}
+                        />
+                      )
+                    })}
+                  </EditableOutcomes>
+                  <div />
+                </EditableOutcomesWrapper>
+              </>
+            ) : (
+              <CardText>Outcomes removed from collections will be placed here.</CardText>
+            )}
+            <CardSubtitle>New Collection</CardSubtitle>
+            <EditableOutcomesWrapper>
+              <EditableOutcomes>
+                {newCollection.map((outcome: OutcomeProps, outcomeIndex: number) => {
+                  return (
+                    <RemovableOutcome
+                      key={outcomeIndex}
+                      onClick={() => {
+                        removeOutcomeFromNewCollection(outcomeIndex)
+                      }}
+                      outcome={outcome.value}
+                    />
+                  )
+                })}
+              </EditableOutcomes>
+              <ButtonAdd
+                disabled={newCollection.length === 0}
                 onClick={() => {
-                  removeOutcomeFromNewCollection(outcomeIndex)
+                  addNewCollection()
                 }}
-                outcome={outcome.value}
               />
-            )
-          })}
-        </EditableOutcomes>
-        <ButtonAdd
-          disabled={newCollection.length === 0}
-          onClick={() => {
-            addNewCollection()
-          }}
-        />
-      </EditableOutcomesWrapper>
+            </EditableOutcomesWrapper>
+          </>
+        }
+      />
+
       <TitleValue
         title="Collections"
         titleControl={

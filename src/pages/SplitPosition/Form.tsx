@@ -1,9 +1,7 @@
 import { BigNumber } from 'ethers/utils'
-import { AllowanceMethods, useAllowanceState } from 'hooks/useAllowanceState'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import styled from 'styled-components'
-import { GetCondition_condition, GetPosition_position } from 'types/generatedGQL'
 
 import { Button } from '../../components/buttons/Button'
 import { CenteredCard } from '../../components/common/CenteredCard'
@@ -27,9 +25,11 @@ import { IconTypes } from '../../components/statusInfo/common'
 import { TitleValue } from '../../components/text/TitleValue'
 import { NULL_PARENT_ID, ZERO_BN } from '../../config/constants'
 import { useConditionContext } from '../../contexts/ConditionContext'
+import { AllowanceMethods, useAllowanceState } from '../../hooks/useAllowanceState'
+import { GetCondition_condition, GetPosition_position } from '../../types/generatedGQL'
 import { getLogger } from '../../util/logger'
 import { trivialPartition } from '../../util/tools'
-import { Token } from '../../util/types'
+import { OutcomeProps, Token } from '../../util/types'
 
 import { SplitFrom } from './SplitFrom'
 
@@ -166,11 +166,25 @@ export const Form = ({
 
   const canSubmit = isValid && allowanceFinished
   const mockedNumberedOutcomes = [
-    [1, 4, 3],
-    [6, 5],
-    [9, 7, 10],
-    [2, 8],
-    [12, 13, 14, 15],
+    [
+      { value: 1, id: '0x1234567' },
+      { value: 4, id: '0x2345678' },
+      { value: 3, id: '0x3456789' },
+    ],
+    [
+      { value: 2, id: '0x4567890' },
+      { value: 5, id: '0x5678901' },
+    ],
+    [
+      { value: 10, id: '0x6789012' },
+      { value: 11, id: '0x7890123' },
+    ],
+    [
+      { value: 6, id: '0x8901234' },
+      { value: 8, id: '0x9012345' },
+      { value: 9, id: '0x0123456' },
+    ],
+    [{ value: 7, id: '0x6543210' }],
   ]
 
   const [isEditPartitionModalOpen, setIsEditPartitionModalOpen] = useState(false)
@@ -226,8 +240,8 @@ export const Form = ({
                   (outcomeList: unknown | any, outcomeListIndex: number) => {
                     return (
                       <StripedListItemLessPadding key={outcomeListIndex}>
-                        {outcomeList.map((outcome: string, outcomeIndex: number) => (
-                          <Outcome key={outcomeIndex} outcome={outcome} />
+                        {outcomeList.map((outcome: OutcomeProps, outcomeIndex: number) => (
+                          <Outcome key={outcomeIndex} outcome={outcome.value} />
                         ))}
                       </StripedListItemLessPadding>
                     )
@@ -273,6 +287,7 @@ export const Form = ({
         <EditPartitionModal
           isOpen={isEditPartitionModalOpen}
           onRequestClose={() => setIsEditPartitionModalOpen(false)}
+          outcomes={mockedNumberedOutcomes}
         />
       )}
     </CenteredCard>

@@ -64,6 +64,24 @@ export const Outcome: React.FC<Props> = (props) => {
   )
 }
 
+export const DraggableOutcome = styled(Outcome)`
+  cursor: pointer;
+
+  .outcomeCircle {
+    &:hover {
+      background-color: ${(props) => props.theme.colors.error};
+      border-color: ${(props) => props.theme.colors.error};
+      color: #fff;
+    }
+
+    &.isDragging {
+      background-color: #fff;
+      border-color: ${(props) => props.theme.colors.darkerGray};
+      cursor: move;
+    }
+  }
+`
+
 export const PlaceholderOutcome = styled(Outcome)`
   left: -100vw;
   opacity: 1;
