@@ -4,6 +4,16 @@ import styled from 'styled-components'
 import { ArrowDown } from '../../icons/ArrowDown'
 import { ArrowUp } from '../../icons/ArrowUp'
 
+export enum ButtonBulkMoveActions {
+  add = 'add',
+  remove = 'remove',
+}
+
+export enum ButtonBulkMoveDirection {
+  down = 'down',
+  up = 'up',
+}
+
 const Wrapper = styled.button<{ action: ButtonBulkMoveActions }>`
   align-items: center;
   background: transparent;
@@ -24,22 +34,41 @@ const Wrapper = styled.button<{ action: ButtonBulkMoveActions }>`
   user-select: none;
   width: 30px;
 
+  path {
+    transition: all 0.15s ease-out;
+  }
+
+  &:hover {
+    ${(props) =>
+      props.action === ButtonBulkMoveActions.add &&
+      `
+        border-color: ${props.theme.colors.primary};
+        path {
+          fill: ${props.theme.colors.primary};
+        }
+      `}
+
+    ${(props) =>
+      props.action === ButtonBulkMoveActions.remove &&
+      `
+        border-color: ${props.theme.colors.error};
+        path {
+          fill: ${props.theme.colors.error};
+        }
+      `}
+  }
+
   &[disabled],
   &[disabled]:hover {
+    border-color: ${(props) => props.theme.colors.mediumGrey};
     cursor: not-allowed;
     opacity: 0.5;
+
+    path {
+      fill: ${(props) => props.theme.colors.mediumGrey};
+    }
   }
 `
-
-export enum ButtonBulkMoveActions {
-  add = 'add',
-  remove = 'remove',
-}
-
-export enum ButtonBulkMoveDirection {
-  down = 'down',
-  up = 'up',
-}
 
 interface ButtonBulkMoveProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   action: ButtonBulkMoveActions
