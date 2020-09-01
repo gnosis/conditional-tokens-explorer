@@ -103,6 +103,7 @@ export const TokenIcon: React.FC<Props> = (props) => {
   const { symbol, ...restProps } = props
   const data = getTokenData(symbol)
 
+  // TODO, add a CustomICON for the second option of the ternary
   return (
     <Wrapper {...restProps}>
       {data.length > 0 ? (
@@ -110,7 +111,7 @@ export const TokenIcon: React.FC<Props> = (props) => {
           <Icon>{data[0].icon}</Icon> <Symbol>{symbol}</Symbol>
         </>
       ) : (
-        'Token icon not found...'
+        <Symbol>{symbol}</Symbol>
       )}
     </Wrapper>
   )

@@ -45,7 +45,7 @@ export const InputAmount = ({
             setBalance(balance)
           }
         } else if (splitFrom === 'collateral' && signer) {
-          const erc20Service = new ERC20Service(provider, signer, collateral.address)
+          const erc20Service = new ERC20Service(provider, collateral.address, signer)
           const balance = await erc20Service.balanceOf(address)
           if (isSubscribed) {
             setBalance(balance)

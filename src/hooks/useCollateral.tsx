@@ -3,37 +3,34 @@ import { Token } from 'util/types'
 import React from 'react'
 import { ERC20Service } from 'services/erc20'
 
-import { Web3ContextStatus, useWeb3Context } from '../contexts/Web3Context'
+import { useWeb3ConnectedOrInfura } from '../contexts/Web3Context'
 
-export const useCollateral = (collateralAddress: string) => {
-  const { status } = useWeb3Context()
+export const useCollateral = (collateralAddress: string): Maybe<Token> => {
+  const { _type: status, provider } = useWeb3ConnectedOrInfura()
 
   const [collateral, setCollateral] = React.useState<Maybe<Token>>(null)
 
   React.useEffect(() => {
     let cancelled = false
-    if (status._type === Web3ContextStatus.Connected) {
-      const fetchToken = async (collateral: string) => {
-        const { provider, signer } = status
 
-        try {
-          const erc20Service = new ERC20Service(provider, signer, collateral)
-          const token = await erc20Service.getProfileSummary()
-          if (!cancelled) {
-            setCollateral(token)
-          }
-        } catch (e) {
-          setCollateral(null)
+    const fetchToken = async (collateral: string) => {
+      try {
+        const erc20Service = new ERC20Service(provider, collateral)
+        const token = await erc20Service.getProfileSummary()
+        if (!cancelled) {
+          setCollateral(token)
         }
+      } catch (e) {
+        setCollateral(null)
       }
-
-      fetchToken(collateralAddress)
     }
+
+    fetchToken(collateralAddress)
 
     return () => {
       cancelled = true
     }
-  }, [status, collateralAddress])
+  }, [status, provider, collateralAddress])
 
   return collateral
 }

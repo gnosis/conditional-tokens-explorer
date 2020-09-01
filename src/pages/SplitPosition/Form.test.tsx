@@ -31,6 +31,7 @@ const connectedStatus = {
   signer: null as any,
 } as Connected
 
+const defaultToken = tokens[0]
 const renderWithConnectedProvider = (component: ReactElement) => (
   <Web3Context.Provider value={{ status: connectedStatus, connect, disconnect }}>
     <ThemeProvider theme={theme}>
@@ -50,6 +51,7 @@ test('show unlock button with zero allowance', async () => {
     renderWithConnectedProvider(
       <Form
         allowanceMethods={allowanceMethods}
+        collateral={defaultToken}
         onCollateralChange={onCollateralChange}
         splitPosition={splitPosition}
         tokens={tokens}
@@ -70,6 +72,7 @@ test('toggle unlock button visiblity according to allowance and amount', async (
     renderWithConnectedProvider(
       <Form
         allowanceMethods={allowanceMethods}
+        collateral={defaultToken}
         onCollateralChange={onCollateralChange}
         splitPosition={splitPosition}
         tokens={tokens}
@@ -97,6 +100,7 @@ test.skip('show unlock button after failure', async () => {
     renderWithConnectedProvider(
       <Form
         allowanceMethods={allowanceMethods}
+        collateral={defaultToken}
         onCollateralChange={onCollateralChange}
         splitPosition={splitPosition}
         tokens={tokens}
@@ -111,6 +115,7 @@ test.skip('show unlock button after failure', async () => {
     renderWithConnectedProvider(
       <Form
         allowanceMethods={allowanceMethods}
+        collateral={defaultToken}
         onCollateralChange={onCollateralChange}
         splitPosition={splitPosition}
         tokens={tokens}
