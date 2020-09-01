@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 const Wrapper = styled.svg``
 
-export const IconPlus: React.FC = (props) => (
+export const IconPlusDark: React.FC = (props) => (
   <Wrapper
     className="iconPlus"
     height="12"

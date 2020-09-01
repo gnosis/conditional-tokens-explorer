@@ -193,7 +193,7 @@ export const ConditionsList: React.FC = () => {
       <PageTitle>Conditions</PageTitle>
       {isLoading && <InlineLoading />}
       {error && <InfoCard message={error.message} title="Error" />}
-      {data && !isLoading && (
+      {data && !isLoading && !error && (
         <>
           <TableControls
             end={filterDropdown}
