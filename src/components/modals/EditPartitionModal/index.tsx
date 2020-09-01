@@ -186,7 +186,7 @@ export const EditPartitionModal: React.FC<ModalProps> = (props) => {
   )
 
   const onDragLeave = useCallback((e: any) => {
-    e.currentTarget.className = resetClassName(e, 'dragOver')
+    e.currentTarget.className = resetClassName(e, dragOverClass)
   }, [])
 
   const addOutcomeToNewCollection = useCallback(
@@ -221,23 +221,25 @@ export const EditPartitionModal: React.FC<ModalProps> = (props) => {
   }, [availableOutcomes, newCollection])
 
   const notEnoughCollections = allCollections.length < 2
+  const orphanedOutcomes = availableOutcomes.length > 0 || newCollection.length > 0
+  const disableButton = notEnoughCollections || orphanedOutcomes
 
   return (
     <Modal onRequestClose={onRequestClose} title="Edit Partition" {...restProps}>
-      <CardSubtitle>Add Outcomes To New Collection</CardSubtitle>
+      <CardSubtitle>Available Outcomes</CardSubtitle>
       {availableOutcomes.length ? (
         <>
-          <CardText>Click on an outcome to add it to the collection.</CardText>
+          <CardText>Click on an outcome to add it to the new collection.</CardText>
           <EditableOutcomesWrapper>
             <EditableOutcomes>
-              {availableOutcomes.map((outcome: unknown | any, outcomeIndex: number) => {
+              {availableOutcomes.map((outcome: OutcomeProps, outcomeIndex: number) => {
                 return (
                   <AddableOutcome
                     key={outcomeIndex}
                     onClick={() => {
                       addOutcomeToNewCollection(outcomeIndex)
                     }}
-                    outcome={outcome}
+                    outcome={outcome.value}
                   />
                 )
               })}
@@ -246,22 +248,19 @@ export const EditPartitionModal: React.FC<ModalProps> = (props) => {
           </EditableOutcomesWrapper>
         </>
       ) : (
-        <CardText>
-          No outcomes available. You can make them available by removing them from collections
-          below.
-        </CardText>
+        <CardText>Outcomes removed from collections will be placed here.</CardText>
       )}
       <CardSubtitle>New Collection</CardSubtitle>
       <EditableOutcomesWrapper>
         <EditableOutcomes>
-          {newCollection.map((outcome: unknown | any, outcomeIndex: number) => {
+          {newCollection.map((outcome: OutcomeProps, outcomeIndex: number) => {
             return (
               <RemovableOutcome
                 key={outcomeIndex}
                 onClick={() => {
                   removeOutcomeFromNewCollection(outcomeIndex)
                 }}
-                outcome={outcome}
+                outcome={outcome.value}
               />
             )
           })}
@@ -287,8 +286,7 @@ export const EditPartitionModal: React.FC<ModalProps> = (props) => {
         value={
           <>
             <CardText>
-              Click on an outcome to remove it from a collection. You can also drag outcomes across
-              collections.
+              You can drag outcomes across collections. Click on an outcome to remove it.
             </CardText>
             <StripedList>
               {allCollections.length > 0 ? (
@@ -328,7 +326,7 @@ export const EditPartitionModal: React.FC<ModalProps> = (props) => {
         }
       />
       <ButtonContainer>
-        <Button disabled={notEnoughCollections} onClick={onRequestClose}>
+        <Button disabled={disableButton} onClick={onRequestClose}>
           Save
         </Button>
       </ButtonContainer>

@@ -27,6 +27,7 @@ export const OutcomeCircle = styled.div`
   justify-content: center;
   line-height: 1;
   position: relative;
+  user-select: none;
   width: ${outcomeDimensions};
 `
 
@@ -65,9 +66,17 @@ export const Outcome: React.FC<Props> = (props) => {
 
 export const PlaceholderOutcome = styled(Outcome)`
   left: -100vw;
+  opacity: 1;
   position: absolute;
   top: -100vh;
   z-index: -12345;
+
+  .outcomeCircle {
+    background-color: ${(props) => props.theme.colors.primary};
+    border-color: ${(props) => props.theme.colors.primary};
+    box-shadow: 1px 1px 4px 0 rgba(0, 0, 0, 0.3);
+    color: #fff;
+  }
 
   .outcomeHorizontalLine {
     display: none;
@@ -94,7 +103,7 @@ export const EditableOutcome = styled(Outcome)`
 
 export const AddableOutcome = styled(EditableOutcome)`
   .outcomeCircle {
-    border-color: solid 2px ${(props) => props.theme.colors.mediumGrey};
+    border-color: ${(props) => props.theme.colors.mediumGrey};
     color: ${(props) => props.theme.colors.mediumGrey};
 
     &:hover {
@@ -106,7 +115,7 @@ export const AddableOutcome = styled(EditableOutcome)`
 
 export const RemovableOutcome = styled(EditableOutcome)`
   .outcomeCircle {
-    border-color: solid 2px ${(props) => props.theme.colors.primary};
+    border-color: ${(props) => props.theme.colors.primary};
     color: ${(props) => props.theme.colors.primary};
 
     &:hover {
