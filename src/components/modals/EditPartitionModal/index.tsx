@@ -428,7 +428,12 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
                   )
                 })
               ) : (
-                <StripedListEmpty>No collections.</StripedListEmpty>
+                <StripedListEmpty>
+                  <strong>
+                    No collections. A valid partition needs at least two collections, and no
+                    outcomes can be orphaned.
+                  </strong>
+                </StripedListEmpty>
               )}
             </StripedList>
           </>
