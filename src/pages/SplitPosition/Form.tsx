@@ -1,5 +1,3 @@
-import { positionString } from 'util/tools'
-
 import { PositionPreview } from 'components/splitPosition/PositionPreview'
 import { BigNumber } from 'ethers/utils'
 import { AllowanceMethods, useAllowanceState } from 'hooks/useAllowanceState'
