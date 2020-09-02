@@ -11,6 +11,7 @@ import {
 } from '../../buttons/ButtonBulkMove'
 import { ButtonControl, ButtonControlType } from '../../buttons/ButtonControl'
 import { ButtonType } from '../../buttons/buttonStylingTypes'
+import { ConfirmOverlay } from '../../common/ConfirmOverlay'
 import { Modal, ModalProps } from '../../common/Modal'
 import { DraggableOutcome, EditableOutcome, PlaceholderOutcome } from '../../partitions/Outcome'
 import { ButtonContainer } from '../../pureStyledComponents/ButtonContainer'
@@ -118,54 +119,6 @@ const ButtonAddNewCollectionContainer = styled.div`
 const ButtonReset = styled(Button)`
   margin-right: auto;
 `
-
-const ConfirmOverlay = styled.div`
-  align-items: center;
-  background-color: rgba(255, 255, 255, 0.8);
-  bottom: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
-  z-index: 123;
-`
-
-const ConfirmText = styled.p`
-  color: ${(props) => props.theme.colors.textColor};
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 1.4;
-  margin: 0 0 8px;
-`
-
-const ConfirmControls = styled.div`
-  column-gap: 20px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  margin: 0 auto;
-`
-
-const ConfirmControl = styled.span`
-  color: ${(props) => props.theme.colors.textColor};
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.4;
-  text-transform: uppercase;
-
-  &:hover {
-    text-decoration: underline;
-  }
-`
-
-const Yes = styled(ConfirmControl)`
-  color: ${(props) => props.theme.colors.error};
-`
-
-const No = styled(ConfirmControl)``
 
 interface DraggedOutcomeProps extends OutcomeProps {
   collectionFromIndex: number
@@ -334,8 +287,6 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
   useEffect(() => {
     setAllCollections([...outcomes])
   }, [outcomes])
-
-  const confirmDeletion = useCallback((executeDeletion, hideConfirm) => {}, [])
 
   const notEnoughCollections = allCollections.length < 2
   const orphanedOutcomes = availableOutcomes.length > 0 || newCollection.length > 0
@@ -511,26 +462,16 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
                   </StripedListEmpty>
                 )}
                 {confirmDeleteAllCollections && (
-                  <ConfirmOverlay>
-                    <ConfirmText>Delete all collections?</ConfirmText>
-                    <ConfirmControls>
-                      <Yes
-                        onClick={() => {
-                          removeAllCollections()
-                          setConfirmDeleteAllCollections(false)
-                        }}
-                      >
-                        Yes
-                      </Yes>
-                      <No
-                        onClick={() => {
-                          setConfirmDeleteAllCollections(false)
-                        }}
-                      >
-                        No
-                      </No>
-                    </ConfirmControls>
-                  </ConfirmOverlay>
+                  <ConfirmOverlay
+                    confirm={() => {
+                      removeAllCollections()
+                      setConfirmDeleteAllCollections(false)
+                    }}
+                    deny={() => {
+                      setConfirmDeleteAllCollections(false)
+                    }}
+                    text="Delete all collections?"
+                  />
                 )}
               </>
             </Collections>
