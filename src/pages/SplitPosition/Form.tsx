@@ -283,8 +283,11 @@ export const Form = ({
           value={
             <>
               <CardTextSm>Outcomes Collections</CardTextSm>
-              <StripedListStyled>
-                {mockedNumberedOutcomes.length ? (
+              <StripedListStyled minHeight="200px">
+                {/* DELETE THESE COMMENTS WHEN THIS IS DONE */}
+                {/* Note: As I understand it, outcomes come from the selected condition,
+                so you can't show anything until you selected a condition. */}
+                {conditionIdToPreviewShow && mockedNumberedOutcomes.length ? (
                   mockedNumberedOutcomes.map(
                     (outcomeList: unknown | any, outcomeListIndex: number) => {
                       return (
