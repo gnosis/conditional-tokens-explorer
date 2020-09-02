@@ -67,8 +67,8 @@ export const InputAmount = ({
   const [decimals, setDecimals] = useState(0)
 
   useEffect(() => {
-    setValue('amount', ZERO_BN)
-  }, [collateral, positionId, setValue])
+    setValue('amount', ZERO_BN, true)
+  }, [collateral, positionId, setValue, splitFrom])
 
   useEffect(() => {
     if (
