@@ -42,10 +42,28 @@ interface Props {
   children: React.ReactNode
 }
 
+const isLoading = (
+  loadingQuery: boolean,
+  positions: GetMultiPositions_positions[],
+  positionIds: string[]
+) => {
+  return (
+    loadingQuery ||
+    positions.length !== positionIds.length ||
+    JSON.stringify(positions.map(({ id }) => id).sort()) !== JSON.stringify([...positionIds].sort())
+  )
+}
+
 export const MultiPositionsProvider = (props: Props) => {
   const [positionIds, setPositionIds] = useState<Array<string>>([])
   const [positions, setPositions] = useState<Array<GetMultiPositions_positions>>([])
   const { clearErrors, errors, pushError, removeError } = useErrors()
+
+  const clearPositions = useCallback((): void => {
+    clearErrors()
+    setPositionIds([])
+    setPositions([])
+  }, [clearErrors])
 
   const updatePositionIds = useCallback(
     (positionIds: Array<string>): void => {
@@ -53,10 +71,13 @@ export const MultiPositionsProvider = (props: Props) => {
       if (!positionIds.every((positionId) => isPositionIdValid(positionId))) {
         pushError(PositionErrors.INVALID_ERROR)
       }
-
-      setPositionIds(positionIds)
+      if (positionIds.length) {
+        setPositionIds(positionIds)
+      } else {
+        clearPositions()
+      }
     },
-    [clearErrors, pushError]
+    [clearErrors, pushError, clearPositions]
   )
 
   const addPositionId = useCallback(
@@ -73,12 +94,6 @@ export const MultiPositionsProvider = (props: Props) => {
     [clearErrors, pushError]
   )
 
-  const clearPositions = useCallback((): void => {
-    clearErrors()
-    setPositionIds([])
-    setPositions([])
-  }, [clearErrors])
-
   const removePositionId = useCallback(
     (positionId: string): void => {
       let clearPositionsFlag = false
@@ -87,6 +102,7 @@ export const MultiPositionsProvider = (props: Props) => {
         clearPositionsFlag = next.length === 0
         return next
       })
+
       if (clearPositionsFlag) {
         clearPositions()
       }
@@ -126,7 +142,7 @@ export const MultiPositionsProvider = (props: Props) => {
     positions,
     positionIds,
     errors,
-    loading: loadingQuery,
+    loading: isLoading(loadingQuery, positions, positionIds),
     addPositionId,
     updatePositionIds,
     removePositionId,

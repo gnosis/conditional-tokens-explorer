@@ -111,7 +111,7 @@ export const Outcome: React.FC<Props> = (props) => {
       <ReactTooltip
         className="customTooltip outcomeTooltip"
         clickable={true}
-        delayHide={250}
+        delayHide={100}
         delayShow={1000}
         effect="solid"
         id={`tooltip${outcome.value}`}
