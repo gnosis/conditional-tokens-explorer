@@ -184,27 +184,6 @@ export const Form = ({
     [12, 13, 14, 15],
   ]
 
-  const splitPositionPreview = useMemo(() => {
-    if (!conditionIdToPreviewShow || (splitFromPosition && !position)) {
-      return []
-    }
-
-    if (splitFromPosition && position) {
-      return trivialPartition(outcomeSlot).map((indexSet) => {
-        return positionString(
-          [...position.conditionIds, conditionIdToPreviewShow],
-          [...[position.indexSets], indexSet],
-          amount,
-          collateral
-        )
-      })
-    } else {
-      return trivialPartition(outcomeSlot).map((indexSet) => {
-        return positionString([conditionIdToPreviewShow], [indexSet], amount, collateral)
-      })
-    }
-  }, [conditionIdToPreviewShow, position, outcomeSlot, amount, collateral, splitFromPosition])
-
   return (
     <CenteredCard>
       <Row cols="1fr">

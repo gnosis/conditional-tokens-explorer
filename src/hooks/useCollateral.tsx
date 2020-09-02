@@ -18,12 +18,14 @@ export const useCollateral = (collateralAddress: string): Maybe<Token> => {
         return null
       }
 
+      // if it's already in configs no need to hit the blockchain
       try {
         return networkConfig.getTokenFromAddress(collateralAddress)
       } catch {
         // do nothing
       }
 
+      // try to recover ERC20 profile
       try {
         const erc20Service = new ERC20Service(provider, collateral)
         const token = await erc20Service.getProfileSummary()
@@ -42,7 +44,7 @@ export const useCollateral = (collateralAddress: string): Maybe<Token> => {
     return () => {
       cancelled = true
     }
-  }, [status, provider, collateralAddress])
+  }, [status, provider, collateralAddress, networkConfig])
 
   return collateral
 }

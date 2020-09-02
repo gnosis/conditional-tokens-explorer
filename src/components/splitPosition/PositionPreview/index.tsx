@@ -5,7 +5,7 @@ import { StripedList, StripedListItem } from 'components/pureStyledComponents/St
 import { TitleValue } from 'components/text/TitleValue'
 import { BigNumber } from 'ethers/utils'
 import { useCollateral } from 'hooks/useCollateral'
-import React, { useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import styled from 'styled-components'
 import { GetPosition_position } from 'types/generatedGQL'
 
