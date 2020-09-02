@@ -12,21 +12,18 @@ import React, { useEffect } from 'react'
 import { FormContextValues } from 'react-hook-form'
 import { GetMultiPositions_positions } from 'types/generatedGQL'
 
-const canCanculatePositionToDisplay = (
+const isDataInSync = (
   positionsLoading: boolean,
   balancesLoading: boolean,
   positions: GetMultiPositions_positions[],
-  balances: BigNumber[],
-  positionIds: string[]
+  balances: BigNumber[]
 ) => {
   return (
     !positionsLoading &&
     !balancesLoading &&
     positions.length &&
     balances.length &&
-    balances.length === positionIds.length &&
-    positions.length === positionIds.length &&
-    JSON.stringify(positions.map(({ id }) => id).sort()) === JSON.stringify([...positionIds].sort())
+    balances.length === positions.length
   )
 }
 
@@ -57,20 +54,12 @@ export const InputPosition = ({
   const [positionToDisplay, setPositionToDisplay] = React.useState('')
 
   useEffect(() => {
-    register('positionId', { required: true })
-  }, [register])
+    register('positionId', { required: splitFromPosition })
+  }, [register, splitFromPosition])
 
   React.useEffect(() => {
     if (positionIds.length > 0) {
-      if (
-        canCanculatePositionToDisplay(
-          positionsLoading,
-          balancesLoading,
-          positions,
-          balances,
-          positionIds
-        )
-      ) {
+      if (isDataInSync(positionsLoading, balancesLoading, positions, balances)) {
         const token = networkConfig.getTokenFromAddress(positions[0].collateralToken.id)
         setPositionToDisplay(
           positionString(positions[0].conditionIds, positions[0].indexSets, balances[0], token)
