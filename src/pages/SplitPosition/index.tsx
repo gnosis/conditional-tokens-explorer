@@ -1,12 +1,13 @@
-import { ConditionProvider } from 'contexts/ConditionContext'
 import { BigNumber } from 'ethers/utils'
-import { useAllowance } from 'hooks/useAllowance'
-import { useCollateral } from 'hooks/useCollateral'
-import React, { useState } from 'react'
-import { ConditionalTokensService } from 'services/conditionalTokens'
+import React, { useEffect, useState } from 'react'
 
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
+import { InlineLoading } from '../../components/statusInfo/InlineLoading'
+import { ConditionProvider } from '../../contexts/ConditionContext'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
+import { useAllowance } from '../../hooks/useAllowance'
+import { useCollateral } from '../../hooks/useCollateral'
+import { ConditionalTokensService } from '../../services/conditionalTokens'
 import { getLogger } from '../../util/logger'
 
 import { Form } from './Form'
@@ -18,6 +19,7 @@ export const SplitPosition = () => {
 
   const tokens = networkConfig.getTokens()
   const [collateral, setCollateral] = useState<string>(tokens[0].address)
+  const [isLoading, setIsLoading] = useState(true)
   const allowanceMethods = useAllowance(collateral)
   const collateralToken = useCollateral(collateral)
 
@@ -53,23 +55,29 @@ export const SplitPosition = () => {
   )
 
   // TODO Fix this
-  if (!collateralToken) {
-    logger.error(`Collateral ${collateral} doesn't exist`)
-    return null
-  }
+  useEffect(() => {
+    if (!collateralToken) {
+      logger.error(`Collateral ${collateral} doesn't exist`)
+    } else {
+      setIsLoading(false)
+    }
+  }, [collateralToken, collateral])
 
   return (
     <ConditionProvider>
       <PageTitle>Split Position</PageTitle>
-      <Form
-        allowanceMethods={allowanceMethods}
-        collateral={collateralToken}
-        onCollateralChange={(t: string) => {
-          setCollateral(t)
-        }}
-        splitPosition={splitPosition}
-        tokens={tokens}
-      />
+      {isLoading && <InlineLoading />}
+      {collateralToken && !isLoading && (
+        <Form
+          allowanceMethods={allowanceMethods}
+          collateral={collateralToken}
+          onCollateralChange={(t: string) => {
+            setCollateral(t)
+          }}
+          splitPosition={splitPosition}
+          tokens={tokens}
+        />
+      )}
     </ConditionProvider>
   )
 }
