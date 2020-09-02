@@ -113,7 +113,7 @@ export class ConditionalTokensService {
       amount,
       {
         value: '0x0',
-        gasLimit: 1750000,
+        gasLimit: 2750000, // TODO - should we try to precalculate this?
       }
     )
     return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
