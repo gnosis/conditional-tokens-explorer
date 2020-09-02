@@ -278,7 +278,7 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
     setAllCollections([...outcomes])
     setAvailableOutcomes([])
     setNewCollection([])
-  }, [allCollections, outcomes])
+  }, [outcomes])
 
   useEffect(() => {
     setAllCollections([...outcomes])
