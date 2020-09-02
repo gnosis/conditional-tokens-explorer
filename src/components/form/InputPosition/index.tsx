@@ -54,8 +54,8 @@ export const InputPosition = ({
   const [positionToDisplay, setPositionToDisplay] = React.useState('')
 
   useEffect(() => {
-    register('positionId', { required: true })
-  }, [register])
+    register('positionId', { required: splitFromPosition })
+  }, [register, splitFromPosition])
 
   React.useEffect(() => {
     if (positionIds.length > 0) {
