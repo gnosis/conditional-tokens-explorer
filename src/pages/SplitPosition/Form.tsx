@@ -23,7 +23,7 @@ import {
   StripedListItem,
   StripedListItemLessPadding,
 } from '../../components/pureStyledComponents/StripedList'
-import { TitleControl } from '../../components/pureStyledComponents/TitleControl'
+import { TitleControlButton } from '../../components/pureStyledComponents/TitleControl'
 import { FullLoading } from '../../components/statusInfo/FullLoading'
 import { IconTypes } from '../../components/statusInfo/common'
 import { TitleValue } from '../../components/text/TitleValue'
@@ -276,9 +276,12 @@ export const Form = ({
         <TitleValue
           title="Partition"
           titleControl={
-            <TitleControl onClick={() => setIsEditPartitionModalOpen(true)}>
+            <TitleControlButton
+              // disabled={!conditionIdToPreviewShow}
+              onClick={() => setIsEditPartitionModalOpen(true)}
+            >
               Edit Partition
-            </TitleControl>
+            </TitleControlButton>
           }
           value={
             <>

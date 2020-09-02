@@ -62,5 +62,7 @@ export const StripedListEmpty = styled.div`
   justify-content: center;
   line-height: 1.5;
   margin: 0;
+  padding: 0 25px;
+  text-align: center;
   width: 100%;
 `

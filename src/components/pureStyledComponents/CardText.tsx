@@ -12,6 +12,7 @@ export const CardText = styled.div`
 
 export const CardTextSm = styled(CardText)`
   font-size: 14px;
-  font-style: italic;
+  font-style: normal;
   font-weight: 600;
+  margin: 0 0 5px;
 `

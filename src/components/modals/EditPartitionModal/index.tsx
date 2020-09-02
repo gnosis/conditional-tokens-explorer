@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import styled, { withTheme } from 'styled-components'
 
 import { OutcomeProps } from '../../../util/types'
@@ -10,12 +10,14 @@ import {
   ButtonBulkMoveDirection,
 } from '../../buttons/ButtonBulkMove'
 import { ButtonControl, ButtonControlType } from '../../buttons/ButtonControl'
+import { ButtonType } from '../../buttons/buttonStylingTypes'
 import { Modal, ModalProps } from '../../common/Modal'
 import { DraggableOutcome, EditableOutcome, PlaceholderOutcome } from '../../partitions/Outcome'
 import { ButtonContainer } from '../../pureStyledComponents/ButtonContainer'
 import { CardSubtitle } from '../../pureStyledComponents/CardSubtitle'
 import { CardText } from '../../pureStyledComponents/CardText'
 import { OutcomesContainer } from '../../pureStyledComponents/OutcomesContainer'
+import { SmallNote } from '../../pureStyledComponents/SmallNote'
 import {
   StripedList,
   StripedListEmpty,
@@ -111,6 +113,10 @@ const ButtonAddNewCollectionContainer = styled.div`
   padding-bottom: 4px;
 `
 
+const ButtonReset = styled(Button)`
+  margin-right: auto;
+`
+
 interface DraggedOutcomeProps extends OutcomeProps {
   collectionFromIndex: number
   outcomeIndex: number
@@ -128,10 +134,12 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
   const placeholderOutcomeId = 'placeholderOutcome'
   const outcomesByRow = '13'
 
-  const [allCollections, setAllCollections] = useState<any>(outcomes)
+  const [allCollections, setAllCollections] = useState<any>([])
   const [newCollection, setNewCollection] = useState<any>([])
   const [availableOutcomes, setAvailableOutcomes] = useState<any>([])
   const [draggedOutcome, setDraggedOutcome] = useState<DraggedOutcomeProps | null>(null)
+  const [availableOutcomesColor, setAvailableOutcomesColor] = useState<string | undefined>()
+  const [newCollectionOutcomesColor, setNewCollectionOutcomesColor] = useState<string | undefined>()
 
   const resetClassName = (e: any, className: string) =>
     e.currentTarget.className.replace(className, '')
@@ -264,8 +272,17 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
     [availableOutcomes, allCollections]
   )
 
-  const [availableOutcomesColor, setAvailableOutcomesColor] = useState<string | undefined>()
-  const [newCollectionOutcomesColor, setNewCollectionOutcomesColor] = useState<string | undefined>()
+  const onSave = onRequestClose
+
+  const onReset = useCallback(() => {
+    setAllCollections([...outcomes])
+    setAvailableOutcomes([])
+    setNewCollection([])
+  }, [allCollections, outcomes])
+
+  useEffect(() => {
+    setAllCollections([...outcomes])
+  }, [outcomes])
 
   const notEnoughCollections = allCollections.length < 2
   const orphanedOutcomes = availableOutcomes.length > 0 || newCollection.length > 0
@@ -429,18 +446,21 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
                 })
               ) : (
                 <StripedListEmpty>
-                  <strong>
-                    No collections. A valid partition needs at least two collections, and no
-                    outcomes can be orphaned.
-                  </strong>
+                  <strong>No collections.</strong>
                 </StripedListEmpty>
               )}
             </StripedList>
+            <SmallNote>
+              A valid partition needs at least two collections. No outcomes can be orphaned.
+            </SmallNote>
           </>
         }
       />
       <ButtonContainer>
-        <Button disabled={disableButton} onClick={onRequestClose}>
+        <ButtonReset buttonType={ButtonType.danger} onClick={onReset}>
+          Reset
+        </ButtonReset>
+        <Button disabled={disableButton} onClick={onSave}>
           Save
         </Button>
       </ButtonContainer>
