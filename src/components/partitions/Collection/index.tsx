@@ -78,7 +78,7 @@ export const Collection: React.FC<Props> = (props) => {
             onDragStart={(e: any) => {
               onDragStart(e, collectionIndex, outcome, outcomeIndex)
             }}
-            outcome={outcome.value}
+            outcome={outcome}
           />
         ))}
       </OutcomesInner>

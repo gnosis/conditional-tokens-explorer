@@ -36,6 +36,7 @@
     "react-modal": "^3.11.2",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^3.4.1",
+    "react-tooltip": "^4.2.9",
     "sanitize.css": "^11.0.1",
     "styled-components": "^5.1.1",
     "subscriptions-transport-ws": "^0.9.16",

@@ -182,7 +182,10 @@ export const Contents = ({ position }: Props) => {
                   return (
                     <StripedListItemLessPadding key={outcomeListIndex}>
                       {outcomeList.map((outcome: string, outcomeIndex: number) => (
-                        <Outcome key={outcomeIndex} outcome={outcome} />
+                        <Outcome
+                          key={outcomeIndex}
+                          outcome={{ value: parseInt(outcome), id: '' }}
+                        />
                       ))}
                     </StripedListItemLessPadding>
                   )

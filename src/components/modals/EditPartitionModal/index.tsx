@@ -310,7 +310,7 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
                           onClick={() => {
                             addOutcomeToNewCollection(outcomeIndex)
                           }}
-                          outcome={outcome.value}
+                          outcome={outcome}
                         />
                       )
                     })}
@@ -350,7 +350,7 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
                           onClick={() => {
                             removeOutcomeFromNewCollection(outcomeIndex)
                           }}
-                          outcome={outcome.value}
+                          outcome={outcome}
                         />
                       )
                     })}
@@ -462,7 +462,7 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
       </ButtonContainer>
       <PlaceholderOutcome
         id={placeholderOutcomeId}
-        outcome={(draggedOutcome && draggedOutcome.value.toString()) || ''}
+        outcome={(draggedOutcome && draggedOutcome) || { id: '', value: 0 }}
       />
     </Modal>
   )

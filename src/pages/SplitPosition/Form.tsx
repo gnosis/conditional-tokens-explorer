@@ -193,24 +193,24 @@ export const Form = ({
     ],
     [{ value: 7, id: '0x6543210' }],
     [
-      { value: 12, id: '0x1234567' },
-      { value: 13, id: '0x2345678' },
-      { value: 14, id: '0x3456789' },
-      { value: 15, id: '0x1234567' },
-      { value: 16, id: '0x2345678' },
-      { value: 17, id: '0x3456789' },
-      { value: 18, id: '0x1234567' },
-      { value: 19, id: '0x2345678' },
-      { value: 20, id: '0x3456789' },
-      { value: 21, id: '0x1234567' },
-      { value: 22, id: '0x2345678' },
-      { value: 23, id: '0x3456789' },
-      { value: 24, id: '0x1234567' },
-      { value: 25, id: '0x2345678' },
-      { value: 26, id: '0x3456789' },
-      { value: 27, id: '0x1234567' },
-      { value: 28, id: '0x2345678' },
-      { value: 29, id: '0x3456789' },
+      { value: 12, id: '0x12rt34567' },
+      { value: 13, id: '0x234ert5678' },
+      { value: 14, id: '0x34ert56789' },
+      { value: 15, id: '0xuy1234567' },
+      { value: 16, id: '0x23tyu45678' },
+      { value: 17, id: '0x3456ytu789' },
+      { value: 18, id: '0x1234tyu567' },
+      { value: 19, id: '0x2345yutit678' },
+      { value: 20, id: '0x3456ytu789' },
+      { value: 21, id: '0x123tyu567' },
+      { value: 22, id: '0x2345rtyrt678' },
+      { value: 23, id: '0x3456tryrt789' },
+      { value: 24, id: '0x1234rtyrt567' },
+      { value: 25, id: '0x2345tryrt678' },
+      { value: 26, id: '0x345rete6789' },
+      { value: 27, id: '0x1yhrt234567' },
+      { value: 28, id: '0x234tyutyu5678' },
+      { value: 29, id: '0x3456rtyrty789' },
     ],
   ]
 
@@ -300,7 +300,7 @@ export const Form = ({
                               <Outcome
                                 key={outcomeIndex}
                                 lastInRow={outcomesByRow}
-                                outcome={outcome.value}
+                                outcome={outcome}
                               />
                             ))}
                           </OutcomesContainer>

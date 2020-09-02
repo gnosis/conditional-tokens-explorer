@@ -1,5 +1,8 @@
 import React from 'react'
+import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
+
+import { OutcomeProps } from '../../../util/types'
 
 const outcomeDimensions = '24px'
 
@@ -69,7 +72,7 @@ interface Props {
   onClick?: () => void
   onDragEnd?: (e: any) => void
   onDragStart?: (e: any) => void
-  outcome: string | number
+  outcome: OutcomeProps
 }
 
 export const Outcome: React.FC<Props> = (props) => {
@@ -85,17 +88,34 @@ export const Outcome: React.FC<Props> = (props) => {
   } = props
 
   return (
-    <Wrapper id={id} lastInRow={lastInRow} onClick={onClick} {...restProps}>
+    <Wrapper
+      data-for={`tooltip${outcome.value}`}
+      data-html={true}
+      data-multiline={true}
+      data-tip={outcome.id ? `id: ${outcome.id}` : ''}
+      id={id}
+      lastInRow={lastInRow}
+      onClick={onClick}
+      {...restProps}
+    >
       <OutcomeCircle
         className="outcomeCircle"
         draggable={makeDraggable}
         onDragEnd={onDragEnd}
         onDragStart={onDragStart}
       >
-        {outcome}
+        {outcome.value}
         <OutcomeVerticalLine className="outcomeVerticalLine" />
       </OutcomeCircle>
       <OutcomeHorizontalLine className="outcomeHorizontalLine" />
+      <ReactTooltip
+        className="customTooltip outcomeTooltip"
+        clickable={true}
+        delayHide={250}
+        delayShow={1000}
+        effect="solid"
+        id={`tooltip${outcome.value}`}
+      />
     </Wrapper>
   )
 }
