@@ -9,34 +9,22 @@ import {
   ButtonBulkMoveActions,
   ButtonBulkMoveDirection,
 } from '../../buttons/ButtonBulkMove'
-import { ButtonControl, ButtonControlType } from '../../buttons/ButtonControl'
 import { ButtonType } from '../../buttons/buttonStylingTypes'
 import { ConfirmOverlay } from '../../common/ConfirmOverlay'
 import { Modal, ModalProps } from '../../common/Modal'
-import { DraggableOutcome, EditableOutcome, PlaceholderOutcome } from '../../partitions/Outcome'
+import { Collection } from '../../partitions/Collection'
+import { EditableOutcome, PlaceholderOutcome } from '../../partitions/Outcome'
 import { ButtonContainer } from '../../pureStyledComponents/ButtonContainer'
 import { CardSubtitle } from '../../pureStyledComponents/CardSubtitle'
 import { CardText } from '../../pureStyledComponents/CardText'
 import { OutcomesContainer } from '../../pureStyledComponents/OutcomesContainer'
 import { SmallNote } from '../../pureStyledComponents/SmallNote'
-import {
-  StripedList,
-  StripedListEmpty,
-  StripedListItemLessPadding,
-} from '../../pureStyledComponents/StripedList'
+import { StripedList, StripedListEmpty } from '../../pureStyledComponents/StripedList'
 import { TitleControlButton } from '../../pureStyledComponents/TitleControl'
 import { TitleValue } from '../../text/TitleValue'
 
 const Collections = styled(StripedList)`
   position: relative;
-`
-
-const Collection = styled(StripedListItemLessPadding)`
-  flex-wrap: nowrap;
-
-  &.dragOver {
-    background-color: rgba(0, 156, 180, 0.15);
-  }
 `
 
 const EditableOutcomesWrapper = styled.div`
@@ -421,38 +409,21 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
               <>
                 {allCollections.length > 0 ? (
                   allCollections.map(
-                    (outcomeList: Array<OutcomeProps>, collectionIndex: number) => {
+                    (outcomesList: Array<OutcomeProps>, collectionIndex: number) => {
                       return (
                         <Collection
+                          collectionIndex={collectionIndex}
                           key={collectionIndex}
+                          onDragEnd={onDragEnd}
                           onDragLeave={onDragLeave}
-                          onDragOver={(e) => onDragOver(e, collectionIndex)}
-                          onDrop={(e) => onDrop(e, collectionIndex)}
-                        >
-                          <OutcomesInner columnGap="0" columns="13">
-                            {outcomeList.map((outcome: OutcomeProps, outcomeIndex: number) => (
-                              <DraggableOutcome
-                                key={outcomeIndex}
-                                lastInRow={outcomesByRow}
-                                makeDraggable
-                                onClick={() => {
-                                  removeOutcomeFromCollection(collectionIndex, outcomeIndex)
-                                }}
-                                onDragEnd={onDragEnd}
-                                onDragStart={(e: any) => {
-                                  onDragStart(e, collectionIndex, outcome, outcomeIndex)
-                                }}
-                                outcome={outcome.value}
-                              />
-                            ))}
-                          </OutcomesInner>
-                          <ButtonControl
-                            buttonType={ButtonControlType.delete}
-                            onClick={() => {
-                              removeCollection(collectionIndex)
-                            }}
-                          />
-                        </Collection>
+                          onDragOver={onDragOver}
+                          onDragStart={onDragStart}
+                          onDrop={onDrop}
+                          outcomesByRow={outcomesByRow}
+                          outcomesList={outcomesList}
+                          removeCollection={removeCollection}
+                          removeOutcomeFromCollection={removeOutcomeFromCollection}
+                        />
                       )
                     }
                   )
@@ -470,7 +441,7 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
                     deny={() => {
                       setConfirmDeleteAllCollections(false)
                     }}
-                    text="Delete all collections?"
+                    text="Remove all collections?"
                   />
                 )}
               </>
