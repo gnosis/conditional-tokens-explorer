@@ -2,8 +2,9 @@ import { positionString, truncateStringInTheMiddle } from 'util/tools'
 import { Token } from 'util/types'
 
 import { useBalanceForPosition } from 'hooks/useBalanceForPosition'
+import { useCollateral } from 'hooks/useCollateral'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -65,19 +66,10 @@ export const Contents = ({ position }: Props) => {
   const { setValue } = useLocalStorage('positionid')
   const { balance, error, loading } = useBalanceForPosition(position.id)
 
+  const positionCollateral = useCollateral(position ? position.collateralToken.id : '')
   const [collateralSymbol, setCollateralSymbol] = React.useState('')
-  const [collateral, setCollateral] = React.useState<Maybe<Token>>(null)
-
   const { collateralToken, id, indexSets } = position
 
-  const numberedOutcomes = indexSets.map((indexSet: string) => {
-    return Number(indexSet)
-      .toString(2)
-      .split('')
-      .reverse()
-      .map((value, index) => (value === '1' ? index + 1 : 0))
-      .filter((n) => !!n)
-  })
   const dropdownItems = useMemo(() => {
     return [
       {
@@ -101,21 +93,19 @@ export const Contents = ({ position }: Props) => {
   const ERC20Amount = 100
   const ERC1155Amount = 0
 
-  React.useEffect(() => {
-    try {
-      const token = networkConfig.getTokenFromAddress(collateralToken.id)
-      setCollateralSymbol(token.symbol)
-      setCollateral(token)
-    } catch (error) {
-      logger.error(error)
-    }
-  }, [collateralToken.id, networkConfig])
-
   const positionPreview = React.useMemo(() => {
-    if (collateral && !loading && !error && balance) {
-      return positionString(position.conditionIds, position.indexSets, balance, collateral)
+    if (positionCollateral && !loading && !error && balance) {
+      return positionString(position.conditionIds, position.indexSets, balance, positionCollateral)
     }
-  }, [collateral, position, loading, error, balance])
+  }, [positionCollateral, position, loading, error, balance])
+
+  React.useEffect(() => {
+    if (positionCollateral) {
+      setCollateralSymbol(positionCollateral.symbol)
+    } else {
+      setCollateralSymbol('')
+    }
+  }, [positionCollateral])
 
   return (
     <CenteredCard

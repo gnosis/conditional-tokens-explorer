@@ -54,10 +54,16 @@ export enum PositionErrors {
   INVALID_ERROR = `Invalid position`,
   FETCHING_ERROR = `Error fetching position`,
   NOT_FOUND_ERROR = `Position doesn't exist`,
-  EMPTY_BALANCE_ERROR = `User doesn't had position balance`,
+  EMPTY_BALANCE_ERROR = `User doesn't have position balance`,
 }
 
-export type Errors = ConditionErrors | PositionErrors
+export enum BalanceErrors {
+  INVALID_ERROR = `Invalid position`,
+  FETCHING_ERROR = `Error fetching balance`,
+  EMPTY_BALANCE_ERROR = `User doesn't have position balance`,
+}
+
+export type Errors = ConditionErrors | PositionErrors | BalanceErrors
 
 export type Token = {
   symbol: string
@@ -86,4 +92,9 @@ export type Oracle = {
   description: string
   url: string
   address: string
+}
+
+export enum SplitFromType {
+  collateral = 'collateral',
+  position = 'position',
 }

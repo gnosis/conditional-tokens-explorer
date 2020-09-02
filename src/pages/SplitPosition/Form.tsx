@@ -1,5 +1,4 @@
-import { positionString } from 'util/tools'
-
+import { PositionPreview } from 'components/splitPosition/PositionPreview'
 import { usePositionContext } from 'contexts/PositionContext'
 import { BigNumber } from 'ethers/utils'
 import { AllowanceMethods, useAllowanceState } from 'hooks/useAllowanceState'
@@ -17,7 +16,6 @@ import { Partition } from '../../components/partitions/Partition'
 import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
 import { ErrorContainer, Error as ErrorMessage } from '../../components/pureStyledComponents/Error'
 import { Row } from '../../components/pureStyledComponents/Row'
-import { StripedList, StripedListItem } from '../../components/pureStyledComponents/StripedList'
 import { TitleControl } from '../../components/pureStyledComponents/TitleControl'
 import { FullLoading } from '../../components/statusInfo/FullLoading'
 import { IconTypes } from '../../components/statusInfo/common'
@@ -26,13 +24,9 @@ import { NULL_PARENT_ID, ZERO_BN } from '../../config/constants'
 import { useConditionContext } from '../../contexts/ConditionContext'
 import { getLogger } from '../../util/logger'
 import { trivialPartition } from '../../util/tools'
-import { Token } from '../../util/types'
+import { SplitFromType, Token } from '../../util/types'
 
 import { SplitFrom } from './SplitFrom'
-
-const StripedListStyled = styled(StripedList)`
-  margin-top: 6px;
-`
 
 const PartitionStyled = styled(Partition)`
   margin-top: 6px;
@@ -45,7 +39,7 @@ export type SplitPositionFormMethods = {
   collateral: string
   conditionId: string
   positionId: string
-  splitFrom: SplitFrom
+  splitFrom: SplitFromType
 }
 
 interface Props {
@@ -79,7 +73,7 @@ export const Form = ({
       conditionId: '',
       collateral: tokens[0].address,
       amount: ZERO_BN,
-      splitFrom: 'collateral' as SplitFrom,
+      splitFrom: SplitFromType.collateral,
       positionId: '',
     }
   }, [tokens])
@@ -115,12 +109,12 @@ export const Form = ({
   watch('splitFrom')
   watch('amount')
 
-  const splitFromCollateral = splitFrom === 'collateral'
-  const splitFromPosition = splitFrom === 'position'
+  const splitFromCollateral = splitFrom === SplitFromType.collateral
+  const splitFromPosition = splitFrom === SplitFromType.position
 
   useEffect(() => {
     if (positionIdFromLS) {
-      setValue('splitFrom', 'position', true)
+      setValue('splitFrom', SplitFromType.position, true)
       setValue('positionId', positionIdFromLS, true)
     }
   }, [positionIdFromLS, setValue])
@@ -177,7 +171,19 @@ export const Form = ({
     unlockCollateral,
   } = useAllowanceState(allowanceMethods, amount)
 
-  const canSubmit = isValid && allowanceFinished
+  const isAllowanceVisible = useMemo(() => splitFromCollateral && shouldDisplayAllowance, [
+    shouldDisplayAllowance,
+    splitFromCollateral,
+  ])
+
+  const canSubmit = useMemo(() => {
+    if (splitFromCollateral) {
+      return isValid && allowanceFinished
+    } else {
+      return isValid
+    }
+  }, [splitFromCollateral, isValid, allowanceFinished])
+
   const mockedNumberedOutcomes = [
     [1, 4, 3],
     [6, 5],
@@ -185,27 +191,6 @@ export const Form = ({
     [2, 8],
     [12, 13, 14, 15],
   ]
-
-  const splitPositionPreview = useMemo(() => {
-    if (!conditionIdToPreviewShow || (splitFromPosition && !position)) {
-      return []
-    }
-
-    if (splitFromPosition && position) {
-      return trivialPartition(outcomeSlot).map((indexSet) => {
-        return positionString(
-          [...position.conditionIds, conditionIdToPreviewShow],
-          [...[position.indexSets], indexSet],
-          amount,
-          collateral
-        )
-      })
-    } else {
-      return trivialPartition(outcomeSlot).map((indexSet) => {
-        return positionString([conditionIdToPreviewShow], [indexSet], amount, collateral)
-      })
-    }
-  }, [conditionIdToPreviewShow, position, outcomeSlot, amount, collateral, splitFromPosition])
 
   return (
     <CenteredCard>
@@ -218,7 +203,7 @@ export const Form = ({
           value={
             <SplitFrom
               formMethods={formMethods}
-              onPositionChange={(p) => setPosition(p)}
+              onPositionChange={setPosition}
               splitFromCollateral={splitFromCollateral}
               splitFromPosition={splitFromPosition}
               tokens={tokens}
@@ -226,7 +211,7 @@ export const Form = ({
           }
         />
       </Row>
-      {shouldDisplayAllowance && (
+      {isAllowanceVisible && (
         <SetAllowance
           collateral={collateral}
           fetching={fetchingAllowance}
@@ -250,15 +235,13 @@ export const Form = ({
         />
       </Row>
       <Row cols="1fr" marginBottomXL>
-        <TitleValue
-          title="Split Position Preview"
-          value={
-            <StripedListStyled>
-              {splitPositionPreview.map((preview, i) => (
-                <StripedListItem key={`preview-${i}`}>{preview}</StripedListItem>
-              ))}
-            </StripedListStyled>
-          }
+        <PositionPreview
+          amount={amount}
+          conditionId={conditionIdToPreviewShow}
+          outcomeSlotCount={outcomeSlot}
+          position={position}
+          selectedCollateral={collateral}
+          splitFrom={splitFrom}
         />
       </Row>
       {isTransactionExecuting && (

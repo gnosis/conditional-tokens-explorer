@@ -5,34 +5,31 @@ import { Status } from 'util/types'
 import { Button } from 'components/buttons/Button'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { SelectCondition } from 'components/form/SelectCondition'
+import { SelectPositions } from 'components/form/SelectPositions'
 import { Amount } from 'components/mergePositions/Amount'
 import { MergePreview } from 'components/mergePositions/MergePreview'
-import { SelectPositions } from 'components/mergePositions/SelectPositions'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { Row } from 'components/pureStyledComponents/Row'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
 import { ZERO_BN } from 'config/constants'
+import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useMemo, useState } from 'react'
 import { ConditionalTokensService } from 'services/conditionalTokens'
-
-import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 
 const logger = getLogger('MergePosition')
 
 export const Contents = () => {
   const { _type: statusContext, CTService, connect, networkConfig } = useWeb3ConnectedOrInfura()
 
-  const {
-    balances,
-    clearPositions,
-    errors: positionsErrors,
-    positions,
-  } = useMultiPositionsContext()
+  const { clearPositions, errors: positionsErrors, positions } = useMultiPositionsContext()
+
+  const { balances, errors: balancesErrors, updateBalances } = useBatchBalanceContext()
 
   const { clearCondition, condition, errors: conditionErrors } = useConditionContext()
   const [status, setStatus] = useState<Maybe<Status>>(null)
@@ -78,9 +75,10 @@ export const Contents = () => {
       status === Status.Loading ||
       positionsErrors.length > 0 ||
       conditionErrors.length > 0 ||
+      balancesErrors.length > 0 ||
       !canMergePositions ||
       amount.isZero(),
-    [canMergePositions, amount, status, positionsErrors, conditionErrors]
+    [canMergePositions, amount, status, positionsErrors, conditionErrors, balancesErrors]
   )
 
   const onMerge = useCallback(async () => {
@@ -117,6 +115,7 @@ export const Contents = () => {
         setAmount(ZERO_BN)
         clearPositions()
         clearCondition()
+        updateBalances([])
 
         setStatus(Status.Ready)
       } else {
@@ -135,6 +134,7 @@ export const Contents = () => {
     amount,
     clearPositions,
     clearCondition,
+    updateBalances,
     connect,
   ])
 
@@ -145,6 +145,8 @@ export const Contents = () => {
           callbackToBeExecutedOnRemoveAction={() => {
             setAmount(ZERO_BN)
           }}
+          showOnlyPositionsWithBalance
+          title="Positions"
         />
       </Row>
       <Row cols="1fr">

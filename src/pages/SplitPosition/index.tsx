@@ -1,4 +1,6 @@
+import { BatchBalanceProvider } from 'contexts/BatchBalanceContext'
 import { ConditionProvider } from 'contexts/ConditionContext'
+import { MultiPositionsProvider } from 'contexts/MultiPositionsContext'
 import { PositionProvider } from 'contexts/PositionContext'
 import { BigNumber } from 'ethers/utils'
 import { useAllowance } from 'hooks/useAllowance'
@@ -59,19 +61,21 @@ export const SplitPosition = () => {
   }
 
   return (
-    <PositionProvider>
-      <ConditionProvider>
-        <PageTitle>Split Position</PageTitle>
-        <Form
-          allowanceMethods={allowanceMethods}
-          collateral={collateralToken}
-          onCollateralChange={(t: string) => {
-            setCollateral(t)
-          }}
-          splitPosition={splitPosition}
-          tokens={tokens}
-        />
-      </ConditionProvider>
-    </PositionProvider>
+    <ConditionProvider>
+      <MultiPositionsProvider>
+        <PositionProvider>
+          <BatchBalanceProvider checkForEmptyBalance={true}>
+            <PageTitle>Split Position</PageTitle>
+            <Form
+              allowanceMethods={allowanceMethods}
+              collateral={collateralToken}
+              onCollateralChange={setCollateral}
+              splitPosition={splitPosition}
+              tokens={tokens}
+            />
+          </BatchBalanceProvider>
+        </PositionProvider>
+      </MultiPositionsProvider>
+    </ConditionProvider>
   )
 }
