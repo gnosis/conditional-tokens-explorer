@@ -28,21 +28,18 @@ interface Props {
   callbackToBeExecutedOnRemoveAction?: () => void
 }
 
-const canCanculatePositionToDisplay = (
+const isDataInSync = (
   positionsLoading: boolean,
   balancesLoading: boolean,
   positions: GetMultiPositions_positions[],
-  balances: BigNumber[],
-  positionIds: string[]
+  balances: BigNumber[]
 ) => {
   return (
     !positionsLoading &&
     !balancesLoading &&
     positions.length &&
     balances.length &&
-    balances.length === positionIds.length &&
-    positions.length === positionIds.length &&
-    JSON.stringify(positions.map(({ id }) => id).sort()) === JSON.stringify([...positionIds].sort())
+    balances.length === positions.length
   )
 }
 
@@ -102,15 +99,7 @@ export const SelectPositions = ({
 
   React.useEffect(() => {
     if (positionIds.length > 0) {
-      if (
-        canCanculatePositionToDisplay(
-          positionsLoading,
-          balancesLoading,
-          positions,
-          balances,
-          positionIds
-        )
-      ) {
+      if (isDataInSync(positionsLoading, balancesLoading, positions, balances)) {
         setPositionsToDisplay(
           positions.map((position) => {
             const i = positionIds.findIndex((id) => id === position.id)

@@ -167,7 +167,19 @@ export const Form = ({
     unlockCollateral,
   } = useAllowanceState(allowanceMethods, amount)
 
-  const canSubmit = isValid && allowanceFinished
+  const isAllowanceVisible = useMemo(() => splitFromCollateral && shouldDisplayAllowance, [
+    shouldDisplayAllowance,
+    splitFromCollateral,
+  ])
+
+  const canSubmit = useMemo(() => {
+    if (splitFromCollateral) {
+      return isValid && allowanceFinished
+    } else {
+      return isValid
+    }
+  }, [splitFromCollateral, isValid, allowanceFinished])
+
   const mockedNumberedOutcomes = [
     [1, 4, 3],
     [6, 5],
@@ -208,7 +220,7 @@ export const Form = ({
           value={
             <SplitFrom
               formMethods={formMethods}
-              onPositionChange={(p) => setPosition(p)}
+              onPositionChange={setPosition}
               splitFromCollateral={splitFromCollateral}
               splitFromPosition={splitFromPosition}
               tokens={tokens}
@@ -216,7 +228,7 @@ export const Form = ({
           }
         />
       </Row>
-      {shouldDisplayAllowance && (
+      {isAllowanceVisible && (
         <SetAllowance
           collateral={collateral}
           fetching={fetchingAllowance}
