@@ -1,6 +1,8 @@
 import { truncateStringInTheMiddle } from 'util/tools'
 
-import React from 'react'
+import { useLocalStorage } from 'hooks/useLocalStorageValue'
+import React, { useMemo } from 'react'
+import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { Button } from '../../components/buttons/Button'
@@ -57,6 +59,8 @@ interface Props {
 
 export const Contents = ({ position }: Props) => {
   const { networkConfig } = useWeb3ConnectedOrInfura()
+  const history = useHistory()
+  const { setValue } = useLocalStorage('positionid')
 
   const [collateralSymbol, setCollateralSymbol] = React.useState('')
 
@@ -70,20 +74,24 @@ export const Contents = ({ position }: Props) => {
       .map((value, index) => (value === '1' ? index + 1 : 0))
       .filter((n) => !!n)
   })
-  const dropdownItems = [
-    {
-      onClick: () => {
-        logger.log('Redeem')
+  const dropdownItems = useMemo(() => {
+    return [
+      {
+        onClick: () => {
+          setValue(id)
+          history.push(`/redeem`)
+        },
+        text: 'Redeem',
       },
-      text: 'Redeem',
-    },
-    {
-      onClick: () => {
-        logger.log('Split')
+      {
+        onClick: () => {
+          setValue(id)
+          history.push(`/split`)
+        },
+        text: 'Split',
       },
-      text: 'Split',
-    },
-  ]
+    ]
+  }, [id, history, setValue])
 
   // TODO: refactoring this to make work wrap and unwrap
   const ERC20Amount = 100

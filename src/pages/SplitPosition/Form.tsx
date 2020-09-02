@@ -1,5 +1,6 @@
 import { positionString } from 'util/tools'
 
+import { usePositionContext } from 'contexts/PositionContext'
 import { BigNumber } from 'ethers/utils'
 import { AllowanceMethods, useAllowanceState } from 'hooks/useAllowanceState'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
@@ -71,6 +72,7 @@ export const Form = ({
   tokens,
 }: Props) => {
   const { clearCondition } = useConditionContext()
+  const { positionId: positionIdFromLS } = usePositionContext()
 
   const DEFAULT_VALUES = useMemo(() => {
     return {
@@ -92,6 +94,7 @@ export const Form = ({
     getValues,
     handleSubmit,
     reset,
+    setValue,
     watch,
   } = formMethods
 
@@ -114,6 +117,13 @@ export const Form = ({
 
   const splitFromCollateral = splitFrom === 'collateral'
   const splitFromPosition = splitFrom === 'position'
+
+  useEffect(() => {
+    if (positionIdFromLS) {
+      setValue('splitFrom', 'position', true)
+      setValue('positionId', positionIdFromLS, true)
+    }
+  }, [positionIdFromLS, setValue])
 
   useEffect(() => {
     if (watchCollateralAddress) {

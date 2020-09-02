@@ -1,4 +1,5 @@
 import { ConditionProvider } from 'contexts/ConditionContext'
+import { PositionProvider } from 'contexts/PositionContext'
 import { BigNumber } from 'ethers/utils'
 import { useAllowance } from 'hooks/useAllowance'
 import { useCollateral } from 'hooks/useCollateral'
@@ -52,24 +53,25 @@ export const SplitPosition = () => {
     [status, CTService, connect]
   )
 
-  // TODO Fix this
   if (!collateralToken) {
     logger.error(`Collateral ${collateral} doesn't exist`)
     return null
   }
 
   return (
-    <ConditionProvider>
-      <PageTitle>Split Position</PageTitle>
-      <Form
-        allowanceMethods={allowanceMethods}
-        collateral={collateralToken}
-        onCollateralChange={(t: string) => {
-          setCollateral(t)
-        }}
-        splitPosition={splitPosition}
-        tokens={tokens}
-      />
-    </ConditionProvider>
+    <PositionProvider>
+      <ConditionProvider>
+        <PageTitle>Split Position</PageTitle>
+        <Form
+          allowanceMethods={allowanceMethods}
+          collateral={collateralToken}
+          onCollateralChange={(t: string) => {
+            setCollateral(t)
+          }}
+          splitPosition={splitPosition}
+          tokens={tokens}
+        />
+      </ConditionProvider>
+    </PositionProvider>
   )
 }
