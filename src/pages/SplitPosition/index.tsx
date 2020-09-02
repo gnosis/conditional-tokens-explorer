@@ -68,9 +68,7 @@ export const SplitPosition = () => {
           <Form
             allowanceMethods={allowanceMethods}
             collateral={collateralToken}
-            onCollateralChange={(t: string) => {
-              setCollateral(t)
-            }}
+            onCollateralChange={setCollateral}
             splitPosition={splitPosition}
             tokens={tokens}
           />

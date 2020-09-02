@@ -86,6 +86,9 @@ export const SplitFrom: React.FC<Props> = (props) => {
   const [showCustomCollateralModal, setShowCustomCollateralModal] = useState(false)
   const [showSelectPositionModal, setShowSelectPositionModal] = useState(false)
 
+  const openCustomCollateralModal = useCallback(() => setShowCustomCollateralModal(true), [])
+  const closeCustomCollateralModal = useCallback(() => setShowCustomCollateralModal(false), [])
+
   const openSelectPositinModal = useCallback(() => setShowSelectPositionModal(true), [])
   const closeSelectPositinModal = useCallback(() => setShowSelectPositionModal(false), [])
 
@@ -121,10 +124,7 @@ export const SplitFrom: React.FC<Props> = (props) => {
             <TabText active={splitFromPosition}>Position</TabText>
           </Tab>
         </Tabs>
-        <ToggleableTitleControl
-          onClick={() => setShowCustomCollateralModal(true)}
-          visible={splitFromCollateral}
-        >
+        <ToggleableTitleControl onClick={openCustomCollateralModal} visible={splitFromCollateral}>
           Add Custom Collateral
         </ToggleableTitleControl>
         <ToggleableTitleControl onClick={openSelectPositinModal} visible={splitFromPosition}>
@@ -145,14 +145,7 @@ export const SplitFrom: React.FC<Props> = (props) => {
         visible={splitFromPosition}
       />
       {showCustomCollateralModal && (
-        <CustomCollateralModal
-          onAdd={(token) => {
-            setCustomToken(token)
-          }}
-          onClose={() => {
-            setShowCustomCollateralModal(false)
-          }}
-        />
+        <CustomCollateralModal onAdd={setCustomToken} onClose={closeCustomCollateralModal} />
       )}
       {showSelectPositionModal && (
         <SelectPositionModal

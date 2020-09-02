@@ -48,7 +48,7 @@ const fetchBalance = (
   tokenAddress: string,
   walletAddress: string
 ) => {
-  const erc20Service = new ERC20Service(provider, signer, tokenAddress)
+  const erc20Service = new ERC20Service(provider, tokenAddress, signer)
   return erc20Service.balanceOf(walletAddress)
 }
 

@@ -220,7 +220,6 @@ export const Form = ({
           value={
             <SplitFrom
               formMethods={formMethods}
-              onCollateralChange={onCollateralChange}
               onPositionChange={setPosition}
               splitFromCollateral={splitFromCollateral}
               splitFromPosition={splitFromPosition}
