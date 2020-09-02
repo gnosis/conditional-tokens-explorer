@@ -153,6 +153,7 @@ export const SplitFrom: React.FC<Props> = (props) => {
           onConfirm={onSelectPosidionModalConfirm}
           onRequestClose={closeSelectPositinModal}
           preSelectedPositions={[]}
+          showOnlyPositionsWithBalance
           singlePosition
         />
       )}
