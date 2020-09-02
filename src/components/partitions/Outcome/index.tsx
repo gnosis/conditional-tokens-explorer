@@ -137,58 +137,36 @@ export const PlaceholderOutcome = styled(Outcome)`
   ${hideHorizontalLineCSS}
 `
 
-export const EditableOutcome = styled(Outcome)`
+export const EditableOutcome = styled(Outcome)<{ hoverColor?: string; activeColor?: string }>`
   cursor: pointer;
 
   .outcomeCircle {
     background-color: #fff;
+    border-color: ${(props) => props.theme.colors.mediumGrey};
     border-style: solid;
     border-width: 2px;
+    color: ${(props) => props.theme.colors.mediumGrey};
     font-size: 16px;
     height: 28px;
     transition: all 0.15s ease-out;
     width: 28px;
+
+    &:hover {
+      border-color: ${(props) => props.hoverColor};
+      color: ${(props) => props.hoverColor};
+    }
+
+    ${(props) =>
+      props.activeColor &&
+      `
+        border-color: ${props.activeColor};
+        color: ${props.activeColor};
+    `}
   }
 
   ${hideHorizontalLineCSS}
 `
 
-export const AddableOutcome = styled(EditableOutcome)<{ active?: boolean }>`
-  .outcomeCircle {
-    border-color: ${(props) => props.theme.colors.mediumGrey};
-    color: ${(props) => props.theme.colors.mediumGrey};
-
-    &:hover {
-      border-color: ${(props) => props.theme.colors.primary};
-      color: ${(props) => props.theme.colors.primary};
-    }
-
-    ${(props) =>
-      props.active &&
-      `
-        border-color: ${props.theme.colors.primary};
-        color: ${props.theme.colors.primary};
-    `}
-  }
-`
-
-export const RemovableOutcome = styled(EditableOutcome)<{ active?: boolean }>`
-  .outcomeCircle {
-    border-color: ${(props) => props.theme.colors.primary};
-    color: ${(props) => props.theme.colors.primary};
-
-    &:hover {
-      background-color: ${(props) => props.theme.colors.error};
-      border-color: ${(props) => props.theme.colors.error};
-      color: #fff;
-    }
-
-    ${(props) =>
-      props.active &&
-      `
-        background-color: ${props.theme.colors.error};
-        border-color: ${props.theme.colors.error};
-        color: #fff;
-      `}
-  }
-`
+EditableOutcome.defaultProps = {
+  hoverColor: '#000',
+}

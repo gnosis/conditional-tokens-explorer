@@ -5,9 +5,9 @@ import { IconPlus } from '../../icons/IconPlus'
 
 const Wrapper = styled.button`
   align-items: center;
-  background-color: ${(props) => props.theme.buttonPrimary.backgroundColor};
+  background-color: #fff;
   border-radius: 50%;
-  border: 1px solid ${(props) => props.theme.buttonPrimary.borderColor};
+  border: 2px solid ${(props) => props.theme.buttonPrimary.backgroundColor};
   cursor: pointer;
   display: flex;
   height: 38px;
@@ -17,16 +17,28 @@ const Wrapper = styled.button`
   transition: all 0.15s ease-out;
   width: 38px;
 
+  path {
+    fill: ${(props) => props.theme.buttonPrimary.backgroundColor};
+  }
+
   &:hover {
-    border-color: ${(props) => props.theme.buttonPrimary.borderColorHover};
-    background-color: ${(props) => props.theme.buttonPrimary.backgroundColorHover};
+    background-color: ${(props) => props.theme.buttonPrimary.backgroundColor};
+    border-color: ${(props) => props.theme.buttonPrimary.borderColor};
+
+    path {
+      fill: #fff;
+    }
   }
 
   &[disabled] {
-    background-color: ${(props) => props.theme.buttonPrimary.borderColor};
-    border-color: ${(props) => props.theme.buttonPrimary.borderColor};
+    background-color: #fff;
+    border-color: ${(props) => props.theme.buttonPrimary.backgroundColor};
     cursor: not-allowed;
     opacity: 0.5;
+
+    path {
+      fill: ${(props) => props.theme.buttonPrimary.backgroundColor};
+    }
   }
 `
 

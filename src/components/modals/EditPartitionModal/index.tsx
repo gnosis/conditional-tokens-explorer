@@ -11,12 +11,7 @@ import {
 } from '../../buttons/ButtonBulkMove'
 import { ButtonControl, ButtonControlType } from '../../buttons/ButtonControl'
 import { Modal, ModalProps } from '../../common/Modal'
-import {
-  AddableOutcome,
-  DraggableOutcome,
-  PlaceholderOutcome,
-  RemovableOutcome,
-} from '../../partitions/Outcome'
+import { DraggableOutcome, EditableOutcome, PlaceholderOutcome } from '../../partitions/Outcome'
 import { ButtonContainer } from '../../pureStyledComponents/ButtonContainer'
 import { CardSubtitle } from '../../pureStyledComponents/CardSubtitle'
 import { CardText } from '../../pureStyledComponents/CardText'
@@ -43,7 +38,7 @@ const EditableOutcomesWrapper = styled.div`
   align-items: center;
   display: grid;
   grid-column-gap: 12px;
-  grid-template-columns: 1fr 46px;
+  grid-template-columns: 1fr 38px;
   margin-bottom: 24px;
 
   &:last-child {
@@ -94,22 +89,26 @@ const CardTextPlaceholder = styled(CardText)`
   opacity: 0.7;
 `
 
-const ButtonBulk = styled(ButtonBulkMove)`
+const ButtonBulk = styled(ButtonBulkMove)<{ flipVertical?: boolean }>`
   margin-top: auto;
+
+  ${(props) =>
+    props.flipVertical &&
+    `
+      border-color: ${props.theme.colors.primary};
+      transform: rotateZ(180deg);
+
+      path {
+        fill: ${props.theme.colors.primary};
+      }
+  `}
 `
 
-const ButtonAddNewCollection = styled(ButtonAdd)`
-  border-width: 4px;
-  border-style: solid;
-  margin-top: auto;
-  box-sizing: content-box;
-
-  &,
-  &:hover,
-  &[disabled],
-  &[disabled]:hover {
-    border-color: #fff;
-  }
+const ButtonAddNewCollectionContainer = styled.div`
+  align-items: flex-end;
+  display: flex;
+  height: 100%;
+  padding-bottom: 4px;
 `
 
 interface DraggedOutcomeProps extends OutcomeProps {
@@ -265,15 +264,22 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
     [availableOutcomes, allCollections]
   )
 
-  const [removeAll, setRemoveAll] = useState(undefined)
-  const [addAll, setAddAll] = useState(undefined)
+  const [availableOutcomesColor, setAvailableOutcomesColor] = useState<string | undefined>()
+  const [newCollectionOutcomesColor, setNewCollectionOutcomesColor] = useState<string | undefined>()
 
   const notEnoughCollections = allCollections.length < 2
   const orphanedOutcomes = availableOutcomes.length > 0 || newCollection.length > 0
   const disableButton = notEnoughCollections || orphanedOutcomes
+  const addNewCollectionButtonHover = newCollectionOutcomesColor === theme.colors.primary
 
   return (
-    <Modal onRequestClose={onRequestClose} title="Edit Partition" {...restProps}>
+    <Modal
+      onRequestClose={onRequestClose}
+      shouldCloseOnEsc={false}
+      shouldCloseOnOverlayClick={false}
+      title="Edit Partition"
+      {...restProps}
+    >
       <TitleValueExtraMargin
         title="New Collection"
         value={
@@ -282,14 +288,15 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
             <EditableOutcomesWrapper>
               <EditableOutcomes
                 borderBottomColor={theme.colors.mediumGrey}
-                fullBorderColor={addAll}
+                fullBorderColor={availableOutcomesColor}
               >
                 {availableOutcomes.length ? (
                   <OutcomesInner columnGap="8px" columns="12" rowGap="8px">
                     {availableOutcomes.map((outcome: OutcomeProps, outcomeIndex: number) => {
                       return (
-                        <AddableOutcome
-                          active={addAll}
+                        <EditableOutcome
+                          activeColor={availableOutcomesColor}
+                          hoverColor={theme.colors.primary}
                           key={outcomeIndex}
                           onClick={() => {
                             addOutcomeToNewCollection(outcomeIndex)
@@ -310,25 +317,26 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
                   disabled={availableOutcomes.length === 0}
                   onClick={() => {
                     addAllAvailableOutcomesToNewCollection()
-                    setAddAll(undefined)
+                    setAvailableOutcomesColor(undefined)
                   }}
-                  onMouseEnter={() => setAddAll(theme.colors.primary)}
-                  onMouseLeave={() => setAddAll(undefined)}
+                  onMouseEnter={() => setAvailableOutcomesColor(theme.colors.primary)}
+                  onMouseLeave={() => setAvailableOutcomesColor(undefined)}
                 />
               </EditableOutcomes>
             </EditableOutcomesWrapper>
             <CardSubtitle>New Collection Preview</CardSubtitle>
             <EditableOutcomesWrapper>
               <EditableOutcomes
-                borderBottomColor={theme.colors.primary}
-                fullBorderColor={removeAll}
+                borderBottomColor={theme.colors.mediumGrey}
+                fullBorderColor={newCollectionOutcomesColor}
               >
                 {newCollection.length ? (
                   <OutcomesInner columnGap="8px" columns="12" rowGap="8px">
                     {newCollection.map((outcome: OutcomeProps, outcomeIndex: number) => {
                       return (
-                        <RemovableOutcome
-                          active={removeAll}
+                        <EditableOutcome
+                          activeColor={newCollectionOutcomesColor}
+                          hoverColor={theme.colors.error}
                           key={outcomeIndex}
                           onClick={() => {
                             removeOutcomeFromNewCollection(outcomeIndex)
@@ -347,20 +355,26 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
                   action={ButtonBulkMoveActions.remove}
                   direction={ButtonBulkMoveDirection.up}
                   disabled={newCollection.length === 0}
+                  flipVertical={addNewCollectionButtonHover}
                   onClick={() => {
                     clearOutcomesFromNewCollection()
-                    setRemoveAll(undefined)
+                    setNewCollectionOutcomesColor(undefined)
                   }}
-                  onMouseEnter={() => setRemoveAll(theme.colors.error)}
-                  onMouseLeave={() => setRemoveAll(undefined)}
+                  onMouseEnter={() => setNewCollectionOutcomesColor(theme.colors.error)}
+                  onMouseLeave={() => setNewCollectionOutcomesColor(undefined)}
                 />
               </EditableOutcomes>
-              <ButtonAddNewCollection
-                disabled={newCollection.length === 0}
-                onClick={() => {
-                  addNewCollection()
-                }}
-              />
+              <ButtonAddNewCollectionContainer>
+                <ButtonAdd
+                  disabled={newCollection.length === 0}
+                  onClick={() => {
+                    addNewCollection()
+                    setNewCollectionOutcomesColor(undefined)
+                  }}
+                  onMouseEnter={() => setNewCollectionOutcomesColor(theme.colors.primary)}
+                  onMouseLeave={() => setNewCollectionOutcomesColor(undefined)}
+                />
+              </ButtonAddNewCollectionContainer>
             </EditableOutcomesWrapper>
           </>
         }
