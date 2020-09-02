@@ -92,9 +92,8 @@ export const SplitFrom: React.FC<Props> = (props) => {
   const openSelectPositinModal = useCallback(() => setShowSelectPositionModal(true), [])
   const closeSelectPositinModal = useCallback(() => setShowSelectPositionModal(false), [])
 
-  const onSelectPosidionModalConfirm = React.useCallback(
+  const onSelectPositionModalConfirm = React.useCallback(
     (positions: Array<Position>) => {
-      console.log('onSelectPosidionModalConfirm', positions)
       const ids = positions.map((position) => position.id)
       updatePositionIds(ids)
       updateBalances(ids)
@@ -150,7 +149,7 @@ export const SplitFrom: React.FC<Props> = (props) => {
       {showSelectPositionModal && (
         <SelectPositionModal
           isOpen={showSelectPositionModal}
-          onConfirm={onSelectPosidionModalConfirm}
+          onConfirm={onSelectPositionModalConfirm}
           onRequestClose={closeSelectPositinModal}
           preSelectedPositions={[]}
           showOnlyPositionsWithBalance
