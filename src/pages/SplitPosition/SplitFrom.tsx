@@ -1,4 +1,4 @@
-import { Token } from 'util/types'
+import { SplitFromType, Token } from 'util/types'
 
 import { CustomCollateralModal } from 'components/form/CustomCollateralModal'
 import { SelectPositionModal } from 'components/modals/SelectPositionsModal'
@@ -94,7 +94,6 @@ export const SplitFrom: React.FC<Props> = (props) => {
 
   const onSelectPosidionModalConfirm = React.useCallback(
     (positions: Array<Position>) => {
-      console.log('onSelectPosidionModalConfirm', positions)
       const ids = positions.map((position) => position.id)
       updatePositionIds(ids)
       updateBalances(ids)
@@ -115,12 +114,12 @@ export const SplitFrom: React.FC<Props> = (props) => {
       <Controls>
         <Tabs>
           <Tab>
-            <Radio name="splitFrom" ref={register} type="radio" value="collateral" />
+            <Radio name="splitFrom" ref={register} type="radio" value={SplitFromType.collateral} />
             <TabText active={splitFromCollateral}>Collateral</TabText>
           </Tab>
           <Break />
           <Tab>
-            <Radio name="splitFrom" ref={register} type="radio" value="position" />
+            <Radio name="splitFrom" ref={register} type="radio" value={SplitFromType.position} />
             <TabText active={splitFromPosition}>Position</TabText>
           </Tab>
         </Tabs>
@@ -153,6 +152,7 @@ export const SplitFrom: React.FC<Props> = (props) => {
           onConfirm={onSelectPosidionModalConfirm}
           onRequestClose={closeSelectPositinModal}
           preSelectedPositions={[]}
+          showOnlyPositionsWithBalance
           singlePosition
         />
       )}

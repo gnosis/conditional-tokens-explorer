@@ -93,3 +93,8 @@ export type Oracle = {
   url: string
   address: string
 }
+
+export enum SplitFromType {
+  collateral = 'collateral',
+  position = 'position',
+}

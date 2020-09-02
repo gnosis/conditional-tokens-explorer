@@ -39,7 +39,7 @@ export interface InputPositionProps {
 
 export const InputPosition = ({
   barebones = false,
-  formMethods: { register, setError, setValue, watch },
+  formMethods: { register, setValue },
   onPositionChange,
   splitFromPosition,
   ...restProps
