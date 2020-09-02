@@ -5,22 +5,26 @@ import styled, { css } from 'styled-components'
 import { version as appVersion } from '../../../../package.json'
 
 const Wrapper = styled.footer`
-  align-items: initial;
-  border-radius: 0;
-  display: block;
-  height: auto;
-  margin-top: auto;
-  overflow: visible;
-  padding: 25px 0;
-  width: 100%;
+  &.siteFooter {
+    align-items: initial;
+    border-radius: 0;
+    display: block;
+    height: auto;
+    margin-top: auto;
+    overflow: visible;
+    padding: 25px 0;
+    width: 100%;
+  }
 `
 
 const Items = styled.ul`
-  display: flex;
-  justify-content: center;
-  list-style: none;
-  margin: 0;
-  padding: 0;
+  &.footerItems {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
 `
 
 const Item = styled.li`
@@ -91,8 +95,8 @@ export const Footer: React.FC = (props) => {
   ]
 
   return (
-    <Wrapper {...props}>
-      <Items>
+    <Wrapper className="siteFooter" {...props}>
+      <Items className="footerItems">
         {items.map((item, index) => {
           return (
             <Item key={index}>

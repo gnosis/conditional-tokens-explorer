@@ -11,7 +11,7 @@ export interface BatchBalanceContext {
   loading: boolean
   errors: BalanceErrors[]
   balances: BigNumber[]
-  updateBalaces: (positionIds: Array<string>) => void
+  updateBalances: (positionIds: Array<string>) => void
 }
 
 export const BATCH_BALANCE_CONTEXT_DEFAULT_VALUE = {
@@ -20,7 +20,7 @@ export const BATCH_BALANCE_CONTEXT_DEFAULT_VALUE = {
   errors: [],
   balances: [],
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  updateBalaces: () => {},
+  updateBalances: () => {},
 }
 
 const BatchBalanceContext = React.createContext<BatchBalanceContext>(
@@ -38,7 +38,7 @@ export const BatchBalanceProvider = (props: Props) => {
   const { clearErrors, errors, pushError, removeError } = useErrors()
   const { balances, loading } = useBalanceForBatchPosition(positionIds)
 
-  const updateBalaces = useCallback(
+  const updateBalances = useCallback(
     (positionIds: Array<string>) => {
       clearErrors()
       const validPositions: boolean = positionIds
@@ -68,7 +68,7 @@ export const BatchBalanceProvider = (props: Props) => {
     loading,
     balances,
     errors: errors as BalanceErrors[],
-    updateBalaces,
+    updateBalances,
   }
   return <BatchBalanceContext.Provider value={value}>{children}</BatchBalanceContext.Provider>
 }

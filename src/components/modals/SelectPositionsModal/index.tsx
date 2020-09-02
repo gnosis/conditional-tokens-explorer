@@ -36,13 +36,20 @@ const Search = styled(SearchField)`
 interface Props extends ModalProps {
   isOpen: boolean
   singlePosition?: boolean
+  showOnlyPositionsWithBalance?: boolean
   preSelectedPositions?: string[]
   onConfirm?: (positions: Array<Position>) => void
   onRequestClose?: () => void
 }
 
 export const SelectPositionModal: React.FC<Props> = (props) => {
-  const { onConfirm, preSelectedPositions, singlePosition, ...restProps } = props
+  const {
+    onConfirm,
+    preSelectedPositions,
+    showOnlyPositionsWithBalance,
+    singlePosition,
+    ...restProps
+  } = props
   const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
   const [selectedPositions, setSelectedPositions] = useState<Array<Position>>([])
   const [positionIdToSearch, setPositionIdToSearch] = useState<string>('')
@@ -88,7 +95,6 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
     setSelectedPositions((current) => {
       return current.filter((selected) => selected.id !== position.id)
     })
-    // removePositionId(position.id)
   }, [])
 
   const defaultColumns: Array<any> = useMemo(
@@ -130,11 +136,12 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
       cell: (row: Position) => (
         <ButtonControl
           buttonType={ButtonControlType.add}
+          disabled={!!(singlePosition && selectedPositions.length)}
           onClick={() => (singlePosition ? handleSingleAddClick(row) : handleMultiAddClick(row))}
         />
       ),
     }),
-    [singlePosition, handleSingleAddClick, handleMultiAddClick]
+    [singlePosition, handleSingleAddClick, handleMultiAddClick, selectedPositions]
   )
 
   const deleteCell = useMemo(
@@ -185,10 +192,8 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
   }, [defaultColumns, connectedItems, deleteCell])
 
   const handleDone = useCallback(() => {
-    if (selectedPositions.length) {
-      if (onConfirm && typeof onConfirm === 'function') {
-        onConfirm(selectedPositions)
-      }
+    if (selectedPositions.length && onConfirm && typeof onConfirm === 'function') {
+      onConfirm(selectedPositions)
     }
   }, [onConfirm, selectedPositions])
 
@@ -227,8 +232,18 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
               className="outerTableWrapper inlineTable"
               columns={getPositionsColumns()}
               customStyles={customStyles}
-              data={data || []}
-              noDataComponent={<EmptyContentText>No positions found.</EmptyContentText>}
+              data={
+                data
+                  ? showOnlyPositionsWithBalance
+                    ? data.filter((position) => !position.userBalance.isZero())
+                    : data
+                  : []
+              }
+              noDataComponent={
+                <EmptyContentText>{`No positions${
+                  showOnlyPositionsWithBalance && data.length ? ' with balance' : ''
+                } found.`}</EmptyContentText>
+              }
               noHeader
               pagination
               paginationPerPage={5}

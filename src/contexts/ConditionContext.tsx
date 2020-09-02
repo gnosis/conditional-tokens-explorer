@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/react-hooks'
+import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import React from 'react'
 
 import { GetConditionQuery } from '../queries/conditions'
@@ -43,6 +44,7 @@ export const ConditionProvider = (props: Props) => {
   const [condition, setCondition] = React.useState<Maybe<GetCondition_condition>>(null)
   const [errors, setErrors] = React.useState<ConditionErrors[]>([])
   const [validId, setValidId] = React.useState(false)
+  const { getValue } = useLocalStorage('conditionid')
 
   const clearErrors = React.useCallback((): void => {
     setErrors([])
@@ -120,6 +122,13 @@ export const ConditionProvider = (props: Props) => {
       removeError(ConditionErrors.FETCHING_ERROR)
     }
   }, [errorFetchingCondition, pushError, removeError])
+
+  React.useEffect(() => {
+    const localStorageCondition = getValue()
+    if (localStorageCondition) {
+      setConditionIdCallback(localStorageCondition)
+    }
+  }, [getValue, setConditionIdCallback])
 
   const value = {
     condition,

@@ -24,6 +24,7 @@ import { GetMultiPositions_positions } from 'types/generatedGQL'
 interface Props {
   title: string
   singlePosition?: boolean
+  showOnlyPositionsWithBalance?: boolean
   callbackToBeExecutedOnRemoveAction?: () => void
 }
 
@@ -47,6 +48,7 @@ const canCanculatePositionToDisplay = (
 
 export const SelectPositions = ({
   callbackToBeExecutedOnRemoveAction,
+  showOnlyPositionsWithBalance,
   singlePosition,
   title,
 }: Props) => {
@@ -65,7 +67,7 @@ export const SelectPositions = ({
     balances,
     errors: balancesErrors,
     loading: balancesLoading,
-    updateBalaces,
+    updateBalances,
   } = useBatchBalanceContext()
 
   const [positionsToDisplay, setPositionsToDisplay] = React.useState<Array<string>>([])
@@ -77,10 +79,10 @@ export const SelectPositions = ({
     (positions: Array<Position>) => {
       const ids = positions.map((position) => position.id)
       updatePositionIds(ids)
-      updateBalaces(ids)
+      updateBalances(ids)
       closeModal()
     },
-    [closeModal, updateBalaces, updatePositionIds]
+    [closeModal, updateBalances, updatePositionIds]
   )
 
   const onRemovePosition = React.useCallback(
@@ -93,9 +95,9 @@ export const SelectPositions = ({
       }
       const ids = positionIds.filter((id) => id !== positionId)
       updatePositionIds(ids)
-      updateBalaces(ids)
+      updateBalances(ids)
     },
-    [positionIds, updateBalaces, updatePositionIds, callbackToBeExecutedOnRemoveAction]
+    [positionIds, updateBalances, updatePositionIds, callbackToBeExecutedOnRemoveAction]
   )
 
   React.useEffect(() => {
@@ -190,6 +192,7 @@ export const SelectPositions = ({
           onConfirm={onModalConfirm}
           onRequestClose={closeModal}
           preSelectedPositions={positionIds}
+          showOnlyPositionsWithBalance={showOnlyPositionsWithBalance}
           singlePosition={singlePosition}
         />
       )}

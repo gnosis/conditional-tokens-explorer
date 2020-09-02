@@ -1,6 +1,7 @@
 import { useDebounceCallback } from '@react-hook/debounce'
 import { Position, usePositions } from 'hooks'
-import React, { useCallback, useEffect, useState } from 'react'
+import { useLocalStorage } from 'hooks/useLocalStorageValue'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useHistory } from 'react-router-dom'
 
@@ -20,13 +21,6 @@ import { getLogger } from '../../util/logger'
 
 const logger = getLogger('PositionsList')
 
-const dropdownItems = [
-  { text: 'Details' },
-  { text: 'Redeem' },
-  { text: 'Wrap ERC20' },
-  { text: 'Unwrap ERC1155' },
-]
-
 export const PositionsList = () => {
   const [positionIdToSearch, setPositionIdToSearch] = useState<string>('')
   const [positionIdToShow, setPositionIdToShow] = useState<string>('')
@@ -44,10 +38,46 @@ export const PositionsList = () => {
   const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
   const { data, error, loading } = usePositions(positionIdToSearch)
   const history = useHistory()
+  const { setValue } = useLocalStorage('positionid')
+
   const isLoading = !positionIdToSearch && loading
   const isSearching = positionIdToSearch && loading
 
-  const handleRowClick = React.useCallback(
+  const buildMenuForRow = useCallback(
+    ({ id, userBalance }) => {
+      const detailsOption = {
+        text: 'Details',
+        onClick: () => history.push(`/positions/${id}`),
+      }
+
+      const redeemOption = {
+        text: 'Redeem',
+        onClick: () => {
+          setValue(id)
+          history.push(`/redeem`)
+        },
+      }
+
+      const wrapERC20Option = {
+        text: 'Wrap ERC20',
+        onClick: () => {
+          console.log('wrap not implemented yet')
+        },
+      }
+
+      const unwrapOption = {
+        text: 'Unwrap ERC1155',
+        onClick: () => {
+          console.log('unwrap not implemented yet')
+        },
+      }
+
+      return [detailsOption, redeemOption, wrapERC20Option, unwrapOption]
+    },
+    [history, setValue]
+  )
+
+  const handleRowClick = useCallback(
     (row: Position) => {
       history.push(`/positions/${row.id}`)
     },
@@ -55,6 +85,29 @@ export const PositionsList = () => {
   )
 
   const [connectedItems, setConnectedItems] = useState<Array<any>>([])
+
+  const menu = useMemo(() => {
+    return [
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: Position) => (
+          <Dropdown
+            activeItemHighlight={false}
+            dropdownButtonContent={<ButtonDots />}
+            dropdownPosition={DropdownPosition.right}
+            items={buildMenuForRow(row).map((item, index) => (
+              <DropdownItem key={index} onClick={item.onClick}>
+                {item.text}
+              </DropdownItem>
+            ))}
+          />
+        ),
+        name: '',
+        width: '60px',
+        right: true,
+      },
+    ]
+  }, [buildMenuForRow])
 
   useEffect(() => {
     if (status === Web3ContextStatus.Connected) {
@@ -67,27 +120,9 @@ export const PositionsList = () => {
           selector: 'userBalance',
           sortable: true,
         },
-        {
-          // eslint-disable-next-line react/display-name
-          cell: (row: Position) => (
-            <Dropdown
-              activeItemHighlight={false}
-              dropdownButtonContent={<ButtonDots />}
-              dropdownPosition={DropdownPosition.right}
-              items={dropdownItems.map((item, index) => (
-                <DropdownItem key={index} onClick={() => console.log(`${item.text} for ${row.id}`)}>
-                  {item.text}
-                </DropdownItem>
-              ))}
-            />
-          ),
-          name: '',
-          width: '60px',
-          right: true,
-        },
       ])
     }
-  }, [status])
+  }, [status, buildMenuForRow])
 
   const getColumns = useCallback(() => {
     // If you move this outside of the useCallback, can cause performance issues as a dep of this useCallback
@@ -106,7 +141,7 @@ export const PositionsList = () => {
         cell: (row: Position) => {
           try {
             const token = networkConfig && networkConfig.getTokenFromAddress(row.collateralToken)
-            return <TokenIcon symbol={(token && token.symbol) || ''} />
+            return <TokenIcon symbol={token.symbol} />
           } catch (error) {
             logger.error(error)
             return row.collateralToken
@@ -118,8 +153,8 @@ export const PositionsList = () => {
       },
     ]
 
-    return [...defaultColumns, ...connectedItems]
-  }, [connectedItems, handleRowClick, networkConfig])
+    return [...defaultColumns, ...connectedItems, ...menu]
+  }, [connectedItems, menu, handleRowClick, networkConfig])
 
   const tokensList = networkConfig
     ? [
@@ -150,7 +185,7 @@ export const PositionsList = () => {
       <PageTitle>Positions</PageTitle>
       {isLoading && <InlineLoading />}
       {error && <InfoCard message={error.message} title="Error" />}
-      {data && !isLoading && (
+      {data && !isLoading && !error && (
         <>
           <TableControls
             end={filterDropdown}

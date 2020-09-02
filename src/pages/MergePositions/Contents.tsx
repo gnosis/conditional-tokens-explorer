@@ -29,7 +29,7 @@ export const Contents = () => {
 
   const { clearPositions, errors: positionsErrors, positions } = useMultiPositionsContext()
 
-  const { balances, errors: balancesErrors, updateBalaces } = useBatchBalanceContext()
+  const { balances, errors: balancesErrors, updateBalances } = useBatchBalanceContext()
 
   const { clearCondition, condition, errors: conditionErrors } = useConditionContext()
   const [status, setStatus] = useState<Maybe<Status>>(null)
@@ -115,7 +115,7 @@ export const Contents = () => {
         setAmount(ZERO_BN)
         clearPositions()
         clearCondition()
-        updateBalaces([])
+        updateBalances([])
 
         setStatus(Status.Ready)
       } else {
@@ -134,7 +134,7 @@ export const Contents = () => {
     amount,
     clearPositions,
     clearCondition,
-    updateBalaces,
+    updateBalances,
     connect,
   ])
 
@@ -145,6 +145,7 @@ export const Contents = () => {
           callbackToBeExecutedOnRemoveAction={() => {
             setAmount(ZERO_BN)
           }}
+          showOnlyPositionsWithBalance
           title="Positions"
         />
       </Row>

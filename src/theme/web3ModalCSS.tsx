@@ -5,6 +5,7 @@ export const web3ModalCSS = css`
     background-color: ${(props) => props.theme.modalStyle.overlay.backgroundColor};
     z-index: ${(props) => props.theme.modalStyle.overlay.zIndex};
   }
+
   .web3modal-modal-card {
     background-color: ${(props) => props.theme.modalStyle.content.backgroundColor};
     border-color: ${(props) => props.theme.modalStyle.content.borderColor};

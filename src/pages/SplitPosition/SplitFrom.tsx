@@ -1,9 +1,11 @@
+import { Token } from 'util/types'
+
 import { CustomCollateralModal } from 'components/form/CustomCollateralModal'
 import { SelectPositionModal } from 'components/modals/SelectPositionsModal'
 import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { Position } from 'hooks'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { InputPosition, InputPositionProps } from '../../components/form/InputPosition'
@@ -71,8 +73,7 @@ interface Props extends InputPositionProps, SelectCollateralProps {}
 export const SplitFrom: React.FC<Props> = (props) => {
   const {
     formMethods,
-    formMethods: { register },
-    onCollateralChange,
+    formMethods: { register, setValue },
     onPositionChange,
     splitFromCollateral,
     splitFromPosition,
@@ -80,7 +81,7 @@ export const SplitFrom: React.FC<Props> = (props) => {
   } = props
 
   const { updatePositionIds } = useMultiPositionsContext()
-  const { updateBalaces } = useBatchBalanceContext()
+  const { updateBalances } = useBatchBalanceContext()
 
   const [showCustomCollateralModal, setShowCustomCollateralModal] = useState(false)
   const [showSelectPositionModal, setShowSelectPositionModal] = useState(false)
@@ -93,11 +94,18 @@ export const SplitFrom: React.FC<Props> = (props) => {
       console.log('onSelectPosidionModalConfirm', positions)
       const ids = positions.map((position) => position.id)
       updatePositionIds(ids)
-      updateBalaces(ids)
+      updateBalances(ids)
       closeSelectPositinModal()
     },
-    [closeSelectPositinModal, updateBalaces, updatePositionIds]
+    [closeSelectPositinModal, updateBalances, updatePositionIds]
   )
+  const [customToken, setCustomToken] = useState<Maybe<Token>>(null)
+
+  useEffect(() => {
+    if (customToken) {
+      setValue('collateral', customToken.address, true)
+    }
+  }, [customToken, setValue])
 
   return (
     <>
@@ -125,9 +133,8 @@ export const SplitFrom: React.FC<Props> = (props) => {
       </Controls>
       <ToggleableSelectCollateral
         formMethods={formMethods}
-        onCollateralChange={onCollateralChange}
         splitFromCollateral={splitFromCollateral}
-        tokens={tokens}
+        tokens={customToken ? [...tokens, customToken] : [...tokens]}
         visible={splitFromCollateral}
       />
       <ToggleableInputPosition
@@ -140,7 +147,7 @@ export const SplitFrom: React.FC<Props> = (props) => {
       {showCustomCollateralModal && (
         <CustomCollateralModal
           onAdd={(token) => {
-            onCollateralChange(token.address)
+            setCustomToken(token)
           }}
           onClose={() => {
             setShowCustomCollateralModal(false)
