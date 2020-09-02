@@ -63,18 +63,16 @@ export const SplitPosition = () => {
   return (
     <ConditionProvider>
       <MultiPositionsProvider>
-        <PositionProvider>
-          <BatchBalanceProvider checkForEmptyBalance={true}>
-            <PageTitle>Split Position</PageTitle>
-            <Form
-              allowanceMethods={allowanceMethods}
-              collateral={collateralToken}
-              onCollateralChange={setCollateral}
-              splitPosition={splitPosition}
-              tokens={tokens}
-            />
-          </BatchBalanceProvider>
-        </PositionProvider>
+        <BatchBalanceProvider checkForEmptyBalance={true}>
+          <PageTitle>Split Position</PageTitle>
+          <Form
+            allowanceMethods={allowanceMethods}
+            collateral={collateralToken}
+            onCollateralChange={setCollateral}
+            splitPosition={splitPosition}
+            tokens={tokens}
+          />
+        </BatchBalanceProvider>
       </MultiPositionsProvider>
     </ConditionProvider>
   )
