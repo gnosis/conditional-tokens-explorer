@@ -1,4 +1,4 @@
-import { Token } from 'util/types'
+import { SplitFromType, Token } from 'util/types'
 
 import { CustomCollateralModal } from 'components/form/CustomCollateralModal'
 import { SelectPositionModal } from 'components/modals/SelectPositionsModal'
@@ -114,12 +114,12 @@ export const SplitFrom: React.FC<Props> = (props) => {
       <Controls>
         <Tabs>
           <Tab>
-            <Radio name="splitFrom" ref={register} type="radio" value="collateral" />
+            <Radio name="splitFrom" ref={register} type="radio" value={SplitFromType.collateral} />
             <TabText active={splitFromCollateral}>Collateral</TabText>
           </Tab>
           <Break />
           <Tab>
-            <Radio name="splitFrom" ref={register} type="radio" value="position" />
+            <Radio name="splitFrom" ref={register} type="radio" value={SplitFromType.position} />
             <TabText active={splitFromPosition}>Position</TabText>
           </Tab>
         </Tabs>
