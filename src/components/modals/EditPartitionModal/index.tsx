@@ -24,9 +24,11 @@ import {
   StripedListItemLessPadding,
 } from '../../pureStyledComponents/StripedList'
 import { TitleControlButton } from '../../pureStyledComponents/TitleControl'
-import { InfoCard } from '../../statusInfo/InfoCard'
-import { InlineLoading } from '../../statusInfo/InlineLoading'
 import { TitleValue } from '../../text/TitleValue'
+
+const Collections = styled(StripedList)`
+  position: relative;
+`
 
 const Collection = styled(StripedListItemLessPadding)`
   flex-wrap: nowrap;
@@ -117,6 +119,54 @@ const ButtonReset = styled(Button)`
   margin-right: auto;
 `
 
+const ConfirmOverlay = styled.div`
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 123;
+`
+
+const ConfirmText = styled.p`
+  color: ${(props) => props.theme.colors.textColor};
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0 0 8px;
+`
+
+const ConfirmControls = styled.div`
+  column-gap: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 0 auto;
+`
+
+const ConfirmControl = styled.span`
+  color: ${(props) => props.theme.colors.textColor};
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-transform: uppercase;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`
+
+const Yes = styled(ConfirmControl)`
+  color: ${(props) => props.theme.colors.error};
+`
+
+const No = styled(ConfirmControl)``
+
 interface DraggedOutcomeProps extends OutcomeProps {
   collectionFromIndex: number
   outcomeIndex: number
@@ -140,6 +190,7 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
   const [draggedOutcome, setDraggedOutcome] = useState<DraggedOutcomeProps | null>(null)
   const [availableOutcomesColor, setAvailableOutcomesColor] = useState<string | undefined>()
   const [newCollectionOutcomesColor, setNewCollectionOutcomesColor] = useState<string | undefined>()
+  const [confirmDeleteAllCollections, setConfirmDeleteAllCollections] = useState(false)
 
   const resetClassName = (e: any, className: string) =>
     e.currentTarget.className.replace(className, '')
@@ -284,6 +335,8 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
     setAllCollections([...outcomes])
   }, [outcomes])
 
+  const confirmDeletion = useCallback((executeDeletion, hideConfirm) => {}, [])
+
   const notEnoughCollections = allCollections.length < 2
   const orphanedOutcomes = availableOutcomes.length > 0 || newCollection.length > 0
   const disableButton = notEnoughCollections || orphanedOutcomes
@@ -399,7 +452,12 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
       <TitleValue
         title="Collections"
         titleControl={
-          <TitleControlButton disabled={allCollections.length === 0} onClick={removeAllCollections}>
+          <TitleControlButton
+            disabled={allCollections.length === 0}
+            onClick={() => {
+              setConfirmDeleteAllCollections(true)
+            }}
+          >
             Delete All
           </TitleControlButton>
         }
@@ -408,48 +466,74 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
             <CardText>
               You can drag outcomes across collections. Click on an outcome to remove it.
             </CardText>
-            <StripedList minHeight="200px">
-              {allCollections.length > 0 ? (
-                allCollections.map((outcomeList: Array<OutcomeProps>, collectionIndex: number) => {
-                  return (
-                    <Collection
-                      key={collectionIndex}
-                      onDragLeave={onDragLeave}
-                      onDragOver={(e) => onDragOver(e, collectionIndex)}
-                      onDrop={(e) => onDrop(e, collectionIndex)}
-                    >
-                      <OutcomesInner columnGap="0" columns="13">
-                        {outcomeList.map((outcome: OutcomeProps, outcomeIndex: number) => (
-                          <DraggableOutcome
-                            key={outcomeIndex}
-                            lastInRow={outcomesByRow}
-                            makeDraggable
+            <Collections minHeight="200px">
+              <>
+                {allCollections.length > 0 ? (
+                  allCollections.map(
+                    (outcomeList: Array<OutcomeProps>, collectionIndex: number) => {
+                      return (
+                        <Collection
+                          key={collectionIndex}
+                          onDragLeave={onDragLeave}
+                          onDragOver={(e) => onDragOver(e, collectionIndex)}
+                          onDrop={(e) => onDrop(e, collectionIndex)}
+                        >
+                          <OutcomesInner columnGap="0" columns="13">
+                            {outcomeList.map((outcome: OutcomeProps, outcomeIndex: number) => (
+                              <DraggableOutcome
+                                key={outcomeIndex}
+                                lastInRow={outcomesByRow}
+                                makeDraggable
+                                onClick={() => {
+                                  removeOutcomeFromCollection(collectionIndex, outcomeIndex)
+                                }}
+                                onDragEnd={onDragEnd}
+                                onDragStart={(e: any) => {
+                                  onDragStart(e, collectionIndex, outcome, outcomeIndex)
+                                }}
+                                outcome={outcome.value}
+                              />
+                            ))}
+                          </OutcomesInner>
+                          <ButtonControl
+                            buttonType={ButtonControlType.delete}
                             onClick={() => {
-                              removeOutcomeFromCollection(collectionIndex, outcomeIndex)
+                              removeCollection(collectionIndex)
                             }}
-                            onDragEnd={onDragEnd}
-                            onDragStart={(e: any) => {
-                              onDragStart(e, collectionIndex, outcome, outcomeIndex)
-                            }}
-                            outcome={outcome.value}
                           />
-                        ))}
-                      </OutcomesInner>
-                      <ButtonControl
-                        buttonType={ButtonControlType.delete}
-                        onClick={() => {
-                          removeCollection(collectionIndex)
-                        }}
-                      />
-                    </Collection>
+                        </Collection>
+                      )
+                    }
                   )
-                })
-              ) : (
-                <StripedListEmpty>
-                  <strong>No collections.</strong>
-                </StripedListEmpty>
-              )}
-            </StripedList>
+                ) : (
+                  <StripedListEmpty>
+                    <strong>No collections.</strong>
+                  </StripedListEmpty>
+                )}
+                {confirmDeleteAllCollections && (
+                  <ConfirmOverlay>
+                    <ConfirmText>Delete all collections?</ConfirmText>
+                    <ConfirmControls>
+                      <Yes
+                        onClick={() => {
+                          removeAllCollections()
+                          setConfirmDeleteAllCollections(false)
+                        }}
+                      >
+                        Yes
+                      </Yes>
+                      <No
+                        onClick={() => {
+                          setConfirmDeleteAllCollections(false)
+                        }}
+                      >
+                        No
+                      </No>
+                    </ConfirmControls>
+                  </ConfirmOverlay>
+                )}
+              </>
+            </Collections>
             <SmallNote>
               A valid partition needs at least two collections. No outcomes can be orphaned.
             </SmallNote>
