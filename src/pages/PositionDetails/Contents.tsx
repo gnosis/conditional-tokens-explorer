@@ -1,5 +1,7 @@
-import { truncateStringInTheMiddle } from 'util/tools'
+import { positionString, truncateStringInTheMiddle } from 'util/tools'
+import { Token } from 'util/types'
 
+import { useBalanceForPosition } from 'hooks/useBalanceForPosition'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import React, { useMemo } from 'react'
 import { useHistory } from 'react-router-dom'
@@ -61,8 +63,10 @@ export const Contents = ({ position }: Props) => {
   const { networkConfig } = useWeb3ConnectedOrInfura()
   const history = useHistory()
   const { setValue } = useLocalStorage('positionid')
+  const { balance, error, loading } = useBalanceForPosition(position.id)
 
   const [collateralSymbol, setCollateralSymbol] = React.useState('')
+  const [collateral, setCollateral] = React.useState<Maybe<Token>>(null)
 
   const { collateralToken, id, indexSets } = position
 
@@ -99,12 +103,19 @@ export const Contents = ({ position }: Props) => {
 
   React.useEffect(() => {
     try {
-      const tokenSymbol = networkConfig.getTokenFromAddress(collateralToken.id).symbol
-      setCollateralSymbol(tokenSymbol)
+      const token = networkConfig.getTokenFromAddress(collateralToken.id)
+      setCollateralSymbol(token.symbol)
+      setCollateral(token)
     } catch (error) {
       logger.error(error)
     }
   }, [collateralToken.id, networkConfig])
+
+  const positionPreview = React.useMemo(() => {
+    if (collateral && !loading && !error && balance) {
+      return positionString(position.conditionIds, position.indexSets, balance, collateral)
+    }
+  }, [collateral, position, loading, error, balance])
 
   return (
     <CenteredCard
@@ -179,7 +190,11 @@ export const Contents = ({ position }: Props) => {
         />
       </Row>
       <Row cols="1fr" marginBottomXL>
-        <TitleValue title="Partition" value={<PartitionStyled collections={numberedOutcomes} />} />
+        {/* <TitleValue title="Partition" value={<PartitionStyled collections={numberedOutcomes} />} /> */}
+        <TitleValue
+          title="Position"
+          value={<StripedListItem>{positionPreview || ''} </StripedListItem>}
+        />
       </Row>
     </CenteredCard>
   )
