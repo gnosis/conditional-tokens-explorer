@@ -282,7 +282,7 @@ export const Form = ({
           }
           value={
             <>
-              <CardTextSm>Collections</CardTextSm>
+              <CardTextSm>Outcomes Collections</CardTextSm>
               <StripedListStyled>
                 {mockedNumberedOutcomes.length ? (
                   mockedNumberedOutcomes.map(
