@@ -98,3 +98,10 @@ export enum SplitFromType {
   collateral = 'collateral',
   position = 'position',
 }
+
+export enum OracleFilterOptions {
+  All = 'all',
+  Custom = 'custom',
+  Kleros = 'kleros',
+  Realitio = 'realitio',
+}
