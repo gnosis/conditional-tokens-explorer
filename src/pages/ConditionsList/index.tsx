@@ -18,11 +18,14 @@ import { InfoCard } from '../../components/statusInfo/InfoCard'
 import { InlineLoading } from '../../components/statusInfo/InlineLoading'
 import { CellHash } from '../../components/table/CellHash'
 import { TableControls } from '../../components/table/TableControls'
-import { BuildQueryType } from '../../queries/conditions'
+import { BuildQueryConditionsListType } from '../../queries/conditions'
 import { customStyles } from '../../theme/tableCustomStyles'
 import { OracleFilterOptions } from '../../util/types'
 
 export const ConditionsList: React.FC = () => {
+  const history = useHistory()
+  const { setValue } = useLocalStorage('conditionid')
+
   const [conditionIdToSearch, setConditionIdToSearch] = useState<string>('')
   const [conditionIdToShow, setConditionIdToShow] = useState<string>('')
 
@@ -31,7 +34,6 @@ export const ConditionsList: React.FC = () => {
     OracleFilterOptions.All
   )
 
-  const { setValue } = useLocalStorage('conditionid')
   const debouncedHandler = useDebounceCallback((conditionIdToSearch) => {
     setConditionIdToSearch(conditionIdToSearch)
   }, 500)
@@ -44,7 +46,7 @@ export const ConditionsList: React.FC = () => {
     [debouncedHandler]
   )
 
-  const buildQueryOptions: BuildQueryType = {
+  const buildQueryOptions: BuildQueryConditionsListType = {
     conditionId: conditionIdToSearch,
   }
 
@@ -70,7 +72,6 @@ export const ConditionsList: React.FC = () => {
 
   const isLoading = !conditionIdToSearch && loading
   const isSearching = conditionIdToSearch && loading
-  const history = useHistory()
 
   const buildMenuForRow = useCallback(
     ({ id }) => {
@@ -108,9 +109,12 @@ export const ConditionsList: React.FC = () => {
     [history, setValue]
   )
 
-  const handleRowClick = (row: Conditions_conditions) => {
-    history.push(`/conditions/${row.id}`)
-  }
+  const handleRowClick = useCallback(
+    (row: Conditions_conditions) => {
+      history.push(`/conditions/${row.id}`)
+    },
+    [history]
+  )
 
   const columns = [
     {

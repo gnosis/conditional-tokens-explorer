@@ -1,6 +1,6 @@
 import gql from 'graphql-tag'
 
-export interface BuildQueryType {
+export interface BuildQueryConditionsListType {
   conditionId: string
   oracleIn?: string[]
   oracleNotIn?: string[]
@@ -12,7 +12,7 @@ export const DEFAULT_OPTIONS = {
   oracleNotIn: [],
 }
 
-export const buildQueryConditions = (options: BuildQueryType = DEFAULT_OPTIONS) => {
+export const buildQueryConditions = (options: BuildQueryConditionsListType = DEFAULT_OPTIONS) => {
   const { conditionId, oracleIn, oracleNotIn } = options
 
   const whereClause = [
