@@ -70,7 +70,7 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
   })
 
   const { data, error, loading } = useQuery<Conditions>(query, {
-    variables: { conditionId: conditionIdToSearch },
+    variables: { conditionId: conditionIdToSearch, oracleIn: [], oracleNotIn: [] },
   })
   const [selectedCondition, setSelectedCondition] = useState<Maybe<GetCondition_condition>>(null)
   const { setCondition } = useConditionContext()
