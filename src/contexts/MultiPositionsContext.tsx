@@ -3,7 +3,6 @@ import { Errors, PositionErrors } from 'util/types'
 
 import { useQuery } from '@apollo/react-hooks'
 import { useErrors } from 'hooks/useErrors'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { GetMultiPositionsQuery } from 'queries/positions'
 import React, { useCallback, useEffect, useState } from 'react'
 
@@ -59,7 +58,6 @@ export const MultiPositionsProvider = (props: Props) => {
   const [positionIds, setPositionIds] = useState<Array<string>>([])
   const [positions, setPositions] = useState<Array<GetMultiPositions_positions>>([])
   const { clearErrors, errors, pushError, removeError } = useErrors()
-  const { getValue } = useLocalStorage('positionid')
 
   const clearPositions = useCallback((): void => {
     clearErrors()
@@ -139,13 +137,6 @@ export const MultiPositionsProvider = (props: Props) => {
       pushError(PositionErrors.FETCHING_ERROR)
     }
   }, [errorFetchingPositions, pushError, removeError])
-
-  useEffect(() => {
-    const localStoragePosition = getValue()
-    if (localStoragePosition) {
-      addPositionId(localStoragePosition)
-    }
-  }, [getValue, addPositionId])
 
   const value = {
     positions,

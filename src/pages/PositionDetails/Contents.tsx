@@ -12,7 +12,6 @@ import { ButtonCopy } from '../../components/buttons/ButtonCopy'
 import { ButtonDropdownCircle } from '../../components/buttons/ButtonDropdownCircle'
 import { CenteredCard } from '../../components/common/CenteredCard'
 import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
-import { SetAllowance } from '../../components/common/SetAllowance'
 import { TokenIcon } from '../../components/common/TokenIcon'
 import { Row } from '../../components/pureStyledComponents/Row'
 import { StripedList, StripedListItem } from '../../components/pureStyledComponents/StripedList'
@@ -131,14 +130,6 @@ export const Contents = ({ position }: Props) => {
           }
         />
       </Row>
-      <SetAllowance
-        collateral={collateralToken}
-        fetching={false}
-        finished={false}
-        onUnlock={() => {
-          return 1
-        }}
-      />
       <Row cols="1fr" marginBottomXL>
         <TitleValue
           title="Collateral Wrapping"

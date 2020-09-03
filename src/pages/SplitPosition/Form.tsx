@@ -1,5 +1,4 @@
 import { PositionPreview } from 'components/splitPosition/PositionPreview'
-import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { BigNumber } from 'ethers/utils'
 import { AllowanceMethods, useAllowanceState } from 'hooks/useAllowanceState'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
@@ -66,7 +65,6 @@ export const Form = ({
   tokens,
 }: Props) => {
   const { clearCondition } = useConditionContext()
-  const { positionIds } = useMultiPositionsContext()
 
   const DEFAULT_VALUES = useMemo(() => {
     return {
@@ -88,7 +86,6 @@ export const Form = ({
     getValues,
     handleSubmit,
     reset,
-    setValue,
     watch,
   } = formMethods
 
@@ -111,14 +108,6 @@ export const Form = ({
 
   const splitFromCollateral = splitFrom === SplitFromType.collateral
   const splitFromPosition = splitFrom === SplitFromType.position
-
-  useEffect(() => {
-    if (positionIds.length > 0) {
-      const positionID = positionIds[0]
-      setValue('splitFrom', SplitFromType.position, true)
-      setValue('positionId', positionID, true)
-    }
-  }, [positionIds, setValue])
 
   useEffect(() => {
     if (watchCollateralAddress) {
