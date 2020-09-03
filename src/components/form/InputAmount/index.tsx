@@ -75,7 +75,7 @@ export const InputAmount = ({
       splitFrom === 'position' &&
       canSetPositionBalance(positionsLoading, balancesLoading, positions, balances, positionIds)
     ) {
-      // FIXME - this only works with non custom tokens
+      // TODO - this only works with non custom tokens
       setDecimals(networkConfig.getTokenFromAddress(positions[0].collateralToken.id).decimals)
       setBalance(balances[0])
     }
