@@ -8,14 +8,28 @@ import { OutcomesContainer } from '../../pureStyledComponents/OutcomesContainer'
 import { StripedListItemLessPadding } from '../../pureStyledComponents/StripedList'
 import { DraggableOutcome } from '../Outcome'
 
-const Wrapper = styled(StripedListItemLessPadding)`
+const Wrapper = styled(StripedListItemLessPadding)<{
+  isAboutToDelete?: boolean
+  isDraggingOver?: boolean
+}>`
   flex-wrap: nowrap;
   position: relative;
 
-  &.dragOver {
-    background-color: rgba(0, 156, 180, 0.15);
+  &:nth-child(even),
+  &:nth-child(odd) {
+    ${(props) => props.isDraggingOver && 'background-color: rgba(0, 156, 180, 0.15);'}
+  }
+
+  &:nth-child(even),
+  &:nth-child(odd) {
+    ${(props) => props.isAboutToDelete && 'background-color: rgba(219, 58, 61, 0.05);'}
   }
 `
+
+Wrapper.defaultProps = {
+  isAboutToDelete: false,
+  isDraggingOver: false,
+}
 
 const OutcomesInner = styled(OutcomesContainer)`
   flex-grow: 1;
@@ -26,8 +40,6 @@ const OutcomesInner = styled(OutcomesContainer)`
 interface Props {
   collectionIndex: number
   onDragEnd: (e: any) => void
-  onDragLeave: (e: any) => void
-  onDragOver: (e: any, collectionIndex: number) => void
   onDragStart: (
     e: any,
     collectionFromIndex: number,
@@ -45,8 +57,6 @@ export const Collection: React.FC<Props> = (props) => {
   const {
     collectionIndex,
     onDragEnd,
-    onDragLeave,
-    onDragOver,
     onDragStart,
     onDrop,
     outcomesByRow,
@@ -58,14 +68,22 @@ export const Collection: React.FC<Props> = (props) => {
 
   const [confirmDeleteCollection, setConfirmDeleteCollection] = useState(false)
   const [isDraggingOutcome, setIsDraggingOutcome] = useState(false)
+  const [isAboutToDelete, setIsAboutToDelete] = useState(false)
+  const [isDraggingOver, setIsDraggingOver] = useState(false)
 
   return (
     <Wrapper
-      onDragLeave={onDragLeave}
-      onDragOver={(e) => onDragOver(e, collectionIndex)}
+      isAboutToDelete={isAboutToDelete}
+      isDraggingOver={isDraggingOver}
+      onDragLeave={() => setIsDraggingOver(false)}
+      onDragOver={(e) => {
+        e.preventDefault()
+        setIsDraggingOver(true)
+      }}
       onDrop={(e) => {
         onDrop(e, collectionIndex)
         setIsDraggingOutcome(false)
+        setIsDraggingOver(false)
       }}
       {...restProps}
     >
@@ -94,6 +112,8 @@ export const Collection: React.FC<Props> = (props) => {
       <ButtonControl
         buttonType={ButtonControlType.delete}
         onClick={() => setConfirmDeleteCollection(true)}
+        onMouseEnter={() => setIsAboutToDelete(true)}
+        onMouseLeave={() => setIsAboutToDelete(false)}
       />
       {confirmDeleteCollection && (
         <ConfirmOverlayHorizontal

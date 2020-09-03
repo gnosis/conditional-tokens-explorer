@@ -177,20 +177,6 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
     e.currentTarget.className = resetClassName(e, draggingClass)
   }, [])
 
-  const onDragOver = useCallback(
-    (e: any, collectionToIndex: number) => {
-      e.preventDefault()
-
-      if (draggedOutcome === null || collectionToIndex === draggedOutcome.collectionFromIndex)
-        return
-
-      if (e.currentTarget.className.search(dragOverClass) === -1) {
-        e.currentTarget.className = `${e.currentTarget.className} ${dragOverClass}`
-      }
-    },
-    [draggedOutcome]
-  )
-
   const onDrop = useCallback(
     (e: any, collectionToIndex: number) => {
       e.currentTarget.className = resetClassName(e, dragOverClass)
@@ -204,10 +190,6 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
     },
     [allCollections, draggedOutcome]
   )
-
-  const onDragLeave = useCallback((e: any) => {
-    e.currentTarget.className = resetClassName(e, dragOverClass)
-  }, [])
 
   const addOutcomeToNewCollection = useCallback(
     (outcomeIndex: number) => {
@@ -415,8 +397,6 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
                           collectionIndex={collectionIndex}
                           key={collectionIndex}
                           onDragEnd={onDragEnd}
-                          onDragLeave={onDragLeave}
-                          onDragOver={onDragOver}
                           onDragStart={onDragStart}
                           onDrop={onDrop}
                           outcomesByRow={outcomesByRow}
