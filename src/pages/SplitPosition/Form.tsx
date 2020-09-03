@@ -267,7 +267,7 @@ export const Form = ({
           title="Partition"
           titleControl={
             <TitleControlButton
-              // disabled={!conditionIdToPreviewShow}
+              disabled={!conditionIdToPreviewShow}
               onClick={() => setIsEditPartitionModalOpen(true)}
             >
               Edit Partition
