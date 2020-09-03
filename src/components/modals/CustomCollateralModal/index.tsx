@@ -46,7 +46,7 @@ export const CustomCollateralModal: React.FC<Props> = (props) => {
     if (collateralData) {
       onAdd(collateralData)
 
-      if (onRequestClose !== undefined) {
+      if (typeof onRequestClose === 'function') {
         onRequestClose(e)
       }
     }
