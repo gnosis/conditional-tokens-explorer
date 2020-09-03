@@ -105,3 +105,7 @@ export enum OracleFilterOptions {
   Kleros = 'kleros',
   Realitio = 'realitio',
 }
+
+export enum CollateralFilterOptions {
+  All = 'all',
+}

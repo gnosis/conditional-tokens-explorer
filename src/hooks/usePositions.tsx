@@ -1,31 +1,42 @@
 import { useQuery } from '@apollo/react-hooks'
-import { PositionsListQuery, PositionsSearchQuery } from 'queries/positions'
 import { UserWithPositionsQuery } from 'queries/users'
 import React from 'react'
 import { Positions, UserWithPositions } from 'types/generatedGQL'
 
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../contexts/Web3Context'
+import { BuildQueryPositionsListType, buildQueryPositions } from '../queries/positions'
+import { CollateralFilterOptions } from '../util/types'
 
 import { Position, marshalPositionListData } from './utils'
 
 /**
  * Return a array of positions, and the user balance if it's connected.
  */
-export const usePositions = (searchPositionId: string) => {
+export const usePositions = (searchPositionId: string, collateralFilter?: string) => {
   const { _type: status, address: addressFromWallet } = useWeb3ConnectedOrInfura()
   const [data, setData] = React.useState<Maybe<Position[]>>(null)
   const [address, setAddress] = React.useState<Maybe<string>>(null)
 
-  const options = searchPositionId
-    ? {
-        variables: {
-          positionId: searchPositionId,
-        },
-      }
-    : undefined
+  const buildQueryOptions: BuildQueryPositionsListType = {
+    positionId: searchPositionId,
+  }
+
+  if (collateralFilter !== CollateralFilterOptions.All) {
+    buildQueryOptions.collateral = collateralFilter
+  }
+
+  const query = buildQueryPositions(buildQueryOptions)
+
+  const options = {
+    variables: {
+      positionId: searchPositionId,
+      collateral: collateralFilter,
+    },
+  }
+
   const { data: positionsData, error: positionsError, loading: positionsLoading } = useQuery<
     Positions
-  >(searchPositionId ? PositionsSearchQuery : PositionsListQuery, options)
+  >(query, options)
 
   const { data: userData, error: userError, loading: userLoading } = useQuery<UserWithPositions>(
     UserWithPositionsQuery,

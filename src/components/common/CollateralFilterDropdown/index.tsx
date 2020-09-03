@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { useWeb3ConnectedOrInfura } from '../../../contexts/Web3Context'
-import { Token } from '../../../util/types'
+import { CollateralFilterOptions, Token } from '../../../util/types'
 import { ButtonSelectLight } from '../../buttons/ButtonSelectLight'
 import { Dropdown, DropdownItem, DropdownPosition } from '../Dropdown'
 import { TokenIcon } from '../TokenIcon'
@@ -31,9 +31,9 @@ export const CollateralFilterDropdown = ({ onClick, value }: Props) => {
     {
       content: 'All Collaterals',
       onClick: () => {
-        onClick('all', '')
+        onClick(CollateralFilterOptions.All, '')
       },
-      value: 'all',
+      value: CollateralFilterOptions.All,
     },
     ...tokensList,
   ]

@@ -1,5 +1,38 @@
 import gql from 'graphql-tag'
 
+export interface BuildQueryPositionsListType {
+  positionId: string
+  collateral?: string
+}
+
+export const DEFAULT_OPTIONS = {
+  positionId: '',
+  collateral: '',
+}
+
+export const buildQueryPositions = (options: BuildQueryPositionsListType = DEFAULT_OPTIONS) => {
+  const { collateral, positionId } = options
+
+  const whereClause = [
+    positionId ? 'id: $positionId' : '',
+    collateral ? 'collateralToken: $collateral' : '',
+  ]
+    .filter((s) => s.length)
+    .join(',')
+
+  const query = gql`
+  query PositionsSearch($positionId: String!, $collateral: String!) {
+    positions(first: 1000, where: { ${whereClause} }) {
+      id
+      collateralToken {
+        id
+      }
+    }
+  }
+  `
+  return query
+}
+
 const positionFragment = gql`
   fragment PositionData on Position {
     id
@@ -51,26 +84,4 @@ export const GetMultiPositionsQuery = gql`
     }
   }
   ${positionFragment}
-`
-
-export const PositionsSearchQuery = gql`
-  query PositionsSearch($positionId: String!) {
-    positions(first: 1000, where: { id: $positionId }) {
-      id
-      collateralToken {
-        id
-      }
-    }
-  }
-`
-
-export const PositionsListQuery = gql`
-  query Positions {
-    positions(first: 1000) {
-      id
-      collateralToken {
-        id
-      }
-    }
-  }
 `
