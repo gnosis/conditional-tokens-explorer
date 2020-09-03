@@ -1,15 +1,15 @@
 import { useQuery } from '@apollo/react-hooks'
 import { useDebounceCallback } from '@react-hook/debounce'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
-import { ConditionsListQuery, ConditionsSearchQuery } from 'queries/conditions'
+import { buildQueryConditions } from 'queries/conditions'
 import React, { useCallback, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useHistory } from 'react-router-dom'
 import { Conditions, Conditions_conditions } from 'types/generatedGQL'
 
 import { ButtonDots } from '../../components/buttons/ButtonDots'
-import { ButtonSelectLight } from '../../components/buttons/ButtonSelectLight'
 import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
+import { OraclesFilterDropdown } from '../../components/common/OraclesFilterDropdown'
 import { SearchField } from '../../components/form/SearchField'
 import { EmptyContentText } from '../../components/pureStyledComponents/EmptyContentText'
 import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
@@ -18,11 +18,19 @@ import { InfoCard } from '../../components/statusInfo/InfoCard'
 import { InlineLoading } from '../../components/statusInfo/InlineLoading'
 import { CellHash } from '../../components/table/CellHash'
 import { TableControls } from '../../components/table/TableControls'
+import { BuildQueryType } from '../../queries/conditions'
 import { customStyles } from '../../theme/tableCustomStyles'
+import { OracleFilterOptions } from '../../util/types'
 
 export const ConditionsList: React.FC = () => {
   const [conditionIdToSearch, setConditionIdToSearch] = useState<string>('')
   const [conditionIdToShow, setConditionIdToShow] = useState<string>('')
+
+  const [selectedOracleFilter, setSelectedOracleFilter] = useState<string[]>([])
+  const [selectedOracleValue, setSelectedOracleValue] = useState<OracleFilterOptions>(
+    OracleFilterOptions.All
+  )
+
   const { setValue } = useLocalStorage('conditionid')
   const debouncedHandler = useDebounceCallback((conditionIdToSearch) => {
     setConditionIdToSearch(conditionIdToSearch)
@@ -36,19 +44,36 @@ export const ConditionsList: React.FC = () => {
     [debouncedHandler]
   )
 
-  const { data, error, loading } = useQuery<Conditions>(
-    conditionIdToSearch ? ConditionsSearchQuery : ConditionsListQuery,
-    {
-      variables: { conditionId: conditionIdToSearch },
-    }
-  )
+  const buildQueryOptions: BuildQueryType = {
+    conditionId: conditionIdToSearch,
+  }
+
+  if (selectedOracleValue === OracleFilterOptions.Custom) {
+    buildQueryOptions.oracleNotIn = selectedOracleFilter
+  }
+
+  if (
+    [OracleFilterOptions.Kleros, OracleFilterOptions.Realitio].indexOf(selectedOracleValue) > -1
+  ) {
+    buildQueryOptions.oracleIn = selectedOracleFilter
+  }
+
+  const query = buildQueryConditions(buildQueryOptions)
+
+  const { data, error, loading } = useQuery<Conditions>(query, {
+    variables: {
+      conditionId: conditionIdToSearch,
+      oracleIn: selectedOracleFilter,
+      oracleNotIn: selectedOracleFilter,
+    },
+  })
 
   const isLoading = !conditionIdToSearch && loading
   const isSearching = conditionIdToSearch && loading
   const history = useHistory()
 
   const buildMenuForRow = useCallback(
-    ({ id, oracle }) => {
+    ({ id }) => {
       const detailsOption = {
         text: 'Details',
         onClick: () => history.push(`/conditions/${id}`),
@@ -167,27 +192,6 @@ export const ConditionsList: React.FC = () => {
     },
   ]
 
-  const filterItems = [
-    { text: 'All Reporters / Oracles' },
-    { text: 'Custom Reporters' },
-    { text: 'Realit.io' },
-    { text: 'Kleros' },
-  ]
-
-  const [selectedFilter, setselectedFilter] = useState(0)
-
-  const filterDropdown = (
-    <Dropdown
-      dropdownButtonContent={<ButtonSelectLight content={filterItems[selectedFilter].text} />}
-      dropdownPosition={DropdownPosition.right}
-      items={filterItems.map((item, index) => (
-        <DropdownItem key={index} onClick={() => setselectedFilter(index)}>
-          {item.text}
-        </DropdownItem>
-      ))}
-    />
-  )
-
   return (
     <>
       <PageTitle>Conditions</PageTitle>
@@ -196,7 +200,15 @@ export const ConditionsList: React.FC = () => {
       {data && !isLoading && !error && (
         <>
           <TableControls
-            end={filterDropdown}
+            end={
+              <OraclesFilterDropdown
+                onClick={(value: OracleFilterOptions, filter: string[]) => {
+                  setSelectedOracleFilter(filter)
+                  setSelectedOracleValue(value)
+                }}
+                value={selectedOracleValue}
+              />
+            }
             start={
               <SearchField
                 onChange={inputHandler}

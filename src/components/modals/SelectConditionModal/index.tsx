@@ -5,7 +5,7 @@ import DataTable from 'react-data-table-component'
 import styled from 'styled-components'
 
 import { useConditionContext } from '../../../contexts/ConditionContext'
-import { ConditionsListQuery, ConditionsSearchQuery } from '../../../queries/conditions'
+import { buildQueryConditions } from '../../../queries/conditions'
 import { customStyles } from '../../../theme/tableCustomStyles'
 import {
   Conditions,
@@ -64,12 +64,14 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
     },
     [debouncedHandler]
   )
-  const { data, error, loading } = useQuery<Conditions>(
-    conditionIdToSearch ? ConditionsSearchQuery : ConditionsListQuery,
-    {
-      variables: { conditionId: conditionIdToSearch },
-    }
-  )
+
+  const query = buildQueryConditions({
+    conditionId: conditionIdToSearch,
+  })
+
+  const { data, error, loading } = useQuery<Conditions>(query, {
+    variables: { conditionId: conditionIdToSearch },
+  })
   const [selectedCondition, setSelectedCondition] = useState<Maybe<GetCondition_condition>>(null)
   const { setCondition } = useConditionContext()
 

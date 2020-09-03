@@ -1,31 +1,43 @@
 import gql from 'graphql-tag'
 
-export const ConditionsSearchQuery = gql`
-  query ConditionsSearch($conditionId: String!) {
-    conditions(first: 1000, where: { id: $conditionId }) {
-      id
-      oracle
-      questionId
-      outcomeSlotCount
-      resolved
-      creator
-      resolveBlockNumber
-    }
-  }
-`
+export interface BuildQueryType {
+  conditionId: string
+  oracleIn?: string[]
+  oracleNotIn?: string[]
+}
 
-export const ConditionsListQuery = gql`
-  query Conditions {
-    conditions(first: 1000) {
-      id
-      oracle
-      questionId
-      outcomeSlotCount
-      resolved
-      creator
-    }
-  }
-`
+export const DEFAULT_OPTIONS = {
+  conditionId: '',
+  oracleIn: [],
+  oracleNotIn: [],
+}
+
+export const buildQueryConditions = (options: BuildQueryType = DEFAULT_OPTIONS) => {
+  const { conditionId, oracleIn, oracleNotIn } = options
+
+  const whereClause = [
+    conditionId ? 'id: $conditionId' : '',
+    oracleIn && oracleIn.length > 0 ? 'oracle_in: $oracleIn' : '',
+    oracleNotIn && oracleNotIn.length > 0 ? 'oracle_not_in: $oracleNotIn' : '',
+  ]
+    .filter((s) => s.length)
+    .join(',')
+
+  const query = gql`
+      query ConditionsSearch($conditionId: String!, $oracleIn: [String!]!, $oracleNotIn: [String!]!) {
+        conditions(first: 1000,  where: { ${whereClause} }) {
+          id
+          oracle
+          questionId
+          outcomeSlotCount
+          resolved
+          creator
+          resolveBlockNumber
+        }
+      }
+  `
+  return query
+}
 
 export const GetConditionQuery = gql`
   query GetCondition($id: ID!) {
