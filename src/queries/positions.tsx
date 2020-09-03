@@ -1,6 +1,6 @@
 import gql from 'graphql-tag'
 
-const postitionFragment = gql`
+const positionFragment = gql`
   fragment PositionData on Position {
     id
     indexSets
@@ -41,7 +41,7 @@ export const GetPositionQuery = gql`
       ...PositionData
     }
   }
-  ${postitionFragment}
+  ${positionFragment}
 `
 
 export const GetMultiPositionsQuery = gql`
@@ -50,7 +50,7 @@ export const GetMultiPositionsQuery = gql`
       ...PositionData
     }
   }
-  ${postitionFragment}
+  ${positionFragment}
 `
 
 export const PositionsSearchQuery = gql`
