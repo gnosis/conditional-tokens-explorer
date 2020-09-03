@@ -1,10 +1,9 @@
 import { positionString, truncateStringInTheMiddle } from 'util/tools'
-import { Token } from 'util/types'
 
 import { useBalanceForPosition } from 'hooks/useBalanceForPosition'
 import { useCollateral } from 'hooks/useCollateral'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
-import React, { useCallback, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -15,13 +14,10 @@ import { CenteredCard } from '../../components/common/CenteredCard'
 import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
 import { SetAllowance } from '../../components/common/SetAllowance'
 import { TokenIcon } from '../../components/common/TokenIcon'
-import { Partition } from '../../components/partitions/Partition'
 import { Row } from '../../components/pureStyledComponents/Row'
 import { StripedList, StripedListItem } from '../../components/pureStyledComponents/StripedList'
 import { TitleValue } from '../../components/text/TitleValue'
-import { useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 import { GetPosition_position as Position } from '../../types/generatedGQL'
-import { getLogger } from '../../util/logger'
 
 const CollateralText = styled.span`
   color: ${(props) => props.theme.colors.darkerGray};
@@ -50,25 +46,18 @@ const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
 `
 
-const PartitionStyled = styled(Partition)`
-  margin-top: 6px;
-`
-
-const logger = getLogger('ConditionDetails')
-
 interface Props {
   position: Position
 }
 
 export const Contents = ({ position }: Props) => {
-  const { networkConfig } = useWeb3ConnectedOrInfura()
   const history = useHistory()
   const { setValue } = useLocalStorage('positionid')
   const { balance, error, loading } = useBalanceForPosition(position.id)
 
   const positionCollateral = useCollateral(position ? position.collateralToken.id : '')
   const [collateralSymbol, setCollateralSymbol] = React.useState('')
-  const { collateralToken, id, indexSets } = position
+  const { collateralToken, id } = position
 
   const dropdownItems = useMemo(() => {
     return [

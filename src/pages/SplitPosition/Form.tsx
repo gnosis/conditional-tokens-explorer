@@ -1,6 +1,5 @@
 import { PositionPreview } from 'components/splitPosition/PositionPreview'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
-import { usePositionContext } from 'contexts/PositionContext'
 import { BigNumber } from 'ethers/utils'
 import { AllowanceMethods, useAllowanceState } from 'hooks/useAllowanceState'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'

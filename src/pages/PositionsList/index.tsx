@@ -44,7 +44,7 @@ export const PositionsList = () => {
   const isSearching = positionIdToSearch && loading
 
   const buildMenuForRow = useCallback(
-    ({ id, userBalance }) => {
+    ({ id }) => {
       const detailsOption = {
         text: 'Details',
         onClick: () => history.push(`/positions/${id}`),

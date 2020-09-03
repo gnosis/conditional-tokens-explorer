@@ -1,7 +1,6 @@
 import { BatchBalanceProvider } from 'contexts/BatchBalanceContext'
 import { ConditionProvider } from 'contexts/ConditionContext'
 import { MultiPositionsProvider } from 'contexts/MultiPositionsContext'
-import { PositionProvider } from 'contexts/PositionContext'
 import { BigNumber } from 'ethers/utils'
 import { useAllowance } from 'hooks/useAllowance'
 import { useCollateral } from 'hooks/useCollateral'

@@ -48,7 +48,7 @@ export const ConditionsList: React.FC = () => {
   const history = useHistory()
 
   const buildMenuForRow = useCallback(
-    ({ id, oracle }) => {
+    ({ id }) => {
       const detailsOption = {
         text: 'Details',
         onClick: () => history.push(`/conditions/${id}`),
