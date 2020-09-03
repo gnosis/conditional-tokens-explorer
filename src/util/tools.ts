@@ -120,6 +120,7 @@ export const getIndexSets = (outcomesCount: number) => {
 
 export const positionString = (
   conditionIds: string[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   indexSets: any[],
   balance: BigNumber,
   token: Token

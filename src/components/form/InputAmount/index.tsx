@@ -13,7 +13,7 @@ import { GetMultiPositions_positions } from 'types/generatedGQL'
 
 import { useWeb3ConnectedOrInfura } from '../../../contexts/Web3Context'
 import { SplitFrom, SplitPositionFormMethods } from '../../../pages/SplitPosition/Form'
-import { Token } from '../../../util/types'
+import { SplitFromType, Token } from '../../../util/types'
 import { TitleControlButton } from '../../pureStyledComponents/TitleControl'
 import { TitleValue } from '../../text/TitleValue'
 
@@ -90,7 +90,7 @@ export const InputAmount = ({
   ])
 
   useEffect(() => {
-    if (splitFrom === 'collateral' && signer && address) {
+    if (splitFrom === SplitFromType.collateral && signer && address) {
       fetchBalance(provider, signer, collateral.address, address).then((result) => {
         setDecimals(collateral.decimals)
         setBalance(result)
@@ -98,10 +98,10 @@ export const InputAmount = ({
     }
   }, [splitFrom, provider, signer, collateral, address])
 
-  const tokenSymbol = useMemo(() => (splitFrom === 'collateral' ? collateral.symbol : ''), [
-    splitFrom,
-    collateral,
-  ])
+  const tokenSymbol = useMemo(
+    () => (splitFrom === SplitFromType.collateral ? collateral.symbol : ''),
+    [splitFrom, collateral]
+  )
 
   return (
     <TitleValue
