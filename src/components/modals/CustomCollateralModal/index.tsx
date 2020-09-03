@@ -95,9 +95,9 @@ export const CustomCollateralModal: React.FC<Props> = (props) => {
       )}
       {!isLoading && collateralData && (
         <Row>
-          <TitleValue title={'Token Symbol:'} value={collateralData && collateralData.symbol} />
+          <TitleValue title={'Token Symbol'} value={collateralData && collateralData.symbol} />
           <TitleValue
-            title={'Decimals of Precision:'}
+            title={'Decimals of Precision'}
             value={collateralData && collateralData.decimals}
           />
         </Row>
