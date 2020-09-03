@@ -57,26 +57,35 @@ export const Collection: React.FC<Props> = (props) => {
   } = props
 
   const [confirmDeleteCollection, setConfirmDeleteCollection] = useState(false)
+  const [isDraggingOutcome, setIsDraggingOutcome] = useState(false)
 
   return (
     <Wrapper
       onDragLeave={onDragLeave}
       onDragOver={(e) => onDragOver(e, collectionIndex)}
-      onDrop={(e) => onDrop(e, collectionIndex)}
+      onDrop={(e) => {
+        onDrop(e, collectionIndex)
+        setIsDraggingOutcome(false)
+      }}
       {...restProps}
     >
       <OutcomesInner columnGap="0" columns={outcomesByRow}>
         {outcomesList.map((outcome: OutcomeProps, outcomeIndex: number) => (
           <DraggableOutcome
+            disableTooltip={isDraggingOutcome}
             key={outcomeIndex}
             lastInRow={outcomesByRow}
             makeDraggable
             onClick={() => {
               removeOutcomeFromCollection(collectionIndex, outcomeIndex)
             }}
-            onDragEnd={onDragEnd}
-            onDragStart={(e: any) => {
+            onDragEnd={(e) => {
+              onDragEnd(e)
+              setIsDraggingOutcome(false)
+            }}
+            onDragStart={(e) => {
               onDragStart(e, collectionIndex, outcome, outcomeIndex)
+              setIsDraggingOutcome(true)
             }}
             outcome={outcome}
           />
