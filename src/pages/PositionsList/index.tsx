@@ -6,7 +6,6 @@ import DataTable from 'react-data-table-component'
 import { useHistory } from 'react-router-dom'
 
 import { ButtonDots } from '../../components/buttons/ButtonDots'
-import { ButtonSelectLight } from '../../components/buttons/ButtonSelectLight'
 import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
 import { TokenIcon } from '../../components/common/TokenIcon'
 import { SearchField } from '../../components/form/SearchField'
@@ -18,15 +17,26 @@ import { TableControls } from '../../components/table/TableControls'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
 import { customStyles } from '../../theme/tableCustomStyles'
 import { getLogger } from '../../util/logger'
+import { CollateralFilterDropdown } from '../../components/common/CollateralFilterDropdown'
 
 const logger = getLogger('PositionsList')
 
 export const PositionsList = () => {
+  const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
+  const history = useHistory()
+  const { setValue } = useLocalStorage('positionid')
+
   const [positionIdToSearch, setPositionIdToSearch] = useState<string>('')
   const [positionIdToShow, setPositionIdToShow] = useState<string>('')
+  const [connectedItems, setConnectedItems] = useState<Array<any>>([])
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [selectedCollateralFilter, setSelectedCollateralFilter] = useState<string>('')
+  const [selectedCollateralValue, setSelectedCollateralValue] = useState<string>('all')
+
   const debouncedHandler = useDebounceCallback((positionIdToSearch) => {
     setPositionIdToSearch(positionIdToSearch)
   }, 500)
+
   const inputHandler = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.currentTarget
@@ -35,16 +45,14 @@ export const PositionsList = () => {
     },
     [debouncedHandler]
   )
-  const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
+
   const { data, error, loading } = usePositions(positionIdToSearch)
-  const history = useHistory()
-  const { setValue } = useLocalStorage('positionid')
 
   const isLoading = !positionIdToSearch && loading
   const isSearching = positionIdToSearch && loading
 
   const buildMenuForRow = useCallback(
-    ({ id, userBalance }) => {
+    ({ id }) => {
       const detailsOption = {
         text: 'Details',
         onClick: () => history.push(`/positions/${id}`),
@@ -83,8 +91,6 @@ export const PositionsList = () => {
     },
     [history]
   )
-
-  const [connectedItems, setConnectedItems] = useState<Array<any>>([])
 
   const menu = useMemo(() => {
     return [
@@ -156,30 +162,6 @@ export const PositionsList = () => {
     return [...defaultColumns, ...connectedItems, ...menu]
   }, [connectedItems, menu, handleRowClick, networkConfig])
 
-  const tokensList = networkConfig
-    ? [
-        ...networkConfig.getTokens().map((item) => {
-          return { content: <TokenIcon symbol={item.symbol} /> }
-        }),
-      ]
-    : []
-
-  const filterItems = [{ content: 'All Collaterals' }, ...tokensList]
-
-  const [selectedFilter, setselectedFilter] = useState(0)
-
-  const filterDropdown = (
-    <Dropdown
-      dropdownButtonContent={<ButtonSelectLight content={filterItems[selectedFilter].content} />}
-      dropdownPosition={DropdownPosition.right}
-      items={filterItems.map((item, index) => (
-        <DropdownItem key={index} onClick={() => setselectedFilter(index)}>
-          {item.content}
-        </DropdownItem>
-      ))}
-    />
-  )
-
   return (
     <>
       <PageTitle>Positions</PageTitle>
@@ -188,7 +170,15 @@ export const PositionsList = () => {
       {data && !isLoading && !error && (
         <>
           <TableControls
-            end={filterDropdown}
+            end={
+              <CollateralFilterDropdown
+                onClick={(symbol: string, address: string) => {
+                  setSelectedCollateralFilter(address)
+                  setSelectedCollateralValue(symbol)
+                }}
+                value={selectedCollateralValue}
+              />
+            }
             start={
               <SearchField
                 onChange={inputHandler}
