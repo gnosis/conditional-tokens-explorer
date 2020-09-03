@@ -1,16 +1,15 @@
-import { Token } from 'util/types'
-
-import { CustomCollateralModal } from 'components/form/CustomCollateralModal'
-import { SelectPositionModal } from 'components/modals/SelectPositionsModal'
-import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
-import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
-import { Position } from 'hooks'
 import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
+import { CustomCollateralModal } from '../../components/form/CustomCollateralModal'
 import { InputPosition, InputPositionProps } from '../../components/form/InputPosition'
 import { SelectCollateral, SelectCollateralProps } from '../../components/form/SelectCollateral'
+import { SelectPositionModal } from '../../components/modals/SelectPositionsModal'
 import { TitleControl } from '../../components/pureStyledComponents/TitleControl'
+import { useBatchBalanceContext } from '../../contexts/BatchBalanceContext'
+import { useMultiPositionsContext } from '../../contexts/MultiPositionsContext'
+import { Position } from '../../hooks'
+import { SplitFromType, Token } from '../../util/types'
 
 const Controls = styled.div`
   align-items: center;
@@ -114,12 +113,12 @@ export const SplitFrom: React.FC<Props> = (props) => {
       <Controls>
         <Tabs>
           <Tab>
-            <Radio name="splitFrom" ref={register} type="radio" value="collateral" />
+            <Radio name="splitFrom" ref={register} type="radio" value={SplitFromType.collateral} />
             <TabText active={splitFromCollateral}>Collateral</TabText>
           </Tab>
           <Break />
           <Tab>
-            <Radio name="splitFrom" ref={register} type="radio" value="position" />
+            <Radio name="splitFrom" ref={register} type="radio" value={SplitFromType.position} />
             <TabText active={splitFromPosition}>Position</TabText>
           </Tab>
         </Tabs>
