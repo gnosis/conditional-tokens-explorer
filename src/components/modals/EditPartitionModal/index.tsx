@@ -461,8 +461,9 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
         </Button>
       </ButtonContainer>
       <PlaceholderOutcome
+        disableTooltip
         id={placeholderOutcomeId}
-        outcome={(draggedOutcome && draggedOutcome) || { id: '', value: 0 }}
+        outcome={draggedOutcome || { id: '5', value: 150 }}
       />
     </Modal>
   )

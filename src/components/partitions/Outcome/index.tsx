@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactTooltip from 'react-tooltip'
-import styled, { css } from 'styled-components'
+import styled, { css, withTheme } from 'styled-components'
 
 import { OutcomeProps } from '../../../util/types'
 
@@ -66,6 +66,7 @@ const OutcomeVerticalLine = styled.div`
 `
 
 interface Props {
+  disableTooltip?: boolean
   id?: string
   lastInRow?: string
   makeDraggable?: boolean
@@ -73,10 +74,12 @@ interface Props {
   onDragEnd?: (e: any) => void
   onDragStart?: (e: any) => void
   outcome: OutcomeProps
+  theme?: any
 }
 
-export const Outcome: React.FC<Props> = (props) => {
+const BaseOutcome: React.FC<Props> = (props) => {
   const {
+    disableTooltip,
     id,
     lastInRow,
     makeDraggable,
@@ -84,15 +87,18 @@ export const Outcome: React.FC<Props> = (props) => {
     onDragEnd,
     onDragStart,
     outcome,
+    theme,
     ...restProps
   } = props
 
+  const tooltipInfo = outcome.id
+
   return (
     <Wrapper
-      data-for={`tooltip${outcome.value}`}
+      data-for={`tooltip_${outcome.value}`}
       data-html={true}
       data-multiline={true}
-      data-tip={outcome.id ? `id: ${outcome.id}` : ''}
+      data-tip={`id: ${outcome.id}`}
       id={id}
       lastInRow={lastInRow}
       onClick={onClick}
@@ -108,17 +114,28 @@ export const Outcome: React.FC<Props> = (props) => {
         <OutcomeVerticalLine className="outcomeVerticalLine" />
       </OutcomeCircle>
       <OutcomeHorizontalLine className="outcomeHorizontalLine" />
-      <ReactTooltip
-        className="customTooltip outcomeTooltip"
-        clickable={true}
-        delayHide={100}
-        delayShow={1000}
-        effect="solid"
-        id={`tooltip${outcome.value}`}
-      />
+      {/* Note: I'm disabling tooltips this way so it doesn't interferes with
+       * dragging / dropping and other user interactions.
+       */}
+      {!disableTooltip && (
+        <ReactTooltip
+          arrowColor={theme.colors.darkerGray}
+          backgroundColor={theme.colors.darkerGray}
+          border={false}
+          className="customTooltip outcomeTooltip"
+          delayHide={100}
+          delayShow={1000}
+          disable={!tooltipInfo || disableTooltip}
+          effect="solid"
+          id={`tooltip_${outcome.value}`}
+          textColor="#fff"
+        />
+      )}
     </Wrapper>
   )
 }
+
+export const Outcome = withTheme(BaseOutcome)
 
 export const DraggableOutcome = styled(Outcome)`
   cursor: pointer;
