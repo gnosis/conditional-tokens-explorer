@@ -89,7 +89,7 @@ const networks: { [K in NetworkIds]: Network } = {
     oracles: [
       {
         name: 'realitio',
-        description: 'Realitio Team',
+        description: 'Realit.io',
         url: 'https://realit.io/',
         address: '0x0e414d014a77971f4eaa22ab58e6d84d16ea838e',
       },
@@ -144,7 +144,7 @@ const networks: { [K in NetworkIds]: Network } = {
     oracles: [
       {
         name: 'realitio',
-        description: 'Realitio Team',
+        description: 'Realit.io',
         url: 'https://realit.io/',
         address: '0x576b76eebe6b5411c0ef310e65de9bff8a60130f',
       },
@@ -199,7 +199,7 @@ const networks: { [K in NetworkIds]: Network } = {
     oracles: [
       {
         name: 'realitio',
-        description: 'Realitio Team',
+        description: 'Realit.io',
         url: 'https://realit.io/',
         address: '0xDb56f2e9369E0D7bD191099125a3f6C370F8ed15',
       },
@@ -230,6 +230,10 @@ export class NetworkConfig {
 
   getTokens(): Token[] {
     return networks[this.networkId].tokens
+  }
+
+  getOracles(): Oracle[] {
+    return networks[this.networkId].oracles
   }
 
   getGraphUris(): { httpUri: string; wsUri: string } {
