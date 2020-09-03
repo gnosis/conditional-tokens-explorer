@@ -24,7 +24,7 @@ export const buildQueryConditions = (options: BuildQueryConditionsListType = DEF
     .join(',')
 
   const query = gql`
-      query ConditionsSearch($conditionId: String!, $oracleIn: [String!]!, $oracleNotIn: [String!]!) {
+      query Conditions($conditionId: String!, $oracleIn: [String!]!, $oracleNotIn: [String!]!) {
         conditions(first: 1000,  where: { ${whereClause} }) {
           id
           oracle
@@ -52,6 +52,7 @@ export const GetConditionQuery = gql`
       payoutNumerators
       payoutDenominator
       resolveTimestamp
+      resolveBlockNumber
       positions {
         id
         collateralToken {

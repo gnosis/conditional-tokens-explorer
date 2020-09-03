@@ -29,17 +29,15 @@ export const Wrapper = (props: WrapperProps) => {
     <>
       <PageTitle>Position Details</PageTitle>
       {loading && <InlineLoading />}
-      {!loading && !position && isPositionErrorNotFound(errors) && (
+      {!loading && !position && isPositionErrorNotFound(errors) ? (
         <InfoCard message="We couldn't find this position..." title="Not Found" />
-      )}
-      {!loading && !position && isPositionErrorInvalid(errors) && (
+      ) : !loading && !position && isPositionErrorInvalid(errors) ? (
         <InfoCard message="Position not valid..." title="Error" />
-      )}
-
-      {!loading && !position && isPositionErrorFetching(errors) && (
+      ) : !loading && !position && isPositionErrorFetching(errors) ? (
         <InfoCard message="We couldn't fetch the data for this position..." title="Error" />
+      ) : (
+        position && <Contents position={position} />
       )}
-      {position && <Contents position={position} />}
     </>
   )
 }

@@ -4,10 +4,10 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: ConditionsSearch
+// GraphQL query operation: Conditions
 // ====================================================
 
-export interface ConditionsSearch_conditions {
+export interface Conditions_conditions {
   __typename: "Condition";
   id: string;
   oracle: any;
@@ -18,11 +18,11 @@ export interface ConditionsSearch_conditions {
   resolveBlockNumber: any | null;
 }
 
-export interface ConditionsSearch {
-  conditions: ConditionsSearch_conditions[];
+export interface Conditions {
+  conditions: Conditions_conditions[];
 }
 
-export interface ConditionsSearchVariables {
+export interface ConditionsVariables {
   conditionId: string;
   oracleIn: string[];
   oracleNotIn: string[];
@@ -60,6 +60,7 @@ export interface GetCondition_condition {
   payoutNumerators: any[] | null;
   payoutDenominator: any | null;
   resolveTimestamp: any | null;
+  resolveBlockNumber: any | null;
   positions: GetCondition_condition_positions[] | null;
 }
 
@@ -77,25 +78,25 @@ export interface GetConditionVariables {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: PositionsSearch
+// GraphQL query operation: Positions
 // ====================================================
 
-export interface PositionsSearch_positions_collateralToken {
+export interface Positions_positions_collateralToken {
   __typename: "CollateralToken";
   id: string;
 }
 
-export interface PositionsSearch_positions {
+export interface Positions_positions {
   __typename: "Position";
   id: string;
-  collateralToken: PositionsSearch_positions_collateralToken;
+  collateralToken: Positions_positions_collateralToken;
 }
 
-export interface PositionsSearch {
-  positions: PositionsSearch_positions[];
+export interface Positions {
+  positions: Positions_positions[];
 }
 
-export interface PositionsSearchVariables {
+export interface PositionsVariables {
   positionId: string;
   collateral: string;
 }

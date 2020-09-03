@@ -21,7 +21,7 @@ export const buildQueryPositions = (options: BuildQueryPositionsListType = DEFAU
     .join(',')
 
   const query = gql`
-  query PositionsSearch($positionId: String!, $collateral: String!) {
+  query Positions($positionId: String!, $collateral: String!) {
     positions(first: 1000, where: { ${whereClause} }) {
       id
       collateralToken {
