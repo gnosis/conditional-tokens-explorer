@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { CustomCollateralModal } from '../../components/form/CustomCollateralModal'
 import { InputPosition, InputPositionProps } from '../../components/form/InputPosition'
 import { SelectCollateral, SelectCollateralProps } from '../../components/form/SelectCollateral'
+import { CustomCollateralModal } from '../../components/modals/CustomCollateralModal'
 import { SelectPositionModal } from '../../components/modals/SelectPositionsModal'
 import { TitleControl } from '../../components/pureStyledComponents/TitleControl'
 import { useBatchBalanceContext } from '../../contexts/BatchBalanceContext'
@@ -143,7 +143,11 @@ export const SplitFrom: React.FC<Props> = (props) => {
         visible={splitFromPosition}
       />
       {showCustomCollateralModal && (
-        <CustomCollateralModal onAdd={setCustomToken} onClose={closeCustomCollateralModal} />
+        <CustomCollateralModal
+          isOpen={showCustomCollateralModal}
+          onAdd={setCustomToken}
+          onRequestClose={closeCustomCollateralModal}
+        />
       )}
       {showSelectPositionModal && (
         <SelectPositionModal
