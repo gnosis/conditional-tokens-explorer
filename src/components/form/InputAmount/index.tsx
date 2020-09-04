@@ -70,8 +70,6 @@ export const InputAmount = ({
     setValue('amount', ZERO_BN)
   }, [collateral, positionId, setValue])
 
-  console.log(splitFrom, balance?.toString())
-
   useEffect(() => {
     if (
       splitFrom === SplitFromType.position &&
