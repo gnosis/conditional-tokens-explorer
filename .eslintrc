@@ -75,7 +75,7 @@
       ],
       "pathGroupsExcludedImportTypes": ["builtin"]
     }],
-    "no-restricted-imports": ["warn", { "patterns": ["../*", "./*"] }],
+    "no-restricted-imports": ["error", { "patterns": ["../*", "./*"] }],
     "import/prefer-default-export": 0,
     "sort-destructure-keys/sort-destructure-keys": 2,
     "react/jsx-label-has-associated-control": 0,
@@ -87,7 +87,7 @@
       }
     ],
     "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn",
+    "react-hooks/exhaustive-deps": "error",
     "@typescript-eslint/explicit-module-boundary-types": "off"
   }
 }
