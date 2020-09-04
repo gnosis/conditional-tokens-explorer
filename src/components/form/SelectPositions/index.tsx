@@ -18,7 +18,8 @@ import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { BigNumber } from 'ethers/utils'
 import { Position } from 'hooks'
-import React from 'react'
+import { useLocalStorage } from 'hooks/useLocalStorageValue'
+import React, { useEffect } from 'react'
 import { GetMultiPositions_positions } from 'types/generatedGQL'
 
 interface Props {
@@ -66,6 +67,16 @@ export const SelectPositions = ({
     loading: balancesLoading,
     updateBalances,
   } = useBatchBalanceContext()
+
+  const { getValue } = useLocalStorage('positionid')
+
+  useEffect(() => {
+    const localStoragePosition = getValue()
+    if (localStoragePosition) {
+      updatePositionIds([localStoragePosition])
+      updateBalances([localStoragePosition])
+    }
+  }, [getValue, updatePositionIds, updateBalances])
 
   const [positionsToDisplay, setPositionsToDisplay] = React.useState<Array<string>>([])
 

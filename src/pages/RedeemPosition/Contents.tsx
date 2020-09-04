@@ -23,6 +23,7 @@ const logger = getLogger('RedeemPosition')
 export const Contents = () => {
   const { _type: status, CTService, connect, networkConfig } = useWeb3ConnectedOrInfura()
   const { clearPositions, errors: positionsErrors, positions } = useMultiPositionsContext()
+
   const { clearCondition, condition, errors: conditionErrors } = useConditionContext()
   const [statusTransaction, setStatusTransaction] = React.useState<Maybe<Status>>(null)
 
