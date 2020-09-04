@@ -4,7 +4,6 @@ import styled from 'styled-components'
 import { Button } from 'components/buttons/Button'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
-import { Token } from 'util/types'
 
 const Wrapper = styled.div`
   align-items: center;
@@ -31,7 +30,8 @@ const UnlockButton = styled(Button)`
 `
 
 interface Props {
-  collateral: Token
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  collateral: any
   fetching: boolean
   finished: boolean
   onUnlock: () => void
