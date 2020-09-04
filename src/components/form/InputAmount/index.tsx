@@ -70,9 +70,11 @@ export const InputAmount = ({
     setValue('amount', ZERO_BN)
   }, [collateral, positionId, setValue])
 
+  console.log(splitFrom, balance?.toString())
+
   useEffect(() => {
     if (
-      splitFrom === 'position' &&
+      splitFrom === SplitFromType.position &&
       canSetPositionBalance(positionsLoading, balancesLoading, positions, balances, positionIds)
     ) {
       // FIXME - this only works with non custom tokens
@@ -90,11 +92,19 @@ export const InputAmount = ({
   ])
 
   useEffect(() => {
+    let cancelled = false
+
     if (splitFrom === SplitFromType.collateral && signer && address) {
       fetchBalance(provider, signer, collateral.address, address).then((result) => {
-        setDecimals(collateral.decimals)
-        setBalance(result)
+        if (!cancelled) {
+          setDecimals(collateral.decimals)
+          setBalance(result)
+        }
       })
+    }
+
+    return () => {
+      cancelled = true
     }
   }, [splitFrom, provider, signer, collateral, address])
 
