@@ -117,8 +117,8 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
             row.collateralToken
           )
         },
-        maxWidth: '140px',
-        minWidth: '140px',
+        maxWidth: '150px',
+        minWidth: '150px',
         name: 'Collateral',
         selector: 'collateralToken',
         sortable: true,
