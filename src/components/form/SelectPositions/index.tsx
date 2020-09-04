@@ -12,6 +12,7 @@ import {
 import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { TitleControl } from 'components/pureStyledComponents/TitleControl'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { Spinner } from 'components/statusInfo/Spinner'
 import { TitleValue } from 'components/text/TitleValue'
 import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
@@ -129,6 +130,7 @@ export const SelectPositions = ({
 
   return (
     <>
+      {(isLoading || balancesLoading) && <Spinner />}
       <TitleValue
         title={title}
         titleControl={
@@ -139,13 +141,16 @@ export const SelectPositions = ({
         value={
           <>
             {singlePosition ? (
-              <Textfield
-                disabled={true}
-                error={!!errors.length}
-                placeholder={'Please select a position...'}
-                type="text"
-                value={positionsToDisplay.length ? positionsToDisplay[0] : ''}
-              />
+              <>
+                <Textfield
+                  disabled={true}
+                  error={!!errors.length}
+                  placeholder={'Please select a position...'}
+                  type="text"
+                  value={positionsToDisplay.length ? positionsToDisplay[0] : ''}
+                />
+                {(isLoading || balancesLoading) && <Spinner />}
+              </>
             ) : (
               <StripedList maxHeight="150px">
                 {positionsToDisplay.length ? (

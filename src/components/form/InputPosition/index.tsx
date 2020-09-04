@@ -3,6 +3,7 @@ import { Errors } from 'util/types'
 
 import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
+import { Spinner } from 'components/statusInfo/Spinner'
 import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
@@ -10,7 +11,14 @@ import { BigNumber } from 'ethers/utils'
 import { SplitPositionFormMethods } from 'pages/SplitPosition/Form'
 import React, { useEffect } from 'react'
 import { FormContextValues } from 'react-hook-form'
+import styled from 'styled-components'
 import { GetMultiPositions_positions } from 'types/generatedGQL'
+
+const Wrapper = styled.div``
+
+const InputWrapper = styled.div`
+  position: relative;
+`
 
 const isDataInSync = (
   positionsLoading: boolean,
@@ -28,14 +36,12 @@ const isDataInSync = (
 }
 
 export interface InputPositionProps {
-  barebones?: boolean
   formMethods: FormContextValues<SplitPositionFormMethods>
   onPositionChange: (position: Maybe<GetMultiPositions_positions>) => void
   splitFromPosition: boolean
 }
 
 export const InputPosition = ({
-  barebones = false,
   formMethods: { register, setValue },
   onPositionChange,
   splitFromPosition,
@@ -89,15 +95,17 @@ export const InputPosition = ({
   ])
 
   return (
-    <>
-      <Textfield
-        disabled={true}
-        error={!!errors.length}
-        placeholder={'Please select a position...'}
-        type="text"
-        value={positionToDisplay}
-        {...restProps}
-      />
+    <Wrapper {...restProps}>
+      <InputWrapper>
+        <Textfield
+          disabled={true}
+          error={!!errors.length}
+          placeholder={'Please select a position...'}
+          type="text"
+          value={positionToDisplay}
+        />
+        {balancesLoading && <Spinner />}
+      </InputWrapper>
       {!!errors && (
         <ErrorContainer>
           {errors.map((error: Errors, index: number) => (
@@ -105,6 +113,6 @@ export const InputPosition = ({
           ))}
         </ErrorContainer>
       )}
-    </>
+    </Wrapper>
   )
 }
