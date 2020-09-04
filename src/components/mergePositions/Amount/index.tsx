@@ -1,10 +1,10 @@
 import { BigNumber } from 'ethers/utils'
 import React from 'react'
 
-import { formatBigNumber } from '../../../util/tools'
-import { BigNumberInputWrapper } from '../../form/BigNumberInputWrapper'
-import { TitleControlButton } from '../../pureStyledComponents/TitleControl'
-import { TitleValue } from '../../text/TitleValue'
+import { BigNumberInputWrapper } from 'components/form/BigNumberInputWrapper'
+import { TitleControlButton } from 'components/pureStyledComponents/TitleControl'
+import { TitleValue } from 'components/text/TitleValue'
+import { formatBigNumber } from 'util/tools'
 
 interface Props {
   amount: BigNumber

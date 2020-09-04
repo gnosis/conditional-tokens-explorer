@@ -1,13 +1,13 @@
-import WalletConnectProvider from '@walletconnect/web3-provider'
 import { ethers } from 'ethers'
 import { InfuraProvider, JsonRpcSigner, Web3Provider } from 'ethers/providers'
 import React from 'react'
 import Web3Modal from 'web3modal'
 
-import { DEFAULT_NETWORK_ID, INFURA_ID } from '../config/constants'
-import { NetworkConfig } from '../config/networkConfig'
-import { ConditionalTokensService } from '../services/conditionalTokens'
-import { RealitioService } from '../services/realitio'
+import WalletConnectProvider from '@walletconnect/web3-provider'
+import { DEFAULT_NETWORK_ID, INFURA_ID } from 'config/constants'
+import { NetworkConfig } from 'config/networkConfig'
+import { ConditionalTokensService } from 'services/conditionalTokens'
+import { RealitioService } from 'services/realitio'
 
 export enum Web3ContextStatus {
   NotAsked = 'notAsked',

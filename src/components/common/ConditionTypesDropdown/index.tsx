@@ -1,9 +1,9 @@
 import React from 'react'
 
-import { ConditionType } from '../../../util/types'
-import { ButtonSelect } from '../../buttons/ButtonSelect'
-import { SelectItem } from '../../form/SelectItem'
-import { Dropdown, DropdownPosition } from '../Dropdown'
+import { ButtonSelect } from 'components/buttons/ButtonSelect'
+import { Dropdown, DropdownPosition } from 'components/common/Dropdown'
+import { SelectItem } from 'components/form/SelectItem'
+import { ConditionType } from 'util/types'
 
 interface Props {
   onClick: (value: ConditionType) => void

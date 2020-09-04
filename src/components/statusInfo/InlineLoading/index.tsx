@@ -1,8 +1,8 @@
 import React, { HTMLAttributes } from 'react'
 import styled, { css } from 'styled-components'
 
-import { Spinner } from '../Spinner'
-import { Text } from '../common'
+import { Spinner } from 'components/statusInfo/Spinner'
+import { Text } from 'components/statusInfo/common'
 
 const FlexCSS = css`
   align-items: center;

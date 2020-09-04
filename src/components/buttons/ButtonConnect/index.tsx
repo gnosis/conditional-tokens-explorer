@@ -2,8 +2,8 @@ import { darken } from 'polished'
 import React, { ButtonHTMLAttributes } from 'react'
 import styled from 'styled-components'
 
-import { useWeb3Disconnected } from '../../../contexts/Web3Context'
-import { ChevronRight } from '../../icons/ChevronRight'
+import { ChevronRight } from 'components/icons/ChevronRight'
+import { useWeb3Disconnected } from 'contexts/Web3Context'
 
 const Wrapper = styled.button`
   &.buttonConnect {

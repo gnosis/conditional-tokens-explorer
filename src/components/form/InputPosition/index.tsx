@@ -1,16 +1,16 @@
-import { positionString } from 'util/tools'
-import { Errors } from 'util/types'
+import { BigNumber } from 'ethers/utils'
+import React, { useEffect } from 'react'
+import { FormContextValues } from 'react-hook-form'
 
 import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { BigNumber } from 'ethers/utils'
 import { SplitPositionFormMethods } from 'pages/SplitPosition/Form'
-import React, { useEffect } from 'react'
-import { FormContextValues } from 'react-hook-form'
 import { GetMultiPositions_positions } from 'types/generatedGQL'
+import { positionString } from 'util/tools'
+import { Errors } from 'util/types'
 
 const isDataInSync = (
   positionsLoading: boolean,
@@ -35,6 +35,7 @@ export interface InputPositionProps {
 }
 
 export const InputPosition = ({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   barebones = false,
   formMethods: { register, setValue },
   onPositionChange,

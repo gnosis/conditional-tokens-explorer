@@ -1,8 +1,8 @@
 import { BigNumber } from 'ethers/utils'
 import { useCallback } from 'react'
 
-import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../contexts/Web3Context'
-import { ERC20Service } from '../services/erc20'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { ERC20Service } from 'services/erc20'
 
 /**
  * Return the allowance of the given `signer` for the conditional tokens contract.

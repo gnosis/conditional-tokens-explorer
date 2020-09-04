@@ -1,8 +1,8 @@
 import React, { ButtonHTMLAttributes } from 'react'
 import styled from 'styled-components'
 
-import { Dots } from '../../icons/Dots'
-import { ButtonProps } from '../buttonStylingTypes'
+import { ButtonProps } from 'components/buttons/buttonStylingTypes'
+import { Dots } from 'components/icons/Dots'
 
 const Wrapper = styled.button`
   align-items: center;

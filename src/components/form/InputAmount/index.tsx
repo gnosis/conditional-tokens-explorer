@@ -1,21 +1,20 @@
-import { formatBigNumber } from 'util/tools'
-
-import { BigNumberInputWrapper } from 'components/form/BigNumberInputWrapper'
-import { ZERO_BN } from 'config/constants'
-import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
-import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { InfuraProvider, JsonRpcSigner, Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { Controller, FormContextValues } from 'react-hook-form'
+
+import { BigNumberInputWrapper } from 'components/form/BigNumberInputWrapper'
+import { TitleControlButton } from 'components/pureStyledComponents/TitleControl'
+import { TitleValue } from 'components/text/TitleValue'
+import { ZERO_BN } from 'config/constants'
+import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
+import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { SplitFrom, SplitPositionFormMethods } from 'pages/SplitPosition/Form'
 import { ERC20Service } from 'services/erc20'
 import { GetMultiPositions_positions } from 'types/generatedGQL'
-
-import { useWeb3ConnectedOrInfura } from '../../../contexts/Web3Context'
-import { SplitFrom, SplitPositionFormMethods } from '../../../pages/SplitPosition/Form'
-import { Token } from '../../../util/types'
-import { TitleControlButton } from '../../pureStyledComponents/TitleControl'
-import { TitleValue } from '../../text/TitleValue'
+import { formatBigNumber } from 'util/tools'
+import { Token } from 'util/types'
 
 interface Props {
   collateral: Token

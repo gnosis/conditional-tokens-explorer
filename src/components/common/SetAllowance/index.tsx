@@ -1,9 +1,10 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { Button } from '../../buttons/Button'
-import { ButtonType } from '../../buttons/buttonStylingTypes'
-import { InlineLoading } from '../../statusInfo/InlineLoading'
+import { Button } from 'components/buttons/Button'
+import { ButtonType } from 'components/buttons/buttonStylingTypes'
+import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { Token } from 'util/types'
 
 const Wrapper = styled.div`
   align-items: center;
@@ -30,7 +31,7 @@ const UnlockButton = styled(Button)`
 `
 
 interface Props {
-  collateral: any
+  collateral: Token
   fetching: boolean
   finished: boolean
   onUnlock: () => void

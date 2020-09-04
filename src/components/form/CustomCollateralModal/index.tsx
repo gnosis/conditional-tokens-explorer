@@ -1,4 +1,6 @@
-import { Token } from 'util/types'
+import React, { useState } from 'react'
+import ReactDOM from 'react-dom'
+import styled from 'styled-components'
 
 import { Button } from 'components/buttons'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
@@ -6,9 +8,7 @@ import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { Card } from 'components/statusInfo/common'
 import { TitleValue } from 'components/text/TitleValue'
 import { useCollateral } from 'hooks/useCollateral'
-import React, { useState } from 'react'
-import ReactDOM from 'react-dom'
-import styled from 'styled-components'
+import { Token } from 'util/types'
 
 const ButtonStyled = styled(Button)`
   margin-right: auto;

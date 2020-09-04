@@ -1,12 +1,12 @@
 import { useQuery } from '@apollo/react-hooks'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import React, { useContext, useState } from 'react'
 
-import { useBalanceForPosition } from '../hooks/useBalanceForPosition'
-import { GetPositionQuery } from '../queries/positions'
-import { GetPosition, GetPosition_position } from '../types/generatedGQL'
-import { isPositionIdValid } from '../util/tools'
-import { PositionErrors } from '../util/types'
+import { useBalanceForPosition } from 'hooks/useBalanceForPosition'
+import { useLocalStorage } from 'hooks/useLocalStorageValue'
+import { GetPositionQuery } from 'queries/positions'
+import { GetPosition, GetPosition_position } from 'types/generatedGQL'
+import { isPositionIdValid } from 'util/tools'
+import { PositionErrors } from 'util/types'
 
 export interface PositionContext {
   position: Maybe<GetPosition_position>
