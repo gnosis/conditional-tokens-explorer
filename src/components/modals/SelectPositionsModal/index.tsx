@@ -103,7 +103,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
       {
         // eslint-disable-next-line react/display-name
         cell: (row: Position) => truncateStringInTheMiddle(row.id, 8, 6),
-        maxWidth: '160px',
+        maxWidth: '170px',
         name: 'Position Id',
         selector: 'id',
         sortable: true,
@@ -117,8 +117,8 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
             row.collateralToken
           )
         },
-        maxWidth: '150px',
-        minWidth: '150px',
+        maxWidth: '140px',
+        minWidth: '140px',
         name: 'Collateral',
         selector: 'collateralToken',
         sortable: true,
