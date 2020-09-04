@@ -7,7 +7,16 @@ import Web3Utils from 'web3-utils'
 import { CONFIRMATIONS_TO_WAIT } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
 
-const CTHelpers = CTHelpersConstructor(Web3Utils)
+// HACK - yarn build is breaking web3-utils soliditySha3. This should get the same results
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function soliditySha3(...args: any[]) {
+  const t = args.map(({ t }) => t)
+  const v = args.map(({ v }) => v)
+
+  return ethers.utils.solidityKeccak256(t, v)
+}
+
+const CTHelpers = CTHelpersConstructor({ ...Web3Utils, soliditySha3 })
 
 const conditionalTokensAbi = [
   'function prepareCondition(address oracle, bytes32 questionId, uint outcomeSlotCount) external',

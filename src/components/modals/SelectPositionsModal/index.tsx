@@ -12,12 +12,12 @@ import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
-import { CellHash } from 'components/table/CellHash'
 import { TableControls } from 'components/table/TableControls'
 import { TitleValue } from 'components/text/TitleValue'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { Position, usePositions } from 'hooks'
 import { customStyles } from 'theme/tableCustomStyles'
+import { truncateStringInTheMiddle } from 'util/tools'
 
 const LoadingWrapper = styled.div`
   align-items: center;
@@ -36,11 +36,11 @@ const Search = styled(SearchField)`
 
 interface Props extends ModalProps {
   isOpen: boolean
-  singlePosition?: boolean
-  showOnlyPositionsWithBalance?: boolean
-  preSelectedPositions?: string[]
   onConfirm?: (positions: Array<Position>) => void
   onRequestClose?: () => void
+  preSelectedPositions?: string[]
+  showOnlyPositionsWithBalance?: boolean
+  singlePosition?: boolean
 }
 
 export const SelectPositionModal: React.FC<Props> = (props) => {
@@ -103,7 +103,8 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
     () => [
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: Position) => <CellHash underline value={row.id} />,
+        cell: (row: Position) => truncateStringInTheMiddle(row.id, 8, 6),
+        maxWidth: '170px',
         name: 'Position Id',
         selector: 'id',
         sortable: true,
@@ -117,11 +118,11 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
             row.collateralToken
           )
         },
+        maxWidth: '140px',
+        minWidth: '140px',
         name: 'Collateral',
         selector: 'collateralToken',
         sortable: true,
-        maxWidth: '150px',
-        minWidth: '150px',
       },
     ],
     [networkConfig]
@@ -206,12 +207,12 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
   return (
     <Modal
       {...restProps}
-      subTitle={singlePosition ? 'Select one Position.' : 'Select multiple Positions.'}
+      subTitle={singlePosition ? 'Select one position.' : 'Select multiple positions.'}
       title={'Select Position'}
     >
       {isLoading && (
         <LoadingWrapper>
-          <InlineLoading message="Loading conditions..." />
+          <InlineLoading message="Loading positions..." />
         </LoadingWrapper>
       )}
       {error && <InfoCard message={error.message} title="Error" />}
@@ -221,7 +222,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
             start={
               <Search
                 onChange={inputHandler}
-                placeholder="Search condition id..."
+                placeholder="Search position id..."
                 value={positionIdToShow}
               />
             }
@@ -250,9 +251,6 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
               noHeader
               pagination
               paginationPerPage={5}
-              style={{
-                width: '100%',
-              }}
             />
           )}
           <TitleValue
@@ -265,9 +263,6 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
                 data={selectedPositions}
                 noDataComponent={<EmptyContentText>No positions selected.</EmptyContentText>}
                 noHeader
-                style={{
-                  width: '100%',
-                }}
               />
             }
           />
