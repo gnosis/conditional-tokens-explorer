@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import { ButtonControl, ButtonControlType } from 'components/buttons/ButtonControl'
 import { SelectPositionModal } from 'components/modals/SelectPositionsModal'
@@ -18,6 +18,7 @@ import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { Position } from 'hooks'
+import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { GetMultiPositions_positions } from 'types/generatedGQL'
 import { positionString } from 'util/tools'
 import { Errors } from 'util/types'
@@ -67,6 +68,16 @@ export const SelectPositions = ({
     loading: balancesLoading,
     updateBalances,
   } = useBatchBalanceContext()
+
+  const { getValue } = useLocalStorage('positionid')
+
+  useEffect(() => {
+    const localStoragePosition = getValue()
+    if (localStoragePosition) {
+      updatePositionIds([localStoragePosition])
+      updateBalances([localStoragePosition])
+    }
+  }, [getValue, updatePositionIds, updateBalances])
 
   const [positionsToDisplay, setPositionsToDisplay] = React.useState<Array<string>>([])
 
