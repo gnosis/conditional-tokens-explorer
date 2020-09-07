@@ -1,4 +1,5 @@
-import { arePositionMergeablesByCondition, getMergePreview } from 'util/tools'
+import { BigNumber } from 'ethers/utils'
+import React, { useMemo } from 'react'
 
 import {
   StripedList,
@@ -9,8 +10,7 @@ import { TitleValue } from 'components/text/TitleValue'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { BigNumber } from 'ethers/utils'
-import React, { useMemo } from 'react'
+import { arePositionMergeablesByCondition, getMergePreview } from 'util/tools'
 
 interface Props {
   amount: BigNumber

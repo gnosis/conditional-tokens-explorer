@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { ButtonSelect } from '../ButtonSelect'
+import { ButtonSelect } from 'components/buttons/ButtonSelect'
 
 const Wrapper = styled(ButtonSelect)`
   border-color: ${(props) => props.theme.colors.lightGrey};

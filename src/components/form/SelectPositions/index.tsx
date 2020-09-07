@@ -1,5 +1,5 @@
-import { positionString } from 'util/tools'
-import { Errors } from 'util/types'
+import { BigNumber } from 'ethers/utils'
+import React, { useEffect } from 'react'
 
 import { ButtonControl, ButtonControlType } from 'components/buttons/ButtonControl'
 import { SelectPositionModal } from 'components/modals/SelectPositionsModal'
@@ -16,11 +16,11 @@ import { TitleValue } from 'components/text/TitleValue'
 import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { BigNumber } from 'ethers/utils'
 import { Position } from 'hooks'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
-import React, { useEffect } from 'react'
 import { GetMultiPositions_positions } from 'types/generatedGQL'
+import { positionString } from 'util/tools'
+import { Errors } from 'util/types'
 
 interface Props {
   title: string

@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-import { BaseCard } from '../pureStyledComponents/BaseCard'
+import { BaseCard } from 'components/pureStyledComponents/BaseCard'
 
 export const Title = styled.h1<{ textAlign?: string }>`
   color: ${(props) => props.theme.colors.darkBlue};

@@ -1,9 +1,9 @@
-import { Remote } from 'util/remoteData'
-
 import { constants } from 'ethers'
 import { TransactionReceipt } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 import { useCallback, useEffect, useState } from 'react'
+
+import { Remote } from 'util/remoteData'
 
 export type AllowanceMethods = {
   refresh: () => Promise<BigNumber>

@@ -1,11 +1,11 @@
 import { useQuery } from '@apollo/react-hooks'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import React from 'react'
 
-import { GetConditionQuery } from '../queries/conditions'
-import { GetCondition, GetCondition_condition } from '../types/generatedGQL'
-import { isConditionIdValid } from '../util/tools'
-import { ConditionErrors } from '../util/types'
+import { useLocalStorage } from 'hooks/useLocalStorageValue'
+import { GetConditionQuery } from 'queries/conditions'
+import { GetCondition, GetCondition_condition } from 'types/generatedGQL'
+import { isConditionIdValid } from 'util/tools'
+import { ConditionErrors } from 'util/types'
 
 export interface ConditionContext {
   condition: Maybe<GetCondition_condition>

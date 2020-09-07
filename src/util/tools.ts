@@ -3,14 +3,13 @@ import { Provider } from 'ethers/providers'
 import { BigNumber, formatUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
 
-import { BYTES_REGEX } from '../config/constants'
+import { BYTES_REGEX } from 'config/constants'
 import {
   GetCondition_condition,
   GetMultiPositions_positions,
   GetPosition_position,
-} from '../types/generatedGQL'
-
-import { ConditionErrors, PositionErrors, Token } from './types'
+} from 'types/generatedGQL'
+import { ConditionErrors, PositionErrors, Token } from 'util/types'
 
 export const isAddress = (address: string) => {
   try {

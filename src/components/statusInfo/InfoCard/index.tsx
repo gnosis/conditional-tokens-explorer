@@ -1,9 +1,9 @@
 import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
 
-import { Card, Icon, IconTypes, Text, Title } from '../common'
-import { AlertIcon } from '../icons/AlertIcon'
-import { ErrorIcon } from '../icons/ErrorIcon'
+import { Card, Icon, IconTypes, Text, Title } from 'components/statusInfo/common'
+import { AlertIcon } from 'components/statusInfo/icons/AlertIcon'
+import { ErrorIcon } from 'components/statusInfo/icons/ErrorIcon'
 
 const Wrapper = styled(Card)`
   margin: auto;

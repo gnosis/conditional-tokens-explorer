@@ -1,12 +1,12 @@
 import { useDebounceCallback } from '@react-hook/debounce'
-import { useConditionContext } from 'contexts/ConditionContext'
 import React from 'react'
 
-import { SelectConditionModal } from '../../modals/SelectConditionModal'
-import { Error, ErrorContainer } from '../../pureStyledComponents/Error'
-import { Textfield } from '../../pureStyledComponents/Textfield'
-import { TitleControl } from '../../pureStyledComponents/TitleControl'
-import { TitleValue } from '../../text/TitleValue'
+import { SelectConditionModal } from 'components/modals/SelectConditionModal'
+import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
+import { Textfield } from 'components/pureStyledComponents/Textfield'
+import { TitleControl } from 'components/pureStyledComponents/TitleControl'
+import { TitleValue } from 'components/text/TitleValue'
+import { useConditionContext } from 'contexts/ConditionContext'
 
 interface Props {
   title?: string

@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { BaseCard } from '../../pureStyledComponents/BaseCard'
+import { BaseCard } from 'components/pureStyledComponents/BaseCard'
 
 const Wrapper = styled(BaseCard)`
   margin-left: auto;

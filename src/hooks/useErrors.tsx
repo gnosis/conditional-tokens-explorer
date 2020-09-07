@@ -1,6 +1,6 @@
-import { Errors } from 'util/types'
-
 import React, { useState } from 'react'
+
+import { Errors } from 'util/types'
 
 export const useErrors = () => {
   const [errors, setErrors] = useState<Array<Errors>>([])

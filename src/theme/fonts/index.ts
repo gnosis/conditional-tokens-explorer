@@ -1,10 +1,10 @@
 import { css } from 'styled-components'
 
-import AvertaBold from './Averta-Bold.woff2'
-import AvertaRegularItalic from './Averta-Regular-Italic.woff2'
-import AvertaRegular from './Averta-Regular.woff2'
-import AvertaSemiboldItalic from './Averta-Semibold-Italic.woff2'
-import AvertaSemibold from './Averta-Semibold.woff2'
+import AvertaBold from 'theme/fonts/Averta-Bold.woff2'
+import AvertaRegularItalic from 'theme/fonts/Averta-Regular-Italic.woff2'
+import AvertaRegular from 'theme/fonts/Averta-Regular.woff2'
+import AvertaSemiboldItalic from 'theme/fonts/Averta-Semibold-Italic.woff2'
+import AvertaSemibold from 'theme/fonts/Averta-Semibold.woff2'
 
 export const localFonts = css`
   @font-face {

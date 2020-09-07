@@ -1,19 +1,19 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { BatIcon } from './img/BatIcon'
-import { CDaiIcon } from './img/CDaiIcon'
-import { ChaiIcon } from './img/ChaiIcon'
-import { DaiIcon } from './img/DaiIcon'
-import { DxdIcon } from './img/DxdIcon'
-import { EtherIcon } from './img/EtherIcon'
-import { GnoIcon } from './img/GnoIcon'
-import { OwlIcon } from './img/OwlIcon'
-import { PnkIcon } from './img/PnkIcon'
-import { UsdcIcon } from './img/UsdcIcon'
-import { UsdtIcon } from './img/UsdtIcon'
-import { WEthIcon } from './img/WEthIcon'
-import { ZrxIcon } from './img/ZrxIcon'
+import { BatIcon } from 'components/common/TokenIcon/img/BatIcon'
+import { CDaiIcon } from 'components/common/TokenIcon/img/CDaiIcon'
+import { ChaiIcon } from 'components/common/TokenIcon/img/ChaiIcon'
+import { DaiIcon } from 'components/common/TokenIcon/img/DaiIcon'
+import { DxdIcon } from 'components/common/TokenIcon/img/DxdIcon'
+import { EtherIcon } from 'components/common/TokenIcon/img/EtherIcon'
+import { GnoIcon } from 'components/common/TokenIcon/img/GnoIcon'
+import { OwlIcon } from 'components/common/TokenIcon/img/OwlIcon'
+import { PnkIcon } from 'components/common/TokenIcon/img/PnkIcon'
+import { UsdcIcon } from 'components/common/TokenIcon/img/UsdcIcon'
+import { UsdtIcon } from 'components/common/TokenIcon/img/UsdtIcon'
+import { WEthIcon } from 'components/common/TokenIcon/img/WEthIcon'
+import { ZrxIcon } from 'components/common/TokenIcon/img/ZrxIcon'
 
 const Wrapper = styled.div`
   align-items: center;
@@ -91,6 +91,7 @@ const currenciesData = [
   },
 ]
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getTokenData = (symbol: string): Array<any> => {
   return currenciesData.filter((item) => item.symbol.toUpperCase() === symbol.toUpperCase())
 }

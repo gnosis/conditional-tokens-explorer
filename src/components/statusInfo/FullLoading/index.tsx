@@ -2,11 +2,11 @@ import React, { HTMLAttributes } from 'react'
 import ReactDOM from 'react-dom'
 import styled, { css } from 'styled-components'
 
-import { Button } from '../../buttons/Button'
-import { Spinner } from '../Spinner'
-import { Card, Icon, IconTypes, Text, Title } from '../common'
-import { AlertIcon } from '../icons/AlertIcon'
-import { ErrorIcon } from '../icons/ErrorIcon'
+import { Button } from 'components/buttons/Button'
+import { Spinner } from 'components/statusInfo/Spinner'
+import { Card, Icon, IconTypes, Text, Title } from 'components/statusInfo/common'
+import { AlertIcon } from 'components/statusInfo/icons/AlertIcon'
+import { ErrorIcon } from 'components/statusInfo/icons/ErrorIcon'
 
 const Wrapper = styled.div`
   align-items: center;
