@@ -8,11 +8,19 @@ import { CenteredCard } from 'components/common/CenteredCard'
 import { SetAllowance } from 'components/common/SetAllowance'
 import { InputAmount } from 'components/form/InputAmount'
 import { InputCondition } from 'components/form/InputCondition'
-import { Partition } from 'components/partitions/Partition'
+import { EditPartitionModal } from 'components/modals/EditPartitionModal'
+import { Outcome } from 'components/partitions/Outcome'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
+import { CardTextSm } from 'components/pureStyledComponents/CardText'
 import { ErrorContainer, Error as ErrorMessage } from 'components/pureStyledComponents/Error'
+import { OutcomesContainer } from 'components/pureStyledComponents/OutcomesContainer'
 import { Row } from 'components/pureStyledComponents/Row'
-import { TitleControl } from 'components/pureStyledComponents/TitleControl'
+import {
+  StripedList,
+  StripedListEmpty,
+  StripedListItemLessPadding,
+} from 'components/pureStyledComponents/StripedList'
+import { TitleControlButton } from 'components/pureStyledComponents/TitleControl'
 import { PositionPreview } from 'components/splitPosition/PositionPreview'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
@@ -24,9 +32,9 @@ import { SplitFrom } from 'pages/SplitPosition/SplitFrom'
 import { GetCondition_condition, GetPosition_position } from 'types/generatedGQL'
 import { getLogger } from 'util/logger'
 import { trivialPartition } from 'util/tools'
-import { SplitFromType, Token } from 'util/types'
+import { OutcomeProps, SplitFromType, Token } from 'util/types'
 
-const PartitionStyled = styled(Partition)`
+const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
 `
 
@@ -174,12 +182,49 @@ export const Form = ({
   }, [splitFromCollateral, isValid, allowanceFinished])
 
   const mockedNumberedOutcomes = [
-    [1, 4, 3],
-    [6, 5],
-    [9, 7, 10],
-    [2, 8],
-    [12, 13, 14, 15],
+    [
+      { value: 1, id: '0x1234567' },
+      { value: 4, id: '0x2345678' },
+      { value: 3, id: '0x3456789' },
+    ],
+    [
+      { value: 2, id: '0x4567890' },
+      { value: 5, id: '0x5678901' },
+    ],
+    [
+      { value: 10, id: '0x6789012' },
+      { value: 11, id: '0x7890123' },
+    ],
+    [
+      { value: 6, id: '0x8901234' },
+      { value: 8, id: '0x9012345' },
+      { value: 9, id: '0x0123456' },
+    ],
+    [{ value: 7, id: '0x6543210' }],
+    [
+      { value: 12, id: '0x12rt34567' },
+      { value: 13, id: '0x234ert5678' },
+      { value: 14, id: '0x34ert56789' },
+      { value: 15, id: '0xuy1234567' },
+      { value: 16, id: '0x23tyu45678' },
+      { value: 17, id: '0x3456ytu789' },
+      { value: 18, id: '0x1234tyu567' },
+      { value: 19, id: '0x2345yutit678' },
+      { value: 20, id: '0x3456ytu789' },
+      { value: 21, id: '0x123tyu567' },
+      { value: 22, id: '0x2345rtyrt678' },
+      { value: 23, id: '0x3456tryrt789' },
+      { value: 24, id: '0x1234rtyrt567' },
+      { value: 25, id: '0x2345tryrt678' },
+      { value: 26, id: '0x345rete6789' },
+      { value: 27, id: '0x1yhrt234567' },
+      { value: 28, id: '0x234tyutyu5678' },
+      { value: 29, id: '0x3456rtyrty789' },
+    ],
   ]
+
+  const [isEditPartitionModalOpen, setIsEditPartitionModalOpen] = useState(false)
+  const outcomesByRow = '15'
 
   return (
     <CenteredCard>
@@ -219,8 +264,46 @@ export const Form = ({
       <Row cols="1fr" marginBottomXL>
         <TitleValue
           title="Partition"
-          titleControl={<TitleControl>Edit Partition</TitleControl>}
-          value={<PartitionStyled collections={mockedNumberedOutcomes} />}
+          titleControl={
+            <TitleControlButton
+              disabled={!conditionIdToPreviewShow}
+              onClick={() => setIsEditPartitionModalOpen(true)}
+            >
+              Edit Partition
+            </TitleControlButton>
+          }
+          value={
+            <>
+              <CardTextSm>Outcomes Collections</CardTextSm>
+              <StripedListStyled minHeight="200px">
+                {/* DELETE THESE COMMENTS WHEN THIS IS DONE */}
+                {/* Note: As I understand it, outcomes come from the selected condition,
+                so you can't show anything until you selected a condition. */}
+                {conditionIdToPreviewShow && mockedNumberedOutcomes.length ? (
+                  mockedNumberedOutcomes.map(
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    (outcomeList: unknown | any, outcomeListIndex: number) => {
+                      return (
+                        <StripedListItemLessPadding key={outcomeListIndex}>
+                          <OutcomesContainer columnGap="0" columns={outcomesByRow}>
+                            {outcomeList.map((outcome: OutcomeProps, outcomeIndex: number) => (
+                              <Outcome
+                                key={outcomeIndex}
+                                lastInRow={outcomesByRow}
+                                outcome={outcome}
+                              />
+                            ))}
+                          </OutcomesContainer>
+                        </StripedListItemLessPadding>
+                      )
+                    }
+                  )
+                ) : (
+                  <StripedListEmpty>No Collections.</StripedListEmpty>
+                )}
+              </StripedListStyled>
+            </>
+          }
         />
       </Row>
       <Row cols="1fr" marginBottomXL>
@@ -253,6 +336,13 @@ export const Form = ({
           Split
         </Button>
       </ButtonContainer>
+      {isEditPartitionModalOpen && (
+        <EditPartitionModal
+          isOpen={isEditPartitionModalOpen}
+          onRequestClose={() => setIsEditPartitionModalOpen(false)}
+          outcomes={mockedNumberedOutcomes}
+        />
+      )}
     </CenteredCard>
   )
 }
