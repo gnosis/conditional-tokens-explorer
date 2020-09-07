@@ -31,7 +31,6 @@ const query = buildQueryPositions(buildQueryOptions)
 
 const variables = {
   positionId: '',
-  collateral: '',
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -60,8 +59,7 @@ test('position list should show right columns when the user is connected', async
   const mockQueryResult = [
     {
       request: {
-        query: query,
-        variables: variables,
+        query: query
       },
       result: {
         data: {
@@ -139,7 +137,6 @@ test('position list shold show right columns when the user is not connected', as
     {
       request: {
         query: query,
-        variables: variables,
       },
       result: {
         data: {
