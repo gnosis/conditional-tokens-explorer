@@ -8,20 +8,13 @@ import { ButtonDropdownCircle } from 'components/buttons/ButtonDropdownCircle'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
-import { Outcome } from 'components/partitions/Outcome'
-import { CardTextSm } from 'components/pureStyledComponents/CardText'
 import { Row } from 'components/pureStyledComponents/Row'
-import {
-  StripedList,
-  StripedListItem,
-  StripedListItemLessPadding,
-} from 'components/pureStyledComponents/StripedList'
+import { StripedList, StripedListItem } from 'components/pureStyledComponents/StripedList'
 import { TitleValue } from 'components/text/TitleValue'
 import { useBalanceForPosition } from 'hooks/useBalanceForPosition'
 import { useCollateral } from 'hooks/useCollateral'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { GetPosition_position as Position } from 'types/generatedGQL'
-import { getLogger } from 'util/logger'
 import { positionString, truncateStringInTheMiddle } from 'util/tools'
 
 const CollateralText = styled.span`
@@ -51,8 +44,6 @@ const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
 `
 
-const logger = getLogger('ConditionDetails')
-
 interface Props {
   position: Position
 }
@@ -64,16 +55,7 @@ export const Contents = ({ position }: Props) => {
 
   const positionCollateral = useCollateral(position ? position.collateralToken.id : '')
   const [collateralSymbol, setCollateralSymbol] = React.useState('')
-  const { collateralToken, id, indexSets } = position
-
-  const numberedOutcomes = indexSets.map((indexSet: string) => {
-    return Number(indexSet)
-      .toString(2)
-      .split('')
-      .reverse()
-      .map((value, index) => (value === '1' ? index + 1 : 0))
-      .filter((n) => !!n)
-  })
+  const { collateralToken, id } = position
 
   const dropdownItems = useMemo(() => {
     return [
@@ -178,29 +160,8 @@ export const Contents = ({ position }: Props) => {
       </Row>
       <Row cols="1fr" marginBottomXL>
         <TitleValue
-          title="Partition"
-          value={
-            <>
-              <CardTextSm>Collections</CardTextSm>
-              <StripedListStyled>
-                {
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  numberedOutcomes.map((outcomeList: unknown | any, outcomeListIndex: number) => {
-                    return (
-                      <StripedListItemLessPadding key={outcomeListIndex}>
-                        {outcomeList.map((outcome: string, outcomeIndex: number) => (
-                          <Outcome
-                            key={outcomeIndex}
-                            outcome={{ value: parseInt(outcome), id: '' }}
-                          />
-                        ))}
-                      </StripedListItemLessPadding>
-                    )
-                  })
-                }
-              </StripedListStyled>
-            </>
-          }
+          title="Position"
+          value={<StripedListItem>{positionPreview || ''} </StripedListItem>}
         />
       </Row>
     </CenteredCard>
