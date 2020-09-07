@@ -1,7 +1,8 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { PageTitle } from 'components/pureStyledComponents/PageTitle'
+import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { BatchBalanceProvider } from 'contexts/BatchBalanceContext'
 import { ConditionProvider } from 'contexts/ConditionContext'
 import { MultiPositionsProvider } from 'contexts/MultiPositionsContext'
@@ -19,6 +20,7 @@ export const SplitPosition = () => {
 
   const tokens = networkConfig.getTokens()
   const [collateral, setCollateral] = useState<string>(tokens[0].address)
+  const [isLoading, setIsLoading] = useState(true)
   const allowanceMethods = useAllowance(collateral)
   const collateralToken = useCollateral(collateral)
 
@@ -54,25 +56,31 @@ export const SplitPosition = () => {
   )
 
   // TODO Fix this
-  if (!collateralToken) {
-    logger.error(`Collateral ${collateral} doesn't exist`)
-    return null
-  }
+  useEffect(() => {
+    if (!collateralToken) {
+      logger.error(`Collateral ${collateral} doesn't exist`)
+    } else {
+      setIsLoading(false)
+    }
+  }, [collateralToken, collateral])
 
   return (
     <ConditionProvider>
-      <MultiPositionsProvider>
-        <BatchBalanceProvider checkForEmptyBalance={true}>
-          <PageTitle>Split Position</PageTitle>
-          <Form
-            allowanceMethods={allowanceMethods}
-            collateral={collateralToken}
-            onCollateralChange={setCollateral}
-            splitPosition={splitPosition}
-            tokens={tokens}
-          />
-        </BatchBalanceProvider>
-      </MultiPositionsProvider>
+      <PageTitle>Split Position</PageTitle>
+      {isLoading && <InlineLoading />}
+      {collateralToken && !isLoading && (
+        <MultiPositionsProvider>
+          <BatchBalanceProvider checkForEmptyBalance={true}>
+            <Form
+              allowanceMethods={allowanceMethods}
+              collateral={collateralToken}
+              onCollateralChange={setCollateral}
+              splitPosition={splitPosition}
+              tokens={tokens}
+            />
+          </BatchBalanceProvider>
+        </MultiPositionsProvider>
+      )}
     </ConditionProvider>
   )
 }

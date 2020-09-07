@@ -8,9 +8,14 @@ import { CenteredCard } from 'components/common/CenteredCard'
 import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
 import { SetAllowance } from 'components/common/SetAllowance'
 import { TokenIcon } from 'components/common/TokenIcon'
-import { Partition } from 'components/partitions/Partition'
+import { Outcome } from 'components/partitions/Outcome'
+import { CardTextSm } from 'components/pureStyledComponents/CardText'
 import { Row } from 'components/pureStyledComponents/Row'
-import { StripedList, StripedListItem } from 'components/pureStyledComponents/StripedList'
+import {
+  StripedList,
+  StripedListItem,
+  StripedListItemLessPadding,
+} from 'components/pureStyledComponents/StripedList'
 import { TitleValue } from 'components/text/TitleValue'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { GetPosition_position as Position } from 'types/generatedGQL'
@@ -41,10 +46,6 @@ const CollateralWrapButton = styled(Button)`
 `
 
 const StripedListStyled = styled(StripedList)`
-  margin-top: 6px;
-`
-
-const PartitionStyled = styled(Partition)`
   margin-top: 6px;
 `
 
@@ -144,7 +145,7 @@ export const Contents = ({ position }: Props) => {
         <TitleValue
           title="Collateral Wrapping"
           value={
-            <StripedListStyled>
+            <StripedListStyled maxHeight="auto">
               <StripedListItem>
                 <CollateralText>
                   <CollateralTextStrong>ERC20:</CollateralTextStrong>{' '}
@@ -170,7 +171,31 @@ export const Contents = ({ position }: Props) => {
         />
       </Row>
       <Row cols="1fr" marginBottomXL>
-        <TitleValue title="Partition" value={<PartitionStyled collections={numberedOutcomes} />} />
+        <TitleValue
+          title="Partition"
+          value={
+            <>
+              <CardTextSm>Collections</CardTextSm>
+              <StripedListStyled>
+                {
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  numberedOutcomes.map((outcomeList: unknown | any, outcomeListIndex: number) => {
+                    return (
+                      <StripedListItemLessPadding key={outcomeListIndex}>
+                        {outcomeList.map((outcome: string, outcomeIndex: number) => (
+                          <Outcome
+                            key={outcomeIndex}
+                            outcome={{ value: parseInt(outcome), id: '' }}
+                          />
+                        ))}
+                      </StripedListItemLessPadding>
+                    )
+                  })
+                }
+              </StripedListStyled>
+            </>
+          }
+        />
       </Row>
     </CenteredCard>
   )

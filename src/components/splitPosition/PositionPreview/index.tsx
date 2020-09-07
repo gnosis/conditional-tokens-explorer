@@ -2,7 +2,11 @@ import { BigNumber } from 'ethers/utils'
 import React, { useMemo } from 'react'
 import styled from 'styled-components'
 
-import { StripedList, StripedListItem } from 'components/pureStyledComponents/StripedList'
+import {
+  StripedList,
+  StripedListEmpty,
+  StripedListItem,
+} from 'components/pureStyledComponents/StripedList'
 import { TitleValue } from 'components/text/TitleValue'
 import { useCollateral } from 'hooks/useCollateral'
 import { GetPosition_position } from 'types/generatedGQL'
@@ -10,12 +14,12 @@ import { positionString, trivialPartition } from 'util/tools'
 import { SplitFromType, Token } from 'util/types'
 
 interface Props {
-  splitFrom: SplitFromType
+  amount: BigNumber
   conditionId: string
   outcomeSlotCount: number
-  selectedCollateral: Token
   position: Maybe<GetPosition_position>
-  amount: BigNumber
+  selectedCollateral: Token
+  splitFrom: SplitFromType
 }
 
 const StripedListStyled = styled(StripedList)`
@@ -31,7 +35,6 @@ export const PositionPreview = ({
   splitFrom,
 }: Props) => {
   const positionCollateral = useCollateral(position ? position.collateralToken.id : '')
-
   const splitFromCollateral = useMemo(() => splitFrom === SplitFromType.collateral, [splitFrom])
   const splitFromPosition = useMemo(() => splitFrom === SplitFromType.position, [splitFrom])
 
@@ -58,14 +61,14 @@ export const PositionPreview = ({
     }
     return []
   }, [
-    conditionId,
-    position,
-    outcomeSlotCount,
     amount,
-    selectedCollateral,
-    splitFromPosition,
-    splitFromCollateral,
+    conditionId,
+    outcomeSlotCount,
+    position,
     positionCollateral,
+    selectedCollateral,
+    splitFromCollateral,
+    splitFromPosition,
   ])
 
   return (
@@ -73,9 +76,13 @@ export const PositionPreview = ({
       title="Split Position Preview"
       value={
         <StripedListStyled>
-          {splitPositionPreview.map((preview, i) => (
-            <StripedListItem key={`preview-${i}`}>{preview}</StripedListItem>
-          ))}
+          {splitPositionPreview.length > 0 ? (
+            splitPositionPreview.map((preview, i) => (
+              <StripedListItem key={`preview-${i}`}>{preview}</StripedListItem>
+            ))
+          ) : (
+            <StripedListEmpty>No Split Positions.</StripedListEmpty>
+          )}
         </StripedListStyled>
       }
     />
