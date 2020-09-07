@@ -1,8 +1,8 @@
 import { BigNumber } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
-import { useWeb3ConnectedOrInfura } from '../contexts/Web3Context'
-import { getLogger } from '../util/logger'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { getLogger } from 'util/logger'
 
 const logger = getLogger('UseBalanceForBatchPosition')
 

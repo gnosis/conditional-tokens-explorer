@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { FormContextValues } from 'react-hook-form'
 
-import { SplitPositionFormMethods } from '../../../pages/SplitPosition/Form'
-import { getLogger } from '../../../util/logger'
-import { Token } from '../../../util/types'
-import { ButtonSelect } from '../../buttons/ButtonSelect'
-import { Dropdown, DropdownPosition } from '../../common/Dropdown'
-import { TokenIcon } from '../../common/TokenIcon'
-import { SelectItem } from '../../form/SelectItem'
+import { ButtonSelect } from 'components/buttons/ButtonSelect'
+import { Dropdown, DropdownPosition } from 'components/common/Dropdown'
+import { TokenIcon } from 'components/common/TokenIcon'
+import { SelectItem } from 'components/form/SelectItem'
+import { SplitPositionFormMethods } from 'pages/SplitPosition/Form'
+import { getLogger } from 'util/logger'
+import { Token } from 'util/types'
 
 export interface SelectCollateralProps {
   formMethods: FormContextValues<SplitPositionFormMethods>

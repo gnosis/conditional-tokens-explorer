@@ -2,7 +2,7 @@ import React from 'react'
 import ReactModal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
-import { CloseIcon } from './img/CloseIcon'
+import { CloseIcon } from 'components/common/Modal/img/CloseIcon'
 
 const Title = styled.div<{ hasTitle: boolean }>`
   align-items: center;

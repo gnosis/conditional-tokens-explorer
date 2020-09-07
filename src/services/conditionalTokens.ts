@@ -4,10 +4,11 @@ import { TransactionReceipt } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 import Web3Utils from 'web3-utils'
 
-import { CONFIRMATIONS_TO_WAIT } from '../config/constants'
-import { NetworkConfig } from '../config/networkConfig'
+import { CONFIRMATIONS_TO_WAIT } from 'config/constants'
+import { NetworkConfig } from 'config/networkConfig'
 
 // HACK - yarn build is breaking web3-utils soliditySha3. This should get the same results
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function soliditySha3(...args: any[]) {
   const t = args.map(({ t }) => t)
   const v = args.map(({ v }) => v)

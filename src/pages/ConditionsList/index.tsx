@@ -1,24 +1,24 @@
 import { useQuery } from '@apollo/react-hooks'
 import { useDebounceCallback } from '@react-hook/debounce'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
-import { ConditionsListQuery, ConditionsSearchQuery } from 'queries/conditions'
 import React, { useCallback, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useHistory } from 'react-router-dom'
-import { Conditions, Conditions_conditions } from 'types/generatedGQL'
 
-import { ButtonDots } from '../../components/buttons/ButtonDots'
-import { ButtonSelectLight } from '../../components/buttons/ButtonSelectLight'
-import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
-import { SearchField } from '../../components/form/SearchField'
-import { EmptyContentText } from '../../components/pureStyledComponents/EmptyContentText'
-import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
-import { Pill, PillTypes } from '../../components/pureStyledComponents/Pill'
-import { InfoCard } from '../../components/statusInfo/InfoCard'
-import { InlineLoading } from '../../components/statusInfo/InlineLoading'
-import { CellHash } from '../../components/table/CellHash'
-import { TableControls } from '../../components/table/TableControls'
-import { customStyles } from '../../theme/tableCustomStyles'
+import { ButtonDots } from 'components/buttons/ButtonDots'
+import { ButtonSelectLight } from 'components/buttons/ButtonSelectLight'
+import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
+import { SearchField } from 'components/form/SearchField'
+import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
+import { PageTitle } from 'components/pureStyledComponents/PageTitle'
+import { Pill, PillTypes } from 'components/pureStyledComponents/Pill'
+import { InfoCard } from 'components/statusInfo/InfoCard'
+import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { CellHash } from 'components/table/CellHash'
+import { TableControls } from 'components/table/TableControls'
+import { useLocalStorage } from 'hooks/useLocalStorageValue'
+import { ConditionsListQuery, ConditionsSearchQuery } from 'queries/conditions'
+import { customStyles } from 'theme/tableCustomStyles'
+import { Conditions, Conditions_conditions } from 'types/generatedGQL'
 
 export const ConditionsList: React.FC = () => {
   const [conditionIdToSearch, setConditionIdToSearch] = useState<string>('')
@@ -48,7 +48,7 @@ export const ConditionsList: React.FC = () => {
   const history = useHistory()
 
   const buildMenuForRow = useCallback(
-    ({ id, oracle }) => {
+    ({ id }) => {
       const detailsOption = {
         text: 'Details',
         onClick: () => history.push(`/conditions/${id}`),

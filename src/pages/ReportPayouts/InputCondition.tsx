@@ -1,10 +1,10 @@
 import React from 'react'
 
-import { Error, ErrorContainer } from '../../components/pureStyledComponents/Error'
-import { Textfield } from '../../components/pureStyledComponents/Textfield'
-import { TitleControlButton } from '../../components/pureStyledComponents/TitleControl'
-import { TitleValue } from '../../components/text/TitleValue'
-import { ConditionErrors } from '../../util/types'
+import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
+import { Textfield } from 'components/pureStyledComponents/Textfield'
+import { TitleControlButton } from 'components/pureStyledComponents/TitleControl'
+import { TitleValue } from 'components/text/TitleValue'
+import { ConditionErrors } from 'util/types'
 
 interface Props {
   conditionId: string

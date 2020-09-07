@@ -1,5 +1,7 @@
-import { positionString } from 'util/tools'
-import { Errors } from 'util/types'
+import { BigNumber } from 'ethers/utils'
+import React, { useEffect } from 'react'
+import { FormContextValues } from 'react-hook-form'
+import styled from 'styled-components'
 
 import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
@@ -7,12 +9,10 @@ import { Spinner } from 'components/statusInfo/Spinner'
 import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { BigNumber } from 'ethers/utils'
 import { SplitPositionFormMethods } from 'pages/SplitPosition/Form'
-import React, { useEffect } from 'react'
-import { FormContextValues } from 'react-hook-form'
-import styled from 'styled-components'
 import { GetMultiPositions_positions } from 'types/generatedGQL'
+import { positionString } from 'util/tools'
+import { Errors } from 'util/types'
 
 const Wrapper = styled.div``
 

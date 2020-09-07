@@ -1,8 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { truncateStringInTheMiddle } from '../../../util/tools'
-import { ButtonCopy } from '../../buttons/ButtonCopy'
+import { ButtonCopy } from 'components/buttons/ButtonCopy'
+import { truncateStringInTheMiddle } from 'util/tools'
 
 const Wrapper = styled.span`
   font-family: monospace;
@@ -19,6 +19,7 @@ Text.defaultProps = {
 }
 
 interface Props {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onClick?: (row: any) => void
   truncateInTheMiddle?: boolean
   underline?: boolean

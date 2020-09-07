@@ -1,17 +1,16 @@
+import { BigNumber } from 'ethers/utils'
+import React, { useState } from 'react'
+
+import { PageTitle } from 'components/pureStyledComponents/PageTitle'
 import { BatchBalanceProvider } from 'contexts/BatchBalanceContext'
 import { ConditionProvider } from 'contexts/ConditionContext'
 import { MultiPositionsProvider } from 'contexts/MultiPositionsContext'
-import { BigNumber } from 'ethers/utils'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useAllowance } from 'hooks/useAllowance'
 import { useCollateral } from 'hooks/useCollateral'
-import React, { useState } from 'react'
+import { Form } from 'pages/SplitPosition/Form'
 import { ConditionalTokensService } from 'services/conditionalTokens'
-
-import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
-import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
-import { getLogger } from '../../util/logger'
-
-import { Form } from './Form'
+import { getLogger } from 'util/logger'
 
 const logger = getLogger('SplitPositionIndex')
 

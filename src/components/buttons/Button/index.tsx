@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { ButtonCSS, ButtonProps } from '../buttonStylingTypes'
+import { ButtonCSS, ButtonProps } from 'components/buttons/buttonStylingTypes'
 
 const Wrapper = styled.button<ButtonProps>`
   ${ButtonCSS}
