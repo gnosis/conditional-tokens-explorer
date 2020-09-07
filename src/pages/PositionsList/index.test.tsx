@@ -7,7 +7,7 @@ import { ThemeProvider } from 'styled-components'
 
 import { Connected, NotAsked, Web3Context, Web3ContextStatus } from 'contexts/Web3Context'
 import { PositionsList } from 'pages/PositionsList/index'
-import { BuildQueryPositionsListType, buildQueryPositions } from 'queries/positions'
+import { PositionsListType, buildQueryPositions } from 'queries/positions'
 import { UserWithPositionsQuery } from 'queries/users'
 import theme from 'theme'
 
@@ -23,7 +23,7 @@ const infuraStatus = {
   _type: Web3ContextStatus.Infura,
 } as NotAsked
 
-const buildQueryOptions: BuildQueryPositionsListType = {
+const buildQueryOptions: PositionsListType = {
   positionId: '',
 }
 

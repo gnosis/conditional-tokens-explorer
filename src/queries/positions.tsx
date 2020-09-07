@@ -1,7 +1,7 @@
 import gql from 'graphql-tag'
 
-export interface BuildQueryPositionsListType {
-  positionId: string
+export interface PositionsListType {
+  positionId?: string
   collateral?: string
 }
 
@@ -10,19 +10,29 @@ export const DEFAULT_OPTIONS = {
   collateral: '',
 }
 
-export const buildQueryPositions = (options: BuildQueryPositionsListType = DEFAULT_OPTIONS) => {
+export const buildQueryPositions = (options: PositionsListType = DEFAULT_OPTIONS) => {
   const { collateral, positionId } = options
 
-  const whereClause = [
+  const whereClauseInternal = [
     positionId ? 'id: $positionId' : '',
     collateral ? 'collateralToken: $collateral' : '',
   ]
     .filter((s) => s.length)
     .join(',')
+  const whereClause = whereClauseInternal ? `, where: { ${whereClauseInternal} }` : ''
+
+  const variablesClauseInternal = [
+    positionId ? '$positionId: String' : '',
+    collateral ? '$collateral: String' : '',
+  ]
+    .filter((s) => s.length)
+    .join(',')
+
+  const variablesClause = variablesClauseInternal ? `(${variablesClauseInternal})` : ''
 
   const query = gql`
-  query Positions($positionId: String!, $collateral: String!) {
-    positions(first: 1000, where: { ${whereClause} }) {
+  query Positions ${variablesClause} {
+    positions(first: 1000 ${whereClause}) {
       id
       collateralToken {
         id
