@@ -94,7 +94,8 @@ export const usePositions = (searchPositionId: string) => {
           } as PositionWithUserBalanceWithDecimals
         })
 
-        setData(await Promise.all(positionListDataPromises))
+        const positionListDataResolved = await Promise.all(positionListDataPromises)
+        setData(positionListDataResolved)
       }
 
       fetchUserBalanceWithDecimals()
