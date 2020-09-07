@@ -8,9 +8,11 @@ const Wrapper = styled.div`
   position: relative;
 `
 
-const TextfieldStyled = styled(Textfield)`
+const TextfieldStyled = styled(Textfield)<{ isFetching: boolean }>`
   position: relative;
   z-index: 1;
+
+  ${(props) => props.isFetching && 'padding-right: 100px;'}
 `
 
 const SpinnerWrapper = styled.div`
@@ -42,7 +44,7 @@ export const TextfieldFetchableData: React.FC<Props> = (props) => {
   const { className, isFetching, ...restProps } = props
   return (
     <Wrapper className={className}>
-      <TextfieldStyled {...restProps} />
+      <TextfieldStyled isFetching={isFetching} {...restProps} />
       {isFetching && (
         <SpinnerWrapper>
           <Text>Fetching…</Text>
