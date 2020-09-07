@@ -1,4 +1,3 @@
-import { useQuery } from '@apollo/react-hooks'
 import { useDebounceCallback } from '@react-hook/debounce'
 import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -20,9 +19,9 @@ import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { TableControls } from 'components/table/TableControls'
 import { TitleValue } from 'components/text/TitleValue'
 import { useConditionContext } from 'contexts/ConditionContext'
-import { buildQueryConditions } from 'queries/conditions'
+import { useConditions } from 'hooks/useConditions'
 import { customStyles } from 'theme/tableCustomStyles'
-import { Conditions, Conditions_conditions, GetCondition_condition } from 'types/generatedGQL'
+import { Conditions_conditions, GetCondition_condition } from 'types/generatedGQL'
 import { truncateStringInTheMiddle } from 'util/tools'
 
 const LoadingWrapper = styled.div`
@@ -61,13 +60,10 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
     [debouncedHandler]
   )
 
-  const query = buildQueryConditions({
+  const { data, error, loading } = useConditions({
     conditionId: conditionIdToSearch,
   })
 
-  const { data, error, loading } = useQuery<Conditions>(query, {
-    variables: { conditionId: conditionIdToSearch, oracleIn: [], oracleNotIn: [] },
-  })
   const [selectedCondition, setSelectedCondition] = useState<Maybe<GetCondition_condition>>(null)
   const { setCondition } = useConditionContext()
 
