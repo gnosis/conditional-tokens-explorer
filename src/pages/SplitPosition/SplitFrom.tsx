@@ -1,6 +1,6 @@
 import { SplitFromType, Token } from 'util/types'
 
-import { CustomCollateralModal } from 'components/form/CustomCollateralModal'
+import { CustomCollateralModal } from 'components/modals/CustomCollateralModal'
 import { SelectPositionModal } from 'components/modals/SelectPositionsModal'
 import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
@@ -155,7 +155,11 @@ export const SplitFrom: React.FC<Props> = (props) => {
         visible={splitFromPosition}
       />
       {showCustomCollateralModal && (
-        <CustomCollateralModal onAdd={setCustomToken} onClose={closeCustomCollateralModal} />
+        <CustomCollateralModal
+          isOpen={showCustomCollateralModal}
+          onAdd={setCustomToken}
+          onRequestClose={closeCustomCollateralModal}
+        />
       )}
       {showSelectPositionModal && (
         <SelectPositionModal
