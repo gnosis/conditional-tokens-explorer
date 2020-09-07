@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { useCollateral } from '../../../hooks/useCollateral'
-import { Token } from '../../../util/types'
-import { Button } from '../../buttons'
-import { Modal, ModalProps } from '../../common/Modal'
-import { ButtonContainer } from '../../pureStyledComponents/ButtonContainer'
-import { Error, ErrorContainer } from '../../pureStyledComponents/Error'
-import { Row } from '../../pureStyledComponents/Row'
-import { Textfield } from '../../pureStyledComponents/Textfield'
-import { InlineLoading } from '../../statusInfo/InlineLoading'
-import { TitleValue } from '../../text/TitleValue'
+import { Button } from 'components/buttons'
+import { Modal, ModalProps } from 'components/common/Modal'
+import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
+import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
+import { Row } from 'components/pureStyledComponents/Row'
+import { Textfield } from 'components/pureStyledComponents/Textfield'
+import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { TitleValue } from 'components/text/TitleValue'
+import { useCollateral } from 'hooks/useCollateral'
+import { Token } from 'util/types'
 
 const FirstRow = styled(Row)`
   padding-top: 12px;

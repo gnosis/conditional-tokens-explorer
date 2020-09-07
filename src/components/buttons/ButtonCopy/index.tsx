@@ -1,8 +1,8 @@
 import React from 'react'
-import { CopyToClipboard } from 'react-copy-to-clipboard'
 import styled from 'styled-components'
 
-import { CopyIcon } from '../../icons/CopyIcon'
+import { CopyIcon } from 'components/icons/CopyIcon'
+import { CopyToClipboard } from 'react-copy-to-clipboard'
 
 const Wrapper = styled.button<{ light?: boolean }>`
   background: none;

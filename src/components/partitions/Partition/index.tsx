@@ -1,9 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { Outcome } from '../Outcome'
-import { ListItem } from '../pureStyledComponents/ListItem'
-import { Wrapper } from '../pureStyledComponents/Wrapper'
+import { Outcome } from 'components/partitions/Outcome'
+import { ListItem } from 'components/partitions/pureStyledComponents/ListItem'
+import { Wrapper } from 'components/partitions/pureStyledComponents/Wrapper'
 
 const Title = styled.h3`
   color: ${(props) => props.theme.colors.textColor};
@@ -25,15 +25,18 @@ export const Partition: React.FC<Props> = (props) => {
     <>
       <Title>Collections</Title>
       <Wrapper {...restProps}>
-        {collections.map((outcomeList: unknown | any, outcomeListIndex: number) => {
-          return (
-            <ListItem key={outcomeListIndex}>
-              {outcomeList.map((outcome: string, outcomeIndex: number) => (
-                <Outcome key={outcomeIndex} outcome={outcome} />
-              ))}
-            </ListItem>
-          )
-        })}
+        {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          collections.map((outcomeList: unknown | any, outcomeListIndex: number) => {
+            return (
+              <ListItem key={outcomeListIndex}>
+                {outcomeList.map((outcome: string, outcomeIndex: number) => (
+                  <Outcome key={outcomeIndex} outcome={outcome} />
+                ))}
+              </ListItem>
+            )
+          })
+        }
       </Wrapper>
     </>
   )

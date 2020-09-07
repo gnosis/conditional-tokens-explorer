@@ -1,15 +1,15 @@
 import { MockedProvider } from '@apollo/react-testing'
 import { render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { ZERO_BN } from 'config/constants'
-import { NetworkConfig } from 'config/networkConfig'
-import { Connected, Web3Context, Web3ContextStatus } from 'contexts/Web3Context'
 import { BigNumber } from 'ethers/utils'
 import React, { ReactElement } from 'react'
 import { ThemeProvider } from 'styled-components'
-import theme from 'theme'
 
-import { Form } from './Form'
+import { ZERO_BN } from 'config/constants'
+import { NetworkConfig } from 'config/networkConfig'
+import { Connected, Web3Context, Web3ContextStatus } from 'contexts/Web3Context'
+import { Form } from 'pages/SplitPosition/Form'
+import theme from 'theme'
 
 const onCollateralChange = jest.fn()
 const splitPosition = jest.fn()

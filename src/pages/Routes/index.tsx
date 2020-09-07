@@ -1,17 +1,17 @@
-import { MergePositions } from 'pages/MergePositions'
 import React from 'react'
 import { Redirect, Route, RouteProps, Switch } from 'react-router-dom'
 
-import { InfoCard } from '../../components/statusInfo/InfoCard'
-import { Web3ContextStatus, useWeb3Context } from '../../contexts/Web3Context'
-import { ConditionDetails } from '../ConditionDetails'
-import { ConditionsList } from '../ConditionsList'
-import { PositionDetails } from '../PositionDetails'
-import { PositionsList } from '../PositionsList'
-import { PrepareCondition } from '../PrepareCondition'
-import { RedeemPosition } from '../RedeemPosition'
-import { ReportPayoutsContainer } from '../ReportPayouts'
-import { SplitPosition } from '../SplitPosition'
+import { InfoCard } from 'components/statusInfo/InfoCard'
+import { Web3ContextStatus, useWeb3Context } from 'contexts/Web3Context'
+import { ConditionDetails } from 'pages/ConditionDetails'
+import { ConditionsList } from 'pages/ConditionsList'
+import { MergePositions } from 'pages/MergePositions'
+import { PositionDetails } from 'pages/PositionDetails'
+import { PositionsList } from 'pages/PositionsList'
+import { PrepareCondition } from 'pages/PrepareCondition'
+import { RedeemPosition } from 'pages/RedeemPosition'
+import { ReportPayoutsContainer } from 'pages/ReportPayouts'
+import { SplitPosition } from 'pages/SplitPosition'
 
 const ProtectedRoute: React.FC<RouteProps> = (props) => {
   const { component, path } = props

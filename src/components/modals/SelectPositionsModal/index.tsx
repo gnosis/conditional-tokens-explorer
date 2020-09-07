@@ -3,21 +3,21 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import styled from 'styled-components'
 
-import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../../contexts/Web3Context'
-import { Position, usePositions } from '../../../hooks'
-import { customStyles } from '../../../theme/tableCustomStyles'
-import { truncateStringInTheMiddle } from '../../../util/tools'
-import { Button } from '../../buttons'
-import { ButtonControl, ButtonControlType } from '../../buttons/ButtonControl'
-import { Modal, ModalProps } from '../../common/Modal'
-import { TokenIcon } from '../../common/TokenIcon'
-import { SearchField } from '../../form/SearchField'
-import { ButtonContainer } from '../../pureStyledComponents/ButtonContainer'
-import { EmptyContentText } from '../../pureStyledComponents/EmptyContentText'
-import { InfoCard } from '../../statusInfo/InfoCard'
-import { InlineLoading } from '../../statusInfo/InlineLoading'
-import { TableControls } from '../../table/TableControls'
-import { TitleValue } from '../../text/TitleValue'
+import { Button } from 'components/buttons'
+import { ButtonControl, ButtonControlType } from 'components/buttons/ButtonControl'
+import { Modal, ModalProps } from 'components/common/Modal'
+import { TokenIcon } from 'components/common/TokenIcon'
+import { SearchField } from 'components/form/SearchField'
+import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
+import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
+import { InfoCard } from 'components/statusInfo/InfoCard'
+import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { TableControls } from 'components/table/TableControls'
+import { TitleValue } from 'components/text/TitleValue'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { Position, usePositions } from 'hooks'
+import { customStyles } from 'theme/tableCustomStyles'
+import { truncateStringInTheMiddle } from 'util/tools'
 
 const LoadingWrapper = styled.div`
   align-items: center;
@@ -98,6 +98,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
     })
   }, [])
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const defaultColumns: Array<any> = useMemo(
     () => [
       {
@@ -164,6 +165,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
     [handleRemoveClick]
   )
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [connectedItems, setConnectedItems] = useState<Array<any>>([])
 
   useEffect(() => {

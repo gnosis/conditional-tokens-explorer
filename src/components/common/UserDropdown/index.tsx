@@ -1,15 +1,14 @@
-import { Connected, useWeb3Connected } from 'contexts/Web3Context'
 import React from 'react'
 import styled from 'styled-components'
 import { getInjectedProviderName, getProviderInfo } from 'web3modal'
 
-import { truncateStringInTheMiddle } from '../../../util/tools'
-import { Button } from '../../buttons/Button'
-import { ButtonType } from '../../buttons/buttonStylingTypes'
-import { Pill } from '../../pureStyledComponents/Pill'
-import { Dropdown, DropdownItem, DropdownPosition } from '../Dropdown'
-
-import { ChevronDown } from './img/ChevronDown'
+import { Button } from 'components/buttons/Button'
+import { ButtonType } from 'components/buttons/buttonStylingTypes'
+import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
+import { ChevronDown } from 'components/common/UserDropdown/img/ChevronDown'
+import { Pill } from 'components/pureStyledComponents/Pill'
+import { Connected, useWeb3Connected } from 'contexts/Web3Context'
+import { truncateStringInTheMiddle } from 'util/tools'
 
 const Wrapper = styled(Dropdown)`
   align-items: center;

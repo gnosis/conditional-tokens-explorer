@@ -1,9 +1,8 @@
-import { Token } from 'util/types'
-
 import React from 'react'
-import { ERC20Service } from 'services/erc20'
 
-import { useWeb3ConnectedOrInfura } from '../contexts/Web3Context'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { ERC20Service } from 'services/erc20'
+import { Token } from 'util/types'
 
 export const useCollateral = (collateralAddress: string): Maybe<Token> => {
   const { _type: status, networkConfig, provider } = useWeb3ConnectedOrInfura()

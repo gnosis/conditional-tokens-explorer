@@ -1,8 +1,8 @@
 import React, { ButtonHTMLAttributes } from 'react'
 import styled from 'styled-components'
 
-import { ChevronDown } from '../../icons/ChevronDown'
-import { ButtonProps } from '../buttonStylingTypes'
+import { ButtonProps } from 'components/buttons/buttonStylingTypes'
+import { ChevronDown } from 'components/icons/ChevronDown'
 
 const Wrapper = styled.button`
   align-items: center;

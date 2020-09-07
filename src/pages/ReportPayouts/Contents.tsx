@@ -1,12 +1,11 @@
-import { SelectCondition } from 'components/form/SelectCondition'
 import React, { useMemo } from 'react'
 
-import { CenteredCard } from '../../components/common/CenteredCard'
-import { Row } from '../../components/pureStyledComponents/Row'
-import { StripedList, StripedListEmpty } from '../../components/pureStyledComponents/StripedList'
-import { useConditionContext } from '../../contexts/ConditionContext'
-
-import { OutcomesTable } from './OutcomesTable'
+import { CenteredCard } from 'components/common/CenteredCard'
+import { SelectCondition } from 'components/form/SelectCondition'
+import { Row } from 'components/pureStyledComponents/Row'
+import { StripedList, StripedListEmpty } from 'components/pureStyledComponents/StripedList'
+import { useConditionContext } from 'contexts/ConditionContext'
+import { OutcomesTable } from 'pages/ReportPayouts/OutcomesTable'
 
 export const Contents: React.FC = () => {
   const { condition } = useConditionContext()

@@ -1,10 +1,10 @@
 import React, { ButtonHTMLAttributes } from 'react'
 import styled from 'styled-components'
 
-import { IconDelete } from '../../icons/IconDelete'
-import { IconEdit } from '../../icons/IconEdit'
-import { IconOk } from '../../icons/IconOk'
-import { IconPlus } from '../../icons/IconPlus'
+import { IconDelete } from 'components/icons/IconDelete'
+import { IconEdit } from 'components/icons/IconEdit'
+import { IconOk } from 'components/icons/IconOk'
+import { IconPlus } from 'components/icons/IconPlus'
 
 const Wrapper = styled.button`
   background-color: transparent;
