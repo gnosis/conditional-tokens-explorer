@@ -1,4 +1,3 @@
-import { useQuery } from '@apollo/react-hooks'
 import { useDebounceCallback } from '@react-hook/debounce'
 import React, { useCallback, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -15,10 +14,10 @@ import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { CellHash } from 'components/table/CellHash'
 import { TableControls } from 'components/table/TableControls'
+import { useConditions } from 'hooks/useConditions'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
-import { BuildQueryConditionsListType, buildQueryConditions } from 'queries/conditions'
 import { customStyles } from 'theme/tableCustomStyles'
-import { Conditions, Conditions_conditions } from 'types/generatedGQL'
+import { Conditions_conditions } from 'types/generatedGQL'
 import { OracleFilterOptions } from 'util/types'
 
 export const ConditionsList: React.FC = () => {
@@ -33,40 +32,23 @@ export const ConditionsList: React.FC = () => {
     OracleFilterOptions.All
   )
 
-  const debouncedHandler = useDebounceCallback((conditionIdToSearch) => {
+  const debouncedHandlerConditionToSearch = useDebounceCallback((conditionIdToSearch) => {
     setConditionIdToSearch(conditionIdToSearch)
   }, 500)
-  const inputHandler = React.useCallback(
+
+  const onChangeConditionId = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.currentTarget
       setConditionIdToShow(value)
-      debouncedHandler(value)
+      debouncedHandlerConditionToSearch(value)
     },
-    [debouncedHandler]
+    [debouncedHandlerConditionToSearch]
   )
 
-  const buildQueryOptions: BuildQueryConditionsListType = {
+  const { data, error, loading } = useConditions({
     conditionId: conditionIdToSearch,
-  }
-
-  if (selectedOracleValue === OracleFilterOptions.Custom) {
-    buildQueryOptions.oracleNotIn = selectedOracleFilter
-  }
-
-  if (
-    [OracleFilterOptions.Kleros, OracleFilterOptions.Realitio].indexOf(selectedOracleValue) > -1
-  ) {
-    buildQueryOptions.oracleIn = selectedOracleFilter
-  }
-
-  const query = buildQueryConditions(buildQueryOptions)
-
-  const { data, error, loading } = useQuery<Conditions>(query, {
-    variables: {
-      conditionId: conditionIdToSearch,
-      oracleIn: selectedOracleFilter,
-      oracleNotIn: selectedOracleFilter,
-    },
+    oracleValue: selectedOracleValue,
+    oracleFilter: selectedOracleFilter,
   })
 
   const isLoading = !conditionIdToSearch && loading
@@ -214,7 +196,7 @@ export const ConditionsList: React.FC = () => {
             }
             start={
               <SearchField
-                onChange={inputHandler}
+                onChange={onChangeConditionId}
                 placeholder="Search by condition id..."
                 value={conditionIdToShow}
               />
