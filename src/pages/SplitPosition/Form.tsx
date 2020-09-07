@@ -281,6 +281,7 @@ export const Form = ({
                 so you can't show anything until you selected a condition. */}
                 {conditionIdToPreviewShow && mockedNumberedOutcomes.length ? (
                   mockedNumberedOutcomes.map(
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     (outcomeList: unknown | any, outcomeListIndex: number) => {
                       return (
                         <StripedListItemLessPadding key={outcomeListIndex}>

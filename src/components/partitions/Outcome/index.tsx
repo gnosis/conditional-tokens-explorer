@@ -71,9 +71,12 @@ interface Props {
   lastInRow?: string
   makeDraggable?: boolean
   onClick?: () => void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onDragEnd?: (e: any) => void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onDragStart?: (e: any) => void
   outcome: OutcomeProps
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   theme?: any
 }
 

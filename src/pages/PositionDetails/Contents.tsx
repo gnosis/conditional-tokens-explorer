@@ -177,18 +177,21 @@ export const Contents = ({ position }: Props) => {
             <>
               <CardTextSm>Collections</CardTextSm>
               <StripedListStyled>
-                {numberedOutcomes.map((outcomeList: unknown | any, outcomeListIndex: number) => {
-                  return (
-                    <StripedListItemLessPadding key={outcomeListIndex}>
-                      {outcomeList.map((outcome: string, outcomeIndex: number) => (
-                        <Outcome
-                          key={outcomeIndex}
-                          outcome={{ value: parseInt(outcome), id: '' }}
-                        />
-                      ))}
-                    </StripedListItemLessPadding>
-                  )
-                })}
+                {
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  numberedOutcomes.map((outcomeList: unknown | any, outcomeListIndex: number) => {
+                    return (
+                      <StripedListItemLessPadding key={outcomeListIndex}>
+                        {outcomeList.map((outcome: string, outcomeIndex: number) => (
+                          <Outcome
+                            key={outcomeIndex}
+                            outcome={{ value: parseInt(outcome), id: '' }}
+                          />
+                        ))}
+                      </StripedListItemLessPadding>
+                    )
+                  })
+                }
               </StripedListStyled>
             </>
           }

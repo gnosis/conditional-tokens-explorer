@@ -114,7 +114,9 @@ interface DraggedOutcomeProps extends OutcomeProps {
 }
 
 interface EditPartitionModalProps extends ModalProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   outcomes: Array<any>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   theme?: any
 }
 
@@ -125,14 +127,18 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
   const placeholderOutcomeId = 'placeholderOutcome'
   const outcomesByRow = '13'
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [allCollections, setAllCollections] = useState<any>([])
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [newCollection, setNewCollection] = useState<any>([])
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [availableOutcomes, setAvailableOutcomes] = useState<any>([])
   const [draggedOutcome, setDraggedOutcome] = useState<DraggedOutcomeProps | null>(null)
   const [availableOutcomesColor, setAvailableOutcomesColor] = useState<string | undefined>()
   const [newCollectionOutcomesColor, setNewCollectionOutcomesColor] = useState<string | undefined>()
   const [confirmDeleteAllCollections, setConfirmDeleteAllCollections] = useState(false)
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const resetClassName = (e: any, className: string) =>
     e.currentTarget.className.replace(className, '')
 
@@ -143,6 +149,7 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
       allCollections[collectionIndex].splice(outcomeIndex, 1)
 
       setAllCollections([
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ...allCollections.filter((item: any) => {
           return item.length > 0
         }),
@@ -152,6 +159,7 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
   )
 
   const onDragStart = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (e: any, collectionFromIndex: number, outcome: OutcomeProps, outcomeIndex: number) => {
       const placeholderOutcome = document.getElementById(placeholderOutcomeId)
 
@@ -172,12 +180,13 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
     },
     []
   )
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onDragEnd = useCallback((e: any) => {
     e.currentTarget.className = resetClassName(e, draggingClass)
   }, [])
 
   const onDrop = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (e: any, collectionToIndex: number) => {
       e.currentTarget.className = resetClassName(e, dragOverClass)
 
@@ -186,6 +195,7 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
 
       allCollections[draggedOutcome.collectionFromIndex].splice(draggedOutcome.outcomeIndex, 1)
       allCollections[collectionToIndex].push({ value: draggedOutcome.value, id: draggedOutcome.id })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setAllCollections([...allCollections.filter((collection: any) => collection.length > 0)])
     },
     [allCollections, draggedOutcome]
@@ -223,6 +233,7 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
   }, [availableOutcomes, newCollection])
 
   const removeAllCollections = useCallback(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const newAvailableOutcomes: Array<any> = []
 
     allCollections.forEach((item: Array<OutcomeProps>) => {

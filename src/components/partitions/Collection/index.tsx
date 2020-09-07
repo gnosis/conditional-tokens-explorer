@@ -39,14 +39,18 @@ const OutcomesInner = styled(OutcomesContainer)`
 
 interface Props {
   collectionIndex: number
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onDragEnd: (e: any) => void
   onDragStart: (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     e: any,
     collectionFromIndex: number,
     outcome: OutcomeProps,
     outcomeIndex: number
   ) => void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onDrop: (e: any, collectionIndex: number) => void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   outcomesList: any
   outcomesByRow: string
   removeCollection: (collectionIndex: number) => void
