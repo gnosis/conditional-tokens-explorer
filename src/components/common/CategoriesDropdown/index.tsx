@@ -1,9 +1,9 @@
 import React from 'react'
 
-import { Categories } from '../../../util/types'
-import { ButtonSelect } from '../../buttons/ButtonSelect'
-import { SelectItem } from '../../form/SelectItem'
-import { Dropdown, DropdownPosition } from '../Dropdown'
+import { ButtonSelect } from 'components/buttons/ButtonSelect'
+import { Dropdown, DropdownPosition } from 'components/common/Dropdown'
+import { SelectItem } from 'components/form/SelectItem'
+import { Categories } from 'util/types'
 
 interface Props {
   onClick: (value: Categories) => void

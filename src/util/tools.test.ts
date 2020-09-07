@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers/utils'
-import { GetCondition_condition, GetPosition_position } from 'types/generatedGQL'
 
+import { GetCondition_condition, GetPosition_position } from 'types/generatedGQL'
 import {
   arePositionMergeables,
   arePositionMergeablesByCondition,
@@ -12,8 +12,8 @@ import {
   isFullIndexSetPartition,
   positionString,
   positionsSameConditionsSet,
-} from './tools'
-import { Token } from './types'
+} from 'util/tools'
+import { Token } from 'util/types'
 
 test('positionString should return the rigth Positions string', async () => {
   expect(

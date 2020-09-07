@@ -1,8 +1,8 @@
 import React from 'react'
-import ReactTooltip from 'react-tooltip'
 import styled, { css, withTheme } from 'styled-components'
 
-import { OutcomeProps } from '../../../util/types'
+import ReactTooltip from 'react-tooltip'
+import { OutcomeProps } from 'util/types'
 
 const outcomeDimensions = '24px'
 

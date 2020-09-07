@@ -1,10 +1,10 @@
-import { isPositionIdValid } from 'util/tools'
-import { BalanceErrors } from 'util/types'
-
 import { BigNumber } from 'ethers/utils'
+import React, { useCallback, useEffect, useState } from 'react'
+
 import { useBalanceForBatchPosition } from 'hooks/useBalanceForBatchPosition'
 import { useErrors } from 'hooks/useErrors'
-import React, { useCallback, useEffect, useState } from 'react'
+import { isPositionIdValid } from 'util/tools'
+import { BalanceErrors } from 'util/types'
 
 export interface BatchBalanceContext {
   positionIds: string[]

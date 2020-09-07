@@ -1,7 +1,7 @@
 import React from 'react'
 
-import { useWeb3ConnectedOrInfura } from '../contexts/Web3Context'
-import { Question } from '../util/types'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { Question } from 'util/types'
 
 export const useQuestion = (questionId: string, outcomeSlotCount: number) => {
   const { RtioService, networkConfig } = useWeb3ConnectedOrInfura()

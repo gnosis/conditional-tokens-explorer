@@ -1,6 +1,6 @@
-import { getLogger } from 'util/logger'
-import { arePositionMergeables, arePositionMergeablesByCondition, minBigNumber } from 'util/tools'
-import { Status } from 'util/types'
+import { ethers } from 'ethers'
+import { BigNumber } from 'ethers/utils'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import { Button } from 'components/buttons/Button'
 import { CenteredCard } from 'components/common/CenteredCard'
@@ -17,10 +17,10 @@ import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { ethers } from 'ethers'
-import { BigNumber } from 'ethers/utils'
-import React, { useCallback, useMemo, useState } from 'react'
 import { ConditionalTokensService } from 'services/conditionalTokens'
+import { getLogger } from 'util/logger'
+import { arePositionMergeables, arePositionMergeablesByCondition, minBigNumber } from 'util/tools'
+import { Status } from 'util/types'
 
 const logger = getLogger('MergePosition')
 

@@ -1,27 +1,27 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import styled, { withTheme } from 'styled-components'
 
-import { OutcomeProps } from '../../../util/types'
-import { Button } from '../../buttons/Button'
-import { ButtonAdd } from '../../buttons/ButtonAdd'
+import { Button } from 'components/buttons/Button'
+import { ButtonAdd } from 'components/buttons/ButtonAdd'
 import {
   ButtonBulkMove,
   ButtonBulkMoveActions,
   ButtonBulkMoveDirection,
-} from '../../buttons/ButtonBulkMove'
-import { ButtonType } from '../../buttons/buttonStylingTypes'
-import { ConfirmOverlay } from '../../common/ConfirmOverlay'
-import { Modal, ModalProps } from '../../common/Modal'
-import { Collection } from '../../partitions/Collection'
-import { EditableOutcome, PlaceholderOutcome } from '../../partitions/Outcome'
-import { ButtonContainer } from '../../pureStyledComponents/ButtonContainer'
-import { CardSubtitle } from '../../pureStyledComponents/CardSubtitle'
-import { CardText } from '../../pureStyledComponents/CardText'
-import { OutcomesContainer } from '../../pureStyledComponents/OutcomesContainer'
-import { SmallNote } from '../../pureStyledComponents/SmallNote'
-import { StripedList, StripedListEmpty } from '../../pureStyledComponents/StripedList'
-import { TitleControlButton } from '../../pureStyledComponents/TitleControl'
-import { TitleValue } from '../../text/TitleValue'
+} from 'components/buttons/ButtonBulkMove'
+import { ButtonType } from 'components/buttons/buttonStylingTypes'
+import { ConfirmOverlay } from 'components/common/ConfirmOverlay'
+import { Modal, ModalProps } from 'components/common/Modal'
+import { Collection } from 'components/partitions/Collection'
+import { EditableOutcome, PlaceholderOutcome } from 'components/partitions/Outcome'
+import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
+import { CardSubtitle } from 'components/pureStyledComponents/CardSubtitle'
+import { CardText } from 'components/pureStyledComponents/CardText'
+import { OutcomesContainer } from 'components/pureStyledComponents/OutcomesContainer'
+import { SmallNote } from 'components/pureStyledComponents/SmallNote'
+import { StripedList, StripedListEmpty } from 'components/pureStyledComponents/StripedList'
+import { TitleControlButton } from 'components/pureStyledComponents/TitleControl'
+import { TitleValue } from 'components/text/TitleValue'
+import { OutcomeProps } from 'util/types'
 
 const Collections = styled(StripedList)`
   position: relative;

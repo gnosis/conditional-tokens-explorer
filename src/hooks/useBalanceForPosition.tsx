@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers/utils'
 import React from 'react'
 
-import { useWeb3ConnectedOrInfura } from '../contexts/Web3Context'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 
 export const useBalanceForPosition = (position: string) => {
   const { CTService } = useWeb3ConnectedOrInfura()

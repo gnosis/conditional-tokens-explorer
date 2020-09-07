@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { ButtonAdd } from '../../buttons/ButtonAdd'
-import { ButtonControl, ButtonControlType } from '../../buttons/ButtonControl'
-import { Row } from '../../pureStyledComponents/Row'
+import { ButtonAdd } from 'components/buttons/ButtonAdd'
+import { ButtonControl, ButtonControlType } from 'components/buttons/ButtonControl'
+import { Row } from 'components/pureStyledComponents/Row'
 import {
   StripedList,
   StripedListEmpty,
   StripedListItem,
-} from '../../pureStyledComponents/StripedList'
-import { Textfield } from '../../pureStyledComponents/Textfield'
-import { TitleValue } from '../../text/TitleValue'
+} from 'components/pureStyledComponents/StripedList'
+import { Textfield } from 'components/pureStyledComponents/Textfield'
+import { TitleValue } from 'components/text/TitleValue'
 
 const NewOutcomeWrapper = styled.div`
   column-gap: 12px;

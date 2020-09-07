@@ -1,5 +1,6 @@
-import { positionString, trivialPartition } from 'util/tools'
-import { SplitFromType, Token } from 'util/types'
+import { BigNumber } from 'ethers/utils'
+import React, { useMemo } from 'react'
+import styled from 'styled-components'
 
 import {
   StripedList,
@@ -7,11 +8,10 @@ import {
   StripedListItem,
 } from 'components/pureStyledComponents/StripedList'
 import { TitleValue } from 'components/text/TitleValue'
-import { BigNumber } from 'ethers/utils'
 import { useCollateral } from 'hooks/useCollateral'
-import React, { useMemo } from 'react'
-import styled from 'styled-components'
 import { GetPosition_position } from 'types/generatedGQL'
+import { positionString, trivialPartition } from 'util/tools'
+import { SplitFromType, Token } from 'util/types'
 
 interface Props {
   amount: BigNumber

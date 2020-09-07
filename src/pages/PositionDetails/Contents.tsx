@@ -1,27 +1,26 @@
-import { truncateStringInTheMiddle } from 'util/tools'
-
 import React from 'react'
 import styled from 'styled-components'
 
-import { Button } from '../../components/buttons/Button'
-import { ButtonCopy } from '../../components/buttons/ButtonCopy'
-import { ButtonDropdownCircle } from '../../components/buttons/ButtonDropdownCircle'
-import { CenteredCard } from '../../components/common/CenteredCard'
-import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
-import { SetAllowance } from '../../components/common/SetAllowance'
-import { TokenIcon } from '../../components/common/TokenIcon'
-import { Outcome } from '../../components/partitions/Outcome'
-import { CardTextSm } from '../../components/pureStyledComponents/CardText'
-import { Row } from '../../components/pureStyledComponents/Row'
+import { Button } from 'components/buttons/Button'
+import { ButtonCopy } from 'components/buttons/ButtonCopy'
+import { ButtonDropdownCircle } from 'components/buttons/ButtonDropdownCircle'
+import { CenteredCard } from 'components/common/CenteredCard'
+import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
+import { SetAllowance } from 'components/common/SetAllowance'
+import { TokenIcon } from 'components/common/TokenIcon'
+import { Outcome } from 'components/partitions/Outcome'
+import { CardTextSm } from 'components/pureStyledComponents/CardText'
+import { Row } from 'components/pureStyledComponents/Row'
 import {
   StripedList,
   StripedListItem,
   StripedListItemLessPadding,
-} from '../../components/pureStyledComponents/StripedList'
-import { TitleValue } from '../../components/text/TitleValue'
-import { useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
-import { GetPosition_position as Position } from '../../types/generatedGQL'
-import { getLogger } from '../../util/logger'
+} from 'components/pureStyledComponents/StripedList'
+import { TitleValue } from 'components/text/TitleValue'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { GetPosition_position as Position } from 'types/generatedGQL'
+import { getLogger } from 'util/logger'
+import { truncateStringInTheMiddle } from 'util/tools'
 
 const CollateralText = styled.span`
   color: ${(props) => props.theme.colors.darkerGray};

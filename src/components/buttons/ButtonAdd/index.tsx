@@ -1,7 +1,7 @@
 import React, { ButtonHTMLAttributes } from 'react'
 import styled from 'styled-components'
 
-import { IconPlus } from '../../icons/IconPlus'
+import { IconPlus } from 'components/icons/IconPlus'
 
 const Wrapper = styled.button`
   align-items: center;

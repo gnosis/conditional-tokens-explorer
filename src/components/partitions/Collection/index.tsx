@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 
-import { OutcomeProps } from '../../../util/types'
-import { ButtonControl, ButtonControlType } from '../../buttons/ButtonControl'
-import { ConfirmOverlayHorizontal } from '../../common/ConfirmOverlay'
-import { OutcomesContainer } from '../../pureStyledComponents/OutcomesContainer'
-import { StripedListItemLessPadding } from '../../pureStyledComponents/StripedList'
-import { DraggableOutcome } from '../Outcome'
+import { ButtonControl, ButtonControlType } from 'components/buttons/ButtonControl'
+import { ConfirmOverlayHorizontal } from 'components/common/ConfirmOverlay'
+import { DraggableOutcome } from 'components/partitions/Outcome'
+import { OutcomesContainer } from 'components/pureStyledComponents/OutcomesContainer'
+import { StripedListItemLessPadding } from 'components/pureStyledComponents/StripedList'
+import { OutcomeProps } from 'util/types'
 
 const Wrapper = styled(StripedListItemLessPadding)<{
   isAboutToDelete?: boolean

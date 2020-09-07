@@ -1,15 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { InputPosition, InputPositionProps } from '../../components/form/InputPosition'
-import { SelectCollateral, SelectCollateralProps } from '../../components/form/SelectCollateral'
-import { CustomCollateralModal } from '../../components/modals/CustomCollateralModal'
-import { SelectPositionModal } from '../../components/modals/SelectPositionsModal'
-import { TitleControl } from '../../components/pureStyledComponents/TitleControl'
-import { useBatchBalanceContext } from '../../contexts/BatchBalanceContext'
-import { useMultiPositionsContext } from '../../contexts/MultiPositionsContext'
-import { Position } from '../../hooks'
-import { SplitFromType, Token } from '../../util/types'
+import { InputPosition, InputPositionProps } from 'components/form/InputPosition'
+import { SelectCollateral, SelectCollateralProps } from 'components/form/SelectCollateral'
+import { CustomCollateralModal } from 'components/modals/CustomCollateralModal'
+import { SelectPositionModal } from 'components/modals/SelectPositionsModal'
+import { TitleControl } from 'components/pureStyledComponents/TitleControl'
+import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
+import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
+import { Position } from 'hooks'
+import { SplitFromType, Token } from 'util/types'
 
 const Controls = styled.div`
   align-items: center;

@@ -1,18 +1,17 @@
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 
-import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
-import { InlineLoading } from '../../components/statusInfo/InlineLoading'
-import { BatchBalanceProvider } from '../../contexts/BatchBalanceContext'
-import { ConditionProvider } from '../../contexts/ConditionContext'
-import { MultiPositionsProvider } from '../../contexts/MultiPositionsContext'
-import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
-import { useAllowance } from '../../hooks/useAllowance'
-import { useCollateral } from '../../hooks/useCollateral'
-import { ConditionalTokensService } from '../../services/conditionalTokens'
-import { getLogger } from '../../util/logger'
-
-import { Form } from './Form'
+import { PageTitle } from 'components/pureStyledComponents/PageTitle'
+import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { BatchBalanceProvider } from 'contexts/BatchBalanceContext'
+import { ConditionProvider } from 'contexts/ConditionContext'
+import { MultiPositionsProvider } from 'contexts/MultiPositionsContext'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useAllowance } from 'hooks/useAllowance'
+import { useCollateral } from 'hooks/useCollateral'
+import { Form } from 'pages/SplitPosition/Form'
+import { ConditionalTokensService } from 'services/conditionalTokens'
+import { getLogger } from 'util/logger'
 
 const logger = getLogger('SplitPositionIndex')
 

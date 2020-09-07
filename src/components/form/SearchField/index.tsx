@@ -1,8 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { Magnifier } from '../../icons/Magnifier'
-import { Textfield } from '../../pureStyledComponents/Textfield'
+import { Magnifier } from 'components/icons/Magnifier'
+import { Textfield } from 'components/pureStyledComponents/Textfield'
 
 const Wrapper = styled.label`
   display: block;

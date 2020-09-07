@@ -1,8 +1,8 @@
 import React, { ButtonHTMLAttributes } from 'react'
 import styled from 'styled-components'
 
-import { ArrowDown } from '../../icons/ArrowDown'
-import { ArrowUp } from '../../icons/ArrowUp'
+import { ArrowDown } from 'components/icons/ArrowDown'
+import { ArrowUp } from 'components/icons/ArrowUp'
 
 export enum ButtonBulkMoveActions {
   add = 'add',

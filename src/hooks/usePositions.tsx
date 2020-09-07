@@ -1,12 +1,11 @@
 import { useQuery } from '@apollo/react-hooks'
+import React from 'react'
+
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { Position, marshalPositionListData } from 'hooks/utils'
 import { PositionsListQuery, PositionsSearchQuery } from 'queries/positions'
 import { UserWithPositionsQuery } from 'queries/users'
-import React from 'react'
 import { Positions, UserWithPositions } from 'types/generatedGQL'
-
-import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../contexts/Web3Context'
-
-import { Position, marshalPositionListData } from './utils'
 
 /**
  * Return a array of positions, and the user balance if it's connected.
