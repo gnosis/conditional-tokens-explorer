@@ -3,9 +3,8 @@ import React, { useEffect } from 'react'
 import { FormContextValues } from 'react-hook-form'
 import styled from 'styled-components'
 
+import { TextfieldFetchableData } from 'components/form/TextfieldFetchableData'
 import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
-import { Textfield } from 'components/pureStyledComponents/Textfield'
-import { Spinner } from 'components/statusInfo/Spinner'
 import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
@@ -97,14 +96,14 @@ export const InputPosition = ({
   return (
     <Wrapper {...restProps}>
       <InputWrapper>
-        <Textfield
+        <TextfieldFetchableData
           disabled={true}
           error={!!errors.length}
+          isFetching={balancesLoading}
           placeholder={'Please select a position...'}
           type="text"
           value={positionToDisplay}
         />
-        {balancesLoading && <Spinner />}
       </InputWrapper>
       {!!errors && (
         <ErrorContainer>
