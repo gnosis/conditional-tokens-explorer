@@ -1,17 +1,15 @@
 import { MockedProvider } from '@apollo/react-testing'
 import { waitFor } from '@testing-library/dom'
 import { render } from '@testing-library/react'
-import { Connected, NotAsked, Web3Context } from 'contexts/Web3Context'
-import { BuildQueryPositionsListType, buildQueryPositions } from 'queries/positions'
-import { UserWithPositionsQuery } from 'queries/users'
 import React from 'react'
 import { act } from 'react-dom/test-utils'
 import { ThemeProvider } from 'styled-components'
+
+import { Connected, NotAsked, Web3Context, Web3ContextStatus } from 'contexts/Web3Context'
+import { PositionsList } from 'pages/PositionsList/index'
+import { BuildQueryPositionsListType, buildQueryPositions } from 'queries/positions'
+import { UserWithPositionsQuery } from 'queries/users'
 import theme from 'theme'
-
-import { Web3ContextStatus } from '../../contexts/Web3Context'
-
-import { PositionsList } from './index'
 
 const connect = jest.fn()
 const disconnect = jest.fn()

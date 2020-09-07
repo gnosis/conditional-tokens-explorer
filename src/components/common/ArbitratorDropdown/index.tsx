@@ -1,8 +1,8 @@
 import React from 'react'
 
-import { ButtonSelect } from '../../buttons/ButtonSelect'
-import { SelectItem } from '../../form/SelectItem'
-import { Dropdown, DropdownPosition } from '../Dropdown'
+import { ButtonSelect } from 'components/buttons/ButtonSelect'
+import { Dropdown, DropdownPosition } from 'components/common/Dropdown'
+import { SelectItem } from 'components/form/SelectItem'
 
 interface Props {
   onClick: (value: string) => void

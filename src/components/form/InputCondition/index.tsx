@@ -1,8 +1,9 @@
+import React, { useEffect } from 'react'
+import { FormContextValues } from 'react-hook-form'
+
 import { SelectCondition } from 'components/form/SelectCondition'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { SplitPositionFormMethods } from 'pages/SplitPosition/Form'
-import React, { useEffect } from 'react'
-import { FormContextValues } from 'react-hook-form'
 import { GetCondition_condition } from 'types/generatedGQL'
 
 interface Props {

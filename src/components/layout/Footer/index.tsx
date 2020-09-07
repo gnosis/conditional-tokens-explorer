@@ -2,6 +2,7 @@ import React from 'react'
 import { NavLink } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 
+// eslint-disable-next-line no-restricted-imports
 import { version as appVersion } from '../../../../package.json'
 
 const Wrapper = styled.footer`

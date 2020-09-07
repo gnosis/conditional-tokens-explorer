@@ -1,6 +1,6 @@
 import { IDataTableStyles } from 'react-data-table-component'
 
-import theme from './index'
+import theme from 'theme/index'
 
 const horizontalPadding = '15px'
 

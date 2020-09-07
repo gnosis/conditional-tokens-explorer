@@ -1,9 +1,9 @@
 import React from 'react'
 
-import { useWeb3ConnectedOrInfura } from '../../../contexts/Web3Context'
-import { Oracle, OracleFilterOptions } from '../../../util/types'
-import { ButtonSelectLight } from '../../buttons/ButtonSelectLight'
-import { Dropdown, DropdownItem, DropdownPosition } from '../Dropdown'
+import { ButtonSelectLight } from 'components/buttons/ButtonSelectLight'
+import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { Oracle, OracleFilterOptions } from 'util/types'
 
 interface Props {
   onClick: (value: OracleFilterOptions, filter: string[]) => void

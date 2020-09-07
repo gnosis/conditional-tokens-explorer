@@ -1,4 +1,5 @@
-import { getRedeemedBalance, getRedeemedPreview } from 'util/tools'
+import { BigNumber } from 'ethers/utils'
+import React, { useMemo } from 'react'
 
 import {
   StripedList,
@@ -7,10 +8,9 @@ import {
 } from 'components/pureStyledComponents/StripedList'
 import { TitleValue } from 'components/text/TitleValue'
 import { NetworkConfig } from 'config/networkConfig'
-import { BigNumber } from 'ethers/utils'
 import { useBalanceForPosition } from 'hooks/useBalanceForPosition'
-import React, { useMemo } from 'react'
 import { GetCondition_condition, GetPosition_position } from 'types/generatedGQL'
+import { getRedeemedBalance, getRedeemedPreview } from 'util/tools'
 
 interface Props {
   position: Maybe<GetPosition_position>

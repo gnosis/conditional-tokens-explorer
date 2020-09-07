@@ -1,6 +1,6 @@
-import { Errors } from 'util/types'
-
 import React from 'react'
+
+import { Errors } from 'util/types'
 
 interface Props {
   children: React.ReactNode

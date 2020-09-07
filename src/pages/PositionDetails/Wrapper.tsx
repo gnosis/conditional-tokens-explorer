@@ -1,16 +1,15 @@
 import React from 'react'
 
-import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
-import { InfoCard } from '../../components/statusInfo/InfoCard'
-import { InlineLoading } from '../../components/statusInfo/InlineLoading'
-import { usePositionContext } from '../../contexts/PositionContext'
+import { PageTitle } from 'components/pureStyledComponents/PageTitle'
+import { InfoCard } from 'components/statusInfo/InfoCard'
+import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { usePositionContext } from 'contexts/PositionContext'
+import { Contents } from 'pages/PositionDetails/Contents'
 import {
   isPositionErrorFetching,
   isPositionErrorInvalid,
   isPositionErrorNotFound,
-} from '../../util/tools'
-
-import { Contents } from './Contents'
+} from 'util/tools'
 
 interface WrapperProps {
   positionId: string

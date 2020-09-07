@@ -1,10 +1,10 @@
 import { createGlobalStyle } from 'styled-components'
 
-import { dataTableCSS } from './dataTableCSS'
-import { localFonts } from './fonts'
-import { web3ModalCSS } from './web3ModalCSS'
-
-import theme from './index'
+import { dataTableCSS } from 'theme/dataTableCSS'
+import { localFonts } from 'theme/fonts'
+import theme from 'theme/index'
+import { reactTooltipCSS } from 'theme/reactTooltipCSS'
+import { web3ModalCSS } from 'theme/web3ModalCSS'
 
 type ThemeType = typeof theme
 
@@ -32,4 +32,5 @@ export const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
 
   ${web3ModalCSS}
   ${dataTableCSS}
+  ${reactTooltipCSS}
 `

@@ -1,7 +1,7 @@
 import React, { DOMAttributes, createRef, useCallback, useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 
-import { BaseCard } from '../../pureStyledComponents/BaseCard'
+import { BaseCard } from 'components/pureStyledComponents/BaseCard'
 
 export enum DropdownPosition {
   center,
@@ -190,30 +190,33 @@ export const Dropdown: React.FC<Props> = (props) => {
         isOpen={isOpen}
         noPadding
       >
-        {items.map((item: any, index: number) => {
-          const isActive = activeItemHighlight && index === currentItemIndex
-          const dropdownItem = React.cloneElement(item, {
-            active: isActive,
-            className: 'dropdownItem',
-            key: item.key ? item.key : index,
-            onClick: (e) => {
-              e.stopPropagation()
+        {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          items.map((item: any, index: number) => {
+            const isActive = activeItemHighlight && index === currentItemIndex
+            const dropdownItem = React.cloneElement(item, {
+              active: isActive,
+              className: 'dropdownItem',
+              key: item.key ? item.key : index,
+              onClick: (e) => {
+                e.stopPropagation()
 
-              if (closeOnClick) {
-                setIsOpen(false)
-              }
+                if (closeOnClick) {
+                  setIsOpen(false)
+                }
 
-              if (!item.props.onClick) {
-                return
-              }
+                if (!item.props.onClick) {
+                  return
+                }
 
-              item.props.onClick()
-              setCurrentItemIndex(index)
-            },
+                item.props.onClick()
+                setCurrentItemIndex(index)
+              },
+            })
+
+            return dropdownItem
           })
-
-          return dropdownItem
-        })}
+        }
       </Items>
     </Wrapper>
   )

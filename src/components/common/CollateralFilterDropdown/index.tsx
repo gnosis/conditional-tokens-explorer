@@ -1,10 +1,10 @@
 import React from 'react'
 
-import { useWeb3ConnectedOrInfura } from '../../../contexts/Web3Context'
-import { CollateralFilterOptions, Token } from '../../../util/types'
-import { ButtonSelectLight } from '../../buttons/ButtonSelectLight'
-import { Dropdown, DropdownItem, DropdownPosition } from '../Dropdown'
-import { TokenIcon } from '../TokenIcon'
+import { ButtonSelectLight } from 'components/buttons/ButtonSelectLight'
+import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
+import { TokenIcon } from 'components/common/TokenIcon'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { CollateralFilterOptions, Token } from 'util/types'
 
 interface Props {
   onClick: (symbol: string, address: string) => void

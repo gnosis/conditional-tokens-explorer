@@ -1,24 +1,24 @@
 import { useDebounceCallback } from '@react-hook/debounce'
-import { Position, usePositions } from 'hooks'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useHistory } from 'react-router-dom'
 
-import { ButtonDots } from '../../components/buttons/ButtonDots'
-import { CollateralFilterDropdown } from '../../components/common/CollateralFilterDropdown'
-import { Dropdown, DropdownItem, DropdownPosition } from '../../components/common/Dropdown'
-import { TokenIcon } from '../../components/common/TokenIcon'
-import { SearchField } from '../../components/form/SearchField'
-import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
-import { InfoCard } from '../../components/statusInfo/InfoCard'
-import { InlineLoading } from '../../components/statusInfo/InlineLoading'
-import { CellHash } from '../../components/table/CellHash'
-import { TableControls } from '../../components/table/TableControls'
-import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
-import { customStyles } from '../../theme/tableCustomStyles'
-import { getLogger } from '../../util/logger'
-import { CollateralFilterOptions } from '../../util/types'
+import { ButtonDots } from 'components/buttons/ButtonDots'
+import { CollateralFilterDropdown } from 'components/common/CollateralFilterDropdown'
+import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
+import { TokenIcon } from 'components/common/TokenIcon'
+import { SearchField } from 'components/form/SearchField'
+import { PageTitle } from 'components/pureStyledComponents/PageTitle'
+import { InfoCard } from 'components/statusInfo/InfoCard'
+import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { CellHash } from 'components/table/CellHash'
+import { TableControls } from 'components/table/TableControls'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { Position, usePositions } from 'hooks'
+import { useLocalStorage } from 'hooks/useLocalStorageValue'
+import { customStyles } from 'theme/tableCustomStyles'
+import { getLogger } from 'util/logger'
+import { CollateralFilterOptions } from 'util/types'
 
 const logger = getLogger('PositionsList')
 
@@ -29,6 +29,7 @@ export const PositionsList = () => {
 
   const [positionIdToSearch, setPositionIdToSearch] = useState<string>('')
   const [positionIdToShow, setPositionIdToShow] = useState<string>('')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [connectedItems, setConnectedItems] = useState<Array<any>>([])
   const [selectedCollateralFilter, setSelectedCollateralFilter] = useState<string>('')
   const [selectedCollateralValue, setSelectedCollateralValue] = useState<string>(
@@ -71,14 +72,14 @@ export const PositionsList = () => {
       const wrapERC20Option = {
         text: 'Wrap ERC20',
         onClick: () => {
-          console.log('wrap not implemented yet')
+          logger.log('wrap not implemented yet')
         },
       }
 
       const unwrapOption = {
         text: 'Unwrap ERC1155',
         onClick: () => {
-          console.log('unwrap not implemented yet')
+          logger.log('unwrap not implemented yet')
         },
       }
 
@@ -134,6 +135,7 @@ export const PositionsList = () => {
 
   const getColumns = useCallback(() => {
     // If you move this outside of the useCallback, can cause performance issues as a dep of this useCallback
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const defaultColumns: Array<any> = [
       {
         // eslint-disable-next-line react/display-name

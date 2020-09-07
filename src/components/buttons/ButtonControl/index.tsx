@@ -1,10 +1,10 @@
 import React, { ButtonHTMLAttributes } from 'react'
 import styled from 'styled-components'
 
-import { IconDelete } from '../../icons/IconDelete'
-import { IconEdit } from '../../icons/IconEdit'
-import { IconOk } from '../../icons/IconOk'
-import { IconPlus } from '../../icons/IconPlus'
+import { IconDelete } from 'components/icons/IconDelete'
+import { IconEdit } from 'components/icons/IconEdit'
+import { IconOk } from 'components/icons/IconOk'
+import { IconPlus } from 'components/icons/IconPlus'
 
 const Wrapper = styled.button`
   background-color: transparent;
@@ -58,12 +58,14 @@ export enum ButtonControlType {
 
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   buttonType?: ButtonControlType
+  className?: string
 }
 
 export const ButtonControl: React.FC<Props> = (props) => {
-  const { buttonType = ButtonControlType.ok, ...restProps } = props
+  const { className, buttonType = ButtonControlType.ok, ...restProps } = props
+
   return (
-    <Wrapper {...restProps}>
+    <Wrapper className={`${className} buttonControl`} {...restProps}>
       {buttonType === ButtonControlType.delete && <IconDelete />}
       {buttonType === ButtonControlType.ok && <IconOk />}
       {buttonType === ButtonControlType.edit && <IconEdit />}

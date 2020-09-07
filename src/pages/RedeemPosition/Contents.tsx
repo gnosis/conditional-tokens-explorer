@@ -1,28 +1,29 @@
-import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback } from 'react'
 
-import { Button } from '../../components/buttons'
-import { CenteredCard } from '../../components/common/CenteredCard'
-import { SelectCondition } from '../../components/form/SelectCondition'
-import { SelectPositions } from '../../components/form/SelectPositions'
-import { ButtonContainer } from '../../components/pureStyledComponents/ButtonContainer'
-import { Error, ErrorContainer } from '../../components/pureStyledComponents/Error'
-import { Row } from '../../components/pureStyledComponents/Row'
-import { PositionPreview } from '../../components/redeemPosition/PositionPreview'
-import { useConditionContext } from '../../contexts/ConditionContext'
-import { Web3ContextStatus, useWeb3ConnectedOrInfura } from '../../contexts/Web3Context'
-import { useIsPositionRelatedToCondition } from '../../hooks/useIsPositionRelatedToCondition'
-import { ConditionalTokensService } from '../../services/conditionalTokens'
-import { getLogger } from '../../util/logger'
-import { Status } from '../../util/types'
+import { Button } from 'components/buttons'
+import { CenteredCard } from 'components/common/CenteredCard'
+import { SelectCondition } from 'components/form/SelectCondition'
+import { SelectPositions } from 'components/form/SelectPositions'
+import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
+import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
+import { Row } from 'components/pureStyledComponents/Row'
+import { PositionPreview } from 'components/redeemPosition/PositionPreview'
+import { useConditionContext } from 'contexts/ConditionContext'
+import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useIsPositionRelatedToCondition } from 'hooks/useIsPositionRelatedToCondition'
+import { ConditionalTokensService } from 'services/conditionalTokens'
+import { getLogger } from 'util/logger'
+import { Status } from 'util/types'
 
 const logger = getLogger('RedeemPosition')
 
 export const Contents = () => {
   const { _type: status, CTService, connect, networkConfig } = useWeb3ConnectedOrInfura()
   const { clearPositions, errors: positionsErrors, positions } = useMultiPositionsContext()
+
   const { clearCondition, condition, errors: conditionErrors } = useConditionContext()
   const [statusTransaction, setStatusTransaction] = React.useState<Maybe<Status>>(null)
 

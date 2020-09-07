@@ -1,12 +1,11 @@
-import { useWeb3Context } from 'contexts/Web3Context'
 import React from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { Web3ContextStatus } from '../../../contexts/Web3Context'
-import { ButtonConnect } from '../../buttons/ButtonConnect'
-import { Logo } from '../../common/Logo'
-import { UserDropdown } from '../../common/UserDropdown'
+import { ButtonConnect } from 'components/buttons/ButtonConnect'
+import { Logo } from 'components/common/Logo'
+import { UserDropdown } from 'components/common/UserDropdown'
+import { Web3ContextStatus, useWeb3Context } from 'contexts/Web3Context'
 
 const Wrapper = styled.header`
   &.siteHeader {

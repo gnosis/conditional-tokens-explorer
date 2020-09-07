@@ -1,8 +1,8 @@
 import { useQuery } from '@apollo/react-hooks'
 import React from 'react'
 
-import { GetPositionQuery } from '../queries/positions'
-import { GetPosition } from '../types/generatedGQL'
+import { GetPositionQuery } from 'queries/positions'
+import { GetPosition } from 'types/generatedGQL'
 
 export const useIsPositionRelatedToCondition = (positionId: string, conditionId: string) => {
   const [isRelated, setIsRelated] = React.useState<boolean>(false)

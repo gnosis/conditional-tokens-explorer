@@ -1,5 +1,3 @@
-import { NetworkIds, Oracle, Token } from '../util/types'
-
 import {
   CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_GANACHE,
   CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_MAINNET,
@@ -16,7 +14,8 @@ import {
   REALITIO_CONTRACT_ADDRESS_FOR_GANACHE,
   REALITIO_CONTRACT_ADDRESS_FOR_MAINNET,
   REALITIO_CONTRACT_ADDRESS_FOR_RINKEBY,
-} from './constants'
+} from 'config/constants'
+import { NetworkIds, Oracle, Token } from 'util/types'
 
 interface Network {
   earliestBlockToCheck: number
