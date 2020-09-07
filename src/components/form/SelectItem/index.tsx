@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { DropdownItem } from '../../common/Dropdown'
+import { DropdownItem } from 'components/common/Dropdown'
 
 const Wrappper = styled(DropdownItem)`
   padding: 0;

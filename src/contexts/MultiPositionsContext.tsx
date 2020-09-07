@@ -1,12 +1,11 @@
-import { isPositionIdValid } from 'util/tools'
-import { Errors, PositionErrors } from 'util/types'
-
 import { useQuery } from '@apollo/react-hooks'
-import { useErrors } from 'hooks/useErrors'
-import { GetMultiPositionsQuery } from 'queries/positions'
 import React, { useCallback, useEffect, useState } from 'react'
 
-import { GetMultiPositions, GetMultiPositions_positions } from '../types/generatedGQL'
+import { useErrors } from 'hooks/useErrors'
+import { GetMultiPositionsQuery } from 'queries/positions'
+import { GetMultiPositions, GetMultiPositions_positions } from 'types/generatedGQL'
+import { isPositionIdValid } from 'util/tools'
+import { Errors, PositionErrors } from 'util/types'
 
 export interface MultiPositionsContext {
   positions: Array<GetMultiPositions_positions>

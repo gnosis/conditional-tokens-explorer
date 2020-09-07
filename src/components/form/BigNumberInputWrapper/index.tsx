@@ -3,8 +3,8 @@ import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
-import { ZERO_BN } from '../../../config/constants'
-import { Textfield } from '../../pureStyledComponents/Textfield'
+import { Textfield } from 'components/pureStyledComponents/Textfield'
+import { ZERO_BN } from 'config/constants'
 
 const Wrapper = styled.span<{ hasTokenSymbol?: boolean }>`
   position: relative;

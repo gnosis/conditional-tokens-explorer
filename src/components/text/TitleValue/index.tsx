@@ -29,7 +29,6 @@ const Value = styled.div<{ flexDirection?: string }>`
   font-weight: 400;
   line-height: 1.4;
   margin: 0;
-  text-transform: capitalize;
 
   a {
     color: ${(props) => props.theme.colors.textColorDarker};

@@ -1,8 +1,8 @@
-import { ZERO_BN } from 'config/constants'
 import { BigNumber } from 'ethers/utils'
-import { Positions_positions, UserWithPositions_user } from 'types/generatedGQL'
 
-import { marshalPositionListData } from './utils'
+import { ZERO_BN } from 'config/constants'
+import { marshalPositionListData } from 'hooks/utils'
+import { Positions_positions, UserWithPositions_user } from 'types/generatedGQL'
 
 const positions: Positions_positions[] = [
   {

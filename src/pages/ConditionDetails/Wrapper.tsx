@@ -1,16 +1,15 @@
 import React from 'react'
 
-import { PageTitle } from '../../components/pureStyledComponents/PageTitle'
-import { InfoCard } from '../../components/statusInfo/InfoCard'
-import { InlineLoading } from '../../components/statusInfo/InlineLoading'
-import { useConditionContext } from '../../contexts/ConditionContext'
+import { PageTitle } from 'components/pureStyledComponents/PageTitle'
+import { InfoCard } from 'components/statusInfo/InfoCard'
+import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { useConditionContext } from 'contexts/ConditionContext'
+import { Contents } from 'pages/ConditionDetails/Contents'
 import {
   isConditionErrorFetching,
   isConditionErrorInvalid,
   isConditionErrorNotFound,
-} from '../../util/tools'
-
-import { Contents } from './Contents'
+} from 'util/tools'
 
 interface WrapperProps {
   conditionId: string

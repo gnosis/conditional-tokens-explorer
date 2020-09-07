@@ -1,9 +1,9 @@
+import React from 'react'
+
 import { BatchBalanceProvider } from 'contexts/BatchBalanceContext'
 import { ConditionProvider } from 'contexts/ConditionContext'
 import { MultiPositionsProvider } from 'contexts/MultiPositionsContext'
-import React from 'react'
-
-import { Contents } from './Contents'
+import { Contents } from 'pages/RedeemPosition/Contents'
 
 export const RedeemPosition = () => {
   return (

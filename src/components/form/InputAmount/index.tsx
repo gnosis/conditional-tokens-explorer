@@ -1,21 +1,20 @@
-import { formatBigNumber } from 'util/tools'
-
-import { BigNumberInputWrapper } from 'components/form/BigNumberInputWrapper'
-import { ZERO_BN } from 'config/constants'
-import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
-import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { InfuraProvider, JsonRpcSigner, Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { Controller, FormContextValues } from 'react-hook-form'
+
+import { BigNumberInputWrapper } from 'components/form/BigNumberInputWrapper'
+import { TitleControlButton } from 'components/pureStyledComponents/TitleControl'
+import { TitleValue } from 'components/text/TitleValue'
+import { ZERO_BN } from 'config/constants'
+import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
+import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { SplitFrom, SplitPositionFormMethods } from 'pages/SplitPosition/Form'
 import { ERC20Service } from 'services/erc20'
 import { GetMultiPositions_positions } from 'types/generatedGQL'
-
-import { useWeb3ConnectedOrInfura } from '../../../contexts/Web3Context'
-import { SplitFrom, SplitPositionFormMethods } from '../../../pages/SplitPosition/Form'
-import { Token } from '../../../util/types'
-import { TitleControlButton } from '../../pureStyledComponents/TitleControl'
-import { TitleValue } from '../../text/TitleValue'
+import { formatBigNumber } from 'util/tools'
+import { SplitFromType, Token } from 'util/types'
 
 interface Props {
   collateral: Token
@@ -72,7 +71,7 @@ export const InputAmount = ({
 
   useEffect(() => {
     if (
-      splitFrom === 'position' &&
+      splitFrom === SplitFromType.position &&
       canSetPositionBalance(positionsLoading, balancesLoading, positions, balances, positionIds)
     ) {
       // FIXME - this only works with non custom tokens
@@ -90,18 +89,26 @@ export const InputAmount = ({
   ])
 
   useEffect(() => {
-    if (splitFrom === 'collateral' && signer && address) {
+    let cancelled = false
+
+    if (splitFrom === SplitFromType.collateral && signer && address) {
       fetchBalance(provider, signer, collateral.address, address).then((result) => {
-        setDecimals(collateral.decimals)
-        setBalance(result)
+        if (!cancelled) {
+          setDecimals(collateral.decimals)
+          setBalance(result)
+        }
       })
+    }
+
+    return () => {
+      cancelled = true
     }
   }, [splitFrom, provider, signer, collateral, address])
 
-  const tokenSymbol = useMemo(() => (splitFrom === 'collateral' ? collateral.symbol : ''), [
-    splitFrom,
-    collateral,
-  ])
+  const tokenSymbol = useMemo(
+    () => (splitFrom === SplitFromType.collateral ? collateral.symbol : ''),
+    [splitFrom, collateral]
+  )
 
   return (
     <TitleValue

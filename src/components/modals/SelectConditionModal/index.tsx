@@ -4,30 +4,26 @@ import React, { useCallback, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import styled from 'styled-components'
 
-import { useConditionContext } from '../../../contexts/ConditionContext'
-import { ConditionsListQuery, ConditionsSearchQuery } from '../../../queries/conditions'
-import { customStyles } from '../../../theme/tableCustomStyles'
-import {
-  Conditions,
-  Conditions_conditions,
-  GetCondition_condition,
-} from '../../../types/generatedGQL'
-import { truncateStringInTheMiddle } from '../../../util/tools'
-import { Button } from '../../buttons/Button'
-import { ButtonControl, ButtonControlType } from '../../buttons/ButtonControl'
-import { Modal, ModalProps } from '../../common/Modal'
-import { SearchField } from '../../form/SearchField'
-import { ButtonContainer } from '../../pureStyledComponents/ButtonContainer'
-import { EmptyContentText } from '../../pureStyledComponents/EmptyContentText'
+import { Button } from 'components/buttons/Button'
+import { ButtonControl, ButtonControlType } from 'components/buttons/ButtonControl'
+import { Modal, ModalProps } from 'components/common/Modal'
+import { SearchField } from 'components/form/SearchField'
+import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
+import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import {
   StripedList,
   StripedListEmpty,
   StripedListItem,
-} from '../../pureStyledComponents/StripedList'
-import { InfoCard } from '../../statusInfo/InfoCard'
-import { InlineLoading } from '../../statusInfo/InlineLoading'
-import { TableControls } from '../../table/TableControls'
-import { TitleValue } from '../../text/TitleValue'
+} from 'components/pureStyledComponents/StripedList'
+import { InfoCard } from 'components/statusInfo/InfoCard'
+import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { TableControls } from 'components/table/TableControls'
+import { TitleValue } from 'components/text/TitleValue'
+import { useConditionContext } from 'contexts/ConditionContext'
+import { ConditionsListQuery, ConditionsSearchQuery } from 'queries/conditions'
+import { customStyles } from 'theme/tableCustomStyles'
+import { Conditions, Conditions_conditions, GetCondition_condition } from 'types/generatedGQL'
+import { truncateStringInTheMiddle } from 'util/tools'
 
 const LoadingWrapper = styled.div`
   align-items: center;

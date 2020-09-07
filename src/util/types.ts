@@ -93,3 +93,13 @@ export type Oracle = {
   url: string
   address: string
 }
+
+export interface OutcomeProps {
+  id: string
+  value: number
+}
+
+export enum SplitFromType {
+  collateral = 'collateral',
+  position = 'position',
+}
