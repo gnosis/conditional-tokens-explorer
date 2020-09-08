@@ -141,7 +141,6 @@ export const SelectPositions = ({
 
   return (
     <>
-      {(isLoading || balancesLoading) && <Spinner />}
       <TitleValue
         title={title}
         titleControl={
@@ -152,18 +151,16 @@ export const SelectPositions = ({
         value={
           <>
             {singlePosition ? (
-              <>
-                <TextfieldFetchableData
-                  disabled={true}
-                  error={!!errors.length}
-                  isFetching={isLoading || balancesLoading}
-                  placeholder={'Please select a position...'}
-                  type="text"
-                  value={positionsToDisplay.length ? positionsToDisplay[0] : ''}
-                />
-              </>
+              <TextfieldFetchableData
+                disabled={true}
+                error={!!errors.length}
+                isFetching={isLoading || balancesLoading}
+                placeholder={'Please select a position...'}
+                type="text"
+                value={positionsToDisplay.length ? positionsToDisplay[0] : ''}
+              />
             ) : (
-              <StripedList maxHeight="150px">
+              <StripedList maxHeight="300px" minHeight="120px">
                 {positionsToDisplay.length ? (
                   positionsToDisplay.map((position: string, index: number) => (
                     <StripedListItem key={index}>
