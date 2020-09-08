@@ -14,7 +14,7 @@ import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { CellHash } from 'components/table/CellHash'
 import { TableControls } from 'components/table/TableControls'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { Position, usePositions } from 'hooks'
+import { PositionWithUserBalanceWithDecimals, usePositions } from 'hooks'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { customStyles } from 'theme/tableCustomStyles'
 import { getLogger } from 'util/logger'
@@ -93,7 +93,7 @@ export const PositionsList = () => {
   )
 
   const handleRowClick = useCallback(
-    (row: Position) => {
+    (row: PositionWithUserBalanceWithDecimals) => {
       history.push(`/positions/${row.id}`)
     },
     [history]
@@ -103,7 +103,7 @@ export const PositionsList = () => {
     return [
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: Position) => (
+        cell: (row: PositionWithUserBalanceWithDecimals) => (
           <Dropdown
             activeItemHighlight={false}
             dropdownButtonContent={<ButtonDots />}
@@ -127,7 +127,11 @@ export const PositionsList = () => {
       setConnectedItems([
         {
           // eslint-disable-next-line react/display-name
-          cell: (row: Position) => row.userBalance.toString(),
+          cell: (row: PositionWithUserBalanceWithDecimals) => (
+            <span {...(row.userBalanceWithDecimals ? { title: row.userBalance.toString() } : {})}>
+              {row.userBalanceWithDecimals}
+            </span>
+          ),
           name: 'ERC1155 Amount',
           right: true,
           selector: 'userBalance',
@@ -143,7 +147,7 @@ export const PositionsList = () => {
     const defaultColumns: Array<any> = [
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: Position) => (
+        cell: (row: PositionWithUserBalanceWithDecimals) => (
           <CellHash onClick={() => handleRowClick(row)} underline value={row.id} />
         ),
         name: 'Position Id',
@@ -152,7 +156,7 @@ export const PositionsList = () => {
       },
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: Position) => {
+        cell: (row: PositionWithUserBalanceWithDecimals) => {
           try {
             const token = networkConfig && networkConfig.getTokenFromAddress(row.collateralToken)
             // Please don't delete this because the tests will explode

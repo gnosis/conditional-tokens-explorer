@@ -15,7 +15,7 @@ import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { TableControls } from 'components/table/TableControls'
 import { TitleValue } from 'components/text/TitleValue'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { Position, usePositions } from 'hooks'
+import { PositionWithUserBalanceWithDecimals, usePositions } from 'hooks'
 import { customStyles } from 'theme/tableCustomStyles'
 import { truncateStringInTheMiddle } from 'util/tools'
 
@@ -36,7 +36,7 @@ const Search = styled(SearchField)`
 
 interface Props extends ModalProps {
   isOpen: boolean
-  onConfirm?: (positions: Array<Position>) => void
+  onConfirm?: (positions: Array<PositionWithUserBalanceWithDecimals>) => void
   onRequestClose?: () => void
   preSelectedPositions?: string[]
   showOnlyPositionsWithBalance?: boolean
@@ -52,7 +52,9 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
     ...restProps
   } = props
   const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
-  const [selectedPositions, setSelectedPositions] = useState<Array<Position>>([])
+  const [selectedPositions, setSelectedPositions] = useState<
+    Array<PositionWithUserBalanceWithDecimals>
+  >([])
   const [positionIdToSearch, setPositionIdToSearch] = useState<string>('')
   const [positionIdToShow, setPositionIdToShow] = useState<string>('')
 
@@ -75,26 +77,27 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
 
   useEffect(() => {
     if (data && data.length && preSelectedPositions && preSelectedPositions.length) {
-      setSelectedPositions((current) => {
+      setSelectedPositions((current: Array<PositionWithUserBalanceWithDecimals>) => {
         const currentIds = current.map(({ id }) => id)
         const filteredPre = preSelectedPositions.filter((pre) => !currentIds.includes(pre))
-        return [...current, ...data.filter(({ id }) => filteredPre.includes(id))]
+        const dataFiltered = data.filter(({ id }) => filteredPre.includes(id))
+        return [...current, ...dataFiltered]
       })
     }
   }, [preSelectedPositions, data])
 
-  const handleMultiAddClick = useCallback((position: Position) => {
+  const handleMultiAddClick = useCallback((position: PositionWithUserBalanceWithDecimals) => {
     setSelectedPositions((current) => {
       const included = current.find((selected) => selected.id === position.id)
       return included ? current : [...current, position]
     })
   }, [])
 
-  const handleSingleAddClick = useCallback((position: Position) => {
+  const handleSingleAddClick = useCallback((position: PositionWithUserBalanceWithDecimals) => {
     setSelectedPositions([position])
   }, [])
 
-  const handleRemoveClick = useCallback((position: Position) => {
+  const handleRemoveClick = useCallback((position: PositionWithUserBalanceWithDecimals) => {
     setSelectedPositions((current) => {
       return current.filter((selected) => selected.id !== position.id)
     })
@@ -105,7 +108,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
     () => [
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: Position) => truncateStringInTheMiddle(row.id, 8, 6),
+        cell: (row: PositionWithUserBalanceWithDecimals) => truncateStringInTheMiddle(row.id, 8, 6),
         maxWidth: '170px',
         name: 'Position Id',
         selector: 'id',
@@ -113,7 +116,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
       },
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: Position) => {
+        cell: (row: PositionWithUserBalanceWithDecimals) => {
           return networkConfig ? (
             <TokenIcon symbol={networkConfig.getTokenFromAddress(row.collateralToken).symbol} />
           ) : (
@@ -138,7 +141,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
       maxWidth: '36px',
       minWidth: '36px',
       // eslint-disable-next-line react/display-name
-      cell: (row: Position) => (
+      cell: (row: PositionWithUserBalanceWithDecimals) => (
         <ButtonControl
           buttonType={ButtonControlType.add}
           disabled={!!(singlePosition && selectedPositions.length)}
@@ -157,7 +160,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
       maxWidth: '36px',
       minWidth: '36px',
       // eslint-disable-next-line react/display-name
-      cell: (row: Position) => (
+      cell: (row: PositionWithUserBalanceWithDecimals) => (
         <ButtonControl
           buttonType={ButtonControlType.delete}
           onClick={() => handleRemoveClick(row)}
@@ -175,7 +178,11 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
       setConnectedItems([
         {
           // eslint-disable-next-line react/display-name
-          cell: (row: Position) => row.userBalance.toString(),
+          cell: (row: PositionWithUserBalanceWithDecimals) => (
+            <span {...(row.userBalanceWithDecimals ? { title: row.userBalance.toString() } : {})}>
+              {row.userBalanceWithDecimals}
+            </span>
+          ),
           name: 'ERC1155 Amount',
           right: true,
           selector: 'userBalance',
