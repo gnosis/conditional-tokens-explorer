@@ -17,14 +17,13 @@ export const Contents: React.FC = () => {
         <SelectCondition />
       </Row>
       {condition && !isConditionResolved && <OutcomesTable condition={condition} />}
-      {!condition && (
-        <StripedList>
-          <StripedListEmpty>Please select a condition to report.</StripedListEmpty>
-        </StripedList>
-      )}
-      {isConditionResolved && (
-        <StripedList>
-          <StripedListEmpty>The condition is already resolved.</StripedListEmpty>
+      {(!condition || isConditionResolved) && (
+        <StripedList minHeight="120px">
+          <StripedListEmpty>
+            {!condition
+              ? 'Please select a condition to report.'
+              : 'The condition is already resolved.'}
+          </StripedListEmpty>
         </StripedList>
       )}
     </CenteredCard>

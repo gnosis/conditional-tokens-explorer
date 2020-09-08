@@ -1,9 +1,9 @@
 import { useDebounceCallback } from '@react-hook/debounce'
 import React from 'react'
 
+import { TextfieldFetchableData } from 'components/form/TextfieldFetchableData'
 import { SelectConditionModal } from 'components/modals/SelectConditionModal'
 import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
-import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { TitleControl } from 'components/pureStyledComponents/TitleControl'
 import { TitleValue } from 'components/text/TitleValue'
 import { useConditionContext } from 'contexts/ConditionContext'
@@ -21,6 +21,7 @@ export const SelectCondition: React.FC<Props> = (props) => {
   const debouncedHandler = useDebounceCallback((id) => {
     setConditionId(id)
   }, 500)
+
   const inputHandler = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.currentTarget
@@ -48,10 +49,11 @@ export const SelectCondition: React.FC<Props> = (props) => {
         titleControl={<TitleControl onClick={openModal}>Select Condition</TitleControl>}
         value={
           <>
-            <Textfield
+            <TextfieldFetchableData
               error={!!errors.length}
+              isFetching={loading}
               onChange={inputHandler}
-              placeholder={loading ? 'Loading...' : 'Please select a condition...'}
+              placeholder={'Please select a condition...'}
               type="text"
               value={conditionId}
             />

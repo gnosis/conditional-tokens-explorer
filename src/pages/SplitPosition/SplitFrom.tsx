@@ -147,7 +147,6 @@ export const SplitFrom: React.FC<Props> = (props) => {
         visible={splitFromCollateral}
       />
       <ToggleableInputPosition
-        barebones
         formMethods={formMethods}
         onPositionChange={onPositionChange}
         splitFromPosition={splitFromPosition}
