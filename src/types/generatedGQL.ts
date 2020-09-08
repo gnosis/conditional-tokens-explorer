@@ -4,34 +4,6 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: ConditionsSearch
-// ====================================================
-
-export interface ConditionsSearch_conditions {
-  __typename: "Condition";
-  id: string;
-  oracle: any;
-  questionId: any;
-  outcomeSlotCount: number;
-  resolved: boolean;
-  creator: any;
-  resolveBlockNumber: any | null;
-}
-
-export interface ConditionsSearch {
-  conditions: ConditionsSearch_conditions[];
-}
-
-export interface ConditionsSearchVariables {
-  conditionId: string;
-}
-
-/* tslint:disable */
-/* eslint-disable */
-// @generated
-// This file was automatically generated and should not be edited.
-
-// ====================================================
 // GraphQL query operation: Conditions
 // ====================================================
 
@@ -43,10 +15,17 @@ export interface Conditions_conditions {
   outcomeSlotCount: number;
   resolved: boolean;
   creator: any;
+  resolveBlockNumber: any | null;
 }
 
 export interface Conditions {
   conditions: Conditions_conditions[];
+}
+
+export interface ConditionsVariables {
+  conditionId: string;
+  oracleIn: string[];
+  oracleNotIn: string[];
 }
 
 /* tslint:disable */
@@ -81,6 +60,7 @@ export interface GetCondition_condition {
   payoutNumerators: any[] | null;
   payoutDenominator: any | null;
   resolveTimestamp: any | null;
+  resolveBlockNumber: any | null;
   positions: GetCondition_condition_positions[] | null;
 }
 
@@ -90,6 +70,35 @@ export interface GetCondition {
 
 export interface GetConditionVariables {
   id: string;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL query operation: Positions
+// ====================================================
+
+export interface Positions_positions_collateralToken {
+  __typename: "CollateralToken";
+  id: string;
+}
+
+export interface Positions_positions {
+  __typename: "Position";
+  id: string;
+  collateralToken: Positions_positions_collateralToken;
+}
+
+export interface Positions {
+  positions: Positions_positions[];
+}
+
+export interface PositionsVariables {
+  positionId: string;
+  collateral: string;
 }
 
 /* tslint:disable */
@@ -222,58 +231,6 @@ export interface GetMultiPositions {
 
 export interface GetMultiPositionsVariables {
   ids: string[];
-}
-
-/* tslint:disable */
-/* eslint-disable */
-// @generated
-// This file was automatically generated and should not be edited.
-
-// ====================================================
-// GraphQL query operation: PositionsSearch
-// ====================================================
-
-export interface PositionsSearch_positions_collateralToken {
-  __typename: "CollateralToken";
-  id: string;
-}
-
-export interface PositionsSearch_positions {
-  __typename: "Position";
-  id: string;
-  collateralToken: PositionsSearch_positions_collateralToken;
-}
-
-export interface PositionsSearch {
-  positions: PositionsSearch_positions[];
-}
-
-export interface PositionsSearchVariables {
-  positionId: string;
-}
-
-/* tslint:disable */
-/* eslint-disable */
-// @generated
-// This file was automatically generated and should not be edited.
-
-// ====================================================
-// GraphQL query operation: Positions
-// ====================================================
-
-export interface Positions_positions_collateralToken {
-  __typename: "CollateralToken";
-  id: string;
-}
-
-export interface Positions_positions {
-  __typename: "Position";
-  id: string;
-  collateralToken: Positions_positions_collateralToken;
-}
-
-export interface Positions {
-  positions: Positions_positions[];
 }
 
 /* tslint:disable */

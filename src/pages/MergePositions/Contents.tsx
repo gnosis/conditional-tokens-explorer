@@ -33,7 +33,7 @@ export const Contents = () => {
 
   const { clearCondition, condition, errors: conditionErrors } = useConditionContext()
   const [status, setStatus] = useState<Maybe<Status>>(null)
-  const [error, setError] = useState<string | undefined>()
+  const [error, setError] = useState<Maybe<Error>>(null)
 
   const canMergePositions = useMemo(() => {
     return condition && arePositionMergeablesByCondition(positions, condition)
@@ -172,7 +172,7 @@ export const Contents = () => {
             status === Status.Error ? { text: 'OK', onClick: () => setStatus(null) } : undefined
           }
           icon={status === Status.Error ? IconTypes.error : IconTypes.spinner}
-          message={status === Status.Error ? error : 'Waiting...'}
+          message={status === Status.Error ? error?.message : 'Waiting...'}
           title={status === Status.Error ? 'Error' : 'Merge Positions'}
         />
       )}
