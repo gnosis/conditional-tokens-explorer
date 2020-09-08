@@ -10,18 +10,24 @@ import { PositionsList } from 'pages/PositionsList/index'
 import { PositionsListType, buildQueryPositions } from 'queries/positions'
 import { UserWithPositionsQuery } from 'queries/users'
 import theme from 'theme'
+import { NetworkConfig } from 'config/networkConfig'
+import { Infura } from 'contexts/Web3Context'
 
 const connect = jest.fn()
 const disconnect = jest.fn()
 
+const networkConfig = new NetworkConfig(4)
+
 const connectedStatus = {
   _type: Web3ContextStatus.Connected,
   address: '0x123',
+  networkConfig,
 } as Connected
 
 const infuraStatus = {
   _type: Web3ContextStatus.Infura,
-} as NotAsked
+  networkConfig,
+} as Infura
 
 const buildQueryOptions: PositionsListType = {
   positionId: '',
@@ -65,7 +71,7 @@ test('position list should show right columns when the user is connected', async
               id: 'Position1',
               collateralToken: {
                 __typename: 'CollateralToken',
-                id: 'token1',
+                id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
               },
             },
             {
@@ -73,7 +79,7 @@ test('position list should show right columns when the user is connected', async
               id: 'Position2',
               collateralToken: {
                 __typename: 'CollateralToken',
-                id: 'token1',
+                id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
               },
             },
           ],
@@ -142,7 +148,7 @@ test('position list shold show right columns when the user is not connected', as
               id: 'Position1',
               collateralToken: {
                 __typename: 'CollateralToken',
-                id: 'token1',
+                id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
               },
             },
             {
@@ -150,7 +156,7 @@ test('position list shold show right columns when the user is not connected', as
               id: 'Position2',
               collateralToken: {
                 __typename: 'CollateralToken',
-                id: 'token1',
+                id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
               },
             },
           ],
