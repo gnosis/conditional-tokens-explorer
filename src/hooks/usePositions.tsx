@@ -3,6 +3,7 @@ import React from 'react'
 
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { Position, marshalPositionListData } from 'hooks/utils'
+import uniqBy from 'lodash.uniqby'
 import { PositionsListType, buildQueryPositions } from 'queries/positions'
 import { UserWithPositionsQuery } from 'queries/users'
 import { ERC20Service } from 'services/erc20'
@@ -77,34 +78,60 @@ export const usePositions = (options: OptionsToSearch) => {
       const positionListData = marshalPositionListData(positionsData.positions, userData?.user)
 
       const fetchUserBalanceWithDecimals = async () => {
-        const positionListDataPromises = positionListData.map(async (position: Position) => {
-          const { collateralToken, userBalance } = position
+        const uniqueCollateralTokens = uniqBy(positionListData, 'collateralToken')
+
+        const collateralTokensPromises = uniqueCollateralTokens.map(async (position: Position) => {
+          const { collateralToken } = position
 
           try {
-            const token = networkConfig.getTokenFromAddress(collateralToken)
+            const { decimals } = networkConfig.getTokenFromAddress(collateralToken)
             return {
-              ...position,
-              userBalanceWithDecimals: formatBigNumber(userBalance, token.decimals),
-            } as PositionWithUserBalanceWithDecimals
+              collateralToken,
+              decimals,
+            }
           } catch (err) {
             logger.error(err)
           }
 
           try {
             const erc20Service = new ERC20Service(provider, collateralToken)
-            const token = await erc20Service.getProfileSummary()
+            const { decimals } = await erc20Service.getProfileSummary()
 
             return {
-              ...position,
-              userBalanceWithDecimals: formatBigNumber(userBalance, token.decimals),
-            } as PositionWithUserBalanceWithDecimals
+              collateralToken,
+              decimals,
+            }
           } catch (err) {
             logger.error(err)
           }
 
           return {
+            collateralToken,
+            decimals: null,
+          }
+        })
+        const collateralTokensResolved = await Promise.all(collateralTokensPromises)
+
+        const positionListDataPromises = positionListData.map(async (position: Position) => {
+          const { collateralToken, userBalance } = position
+
+          const collateralTokenFound = collateralTokensResolved.filter(
+            (collateralTokenInformation) => {
+              return (
+                collateralTokenInformation.collateralToken.toLowerCase() ===
+                collateralToken.toLowerCase()
+              )
+            }
+          )
+
+          const userBalanceWithDecimals =
+            collateralTokenFound.length && collateralTokenFound[0].decimals
+              ? formatBigNumber(userBalance, collateralTokenFound[0].decimals)
+              : userBalance.toString()
+
+          return {
             ...position,
-            userBalanceWithDecimals: userBalance.toString(),
+            userBalanceWithDecimals,
           } as PositionWithUserBalanceWithDecimals
         })
 
