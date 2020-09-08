@@ -3,28 +3,42 @@ import React from 'react'
 
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { Position, marshalPositionListData } from 'hooks/utils'
-import { PositionsListQuery, PositionsSearchQuery } from 'queries/positions'
+import { PositionsListType, buildQueryPositions } from 'queries/positions'
 import { UserWithPositionsQuery } from 'queries/users'
 import { Positions, UserWithPositions } from 'types/generatedGQL'
+import { CollateralFilterOptions } from 'util/types'
+
+interface OptionsToSearch {
+  positionId?: string
+  collateralValue?: string
+  collateralFilter?: string
+}
 
 /**
  * Return a array of positions, and the user balance if it's connected.
  */
-export const usePositions = (searchPositionId: string) => {
+export const usePositions = (options: OptionsToSearch) => {
   const { _type: status, address: addressFromWallet } = useWeb3ConnectedOrInfura()
+  const { collateralFilter, collateralValue, positionId } = options
+
   const [data, setData] = React.useState<Maybe<Position[]>>(null)
   const [address, setAddress] = React.useState<Maybe<string>>(null)
 
-  const options = searchPositionId
-    ? {
-        variables: {
-          positionId: searchPositionId,
-        },
-      }
-    : undefined
+  const queryOptions: PositionsListType = {}
+
+  if (positionId) {
+    queryOptions.positionId = positionId
+  }
+
+  if (collateralValue !== CollateralFilterOptions.All) {
+    queryOptions.collateral = collateralFilter
+  }
+
+  const query = buildQueryPositions(queryOptions)
+
   const { data: positionsData, error: positionsError, loading: positionsLoading } = useQuery<
     Positions
-  >(searchPositionId ? PositionsSearchQuery : PositionsListQuery, options)
+  >(query, { variables: queryOptions })
 
   const { data: userData, error: userError, loading: userLoading } = useQuery<UserWithPositions>(
     UserWithPositionsQuery,

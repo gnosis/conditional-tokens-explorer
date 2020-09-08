@@ -69,7 +69,9 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
     [debouncedHandler]
   )
 
-  const { data, error, loading } = usePositions(positionIdToSearch)
+  const { data, error, loading } = usePositions({
+    positionId: positionIdToSearch,
+  })
 
   useEffect(() => {
     if (data && data.length && preSelectedPositions && preSelectedPositions.length) {
