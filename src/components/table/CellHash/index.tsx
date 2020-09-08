@@ -5,8 +5,8 @@ import { ButtonCopy } from 'components/buttons/ButtonCopy'
 import { truncateStringInTheMiddle } from 'util/tools'
 
 const Wrapper = styled.span`
-  font-family: monospace;
-  font-variant: tabular-nums;
+  font-family: 'Roboto Mono', monospace;
+  text-transform: uppercase;
 `
 
 const Text = styled.span<{ underline?: boolean }>`
