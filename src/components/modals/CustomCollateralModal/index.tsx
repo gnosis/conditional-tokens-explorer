@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 
 import { Button } from 'components/buttons'
@@ -29,16 +29,8 @@ interface Props extends ModalProps {
 export const CustomCollateralModal: React.FC<Props> = (props) => {
   const { onAdd, onRequestClose, ...restProps } = props
   const [collateralAddress, setCollateralAddress] = useState<string>('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string>()
 
-  const collateralData = useCollateral(collateralAddress)
-
-  useEffect(() => {
-    if (collateralData) {
-      setIsLoading(false)
-    }
-  }, [collateralData])
+  const { collateral: collateralData, error, loading } = useCollateral(collateralAddress)
 
   const onClickAddButton = (
     e: React.MouseEvent<Element, MouseEvent> | React.KeyboardEvent<Element>
@@ -69,31 +61,21 @@ export const CustomCollateralModal: React.FC<Props> = (props) => {
                 onChange={(event) => {
                   const { value } = event.target
                   setCollateralAddress(value)
-                  setIsLoading(true)
-                  // Note: This is just a mockery to test displaying errors, we should
-                  // show proper informative errors
-                  if (value.length < 16) {
-                    setError('Not a valid contract address.')
-                  } else {
-                    setError('')
-                  }
                 }}
                 placeholder="A valid contract address..."
                 type="text"
               />
               {error && (
                 <ErrorContainer>
-                  <Error>{error}</Error>
+                  <Error>{error.message}</Error>
                 </ErrorContainer>
               )}
             </>
           }
         />
       </FirstRow>
-      {!collateralData && (
-        <SpinnerWrapper>{isLoading && !error && <InlineLoading />}</SpinnerWrapper>
-      )}
-      {!isLoading && collateralData && (
+      {!collateralData && <SpinnerWrapper>{loading && !error && <InlineLoading />}</SpinnerWrapper>}
+      {!loading && collateralData && (
         <Row>
           <TitleValue title={'Token Symbol'} value={collateralData && collateralData.symbol} />
           <TitleValue

@@ -34,7 +34,9 @@ export const PositionPreview = ({
   selectedCollateral,
   splitFrom,
 }: Props) => {
-  const positionCollateral = useCollateral(position ? position.collateralToken.id : '')
+  const { collateral: positionCollateral } = useCollateral(
+    position ? position.collateralToken.id : ''
+  )
   const splitFromCollateral = useMemo(() => splitFrom === SplitFromType.collateral, [splitFrom])
   const splitFromPosition = useMemo(() => splitFrom === SplitFromType.position, [splitFrom])
 

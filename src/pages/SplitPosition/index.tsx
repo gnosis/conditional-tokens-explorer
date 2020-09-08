@@ -22,7 +22,7 @@ export const SplitPosition = () => {
   const [collateral, setCollateral] = useState<string>(tokens[0].address)
   const [isLoading, setIsLoading] = useState(true)
   const allowanceMethods = useAllowance(collateral)
-  const collateralToken = useCollateral(collateral)
+  const { collateral: collateralToken } = useCollateral(collateral)
 
   const splitPosition = React.useCallback(
     async (

@@ -53,7 +53,9 @@ export const Contents = ({ position }: Props) => {
   const { setValue } = useLocalStorage('positionid')
   const { balance, error, loading } = useBalanceForPosition(position.id)
 
-  const positionCollateral = useCollateral(position ? position.collateralToken.id : '')
+  const { collateral: positionCollateral } = useCollateral(
+    position ? position.collateralToken.id : ''
+  )
   const [collateralSymbol, setCollateralSymbol] = React.useState('')
   const { collateralToken, id } = position
 
