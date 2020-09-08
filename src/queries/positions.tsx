@@ -1,6 +1,49 @@
 import gql from 'graphql-tag'
 
-const postitionFragment = gql`
+export interface PositionsListType {
+  positionId?: string
+  collateral?: string
+}
+
+export const DEFAULT_OPTIONS = {
+  positionId: '',
+  collateral: '',
+}
+
+export const buildQueryPositions = (options: PositionsListType = DEFAULT_OPTIONS) => {
+  const { collateral, positionId } = options
+
+  const whereClauseInternal = [
+    positionId ? 'id: $positionId' : '',
+    collateral ? 'collateralToken: $collateral' : '',
+  ]
+    .filter((s) => s.length)
+    .join(',')
+  const whereClause = whereClauseInternal ? `, where: { ${whereClauseInternal} }` : ''
+
+  const variablesClauseInternal = [
+    positionId ? '$positionId: String' : '',
+    collateral ? '$collateral: String' : '',
+  ]
+    .filter((s) => s.length)
+    .join(',')
+
+  const variablesClause = variablesClauseInternal ? `(${variablesClauseInternal})` : ''
+
+  const query = gql`
+  query Positions ${variablesClause} {
+    positions(first: 1000 ${whereClause}) {
+      id
+      collateralToken {
+        id
+      }
+    }
+  }
+  `
+  return query
+}
+
+const positionFragment = gql`
   fragment PositionData on Position {
     id
     indexSets
@@ -41,7 +84,7 @@ export const GetPositionQuery = gql`
       ...PositionData
     }
   }
-  ${postitionFragment}
+  ${positionFragment}
 `
 
 export const GetMultiPositionsQuery = gql`
@@ -50,27 +93,5 @@ export const GetMultiPositionsQuery = gql`
       ...PositionData
     }
   }
-  ${postitionFragment}
-`
-
-export const PositionsSearchQuery = gql`
-  query PositionsSearch($positionId: String!) {
-    positions(first: 1000, where: { id: $positionId }) {
-      id
-      collateralToken {
-        id
-      }
-    }
-  }
-`
-
-export const PositionsListQuery = gql`
-  query Positions {
-    positions(first: 1000) {
-      id
-      collateralToken {
-        id
-      }
-    }
-  }
+  ${positionFragment}
 `

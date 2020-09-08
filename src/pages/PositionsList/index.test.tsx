@@ -7,7 +7,7 @@ import { ThemeProvider } from 'styled-components'
 
 import { Connected, NotAsked, Web3Context, Web3ContextStatus } from 'contexts/Web3Context'
 import { PositionsList } from 'pages/PositionsList/index'
-import { PositionsListQuery } from 'queries/positions'
+import { PositionsListType, buildQueryPositions } from 'queries/positions'
 import { UserWithPositionsQuery } from 'queries/users'
 import theme from 'theme'
 
@@ -22,6 +22,16 @@ const connectedStatus = {
 const infuraStatus = {
   _type: Web3ContextStatus.Infura,
 } as NotAsked
+
+const buildQueryOptions: PositionsListType = {
+  positionId: '',
+}
+
+const query = buildQueryPositions(buildQueryOptions)
+
+const variables = {
+  positionId: '',
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const renderWithConnectedProvider = (component: any, query: any) => {
@@ -49,7 +59,7 @@ test('position list should show right columns when the user is connected', async
   const mockQueryResult = [
     {
       request: {
-        query: PositionsListQuery,
+        query: query
       },
       result: {
         data: {
@@ -111,8 +121,8 @@ test('position list should show right columns when the user is connected', async
       expect(getByRole('table')).toBeInTheDocument()
     })
 
-    const positinIdColumn = await findByText(/Position Id/i)
-    expect(positinIdColumn).toBeInTheDocument()
+    const positionIdColumn = await findByText(/Position Id/i)
+    expect(positionIdColumn).toBeInTheDocument()
 
     // const collateralColumn = await findByText(/Collateral/i)
     // expect(collateralColumn).toBeInTheDocument()
@@ -126,7 +136,7 @@ test('position list shold show right columns when the user is not connected', as
   const mockQueryResult = [
     {
       request: {
-        query: PositionsListQuery,
+        query: query,
       },
       result: {
         data: {
@@ -162,8 +172,8 @@ test('position list shold show right columns when the user is not connected', as
       expect(getByRole('table')).toBeInTheDocument()
     })
 
-    const positinIdColumn = await findByText(/Position Id/i)
-    expect(positinIdColumn).toBeInTheDocument()
+    const positionIdColumn = await findByText(/Position Id/i)
+    expect(positionIdColumn).toBeInTheDocument()
     //
     // const collateralColumn = await findByText(/Collateral/i)
     // expect(collateralColumn).toBeInTheDocument()
