@@ -59,7 +59,7 @@ test('position list should show right columns when the user is connected', async
   const mockQueryResult = [
     {
       request: {
-        query: query
+        query: query,
       },
       result: {
         data: {
