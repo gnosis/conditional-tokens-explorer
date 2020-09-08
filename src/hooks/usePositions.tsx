@@ -7,9 +7,9 @@ import { PositionsListType, buildQueryPositions } from 'queries/positions'
 import { UserWithPositionsQuery } from 'queries/users'
 import { ERC20Service } from 'services/erc20'
 import { Positions, UserWithPositions } from 'types/generatedGQL'
-import { CollateralFilterOptions } from 'util/types'
-import { formatBigNumber } from 'util/tools'
 import { getLogger } from 'util/logger'
+import { formatBigNumber } from 'util/tools'
+import { CollateralFilterOptions } from 'util/types'
 
 export type UserBalanceWithDecimals = {
   userBalanceWithDecimals: string
@@ -29,10 +29,15 @@ const logger = getLogger('UsePositions')
  * Return a array of positions, and the user balance if it's connected.
  */
 export const usePositions = (options: OptionsToSearch) => {
-  const { _type: status, address: addressFromWallet, networkConfig, provider } = useWeb3ConnectedOrInfura()
+  const {
+    _type: status,
+    address: addressFromWallet,
+    networkConfig,
+    provider,
+  } = useWeb3ConnectedOrInfura()
   const { collateralFilter, collateralValue, positionId } = options
 
-  const [data, setData] = React.useState<Maybe<Position[]>>(null)
+  const [data, setData] = React.useState<Maybe<PositionWithUserBalanceWithDecimals[]>>(null)
   const [address, setAddress] = React.useState<Maybe<string>>(null)
 
   const queryOptions: PositionsListType = {}

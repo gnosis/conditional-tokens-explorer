@@ -77,10 +77,11 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
 
   useEffect(() => {
     if (data && data.length && preSelectedPositions && preSelectedPositions.length) {
-      setSelectedPositions((current) => {
+      setSelectedPositions((current: Array<PositionWithUserBalanceWithDecimals>) => {
         const currentIds = current.map(({ id }) => id)
         const filteredPre = preSelectedPositions.filter((pre) => !currentIds.includes(pre))
-        return [...current, ...data.filter(({ id }) => filteredPre.includes(id))]
+        const dataFiltered = data.filter(({ id }) => filteredPre.includes(id))
+        return [...current, ...dataFiltered]
       })
     }
   }, [preSelectedPositions, data])
