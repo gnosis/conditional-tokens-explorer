@@ -22,12 +22,6 @@ export interface Conditions {
   conditions: Conditions_conditions[];
 }
 
-export interface ConditionsVariables {
-  conditionId: string;
-  oracleIn: string[];
-  oracleNotIn: string[];
-}
-
 /* tslint:disable */
 /* eslint-disable */
 // @generated
@@ -94,11 +88,6 @@ export interface Positions_positions {
 
 export interface Positions {
   positions: Positions_positions[];
-}
-
-export interface PositionsVariables {
-  positionId: string;
-  collateral: string;
 }
 
 /* tslint:disable */

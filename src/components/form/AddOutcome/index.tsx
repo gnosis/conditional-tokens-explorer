@@ -135,7 +135,7 @@ export const AddOutcome: React.FC<Props> = (props) => {
       <TitleValue
         title="Outcomes"
         value={
-          <StripedList>
+          <StripedList maxHeight="300px" minHeight="200px">
             {outcomes.length ? (
               outcomes.map((item, index) => (
                 <StripedListItem key={index}>

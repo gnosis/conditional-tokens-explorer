@@ -160,7 +160,7 @@ export const SelectPositions = ({
                 value={positionsToDisplay.length ? positionsToDisplay[0] : ''}
               />
             ) : (
-              <StripedList maxHeight="300px" minHeight="120px">
+              <StripedList maxHeight="300px" minHeight="90px">
                 {positionsToDisplay.length ? (
                   positionsToDisplay.map((position: string, index: number) => (
                     <StripedListItem key={index}>
@@ -173,7 +173,11 @@ export const SelectPositions = ({
                   ))
                 ) : (
                   <StripedListEmpty>
-                    {isLoading && errors.length === 0 ? <InlineLoading /> : 'No positions.'}
+                    {isLoading && errors.length === 0 ? (
+                      <InlineLoading height="30px" width="30px" />
+                    ) : (
+                      'No positions.'
+                    )}
                   </StripedListEmpty>
                 )}
               </StripedList>
