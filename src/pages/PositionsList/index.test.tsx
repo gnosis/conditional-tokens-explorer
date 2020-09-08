@@ -6,7 +6,7 @@ import { act } from 'react-dom/test-utils'
 import { ThemeProvider } from 'styled-components'
 
 import { NetworkConfig } from 'config/networkConfig'
-import { Connected, Infura, NotAsked, Web3Context, Web3ContextStatus } from 'contexts/Web3Context'
+import { Connected, Infura, Web3Context, Web3ContextStatus } from 'contexts/Web3Context'
 import { PositionsList } from 'pages/PositionsList/index'
 import { PositionsListType, buildQueryPositions } from 'queries/positions'
 import { UserWithPositionsQuery } from 'queries/users'
