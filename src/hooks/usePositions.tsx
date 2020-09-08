@@ -112,7 +112,7 @@ export const usePositions = (options: OptionsToSearch) => {
         })
         const collateralTokensResolved = await Promise.all(collateralTokensPromises)
 
-        const positionListDataPromises = positionListData.map(async (position: Position) => {
+        const positionListDataEnhanced = positionListData.map((position: Position) => {
           const { collateralToken, userBalance } = position
 
           const collateralTokenFound = collateralTokensResolved.filter(
@@ -135,8 +135,7 @@ export const usePositions = (options: OptionsToSearch) => {
           } as PositionWithUserBalanceWithDecimals
         })
 
-        const positionListDataResolved = await Promise.all(positionListDataPromises)
-        setData(positionListDataResolved)
+        setData(positionListDataEnhanced)
       }
 
       fetchUserBalanceWithDecimals()
