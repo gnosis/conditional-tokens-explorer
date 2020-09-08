@@ -1,6 +1,13 @@
+import { InputHTMLAttributes } from 'react'
 import styled, { css } from 'styled-components'
 
-export const TextfieldCSS = css<{ error?: boolean }>`
+interface TexfieldCSSProps {
+  error?: boolean
+}
+
+export interface TextfieldProps extends InputHTMLAttributes<HTMLInputElement>, TexfieldCSSProps {}
+
+export const TextfieldCSS = css<TexfieldCSSProps>`
   background-color: ${(props) => props.theme.textField.backgroundColor};
   border-color: ${(props) =>
     props.error ? props.theme.textField.errorColor : props.theme.textField.borderColor};
@@ -39,6 +46,6 @@ export const TextfieldCSS = css<{ error?: boolean }>`
   }
 `
 
-export const Textfield = styled.input`
+export const Textfield = styled.input<TextfieldProps>`
   ${TextfieldCSS}
 `

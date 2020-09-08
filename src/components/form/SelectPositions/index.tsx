@@ -2,6 +2,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { useEffect } from 'react'
 
 import { ButtonControl, ButtonControlType } from 'components/buttons/ButtonControl'
+import { TextfieldFetchableData } from 'components/form/TextfieldFetchableData'
 import { SelectPositionModal } from 'components/modals/SelectPositionsModal'
 import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
 import {
@@ -9,7 +10,6 @@ import {
   StripedListEmpty,
   StripedListItem,
 } from 'components/pureStyledComponents/StripedList'
-import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { TitleControl } from 'components/pureStyledComponents/TitleControl'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { TitleValue } from 'components/text/TitleValue'
@@ -150,15 +150,16 @@ export const SelectPositions = ({
         value={
           <>
             {singlePosition ? (
-              <Textfield
+              <TextfieldFetchableData
                 disabled={true}
                 error={!!errors.length}
+                isFetching={isLoading || balancesLoading}
                 placeholder={'Please select a position...'}
                 type="text"
                 value={positionsToDisplay.length ? positionsToDisplay[0] : ''}
               />
             ) : (
-              <StripedList maxHeight="150px">
+              <StripedList maxHeight="300px" minHeight="90px">
                 {positionsToDisplay.length ? (
                   positionsToDisplay.map((position: string, index: number) => (
                     <StripedListItem key={index}>
@@ -171,7 +172,11 @@ export const SelectPositions = ({
                   ))
                 ) : (
                   <StripedListEmpty>
-                    {isLoading && errors.length === 0 ? <InlineLoading /> : 'No positions.'}
+                    {isLoading && errors.length === 0 ? (
+                      <InlineLoading height="30px" width="30px" />
+                    ) : (
+                      'No positions.'
+                    )}
                   </StripedListEmpty>
                 )}
               </StripedList>

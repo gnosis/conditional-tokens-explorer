@@ -1,9 +1,10 @@
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect } from 'react'
 import { FormContextValues } from 'react-hook-form'
+import styled from 'styled-components'
 
+import { TextfieldFetchableData } from 'components/form/TextfieldFetchableData'
 import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
-import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
@@ -11,6 +12,12 @@ import { SplitPositionFormMethods } from 'pages/SplitPosition/Form'
 import { GetMultiPositions_positions } from 'types/generatedGQL'
 import { positionString } from 'util/tools'
 import { Errors } from 'util/types'
+
+const Wrapper = styled.div``
+
+const InputWrapper = styled.div`
+  position: relative;
+`
 
 const isDataInSync = (
   positionsLoading: boolean,
@@ -28,15 +35,12 @@ const isDataInSync = (
 }
 
 export interface InputPositionProps {
-  barebones?: boolean
   formMethods: FormContextValues<SplitPositionFormMethods>
   onPositionChange: (position: Maybe<GetMultiPositions_positions>) => void
   splitFromPosition: boolean
 }
 
 export const InputPosition = ({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  barebones = false,
   formMethods: { register, setValue },
   onPositionChange,
   splitFromPosition,
@@ -90,15 +94,17 @@ export const InputPosition = ({
   ])
 
   return (
-    <>
-      <Textfield
-        disabled={true}
-        error={!!errors.length}
-        placeholder={'Please select a position...'}
-        type="text"
-        value={positionToDisplay}
-        {...restProps}
-      />
+    <Wrapper {...restProps}>
+      <InputWrapper>
+        <TextfieldFetchableData
+          disabled={true}
+          error={!!errors.length}
+          isFetching={balancesLoading}
+          placeholder={'Please select a position...'}
+          type="text"
+          value={positionToDisplay}
+        />
+      </InputWrapper>
       {!!errors && (
         <ErrorContainer>
           {errors.map((error: Errors, index: number) => (
@@ -106,6 +112,6 @@ export const InputPosition = ({
           ))}
         </ErrorContainer>
       )}
-    </>
+    </Wrapper>
   )
 }
