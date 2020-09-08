@@ -29,10 +29,6 @@ const buildQueryOptions: PositionsListType = {
 
 const query = buildQueryPositions(buildQueryOptions)
 
-const variables = {
-  positionId: '',
-}
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const renderWithConnectedProvider = (component: any, query: any) => {
   return render(

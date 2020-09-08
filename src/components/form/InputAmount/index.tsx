@@ -70,13 +70,16 @@ export const InputAmount = ({
   }, [collateral, positionId, setValue, splitFrom])
 
   useEffect(() => {
-    if (
-      splitFrom === SplitFromType.position &&
-      canSetPositionBalance(positionsLoading, balancesLoading, positions, balances, positionIds)
-    ) {
-      // TODO - this only works with non custom tokens
-      setDecimals(networkConfig.getTokenFromAddress(positions[0].collateralToken.id).decimals)
-      setBalance(balances[0])
+    if (splitFrom === SplitFromType.position) {
+      if (
+        canSetPositionBalance(positionsLoading, balancesLoading, positions, balances, positionIds)
+      ) {
+        // TODO - this only works with non custom tokens
+        setDecimals(networkConfig.getTokenFromAddress(positions[0].collateralToken.id).decimals)
+        setBalance(balances[0])
+      } else {
+        setBalance(ZERO_BN)
+      }
     }
   }, [
     splitFrom,
