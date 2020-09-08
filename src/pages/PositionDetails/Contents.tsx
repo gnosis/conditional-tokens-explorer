@@ -82,6 +82,8 @@ export const Contents = ({ position }: Props) => {
   const ERC20Amount = 100
   const ERC1155Amount = 0
 
+  // TODO: is this necessary ? remove it if not
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const positionPreview = React.useMemo(() => {
     if (positionCollateral && !loading && !error && balance) {
       return positionString(position.conditionIds, position.indexSets, balance, positionCollateral)
