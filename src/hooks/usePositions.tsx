@@ -1,9 +1,9 @@
 import { useQuery } from '@apollo/react-hooks'
+import uniqBy from 'lodash.uniqby'
 import React from 'react'
 
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { Position, marshalPositionListData } from 'hooks/utils'
-import uniqBy from 'lodash.uniqby'
 import { PositionsListType, buildQueryPositions } from 'queries/positions'
 import { UserWithPositionsQuery } from 'queries/users'
 import { ERC20Service } from 'services/erc20'
