@@ -12,7 +12,6 @@ import {
 } from 'components/pureStyledComponents/StripedList'
 import { TitleControl } from 'components/pureStyledComponents/TitleControl'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
-import { Spinner } from 'components/statusInfo/Spinner'
 import { TitleValue } from 'components/text/TitleValue'
 import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
