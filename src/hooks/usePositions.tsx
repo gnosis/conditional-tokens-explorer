@@ -3,12 +3,13 @@ import React from 'react'
 
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { Position, marshalPositionListData } from 'hooks/utils'
-import { PositionsListQuery, PositionsSearchQuery } from 'queries/positions'
+import { PositionsListType, buildQueryPositions } from 'queries/positions'
 import { UserWithPositionsQuery } from 'queries/users'
 import { ERC20Service } from 'services/erc20'
 import { Positions, UserWithPositions } from 'types/generatedGQL'
-import { getLogger } from 'util/logger'
+import { CollateralFilterOptions } from 'util/types'
 import { formatBigNumber } from 'util/tools'
+import { getLogger } from 'util/logger'
 
 export type UserBalanceWithDecimals = {
   userBalanceWithDecimals: string
@@ -16,31 +17,39 @@ export type UserBalanceWithDecimals = {
 
 export type PositionWithUserBalanceWithDecimals = Position & UserBalanceWithDecimals
 
+interface OptionsToSearch {
+  positionId?: string
+  collateralValue?: string
+  collateralFilter?: string
+}
+
 const logger = getLogger('UsePositions')
 
 /**
  * Return a array of positions, and the user balance if it's connected.
  */
-export const usePositions = (searchPositionId: string) => {
-  const {
-    _type: status,
-    address: addressFromWallet,
-    networkConfig,
-    provider,
-  } = useWeb3ConnectedOrInfura()
-  const [data, setData] = React.useState<Maybe<PositionWithUserBalanceWithDecimals[]>>(null)
+export const usePositions = (options: OptionsToSearch) => {
+  const { _type: status, address: addressFromWallet, networkConfig, provider } = useWeb3ConnectedOrInfura()
+  const { collateralFilter, collateralValue, positionId } = options
+
+  const [data, setData] = React.useState<Maybe<Position[]>>(null)
   const [address, setAddress] = React.useState<Maybe<string>>(null)
 
-  const options = searchPositionId
-    ? {
-        variables: {
-          positionId: searchPositionId,
-        },
-      }
-    : undefined
+  const queryOptions: PositionsListType = {}
+
+  if (positionId) {
+    queryOptions.positionId = positionId
+  }
+
+  if (collateralValue !== CollateralFilterOptions.All) {
+    queryOptions.collateral = collateralFilter
+  }
+
+  const query = buildQueryPositions(queryOptions)
+
   const { data: positionsData, error: positionsError, loading: positionsLoading } = useQuery<
     Positions
-  >(searchPositionId ? PositionsSearchQuery : PositionsListQuery, options)
+  >(query, { variables: queryOptions })
 
   const { data: userData, error: userError, loading: userLoading } = useQuery<UserWithPositions>(
     UserWithPositionsQuery,

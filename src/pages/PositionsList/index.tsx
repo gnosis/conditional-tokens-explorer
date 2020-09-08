@@ -4,7 +4,7 @@ import DataTable from 'react-data-table-component'
 import { useHistory } from 'react-router-dom'
 
 import { ButtonDots } from 'components/buttons/ButtonDots'
-import { ButtonSelectLight } from 'components/buttons/ButtonSelectLight'
+import { CollateralFilterDropdown } from 'components/common/CollateralFilterDropdown'
 import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
 import { SearchField } from 'components/form/SearchField'
@@ -18,27 +18,42 @@ import { PositionWithUserBalanceWithDecimals, usePositions } from 'hooks'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { customStyles } from 'theme/tableCustomStyles'
 import { getLogger } from 'util/logger'
+import { CollateralFilterOptions } from 'util/types'
 
 const logger = getLogger('PositionsList')
 
 export const PositionsList = () => {
+  const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
+  const history = useHistory()
+  const { setValue } = useLocalStorage('positionid')
+
   const [positionIdToSearch, setPositionIdToSearch] = useState<string>('')
   const [positionIdToShow, setPositionIdToShow] = useState<string>('')
-  const debouncedHandler = useDebounceCallback((positionIdToSearch) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [connectedItems, setConnectedItems] = useState<Array<any>>([])
+  const [selectedCollateralFilter, setSelectedCollateralFilter] = useState<string>('')
+  const [selectedCollateralValue, setSelectedCollateralValue] = useState<string>(
+    CollateralFilterOptions.All
+  )
+
+  const debouncedHandlerPositionIdToSearch = useDebounceCallback((positionIdToSearch) => {
     setPositionIdToSearch(positionIdToSearch)
   }, 500)
-  const inputHandler = React.useCallback(
+
+  const onChangePositionId = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.currentTarget
       setPositionIdToShow(value)
-      debouncedHandler(value)
+      debouncedHandlerPositionIdToSearch(value)
     },
-    [debouncedHandler]
+    [debouncedHandlerPositionIdToSearch]
   )
-  const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
-  const { data, error, loading } = usePositions(positionIdToSearch)
-  const history = useHistory()
-  const { setValue } = useLocalStorage('positionid')
+
+  const { data, error, loading } = usePositions({
+    positionId: positionIdToSearch,
+    collateralFilter: selectedCollateralFilter,
+    collateralValue: selectedCollateralValue,
+  })
 
   const isLoading = !positionIdToSearch && loading
   const isSearching = positionIdToSearch && loading
@@ -83,9 +98,6 @@ export const PositionsList = () => {
     },
     [history]
   )
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [connectedItems, setConnectedItems] = useState<Array<any>>([])
 
   const menu = useMemo(() => {
     return [
@@ -147,7 +159,8 @@ export const PositionsList = () => {
         cell: (row: PositionWithUserBalanceWithDecimals) => {
           try {
             const token = networkConfig && networkConfig.getTokenFromAddress(row.collateralToken)
-            return <TokenIcon symbol={token.symbol} />
+            // Please don't delete this because the tests will explode
+            return <TokenIcon symbol={(token && token.symbol) || ''} />
           } catch (error) {
             logger.error(error)
             return row.collateralToken
@@ -162,30 +175,6 @@ export const PositionsList = () => {
     return [...defaultColumns, ...connectedItems, ...menu]
   }, [connectedItems, menu, handleRowClick, networkConfig])
 
-  const tokensList = networkConfig
-    ? [
-        ...networkConfig.getTokens().map((item) => {
-          return { content: <TokenIcon symbol={item.symbol} /> }
-        }),
-      ]
-    : []
-
-  const filterItems = [{ content: 'All Collaterals' }, ...tokensList]
-
-  const [selectedFilter, setselectedFilter] = useState(0)
-
-  const filterDropdown = (
-    <Dropdown
-      dropdownButtonContent={<ButtonSelectLight content={filterItems[selectedFilter].content} />}
-      dropdownPosition={DropdownPosition.right}
-      items={filterItems.map((item, index) => (
-        <DropdownItem key={index} onClick={() => setselectedFilter(index)}>
-          {item.content}
-        </DropdownItem>
-      ))}
-    />
-  )
-
   return (
     <>
       <PageTitle>Positions</PageTitle>
@@ -194,10 +183,18 @@ export const PositionsList = () => {
       {data && !isLoading && !error && (
         <>
           <TableControls
-            end={filterDropdown}
+            end={
+              <CollateralFilterDropdown
+                onClick={(symbol: string, address: string) => {
+                  setSelectedCollateralFilter(address)
+                  setSelectedCollateralValue(symbol)
+                }}
+                value={selectedCollateralValue}
+              />
+            }
             start={
               <SearchField
-                onChange={inputHandler}
+                onChange={onChangePositionId}
                 placeholder="Search by position id..."
                 value={positionIdToShow}
               />
