@@ -11,9 +11,23 @@ export const web3ModalCSS = css`
     border-color: ${(props) => props.theme.modalStyle.content.borderColor};
     border-radius: ${(props) => props.theme.modalStyle.content.borderRadius};
     box-shadow: ${(props) => props.theme.modalStyle.content.boxShadow};
+    margin: 0;
     max-width: 350px;
-    padding: ${(props) => props.theme.cards.paddingVertical}
-      ${(props) => props.theme.cards.paddingHorizontal};
+    padding-bottom: 50px;
+    padding-left: ${(props) => props.theme.cards.paddingHorizontal};
+    padding-right: ${(props) => props.theme.cards.paddingHorizontal};
+    padding-top: ${(props) => props.theme.cards.paddingVertical};
+
+    &::before {
+      color: ${(props) => props.theme.colors.darkBlue};
+      content: 'Connect A Wallet';
+      font-family: ${(props) => props.theme.fonts.fontFamily};
+      font-size: 22px;
+      font-weight: 400;
+      line-height: 1.2;
+      margin: 0 0 25px;
+      text-align: left;
+    }
   }
 
   .web3modal-provider-wrapper {
@@ -28,6 +42,7 @@ export const web3ModalCSS = css`
       flex-direction: row;
       justify-content: flex-start;
       padding: 12px;
+      transition: all 0.15s linear;
 
       .web3modal-provider-icon {
         flex-grow: 0;
@@ -41,7 +56,7 @@ export const web3ModalCSS = css`
         font-size: 17px;
         font-weight: 600;
         line-height: 1;
-        margin: 0 0 0 12px;
+        margin: 4px 0 0 12px;
         padding: 0;
         text-align: left;
       }
