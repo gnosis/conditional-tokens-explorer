@@ -79,8 +79,8 @@ export const Contents = ({ position }: Props) => {
   }, [id, history, setValue])
 
   // TODO: refactoring this to make work wrap and unwrap
-  const ERC20Amount = 100
-  const ERC1155Amount = 0
+  const ERC1155Amount = 1000
+  const ERC20Amount = 0
 
   // TODO: is this necessary ? remove it if not
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -140,23 +140,23 @@ export const Contents = ({ position }: Props) => {
             <StripedListStyled maxHeight="auto">
               <StripedListItem>
                 <CollateralText>
-                  <CollateralTextStrong>ERC20:</CollateralTextStrong>{' '}
+                  <CollateralTextStrong>ERC1155:</CollateralTextStrong>{' '}
                   <CollateralTextAmount>
-                    {ERC20Amount} {collateralSymbol}
+                    {ERC1155Amount} {collateralSymbol}
                   </CollateralTextAmount>
                 </CollateralText>
-                <CollateralWrapButton>Wrap</CollateralWrapButton>
+                <CollateralWrapButton disabled={!ERC1155Amount}>Wrap</CollateralWrapButton>
               </StripedListItem>
               <StripedListItem>
                 <CollateralText>
-                  <CollateralTextStrong>ERC1155:</CollateralTextStrong>{' '}
+                  <CollateralTextStrong>ERC20:</CollateralTextStrong>{' '}
                   <CollateralTextAmount>
-                    {ERC1155Amount
-                      ? `${ERC1155Amount} ${collateralSymbol}`
-                      : 'No unwrapper collateral yet.'}
+                    {ERC20Amount
+                      ? `${ERC20Amount} ${collateralSymbol}`
+                      : 'No unwrapped collateral yet.'}
                   </CollateralTextAmount>
                 </CollateralText>
-                <CollateralWrapButton disabled={!ERC1155Amount}>Unwrap</CollateralWrapButton>
+                <CollateralWrapButton disabled={!ERC20Amount}>Unwrap</CollateralWrapButton>
               </StripedListItem>
             </StripedListStyled>
           }
