@@ -26,7 +26,7 @@ const DECIMALS = 2
 const ORACLE_NOT_VALID_TO_REPORT_ERROR = 'The connected user is a not allowed to report payouts'
 const PAYOUTS_POSITIVE_ERROR = 'At least one payout must be positive'
 
-const logger = getLogger('OutcomSlotsToReport')
+const logger = getLogger('ReportPayouts')
 
 export const Contents: React.FC = () => {
   const { clearCondition, condition } = useConditionContext()
@@ -34,10 +34,12 @@ export const Contents: React.FC = () => {
 
   const [payoutEmptyError, setPayoutEmptyError] = useState(false)
   const [transactionStatus, setTransactionStatus] = useState<Maybe<Status>>(null)
-  const [oracleNotValidError, setOracleNotValidError] = useState(true)
+  const [oracleNotValidError, setOracleNotValidError] = useState(false)
   const [error, setError] = useState<Maybe<Error>>(null)
 
   const isConditionResolved = useMemo(() => condition && condition.resolved, [condition])
+  const questionId = useMemo(() => condition && condition.questionId, [condition])
+  const oracle = useMemo(() => condition && condition.oracle, [condition])
 
   const formMethods = useForm<FormInputs>({ mode: 'onSubmit' })
   const {
@@ -45,9 +47,6 @@ export const Contents: React.FC = () => {
     handleSubmit,
     watch,
   } = formMethods
-
-  const questionId = condition && condition.questionId
-  const oracle = condition && condition.oracle
 
   // Variable used to disable the submit button, check for payouts not empty and the oracle must be valid
   const disableSubmit =
@@ -59,7 +58,8 @@ export const Contents: React.FC = () => {
 
   // Check if the sender is valid
   useEffect(() => {
-    if (status === Web3ContextStatus.Connected && address && oracle) {
+    if (!oracle) return
+    if (status === Web3ContextStatus.Connected && address) {
       setOracleNotValidError(oracle.toLowerCase() !== address.toLowerCase())
     } else {
       setOracleNotValidError(true)
