@@ -4,6 +4,7 @@ import { dataTableCSS } from 'theme/dataTableCSS'
 import { localFonts } from 'theme/fonts'
 import theme from 'theme/index'
 import { reactTooltipCSS } from 'theme/reactTooltipCSS'
+import { walletConnectCSS } from 'theme/walletConnectCSS'
 import { web3ModalCSS } from 'theme/web3ModalCSS'
 
 type ThemeType = typeof theme
@@ -31,6 +32,7 @@ export const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
   }
 
   ${web3ModalCSS}
+  ${walletConnectCSS}
   ${dataTableCSS}
   ${reactTooltipCSS}
 `
