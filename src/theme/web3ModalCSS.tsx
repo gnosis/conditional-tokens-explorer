@@ -18,35 +18,43 @@ export const web3ModalCSS = css`
     position: relative;
     width: 100vw;
 
-    .web3modal-modal-hitbox::before {
-      color: ${(props) => props.theme.colors.darkBlue};
-      content: '';
-      background: url(data:image/svg+xml;base64,PHN2ZwogICAgaGVpZ2h0PSIyMCIKICAgIHZpZXdCb3g9IjAgMCAyMCAyMCIKICAgIHdpZHRoPSIyMCIKICAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICA+CiAgICA8cGF0aCBkPSJNMCAwaDIwdjIwSDB6IiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIC8+CiAgICA8cGF0aAogICAgICBkPSJNMTEuMTMgMTBsNi42MzMgNi42MzJhLjguOCAwIDAgMS0xLjEzMiAxLjEzMUwxMCAxMS4xM2wtNi42MzUgNi42MzJhLjguOCAwIDAgMS0xLjEzMi0xLjEzMkw4Ljg2NiAxMCAyLjIzMyAzLjM2NWEuOC44IDAgMCAxIDEuMTMyLTEuMTMyTDEwIDguODY2bDYuNjMzLTYuNjMzYS44LjggMCAwIDEgMS4xMzIgMS4xMzJMMTEuMTMgMTB6IgogICAgICBmaWxsPSIjMDAxNDI4IgogICAgICBmaWxsLXJ1bGU9ImV2ZW5vZGQiCiAgICAvPgogIDwvc3ZnPg==);
-      cursor: pointer;
-      font-family: ${(props) => props.theme.fonts.fontFamily};
-      font-size: 22px;
-      height: ${X_DIMENSIONS};
-      left: 50%;
+    .web3modal-modal-hitbox {
+      bottom: 0;
+      left: 0;
       position: absolute;
-      top: 50%;
-      transform: translateX(
-          calc(
-            -50% + (
-                ${MODAL_WIDTH} - ${(props) => props.theme.cards.paddingHorizontal} * 2 -
-                  ${X_DIMENSIONS} / 2
-              ) / 2
+      right: 0;
+      top: 0;
+
+      &::before {
+        color: ${(props) => props.theme.colors.darkBlue};
+        content: '';
+        background: url(data:image/svg+xml;base64,PHN2ZwogICAgaGVpZ2h0PSIyMCIKICAgIHZpZXdCb3g9IjAgMCAyMCAyMCIKICAgIHdpZHRoPSIyMCIKICAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICA+CiAgICA8cGF0aCBkPSJNMCAwaDIwdjIwSDB6IiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIC8+CiAgICA8cGF0aAogICAgICBkPSJNMTEuMTMgMTBsNi42MzMgNi42MzJhLjguOCAwIDAgMS0xLjEzMiAxLjEzMUwxMCAxMS4xM2wtNi42MzUgNi42MzJhLjguOCAwIDAgMS0xLjEzMi0xLjEzMkw4Ljg2NiAxMCAyLjIzMyAzLjM2NWEuOC44IDAgMCAxIDEuMTMyLTEuMTMyTDEwIDguODY2bDYuNjMzLTYuNjMzYS44LjggMCAwIDEgMS4xMzIgMS4xMzJMMTEuMTMgMTB6IgogICAgICBmaWxsPSIjMDAxNDI4IgogICAgICBmaWxsLXJ1bGU9ImV2ZW5vZGQiCiAgICAvPgogIDwvc3ZnPg==);
+        cursor: pointer;
+        font-family: ${(props) => props.theme.fonts.fontFamily};
+        font-size: 22px;
+        height: ${X_DIMENSIONS};
+        left: 50%;
+        position: absolute;
+        top: 50%;
+        transform: translateX(
+            calc(
+              -50% + (
+                  ${MODAL_WIDTH} - ${(props) => props.theme.cards.paddingHorizontal} * 2 -
+                    ${X_DIMENSIONS} / 2
+                ) / 2
+            )
           )
-        )
-        translateY(
-          calc(
-            -50% - (
-                ${MODAL_HEIGHT} - ${(props) => props.theme.cards.paddingVertical} * 2 -
-                  ${X_DIMENSIONS} / 2
-              ) / 2
-          )
-        );
-      width: ${X_DIMENSIONS};
-      z-index: 150;
+          translateY(
+            calc(
+              -50% - (
+                  ${MODAL_HEIGHT} - ${(props) => props.theme.cards.paddingVertical} * 2 -
+                    ${X_DIMENSIONS} / 2
+                ) / 2
+            )
+          );
+        width: ${X_DIMENSIONS};
+        z-index: 150;
+      }
     }
   }
 
