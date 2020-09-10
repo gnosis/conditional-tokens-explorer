@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -8,14 +8,18 @@ import { ButtonDropdownCircle } from 'components/buttons/ButtonDropdownCircle'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
+import { WrapModal } from 'components/modals/WrapModal'
 import { Row } from 'components/pureStyledComponents/Row'
 import { StripedList, StripedListItem } from 'components/pureStyledComponents/StripedList'
+import { FullLoading } from 'components/statusInfo/FullLoading'
+import { IconTypes } from 'components/statusInfo/common'
 import { TitleValue } from 'components/text/TitleValue'
 import { useBalanceForPosition } from 'hooks/useBalanceForPosition'
 import { useCollateral } from 'hooks/useCollateral'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { GetPosition_position as Position } from 'types/generatedGQL'
-import { positionString, truncateStringInTheMiddle } from 'util/tools'
+import { formatBigNumber, positionString, truncateStringInTheMiddle } from 'util/tools'
+import { Status } from 'util/types'
 
 const CollateralText = styled.span`
   color: ${(props) => props.theme.colors.darkerGray};
@@ -52,12 +56,15 @@ export const Contents = ({ position }: Props) => {
   const history = useHistory()
   const { setValue } = useLocalStorage('positionid')
   const { balance, error, loading } = useBalanceForPosition(position.id)
+  const [status, setStatus] = useState<Maybe<Status>>(null)
+  const [action, setAction] = useState<string>('')
 
   const { collateral: positionCollateral } = useCollateral(
     position ? position.collateralToken.id : ''
   )
   const [collateralSymbol, setCollateralSymbol] = React.useState('')
   const { collateralToken, id } = position
+  const [isWrapModalOpen, setIsWrapModalOpen] = useState(false)
 
   const dropdownItems = useMemo(() => {
     return [
@@ -78,11 +85,8 @@ export const Contents = ({ position }: Props) => {
     ]
   }, [id, history, setValue])
 
-  // TODO: refactoring this to make work wrap and unwrap
-  const ERC1155Amount = 1000
   const ERC20Amount = 0
 
-  // TODO: is this necessary ? remove it if not
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const positionPreview = React.useMemo(() => {
     if (positionCollateral && !loading && !error && balance) {
@@ -97,6 +101,20 @@ export const Contents = ({ position }: Props) => {
       setCollateralSymbol('')
     }
   }, [positionCollateral])
+
+  const decimals = useMemo(
+    () => (positionCollateral && positionCollateral.decimals ? positionCollateral.decimals : 0),
+    [positionCollateral]
+  )
+
+  const onWrap = useCallback(() => {
+    setStatus(Status.Loading)
+    setAction('Wrapping ERC1155...')
+
+    setTimeout(() => {
+      setStatus(Status.Done)
+    }, 5000)
+  }, [])
 
   return (
     <CenteredCard
@@ -142,10 +160,15 @@ export const Contents = ({ position }: Props) => {
                 <CollateralText>
                   <CollateralTextStrong>ERC1155:</CollateralTextStrong>{' '}
                   <CollateralTextAmount>
-                    {ERC1155Amount} {collateralSymbol}
+                    {formatBigNumber(balance, decimals)} {collateralSymbol}
                   </CollateralTextAmount>
                 </CollateralText>
-                <CollateralWrapButton disabled={!ERC1155Amount}>Wrap</CollateralWrapButton>
+                <CollateralWrapButton
+                  disabled={balance.isZero()}
+                  onClick={() => setIsWrapModalOpen(true)}
+                >
+                  Wrap
+                </CollateralWrapButton>
               </StripedListItem>
               <StripedListItem>
                 <CollateralText>
@@ -168,6 +191,35 @@ export const Contents = ({ position }: Props) => {
           value={<StripedListItem>{positionPreview || ''} </StripedListItem>}
         />
       </Row>
+      {isWrapModalOpen && (
+        <WrapModal
+          balance={balance}
+          decimals={decimals}
+          isOpen={isWrapModalOpen}
+          onRequestClose={() => setIsWrapModalOpen(false)}
+          onWrap={onWrap}
+          tokenSymbol={collateralSymbol}
+        />
+      )}
+      {(status === Status.Loading || status === Status.Error) && (
+        <FullLoading
+          actionButton={
+            status === Status.Error ? { text: 'OK', onClick: () => setStatus(null) } : undefined
+          }
+          icon={status === Status.Error ? IconTypes.error : IconTypes.spinner}
+          message={status === Status.Error ? 'There was a problem' : 'Working...'}
+          title={status === Status.Error ? 'Error' : action}
+        />
+      )}
+      {/* ADD OK ICON HERE! */}
+      {status === Status.Done && (
+        <FullLoading
+          actionButton={{ text: 'OK', onClick: () => setStatus(null) }}
+          icon={IconTypes.alert}
+          message={'Done!'}
+          title={action}
+        />
+      )}
     </CenteredCard>
   )
 }
