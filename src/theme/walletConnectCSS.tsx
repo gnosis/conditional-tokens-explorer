@@ -6,7 +6,7 @@ export const walletConnectCSS = css`
       color: ${(props) => props.theme.colors.darkBlue};
     }
     .walletconnect-qrcode__base {
-      background-color: transparent;
+      background-color: ${(props) => props.theme.modalStyle.overlay.backgroundColor};
     }
     .walletconnect-modal__base {
       border-radius: ${(props) => props.theme.modalStyle.content.borderRadius};
