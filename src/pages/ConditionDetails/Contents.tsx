@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useMemo } from 'react'
+import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { ButtonCopy } from 'components/buttons/ButtonCopy'
@@ -12,9 +13,9 @@ import { TitleValue } from 'components/text/TitleValue'
 import { INFORMATION_NOT_AVAILABLE } from 'config/constants'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useIsConditionFromOmen } from 'hooks/useIsConditionFromOmen'
+import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { useQuestion } from 'hooks/useQuestion'
 import { GetCondition_condition } from 'types/generatedGQL'
-import { getLogger } from 'util/logger'
 import { formatTS, getConditionTypeTitle, truncateStringInTheMiddle } from 'util/tools'
 import { ConditionStatus, ConditionType } from 'util/types'
 
@@ -22,14 +23,15 @@ const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
 `
 
-const logger = getLogger('ConditionDetails')
-
 interface Props {
   condition: GetCondition_condition
 }
 
 export const Contents: React.FC<Props> = ({ condition }) => {
   const { networkConfig } = useWeb3ConnectedOrInfura()
+  const history = useHistory()
+
+  const { setValue } = useLocalStorage('conditionid')
 
   const {
     creator,
@@ -41,32 +43,31 @@ export const Contents: React.FC<Props> = ({ condition }) => {
     resolved,
   } = condition
 
-  const dropdownItems = [
-    {
-      onClick: () => {
-        logger.log('Resolve Condition')
+  const dropdownItems = useMemo(() => {
+    return [
+      {
+        onClick: () => {
+          setValue(conditionId)
+          history.push(`/split/`)
+        },
+        text: 'Split Position',
       },
-      text: 'Resolve Condition',
-    },
-    {
-      onClick: () => {
-        logger.log('Split Position')
+      {
+        onClick: () => {
+          setValue(conditionId)
+          history.push(`/merge/`)
+        },
+        text: 'Merge Positions',
       },
-      text: 'Split Position',
-    },
-    {
-      onClick: () => {
-        logger.log('Merge Positions')
+      {
+        onClick: () => {
+          setValue(conditionId)
+          history.push(`/report/`)
+        },
+        text: 'Report Payouts',
       },
-      text: 'Merge Positions',
-    },
-    {
-      onClick: () => {
-        logger.log('Report Payouts')
-      },
-      text: 'Report Payouts',
-    },
-  ]
+    ]
+  }, [history, setValue, conditionId])
 
   const { outcomesPrettier, question } = useQuestion(questionId, outcomeSlotCount)
   const isConditionFromOmen = useIsConditionFromOmen(creator, oracle, question)
