@@ -101,6 +101,9 @@ export const Form = ({
   const [position, setPosition] = useState<Maybe<GetPosition_position>>(null)
   const [isTransactionExecuting, setIsTransactionExecuting] = useState(false)
   const [error, setError] = useState<Maybe<Error>>(null)
+  const [originalPartition, setOriginalPartition] = useState<BigNumber[]>([])
+  const [numberedOutcomes, setNumberedOutcomes] = useState<Array<Array<OutcomeProps>>>([])
+  const [isEditPartitionModalOpen, setIsEditPartitionModalOpen] = useState(false)
 
   const { amount, positionId, splitFrom } = getValues() as SplitPositionFormMethods
 
@@ -122,11 +125,34 @@ export const Form = ({
     }
   }, [getValues, onCollateralChange, watchCollateralAddress])
 
+  useEffect(() => {
+    setOriginalPartition(trivialPartition(outcomeSlot))
+  }, [outcomeSlot])
+
+  useEffect(() => {
+    const numberedOutcomesToSet = originalPartition.map((outcome: BigNumber, key: number) => {
+      return [{ value: key, id: outcome.toString() }]
+    })
+    setNumberedOutcomes(numberedOutcomesToSet)
+  }, [originalPartition, setNumberedOutcomes])
+
+  const partition = useMemo(() => {
+    return numberedOutcomes.map((collection: Array<OutcomeProps>) => {
+      const collectionExtract = collection.map((item) => item.id).sort((a, b) => +a - +b) //ascending sort
+      const indexSet = collectionExtract.reduce((acc, indexSet) => acc | +indexSet, 0)
+      return new BigNumber(indexSet)
+    })
+  }, [numberedOutcomes])
+
+  const onEditPartitionSave = useCallback((numberedOutcomes: Array<Array<OutcomeProps>>) => {
+    setIsEditPartitionModalOpen(false)
+    setNumberedOutcomes(numberedOutcomes)
+  }, [])
+
   const onSubmit = useCallback(
     async ({ amount, collateral, conditionId }: SplitPositionFormMethods) => {
       try {
         setIsTransactionExecuting(true)
-        const partition = trivialPartition(outcomeSlot)
 
         if (splitFromCollateral) {
           await splitPosition(collateral, NULL_PARENT_ID, conditionId, partition, amount)
@@ -150,7 +176,7 @@ export const Form = ({
       }
     },
     [
-      outcomeSlot,
+      partition,
       splitFromCollateral,
       splitFromPosition,
       position,
@@ -181,49 +207,6 @@ export const Form = ({
     }
   }, [splitFromCollateral, isValid, allowanceFinished])
 
-  const mockedNumberedOutcomes = [
-    [
-      { value: 1, id: '0x1234567' },
-      { value: 4, id: '0x2345678' },
-      { value: 3, id: '0x3456789' },
-    ],
-    [
-      { value: 2, id: '0x4567890' },
-      { value: 5, id: '0x5678901' },
-    ],
-    [
-      { value: 10, id: '0x6789012' },
-      { value: 11, id: '0x7890123' },
-    ],
-    [
-      { value: 6, id: '0x8901234' },
-      { value: 8, id: '0x9012345' },
-      { value: 9, id: '0x0123456' },
-    ],
-    [{ value: 7, id: '0x6543210' }],
-    [
-      { value: 12, id: '0x12rt34567' },
-      { value: 13, id: '0x234ert5678' },
-      { value: 14, id: '0x34ert56789' },
-      { value: 15, id: '0xuy1234567' },
-      { value: 16, id: '0x23tyu45678' },
-      { value: 17, id: '0x3456ytu789' },
-      { value: 18, id: '0x1234tyu567' },
-      { value: 19, id: '0x2345yutit678' },
-      { value: 20, id: '0x3456ytu789' },
-      { value: 21, id: '0x123tyu567' },
-      { value: 22, id: '0x2345rtyrt678' },
-      { value: 23, id: '0x3456tryrt789' },
-      { value: 24, id: '0x1234rtyrt567' },
-      { value: 25, id: '0x2345tryrt678' },
-      { value: 26, id: '0x345rete6789' },
-      { value: 27, id: '0x1yhrt234567' },
-      { value: 28, id: '0x234tyutyu5678' },
-      { value: 29, id: '0x3456rtyrty789' },
-    ],
-  ]
-
-  const [isEditPartitionModalOpen, setIsEditPartitionModalOpen] = useState(false)
   const outcomesByRow = '15'
 
   return (
@@ -276,13 +259,10 @@ export const Form = ({
             <>
               <CardTextSm>Outcomes Collections</CardTextSm>
               <StripedListStyled minHeight="200px">
-                {/* DELETE THESE COMMENTS WHEN THIS IS DONE */}
-                {/* Note: As I understand it, outcomes come from the selected condition,
-                so you can't show anything until you selected a condition. */}
-                {conditionIdToPreviewShow && mockedNumberedOutcomes.length ? (
-                  mockedNumberedOutcomes.map(
+                {numberedOutcomes && numberedOutcomes.length ? (
+                  numberedOutcomes.map(
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    (outcomeList: unknown | any, outcomeListIndex: number) => {
+                    (outcomeList: OutcomeProps[], outcomeListIndex: number) => {
                       return (
                         <StripedListItemLessPadding key={outcomeListIndex}>
                           <OutcomesContainer columnGap="0" columns={outcomesByRow}>
@@ -310,7 +290,7 @@ export const Form = ({
         <PositionPreview
           amount={amount}
           conditionId={conditionIdToPreviewShow}
-          outcomeSlotCount={outcomeSlot}
+          partition={partition}
           position={position}
           selectedCollateral={collateral}
           splitFrom={splitFrom}
@@ -340,7 +320,8 @@ export const Form = ({
         <EditPartitionModal
           isOpen={isEditPartitionModalOpen}
           onRequestClose={() => setIsEditPartitionModalOpen(false)}
-          outcomes={mockedNumberedOutcomes}
+          onSave={onEditPartitionSave}
+          outcomes={numberedOutcomes}
         />
       )}
     </CenteredCard>

@@ -10,13 +10,13 @@ import {
 import { TitleValue } from 'components/text/TitleValue'
 import { useCollateral } from 'hooks/useCollateral'
 import { GetPosition_position } from 'types/generatedGQL'
-import { positionString, trivialPartition } from 'util/tools'
+import { positionString } from 'util/tools'
 import { SplitFromType, Token } from 'util/types'
 
 interface Props {
   amount: BigNumber
   conditionId: string
-  outcomeSlotCount: number
+  partition: Maybe<BigNumber[]>
   position: Maybe<GetPosition_position>
   selectedCollateral: Token
   splitFrom: SplitFromType
@@ -29,7 +29,7 @@ const StripedListStyled = styled(StripedList)`
 export const PositionPreview = ({
   amount,
   conditionId,
-  outcomeSlotCount,
+  partition,
   position,
   selectedCollateral,
   splitFrom,
@@ -45,14 +45,14 @@ export const PositionPreview = ({
       return []
     }
 
-    if (splitFromCollateral) {
-      return trivialPartition(outcomeSlotCount).map((indexSet) => {
+    if (splitFromCollateral && partition && partition.length > 0) {
+      return partition.map((indexSet) => {
         return positionString([conditionId], [indexSet], amount, selectedCollateral)
       })
     }
 
-    if (position && positionCollateral) {
-      return trivialPartition(outcomeSlotCount).map((indexSet) => {
+    if (position && positionCollateral && partition && partition.length > 0) {
+      return partition.map((indexSet) => {
         return positionString(
           [...position.conditionIds, conditionId],
           [...[position.indexSets], indexSet],
@@ -65,7 +65,7 @@ export const PositionPreview = ({
   }, [
     amount,
     conditionId,
-    outcomeSlotCount,
+    partition,
     position,
     positionCollateral,
     selectedCollateral,
