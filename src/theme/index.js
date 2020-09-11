@@ -69,6 +69,7 @@ const theme = {
     primary: primary,
     textColor: textColor,
     tomatoRed: error,
+    warning: '#ffc05f',
     whitesmoke1: whitesmoke1,
     whitesmoke2: whitesmoke2,
     whitesmoke3: whitesmoke3,

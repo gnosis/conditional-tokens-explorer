@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useMemo, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
@@ -5,13 +6,15 @@ import styled from 'styled-components'
 import { Button } from 'components/buttons/Button'
 import { ButtonCopy } from 'components/buttons/ButtonCopy'
 import { ButtonDropdownCircle } from 'components/buttons/ButtonDropdownCircle'
+import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
+import { UnwrapModal } from 'components/modals/UnwrapModal'
 import { WrapModal } from 'components/modals/WrapModal'
 import { Row } from 'components/pureStyledComponents/Row'
 import { StripedList, StripedListItem } from 'components/pureStyledComponents/StripedList'
-import { FullLoading } from 'components/statusInfo/FullLoading'
+import { ActionButtonProps, FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
 import { TitleValue } from 'components/text/TitleValue'
 import { useBalanceForPosition } from 'hooks/useBalanceForPosition'
@@ -56,8 +59,6 @@ export const Contents = ({ position }: Props) => {
   const history = useHistory()
   const { setValue } = useLocalStorage('positionid')
   const { balance, error, loading } = useBalanceForPosition(position.id)
-  const [status, setStatus] = useState<Maybe<Status>>(null)
-  const [action, setAction] = useState<string>('')
 
   const { collateral: positionCollateral } = useCollateral(
     position ? position.collateralToken.id : ''
@@ -65,6 +66,7 @@ export const Contents = ({ position }: Props) => {
   const [collateralSymbol, setCollateralSymbol] = React.useState('')
   const { collateralToken, id } = position
   const [isWrapModalOpen, setIsWrapModalOpen] = useState(false)
+  const [isUnwrapModalOpen, setIsUnwrapModalOpen] = useState(false)
 
   const dropdownItems = useMemo(() => {
     return [
@@ -85,7 +87,7 @@ export const Contents = ({ position }: Props) => {
     ]
   }, [id, history, setValue])
 
-  const ERC20Amount = 0
+  const ERC20Amount = new BigNumber('500000000000000000')
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const positionPreview = React.useMemo(() => {
@@ -107,12 +109,58 @@ export const Contents = ({ position }: Props) => {
     [positionCollateral]
   )
 
-  const onWrap = useCallback(() => {
+  const [statusTitle, setStatusTitle] = useState<string>('')
+  const [statusMessage, setStatusMessage] = useState<string>('')
+  const [status, setStatus] = useState<Maybe<Status>>(null)
+  const [statusIcon, setStatusIcon] = useState<IconTypes>()
+  const [statusOnClick, setStatusOnClick] = useState<ActionButtonProps | undefined>(undefined)
+
+  const setStatusWorking = (title: string, message = 'Working...') => {
     setStatus(Status.Loading)
-    setAction('Wrapping ERC1155...')
+    setStatusTitle(title)
+    setStatusIcon(IconTypes.spinner)
+    setStatusMessage(message)
+    setStatusOnClick(undefined)
+  }
+
+  const setStatusDone = (title: string, message = 'Done!') => {
+    setStatusTitle(title)
+    setStatus(Status.Done)
+    setStatusMessage(message)
+    setStatusIcon(IconTypes.ok)
+    setStatusOnClick({
+      onClick: () => setStatus(null),
+      text: 'OK',
+    })
+  }
+
+  const setStatusError = (title: string, message = 'There was an error...') => {
+    setStatusTitle(title)
+    setStatus(Status.Done)
+    setStatusMessage(message)
+    setStatusIcon(IconTypes.error)
+    setStatusOnClick({
+      buttonType: ButtonType.danger,
+      onClick: () => setStatus(null),
+      text: 'Close',
+    })
+  }
+
+  const onWrap = useCallback(() => {
+    const onWrapTitle = 'Wrapping ERC1155'
+    setStatusWorking(onWrapTitle)
 
     setTimeout(() => {
-      setStatus(Status.Done)
+      setStatusDone(onWrapTitle)
+    }, 5000)
+  }, [])
+
+  const onUnwrap = useCallback(() => {
+    const onWrapTitle = 'Unwrapping ERC20'
+    setStatusWorking(onWrapTitle)
+
+    setTimeout(() => {
+      setStatusError(onWrapTitle)
     }, 5000)
   }, [])
 
@@ -164,7 +212,7 @@ export const Contents = ({ position }: Props) => {
                   </CollateralTextAmount>
                 </CollateralText>
                 <CollateralWrapButton
-                  disabled={balance.isZero()}
+                  disabled={!balance || balance.isZero()}
                   onClick={() => setIsWrapModalOpen(true)}
                 >
                   Wrap
@@ -174,12 +222,17 @@ export const Contents = ({ position }: Props) => {
                 <CollateralText>
                   <CollateralTextStrong>ERC20:</CollateralTextStrong>{' '}
                   <CollateralTextAmount>
-                    {ERC20Amount
-                      ? `${ERC20Amount} ${collateralSymbol}`
+                    {!ERC20Amount.isZero()
+                      ? `${formatBigNumber(ERC20Amount, decimals)} ${collateralSymbol}`
                       : 'No unwrapped collateral yet.'}
                   </CollateralTextAmount>
                 </CollateralText>
-                <CollateralWrapButton disabled={!ERC20Amount}>Unwrap</CollateralWrapButton>
+                <CollateralWrapButton
+                  disabled={!ERC20Amount || ERC20Amount.isZero()}
+                  onClick={() => setIsUnwrapModalOpen(true)}
+                >
+                  Unwrap
+                </CollateralWrapButton>
               </StripedListItem>
             </StripedListStyled>
           }
@@ -201,23 +254,22 @@ export const Contents = ({ position }: Props) => {
           tokenSymbol={collateralSymbol}
         />
       )}
-      {(status === Status.Loading || status === Status.Error) && (
-        <FullLoading
-          actionButton={
-            status === Status.Error ? { text: 'OK', onClick: () => setStatus(null) } : undefined
-          }
-          icon={status === Status.Error ? IconTypes.error : IconTypes.spinner}
-          message={status === Status.Error ? 'There was a problem' : 'Working...'}
-          title={status === Status.Error ? 'Error' : action}
+      {isUnwrapModalOpen && (
+        <UnwrapModal
+          balance={ERC20Amount}
+          decimals={decimals}
+          isOpen={isUnwrapModalOpen}
+          onRequestClose={() => setIsUnwrapModalOpen(false)}
+          onWrap={onUnwrap}
+          tokenSymbol={collateralSymbol}
         />
       )}
-      {/* ADD OK ICON HERE! */}
-      {status === Status.Done && (
+      {status !== null && (
         <FullLoading
-          actionButton={{ text: 'OK', onClick: () => setStatus(null) }}
-          icon={IconTypes.alert}
-          message={'Done!'}
-          title={action}
+          actionButton={statusOnClick}
+          icon={statusIcon}
+          message={statusMessage}
+          title={statusTitle}
         />
       )}
     </CenteredCard>

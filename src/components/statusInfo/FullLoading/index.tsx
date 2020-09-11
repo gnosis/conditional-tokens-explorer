@@ -3,10 +3,12 @@ import ReactDOM from 'react-dom'
 import styled, { css } from 'styled-components'
 
 import { Button } from 'components/buttons/Button'
+import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { Spinner } from 'components/statusInfo/Spinner'
 import { Card, Icon, IconTypes, Text, Title } from 'components/statusInfo/common'
 import { AlertIcon } from 'components/statusInfo/icons/AlertIcon'
 import { ErrorIcon } from 'components/statusInfo/icons/ErrorIcon'
+import { OkIcon } from 'components/statusInfo/icons/OkIcon'
 
 const Wrapper = styled.div`
   align-items: center;
@@ -53,9 +55,10 @@ const ActionButton = styled(Button)`
   width: 100%;
 `
 
-interface ActionButtonProps {
-  text: string
+export interface ActionButtonProps {
+  buttonType?: ButtonType | undefined
   onClick: () => void
+  text: string
 }
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -87,11 +90,14 @@ export const FullLoading: React.FC<Props> = (props) => {
         {icon === IconTypes.spinner && <LoadingSpinner />}
         {icon === IconTypes.alert && <AlertIcon />}
         {icon === IconTypes.error && <ErrorIcon />}
+        {icon === IconTypes.ok && <OkIcon />}
       </Icon>
       {message && <Text>{message}</Text>}
       {actionButton && (
         <ButtonContainer>
-          <ActionButton onClick={actionButton.onClick}>{actionButton.text}</ActionButton>
+          <ActionButton buttonType={actionButton.buttonType} onClick={actionButton.onClick}>
+            {actionButton.text}
+          </ActionButton>
         </ButtonContainer>
       )}
     </LoadingCard>

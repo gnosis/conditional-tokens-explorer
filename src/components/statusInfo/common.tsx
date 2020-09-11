@@ -17,7 +17,7 @@ Title.defaultProps = {
 
 export const Text = styled.p<{ textAlign?: string }>`
   color: ${(props) => props.theme.colors.darkGrey};
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 400;
   line-height: 1.4;
   margin: 0;
@@ -46,4 +46,5 @@ export enum IconTypes {
   alert = 1,
   error = 2,
   spinner = 3,
+  ok = 4,
 }
