@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { ERC20Service } from 'services/erc20'
+import { getTokenSummary } from 'util/tools'
 import { Token } from 'util/types'
 
 export const useCollateral = (
@@ -20,18 +20,7 @@ export const useCollateral = (
       if (!collateralAddress) {
         return null
       }
-
-      // if it's already in configs no need to hit the blockchain
-      try {
-        return networkConfig.getTokenFromAddress(collateralAddress)
-      } catch {
-        // do nothing
-      }
-
-      // try to recover ERC20 profile
-      const erc20Service = new ERC20Service(provider, collateral)
-      const token = await erc20Service.getProfileSummary()
-      return token
+      return await getTokenSummary(networkConfig, provider, collateral)
     }
 
     setLoading(true)

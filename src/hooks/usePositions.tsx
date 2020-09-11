@@ -6,10 +6,9 @@ import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Contex
 import { Position, marshalPositionListData } from 'hooks/utils'
 import { PositionsListType, buildQueryPositions } from 'queries/positions'
 import { UserWithPositionsQuery } from 'queries/users'
-import { ERC20Service } from 'services/erc20'
 import { Positions, UserWithPositions } from 'types/generatedGQL'
 import { getLogger } from 'util/logger'
-import { formatBigNumber } from 'util/tools'
+import { formatBigNumber, getTokenSummary } from 'util/tools'
 import { CollateralFilterOptions } from 'util/types'
 
 export type UserBalanceWithDecimals = {
@@ -82,33 +81,7 @@ export const usePositions = (options: OptionsToSearch) => {
 
         const collateralTokensPromises = uniqueCollateralTokens.map(async (position: Position) => {
           const { collateralToken } = position
-
-          try {
-            const { decimals } = networkConfig.getTokenFromAddress(collateralToken)
-            return {
-              collateralToken,
-              decimals,
-            }
-          } catch (err) {
-            logger.error(err)
-          }
-
-          try {
-            const erc20Service = new ERC20Service(provider, collateralToken)
-            const { decimals } = await erc20Service.getProfileSummary()
-
-            return {
-              collateralToken,
-              decimals,
-            }
-          } catch (err) {
-            logger.error(err)
-          }
-
-          return {
-            collateralToken,
-            decimals: null,
-          }
+          return await getTokenSummary(networkConfig, provider, collateralToken, logger)
         })
         const collateralTokensResolved = await Promise.all(collateralTokensPromises)
 
@@ -118,8 +91,7 @@ export const usePositions = (options: OptionsToSearch) => {
           const collateralTokenFound = collateralTokensResolved.filter(
             (collateralTokenInformation) => {
               return (
-                collateralTokenInformation.collateralToken.toLowerCase() ===
-                collateralToken.toLowerCase()
+                collateralTokenInformation.address.toLowerCase() === collateralToken.toLowerCase()
               )
             }
           )
