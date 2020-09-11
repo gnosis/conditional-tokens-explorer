@@ -1,7 +1,7 @@
 import React from 'react'
 
 export const UsdcIcon = () => (
-  <svg fill="none" height="20" width="20" xmlns="http://www.w3.org/2000/svg">
+  <svg fill="none" height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg">
     <path
       d="M10 20c5.523 0 10-4.477 10-10S15.523 0 10 0 0 4.477 0 10s4.477 10 10 10z"
       fill="#2775CA"
