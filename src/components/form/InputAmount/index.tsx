@@ -10,6 +10,7 @@ import { ZERO_BN } from 'config/constants'
 import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useWithToken } from 'hooks/useWithToken'
 import { SplitFrom, SplitPositionFormMethods } from 'pages/SplitPosition/Form'
 import { ERC20Service } from 'services/erc20'
 import { GetMultiPositions_positions } from 'types/generatedGQL'
@@ -59,6 +60,7 @@ export const InputAmount = ({
 }: Props) => {
   const { address, networkConfig, provider, signer } = useWeb3ConnectedOrInfura()
   const { loading: positionsLoading, positionIds, positions } = useMultiPositionsContext()
+  const positionsWithToken = useWithToken<GetMultiPositions_positions>(positions)
 
   const { balances, loading: balancesLoading } = useBatchBalanceContext()
 
@@ -74,8 +76,7 @@ export const InputAmount = ({
       if (
         canSetPositionBalance(positionsLoading, balancesLoading, positions, balances, positionIds)
       ) {
-        // TODO - this only works with non custom tokens
-        setDecimals(networkConfig.getTokenFromAddress(positions[0].collateralToken.id).decimals)
+        setDecimals(positionsWithToken[0].token.decimals)
         setBalance(balances[0])
       } else {
         setBalance(ZERO_BN)
@@ -89,6 +90,7 @@ export const InputAmount = ({
     balancesLoading,
     positions,
     networkConfig,
+    positionsWithToken,
   ])
 
   useEffect(() => {

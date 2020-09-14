@@ -9,13 +9,16 @@ import { UserWithPositionsQuery } from 'queries/users'
 import { Positions, UserWithPositions } from 'types/generatedGQL'
 import { getLogger } from 'util/logger'
 import { formatBigNumber, getTokenSummary } from 'util/tools'
-import { CollateralFilterOptions } from 'util/types'
+import { CollateralFilterOptions, Token } from 'util/types'
 
 export type UserBalanceWithDecimals = {
   userBalanceWithDecimals: string
 }
 
 export type PositionWithUserBalanceWithDecimals = Position & UserBalanceWithDecimals
+export type PositionWithUserBalanceWithDecimalsWithToken = PositionWithUserBalanceWithDecimals & {
+  token: Token
+}
 
 interface OptionsToSearch {
   positionId?: string
