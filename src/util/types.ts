@@ -114,3 +114,7 @@ export enum OracleFilterOptions {
 export enum CollateralFilterOptions {
   All = 'all',
 }
+
+export type PositionIdsArray = {
+  positionId: string
+}
