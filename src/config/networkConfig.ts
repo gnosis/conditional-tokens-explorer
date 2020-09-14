@@ -14,6 +14,9 @@ import {
   REALITIO_CONTRACT_ADDRESS_FOR_GANACHE,
   REALITIO_CONTRACT_ADDRESS_FOR_MAINNET,
   REALITIO_CONTRACT_ADDRESS_FOR_RINKEBY,
+  WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_GANACHE,
+  WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_MAINNET,
+  WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_RINKEBY,
 } from 'config/constants'
 import { NetworkIds, Oracle, Token } from 'util/types'
 
@@ -22,6 +25,7 @@ interface Network {
   contracts: {
     conditionalTokensAddress: string
     realitioAddress: string
+    wrapped1155FactoryAddress: string
   }
   tokens: Token[]
   graphHttpUri: string
@@ -35,6 +39,7 @@ const networks: { [K in NetworkIds]: Network } = {
     contracts: {
       conditionalTokensAddress: CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_MAINNET,
       realitioAddress: REALITIO_CONTRACT_ADDRESS_FOR_MAINNET,
+      wrapped1155FactoryAddress: WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_MAINNET,
     },
     tokens: [
       {
@@ -105,6 +110,7 @@ const networks: { [K in NetworkIds]: Network } = {
     contracts: {
       conditionalTokensAddress: CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_RINKEBY,
       realitioAddress: REALITIO_CONTRACT_ADDRESS_FOR_RINKEBY,
+      wrapped1155FactoryAddress: WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_RINKEBY,
     },
     tokens: [
       {
@@ -160,6 +166,7 @@ const networks: { [K in NetworkIds]: Network } = {
     contracts: {
       conditionalTokensAddress: CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_GANACHE,
       realitioAddress: REALITIO_CONTRACT_ADDRESS_FOR_GANACHE,
+      wrapped1155FactoryAddress: WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_GANACHE,
     },
     tokens: [
       {
