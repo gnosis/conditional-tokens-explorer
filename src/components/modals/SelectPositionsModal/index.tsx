@@ -15,10 +15,14 @@ import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { TableControls } from 'components/table/TableControls'
 import { TitleValue } from 'components/text/TitleValue'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { PositionWithUserBalanceWithDecimals, usePositions } from 'hooks'
+import {
+  PositionWithUserBalanceWithDecimals,
+  PositionWithUserBalanceWithDecimalsWithToken,
+  usePositions,
+} from 'hooks'
+import { useWithToken } from 'hooks/useWithToken'
 import { customStyles } from 'theme/tableCustomStyles'
-import { getTokenSummary, truncateStringInTheMiddle } from 'util/tools'
-import { Token } from 'util/types'
+import { truncateStringInTheMiddle } from 'util/tools'
 
 const LoadingWrapper = styled.div`
   align-items: center;
@@ -44,8 +48,6 @@ interface Props extends ModalProps {
   singlePosition?: boolean
 }
 
-type PositionWithUserBalanceWithToken = PositionWithUserBalanceWithDecimals & { token: Token }
-
 export const SelectPositionModal: React.FC<Props> = (props) => {
   const {
     onConfirm,
@@ -54,14 +56,10 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
     singlePosition,
     ...restProps
   } = props
-  const { _type: status, networkConfig, provider } = useWeb3ConnectedOrInfura()
+  const { _type: status } = useWeb3ConnectedOrInfura()
   const [selectedPositions, setSelectedPositions] = useState<
     Array<PositionWithUserBalanceWithDecimals>
   >([])
-  const [selectedPositionsWithToken, setSelectedPositionsWithToken] = useState<
-    Array<PositionWithUserBalanceWithToken>
-  >([])
-  const [dataWithToken, setDataWithToken] = useState<Array<PositionWithUserBalanceWithToken>>([])
   const [positionIdToSearch, setPositionIdToSearch] = useState<string>('')
   const [positionIdToShow, setPositionIdToShow] = useState<string>('')
 
@@ -110,62 +108,16 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
     })
   }, [])
 
-  useEffect(() => {
-    let cancelled = false
-    const fetchTokens = async (
-      positions: PositionWithUserBalanceWithDecimals[]
-    ): Promise<PositionWithUserBalanceWithToken[]> => {
-      return Promise.all(
-        positions.map(async (position) => {
-          const token = await getTokenSummary(networkConfig, provider, position.collateralToken)
-          return { ...position, token }
-        })
-      )
-    }
-
-    fetchTokens(selectedPositions).then((positions) => {
-      if (!cancelled) {
-        setSelectedPositionsWithToken(positions)
-      }
-    })
-
-    return () => {
-      cancelled = true
-    }
-  }, [selectedPositions, networkConfig, provider])
-
-  useEffect(() => {
-    let cancelled = false
-    const fetchTokens = async (
-      positions: PositionWithUserBalanceWithDecimals[]
-    ): Promise<PositionWithUserBalanceWithToken[]> => {
-      return Promise.all(
-        positions.map(async (position) => {
-          const token = await getTokenSummary(networkConfig, provider, position.collateralToken)
-          return { ...position, token }
-        })
-      )
-    }
-
-    if (data && !loading) {
-      fetchTokens(data).then((positions) => {
-        if (!cancelled) {
-          setDataWithToken(positions)
-        }
-      })
-    }
-
-    return () => {
-      cancelled = true
-    }
-  }, [data, networkConfig, provider, loading])
+  const selectedPositionsWithToken = useWithToken(selectedPositions)
+  const dataWithToken = useWithToken(data || [])
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const defaultColumns: Array<any> = useMemo(
     () => [
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: PositionWithUserBalanceWithToken) => truncateStringInTheMiddle(row.id, 8, 6),
+        cell: (row: PositionWithUserBalanceWithDecimalsWithToken) =>
+          truncateStringInTheMiddle(row.id, 8, 6),
         maxWidth: '170px',
         name: 'Position Id',
         selector: 'id',
@@ -173,7 +125,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
       },
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: PositionWithUserBalanceWithToken) => {
+        cell: (row: PositionWithUserBalanceWithDecimalsWithToken) => {
           return row.token.symbol ? <TokenIcon symbol={row.token.symbol} /> : row.collateralToken
         },
         maxWidth: '140px',
@@ -194,7 +146,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
       maxWidth: '36px',
       minWidth: '36px',
       // eslint-disable-next-line react/display-name
-      cell: (row: PositionWithUserBalanceWithToken) => (
+      cell: (row: PositionWithUserBalanceWithDecimalsWithToken) => (
         <ButtonControl
           buttonType={ButtonControlType.add}
           disabled={!!(singlePosition && selectedPositionsWithToken.length)}
@@ -213,7 +165,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
       maxWidth: '36px',
       minWidth: '36px',
       // eslint-disable-next-line react/display-name
-      cell: (row: PositionWithUserBalanceWithToken) => (
+      cell: (row: PositionWithUserBalanceWithDecimalsWithToken) => (
         <ButtonControl
           buttonType={ButtonControlType.delete}
           onClick={() => handleRemoveClick(row)}
@@ -231,7 +183,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
       setConnectedItems([
         {
           // eslint-disable-next-line react/display-name
-          cell: (row: PositionWithUserBalanceWithToken) => (
+          cell: (row: PositionWithUserBalanceWithDecimalsWithToken) => (
             <span {...(row.userBalanceWithDecimals ? { title: row.userBalance.toString() } : {})}>
               {row.userBalanceWithDecimals}
             </span>
