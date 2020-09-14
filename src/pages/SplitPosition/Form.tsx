@@ -1,8 +1,6 @@
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
 import { useForm } from 'react-hook-form'
-import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { Button } from 'components/buttons/Button'
@@ -14,7 +12,6 @@ import { EditPartitionModal } from 'components/modals/EditPartitionModal'
 import { Outcome } from 'components/partitions/Outcome'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { CardTextSm } from 'components/pureStyledComponents/CardText'
-import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import { OutcomesContainer } from 'components/pureStyledComponents/OutcomesContainer'
 import { Row } from 'components/pureStyledComponents/Row'
 import {
@@ -23,17 +20,16 @@ import {
   StripedListItemLessPadding,
 } from 'components/pureStyledComponents/StripedList'
 import { TitleControlButton } from 'components/pureStyledComponents/TitleControl'
+import { DisplayTablePositions } from 'components/splitPosition/DisplayTablePosition'
 import { PositionPreview } from 'components/splitPosition/PositionPreview'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
-import { CellHash } from 'components/table/CellHash'
 import { TitleValue } from 'components/text/TitleValue'
 import { NULL_PARENT_ID, ZERO_BN } from 'config/constants'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { AllowanceMethods, useAllowanceState } from 'hooks/useAllowanceState'
 import { SplitFrom } from 'pages/SplitPosition/SplitFrom'
 import { ConditionalTokensService } from 'services/conditionalTokens'
-import { customStyles } from 'theme/tableCustomStyles'
 import { GetCondition_condition, GetPosition_position } from 'types/generatedGQL'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
@@ -69,53 +65,6 @@ interface Props {
 }
 
 const logger = getLogger('Form')
-
-const DisplayTablePositions = ({ data }: { data: PositionIdsArray[] }) => {
-  const history = useHistory()
-
-  const handleRowClick = useCallback(
-    (positionId: string) => {
-      history.push(`/positions/${positionId}`)
-    },
-    [history]
-  )
-
-  const getColumns = useCallback(() => {
-    return [
-      {
-        // eslint-disable-next-line react/display-name
-        cell: (row: PositionIdsArray) => {
-          return (
-            <CellHash
-              onClick={() => {
-                handleRowClick(row.positionId)
-              }}
-              underline
-              value={row.positionId}
-            />
-          )
-        },
-        maxWidth: '370px',
-        name: 'Position Id',
-        selector: 'id',
-        sortable: true,
-      },
-    ]
-  }, [handleRowClick])
-
-  return (
-    <DataTable
-      className="outerTableWrapper inlineTable"
-      columns={getColumns()}
-      customStyles={customStyles}
-      data={data || []}
-      noDataComponent={<EmptyContentText>{`No positions found.`}</EmptyContentText>}
-      noHeader
-      pagination
-      paginationPerPage={5}
-    />
-  )
-}
 
 export const Form = ({
   allowanceMethods,
@@ -300,7 +249,7 @@ export const Form = ({
 
   const fullLoadingBody =
     status.isSuccess() && status.hasData() ? (
-      <DisplayTablePositions data={status.get() || []} />
+      <DisplayTablePositions positionIds={status.get() || []} />
     ) : undefined
 
   return (
