@@ -14,6 +14,9 @@ import { UsdcIcon } from 'components/common/TokenIcon/img/UsdcIcon'
 import { UsdtIcon } from 'components/common/TokenIcon/img/UsdtIcon'
 import { WEthIcon } from 'components/common/TokenIcon/img/WEthIcon'
 import { ZrxIcon } from 'components/common/TokenIcon/img/ZrxIcon'
+import Blockies from 'react-blockies'
+
+const ICON_DIMENSIONS = '20px'
 
 const Wrapper = styled.div`
   align-items: center;
@@ -21,13 +24,26 @@ const Wrapper = styled.div`
 `
 
 const Icon = styled.div`
-  width: 20px;
-  height: 20px;
+  height: ${ICON_DIMENSIONS};
+  width: ${ICON_DIMENSIONS};
 
   svg {
     display: block;
-    max-height: 20px;
-    max-width: 20px;
+    max-height: ${ICON_DIMENSIONS};
+    max-width: ${ICON_DIMENSIONS};
+  }
+`
+
+const CustomIconWrapper = styled.div`
+  border-radius: 50%;
+  height: ${ICON_DIMENSIONS};
+  overflow: hidden;
+  width: ${ICON_DIMENSIONS};
+
+  canvas {
+    border-radius: 50%;
+    max-height: 100% !important;
+    max-width: 100% !important;
   }
 `
 
@@ -104,16 +120,16 @@ export const TokenIcon: React.FC<Props> = (props) => {
   const { symbol, ...restProps } = props
   const data = getTokenData(symbol)
 
-  // TODO, add a CustomICON for the second option of the ternary
   return (
     <Wrapper {...restProps}>
       {data.length > 0 ? (
-        <>
-          <Icon>{data[0].icon}</Icon> <Symbol>{symbol}</Symbol>
-        </>
+        <Icon>{data[0].icon}</Icon>
       ) : (
-        <Symbol>{symbol}</Symbol>
+        <CustomIconWrapper>
+          <Blockies scale={2} seed={symbol} size={10} />
+        </CustomIconWrapper>
       )}
+      <Symbol>{symbol}</Symbol>
     </Wrapper>
   )
 }
