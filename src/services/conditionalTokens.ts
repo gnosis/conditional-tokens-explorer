@@ -35,6 +35,7 @@ const conditionalTokensAbi = [
   'function mergePositions(address collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] partition, uint amount) external',
   'function splitPosition(address collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] partition, uint amount) external',
   'function reportPayouts(bytes32 questionId, uint[] payouts)',
+  'function safeBatchTransferFrom(address from, address to, uint256[] ids, uint256[] values, bytes data) external',
 ]
 
 export class ConditionalTokensService {
@@ -128,12 +129,12 @@ export class ConditionalTokensService {
     return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
   }
 
-  redeemPositions = async (
+  async redeemPositions(
     collateralToken: string,
     parentCollectionId: string, // If doesn't exist, must be zero, ethers.constants.HashZero
     conditionId: string,
     indexSets: string[]
-  ): Promise<TransactionReceipt> => {
+  ): Promise<TransactionReceipt> {
     const tx = await this.contract.redeemPositions(
       collateralToken,
       parentCollectionId,
@@ -143,13 +144,13 @@ export class ConditionalTokensService {
     return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
   }
 
-  mergePositions = async (
+  async mergePositions(
     collateralToken: string,
     parentCollectionId: string, // If doesn't exist, must be zero, ethers.constants.HashZero
     conditionId: string,
     partition: string[],
     amount: BigNumber
-  ): Promise<TransactionReceipt> => {
+  ): Promise<TransactionReceipt> {
     const tx = await this.contract.mergePositions(
       collateralToken,
       parentCollectionId,
@@ -189,6 +190,40 @@ export class ConditionalTokensService {
 
   async reportPayouts(questionId: string, payouts: number[]): Promise<TransactionReceipt> {
     const tx = await this.contract.reportPayouts(questionId, payouts)
+    return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
+  }
+
+  // Method  used to wrapp multiple erc1155
+  async safeBatchTransferFrom(
+    addressFrom: string,
+    addressTo: string,
+    positionIds: Array<string>,
+    outcomeTokensToTransfer: Array<BigNumber>
+  ): Promise<TransactionReceipt> {
+    const tx = await this.contract.safeTransferFrom(
+      addressFrom,
+      addressTo,
+      positionIds,
+      outcomeTokensToTransfer,
+      ethers.constants.HashZero
+    )
+    return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
+  }
+
+  // Method  used to wrapp some erc1155
+  async safeTransferFrom(
+    addressFrom: string,
+    addressTo: string,
+    positionId: string,
+    outcomeTokensToTransfer: BigNumber
+  ): Promise<TransactionReceipt> {
+    const tx = await this.contract.safeTransferFrom(
+      addressFrom,
+      addressTo,
+      positionId,
+      outcomeTokensToTransfer,
+      ethers.constants.HashZero
+    )
     return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
   }
 }
