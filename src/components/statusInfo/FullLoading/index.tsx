@@ -66,6 +66,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   height?: string
   icon?: IconTypes
   message?: string
+  bodyComponent?: React.ReactNode | undefined
   noOverlay?: boolean
   title?: string
   width?: string
@@ -77,6 +78,7 @@ export const FullLoading: React.FC<Props> = (props) => {
     icon = IconTypes.spinner,
     height,
     message,
+    bodyComponent,
     noOverlay,
     title,
     width,
@@ -93,6 +95,7 @@ export const FullLoading: React.FC<Props> = (props) => {
         {icon === IconTypes.ok && <OkIcon />}
       </Icon>
       {message && <Text>{message}</Text>}
+      {bodyComponent}
       {actionButton && (
         <ButtonContainer>
           <ActionButton buttonType={actionButton.buttonType} onClick={actionButton.onClick}>
