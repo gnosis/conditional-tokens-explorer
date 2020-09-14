@@ -118,17 +118,18 @@ interface EditPartitionModalProps extends ModalProps {
   outcomes: Array<any>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   theme?: any
+  onSave: (numberedOutcomes: Array<Array<OutcomeProps>>) => void
 }
 
 const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
-  const { onRequestClose, outcomes, theme, ...restProps } = props
+  const { onRequestClose, onSave, outcomes, theme, ...restProps } = props
   const dragOverClass = 'dragOver'
   const draggingClass = 'isDragging'
   const placeholderOutcomeId = 'placeholderOutcome'
   const outcomesByRow = '13'
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [allCollections, setAllCollections] = useState<any>([])
+  const [allCollections, setAllCollections] = useState<Array<Array<OutcomeProps>>>([])
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [newCollection, setNewCollection] = useState<any>([])
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -144,7 +145,11 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
 
   const removeOutcomeFromCollection = useCallback(
     (collectionIndex: number, outcomeIndex: number) => {
-      setAvailableOutcomes([...availableOutcomes, allCollections[collectionIndex][outcomeIndex]])
+      setAvailableOutcomes(
+        [...availableOutcomes, allCollections[collectionIndex][outcomeIndex]].sort((a, b) =>
+          a.value > b.value ? 1 : -1
+        )
+      )
 
       allCollections[collectionIndex].splice(outcomeIndex, 1)
 
@@ -203,7 +208,11 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
 
   const addOutcomeToNewCollection = useCallback(
     (outcomeIndex: number) => {
-      setNewCollection([...newCollection, availableOutcomes[outcomeIndex]])
+      setNewCollection(
+        [...newCollection, availableOutcomes[outcomeIndex]].sort((a, b) =>
+          a.value > b.value ? 1 : -1
+        )
+      )
       availableOutcomes.splice(outcomeIndex, 1)
     },
     [newCollection, availableOutcomes]
@@ -211,7 +220,11 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
 
   const removeOutcomeFromNewCollection = useCallback(
     (outcomeIndex: number) => {
-      setAvailableOutcomes([...availableOutcomes, newCollection[outcomeIndex]])
+      setAvailableOutcomes(
+        [...availableOutcomes, newCollection[outcomeIndex]].sort((a, b) =>
+          a.value > b.value ? 1 : -1
+        )
+      )
       newCollection.splice(outcomeIndex, 1)
     },
     [newCollection, availableOutcomes]
@@ -223,12 +236,16 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
   }, [newCollection, allCollections])
 
   const addAllAvailableOutcomesToNewCollection = useCallback(() => {
-    setNewCollection([...newCollection, ...availableOutcomes])
+    setNewCollection(
+      [...newCollection, ...availableOutcomes].sort((a, b) => (a.value > b.value ? 1 : -1))
+    )
     availableOutcomes.length = 0
   }, [availableOutcomes, newCollection])
 
   const clearOutcomesFromNewCollection = useCallback(() => {
-    setAvailableOutcomes([...availableOutcomes, ...newCollection])
+    setAvailableOutcomes(
+      [...availableOutcomes, ...newCollection].sort((a, b) => (a.value > b.value ? 1 : -1))
+    )
     newCollection.length = 0
   }, [availableOutcomes, newCollection])
 
@@ -242,14 +259,20 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
       })
     })
 
-    setAvailableOutcomes([...availableOutcomes, ...newAvailableOutcomes])
+    setAvailableOutcomes(
+      [...availableOutcomes, ...newAvailableOutcomes].sort((a, b) => (a.value > b.value ? 1 : -1))
+    )
     allCollections.length = 0
   }, [allCollections, availableOutcomes])
 
   const removeCollection = useCallback(
     (collectionIndex: number) => {
-      setAvailableOutcomes([...availableOutcomes, ...allCollections[collectionIndex]])
-      allCollections[collectionIndex].length = 0
+      setAvailableOutcomes(
+        [...availableOutcomes, ...allCollections[collectionIndex]].sort((a, b) =>
+          a.value > b.value ? 1 : -1
+        )
+      )
+      allCollections.splice(collectionIndex, 1)
       setAllCollections([
         ...allCollections.filter((collection: Array<OutcomeProps>) => collection.length > 0),
       ])
@@ -257,7 +280,9 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
     [availableOutcomes, allCollections]
   )
 
-  const onSave = onRequestClose
+  const onSubmit = () => {
+    onSave(allCollections)
+  }
 
   const onReset = useCallback(() => {
     setAllCollections([...outcomes])
@@ -447,7 +472,7 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
         <ButtonReset buttonType={ButtonType.danger} onClick={onReset}>
           Reset
         </ButtonReset>
-        <Button disabled={disableButton} onClick={onSave}>
+        <Button disabled={disableButton} onClick={onSubmit}>
           Save
         </Button>
       </ButtonContainer>

@@ -55,14 +55,11 @@ export const SplitPosition = () => {
     [status, CTService, connect]
   )
 
-  // TODO Fix this
   useEffect(() => {
-    if (!collateralToken) {
-      logger.error(`Collateral ${collateral} doesn't exist`)
-    } else {
+    if (collateralToken) {
       setIsLoading(false)
     }
-  }, [collateralToken, collateral])
+  }, [collateralToken])
 
   return (
     <ConditionProvider>
