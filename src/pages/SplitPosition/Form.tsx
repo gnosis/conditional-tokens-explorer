@@ -1,6 +1,8 @@
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import DataTable from 'react-data-table-component'
 import { useForm } from 'react-hook-form'
+import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { Button } from 'components/buttons/Button'
@@ -12,7 +14,7 @@ import { EditPartitionModal } from 'components/modals/EditPartitionModal'
 import { Outcome } from 'components/partitions/Outcome'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { CardTextSm } from 'components/pureStyledComponents/CardText'
-import { ErrorContainer, Error as ErrorMessage } from 'components/pureStyledComponents/Error'
+import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import { OutcomesContainer } from 'components/pureStyledComponents/OutcomesContainer'
 import { Row } from 'components/pureStyledComponents/Row'
 import {
@@ -24,15 +26,19 @@ import { TitleControlButton } from 'components/pureStyledComponents/TitleControl
 import { PositionPreview } from 'components/splitPosition/PositionPreview'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
+import { CellHash } from 'components/table/CellHash'
 import { TitleValue } from 'components/text/TitleValue'
 import { NULL_PARENT_ID, ZERO_BN } from 'config/constants'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { AllowanceMethods, useAllowanceState } from 'hooks/useAllowanceState'
 import { SplitFrom } from 'pages/SplitPosition/SplitFrom'
+import { ConditionalTokensService } from 'services/conditionalTokens'
+import { customStyles } from 'theme/tableCustomStyles'
 import { GetCondition_condition, GetPosition_position } from 'types/generatedGQL'
 import { getLogger } from 'util/logger'
+import { Remote } from 'util/remoteData'
 import { trivialPartition } from 'util/tools'
-import { OutcomeProps, SplitFromType, Token } from 'util/types'
+import { OutcomeProps, PositionIdsArray, SplitFromType, Token } from 'util/types'
 
 const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
@@ -63,6 +69,53 @@ interface Props {
 }
 
 const logger = getLogger('Form')
+
+const DisplayTablePositions = ({ data }: { data: PositionIdsArray[] }) => {
+  const history = useHistory()
+
+  const handleRowClick = useCallback(
+    (positionId: string) => {
+      history.push(`/positions/${positionId}`)
+    },
+    [history]
+  )
+
+  const getColumns = useCallback(() => {
+    return [
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: PositionIdsArray) => {
+          return (
+            <CellHash
+              onClick={() => {
+                handleRowClick(row.positionId)
+              }}
+              underline
+              value={row.positionId}
+            />
+          )
+        },
+        maxWidth: '370px',
+        name: 'Position Id',
+        selector: 'id',
+        sortable: true,
+      },
+    ]
+  }, [handleRowClick])
+
+  return (
+    <DataTable
+      className="outerTableWrapper inlineTable"
+      columns={getColumns()}
+      customStyles={customStyles}
+      data={data || []}
+      noDataComponent={<EmptyContentText>{`No positions found.`}</EmptyContentText>}
+      noHeader
+      pagination
+      paginationPerPage={5}
+    />
+  )
+}
 
 export const Form = ({
   allowanceMethods,
@@ -99,11 +152,13 @@ export const Form = ({
   const [outcomeSlot, setOutcomeSlot] = useState(0)
   const [conditionIdToPreviewShow, setConditionIdToPreviewShow] = useState('')
   const [position, setPosition] = useState<Maybe<GetPosition_position>>(null)
-  const [isTransactionExecuting, setIsTransactionExecuting] = useState(false)
-  const [error, setError] = useState<Maybe<Error>>(null)
   const [originalPartition, setOriginalPartition] = useState<BigNumber[]>([])
   const [numberedOutcomes, setNumberedOutcomes] = useState<Array<Array<OutcomeProps>>>([])
   const [isEditPartitionModalOpen, setIsEditPartitionModalOpen] = useState(false)
+
+  const [status, setStatus] = useState<Remote<PositionIdsArray[]>>(
+    Remote.notAsked<PositionIdsArray[]>()
+  )
 
   const { amount, positionId, splitFrom } = getValues() as SplitPositionFormMethods
 
@@ -152,24 +207,41 @@ export const Form = ({
   const onSubmit = useCallback(
     async ({ amount, collateral, conditionId }: SplitPositionFormMethods) => {
       try {
-        setIsTransactionExecuting(true)
+        setStatus(Remote.loading())
 
+        let positions: PositionIdsArray[]
         if (splitFromCollateral) {
           await splitPosition(collateral, NULL_PARENT_ID, conditionId, partition, amount)
+
+          positions = ConditionalTokensService.getPositionsFromPartition(
+            partition,
+            NULL_PARENT_ID,
+            conditionId,
+            collateral
+          )
         } else if (splitFromPosition && position) {
           const {
             collateralToken: { id: collateral },
             collection: { id: collectionId },
           } = position
+
           await splitPosition(collateral, collectionId, conditionId, partition, amount)
+
+          positions = ConditionalTokensService.getPositionsFromPartition(
+            partition,
+            collectionId,
+            conditionId,
+            collateral
+          )
         } else {
           throw Error('Invalid split origin')
         }
+
+        setStatus(Remote.success(positions))
       } catch (err) {
         logger.error(err)
-        setError(err)
+        setStatus(Remote.failure(err))
       } finally {
-        setIsTransactionExecuting(false)
         reset(DEFAULT_VALUES)
         // Clear condition manually, the reset doesn't work, the use of the conditionContext and react hook form is not so good
         clearCondition()
@@ -208,6 +280,28 @@ export const Form = ({
   }, [splitFromCollateral, isValid, allowanceFinished])
 
   const outcomesByRow = '15'
+
+  const fullLoadingActionButton =
+    status.isSuccess() || status.isFailure()
+      ? { text: 'OK', onClick: () => setStatus(Remote.notAsked<PositionIdsArray[]>()) }
+      : undefined
+
+  const fullLoadingIcon = status.isFailure()
+    ? IconTypes.error
+    : status.isSuccess()
+    ? IconTypes.ok
+    : IconTypes.spinner
+
+  const fullLoadingMessage = status.isFailure()
+    ? status.getFailure()
+    : status.isLoading()
+    ? 'Waiting...'
+    : undefined
+
+  const fullLoadingBody =
+    status.isSuccess() && status.hasData() ? (
+      <DisplayTablePositions data={status.get() || []} />
+    ) : undefined
 
   return (
     <CenteredCard>
@@ -296,20 +390,15 @@ export const Form = ({
           splitFrom={splitFrom}
         />
       </Row>
-      {isTransactionExecuting && (
+      {(status.isLoading() || status.isSuccess() || status.isFailure()) && (
         <FullLoading
-          actionButton={
-            error ? { text: 'OK', onClick: () => setIsTransactionExecuting(true) } : undefined
-          }
-          icon={error ? IconTypes.error : IconTypes.spinner}
-          message={error ? error.message : 'Waiting...'}
-          title={error ? 'Error' : 'Split position'}
+          actionButton={fullLoadingActionButton}
+          bodyComponent={fullLoadingBody}
+          icon={fullLoadingIcon}
+          message={fullLoadingMessage}
+          title={status.isFailure() ? 'Error' : 'Split positions'}
+          width={status.isFailure() ? '550px' : status.isSuccess() ? '460px' : undefined}
         />
-      )}
-      {error && (
-        <ErrorContainer>
-          <ErrorMessage>{error.message}</ErrorMessage>
-        </ErrorContainer>
       )}
       <ButtonContainer>
         <Button disabled={!canSubmit} onClick={handleSubmit(onSubmit)}>
