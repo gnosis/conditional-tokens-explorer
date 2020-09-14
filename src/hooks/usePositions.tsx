@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/react-hooks'
-import uniqBy from 'lodash.uniqby'
+import lodashUniqBy from 'lodash.uniqby'
 import React from 'react'
 
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
@@ -77,7 +77,7 @@ export const usePositions = (options: OptionsToSearch) => {
       const positionListData = marshalPositionListData(positionsData.positions, userData?.user)
 
       const fetchUserBalanceWithDecimals = async () => {
-        const uniqueCollateralTokens = uniqBy(positionListData, 'collateralToken')
+        const uniqueCollateralTokens = lodashUniqBy(positionListData, 'collateralToken')
 
         const collateralTokensPromises = uniqueCollateralTokens.map(async (position: Position) => {
           const { collateralToken } = position

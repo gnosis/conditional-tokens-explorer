@@ -10,10 +10,11 @@ interface Props {
   amount: BigNumber
   balance: BigNumber
   decimals: number
-  disabled: boolean
+  disabled?: boolean
   max: string
   onAmountChange: (value: BigNumber) => void
   onUseWalletBalance: () => void
+  tokenSymbol?: string
 }
 
 export const Amount = ({
@@ -24,6 +25,7 @@ export const Amount = ({
   max,
   onAmountChange,
   onUseWalletBalance,
+  tokenSymbol,
 }: Props) => {
   return (
     <TitleValue
@@ -39,6 +41,7 @@ export const Amount = ({
           disabled={disabled}
           max={max}
           onChange={onAmountChange}
+          tokenSymbol={tokenSymbol}
           value={amount}
         />
       }
