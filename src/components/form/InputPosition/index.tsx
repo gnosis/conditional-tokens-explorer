@@ -54,7 +54,7 @@ export const InputPosition = ({
     positionIds,
     positions,
   } = useMultiPositionsContext()
-  const positionsWithToken = useWithToken(positions)
+  const { data: positionsWithToken } = useWithToken(positions)
 
   const { balances, errors: balancesErrors, loading: balancesLoading } = useBatchBalanceContext()
 
@@ -66,7 +66,7 @@ export const InputPosition = ({
 
   React.useEffect(() => {
     if (positionIds.length > 0) {
-      if (isDataInSync(positionsLoading, balancesLoading, positions, balances)) {
+      if (isDataInSync(positionsLoading, balancesLoading, positionsWithToken, balances)) {
         setPositionToDisplay(
           positionString(
             positions[0].conditionIds,

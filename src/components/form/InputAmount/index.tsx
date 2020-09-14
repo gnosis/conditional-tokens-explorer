@@ -60,7 +60,7 @@ export const InputAmount = ({
 }: Props) => {
   const { address, networkConfig, provider, signer } = useWeb3ConnectedOrInfura()
   const { loading: positionsLoading, positionIds, positions } = useMultiPositionsContext()
-  const positionsWithToken = useWithToken<GetMultiPositions_positions>(positions)
+  const { data: positionsWithToken } = useWithToken(positions)
 
   const { balances, loading: balancesLoading } = useBatchBalanceContext()
 
@@ -74,7 +74,13 @@ export const InputAmount = ({
   useEffect(() => {
     if (splitFrom === SplitFromType.position) {
       if (
-        canSetPositionBalance(positionsLoading, balancesLoading, positions, balances, positionIds)
+        canSetPositionBalance(
+          positionsLoading,
+          balancesLoading,
+          positionsWithToken,
+          balances,
+          positionIds
+        )
       ) {
         setDecimals(positionsWithToken[0].token.decimals)
         setBalance(balances[0])

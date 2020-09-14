@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react'
 
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
@@ -11,10 +10,14 @@ type WithAddress =
     }
   | { collateralToken: { id: string } }
 
-export const useWithToken = <T extends WithAddress>(data: T[]): Array<T & { token: Token }> => {
+export const useWithToken = <T extends WithAddress>(
+  data: T[]
+): { data: Array<T & { token: Token }>; loading: boolean } => {
   const { networkConfig, provider } = useWeb3ConnectedOrInfura()
 
   const [dataWithToken, setDataWithToken] = useState<Array<T & { token: Token }>>([])
+  const [loading, setLoading] = useState(true)
+
   useEffect(() => {
     let cancelled = false
     const fetchTokens = async (data: T[]): Promise<Array<T & { token: Token }>> => {
@@ -31,9 +34,11 @@ export const useWithToken = <T extends WithAddress>(data: T[]): Array<T & { toke
     }
 
     if (data && data.length > 0) {
+      setLoading(true)
       fetchTokens(data).then((withToken) => {
         if (!cancelled) {
           setDataWithToken(withToken)
+          setLoading(false)
         }
       })
     }
@@ -43,5 +48,5 @@ export const useWithToken = <T extends WithAddress>(data: T[]): Array<T & { toke
     }
   }, [data, networkConfig, provider])
 
-  return dataWithToken
+  return { data: dataWithToken, loading }
 }

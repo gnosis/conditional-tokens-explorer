@@ -58,7 +58,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
   } = props
   const { _type: status } = useWeb3ConnectedOrInfura()
   const [selectedPositions, setSelectedPositions] = useState<
-    Array<PositionWithUserBalanceWithDecimals>
+    Array<PositionWithUserBalanceWithDecimalsWithToken>
   >([])
   const [positionIdToSearch, setPositionIdToSearch] = useState<string>('')
   const [positionIdToShow, setPositionIdToShow] = useState<string>('')
@@ -79,37 +79,49 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
   const { data, error, loading } = usePositions({
     positionId: positionIdToSearch,
   })
+  const { data: dataWithToken, loading: loadingTokens } = useWithToken(data || [])
 
   useEffect(() => {
-    if (data && data.length && preSelectedPositions && preSelectedPositions.length) {
-      setSelectedPositions((current: Array<PositionWithUserBalanceWithDecimals>) => {
+    if (
+      dataWithToken &&
+      dataWithToken.length &&
+      preSelectedPositions &&
+      preSelectedPositions.length
+    ) {
+      setSelectedPositions((current: Array<PositionWithUserBalanceWithDecimalsWithToken>) => {
         const currentIds = current.map(({ id }) => id)
         const filteredPre = preSelectedPositions.filter((pre) => !currentIds.includes(pre))
-        const dataFiltered = data.filter(({ id }) => filteredPre.includes(id))
+        const dataFiltered = dataWithToken.filter(({ id }) => filteredPre.includes(id))
         return [...current, ...dataFiltered]
       })
     }
-  }, [preSelectedPositions, data])
+  }, [preSelectedPositions, dataWithToken])
 
-  const handleMultiAddClick = useCallback((position: PositionWithUserBalanceWithDecimals) => {
-    setSelectedPositions((current) => {
-      const included = current.find((selected) => selected.id === position.id)
-      return included ? current : [...current, position]
-    })
-  }, [])
+  const handleMultiAddClick = useCallback(
+    (position: PositionWithUserBalanceWithDecimalsWithToken) => {
+      setSelectedPositions((current) => {
+        const included = current.find((selected) => selected.id === position.id)
+        return included ? current : [...current, position]
+      })
+    },
+    []
+  )
 
-  const handleSingleAddClick = useCallback((position: PositionWithUserBalanceWithDecimals) => {
-    setSelectedPositions([position])
-  }, [])
+  const handleSingleAddClick = useCallback(
+    (position: PositionWithUserBalanceWithDecimalsWithToken) => {
+      setSelectedPositions([position])
+    },
+    []
+  )
 
-  const handleRemoveClick = useCallback((position: PositionWithUserBalanceWithDecimals) => {
-    setSelectedPositions((current) => {
-      return current.filter((selected) => selected.id !== position.id)
-    })
-  }, [])
-
-  const selectedPositionsWithToken = useWithToken(selectedPositions)
-  const dataWithToken = useWithToken(data || [])
+  const handleRemoveClick = useCallback(
+    (position: PositionWithUserBalanceWithDecimalsWithToken) => {
+      setSelectedPositions((current) => {
+        return current.filter((selected) => selected.id !== position.id)
+      })
+    },
+    []
+  )
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const defaultColumns: Array<any> = useMemo(
@@ -149,12 +161,12 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
       cell: (row: PositionWithUserBalanceWithDecimalsWithToken) => (
         <ButtonControl
           buttonType={ButtonControlType.add}
-          disabled={!!(singlePosition && selectedPositionsWithToken.length)}
+          disabled={!!(singlePosition && selectedPositions.length)}
           onClick={() => (singlePosition ? handleSingleAddClick(row) : handleMultiAddClick(row))}
         />
       ),
     }),
-    [singlePosition, handleSingleAddClick, handleMultiAddClick, selectedPositionsWithToken]
+    [singlePosition, handleSingleAddClick, handleMultiAddClick, selectedPositions]
   )
 
   const deleteCell = useMemo(
@@ -210,13 +222,13 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
   }, [defaultColumns, connectedItems, deleteCell])
 
   const handleDone = useCallback(() => {
-    if (selectedPositionsWithToken.length && onConfirm && typeof onConfirm === 'function') {
-      onConfirm(selectedPositionsWithToken)
+    if (selectedPositions.length && onConfirm && typeof onConfirm === 'function') {
+      onConfirm(selectedPositions)
     }
-  }, [onConfirm, selectedPositionsWithToken])
+  }, [onConfirm, selectedPositions])
 
-  const isLoading = !positionIdToSearch && loading
-  const isSearching = positionIdToSearch && loading
+  const isLoading = !positionIdToSearch && (loading || loadingTokens)
+  const isSearching = positionIdToSearch && (loading || loadingTokens)
 
   return (
     <Modal
@@ -274,14 +286,14 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
                 className="outerTableWrapper inlineTable"
                 columns={getSelectedColumns()}
                 customStyles={customStyles}
-                data={selectedPositionsWithToken}
+                data={selectedPositions}
                 noDataComponent={<EmptyContentText>No positions selected.</EmptyContentText>}
                 noHeader
               />
             }
           />
           <ButtonContainer>
-            <Button disabled={!selectedPositionsWithToken.length} onClick={handleDone}>
+            <Button disabled={!selectedPositions.length} onClick={handleDone}>
               Done
             </Button>
           </ButtonContainer>

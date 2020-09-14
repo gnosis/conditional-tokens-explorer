@@ -61,7 +61,7 @@ export const SelectPositions = ({
     positions,
     updatePositionIds,
   } = useMultiPositionsContext()
-  const positionsWithToken = useWithToken(positions)
+  const { data: positionsWithToken } = useWithToken(positions)
 
   const {
     balances,
@@ -112,7 +112,7 @@ export const SelectPositions = ({
 
   React.useEffect(() => {
     if (positionIds.length > 0) {
-      if (isDataInSync(positionsLoading, balancesLoading, positions, balances)) {
+      if (isDataInSync(positionsLoading, balancesLoading, positionsWithToken, balances)) {
         setPositionsToDisplay(
           positionsWithToken.map((position) => {
             const i = positionIds.findIndex((id) => id === position.id)

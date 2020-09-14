@@ -59,10 +59,10 @@ export const PositionsList = () => {
     collateralFilter: selectedCollateralFilter,
     collateralValue: selectedCollateralValue,
   })
-  const dataWithToken = useWithToken(data || [])
+  const { data: dataWithToken, loading: loadingCustomTokens } = useWithToken(data || [])
 
-  const isLoading = !positionIdToSearch && loading
-  const isSearching = positionIdToSearch && loading
+  const isLoading = !positionIdToSearch && (loading || loadingCustomTokens)
+  const isSearching = positionIdToSearch && (loading || loadingCustomTokens)
 
   const buildMenuForRow = useCallback(
     ({ id }) => {
