@@ -22,7 +22,8 @@ export const Wrapper = styled.div<{ lastInRow?: string }>`
     ${hideHorizontalLineCSS}
   }
 
-  &:nth-child(${(props) => props.lastInRow && `n+${parseInt(props.lastInRow) + 1}`}) {
+  &:nth-child(${(props) =>
+        props.lastInRow && `+${parseInt(props.lastInRow)}n+${parseInt(props.lastInRow) + 1}`}) {
     .outcomeVerticalLine {
       display: block;
     }
