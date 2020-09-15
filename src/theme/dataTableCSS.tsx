@@ -40,9 +40,11 @@ export const dataTableCSS = css`
         border-bottom: none !important;
       }
 
-      &:nth-last-of-type(1),
-      &:nth-last-of-type(2),
-      &:nth-last-of-type(3) {
+      /*
+        If item count > 7 three last items' dropdowns grow / show upwards to avoid
+        being cut because of overflow hidden...
+       */
+      &:nth-child(n + 8) {
         .dropdownItems {
           bottom: calc(100% + 10px);
           top: auto;
