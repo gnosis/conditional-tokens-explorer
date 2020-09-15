@@ -7,10 +7,10 @@ import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentTe
 import { CellHash } from 'components/table/CellHash'
 import { useCollateral } from 'hooks/useCollateral'
 import { customStyles } from 'theme/tableCustomStyles'
-import { formatBigNumber, truncateStringInTheMiddle } from 'util/tools'
+import { truncateStringInTheMiddle } from 'util/tools'
 import { PositionIdsArray, SplitStatus } from 'util/types'
 
-export const DisplayTablePositions = ({ amount, collateral, positionIds }: SplitStatus) => {
+export const DisplayTablePositions = ({ collateral, positionIds }: SplitStatus) => {
   const history = useHistory()
   const { collateral: collateralFetched, loading } = useCollateral(collateral)
 
@@ -60,28 +60,8 @@ export const DisplayTablePositions = ({ amount, collateral, positionIds }: Split
         selector: 'collateralToken',
         sortable: true,
       },
-      {
-        // eslint-disable-next-line react/display-name
-        cell: () => {
-          if (!loading) {
-            return collateralFetched && amount ? (
-              <span title={amount.toString()}>
-                {formatBigNumber(amount, collateralFetched.decimals)}
-              </span>
-            ) : (
-              <span title={amount.toString()}>{amount.toString()}</span>
-            )
-          } else {
-            return null
-          }
-        },
-        name: 'ERC1155 Amount',
-        right: true,
-        selector: 'userBalance',
-        sortable: true,
-      },
     ]
-  }, [handleRowClick, collateralFetched, collateral, loading, amount])
+  }, [handleRowClick, collateralFetched, collateral, loading])
 
   return (
     <DataTable
