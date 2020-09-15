@@ -12,7 +12,6 @@ import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Drop
 import { TokenIcon } from 'components/common/TokenIcon'
 import { UnwrapModal } from 'components/modals/UnwrapModal'
 import { WrapModal } from 'components/modals/WrapModal'
-import { Collection } from 'components/partitions/Collection'
 import { Outcome } from 'components/partitions/Outcome'
 import { CardTextSm } from 'components/pureStyledComponents/CardText'
 import { OutcomesContainer } from 'components/pureStyledComponents/OutcomesContainer'
@@ -23,7 +22,6 @@ import {
   StripedListItem,
   StripedListItemLessPadding,
 } from 'components/pureStyledComponents/StripedList'
-import { TitleControlButton } from 'components/pureStyledComponents/TitleControl'
 import { ActionButtonProps, FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
 import { TitleValue } from 'components/text/TitleValue'
