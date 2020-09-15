@@ -5,13 +5,16 @@ import { InfoCard } from 'components/statusInfo/InfoCard'
 import { Web3ContextStatus, useWeb3Context } from 'contexts/Web3Context'
 import { ConditionDetails } from 'pages/ConditionDetails'
 import { ConditionsList } from 'pages/ConditionsList'
+import { CookiePolicy } from 'pages/CookiePolicy'
 import { MergePositions } from 'pages/MergePositions'
 import { PositionDetails } from 'pages/PositionDetails'
 import { PositionsList } from 'pages/PositionsList'
 import { PrepareCondition } from 'pages/PrepareCondition'
+import { PrivacyPolicy } from 'pages/PrivacyPolicy'
 import { RedeemPosition } from 'pages/RedeemPosition'
 import { ReportPayoutsContainer } from 'pages/ReportPayouts'
 import { SplitPosition } from 'pages/SplitPosition'
+import { TermsAndConditions } from 'pages/TermsAndConditions'
 
 const ProtectedRoute: React.FC<RouteProps> = (props) => {
   const { component, path } = props
@@ -42,6 +45,9 @@ export const Routes: React.FC = () => {
       <ProtectedRoute component={ReportPayoutsContainer} path="/report" />
       <ProtectedRoute component={RedeemPosition} path="/redeem" />
       <ProtectedRoute component={MergePositions} path="/merge" />
+      <ProtectedRoute component={TermsAndConditions} path="/terms-and-conditions" />
+      <ProtectedRoute component={CookiePolicy} path="/cookie-policy" />
+      <ProtectedRoute component={PrivacyPolicy} path="/privacy-policy" />
       <Route exact path="/">
         <Redirect to="/conditions" />
       </Route>
