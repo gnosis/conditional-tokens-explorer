@@ -31,11 +31,33 @@ sed -i 's/127.0.0.1/ganache/g' truffle-config.js
 REALITIO_PROXY_ADDRESS=$(jq -r '.networks["50"].address' build/contracts/RealitioProxy.json)
 cd -
 
+# deploy Wrapped1155Factory contract
+cd 1155-to-20
+echo "module.exports = {
+  networks: {
+    development: {
+      host: \"ganache\",
+      port: 8545,
+      network_id: \"*\",
+    }
+  },
+  compilers: {
+    solc: {
+      version: \"0.6.12\",
+    }
+  }
+}" > truffle-config.js
+./node_modules/.bin/truffle migrate --network development
+WRAPPED_1155_FACTORY_CONTRACT_ADDRESS=$(jq -r '.networks["50"].address' build/contracts/Wrapped1155Factory.json)
+cd -
+
+
 # save contracts addresses
 echo "Main contracts:" >> contracts_addresses.txt
 echo "realitio: ${REALITIO_ADDRESS}" >> contracts_addresses.txt
 echo "conditional tokens: ${CONDITIONAL_TOKENS_ADDRESS}" >> contracts_addresses.txt
 echo "oracle: ${REALITIO_PROXY_ADDRESS}" >> contracts_addresses.txt
+echo "wrapped1155: ${WRAPPED_1155_FACTORY_CONTRACT_ADDRESS}" >> contracts_addresses.txt
 echo "" >> contracts_addresses.txt
 echo "Tokens:" >> contracts_addresses.txt
 echo "mock cdai: ${MOCK_CDAI_ADDRESS}" >> contracts_addresses.txt

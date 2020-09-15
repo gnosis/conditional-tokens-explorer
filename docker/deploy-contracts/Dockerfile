@@ -20,6 +20,10 @@ RUN apt-get update && apt-get install -y jq && rm -rf /var/lib/apt/lists/* \
   cd realitio-gnosis-proxy && \
   git checkout 040dce3e9c0c8edbb36767e7b029bbe6ccf1af4a && \
   yarn && cd .. \
-  chmod +x prepare_db.sh
+  && git clone https://github.com/gnosis/1155-to-20 && \
+  cd 1155-to-20 && \
+  git checkout 41289b57fc105fac65ec3935af3748a6f5c6d085 && \
+  yarn && cd .. \
+  && chmod +x prepare_db.sh
 
 ENTRYPOINT [ "/bin/sh" ]
