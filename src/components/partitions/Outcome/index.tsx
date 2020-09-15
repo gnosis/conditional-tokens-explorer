@@ -4,8 +4,6 @@ import styled, { css, withTheme } from 'styled-components'
 import ReactTooltip from 'react-tooltip'
 import { OutcomeProps } from 'util/types'
 
-const outcomeDimensions = '27px'
-
 const hideHorizontalLineCSS = css`
   .outcomeHorizontalLine {
     display: none;
@@ -39,13 +37,13 @@ export const OutcomeCircle = styled.div`
   display: flex;
   font-size: 13px;
   font-weight: 600;
-  height: ${outcomeDimensions};
+  height: ${(props) => props.theme.outcomes.dimensions};
   justify-content: center;
   letter-spacing: -0.8px;
   line-height: 1;
   position: relative;
   user-select: none;
-  width: ${outcomeDimensions};
+  width: ${(props) => props.theme.outcomes.dimensions};
   white-space: nowrap;
 `
 
