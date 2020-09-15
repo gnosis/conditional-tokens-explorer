@@ -76,6 +76,7 @@ export const usePositions = (options: OptionsToSearch) => {
   }, [status, addressFromWallet])
 
   React.useEffect(() => {
+    let cancelled = false
     if (positionsData) {
       const positionListData = marshalPositionListData(positionsData.positions, userData?.user)
 
@@ -110,10 +111,15 @@ export const usePositions = (options: OptionsToSearch) => {
           } as PositionWithUserBalanceWithDecimals
         })
 
-        setData(positionListDataEnhanced)
+        if (!cancelled) {
+          setData(positionListDataEnhanced)
+        }
       }
 
       fetchUserBalanceWithDecimals()
+      return () => {
+        cancelled = true
+      }
     }
   }, [positionsData, userData, networkConfig, provider])
 
