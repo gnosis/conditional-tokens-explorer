@@ -7,7 +7,7 @@ import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentTe
 import { CellHash } from 'components/table/CellHash'
 import { useCollateral } from 'hooks/useCollateral'
 import { customStyles } from 'theme/tableCustomStyles'
-import { truncateStringInTheMiddle } from 'util/tools'
+import { formatBigNumber, truncateStringInTheMiddle } from 'util/tools'
 import { PositionIdsArray, SplitStatus } from 'util/types'
 
 export const DisplayTablePositions = ({ collateral, positionIds }: SplitStatus) => {
@@ -36,7 +36,8 @@ export const DisplayTablePositions = ({ collateral, positionIds }: SplitStatus) 
             />
           )
         },
-        maxWidth: '400px',
+        maxWidth: '250px',
+        minWidth: '250px',
         name: 'Position Id',
         selector: 'id',
         sortable: true,
@@ -54,10 +55,33 @@ export const DisplayTablePositions = ({ collateral, positionIds }: SplitStatus) 
             return null
           }
         },
-        maxWidth: '145px',
-        minWidth: '125px',
+        maxWidth: '150px',
+        minWidth: '150px',
         name: 'Collateral',
         selector: 'collateralToken',
+        sortable: true,
+      },
+
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: PositionIdsArray) => {
+          if (!loading) {
+            return collateralFetched ? (
+              <span title={row.balance.toString()}>
+                {formatBigNumber(row.balance, collateralFetched.decimals)}
+              </span>
+            ) : (
+              <span title={row.balance.toString()}>{row.balance.toString()}</span>
+            )
+          } else {
+            return null
+          }
+        },
+        name: 'ERC1155 Amount',
+        maxWidth: '150px',
+        minWidth: '150px',
+        right: true,
+        selector: 'userBalance',
         sortable: true,
       },
     ]

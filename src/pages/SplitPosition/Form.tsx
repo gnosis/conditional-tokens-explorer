@@ -27,9 +27,9 @@ import { IconTypes } from 'components/statusInfo/common'
 import { TitleValue } from 'components/text/TitleValue'
 import { NULL_PARENT_ID, ZERO_BN } from 'config/constants'
 import { useConditionContext } from 'contexts/ConditionContext'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { AllowanceMethods, useAllowanceState } from 'hooks/useAllowanceState'
 import { SplitFrom } from 'pages/SplitPosition/SplitFrom'
-import { ConditionalTokensService } from 'services/conditionalTokens'
 import { GetCondition_condition, GetPosition_position } from 'types/generatedGQL'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
@@ -74,6 +74,7 @@ export const Form = ({
   tokens,
 }: Props) => {
   const { clearCondition } = useConditionContext()
+  const { CTService } = useWeb3ConnectedOrInfura()
 
   const DEFAULT_VALUES = useMemo(() => {
     return {
@@ -160,7 +161,7 @@ export const Form = ({
         if (splitFromCollateral) {
           await splitPosition(collateral, NULL_PARENT_ID, conditionId, partition, amount)
 
-          positionIds = ConditionalTokensService.getPositionsFromPartition(
+          positionIds = await CTService.getPositionsFromPartition(
             partition,
             NULL_PARENT_ID,
             conditionId,
@@ -174,7 +175,7 @@ export const Form = ({
 
           await splitPosition(collateral, collectionId, conditionId, partition, amount)
 
-          positionIds = ConditionalTokensService.getPositionsFromPartition(
+          positionIds = await CTService.getPositionsFromPartition(
             partition,
             collectionId,
             conditionId,
@@ -184,7 +185,7 @@ export const Form = ({
           throw Error('Invalid split origin')
         }
 
-        setStatus(Remote.success({ positionIds, collateral, amount }))
+        setStatus(Remote.success({ positionIds, collateral }))
       } catch (err) {
         logger.error(err)
         setStatus(Remote.failure(err))
@@ -195,6 +196,7 @@ export const Form = ({
       }
     },
     [
+      CTService,
       partition,
       splitFromCollateral,
       splitFromPosition,
@@ -248,7 +250,6 @@ export const Form = ({
   const fullLoadingBody =
     status.isSuccess() && status.hasData() ? (
       <DisplayTablePositions
-        amount={status.get().amount}
         collateral={status.get().collateral}
         positionIds={status.get().positionIds}
       />
@@ -348,7 +349,7 @@ export const Form = ({
           icon={fullLoadingIcon}
           message={fullLoadingMessage}
           title={status.isFailure() ? 'Error' : 'Split positions'}
-          width={status.isFailure() || status.isSuccess() ? '550px' : undefined}
+          width={status.isFailure() || status.isSuccess() ? '600px' : undefined}
         />
       )}
       <ButtonContainer>

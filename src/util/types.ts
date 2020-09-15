@@ -119,10 +119,10 @@ export enum CollateralFilterOptions {
 
 export type PositionIdsArray = {
   positionId: string
+  balance: BigNumber
 }
 
 export interface SplitStatus {
   positionIds: PositionIdsArray[]
   collateral: string
-  amount: BigNumber
 }

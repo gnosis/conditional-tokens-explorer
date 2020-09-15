@@ -94,13 +94,13 @@ export class ConditionalTokensService {
     return CTHelpers.getPositionId(collateralToken, collectionId)
   }
 
-  static getPositionsFromPartition(
+  async getPositionsFromPartition(
     partition: BigNumber[],
     parentCollection: string,
     conditionId: string,
     collateral: string
-  ): PositionIdsArray[] {
-    return partition.map((indexSet: BigNumber) => {
+  ): Promise<PositionIdsArray[]> {
+    const partitionsPromises = partition.map(async (indexSet: BigNumber) => {
       const collectionId = ConditionalTokensService.getCollectionId(
         parentCollection,
         conditionId,
@@ -112,8 +112,13 @@ export class ConditionalTokensService {
         `conditionId: ${conditionId} / parentCollection: ${parentCollection} / indexSet: ${indexSet.toString()}`
       )
       logger.info(`Position: ${positionId}`)
-      return { positionId: positionId }
+
+      const balance = await this.balanceOf(positionId)
+
+      return { positionId, balance }
     })
+    const partitions = await Promise.all(partitionsPromises)
+    return partitions
   }
 
   async prepareCondition(
