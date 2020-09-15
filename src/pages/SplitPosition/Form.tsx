@@ -9,6 +9,7 @@ import { SetAllowance } from 'components/common/SetAllowance'
 import { InputAmount } from 'components/form/InputAmount'
 import { InputCondition } from 'components/form/InputCondition'
 import { EditPartitionModal } from 'components/modals/EditPartitionModal'
+import { SplitPositionModal } from 'components/modals/SplitPositionModal'
 import { Outcome } from 'components/partitions/Outcome'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { CardTextSm } from 'components/pureStyledComponents/CardText'
@@ -189,24 +190,18 @@ export const Form = ({
       } catch (err) {
         logger.error(err)
         setStatus(Remote.failure(err))
-      } finally {
-        reset(DEFAULT_VALUES)
-        // Clear condition manually, the reset doesn't work, the use of the conditionContext and react hook form is not so good
-        clearCondition()
       }
     },
-    [
-      CTService,
-      partition,
-      splitFromCollateral,
-      splitFromPosition,
-      position,
-      splitPosition,
-      reset,
-      DEFAULT_VALUES,
-      clearCondition,
-    ]
+    [CTService, partition, splitFromCollateral, splitFromPosition, position, splitPosition]
   )
+
+  const clearComponent = useCallback(() => {
+    reset(DEFAULT_VALUES)
+    // Clear condition manually, the reset doesn't work, the use of the conditionContext and react hook form is not so good
+    clearCondition()
+    // Clear status to notAsked, so we can close the modal
+    setStatus(Remote.notAsked<SplitStatus>())
+  }, [DEFAULT_VALUES, clearCondition, reset, setStatus])
 
   const {
     allowanceFinished,
@@ -250,6 +245,7 @@ export const Form = ({
   const fullLoadingBody =
     status.isSuccess() && status.hasData() ? (
       <DisplayTablePositions
+        callbackOnHistoryPush={clearComponent}
         collateral={status.get().collateral}
         positionIds={status.get().positionIds}
       />
@@ -342,14 +338,21 @@ export const Form = ({
           splitFrom={splitFrom}
         />
       </Row>
-      {(status.isLoading() || status.isSuccess() || status.isFailure()) && (
+      {(status.isLoading() || status.isFailure()) && (
         <FullLoading
           actionButton={fullLoadingActionButton}
-          bodyComponent={fullLoadingBody}
           icon={fullLoadingIcon}
           message={fullLoadingMessage}
           title={status.isFailure() ? 'Error' : 'Split positions'}
-          width={status.isFailure() || status.isSuccess() ? '600px' : undefined}
+          width={status.isFailure() ? '600px' : undefined}
+        />
+      )}
+      {status.isSuccess() && (
+        <SplitPositionModal
+          bodyComponent={fullLoadingBody}
+          conditionId={conditionIdToPreviewShow}
+          isOpen={status.isSuccess()}
+          onRequestClose={clearComponent}
         />
       )}
       <ButtonContainer>

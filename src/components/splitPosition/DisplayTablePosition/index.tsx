@@ -10,15 +10,24 @@ import { customStyles } from 'theme/tableCustomStyles'
 import { formatBigNumber, truncateStringInTheMiddle } from 'util/tools'
 import { PositionIdsArray, SplitStatus } from 'util/types'
 
-export const DisplayTablePositions = ({ collateral, positionIds }: SplitStatus) => {
+interface Props extends SplitStatus {
+  callbackOnHistoryPush: () => void
+}
+
+export const DisplayTablePositions = ({
+  callbackOnHistoryPush,
+  collateral,
+  positionIds,
+}: Props) => {
   const history = useHistory()
   const { collateral: collateralFetched, loading } = useCollateral(collateral)
 
   const handleRowClick = useCallback(
     (positionId: string) => {
+      callbackOnHistoryPush()
       history.push(`/positions/${positionId}`)
     },
-    [history]
+    [history, callbackOnHistoryPush]
   )
 
   const getColumns = useCallback(() => {
