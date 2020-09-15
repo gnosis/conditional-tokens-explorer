@@ -12,8 +12,18 @@ import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Drop
 import { TokenIcon } from 'components/common/TokenIcon'
 import { UnwrapModal } from 'components/modals/UnwrapModal'
 import { WrapModal } from 'components/modals/WrapModal'
+import { Collection } from 'components/partitions/Collection'
+import { Outcome } from 'components/partitions/Outcome'
+import { CardTextSm } from 'components/pureStyledComponents/CardText'
+import { OutcomesContainer } from 'components/pureStyledComponents/OutcomesContainer'
 import { Row } from 'components/pureStyledComponents/Row'
-import { StripedList, StripedListItem } from 'components/pureStyledComponents/StripedList'
+import {
+  StripedList,
+  StripedListEmpty,
+  StripedListItem,
+  StripedListItemLessPadding,
+} from 'components/pureStyledComponents/StripedList'
+import { TitleControlButton } from 'components/pureStyledComponents/TitleControl'
 import { ActionButtonProps, FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
 import { TitleValue } from 'components/text/TitleValue'
@@ -22,7 +32,7 @@ import { useCollateral } from 'hooks/useCollateral'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { GetPosition_position as Position } from 'types/generatedGQL'
 import { formatBigNumber, positionString, truncateStringInTheMiddle } from 'util/tools'
-import { Status } from 'util/types'
+import { OutcomeProps, Status } from 'util/types'
 
 const CollateralText = styled.span`
   color: ${(props) => props.theme.colors.darkerGray};
@@ -64,7 +74,7 @@ export const Contents = ({ position }: Props) => {
     position ? position.collateralToken.id : ''
   )
   const [collateralSymbol, setCollateralSymbol] = React.useState('')
-  const { collateralToken, id } = position
+  const { collateralToken, id, indexSets } = position
   const [isWrapModalOpen, setIsWrapModalOpen] = useState(false)
   const [isUnwrapModalOpen, setIsUnwrapModalOpen] = useState(false)
 
@@ -89,12 +99,22 @@ export const Contents = ({ position }: Props) => {
 
   const ERC20Amount = new BigNumber('500000000000000000')
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const positionPreview = React.useMemo(() => {
     if (positionCollateral && !loading && !error && balance) {
       return positionString(position.conditionIds, position.indexSets, balance, positionCollateral)
     }
   }, [positionCollateral, position, loading, error, balance])
+
+  const numberedOutcomes = React.useMemo(() => {
+    return indexSets.map((indexSet: string) => {
+      return Number(indexSet)
+        .toString(2)
+        .split('')
+        .reverse()
+        .map((value, index) => (value === '1' ? index + 1 : 0))
+        .filter((n) => !!n)
+    })
+  }, [indexSets])
 
   React.useEffect(() => {
     if (positionCollateral) {
@@ -163,6 +183,8 @@ export const Contents = ({ position }: Props) => {
       setStatusError(onWrapTitle)
     }, 5000)
   }, [])
+
+  const outcomesByRow = '15'
 
   return (
     <CenteredCard
@@ -235,6 +257,43 @@ export const Contents = ({ position }: Props) => {
                 </CollateralWrapButton>
               </StripedListItem>
             </StripedListStyled>
+          }
+        />
+      </Row>
+      <Row cols="1fr" marginBottomXL>
+        <TitleValue
+          title="Partition"
+          value={
+            <>
+              <CardTextSm>Outcomes Collections</CardTextSm>
+              <StripedListStyled minHeight="200px">
+                {numberedOutcomes && numberedOutcomes.length ? (
+                  numberedOutcomes
+                    .map((value) => {
+                      return value.map((value, id) => {
+                        return { id: id.toString(), value }
+                      })
+                    })
+                    .map((outcomeList: OutcomeProps[], outcomeListIndex: number) => {
+                      return (
+                        <StripedListItemLessPadding key={outcomeListIndex}>
+                          <OutcomesContainer columnGap="0" columns={outcomesByRow}>
+                            {outcomeList.map((outcome: OutcomeProps, outcomeIndex: number) => (
+                              <Outcome
+                                key={outcomeIndex}
+                                lastInRow={outcomesByRow}
+                                outcome={outcome}
+                              />
+                            ))}
+                          </OutcomesContainer>
+                        </StripedListItemLessPadding>
+                      )
+                    })
+                ) : (
+                  <StripedListEmpty>No Collections.</StripedListEmpty>
+                )}
+              </StripedListStyled>
+            </>
           }
         />
       </Row>
