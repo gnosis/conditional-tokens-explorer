@@ -34,7 +34,7 @@ import { GetCondition_condition, GetPosition_position } from 'types/generatedGQL
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import { trivialPartition } from 'util/tools'
-import { OutcomeProps, PositionIdsArray, SplitFromType, Token } from 'util/types'
+import { OutcomeProps, PositionIdsArray, SplitFromType, SplitStatus, Token } from 'util/types'
 
 const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
@@ -105,9 +105,7 @@ export const Form = ({
   const [numberedOutcomes, setNumberedOutcomes] = useState<Array<Array<OutcomeProps>>>([])
   const [isEditPartitionModalOpen, setIsEditPartitionModalOpen] = useState(false)
 
-  const [status, setStatus] = useState<Remote<PositionIdsArray[]>>(
-    Remote.notAsked<PositionIdsArray[]>()
-  )
+  const [status, setStatus] = useState<Remote<SplitStatus>>(Remote.notAsked<SplitStatus>())
 
   const { amount, positionId, splitFrom } = getValues() as SplitPositionFormMethods
 
@@ -158,11 +156,11 @@ export const Form = ({
       try {
         setStatus(Remote.loading())
 
-        let positions: PositionIdsArray[]
+        let positionIds: PositionIdsArray[]
         if (splitFromCollateral) {
           await splitPosition(collateral, NULL_PARENT_ID, conditionId, partition, amount)
 
-          positions = ConditionalTokensService.getPositionsFromPartition(
+          positionIds = ConditionalTokensService.getPositionsFromPartition(
             partition,
             NULL_PARENT_ID,
             conditionId,
@@ -176,7 +174,7 @@ export const Form = ({
 
           await splitPosition(collateral, collectionId, conditionId, partition, amount)
 
-          positions = ConditionalTokensService.getPositionsFromPartition(
+          positionIds = ConditionalTokensService.getPositionsFromPartition(
             partition,
             collectionId,
             conditionId,
@@ -186,7 +184,7 @@ export const Form = ({
           throw Error('Invalid split origin')
         }
 
-        setStatus(Remote.success(positions))
+        setStatus(Remote.success({ positionIds, collateral, amount }))
       } catch (err) {
         logger.error(err)
         setStatus(Remote.failure(err))
@@ -232,7 +230,7 @@ export const Form = ({
 
   const fullLoadingActionButton =
     status.isSuccess() || status.isFailure()
-      ? { text: 'OK', onClick: () => setStatus(Remote.notAsked<PositionIdsArray[]>()) }
+      ? { text: 'OK', onClick: () => setStatus(Remote.notAsked<SplitStatus>()) }
       : undefined
 
   const fullLoadingIcon = status.isFailure()
@@ -249,7 +247,11 @@ export const Form = ({
 
   const fullLoadingBody =
     status.isSuccess() && status.hasData() ? (
-      <DisplayTablePositions positionIds={status.get() || []} />
+      <DisplayTablePositions
+        amount={status.get().amount}
+        collateral={status.get().collateral}
+        positionIds={status.get().positionIds}
+      />
     ) : undefined
 
   return (
@@ -346,7 +348,7 @@ export const Form = ({
           icon={fullLoadingIcon}
           message={fullLoadingMessage}
           title={status.isFailure() ? 'Error' : 'Split positions'}
-          width={status.isFailure() ? '550px' : status.isSuccess() ? '460px' : undefined}
+          width={status.isFailure() || status.isSuccess() ? '550px' : undefined}
         />
       )}
       <ButtonContainer>

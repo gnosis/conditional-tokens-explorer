@@ -1,3 +1,5 @@
+import { BigNumber } from 'ethers/utils'
+
 export interface Question {
   id: string
   raw: string
@@ -117,4 +119,10 @@ export enum CollateralFilterOptions {
 
 export type PositionIdsArray = {
   positionId: string
+}
+
+export interface SplitStatus {
+  positionIds: PositionIdsArray[]
+  collateral: string
+  amount: BigNumber
 }
