@@ -4,7 +4,7 @@ import styled, { css, withTheme } from 'styled-components'
 import ReactTooltip from 'react-tooltip'
 import { OutcomeProps } from 'util/types'
 
-const outcomeDimensions = '24px'
+const outcomeDimensions = '27px'
 
 const hideHorizontalLineCSS = css`
   .outcomeHorizontalLine {
@@ -36,14 +36,21 @@ export const OutcomeCircle = styled.div`
   border: 2px solid ${(props) => props.theme.colors.darkerGray};
   color: #fff;
   display: flex;
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 600;
   height: ${outcomeDimensions};
   justify-content: center;
+  letter-spacing: -0.8px;
   line-height: 1;
   position: relative;
   user-select: none;
   width: ${outcomeDimensions};
+  white-space: nowrap;
+`
+
+const OutcomeNumber = styled.span`
+  position: relative;
+  top: 1px;
 `
 
 const OutcomeHorizontalLine = styled.div`
@@ -113,7 +120,7 @@ const BaseOutcome: React.FC<Props> = (props) => {
         onDragEnd={onDragEnd}
         onDragStart={onDragStart}
       >
-        {outcome.value}
+        <OutcomeNumber>{outcome.value}</OutcomeNumber>
         <OutcomeVerticalLine className="outcomeVerticalLine" />
       </OutcomeCircle>
       <OutcomeHorizontalLine className="outcomeHorizontalLine" />
@@ -186,10 +193,7 @@ export const EditableOutcome = styled(Outcome)<{ hoverColor?: string; activeColo
     border-style: solid;
     border-width: 2px;
     color: ${(props) => props.theme.colors.mediumGrey};
-    font-size: 16px;
-    height: 28px;
     transition: all 0.15s ease-out;
-    width: 28px;
 
     &:hover {
       border-color: ${(props) => props.hoverColor};
