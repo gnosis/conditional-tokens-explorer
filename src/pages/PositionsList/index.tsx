@@ -128,7 +128,10 @@ export const PositionsList = () => {
         {
           // eslint-disable-next-line react/display-name
           cell: (row: PositionWithUserBalanceWithDecimals) => (
-            <span {...(row.userBalanceWithDecimals ? { title: row.userBalance.toString() } : {})}>
+            <span
+              onClick={() => handleRowClick(row)}
+              {...(row.userBalanceWithDecimals ? { title: row.userBalance.toString() } : {})}
+            >
               {row.userBalanceWithDecimals}
             </span>
           ),
@@ -139,7 +142,7 @@ export const PositionsList = () => {
         },
       ])
     }
-  }, [status, buildMenuForRow])
+  }, [status, buildMenuForRow, handleRowClick])
 
   const getColumns = useCallback(() => {
     // If you move this outside of the useCallback, can cause performance issues as a dep of this useCallback
@@ -160,7 +163,12 @@ export const PositionsList = () => {
           try {
             const token = networkConfig && networkConfig.getTokenFromAddress(row.collateralToken)
             // Please don't delete this because the tests will explode
-            return <TokenIcon symbol={(token && token.symbol) || ''} />
+            return (
+              <TokenIcon
+                onClick={() => handleRowClick(row)}
+                symbol={(token && token.symbol) || ''}
+              />
+            )
           } catch (error) {
             logger.error(error)
             return row.collateralToken

@@ -116,7 +116,7 @@ export const ConditionsList: React.FC = () => {
     {
       // eslint-disable-next-line react/display-name
       cell: (row: Conditions_conditions) => (
-        <CellHash onClick={handleRowClick} value={row.oracle} />
+        <CellHash onClick={() => handleRowClick(row)} value={row.oracle} />
       ),
       name: 'Reporting Address / Oracle',
       selector: 'oracle',
@@ -125,7 +125,7 @@ export const ConditionsList: React.FC = () => {
     {
       // eslint-disable-next-line react/display-name
       cell: (row: Conditions_conditions) => (
-        <CellHash onClick={handleRowClick} value={row.questionId} />
+        <CellHash onClick={() => handleRowClick(row)} value={row.questionId} />
       ),
       name: 'Question Id',
       selector: 'questionId',
@@ -147,9 +147,13 @@ export const ConditionsList: React.FC = () => {
       // eslint-disable-next-line react/display-name
       cell: (row: Conditions_conditions) =>
         row.resolved ? (
-          <Pill type={PillTypes.primary}>Resolved</Pill>
+          <Pill onClick={() => handleRowClick(row)} type={PillTypes.primary}>
+            Resolved
+          </Pill>
         ) : (
-          <Pill type={PillTypes.open}>Open</Pill>
+          <Pill onClick={() => handleRowClick(row)} type={PillTypes.open}>
+            Open
+          </Pill>
         ),
       sortFunction: (a: Conditions_conditions, b: Conditions_conditions) => {
         const valA = a.resolved ? 2 : 1
