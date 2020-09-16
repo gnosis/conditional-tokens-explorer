@@ -3,7 +3,7 @@ import React from 'react'
 
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 
-export const useBalanceForPosition = (position: string) => {
+export const useBalanceForPosition = (positionId: string, refresh?: string) => {
   const { CTService } = useWeb3ConnectedOrInfura()
 
   const [balance, setBalance] = React.useState<BigNumber>(new BigNumber(0))
@@ -15,17 +15,17 @@ export const useBalanceForPosition = (position: string) => {
 
     const getBalance = async (position: string) => {
       try {
-        const balance = await CTService.balanceOf(position)
+        const balance = await CTService.balanceOf(positionId)
         setBalance(balance)
       } catch (err) {
         setError(err)
       }
     }
 
-    getBalance(position)
+    getBalance(positionId)
 
     setLoading(false)
-  }, [CTService, position, setBalance, setError, setLoading])
+  }, [CTService, positionId, setBalance, setError, setLoading, refresh])
 
   return {
     balance,
