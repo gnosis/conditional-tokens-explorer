@@ -1,3 +1,5 @@
+import { BigNumber } from 'ethers/utils'
+
 export interface Question {
   id: string
   raw: string
@@ -113,4 +115,14 @@ export enum OracleFilterOptions {
 
 export enum CollateralFilterOptions {
   All = 'all',
+}
+
+export type PositionIdsArray = {
+  positionId: string
+  balance: BigNumber
+}
+
+export interface SplitStatus {
+  positionIds: PositionIdsArray[]
+  collateral: string
 }

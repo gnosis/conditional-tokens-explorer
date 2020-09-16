@@ -5,6 +5,7 @@ import styled from 'styled-components'
 
 import { Button } from 'components/buttons/Button'
 import { CenteredCard } from 'components/common/CenteredCard'
+import { Modal } from 'components/common/Modal'
 import { SetAllowance } from 'components/common/SetAllowance'
 import { InputAmount } from 'components/form/InputAmount'
 import { InputCondition } from 'components/form/InputCondition'
@@ -12,7 +13,6 @@ import { EditPartitionModal } from 'components/modals/EditPartitionModal'
 import { Outcome } from 'components/partitions/Outcome'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { CardTextSm } from 'components/pureStyledComponents/CardText'
-import { ErrorContainer, Error as ErrorMessage } from 'components/pureStyledComponents/Error'
 import { OutcomesContainer } from 'components/pureStyledComponents/OutcomesContainer'
 import { Row } from 'components/pureStyledComponents/Row'
 import {
@@ -21,18 +21,21 @@ import {
   StripedListItemLessPadding,
 } from 'components/pureStyledComponents/StripedList'
 import { TitleControlButton } from 'components/pureStyledComponents/TitleControl'
+import { DisplayTablePositions } from 'components/splitPosition/DisplayTablePosition'
 import { PositionPreview } from 'components/splitPosition/PositionPreview'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
 import { TitleValue } from 'components/text/TitleValue'
 import { NULL_PARENT_ID, ZERO_BN } from 'config/constants'
 import { useConditionContext } from 'contexts/ConditionContext'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { AllowanceMethods, useAllowanceState } from 'hooks/useAllowanceState'
 import { SplitFrom } from 'pages/SplitPosition/SplitFrom'
 import { GetCondition_condition, GetPosition_position } from 'types/generatedGQL'
 import { getLogger } from 'util/logger'
-import { trivialPartition } from 'util/tools'
-import { OutcomeProps, SplitFromType, Token } from 'util/types'
+import { Remote } from 'util/remoteData'
+import { trivialPartition, truncateStringInTheMiddle } from 'util/tools'
+import { OutcomeProps, PositionIdsArray, SplitFromType, SplitStatus, Token } from 'util/types'
 
 const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
@@ -72,6 +75,7 @@ export const Form = ({
   tokens,
 }: Props) => {
   const { clearCondition } = useConditionContext()
+  const { CTService } = useWeb3ConnectedOrInfura()
 
   const DEFAULT_VALUES = useMemo(() => {
     return {
@@ -99,11 +103,11 @@ export const Form = ({
   const [outcomeSlot, setOutcomeSlot] = useState(0)
   const [conditionIdToPreviewShow, setConditionIdToPreviewShow] = useState('')
   const [position, setPosition] = useState<Maybe<GetPosition_position>>(null)
-  const [isTransactionExecuting, setIsTransactionExecuting] = useState(false)
-  const [error, setError] = useState<Maybe<Error>>(null)
   const [originalPartition, setOriginalPartition] = useState<BigNumber[]>([])
   const [numberedOutcomes, setNumberedOutcomes] = useState<Array<Array<OutcomeProps>>>([])
   const [isEditPartitionModalOpen, setIsEditPartitionModalOpen] = useState(false)
+
+  const [status, setStatus] = useState<Remote<SplitStatus>>(Remote.notAsked<SplitStatus>())
 
   const { amount, positionId, splitFrom } = getValues() as SplitPositionFormMethods
 
@@ -152,40 +156,52 @@ export const Form = ({
   const onSubmit = useCallback(
     async ({ amount, collateral, conditionId }: SplitPositionFormMethods) => {
       try {
-        setIsTransactionExecuting(true)
+        setStatus(Remote.loading())
 
+        let positionIds: PositionIdsArray[]
         if (splitFromCollateral) {
           await splitPosition(collateral, NULL_PARENT_ID, conditionId, partition, amount)
+
+          positionIds = await CTService.getPositionsFromPartition(
+            partition,
+            NULL_PARENT_ID,
+            conditionId,
+            collateral
+          )
         } else if (splitFromPosition && position) {
           const {
             collateralToken: { id: collateral },
             collection: { id: collectionId },
           } = position
+
           await splitPosition(collateral, collectionId, conditionId, partition, amount)
+
+          positionIds = await CTService.getPositionsFromPartition(
+            partition,
+            collectionId,
+            conditionId,
+            collateral
+          )
         } else {
           throw Error('Invalid split origin')
         }
+
+        setStatus(Remote.success({ positionIds, collateral }))
       } catch (err) {
         logger.error(err)
-        setError(err)
-      } finally {
-        setIsTransactionExecuting(false)
-        reset(DEFAULT_VALUES)
-        // Clear condition manually, the reset doesn't work, the use of the conditionContext and react hook form is not so good
-        clearCondition()
+        setStatus(Remote.failure(err))
       }
     },
-    [
-      partition,
-      splitFromCollateral,
-      splitFromPosition,
-      position,
-      splitPosition,
-      reset,
-      DEFAULT_VALUES,
-      clearCondition,
-    ]
+    [CTService, partition, splitFromCollateral, splitFromPosition, position, splitPosition]
   )
+
+  const clearComponent = useCallback(() => {
+    reset(DEFAULT_VALUES)
+    // Clear condition manually, the reset doesn't work, the use of the conditionContext and react hook form is not so good
+    clearCondition()
+    // Clear status to notAsked, so we can close the modal
+    setStatus(Remote.notAsked<SplitStatus>())
+  }, [DEFAULT_VALUES, clearCondition, reset, setStatus])
 
   const {
     allowanceFinished,
@@ -208,6 +224,32 @@ export const Form = ({
   }, [splitFromCollateral, isValid, allowanceFinished])
 
   const outcomesByRow = '15'
+
+  const fullLoadingActionButton =
+    status.isSuccess() || status.isFailure()
+      ? { text: 'OK', onClick: () => setStatus(Remote.notAsked<SplitStatus>()) }
+      : undefined
+
+  const fullLoadingIcon = status.isFailure()
+    ? IconTypes.error
+    : status.isSuccess()
+    ? IconTypes.ok
+    : IconTypes.spinner
+
+  const fullLoadingMessage = status.isFailure()
+    ? status.getFailure()
+    : status.isLoading()
+    ? 'Waiting...'
+    : undefined
+
+  const splitPositionsTable =
+    status.isSuccess() && status.hasData() ? (
+      <DisplayTablePositions
+        callbackOnHistoryPush={clearComponent}
+        collateral={status.get().collateral}
+        positionIds={status.get().positionIds}
+      />
+    ) : null
 
   return (
     <CenteredCard>
@@ -296,20 +338,28 @@ export const Form = ({
           splitFrom={splitFrom}
         />
       </Row>
-      {isTransactionExecuting && (
+      {(status.isLoading() || status.isFailure()) && (
         <FullLoading
-          actionButton={
-            error ? { text: 'OK', onClick: () => setIsTransactionExecuting(true) } : undefined
-          }
-          icon={error ? IconTypes.error : IconTypes.spinner}
-          message={error ? error.message : 'Waiting...'}
-          title={error ? 'Error' : 'Split position'}
+          actionButton={fullLoadingActionButton}
+          icon={fullLoadingIcon}
+          message={fullLoadingMessage}
+          title={status.isFailure() ? 'Error' : 'Split positions'}
+          width={status.isFailure() ? '600px' : undefined}
         />
       )}
-      {error && (
-        <ErrorContainer>
-          <ErrorMessage>{error.message}</ErrorMessage>
-        </ErrorContainer>
+      {status.isSuccess() && (
+        <Modal
+          isOpen={status.isSuccess()}
+          onRequestClose={clearComponent}
+          subTitle={`Positions were successfully split from ${(
+            <span title={conditionIdToPreviewShow}>
+              {truncateStringInTheMiddle(conditionIdToPreviewShow, 8, 6)}
+            </span>
+          )}.`}
+          title={'Split Positions'}
+        >
+          {splitPositionsTable}
+        </Modal>
       )}
       <ButtonContainer>
         <Button disabled={!canSubmit} onClick={handleSubmit(onSubmit)}>
