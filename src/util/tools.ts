@@ -1,6 +1,5 @@
-import { ethers } from 'ethers'
 import { Provider } from 'ethers/providers'
-import { BigNumber, formatUnits } from 'ethers/utils'
+import { BigNumber, formatUnits, getAddress } from 'ethers/utils'
 import moment from 'moment-timezone'
 
 import { BYTES_REGEX } from 'config/constants'
@@ -13,7 +12,7 @@ import { ConditionErrors, PositionErrors, Token } from 'util/types'
 
 export const isAddress = (address: string) => {
   try {
-    ethers.utils.getAddress(address)
+    getAddress(address)
   } catch (e) {
     return false
   }
