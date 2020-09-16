@@ -10,6 +10,7 @@ import { InputAmount } from 'components/form/InputAmount'
 import { InputCondition } from 'components/form/InputCondition'
 import { EditPartitionModal } from 'components/modals/EditPartitionModal'
 import { Outcome } from 'components/partitions/Outcome'
+import { Pill, PillTypes } from 'components/pureStyledComponents/Pill'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { CardTextSm } from 'components/pureStyledComponents/CardText'
 import { ErrorContainer, Error as ErrorMessage } from 'components/pureStyledComponents/Error'
@@ -216,9 +217,7 @@ export const Form = ({
       <Row cols="1fr">
         <InputCondition formMethods={formMethods} onConditionChange={handleConditionChange} />
         {condition && condition.resolved && (
-          <ErrorContainer>
-            <ErrorMessage>Warning: this condition is resolved</ErrorMessage>
-          </ErrorContainer>
+          <Pill type={PillTypes.open}>Warning: this condition is resolved</Pill>
         )}
       </Row>
       <Row cols="1fr" marginBottomXL>
