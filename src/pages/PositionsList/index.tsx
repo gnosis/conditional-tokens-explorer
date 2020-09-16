@@ -17,8 +17,13 @@ import { IconTypes } from 'components/statusInfo/common'
 import { CellHash } from 'components/table/CellHash'
 import { TableControls } from 'components/table/TableControls'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { PositionWithUserBalanceWithDecimals, usePositions } from 'hooks'
+import {
+  PositionWithUserBalanceWithDecimals,
+  PositionWithUserBalanceWithDecimalsWithToken,
+  usePositions,
+} from 'hooks'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
+import { useWithToken } from 'hooks/useWithToken'
 import { customStyles } from 'theme/tableCustomStyles'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
@@ -27,7 +32,7 @@ import { CollateralFilterOptions, TransferOutcomeOptions } from 'util/types'
 const logger = getLogger('PositionsList')
 
 export const PositionsList = () => {
-  const { _type: status, CTService, connect, networkConfig, signer } = useWeb3ConnectedOrInfura()
+  const { _type: status, CTService, connect, signer } = useWeb3ConnectedOrInfura()
   const history = useHistory()
   const { setValue } = useLocalStorage('positionid')
 
@@ -64,9 +69,10 @@ export const PositionsList = () => {
     collateralFilter: selectedCollateralFilter,
     collateralValue: selectedCollateralValue,
   })
+  const { data: dataWithToken, loading: loadingCustomTokens } = useWithToken(data || [])
 
-  const isLoading = !positionIdToSearch && loading
-  const isSearching = positionIdToSearch && loading
+  const isLoading = !positionIdToSearch && (loading || loadingCustomTokens)
+  const isSearching = positionIdToSearch && (loading || loadingCustomTokens)
 
   const buildMenuForRow = useCallback(
     (row) => {
@@ -181,20 +187,10 @@ export const PositionsList = () => {
       },
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: PositionWithUserBalanceWithDecimals) => {
-          try {
-            const token = networkConfig && networkConfig.getTokenFromAddress(row.collateralToken)
-            // Please don't delete this because the tests will explode
-            return (
-              <TokenIcon
-                onClick={() => handleRowClick(row)}
-                symbol={(token && token.symbol) || ''}
-              />
-            )
-          } catch (error) {
-            logger.error(error)
-            return row.collateralToken
-          }
+        cell: (row: PositionWithUserBalanceWithDecimalsWithToken) => {
+          const { token } = row
+          // Please don't delete this because the tests will explode
+          return token ? <TokenIcon symbol={token.symbol || ''} /> : row.collateralToken
         },
         name: 'Collateral',
         selector: 'collateralToken',
@@ -203,7 +199,7 @@ export const PositionsList = () => {
     ]
 
     return [...defaultColumns, ...connectedItems, ...menu]
-  }, [connectedItems, menu, handleRowClick, networkConfig])
+  }, [connectedItems, menu, handleRowClick])
 
   const onTransferOutcomeTokens = useCallback(
     async (transferValue: TransferOutcomeOptions) => {
@@ -259,7 +255,7 @@ export const PositionsList = () => {
       <PageTitle>Positions</PageTitle>
       {isLoading && <InlineLoading />}
       {error && <InfoCard message={error.message} title="Error" />}
-      {data && !isLoading && !error && (
+      {dataWithToken && !isLoading && !error && (
         <>
           <TableControls
             end={
@@ -285,7 +281,7 @@ export const PositionsList = () => {
               className="outerTableWrapper"
               columns={getColumns()}
               customStyles={customStyles}
-              data={data || []}
+              data={dataWithToken || []}
               highlightOnHover
               noHeader
               onRowClicked={handleRowClick}

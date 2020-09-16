@@ -1,11 +1,20 @@
 import { useCallback } from 'react'
 
+import { getLogger } from 'util/logger'
+
+const logger = getLogger('useLocalStorage')
+
 export const useLocalStorage = <T,>(key: string) => {
   const getValue = useCallback(() => {
     const t = window.localStorage.getItem(key) || null
     window.localStorage.removeItem(key)
 
-    return t ? JSON.parse(t) : ''
+    if (t) {
+      logger.log(t)
+      return JSON.parse(t)
+    } else {
+      return ''
+    }
   }, [key])
 
   const setValue = useCallback(

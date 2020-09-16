@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 import {
   StripedList,
@@ -10,29 +10,38 @@ import { TitleValue } from 'components/text/TitleValue'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { arePositionMergeablesByCondition, getMergePreview } from 'util/tools'
+import { arePositionMergeablesByCondition, getMergePreview, getTokenSummary } from 'util/tools'
 
 interface Props {
   amount: BigNumber
 }
 
 export const MergePreview = ({ amount }: Props) => {
-  const { networkConfig } = useWeb3ConnectedOrInfura()
+  const { networkConfig, provider } = useWeb3ConnectedOrInfura()
 
   const { positions } = useMultiPositionsContext()
   const { condition } = useConditionContext()
+  const [mergedPosition, setMergedPosition] = useState('')
 
   const canMergePositions = useMemo(() => {
     return condition && arePositionMergeablesByCondition(positions, condition)
   }, [positions, condition])
 
-  const mergedPosition = useMemo(() => {
+  useEffect(() => {
+    let cancelled = false
     if (canMergePositions && condition && positions.length > 0) {
-      const token = networkConfig.getTokenFromAddress(positions[0].collateralToken.id)
-      return getMergePreview(positions, condition, amount, token)
+      getTokenSummary(networkConfig, provider, positions[0].collateralToken.id).then((token) => {
+        if (!cancelled) {
+          setMergedPosition(getMergePreview(positions, condition, amount, token))
+        }
+      })
+    } else {
+      setMergedPosition('')
     }
-    return ''
-  }, [canMergePositions, condition, positions, amount, networkConfig])
+    return () => {
+      cancelled = true
+    }
+  }, [canMergePositions, condition, positions, amount, provider, networkConfig])
 
   return (
     <TitleValue
