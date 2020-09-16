@@ -10,10 +10,6 @@ import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Contex
 import { useAllowance } from 'hooks/useAllowance'
 import { useCollateral } from 'hooks/useCollateral'
 import { Form } from 'pages/SplitPosition/Form'
-import { ConditionalTokensService } from 'services/conditionalTokens'
-import { getLogger } from 'util/logger'
-
-const logger = getLogger('SplitPositionIndex')
 
 export const SplitPosition = () => {
   const { _type: status, CTService, connect, networkConfig } = useWeb3ConnectedOrInfura()
@@ -33,20 +29,6 @@ export const SplitPosition = () => {
       amount: BigNumber
     ) => {
       if (status === Web3ContextStatus.Connected && collateral) {
-        partition.forEach((indexSet) => {
-          const collectionId = ConditionalTokensService.getCollectionId(
-            parentCollection,
-            conditionId,
-            indexSet
-          )
-
-          const positionId = ConditionalTokensService.getPositionId(collateral, collectionId)
-          logger.info(
-            `conditionId: ${conditionId} / parentCollection: ${parentCollection} / indexSet: ${indexSet.toString()}`
-          )
-          logger.info(`Position: ${positionId}`)
-        })
-
         await CTService.splitPosition(collateral, parentCollection, conditionId, partition, amount)
       } else {
         connect()

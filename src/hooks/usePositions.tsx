@@ -7,7 +7,6 @@ import { Position, marshalPositionListData } from 'hooks/utils'
 import { PositionsListType, buildQueryPositions } from 'queries/positions'
 import { UserWithPositionsQuery } from 'queries/users'
 import { Positions, UserWithPositions } from 'types/generatedGQL'
-import { getLogger } from 'util/logger'
 import { formatBigNumber, getTokenSummary } from 'util/tools'
 import { CollateralFilterOptions, Token } from 'util/types'
 
@@ -26,8 +25,6 @@ interface OptionsToSearch {
   collateralFilter?: string
 }
 
-const logger = getLogger('UsePositions')
-
 /**
  * Return a array of positions, and the user balance if it's connected.
  */
@@ -42,6 +39,7 @@ export const usePositions = (options: OptionsToSearch) => {
 
   const [data, setData] = React.useState<Maybe<PositionWithUserBalanceWithDecimals[]>>(null)
   const [address, setAddress] = React.useState<Maybe<string>>(null)
+  const [loadingUserBalanceWithDecimals, setLoadingUserBalanceWithDecimals] = React.useState(true)
 
   const queryOptions: PositionsListType = {}
 
@@ -80,12 +78,14 @@ export const usePositions = (options: OptionsToSearch) => {
     if (positionsData) {
       const positionListData = marshalPositionListData(positionsData.positions, userData?.user)
 
+      setLoadingUserBalanceWithDecimals(true)
+
       const fetchUserBalanceWithDecimals = async () => {
         const uniqueCollateralTokens = lodashUniqBy(positionListData, 'collateralToken')
 
         const collateralTokensPromises = uniqueCollateralTokens.map(async (position: Position) => {
           const { collateralToken } = position
-          return await getTokenSummary(networkConfig, provider, collateralToken, logger)
+          return await getTokenSummary(networkConfig, provider, collateralToken)
         })
         const collateralTokensResolved = await Promise.all(collateralTokensPromises)
 
@@ -110,22 +110,24 @@ export const usePositions = (options: OptionsToSearch) => {
             userBalanceWithDecimals,
           } as PositionWithUserBalanceWithDecimals
         })
-
         if (!cancelled) {
           setData(positionListDataEnhanced)
+          setLoadingUserBalanceWithDecimals(false)
         }
       }
 
       fetchUserBalanceWithDecimals()
-      return () => {
-        cancelled = true
-      }
+    } else {
+      setLoadingUserBalanceWithDecimals(false)
+    }
+    return () => {
+      cancelled = true
     }
   }, [positionsData, userData, networkConfig, provider])
 
   return {
     data,
     error: positionsError || userError,
-    loading: positionsLoading || userLoading,
+    loading: positionsLoading || userLoading || loadingUserBalanceWithDecimals,
   }
 }

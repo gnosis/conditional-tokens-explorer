@@ -1,32 +1,43 @@
-type RemoteStatusSuccess<T> = { _type: 'success'; data: T }
+export enum RemoteStatusTypes {
+  NotAsked = 'notAsked',
+  Success = 'success',
+  Loading = 'loading',
+  Failure = 'failure',
+}
+
+export type RemoteStatusNotAsked = { _type: RemoteStatusTypes.NotAsked }
+export type RemoteStatusSuccess<T> = { _type: RemoteStatusTypes.Success; data: T }
+export type RemoteStatusLoading = { _type: RemoteStatusTypes.Loading }
+export type RemoteStatusFailure = { _type: RemoteStatusTypes.Failure; error: Error }
+
 type RemoteStatus<T> =
-  | { _type: 'notAsked' }
+  | RemoteStatusNotAsked
   | RemoteStatusSuccess<T>
-  | { _type: 'loading' }
-  | { _type: 'failure'; error: Error }
+  | RemoteStatusLoading
+  | RemoteStatusFailure
 
 function success<T>(data: T): RemoteStatusSuccess<T> {
   return {
-    _type: 'success',
+    _type: RemoteStatusTypes.Success,
     data,
   }
 }
 
 function loading<T>(): RemoteStatus<T> {
   return {
-    _type: 'loading',
+    _type: RemoteStatusTypes.Loading,
   }
 }
 
-function notAsked<T>(): RemoteStatus<T> {
+function notAsked<T>(): RemoteStatusNotAsked {
   return {
-    _type: 'notAsked',
+    _type: RemoteStatusTypes.NotAsked,
   }
 }
 
-function failure<T>(error: Error): RemoteStatus<T> {
+function failure(error: Error): RemoteStatusFailure {
   return {
-    _type: 'failure',
+    _type: RemoteStatusTypes.Failure,
     error,
   }
 }
@@ -39,7 +50,11 @@ export class Remote<T> {
   }
 
   public hasData(): this is RemoteWithData<T> {
-    return this.status._type === 'success'
+    return this.status._type === RemoteStatusTypes.Success
+  }
+
+  public hasError(): this is RemoteWithFailure<Error> {
+    return this.status._type === RemoteStatusTypes.Failure
   }
 
   public match<U>({
@@ -53,16 +68,16 @@ export class Remote<T> {
     onNotAsked: () => U
     onFailure: (e: Error) => U
   }): U {
-    if (this.status._type === 'notAsked') {
+    if (this.status._type === RemoteStatusTypes.NotAsked) {
       return onNotAsked()
     }
-    if (this.status._type === 'success') {
+    if (this.status._type === RemoteStatusTypes.Success) {
       return onSuccess(this.status.data)
     }
-    if (this.status._type === 'loading') {
+    if (this.status._type === RemoteStatusTypes.Loading) {
       return onLoading()
     }
-    if (this.status._type === 'failure') {
+    if (this.status._type === RemoteStatusTypes.Failure) {
       return onFailure(this.status.error)
     }
 
@@ -71,11 +86,23 @@ export class Remote<T> {
   }
 
   public get(): T | null {
-    return this.status._type === 'success' ? this.status.data : null
+    return this.status._type === RemoteStatusTypes.Success ? this.status.data : null
+  }
+
+  public getFailure(): string {
+    return this.status._type === RemoteStatusTypes.Failure ? this.status.error.message : ''
   }
 
   public isLoading(): boolean {
-    return this.status._type === 'loading'
+    return this.status._type === RemoteStatusTypes.Loading
+  }
+
+  public isFailure(): boolean {
+    return this.status._type === RemoteStatusTypes.Failure
+  }
+
+  public isSuccess(): boolean {
+    return this.status._type === RemoteStatusTypes.Success
   }
 
   public getOr(defaultData: T): T {
@@ -118,5 +145,18 @@ class RemoteWithData<T> extends Remote<T> {
 
   public get(): T {
     return this.status.data
+  }
+}
+
+class RemoteWithFailure<T> extends Remote<T> {
+  protected status: RemoteStatusFailure
+
+  constructor(error: Error) {
+    super()
+    this.status = failure(error)
+  }
+
+  public getFailure(): string {
+    return this.status.error.message
   }
 }

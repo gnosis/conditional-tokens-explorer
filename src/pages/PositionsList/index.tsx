@@ -134,7 +134,10 @@ export const PositionsList = () => {
         {
           // eslint-disable-next-line react/display-name
           cell: (row: PositionWithUserBalanceWithDecimals) => (
-            <span {...(row.userBalanceWithDecimals ? { title: row.userBalance.toString() } : {})}>
+            <span
+              onClick={() => handleRowClick(row)}
+              {...(row.userBalanceWithDecimals ? { title: row.userBalance.toString() } : {})}
+            >
               {row.userBalanceWithDecimals}
             </span>
           ),
@@ -145,7 +148,7 @@ export const PositionsList = () => {
         },
       ])
     }
-  }, [status, buildMenuForRow])
+  }, [status, buildMenuForRow, handleRowClick])
 
   const getColumns = useCallback(() => {
     // If you move this outside of the useCallback, can cause performance issues as a dep of this useCallback

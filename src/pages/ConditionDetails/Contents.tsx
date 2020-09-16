@@ -97,10 +97,6 @@ export const Contents: React.FC<Props> = ({ condition }) => {
     >
       <Row marginBottomXL>
         <TitleValue
-          title="Condition Type"
-          value={isConditionFromOmen ? ConditionType.omen : ConditionType.custom}
-        />
-        <TitleValue
           title="Condition Id"
           value={
             <>
@@ -108,6 +104,10 @@ export const Contents: React.FC<Props> = ({ condition }) => {
               <ButtonCopy value={conditionId} />
             </>
           }
+        />
+        <TitleValue
+          title="Condition Type"
+          value={isConditionFromOmen ? ConditionType.omen : ConditionType.custom}
         />
         <TitleValue
           title="Status"

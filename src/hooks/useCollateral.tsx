@@ -24,6 +24,7 @@ export const useCollateral = (
     }
 
     setLoading(true)
+
     fetchToken(collateralAddress)
       .then((token) => {
         if (!cancelled) {
