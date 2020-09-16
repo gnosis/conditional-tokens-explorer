@@ -35,8 +35,10 @@ export const DisplayTablePositions = ({
       {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionIdsArray) => {
+          const port = window.location.port !== '' ? `:${window.location.port}` : ''
           return (
             <CellHash
+              externalLink={`${window.location.protocol}//${window.location.hostname}${port}/#/positions/${row.positionId}`}
               onClick={() => {
                 handleRowClick(row.positionId)
               }}
