@@ -117,6 +117,16 @@ export enum CollateralFilterOptions {
   All = 'all',
 }
 
+export type PositionIdsArray = {
+  positionId: string
+  balance: BigNumber
+}
+
+export interface SplitStatus {
+  positionIds: PositionIdsArray[]
+  collateral: string
+}
+
 export interface TransferOutcomeOptions {
   amount: BigNumber
   address: string

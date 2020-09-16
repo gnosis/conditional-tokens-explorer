@@ -26,6 +26,7 @@ export const GRAPH_WS_GANACHE =
 export const BYTES_REGEX = /^0x[a-fA-F0-9]{64}$/
 export const NULL_PARENT_ID = '0x0000000000000000000000000000000000000000000000000000000000000000'
 export const ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}$/
+export const INTEGER_NUMBER = /^[0-9]+$/
 export const MIN_OUTCOMES = 2
 export const MAX_OUTCOMES = 256
 
