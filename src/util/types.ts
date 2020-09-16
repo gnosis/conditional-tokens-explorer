@@ -117,7 +117,7 @@ export enum CollateralFilterOptions {
   All = 'all',
 }
 
-export interface TransferOptions {
+export interface TransferOutcomeOptions {
   amount: BigNumber
   address: string
   positionId: string
