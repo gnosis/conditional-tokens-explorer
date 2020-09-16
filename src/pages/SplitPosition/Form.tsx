@@ -98,6 +98,7 @@ export const Form = ({
 
   const [outcomeSlot, setOutcomeSlot] = useState(0)
   const [conditionIdToPreviewShow, setConditionIdToPreviewShow] = useState('')
+  const [condition, setCondition] = useState<Maybe<GetCondition_condition>>(null)
   const [position, setPosition] = useState<Maybe<GetPosition_position>>(null)
   const [isTransactionExecuting, setIsTransactionExecuting] = useState(false)
   const [error, setError] = useState<Maybe<Error>>(null)
@@ -108,6 +109,7 @@ export const Form = ({
   const { amount, positionId, splitFrom } = getValues() as SplitPositionFormMethods
 
   const handleConditionChange = useCallback((condition: Maybe<GetCondition_condition>) => {
+    setCondition(condition)
     setOutcomeSlot(condition ? condition.outcomeSlotCount : 0)
     setConditionIdToPreviewShow(condition ? condition.id : '')
   }, [])
@@ -213,6 +215,11 @@ export const Form = ({
     <CenteredCard>
       <Row cols="1fr">
         <InputCondition formMethods={formMethods} onConditionChange={handleConditionChange} />
+        {condition && condition.resolved && (
+          <ErrorContainer>
+            <ErrorMessage>Warning: this condition is resolved</ErrorMessage>
+          </ErrorContainer>
+        )}
       </Row>
       <Row cols="1fr" marginBottomXL>
         <TitleValue
