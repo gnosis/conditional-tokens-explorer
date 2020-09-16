@@ -37,6 +37,9 @@ export const useCollateral = (
         if (!cancelled) {
           setLoading(false)
           setCollateral(null)
+          if (err.message.indexOf('(') !== -1) {
+            err.message = err.message.split('(')[0]
+          }
           setError(err)
         }
       })

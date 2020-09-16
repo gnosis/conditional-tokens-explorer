@@ -67,7 +67,7 @@ export const CustomCollateralModal: React.FC<Props> = (props) => {
               />
               {error && (
                 <ErrorContainer>
-                  <Error>{error.message.split('(')[0]}</Error>
+                  <Error>{error.message}</Error>
                 </ErrorContainer>
               )}
             </>
