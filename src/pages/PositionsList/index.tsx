@@ -98,7 +98,7 @@ export const PositionsList = () => {
         },
       ]
 
-      if (!userBalance.isZero() || signer) {
+      if (!userBalance.isZero() && signer) {
         menu.push({
           text: 'Transfer outcomes',
           onClick: () => {
