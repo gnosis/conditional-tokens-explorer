@@ -5,11 +5,11 @@ import styled from 'styled-components'
 
 import { Button } from 'components/buttons/Button'
 import { CenteredCard } from 'components/common/CenteredCard'
+import { Modal } from 'components/common/Modal'
 import { SetAllowance } from 'components/common/SetAllowance'
 import { InputAmount } from 'components/form/InputAmount'
 import { InputCondition } from 'components/form/InputCondition'
 import { EditPartitionModal } from 'components/modals/EditPartitionModal'
-import { SplitPositionModal } from 'components/modals/SplitPositionModal'
 import { Outcome } from 'components/partitions/Outcome'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { CardTextSm } from 'components/pureStyledComponents/CardText'
@@ -34,7 +34,7 @@ import { SplitFrom } from 'pages/SplitPosition/SplitFrom'
 import { GetCondition_condition, GetPosition_position } from 'types/generatedGQL'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
-import { trivialPartition } from 'util/tools'
+import { trivialPartition, truncateStringInTheMiddle } from 'util/tools'
 import { OutcomeProps, PositionIdsArray, SplitFromType, SplitStatus, Token } from 'util/types'
 
 const StripedListStyled = styled(StripedList)`
@@ -242,14 +242,14 @@ export const Form = ({
     ? 'Waiting...'
     : undefined
 
-  const fullLoadingBody =
+  const splitPositionsTable =
     status.isSuccess() && status.hasData() ? (
       <DisplayTablePositions
         callbackOnHistoryPush={clearComponent}
         collateral={status.get().collateral}
         positionIds={status.get().positionIds}
       />
-    ) : undefined
+    ) : null
 
   return (
     <CenteredCard>
@@ -348,12 +348,18 @@ export const Form = ({
         />
       )}
       {status.isSuccess() && (
-        <SplitPositionModal
-          bodyComponent={fullLoadingBody}
-          conditionId={conditionIdToPreviewShow}
+        <Modal
           isOpen={status.isSuccess()}
           onRequestClose={clearComponent}
-        />
+          subTitle={`Positions were successfully split from ${(
+            <span title={conditionIdToPreviewShow}>
+              {truncateStringInTheMiddle(conditionIdToPreviewShow, 8, 6)}
+            </span>
+          )}.`}
+          title={'Split Positions'}
+        >
+          {splitPositionsTable}
+        </Modal>
       )}
       <ButtonContainer>
         <Button disabled={!canSubmit} onClick={handleSubmit(onSubmit)}>
