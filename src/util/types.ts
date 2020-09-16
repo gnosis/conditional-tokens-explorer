@@ -126,3 +126,9 @@ export interface SplitStatus {
   positionIds: PositionIdsArray[]
   collateral: string
 }
+
+export interface TransferOutcomeOptions {
+  amount: BigNumber
+  address: string
+  positionId: string
+}

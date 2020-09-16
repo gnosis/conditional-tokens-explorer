@@ -53,19 +53,24 @@ export const usePositions = (options: OptionsToSearch) => {
 
   const query = buildQueryPositions(queryOptions)
 
-  const { data: positionsData, error: positionsError, loading: positionsLoading } = useQuery<
-    Positions
-  >(query, { variables: queryOptions })
+  const {
+    data: positionsData,
+    error: positionsError,
+    loading: positionsLoading,
+    refetch: refetchPositions,
+  } = useQuery<Positions>(query, { variables: queryOptions })
 
-  const { data: userData, error: userError, loading: userLoading } = useQuery<UserWithPositions>(
-    UserWithPositionsQuery,
-    {
-      skip: !address,
-      variables: {
-        account: address,
-      },
-    }
-  )
+  const {
+    data: userData,
+    error: userError,
+    loading: userLoading,
+    refetch: refetchUserPositions,
+  } = useQuery<UserWithPositions>(UserWithPositionsQuery, {
+    skip: !address,
+    variables: {
+      account: address,
+    },
+  })
 
   React.useEffect(() => {
     if (status === Web3ContextStatus.Connected && addressFromWallet) {
@@ -129,5 +134,7 @@ export const usePositions = (options: OptionsToSearch) => {
     data,
     error: positionsError || userError,
     loading: positionsLoading || userLoading || loadingUserBalanceWithDecimals,
+    refetchPositions,
+    refetchUserPositions,
   }
 }

@@ -7,7 +7,7 @@ import Web3Utils from 'web3-utils'
 import { CONFIRMATIONS_TO_WAIT } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
 import { getLogger } from 'util/logger'
-import { PositionIdsArray } from 'util/types'
+import { PositionIdsArray, Token } from 'util/types'
 
 const logger = getLogger('Conditional Tokens')
 
@@ -40,6 +40,8 @@ const conditionalTokensAbi = [
   'function splitPosition(address collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] partition, uint amount) external',
   'function reportPayouts(bytes32 questionId, uint[] payouts)',
   'function safeBatchTransferFrom(address from, address to, uint256[] ids, uint256[] values, bytes data) external',
+  'function decimals() external view returns (uint8)',
+  'function symbol() external view returns (string)',
 ]
 
 export class ConditionalTokensService {
@@ -256,5 +258,15 @@ export class ConditionalTokensService {
       ethers.constants.HashZero
     )
     return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
+  }
+
+  async getProfileSummary(): Promise<Token> {
+    const [decimals, symbol] = await Promise.all([this.contract.decimals(), this.contract.symbol()])
+
+    return {
+      address: this.contract.address,
+      decimals,
+      symbol,
+    }
   }
 }
