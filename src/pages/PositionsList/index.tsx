@@ -222,16 +222,17 @@ export const PositionsList = () => {
     [signer, CTService, connect, refetchUserPositions, refetchPositions]
   )
 
-  const fullLoadingActionButton =
-    transfer.isSuccess()
-      ? {
+  const fullLoadingActionButton = transfer.isSuccess()
+    ? {
         text: 'OK',
         onClick: () => setTransfer(Remote.notAsked<TransferOutcomeOptions>()),
       }
-      :  transfer.isFailure()? {
+    : transfer.isFailure()
+    ? {
         text: 'Close',
         onClick: () => setTransfer(Remote.notAsked<TransferOutcomeOptions>()),
-      }: undefined
+      }
+    : undefined
 
   const fullLoadingIcon = transfer.isFailure()
     ? IconTypes.error

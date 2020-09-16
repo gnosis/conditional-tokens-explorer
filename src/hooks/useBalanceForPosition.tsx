@@ -13,7 +13,7 @@ export const useBalanceForPosition = (positionId: string, refresh?: string) => {
   React.useEffect(() => {
     setLoading(true)
 
-    const getBalance = async (position: string) => {
+    const getBalance = async () => {
       try {
         const balance = await CTService.balanceOf(positionId)
         setBalance(balance)
@@ -22,7 +22,7 @@ export const useBalanceForPosition = (positionId: string, refresh?: string) => {
       }
     }
 
-    getBalance(positionId)
+    getBalance()
 
     setLoading(false)
   }, [CTService, positionId, setBalance, setError, setLoading, refresh])
