@@ -5,6 +5,9 @@ import { SelectCondition } from 'components/form/SelectCondition'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { SplitPositionFormMethods } from 'pages/SplitPosition/Form'
 import { GetCondition_condition } from 'types/generatedGQL'
+import { getLogger } from 'util/logger'
+
+const logger = getLogger('InputCondition')
 
 interface Props {
   formMethods: FormContextValues<SplitPositionFormMethods>
@@ -28,8 +31,14 @@ export const InputCondition = ({
     }
 
     if (!loading && !conditionContextErrors.length && condition) {
-      setValue('conditionId', condition.id, true)
-      onConditionChange(condition)
+      if (condition.resolved) {
+        logger.error(`${condition.id} is already resolved!`)
+        setValue('conditionId', '', true)
+        onConditionChange(null)
+      } else {
+        setValue('conditionId', condition.id, true)
+        onConditionChange(condition)
+      }
     }
   }, [condition, conditionContextErrors, loading, onConditionChange, setValue])
 
