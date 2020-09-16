@@ -10,7 +10,10 @@ import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { TitleValue } from 'components/text/TitleValue'
 import { useCollateral } from 'hooks/useCollateral'
+import { getLogger } from 'util/logger'
 import { Token } from 'util/types'
+
+const logger = getLogger('CustomCollateralModal')
 
 const FirstRow = styled(Row)`
   padding-top: 12px;
@@ -67,7 +70,7 @@ export const CustomCollateralModal: React.FC<Props> = (props) => {
               />
               {error && (
                 <ErrorContainer>
-                  <Error>{error.message}</Error>
+                  <Error>{error.message.split('(')[0]}</Error>
                 </ErrorContainer>
               )}
             </>
