@@ -114,14 +114,15 @@ const getTokenData = (symbol: string): Array<any> => {
 
 interface Props {
   symbol: string
+  onClick?: () => void
 }
 
 export const TokenIcon: React.FC<Props> = (props) => {
-  const { symbol, ...restProps } = props
+  const { onClick, symbol, ...restProps } = props
   const data = getTokenData(symbol)
 
   return (
-    <Wrapper {...restProps}>
+    <Wrapper onClick={onClick} {...restProps}>
       {data.length > 0 ? (
         <Icon>{data[0].icon}</Icon>
       ) : (

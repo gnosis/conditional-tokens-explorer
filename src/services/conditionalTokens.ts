@@ -6,6 +6,10 @@ import Web3Utils from 'web3-utils'
 
 import { CONFIRMATIONS_TO_WAIT } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
+import { getLogger } from 'util/logger'
+import { PositionIdsArray } from 'util/types'
+
+const logger = getLogger('Conditional Tokens')
 
 // HACK - yarn build is breaking web3-utils soliditySha3. This should get the same results
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -89,6 +93,33 @@ export class ConditionalTokensService {
 
   static getPositionId(collateralToken: string, collectionId: string): string {
     return CTHelpers.getPositionId(collateralToken, collectionId)
+  }
+
+  async getPositionsFromPartition(
+    partition: BigNumber[],
+    parentCollection: string,
+    conditionId: string,
+    collateral: string
+  ): Promise<PositionIdsArray[]> {
+    const partitionsPromises = partition.map(async (indexSet: BigNumber) => {
+      const collectionId = ConditionalTokensService.getCollectionId(
+        parentCollection,
+        conditionId,
+        indexSet
+      )
+
+      const positionId = ConditionalTokensService.getPositionId(collateral, collectionId)
+      logger.info(
+        `conditionId: ${conditionId} / parentCollection: ${parentCollection} / indexSet: ${indexSet.toString()}`
+      )
+      logger.info(`Position: ${positionId}`)
+
+      const balance = await this.balanceOf(positionId)
+
+      return { positionId, balance }
+    })
+    const partitions = await Promise.all(partitionsPromises)
+    return partitions
   }
 
   async prepareCondition(
