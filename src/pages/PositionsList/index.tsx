@@ -22,7 +22,7 @@ import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { customStyles } from 'theme/tableCustomStyles'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
-import { CollateralFilterOptions, TransferOptions } from 'util/types'
+import { CollateralFilterOptions, TransferOutcomeOptions } from 'util/types'
 
 const logger = getLogger('PositionsList')
 
@@ -42,8 +42,8 @@ export const PositionsList = () => {
   const [openTransferOutcomeTokensModal, setOpenTransferOutcomeTokensModal] = useState(false)
   const [selectedPositionId, setSelectedPositionId] = useState<string>('')
   const [selectedCollateralToken, setSelectedCollateralToken] = useState<string>('')
-  const [transfer, setTransfer] = useState<Remote<TransferOptions>>(
-    Remote.notAsked<TransferOptions>()
+  const [transfer, setTransfer] = useState<Remote<TransferOutcomeOptions>>(
+    Remote.notAsked<TransferOutcomeOptions>()
   )
 
   const debouncedHandlerPositionIdToSearch = useDebounceCallback((positionIdToSearch) => {
@@ -100,7 +100,7 @@ export const PositionsList = () => {
 
       if (!userBalance.isZero() && signer) {
         menu.push({
-          text: 'Transfer outcomes',
+          text: 'Transfer outcome tokens',
           onClick: () => {
             setSelectedPositionId(id)
             setSelectedCollateralToken(collateralToken)
@@ -197,12 +197,8 @@ export const PositionsList = () => {
     return [...defaultColumns, ...connectedItems, ...menu]
   }, [connectedItems, menu, handleRowClick, networkConfig])
 
-  const closeTransferOutcomeTokensModal = useCallback(() => {
-    setOpenTransferOutcomeTokensModal(false)
-  }, [setOpenTransferOutcomeTokensModal])
-
-  const saveTransferOutcomeTokensModal = useCallback(
-    async (transferValue: TransferOptions) => {
+  const onTransferOutcomeTokens = useCallback(
+    async (transferValue: TransferOutcomeOptions) => {
       if (signer) {
         try {
           setTransfer(Remote.loading())
@@ -227,9 +223,15 @@ export const PositionsList = () => {
   )
 
   const fullLoadingActionButton =
-    transfer.isSuccess() || transfer.isFailure()
-      ? { text: 'OK', onClick: () => setTransfer(Remote.notAsked<TransferOptions>()) }
-      : undefined
+    transfer.isSuccess()
+      ? {
+        text: 'OK',
+        onClick: () => setTransfer(Remote.notAsked<TransferOutcomeOptions>()),
+      }
+      :  transfer.isFailure()? {
+        text: 'Close',
+        onClick: () => setTransfer(Remote.notAsked<TransferOutcomeOptions>()),
+      }: undefined
 
   const fullLoadingIcon = transfer.isFailure()
     ? IconTypes.error
@@ -286,8 +288,8 @@ export const PositionsList = () => {
             <TransferOutcomeTokensModal
               collateralToken={selectedCollateralToken}
               isOpen={openTransferOutcomeTokensModal}
-              onRequestClose={closeTransferOutcomeTokensModal}
-              onSubmit={saveTransferOutcomeTokensModal}
+              onRequestClose={() => setOpenTransferOutcomeTokensModal(false)}
+              onSubmit={onTransferOutcomeTokens}
               positionId={selectedPositionId}
             />
           )}
