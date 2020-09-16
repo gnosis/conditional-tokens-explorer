@@ -88,7 +88,7 @@ export const DisplayTablePositions = ({
             return null
           }
         },
-        name: 'ERC1155 Amount',
+        name: 'ERC1155',
         maxWidth: '150px',
         minWidth: '150px',
         right: true,
