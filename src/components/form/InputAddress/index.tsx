@@ -8,18 +8,21 @@ import { isAddress } from 'util/tools'
 interface Props {
   address: string
   onAddressChange: (value: string) => void
+  onErrorChange: (value: boolean) => void
 }
 
-export const InputAddress = ({ address, onAddressChange }: Props) => {
-  const [error, setError] = React.useState('')
+export const InputAddress = ({ address, onAddressChange, onErrorChange }: Props) => {
+  const [error, onError] = React.useState('')
 
   React.useEffect(() => {
-    if (address && !isAddress(address)) {
-      setError('Address not valid')
+    const isNotAValidAddress = !!address && !isAddress(address)
+    if (isNotAValidAddress) {
+      onError('Address not valid')
     } else {
-      setError('')
+      onError('')
     }
-  }, [address, setError])
+    onErrorChange(isNotAValidAddress)
+  }, [address, onError, onErrorChange])
 
   return (
     <>

@@ -45,6 +45,7 @@ export const TransferOutcomeTokensModal: React.FC<Props> = (props) => {
   const [token, setToken] = React.useState<Maybe<Token>>(null)
   const [amount, setAmount] = React.useState<BigNumber>(ZERO_BN)
   const [address, setAddress] = React.useState('')
+  const [error, setError] = React.useState(false)
   const [isLoading, setLoading] = React.useState(true)
 
   const onClickTransfer = () => {
@@ -60,6 +61,10 @@ export const TransferOutcomeTokensModal: React.FC<Props> = (props) => {
 
   const amountChangeHandler = React.useCallback((value: BigNumber) => {
     setAmount(value)
+  }, [])
+
+  const errorChangeHandler = React.useCallback((value: boolean) => {
+    setError(value)
   }, [])
 
   const useWalletHandler = React.useCallback(() => {
@@ -120,10 +125,14 @@ export const TransferOutcomeTokensModal: React.FC<Props> = (props) => {
             )}
           </FirstRow>
           <Row cols="1fr">
-            <InputAddress address={address} onAddressChange={addressChangeHandler} />
+            <InputAddress
+              address={address}
+              onAddressChange={addressChangeHandler}
+              onErrorChange={errorChangeHandler}
+            />
           </Row>
           <ButtonContainerStyled>
-            <Button disabled={amount.isZero() || !address} onClick={onClickTransfer}>
+            <Button disabled={amount.isZero() || !address || error} onClick={onClickTransfer}>
               Transfer
             </Button>
           </ButtonContainerStyled>
