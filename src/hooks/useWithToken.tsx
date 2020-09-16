@@ -35,12 +35,17 @@ export const useWithToken = <T extends WithAddress>(
 
     if (data && data.length > 0) {
       setLoading(true)
-      fetchTokens(data).then((withToken) => {
-        if (!cancelled) {
-          setDataWithToken(withToken)
-          setLoading(false)
-        }
-      })
+      fetchTokens(data)
+        .then((withToken) => {
+          if (!cancelled) {
+            setDataWithToken(withToken)
+          }
+        })
+        .finally(() => {
+          if (!cancelled) {
+            setLoading(false)
+          }
+        })
     }
 
     return () => {
