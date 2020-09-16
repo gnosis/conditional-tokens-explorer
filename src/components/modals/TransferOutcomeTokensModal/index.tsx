@@ -12,7 +12,7 @@ import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { ZERO_BN } from 'config/constants'
 import { useWeb3Connected } from 'contexts/Web3Context'
 import { ERC20Service } from 'services/erc20'
-import { Token, TransferOptions } from 'util/types'
+import { Token, TransferOutcomeOptions } from 'util/types'
 
 const FirstRow = styled(Row)`
   padding-top: 12px;
@@ -30,8 +30,7 @@ const LoadingWrapper = styled.div`
 `
 
 interface Props extends ModalProps {
-  onRequestClose?: () => void
-  onSubmit: (transfer: TransferOptions) => void
+  onSubmit: (transfer: TransferOutcomeOptions) => void
   positionId: string
   collateralToken: string
 }
@@ -48,11 +47,13 @@ export const TransferOutcomeTokensModal: React.FC<Props> = (props) => {
   const [error, setError] = React.useState(false)
   const [isLoading, setLoading] = React.useState(true)
 
-  const onClickTransfer = () => {
+  const onClickTransfer = (
+    e: React.MouseEvent<Element, MouseEvent> | React.KeyboardEvent<Element>
+  ) => {
     if (typeof onRequestClose === 'function') {
-      onRequestClose()
-      onSubmit({ amount, address, positionId })
+      onRequestClose(e)
     }
+    onSubmit({ amount, address, positionId })
   }
 
   const addressChangeHandler = React.useCallback((value: string) => {
