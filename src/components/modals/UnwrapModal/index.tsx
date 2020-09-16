@@ -20,12 +20,12 @@ const ButtonContainerStyled = styled(ButtonContainer)`
 interface Props extends ModalProps {
   balance: BigNumber
   decimals: number
-  onWrap: () => void
+  onUnWrap: () => void
   tokenSymbol?: string
 }
 
 export const UnwrapModal: React.FC<Props> = (props) => {
-  const { balance, decimals, onRequestClose, onWrap, tokenSymbol, ...restProps } = props
+  const { balance, decimals, onRequestClose, onUnWrap, tokenSymbol, ...restProps } = props
 
   const maxBalance = useMemo(() => (balance ? balance : ZERO_BN), [balance])
 
@@ -62,7 +62,7 @@ export const UnwrapModal: React.FC<Props> = (props) => {
         <Button
           disabled={amount.isZero()}
           onClick={(e) => {
-            onWrap()
+            onUnWrap()
             if (onRequestClose) onRequestClose(e)
           }}
         >

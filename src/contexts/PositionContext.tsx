@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/react-hooks'
+import { BigNumber } from 'ethers/utils'
 import React, { useContext, useState } from 'react'
 
 import { useBalanceForPosition } from 'hooks/useBalanceForPosition'
@@ -12,6 +13,7 @@ export interface PositionContext {
   position: Maybe<GetPosition_position>
   positionId: string
   loading: boolean
+  balance: Maybe<BigNumber>
   errors: PositionErrors[]
   setPositionId: (positionId: string) => void
   clearPosition: () => void
@@ -21,6 +23,7 @@ export const POSITION_CONTEXT_DEFAULT_VALUE = {
   position: null,
   positionId: '',
   loading: false,
+  balance: null,
   errors: [],
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setPositionId: () => {},
@@ -98,6 +101,7 @@ export const PositionProvider = (props: Props) => {
   const value = {
     position,
     positionId,
+    balance,
     errors,
     loading,
     setPositionId: setPositionIdCallback,
