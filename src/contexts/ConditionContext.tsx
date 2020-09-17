@@ -8,13 +8,13 @@ import { isConditionIdValid } from 'util/tools'
 import { ConditionErrors } from 'util/types'
 
 export interface ConditionContext {
+  clearCondition: () => void
   condition: Maybe<GetCondition_condition>
   conditionId: string
-  loading: boolean
   errors: ConditionErrors[]
-  setConditionId: (conditionId: string) => void
+  loading: boolean
   setCondition: (condition: GetCondition_condition) => void
-  clearCondition: () => void
+  setConditionId: (conditionId: string) => void
 }
 
 export const CONDITION_CONTEXT_DEFAULT_VALUE = {

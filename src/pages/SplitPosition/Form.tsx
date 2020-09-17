@@ -6,11 +6,11 @@ import styled from 'styled-components'
 import { Button } from 'components/buttons/Button'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { SetAllowance } from 'components/common/SetAllowance'
+import { Warning } from 'components/common/Warning'
 import { InputAmount } from 'components/form/InputAmount'
 import { InputCondition } from 'components/form/InputCondition'
 import { EditPartitionModal } from 'components/modals/EditPartitionModal'
 import { Outcome } from 'components/partitions/Outcome'
-import { Pill, PillTypes } from 'components/pureStyledComponents/Pill'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { CardTextSm } from 'components/pureStyledComponents/CardText'
 import { ErrorContainer, Error as ErrorMessage } from 'components/pureStyledComponents/Error'
@@ -216,10 +216,12 @@ export const Form = ({
     <CenteredCard>
       <Row cols="1fr">
         <InputCondition formMethods={formMethods} onConditionChange={handleConditionChange} />
-        {condition && condition.resolved && (
-          <Pill type={PillTypes.open}>Warning: this condition is resolved</Pill>
-        )}
       </Row>
+      {condition && condition.resolved && (
+        <Row cols="1fr">
+          <Warning message={'This condition is already resolved.'} />
+        </Row>
+      )}
       <Row cols="1fr" marginBottomXL>
         <TitleValue
           title="Split From"
