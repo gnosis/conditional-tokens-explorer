@@ -29,6 +29,12 @@ export const dataTableCSS = css`
       }
     }
 
+    .rdt_TableCol {
+      div {
+        white-space: nowrap;
+      }
+    }
+
     .rdt_TableRow {
       border-bottom-color: ${(props) => props.theme.colors.lightGrey}!important;
 
