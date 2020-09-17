@@ -7,6 +7,7 @@ import { Button } from 'components/buttons/Button'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { Modal } from 'components/common/Modal'
 import { SetAllowance } from 'components/common/SetAllowance'
+import { Warning } from 'components/common/Warning'
 import { InputAmount } from 'components/form/InputAmount'
 import { InputCondition } from 'components/form/InputCondition'
 import { EditPartitionModal } from 'components/modals/EditPartitionModal'
@@ -102,6 +103,7 @@ export const Form = ({
 
   const [outcomeSlot, setOutcomeSlot] = useState(0)
   const [conditionIdToPreviewShow, setConditionIdToPreviewShow] = useState('')
+  const [condition, setCondition] = useState<Maybe<GetCondition_condition>>(null)
   const [position, setPosition] = useState<Maybe<GetPosition_position>>(null)
   const [originalPartition, setOriginalPartition] = useState<BigNumber[]>([])
   const [numberedOutcomes, setNumberedOutcomes] = useState<Array<Array<OutcomeProps>>>([])
@@ -112,6 +114,7 @@ export const Form = ({
   const { amount, positionId, splitFrom } = getValues() as SplitPositionFormMethods
 
   const handleConditionChange = useCallback((condition: Maybe<GetCondition_condition>) => {
+    setCondition(condition)
     setOutcomeSlot(condition ? condition.outcomeSlotCount : 0)
     setConditionIdToPreviewShow(condition ? condition.id : '')
   }, [])
@@ -256,6 +259,11 @@ export const Form = ({
       <Row cols="1fr">
         <InputCondition formMethods={formMethods} onConditionChange={handleConditionChange} />
       </Row>
+      {condition && condition.resolved && (
+        <Row cols="1fr">
+          <Warning message={'This condition is already resolved.'} />
+        </Row>
+      )}
       <Row cols="1fr" marginBottomXL>
         <TitleValue
           title="Split From"
