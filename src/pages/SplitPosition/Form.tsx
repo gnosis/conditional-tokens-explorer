@@ -351,11 +351,15 @@ export const Form = ({
         <Modal
           isOpen={status.isSuccess()}
           onRequestClose={clearComponent}
-          subTitle={`Positions were successfully split from ${(
-            <span title={conditionIdToPreviewShow}>
-              {truncateStringInTheMiddle(conditionIdToPreviewShow, 8, 6)}
-            </span>
-          )}.`}
+          subTitle={
+            <>
+              Positions were successfully split from{' '}
+              <span title={conditionIdToPreviewShow}>
+                {truncateStringInTheMiddle(conditionIdToPreviewShow, 8, 6)}
+              </span>
+              .
+            </>
+          }
           title={'Split Positions'}
         >
           {splitPositionsTable}

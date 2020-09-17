@@ -50,7 +50,7 @@ export const DisplayTablePositions = ({
         maxWidth: '250px',
         minWidth: '250px',
         name: 'Position Id',
-        selector: 'id',
+        selector: (row: PositionIdsArray) => row.positionId,
         sortable: true,
       },
       {
