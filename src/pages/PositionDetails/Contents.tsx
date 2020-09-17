@@ -6,6 +6,7 @@ import styled from 'styled-components'
 import { Button } from 'components/buttons/Button'
 import { ButtonCopy } from 'components/buttons/ButtonCopy'
 import { ButtonDropdownCircle } from 'components/buttons/ButtonDropdownCircle'
+import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
@@ -101,7 +102,7 @@ export const Contents = ({ position }: Props) => {
 
     if (balance && !balance.isZero() && signer) {
       menu.push({
-        text: 'Transfer outcome tokens',
+        text: 'Transfer Outcome Tokens',
         onClick: () => {
           setOpenTransferOutcomeTokensModal(true)
         },
@@ -157,8 +158,7 @@ export const Contents = ({ position }: Props) => {
       if (signer) {
         try {
           setTransfer(Remote.loading())
-
-          setTransactionTitle('Transfer outcomes tokens')
+          setTransactionTitle('Transfer Outcome Tokens')
 
           const { address: addressTo, amount, positionId } = transferValue
           const addressFrom = await signer.getAddress()
@@ -183,11 +183,13 @@ export const Contents = ({ position }: Props) => {
 
   const fullLoadingActionButton = transfer.isSuccess()
     ? {
-        text: 'OK',
+        buttonType: ButtonType.primary,
         onClick: () => setTransfer(Remote.notAsked<TransferOutcomeOptions>()),
+        text: 'OK',
       }
     : transfer.isFailure()
     ? {
+        buttonType: ButtonType.danger,
         text: 'Close',
         onClick: () => setTransfer(Remote.notAsked<TransferOutcomeOptions>()),
       }
@@ -202,7 +204,7 @@ export const Contents = ({ position }: Props) => {
   const fullLoadingMessage = transfer.isFailure()
     ? transfer.getFailure()
     : transfer.isLoading()
-    ? 'Waiting...'
+    ? 'Working...'
     : undefined
   const fullLoadingTitle = transfer.isFailure() ? 'Error' : transactionTitle
 
@@ -321,7 +323,7 @@ export const Contents = ({ position }: Props) => {
           icon={fullLoadingIcon}
           message={fullLoadingMessage}
           title={fullLoadingTitle}
-          width={transfer.isFailure() ? '400px' : undefined}
+          width={transfer.isFailure() ? '400px' : '320px'}
         />
       )}
     </CenteredCard>

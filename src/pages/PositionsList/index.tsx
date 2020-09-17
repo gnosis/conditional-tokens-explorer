@@ -4,6 +4,7 @@ import DataTable from 'react-data-table-component'
 import { useHistory } from 'react-router-dom'
 
 import { ButtonDots } from 'components/buttons/ButtonDots'
+import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CollateralFilterDropdown } from 'components/common/CollateralFilterDropdown'
 import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
@@ -106,7 +107,7 @@ export const PositionsList = () => {
 
       if (!userBalance.isZero() && signer) {
         menu.push({
-          text: 'Transfer outcome tokens',
+          text: 'Transfer Outcome Tokens',
           onClick: () => {
             setSelectedPositionId(id)
             setSelectedCollateralToken(collateralToken)
@@ -228,11 +229,13 @@ export const PositionsList = () => {
 
   const fullLoadingActionButton = transfer.isSuccess()
     ? {
+        buttonType: ButtonType.primary,
         text: 'OK',
         onClick: () => setTransfer(Remote.notAsked<TransferOutcomeOptions>()),
       }
     : transfer.isFailure()
     ? {
+        buttonType: ButtonType.danger,
         text: 'Close',
         onClick: () => setTransfer(Remote.notAsked<TransferOutcomeOptions>()),
       }
@@ -247,7 +250,7 @@ export const PositionsList = () => {
   const fullLoadingMessage = transfer.isFailure()
     ? transfer.getFailure()
     : transfer.isLoading()
-    ? 'Waiting...'
+    ? 'Working...'
     : undefined
 
   return (
@@ -303,8 +306,8 @@ export const PositionsList = () => {
               actionButton={fullLoadingActionButton}
               icon={fullLoadingIcon}
               message={fullLoadingMessage}
-              title={transfer.isFailure() ? 'Error' : 'Transfer outcomes tokens'}
-              width={transfer.isFailure() ? '400px' : undefined}
+              title={transfer.isFailure() ? 'Error' : 'Transfer Outcome Tokens'}
+              width={transfer.isFailure() ? '400px' : '320px'}
             />
           )}
         </>

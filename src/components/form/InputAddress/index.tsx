@@ -17,7 +17,7 @@ export const InputAddress = ({ address, onAddressChange, onErrorChange }: Props)
   React.useEffect(() => {
     const isNotAValidAddress = !!address && !isAddress(address)
     if (isNotAValidAddress) {
-      onError('Address not valid')
+      onError('Invalid address.')
     } else {
       onError('')
     }
@@ -27,7 +27,7 @@ export const InputAddress = ({ address, onAddressChange, onErrorChange }: Props)
   return (
     <>
       <TitleValue
-        title={'Address'}
+        title={'Send To'}
         value={
           <>
             <Textfield
@@ -36,7 +36,7 @@ export const InputAddress = ({ address, onAddressChange, onErrorChange }: Props)
                 const addressValue = e.target.value
                 onAddressChange(addressValue)
               }}
-              placeholder={'Please enter an address to transfer the outcome tokens...'}
+              placeholder={'Address to transfer your outcome tokens...'}
               type="text"
               value={address}
             />
