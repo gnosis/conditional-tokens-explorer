@@ -1,19 +1,21 @@
-import { ethers } from 'ethers'
 import { Provider } from 'ethers/providers'
-import { BigNumber, formatUnits } from 'ethers/utils'
+import { BigNumber, formatUnits, getAddress } from 'ethers/utils'
 import moment from 'moment-timezone'
 
 import { BYTES_REGEX } from 'config/constants'
+import { NetworkConfig } from 'config/networkConfig'
+import { ERC20Service } from 'services/erc20'
 import {
   GetCondition_condition,
   GetMultiPositions_positions,
   GetPosition_position,
 } from 'types/generatedGQL'
+import { getLogger } from 'util/logger'
 import { ConditionErrors, PositionErrors, Token } from 'util/types'
 
 export const isAddress = (address: string) => {
   try {
-    ethers.utils.getAddress(address)
+    getAddress(address)
   } catch (e) {
     return false
   }
@@ -298,5 +300,42 @@ export const getMergePreview = (
       }, newIndexSets)
     }
     return positionString(positions[0].conditionIds, newIndexSets, amount, token)
+  }
+}
+const fetchTokenLogger = getLogger('getTokenSummary')
+export const getTokenSummary = async (
+  networkConfig: NetworkConfig,
+  provider: Provider,
+  collateralToken: string,
+  logger = fetchTokenLogger
+): Promise<Token> => {
+  try {
+    const { decimals, symbol } = networkConfig.getTokenFromAddress(collateralToken)
+    return {
+      address: collateralToken,
+      decimals,
+      symbol,
+    }
+  } catch {
+    // Do nothing if is not a token from our config, instead we search with erc20Service
+  }
+
+  try {
+    const erc20Service = new ERC20Service(provider, collateralToken)
+    const { decimals, symbol } = await erc20Service.getProfileSummary()
+
+    return {
+      address: collateralToken,
+      decimals,
+      symbol,
+    }
+  } catch (err) {
+    logger.error(err)
+  }
+
+  return {
+    address: collateralToken,
+    decimals: 18,
+    symbol: '',
   }
 }

@@ -15,7 +15,12 @@ import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { TableControls } from 'components/table/TableControls'
 import { TitleValue } from 'components/text/TitleValue'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { PositionWithUserBalanceWithDecimals, usePositions } from 'hooks'
+import {
+  PositionWithUserBalanceWithDecimals,
+  PositionWithUserBalanceWithDecimalsWithToken,
+  usePositions,
+} from 'hooks'
+import { useWithToken } from 'hooks/useWithToken'
 import { customStyles } from 'theme/tableCustomStyles'
 import { truncateStringInTheMiddle } from 'util/tools'
 
@@ -51,9 +56,9 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
     singlePosition,
     ...restProps
   } = props
-  const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
+  const { _type: status } = useWeb3ConnectedOrInfura()
   const [selectedPositions, setSelectedPositions] = useState<
-    Array<PositionWithUserBalanceWithDecimals>
+    Array<PositionWithUserBalanceWithDecimalsWithToken>
   >([])
   const [positionIdToSearch, setPositionIdToSearch] = useState<string>('')
   const [positionIdToShow, setPositionIdToShow] = useState<string>('')
@@ -74,41 +79,57 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
   const { data, error, loading } = usePositions({
     positionId: positionIdToSearch,
   })
+  const { data: dataWithToken, loading: loadingTokens } = useWithToken(data || [])
 
   useEffect(() => {
-    if (data && data.length && preSelectedPositions && preSelectedPositions.length) {
-      setSelectedPositions((current: Array<PositionWithUserBalanceWithDecimals>) => {
+    if (
+      dataWithToken &&
+      dataWithToken.length &&
+      preSelectedPositions &&
+      preSelectedPositions.length
+    ) {
+      setSelectedPositions((current: Array<PositionWithUserBalanceWithDecimalsWithToken>) => {
         const currentIds = current.map(({ id }) => id)
         const filteredPre = preSelectedPositions.filter((pre) => !currentIds.includes(pre))
-        const dataFiltered = data.filter(({ id }) => filteredPre.includes(id))
+        const dataFiltered = dataWithToken.filter(({ id }) => filteredPre.includes(id))
         return [...current, ...dataFiltered]
       })
     }
-  }, [preSelectedPositions, data])
+  }, [preSelectedPositions, dataWithToken])
 
-  const handleMultiAddClick = useCallback((position: PositionWithUserBalanceWithDecimals) => {
-    setSelectedPositions((current) => {
-      const included = current.find((selected) => selected.id === position.id)
-      return included ? current : [...current, position]
-    })
-  }, [])
+  const handleMultiAddClick = useCallback(
+    (position: PositionWithUserBalanceWithDecimalsWithToken) => {
+      setSelectedPositions((current) => {
+        const included = current.find((selected) => selected.id === position.id)
+        return included ? current : [...current, position]
+      })
+    },
+    []
+  )
 
-  const handleSingleAddClick = useCallback((position: PositionWithUserBalanceWithDecimals) => {
-    setSelectedPositions([position])
-  }, [])
+  const handleSingleAddClick = useCallback(
+    (position: PositionWithUserBalanceWithDecimalsWithToken) => {
+      setSelectedPositions([position])
+    },
+    []
+  )
 
-  const handleRemoveClick = useCallback((position: PositionWithUserBalanceWithDecimals) => {
-    setSelectedPositions((current) => {
-      return current.filter((selected) => selected.id !== position.id)
-    })
-  }, [])
+  const handleRemoveClick = useCallback(
+    (position: PositionWithUserBalanceWithDecimalsWithToken) => {
+      setSelectedPositions((current) => {
+        return current.filter((selected) => selected.id !== position.id)
+      })
+    },
+    []
+  )
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const defaultColumns: Array<any> = useMemo(
     () => [
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: PositionWithUserBalanceWithDecimals) => truncateStringInTheMiddle(row.id, 8, 6),
+        cell: (row: PositionWithUserBalanceWithDecimalsWithToken) =>
+          truncateStringInTheMiddle(row.id, 8, 6),
         maxWidth: '170px',
         name: 'Position Id',
         selector: 'id',
@@ -116,12 +137,8 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
       },
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: PositionWithUserBalanceWithDecimals) => {
-          return networkConfig ? (
-            <TokenIcon symbol={networkConfig.getTokenFromAddress(row.collateralToken).symbol} />
-          ) : (
-            row.collateralToken
-          )
+        cell: (row: PositionWithUserBalanceWithDecimalsWithToken) => {
+          return row.token.symbol ? <TokenIcon symbol={row.token.symbol} /> : row.collateralToken
         },
         maxWidth: '140px',
         minWidth: '140px',
@@ -130,7 +147,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
         sortable: true,
       },
     ],
-    [networkConfig]
+    []
   )
 
   const addCell = useMemo(
@@ -141,7 +158,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
       maxWidth: '36px',
       minWidth: '36px',
       // eslint-disable-next-line react/display-name
-      cell: (row: PositionWithUserBalanceWithDecimals) => (
+      cell: (row: PositionWithUserBalanceWithDecimalsWithToken) => (
         <ButtonControl
           buttonType={ButtonControlType.add}
           disabled={!!(singlePosition && selectedPositions.length)}
@@ -160,7 +177,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
       maxWidth: '36px',
       minWidth: '36px',
       // eslint-disable-next-line react/display-name
-      cell: (row: PositionWithUserBalanceWithDecimals) => (
+      cell: (row: PositionWithUserBalanceWithDecimalsWithToken) => (
         <ButtonControl
           buttonType={ButtonControlType.delete}
           onClick={() => handleRemoveClick(row)}
@@ -178,7 +195,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
       setConnectedItems([
         {
           // eslint-disable-next-line react/display-name
-          cell: (row: PositionWithUserBalanceWithDecimals) => (
+          cell: (row: PositionWithUserBalanceWithDecimalsWithToken) => (
             <span {...(row.userBalanceWithDecimals ? { title: row.userBalance.toString() } : {})}>
               {row.userBalanceWithDecimals}
             </span>
@@ -210,8 +227,8 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
     }
   }, [onConfirm, selectedPositions])
 
-  const isLoading = !positionIdToSearch && loading
-  const isSearching = positionIdToSearch && loading
+  const isLoading = !positionIdToSearch && (loading || loadingTokens)
+  const isSearching = positionIdToSearch && (loading || loadingTokens)
 
   return (
     <Modal
@@ -225,7 +242,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
         </LoadingWrapper>
       )}
       {error && <InfoCard message={error.message} title="Error" />}
-      {data && !isLoading && (
+      {dataWithToken && !isLoading && (
         <>
           <TableControls
             start={
@@ -248,13 +265,13 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
               data={
                 data
                   ? showOnlyPositionsWithBalance
-                    ? data.filter((position) => !position.userBalance.isZero())
-                    : data
+                    ? dataWithToken.filter((position) => !position.userBalance.isZero())
+                    : dataWithToken
                   : []
               }
               noDataComponent={
                 <EmptyContentText>{`No positions${
-                  showOnlyPositionsWithBalance && data.length ? ' with balance' : ''
+                  showOnlyPositionsWithBalance && dataWithToken.length ? ' with balance' : ''
                 } found.`}</EmptyContentText>
               }
               noHeader

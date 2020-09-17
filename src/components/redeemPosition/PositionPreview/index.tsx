@@ -9,6 +9,7 @@ import {
 import { TitleValue } from 'components/text/TitleValue'
 import { NetworkConfig } from 'config/networkConfig'
 import { useBalanceForPosition } from 'hooks/useBalanceForPosition'
+import { useCollateral } from 'hooks/useCollateral'
 import { GetCondition_condition, GetPosition_position } from 'types/generatedGQL'
 import { getRedeemedBalance, getRedeemedPreview } from 'util/tools'
 
@@ -18,8 +19,9 @@ interface Props {
   networkConfig: NetworkConfig
 }
 
-export const PositionPreview = ({ condition, networkConfig, position }: Props) => {
+export const PositionPreview = ({ condition, position }: Props) => {
   const { balance } = useBalanceForPosition(position?.id || '')
+  const { collateral: token } = useCollateral(position ? position.collateralToken.id : '')
 
   const redeemedBalance = useMemo(
     () =>
@@ -28,12 +30,11 @@ export const PositionPreview = ({ condition, networkConfig, position }: Props) =
   )
 
   const redeemedPreview = useMemo(() => {
-    if (position && condition) {
-      const token = networkConfig.getTokenFromAddress(position.collateralToken.id)
+    if (position && condition && token) {
       return getRedeemedPreview(position, condition, redeemedBalance, token)
     }
     return ''
-  }, [position, condition, redeemedBalance, networkConfig])
+  }, [position, condition, redeemedBalance, token])
 
   return (
     <TitleValue

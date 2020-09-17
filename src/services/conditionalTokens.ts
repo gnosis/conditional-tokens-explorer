@@ -6,6 +6,10 @@ import Web3Utils from 'web3-utils'
 
 import { CONFIRMATIONS_TO_WAIT } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
+import { getLogger } from 'util/logger'
+import { PositionIdsArray, Token } from 'util/types'
+
+const logger = getLogger('Conditional Tokens')
 
 // HACK - yarn build is breaking web3-utils soliditySha3. This should get the same results
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -36,6 +40,8 @@ const conditionalTokensAbi = [
   'function splitPosition(address collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] partition, uint amount) external',
   'function reportPayouts(bytes32 questionId, uint[] payouts)',
   'function safeBatchTransferFrom(address from, address to, uint256[] ids, uint256[] values, bytes data) external',
+  'function decimals() external view returns (uint8)',
+  'function symbol() external view returns (string)',
 ]
 
 export class ConditionalTokensService {
@@ -89,6 +95,33 @@ export class ConditionalTokensService {
 
   static getPositionId(collateralToken: string, collectionId: string): string {
     return CTHelpers.getPositionId(collateralToken, collectionId)
+  }
+
+  async getPositionsFromPartition(
+    partition: BigNumber[],
+    parentCollection: string,
+    conditionId: string,
+    collateral: string
+  ): Promise<PositionIdsArray[]> {
+    const partitionsPromises = partition.map(async (indexSet: BigNumber) => {
+      const collectionId = ConditionalTokensService.getCollectionId(
+        parentCollection,
+        conditionId,
+        indexSet
+      )
+
+      const positionId = ConditionalTokensService.getPositionId(collateral, collectionId)
+      logger.info(
+        `conditionId: ${conditionId} / parentCollection: ${parentCollection} / indexSet: ${indexSet.toString()}`
+      )
+      logger.info(`Position: ${positionId}`)
+
+      const balance = await this.balanceOf(positionId)
+
+      return { positionId, balance }
+    })
+    const partitions = await Promise.all(partitionsPromises)
+    return partitions
   }
 
   async prepareCondition(
@@ -225,5 +258,15 @@ export class ConditionalTokensService {
       ethers.constants.HashZero
     )
     return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
+  }
+
+  async getProfileSummary(): Promise<Token> {
+    const [decimals, symbol] = await Promise.all([this.contract.decimals(), this.contract.symbol()])
+
+    return {
+      address: this.contract.address,
+      decimals,
+      symbol,
+    }
   }
 }

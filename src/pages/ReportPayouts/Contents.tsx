@@ -1,4 +1,4 @@
-import { BigNumber, formatUnits } from 'ethers/utils'
+import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -83,9 +83,7 @@ export const Contents: React.FC = () => {
       if (status === Web3ContextStatus.Connected) {
         setTransactionStatus(Status.Loading)
 
-        const payoutsNumbered = payouts.map((payout: BigNumber) =>
-          Number(formatUnits(payout, DECIMALS))
-        )
+        const payoutsNumbered = payouts.map((payout: BigNumber) => payout.toNumber())
         await CTService.reportPayouts(questionId, payoutsNumbered)
 
         setTransactionStatus(Status.Ready)

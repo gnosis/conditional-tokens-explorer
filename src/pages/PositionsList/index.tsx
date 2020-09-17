@@ -8,22 +8,31 @@ import { CollateralFilterDropdown } from 'components/common/CollateralFilterDrop
 import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
 import { SearchField } from 'components/form/SearchField'
+import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
 import { PageTitle } from 'components/pureStyledComponents/PageTitle'
+import { FullLoading } from 'components/statusInfo/FullLoading'
 import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { IconTypes } from 'components/statusInfo/common'
 import { CellHash } from 'components/table/CellHash'
 import { TableControls } from 'components/table/TableControls'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { PositionWithUserBalanceWithDecimals, usePositions } from 'hooks'
+import {
+  PositionWithUserBalanceWithDecimals,
+  PositionWithUserBalanceWithDecimalsWithToken,
+  usePositions,
+} from 'hooks'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
+import { useWithToken } from 'hooks/useWithToken'
 import { customStyles } from 'theme/tableCustomStyles'
 import { getLogger } from 'util/logger'
-import { CollateralFilterOptions } from 'util/types'
+import { Remote } from 'util/remoteData'
+import { CollateralFilterOptions, TransferOutcomeOptions } from 'util/types'
 
 const logger = getLogger('PositionsList')
 
 export const PositionsList = () => {
-  const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
+  const { _type: status, CTService, connect, signer } = useWeb3ConnectedOrInfura()
   const history = useHistory()
   const { setValue } = useLocalStorage('positionid')
 
@@ -34,6 +43,12 @@ export const PositionsList = () => {
   const [selectedCollateralFilter, setSelectedCollateralFilter] = useState<string>('')
   const [selectedCollateralValue, setSelectedCollateralValue] = useState<string>(
     CollateralFilterOptions.All
+  )
+  const [openTransferOutcomeTokensModal, setOpenTransferOutcomeTokensModal] = useState(false)
+  const [selectedPositionId, setSelectedPositionId] = useState<string>('')
+  const [selectedCollateralToken, setSelectedCollateralToken] = useState<string>('')
+  const [transfer, setTransfer] = useState<Remote<TransferOutcomeOptions>>(
+    Remote.notAsked<TransferOutcomeOptions>()
   )
 
   const debouncedHandlerPositionIdToSearch = useDebounceCallback((positionIdToSearch) => {
@@ -49,47 +64,60 @@ export const PositionsList = () => {
     [debouncedHandlerPositionIdToSearch]
   )
 
-  const { data, error, loading } = usePositions({
+  const { data, error, loading, refetchPositions, refetchUserPositions } = usePositions({
     positionId: positionIdToSearch,
     collateralFilter: selectedCollateralFilter,
     collateralValue: selectedCollateralValue,
   })
+  const { data: dataWithToken, loading: loadingCustomTokens } = useWithToken(data || [])
 
-  const isLoading = !positionIdToSearch && loading
-  const isSearching = positionIdToSearch && loading
+  const isLoading = !positionIdToSearch && (loading || loadingCustomTokens)
+  const isSearching = positionIdToSearch && (loading || loadingCustomTokens)
 
   const buildMenuForRow = useCallback(
-    ({ id }) => {
-      const detailsOption = {
-        text: 'Details',
-        onClick: () => history.push(`/positions/${id}`),
-      }
+    (row) => {
+      const { collateralToken, id, userBalance } = row
 
-      const redeemOption = {
-        text: 'Redeem',
-        onClick: () => {
-          setValue(id)
-          history.push(`/redeem`)
+      const menu = [
+        {
+          text: 'Details',
+          onClick: () => history.push(`/positions/${id}`),
         },
-      }
-
-      const wrapERC20Option = {
-        text: 'Wrap ERC20',
-        onClick: () => {
-          logger.log('wrap not implemented yet')
+        {
+          text: 'Redeem',
+          onClick: () => {
+            setValue(id)
+            history.push(`/redeem`)
+          },
         },
-      }
-
-      const unwrapOption = {
-        text: 'Unwrap ERC1155',
-        onClick: () => {
-          logger.log('unwrap not implemented yet')
+        {
+          text: 'Wrap ERC20',
+          onClick: () => {
+            logger.log('wrap not implemented yet')
+          },
         },
+        {
+          text: 'Unwrap ERC1155',
+          onClick: () => {
+            logger.log('unwrap not implemented yet')
+          },
+        },
+      ]
+
+      if (!userBalance.isZero() && signer) {
+        menu.push({
+          text: 'Transfer outcome tokens',
+          onClick: () => {
+            setSelectedPositionId(id)
+            setSelectedCollateralToken(collateralToken)
+            setOpenTransferOutcomeTokensModal(true)
+          },
+        })
       }
 
-      return [detailsOption, redeemOption, wrapERC20Option, unwrapOption]
+      return menu
     },
-    [history, setValue]
+    [history, setValue, signer]
   )
 
   const handleRowClick = useCallback(
@@ -128,7 +156,10 @@ export const PositionsList = () => {
         {
           // eslint-disable-next-line react/display-name
           cell: (row: PositionWithUserBalanceWithDecimals) => (
-            <span {...(row.userBalanceWithDecimals ? { title: row.userBalance.toString() } : {})}>
+            <span
+              onClick={() => handleRowClick(row)}
+              {...(row.userBalanceWithDecimals ? { title: row.userBalance.toString() } : {})}
+            >
               {row.userBalanceWithDecimals}
             </span>
           ),
@@ -139,7 +170,7 @@ export const PositionsList = () => {
         },
       ])
     }
-  }, [status, buildMenuForRow])
+  }, [status, buildMenuForRow, handleRowClick])
 
   const getColumns = useCallback(() => {
     // If you move this outside of the useCallback, can cause performance issues as a dep of this useCallback
@@ -156,15 +187,10 @@ export const PositionsList = () => {
       },
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: PositionWithUserBalanceWithDecimals) => {
-          try {
-            const token = networkConfig && networkConfig.getTokenFromAddress(row.collateralToken)
-            // Please don't delete this because the tests will explode
-            return <TokenIcon symbol={(token && token.symbol) || ''} />
-          } catch (error) {
-            logger.error(error)
-            return row.collateralToken
-          }
+        cell: (row: PositionWithUserBalanceWithDecimalsWithToken) => {
+          const { token } = row
+          // Please don't delete this because the tests will explode
+          return token ? <TokenIcon symbol={token.symbol || ''} /> : row.collateralToken
         },
         name: 'Collateral',
         selector: 'collateralToken',
@@ -173,14 +199,63 @@ export const PositionsList = () => {
     ]
 
     return [...defaultColumns, ...connectedItems, ...menu]
-  }, [connectedItems, menu, handleRowClick, networkConfig])
+  }, [connectedItems, menu, handleRowClick])
+
+  const onTransferOutcomeTokens = useCallback(
+    async (transferValue: TransferOutcomeOptions) => {
+      if (signer) {
+        try {
+          setTransfer(Remote.loading())
+
+          const { address: addressTo, amount, positionId } = transferValue
+          const addressFrom = await signer.getAddress()
+          await CTService.safeTransferFrom(addressFrom, addressTo, positionId, amount)
+
+          refetchPositions()
+          refetchUserPositions()
+
+          setTransfer(Remote.success(transferValue))
+        } catch (err) {
+          logger.error(err)
+          setTransfer(Remote.failure(err))
+        }
+      } else {
+        connect()
+      }
+    },
+    [signer, CTService, connect, refetchUserPositions, refetchPositions]
+  )
+
+  const fullLoadingActionButton = transfer.isSuccess()
+    ? {
+        text: 'OK',
+        onClick: () => setTransfer(Remote.notAsked<TransferOutcomeOptions>()),
+      }
+    : transfer.isFailure()
+    ? {
+        text: 'Close',
+        onClick: () => setTransfer(Remote.notAsked<TransferOutcomeOptions>()),
+      }
+    : undefined
+
+  const fullLoadingIcon = transfer.isFailure()
+    ? IconTypes.error
+    : transfer.isSuccess()
+    ? IconTypes.ok
+    : IconTypes.spinner
+
+  const fullLoadingMessage = transfer.isFailure()
+    ? transfer.getFailure()
+    : transfer.isLoading()
+    ? 'Waiting...'
+    : undefined
 
   return (
     <>
       <PageTitle>Positions</PageTitle>
       {isLoading && <InlineLoading />}
       {error && <InfoCard message={error.message} title="Error" />}
-      {data && !isLoading && !error && (
+      {dataWithToken && !isLoading && !error && (
         <>
           <TableControls
             end={
@@ -206,12 +281,30 @@ export const PositionsList = () => {
               className="outerTableWrapper"
               columns={getColumns()}
               customStyles={customStyles}
-              data={data || []}
+              data={dataWithToken || []}
               highlightOnHover
               noHeader
               onRowClicked={handleRowClick}
               pagination
               responsive
+            />
+          )}
+          {openTransferOutcomeTokensModal && selectedPositionId && selectedCollateralToken && (
+            <TransferOutcomeTokensModal
+              collateralToken={selectedCollateralToken}
+              isOpen={openTransferOutcomeTokensModal}
+              onRequestClose={() => setOpenTransferOutcomeTokensModal(false)}
+              onSubmit={onTransferOutcomeTokens}
+              positionId={selectedPositionId}
+            />
+          )}
+          {(transfer.isLoading() || transfer.isFailure() || transfer.isSuccess()) && (
+            <FullLoading
+              actionButton={fullLoadingActionButton}
+              icon={fullLoadingIcon}
+              message={fullLoadingMessage}
+              title={transfer.isFailure() ? 'Error' : 'Transfer outcomes tokens'}
+              width={transfer.isFailure() ? '400px' : undefined}
             />
           )}
         </>

@@ -65,7 +65,7 @@ const ModalSubTitle = styled.h3`
 
 export interface ModalProps extends React.ComponentProps<typeof ReactModal> {
   hideCloseButton?: boolean
-  subTitle?: string | undefined
+  subTitle?: string | React.ReactNode | undefined
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   theme?: any
   title?: string | undefined

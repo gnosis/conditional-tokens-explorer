@@ -6,25 +6,24 @@ import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Contex
 import { Position, marshalPositionListData } from 'hooks/utils'
 import { PositionsListType, buildQueryPositions } from 'queries/positions'
 import { UserWithPositionsQuery } from 'queries/users'
-import { ERC20Service } from 'services/erc20'
 import { Positions, UserWithPositions } from 'types/generatedGQL'
-import { getLogger } from 'util/logger'
-import { formatBigNumber } from 'util/tools'
-import { CollateralFilterOptions } from 'util/types'
+import { formatBigNumber, getTokenSummary } from 'util/tools'
+import { CollateralFilterOptions, Token } from 'util/types'
 
 export type UserBalanceWithDecimals = {
   userBalanceWithDecimals: string
 }
 
 export type PositionWithUserBalanceWithDecimals = Position & UserBalanceWithDecimals
+export type PositionWithUserBalanceWithDecimalsWithToken = PositionWithUserBalanceWithDecimals & {
+  token: Token
+}
 
 interface OptionsToSearch {
   positionId?: string
   collateralValue?: string
   collateralFilter?: string
 }
-
-const logger = getLogger('UsePositions')
 
 /**
  * Return a array of positions, and the user balance if it's connected.
@@ -40,6 +39,7 @@ export const usePositions = (options: OptionsToSearch) => {
 
   const [data, setData] = React.useState<Maybe<PositionWithUserBalanceWithDecimals[]>>(null)
   const [address, setAddress] = React.useState<Maybe<string>>(null)
+  const [loadingUserBalanceWithDecimals, setLoadingUserBalanceWithDecimals] = React.useState(true)
 
   const queryOptions: PositionsListType = {}
 
@@ -53,19 +53,24 @@ export const usePositions = (options: OptionsToSearch) => {
 
   const query = buildQueryPositions(queryOptions)
 
-  const { data: positionsData, error: positionsError, loading: positionsLoading } = useQuery<
-    Positions
-  >(query, { variables: queryOptions })
+  const {
+    data: positionsData,
+    error: positionsError,
+    loading: positionsLoading,
+    refetch: refetchPositions,
+  } = useQuery<Positions>(query, { variables: queryOptions })
 
-  const { data: userData, error: userError, loading: userLoading } = useQuery<UserWithPositions>(
-    UserWithPositionsQuery,
-    {
-      skip: !address,
-      variables: {
-        account: address,
-      },
-    }
-  )
+  const {
+    data: userData,
+    error: userError,
+    loading: userLoading,
+    refetch: refetchUserPositions,
+  } = useQuery<UserWithPositions>(UserWithPositionsQuery, {
+    skip: !address,
+    variables: {
+      account: address,
+    },
+  })
 
   React.useEffect(() => {
     if (status === Web3ContextStatus.Connected && addressFromWallet) {
@@ -74,41 +79,18 @@ export const usePositions = (options: OptionsToSearch) => {
   }, [status, addressFromWallet])
 
   React.useEffect(() => {
+    let cancelled = false
     if (positionsData) {
       const positionListData = marshalPositionListData(positionsData.positions, userData?.user)
+
+      setLoadingUserBalanceWithDecimals(true)
 
       const fetchUserBalanceWithDecimals = async () => {
         const uniqueCollateralTokens = lodashUniqBy(positionListData, 'collateralToken')
 
         const collateralTokensPromises = uniqueCollateralTokens.map(async (position: Position) => {
           const { collateralToken } = position
-
-          try {
-            const { decimals } = networkConfig.getTokenFromAddress(collateralToken)
-            return {
-              collateralToken,
-              decimals,
-            }
-          } catch (err) {
-            logger.error(err)
-          }
-
-          try {
-            const erc20Service = new ERC20Service(provider, collateralToken)
-            const { decimals } = await erc20Service.getProfileSummary()
-
-            return {
-              collateralToken,
-              decimals,
-            }
-          } catch (err) {
-            logger.error(err)
-          }
-
-          return {
-            collateralToken,
-            decimals: null,
-          }
+          return await getTokenSummary(networkConfig, provider, collateralToken)
         })
         const collateralTokensResolved = await Promise.all(collateralTokensPromises)
 
@@ -118,8 +100,7 @@ export const usePositions = (options: OptionsToSearch) => {
           const collateralTokenFound = collateralTokensResolved.filter(
             (collateralTokenInformation) => {
               return (
-                collateralTokenInformation.collateralToken.toLowerCase() ===
-                collateralToken.toLowerCase()
+                collateralTokenInformation.address.toLowerCase() === collateralToken.toLowerCase()
               )
             }
           )
@@ -134,17 +115,26 @@ export const usePositions = (options: OptionsToSearch) => {
             userBalanceWithDecimals,
           } as PositionWithUserBalanceWithDecimals
         })
-
-        setData(positionListDataEnhanced)
+        if (!cancelled) {
+          setData(positionListDataEnhanced)
+          setLoadingUserBalanceWithDecimals(false)
+        }
       }
 
       fetchUserBalanceWithDecimals()
+    } else {
+      setLoadingUserBalanceWithDecimals(false)
+    }
+    return () => {
+      cancelled = true
     }
   }, [positionsData, userData, networkConfig, provider])
 
   return {
     data,
     error: positionsError || userError,
-    loading: positionsLoading || userLoading,
+    loading: positionsLoading || userLoading || loadingUserBalanceWithDecimals,
+    refetchPositions,
+    refetchUserPositions,
   }
 }
