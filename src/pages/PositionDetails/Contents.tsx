@@ -205,7 +205,7 @@ export const Contents = ({ position }: Props) => {
     ? transfer.getFailure()
     : transfer.isLoading()
     ? 'Working...'
-    : undefined
+    : 'All done!'
   const fullLoadingTitle = transfer.isFailure() ? 'Error' : transactionTitle
 
   return (

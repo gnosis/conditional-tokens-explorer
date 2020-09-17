@@ -251,7 +251,7 @@ export const PositionsList = () => {
     ? transfer.getFailure()
     : transfer.isLoading()
     ? 'Working...'
-    : undefined
+    : 'All done!'
 
   return (
     <>
