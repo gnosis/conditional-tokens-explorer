@@ -101,7 +101,7 @@ export const TransferOutcomeTokensModal: React.FC<Props> = (props) => {
     <Modal
       onRequestClose={onRequestClose}
       style={{ content: { width: '500px' } }}
-      title={'Transfer outcome tokens'}
+      title={'Transfer Outcome Tokens'}
       {...restProps}
     >
       {isLoading && (
@@ -112,7 +112,14 @@ export const TransferOutcomeTokensModal: React.FC<Props> = (props) => {
       {!isLoading && (
         <>
           <FirstRow cols="1fr">
-            {token && token.decimals && (
+            <InputAddress
+              address={address}
+              onAddressChange={addressChangeHandler}
+              onErrorChange={errorChangeHandler}
+            />
+          </FirstRow>
+          {token && token.decimals && (
+            <Row cols="1fr">
               <Amount
                 amount={amount}
                 balance={balance}
@@ -123,15 +130,8 @@ export const TransferOutcomeTokensModal: React.FC<Props> = (props) => {
                 onUseWalletBalance={useWalletHandler}
                 tokenSymbol={'Outcome Tokens'}
               />
-            )}
-          </FirstRow>
-          <Row cols="1fr">
-            <InputAddress
-              address={address}
-              onAddressChange={addressChangeHandler}
-              onErrorChange={errorChangeHandler}
-            />
-          </Row>
+            </Row>
+          )}
           <ButtonContainerStyled>
             <Button disabled={amount.isZero() || !address || error} onClick={onClickTransfer}>
               Transfer

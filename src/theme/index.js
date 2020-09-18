@@ -102,6 +102,9 @@ const theme = {
     horizontalPadding: '10px',
     maxWidth: '1272px',
   },
+  outcomes: {
+    dimensions: '27px',
+  },
   paddings: {
     mainPadding: '15px',
   },

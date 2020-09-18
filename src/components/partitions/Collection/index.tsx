@@ -37,6 +37,13 @@ const OutcomesInner = styled(OutcomesContainer)`
   margin: 0 15px 0 0;
 `
 
+const ButtonControlContainer = styled(OutcomesContainer)`
+  align-items: center;
+  display: flex;
+  height: ${(props) => props.theme.outcomes.dimensions};
+  margin-bottom: auto;
+`
+
 interface Props {
   collectionIndex: number
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -113,12 +120,14 @@ export const Collection: React.FC<Props> = (props) => {
           />
         ))}
       </OutcomesInner>
-      <ButtonControl
-        buttonType={ButtonControlType.delete}
-        onClick={() => setConfirmDeleteCollection(true)}
-        onMouseEnter={() => setIsAboutToDelete(true)}
-        onMouseLeave={() => setIsAboutToDelete(false)}
-      />
+      <ButtonControlContainer>
+        <ButtonControl
+          buttonType={ButtonControlType.delete}
+          onClick={() => setConfirmDeleteCollection(true)}
+          onMouseEnter={() => setIsAboutToDelete(true)}
+          onMouseLeave={() => setIsAboutToDelete(false)}
+        />
+      </ButtonControlContainer>
       {confirmDeleteCollection && (
         <ConfirmOverlayHorizontal
           confirm={() => {
