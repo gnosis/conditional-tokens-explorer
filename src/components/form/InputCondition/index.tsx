@@ -11,10 +11,11 @@ interface Props {
   onConditionChange: (condition: Maybe<GetCondition_condition>) => void
 }
 
-export const InputCondition = ({
-  formMethods: { register, setValue },
-  onConditionChange,
-}: Props) => {
+export const InputCondition: React.FC<Props> = (props) => {
+  const {
+    formMethods: { register, setValue },
+    onConditionChange,
+  } = props
   const { condition, errors: conditionContextErrors, loading } = useConditionContext()
 
   useEffect(() => {

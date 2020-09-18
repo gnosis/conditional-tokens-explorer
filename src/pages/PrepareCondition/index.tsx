@@ -22,6 +22,7 @@ import {
   ADDRESS_REGEX,
   BYTES_REGEX,
   CONFIRMATIONS_TO_WAIT,
+  INTEGER_NUMBER,
   MAX_OUTCOMES,
   MIN_OUTCOMES,
 } from 'config/constants'
@@ -33,6 +34,7 @@ import { Categories, ConditionType, QuestionType } from 'util/types'
 
 const maxOutcomesError = 'Too many outcome slots'
 const minOutcomesError = 'There should be more than one outcome slot'
+const patternOutcomesError = 'Decimal numbers are not allowed'
 
 const logger = getLogger('Prepare Condition')
 
@@ -204,7 +206,12 @@ export const PrepareCondition = () => {
                     name="outcomesSlotCount"
                     onChange={(e) => setNumOutcomes(Number(e.target.value))}
                     placeholder="You can add between 2 and 256 outcomes..."
-                    ref={register({ required: true, min: MIN_OUTCOMES, max: MAX_OUTCOMES })}
+                    ref={register({
+                      required: true,
+                      min: MIN_OUTCOMES,
+                      max: MAX_OUTCOMES,
+                      pattern: INTEGER_NUMBER,
+                    })}
                     type="number"
                   />
                   {errors.outcomesSlotCount && (
@@ -217,6 +224,9 @@ export const PrepareCondition = () => {
                       )}
                       {errors.outcomesSlotCount.type === 'required' && (
                         <ErrorMessage>Required field</ErrorMessage>
+                      )}
+                      {errors.outcomesSlotCount.type === 'pattern' && (
+                        <ErrorMessage>{patternOutcomesError}</ErrorMessage>
                       )}
                     </ErrorContainer>
                   )}

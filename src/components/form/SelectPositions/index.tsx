@@ -18,6 +18,7 @@ import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { Position } from 'hooks'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
+import { useWithToken } from 'hooks/useWithToken'
 import { GetMultiPositions_positions } from 'types/generatedGQL'
 import { positionString } from 'util/tools'
 import { Errors } from 'util/types'
@@ -60,6 +61,7 @@ export const SelectPositions = ({
     positions,
     updatePositionIds,
   } = useMultiPositionsContext()
+  const { data: positionsWithToken } = useWithToken(positions)
 
   const {
     balances,
@@ -110,20 +112,32 @@ export const SelectPositions = ({
 
   React.useEffect(() => {
     if (positionIds.length > 0) {
-      if (isDataInSync(positionsLoading, balancesLoading, positions, balances)) {
+      if (isDataInSync(positionsLoading, balancesLoading, positionsWithToken, balances)) {
         setPositionsToDisplay(
-          positions.map((position) => {
+          positionsWithToken.map((position) => {
             const i = positionIds.findIndex((id) => id === position.id)
-            const token = networkConfig.getTokenFromAddress(position.collateralToken.id)
 
-            return positionString(position.conditionIds, position.indexSets, balances[i], token)
+            return positionString(
+              position.conditionIds,
+              position.indexSets,
+              balances[i],
+              position.token
+            )
           })
         )
       }
     } else {
       setPositionsToDisplay([])
     }
-  }, [balances, networkConfig, positions, positionsLoading, balancesLoading, positionIds])
+  }, [
+    balances,
+    networkConfig,
+    positions,
+    positionsLoading,
+    balancesLoading,
+    positionIds,
+    positionsWithToken,
+  ])
 
   const isLoading = React.useMemo(() => {
     return (

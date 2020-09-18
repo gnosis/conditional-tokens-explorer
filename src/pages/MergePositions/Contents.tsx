@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { Button } from 'components/buttons/Button'
 import { CenteredCard } from 'components/common/CenteredCard'
@@ -19,13 +19,24 @@ import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 import { getLogger } from 'util/logger'
-import { arePositionMergeables, arePositionMergeablesByCondition, minBigNumber } from 'util/tools'
-import { Status } from 'util/types'
+import {
+  arePositionMergeables,
+  arePositionMergeablesByCondition,
+  getTokenSummary,
+  minBigNumber,
+} from 'util/tools'
+import { Status, Token } from 'util/types'
 
 const logger = getLogger('MergePosition')
 
 export const Contents = () => {
-  const { _type: statusContext, CTService, connect, networkConfig } = useWeb3ConnectedOrInfura()
+  const {
+    _type: statusContext,
+    CTService,
+    connect,
+    networkConfig,
+    provider,
+  } = useWeb3ConnectedOrInfura()
 
   const { clearPositions, errors: positionsErrors, positions } = useMultiPositionsContext()
 
@@ -34,6 +45,7 @@ export const Contents = () => {
   const { clearCondition, condition, errors: conditionErrors } = useConditionContext()
   const [status, setStatus] = useState<Maybe<Status>>(null)
   const [error, setError] = useState<Maybe<Error>>(null)
+  const [collateralToken, setCollateralToken] = useState<Maybe<Token>>(null)
 
   const canMergePositions = useMemo(() => {
     return condition && arePositionMergeablesByCondition(positions, condition)
@@ -43,12 +55,19 @@ export const Contents = () => {
     return arePositionMergeables(positions)
   }, [positions])
 
-  const collateralToken = useMemo(() => {
+  useEffect(() => {
+    let cancelled = false
     if (positions.length && mergeablePositions) {
-      return networkConfig.getTokenFromAddress(positions[0].collateralToken.id)
+      getTokenSummary(networkConfig, provider, positions[0].collateralToken.id).then((token) => {
+        if (!cancelled) {
+          setCollateralToken(token)
+        }
+      })
     }
-    return null
-  }, [positions, networkConfig, mergeablePositions])
+    return () => {
+      cancelled = true
+    }
+  }, [positions, networkConfig, provider, mergeablePositions])
 
   const maxBalance = useMemo(
     () => (mergeablePositions && balances.length ? minBigNumber(balances) : ZERO_BN),

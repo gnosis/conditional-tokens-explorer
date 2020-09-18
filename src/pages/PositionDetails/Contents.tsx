@@ -6,10 +6,10 @@ import styled from 'styled-components'
 import { Button } from 'components/buttons/Button'
 import { ButtonCopy } from 'components/buttons/ButtonCopy'
 import { ButtonDropdownCircle } from 'components/buttons/ButtonDropdownCircle'
-import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
+import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
 import { UnwrapModal } from 'components/modals/UnwrapModal'
 import { WrapModal } from 'components/modals/WrapModal'
 import { Outcome } from 'components/partitions/Outcome'
@@ -22,15 +22,18 @@ import {
   StripedListItem,
   StripedListItemLessPadding,
 } from 'components/pureStyledComponents/StripedList'
-import { ActionButtonProps, FullLoading } from 'components/statusInfo/FullLoading'
+import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
 import { TitleValue } from 'components/text/TitleValue'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useBalanceForPosition } from 'hooks/useBalanceForPosition'
 import { useCollateral } from 'hooks/useCollateral'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { GetPosition_position as Position } from 'types/generatedGQL'
+import { getLogger } from 'util/logger'
+import { Remote } from 'util/remoteData'
 import { formatBigNumber, positionString, truncateStringInTheMiddle } from 'util/tools'
-import { OutcomeProps, Status } from 'util/types'
+import { OutcomeProps, TransferOutcomeOptions } from 'util/types'
 
 const CollateralText = styled.span`
   color: ${(props) => props.theme.colors.darkerGray};
@@ -61,39 +64,60 @@ const StripedListStyled = styled(StripedList)`
 
 interface Props {
   position: Position
+  balance: Maybe<BigNumber>
 }
 
+const logger = getLogger('Contents')
+
 export const Contents = ({ position }: Props) => {
+  const { CTService, signer } = useWeb3ConnectedOrInfura()
+  const { collateralToken, id: positionId, indexSets } = position
+  const { id: collateralTokenAddress } = collateralToken
+
   const history = useHistory()
   const { setValue } = useLocalStorage('positionid')
-  const { balance, error, loading } = useBalanceForPosition(position.id)
+  const [refresh, setRefresh] = React.useState('')
+  const { balance, error, loading } = useBalanceForPosition(position.id, refresh)
 
-  const { collateral: positionCollateral } = useCollateral(
-    position ? position.collateralToken.id : ''
-  )
+  const { collateral: positionCollateral } = useCollateral(position ? collateralTokenAddress : '')
   const [collateralSymbol, setCollateralSymbol] = React.useState('')
-  const { collateralToken, id, indexSets } = position
   const [isWrapModalOpen, setIsWrapModalOpen] = useState(false)
   const [isUnwrapModalOpen, setIsUnwrapModalOpen] = useState(false)
+  const [openTransferOutcomeTokensModal, setOpenTransferOutcomeTokensModal] = useState(false)
+  const [transfer, setTransfer] = useState<Remote<TransferOutcomeOptions>>(
+    Remote.notAsked<TransferOutcomeOptions>()
+  )
+  const [transactionTitle, setTransactionTitle] = useState<string>('')
 
   const dropdownItems = useMemo(() => {
-    return [
+    const menu = [
       {
         onClick: () => {
-          setValue(id)
+          setValue(positionId)
           history.push(`/redeem`)
         },
         text: 'Redeem',
       },
       {
         onClick: () => {
-          setValue(id)
+          setValue(positionId)
           history.push(`/split`)
         },
         text: 'Split',
       },
     ]
-  }, [id, history, setValue])
+
+    if (balance && !balance.isZero() && signer) {
+      menu.push({
+        text: 'Transfer outcome tokens',
+        onClick: () => {
+          setOpenTransferOutcomeTokensModal(true)
+        },
+      })
+    }
+
+    return menu
+  }, [positionId, history, signer, balance, setValue])
 
   const ERC20Amount = new BigNumber('500000000000000000')
 
@@ -127,63 +151,80 @@ export const Contents = ({ position }: Props) => {
     [positionCollateral]
   )
 
-  const [statusTitle, setStatusTitle] = useState<string>('')
-  const [statusMessage, setStatusMessage] = useState<string>('')
-  const [status, setStatus] = useState<Maybe<Status>>(null)
-  const [statusIcon, setStatusIcon] = useState<IconTypes>()
-  const [statusOnClick, setStatusOnClick] = useState<ActionButtonProps | undefined>(undefined)
-
-  const setStatusWorking = (title: string, message = 'Working...') => {
-    setStatus(Status.Loading)
-    setStatusTitle(title)
-    setStatusIcon(IconTypes.spinner)
-    setStatusMessage(message)
-    setStatusOnClick(undefined)
-  }
-
-  const setStatusDone = (title: string, message = 'Done!') => {
-    setStatusTitle(title)
-    setStatus(Status.Done)
-    setStatusMessage(message)
-    setStatusIcon(IconTypes.ok)
-    setStatusOnClick({
-      onClick: () => setStatus(null),
-      text: 'OK',
-    })
-  }
-
-  const setStatusError = (title: string, message = 'There was an error...') => {
-    setStatusTitle(title)
-    setStatus(Status.Done)
-    setStatusMessage(message)
-    setStatusIcon(IconTypes.error)
-    setStatusOnClick({
-      buttonType: ButtonType.danger,
-      onClick: () => setStatus(null),
-      text: 'Close',
-    })
-  }
-
   const onWrap = useCallback(() => {
-    const onWrapTitle = 'Wrapping ERC1155'
-    setStatusWorking(onWrapTitle)
+    setTransfer(Remote.loading())
+    setTransactionTitle('Wrapping ERC1155')
 
     setTimeout(() => {
-      setStatusDone(onWrapTitle)
+      setTransfer(Remote.success({ address: '', amount: new BigNumber(0), positionId: '' }))
     }, 5000)
   }, [])
 
   const onUnwrap = useCallback(() => {
-    const onWrapTitle = 'Unwrapping ERC20'
-    setStatusWorking(onWrapTitle)
+    setTransfer(Remote.loading())
+    setTransactionTitle('Unwrapping ERC20')
 
-    setTimeout(() => {
-      setStatusError(onWrapTitle)
-    }, 5000)
+    setTimeout(
+      () => setTransfer(Remote.success({ address: '', amount: new BigNumber(0), positionId: '' })),
+      5000
+    )
   }, [])
 
-  const outcomesByRow = '15'
+  const onTransferOutcomeTokens = useCallback(
+    async (transferValue: TransferOutcomeOptions) => {
+      if (signer) {
+        try {
+          setTransfer(Remote.loading())
 
+          setTransactionTitle('Transfer outcomes tokens')
+
+          const { address: addressTo, amount, positionId } = transferValue
+          const addressFrom = await signer.getAddress()
+
+          const { transactionIndex } = await CTService.safeTransferFrom(
+            addressFrom,
+            addressTo,
+            positionId,
+            amount
+          )
+
+          setRefresh(transactionIndex + '')
+          setTransfer(Remote.success(transferValue))
+        } catch (err) {
+          logger.error(err)
+          setTransfer(Remote.failure(err))
+        }
+      }
+    },
+    [signer, CTService]
+  )
+
+  const fullLoadingActionButton = transfer.isSuccess()
+    ? {
+        text: 'OK',
+        onClick: () => setTransfer(Remote.notAsked<TransferOutcomeOptions>()),
+      }
+    : transfer.isFailure()
+    ? {
+        text: 'Close',
+        onClick: () => setTransfer(Remote.notAsked<TransferOutcomeOptions>()),
+      }
+    : undefined
+
+  const fullLoadingIcon = transfer.isFailure()
+    ? IconTypes.error
+    : transfer.isSuccess()
+    ? IconTypes.ok
+    : IconTypes.spinner
+
+  const fullLoadingMessage = transfer.isFailure()
+    ? transfer.getFailure()
+    : transfer.isLoading()
+    ? 'Waiting...'
+    : undefined
+  const fullLoadingTitle = transfer.isFailure() ? 'Error' : transactionTitle
+
+  const outcomesByRow = '15'
   return (
     <CenteredCard
       dropdown={
@@ -203,8 +244,8 @@ export const Contents = ({ position }: Props) => {
           title="Position Id"
           value={
             <>
-              {truncateStringInTheMiddle(id, 8, 6)}
-              <ButtonCopy value={id} />
+              {truncateStringInTheMiddle(positionId, 8, 6)}
+              <ButtonCopy value={positionId} />
             </>
           }
         />
@@ -213,8 +254,8 @@ export const Contents = ({ position }: Props) => {
           title="Contract Address"
           value={
             <>
-              {truncateStringInTheMiddle(collateralToken.id, 8, 6)}
-              <ButtonCopy value={collateralToken.id} />
+              {truncateStringInTheMiddle(collateralTokenAddress, 8, 6)}
+              <ButtonCopy value={collateralTokenAddress} />
             </>
           }
         />
@@ -317,16 +358,26 @@ export const Contents = ({ position }: Props) => {
           decimals={decimals}
           isOpen={isUnwrapModalOpen}
           onRequestClose={() => setIsUnwrapModalOpen(false)}
-          onWrap={onUnwrap}
+          onUnWrap={onUnwrap}
           tokenSymbol={collateralSymbol}
         />
       )}
-      {status !== null && (
+      {openTransferOutcomeTokensModal && positionId && collateralTokenAddress && (
+        <TransferOutcomeTokensModal
+          collateralToken={collateralTokenAddress}
+          isOpen={openTransferOutcomeTokensModal}
+          onRequestClose={() => setOpenTransferOutcomeTokensModal(false)}
+          onSubmit={onTransferOutcomeTokens}
+          positionId={positionId}
+        />
+      )}
+      {(transfer.isLoading() || transfer.isFailure() || transfer.isSuccess()) && (
         <FullLoading
-          actionButton={statusOnClick}
-          icon={statusIcon}
-          message={statusMessage}
-          title={statusTitle}
+          actionButton={fullLoadingActionButton}
+          icon={fullLoadingIcon}
+          message={fullLoadingMessage}
+          title={fullLoadingTitle}
+          width={transfer.isFailure() ? '400px' : undefined}
         />
       )}
     </CenteredCard>

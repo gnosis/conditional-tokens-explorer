@@ -8,6 +8,7 @@ import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
 import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useWithToken } from 'hooks/useWithToken'
 import { SplitPositionFormMethods } from 'pages/SplitPosition/Form'
 import { GetMultiPositions_positions } from 'types/generatedGQL'
 import { positionString } from 'util/tools'
@@ -53,6 +54,7 @@ export const InputPosition = ({
     positionIds,
     positions,
   } = useMultiPositionsContext()
+  const { data: positionsWithToken } = useWithToken(positions)
 
   const { balances, errors: balancesErrors, loading: balancesLoading } = useBatchBalanceContext()
 
@@ -64,10 +66,14 @@ export const InputPosition = ({
 
   React.useEffect(() => {
     if (positionIds.length > 0) {
-      if (isDataInSync(positionsLoading, balancesLoading, positions, balances)) {
-        const token = networkConfig.getTokenFromAddress(positions[0].collateralToken.id)
+      if (isDataInSync(positionsLoading, balancesLoading, positionsWithToken, balances)) {
         setPositionToDisplay(
-          positionString(positions[0].conditionIds, positions[0].indexSets, balances[0], token)
+          positionString(
+            positions[0].conditionIds,
+            positions[0].indexSets,
+            balances[0],
+            positionsWithToken[0].token
+          )
         )
         onPositionChange(positions[0])
         setValue('positionId', positions[0].id, true)
@@ -86,6 +92,7 @@ export const InputPosition = ({
     positionIds,
     onPositionChange,
     setValue,
+    positionsWithToken,
   ])
 
   const errors = React.useMemo(() => [...positionsErrors, ...balancesErrors], [
