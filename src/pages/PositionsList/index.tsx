@@ -72,7 +72,7 @@ export const PositionsList = () => {
   })
   const { data: dataWithToken, loading: loadingCustomTokens } = useWithToken(data || [])
 
-  const isLoading = !positionIdToSearch && (loading || loadingCustomTokens)
+  const isLoading = !positionIdToSearch && (loading || loadingCustomTokens) && transfer.isNotAsked()
   const isSearching = positionIdToSearch && (loading || loadingCustomTokens)
 
   const buildMenuForRow = useCallback(
