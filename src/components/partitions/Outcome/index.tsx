@@ -39,7 +39,7 @@ export const OutcomeCircle = styled.div`
   font-weight: 600;
   height: ${(props) => props.theme.outcomes.dimensions};
   justify-content: center;
-  letter-spacing: -0.8px;
+  letter-spacing: -0.6px;
   line-height: 1;
   position: relative;
   user-select: none;
