@@ -93,6 +93,10 @@ export class Remote<T> {
     return this.status._type === RemoteStatusTypes.Failure ? this.status.error.message : ''
   }
 
+  public isNotAsked(): boolean {
+    return this.status._type === RemoteStatusTypes.NotAsked
+  }
+
   public isLoading(): boolean {
     return this.status._type === RemoteStatusTypes.Loading
   }

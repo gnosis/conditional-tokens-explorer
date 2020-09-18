@@ -60,6 +60,7 @@ const Items = styled(BaseCard)<{
   display: ${(props) => (props.isOpen ? 'block' : 'none')};
   min-width: 160px;
   position: absolute;
+  white-space: nowrap;
   ${(props) => props.fullWidth && 'width: 100%;'}
   ${(props) => (props.dropdownPosition === DropdownPosition.left ? PositionLeftCSS : '')}
   ${(props) => (props.dropdownPosition === DropdownPosition.right ? PositionRightCSS : '')}
