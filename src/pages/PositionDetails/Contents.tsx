@@ -135,6 +135,7 @@ export const Contents = ({ position }: Props) => {
         .reverse()
         .map((value, index) => (value === '1' ? index + 1 : 0))
         .filter((n) => !!n)
+        .map((n) => n - 1)
     })
   }, [indexSets])
 
