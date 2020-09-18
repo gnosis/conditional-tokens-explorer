@@ -1,6 +1,5 @@
 import React from 'react'
 import styled from 'styled-components'
-import { getInjectedProviderName, getProviderInfo } from 'web3modal'
 
 import { Button } from 'components/buttons/Button'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
@@ -139,9 +138,8 @@ const getNetworkName = (data: Connected): string => {
 }
 
 const getWalletName = (data: Connected): string => {
-  const injectedName = getInjectedProviderName()
-  const provider = getProviderInfo(data.provider)
-  return injectedName || provider.name
+  const isMetaMask = data.provider._web3Provider && data.provider._web3Provider.isMetaMask
+  return isMetaMask ? 'MetaMask' : 'WalletConnect'
 }
 
 const UserDropdownButton: React.FC<UserDropdownProps> = ({ data }) => {
