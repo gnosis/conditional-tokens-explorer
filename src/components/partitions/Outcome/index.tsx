@@ -4,8 +4,6 @@ import styled, { css, withTheme } from 'styled-components'
 import ReactTooltip from 'react-tooltip'
 import { OutcomeProps } from 'util/types'
 
-const outcomeDimensions = '24px'
-
 const hideHorizontalLineCSS = css`
   .outcomeHorizontalLine {
     display: none;
@@ -22,7 +20,8 @@ export const Wrapper = styled.div<{ lastInRow?: string }>`
     ${hideHorizontalLineCSS}
   }
 
-  &:nth-child(${(props) => props.lastInRow && `n+${parseInt(props.lastInRow) + 1}`}) {
+  &:nth-child(${(props) =>
+        props.lastInRow && `+${parseInt(props.lastInRow)}n+${parseInt(props.lastInRow) + 1}`}) {
     .outcomeVerticalLine {
       display: block;
     }
@@ -36,14 +35,21 @@ export const OutcomeCircle = styled.div`
   border: 2px solid ${(props) => props.theme.colors.darkerGray};
   color: #fff;
   display: flex;
-  font-size: 15px;
-  font-weight: 700;
-  height: ${outcomeDimensions};
+  font-size: 13px;
+  font-weight: 600;
+  height: ${(props) => props.theme.outcomes.dimensions};
   justify-content: center;
+  letter-spacing: -0.6px;
   line-height: 1;
   position: relative;
   user-select: none;
-  width: ${outcomeDimensions};
+  width: ${(props) => props.theme.outcomes.dimensions};
+  white-space: nowrap;
+`
+
+const OutcomeNumber = styled.span`
+  position: relative;
+  top: 1px;
 `
 
 const OutcomeHorizontalLine = styled.div`
@@ -113,7 +119,7 @@ const BaseOutcome: React.FC<Props> = (props) => {
         onDragEnd={onDragEnd}
         onDragStart={onDragStart}
       >
-        {outcome.value}
+        <OutcomeNumber>{outcome.value}</OutcomeNumber>
         <OutcomeVerticalLine className="outcomeVerticalLine" />
       </OutcomeCircle>
       <OutcomeHorizontalLine className="outcomeHorizontalLine" />
@@ -186,10 +192,7 @@ export const EditableOutcome = styled(Outcome)<{ hoverColor?: string; activeColo
     border-style: solid;
     border-width: 2px;
     color: ${(props) => props.theme.colors.mediumGrey};
-    font-size: 16px;
-    height: 28px;
     transition: all 0.15s ease-out;
-    width: 28px;
 
     &:hover {
       border-color: ${(props) => props.hoverColor};

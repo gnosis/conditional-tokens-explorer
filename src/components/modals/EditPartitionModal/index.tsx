@@ -21,6 +21,7 @@ import { SmallNote } from 'components/pureStyledComponents/SmallNote'
 import { StripedList, StripedListEmpty } from 'components/pureStyledComponents/StripedList'
 import { TitleControlButton } from 'components/pureStyledComponents/TitleControl'
 import { TitleValue } from 'components/text/TitleValue'
+import lodashClonedeep from 'lodash.clonedeep'
 import { OutcomeProps } from 'util/types'
 
 const Collections = styled(StripedList)`
@@ -114,8 +115,7 @@ interface DraggedOutcomeProps extends OutcomeProps {
 }
 
 interface EditPartitionModalProps extends ModalProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  outcomes: Array<any>
+  outcomes: Array<Array<OutcomeProps>>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   theme?: any
   onSave: (numberedOutcomes: Array<Array<OutcomeProps>>) => void
@@ -200,8 +200,15 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
 
       allCollections[draggedOutcome.collectionFromIndex].splice(draggedOutcome.outcomeIndex, 1)
       allCollections[collectionToIndex].push({ value: draggedOutcome.value, id: draggedOutcome.id })
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setAllCollections([...allCollections.filter((collection: any) => collection.length > 0)])
+      setAllCollections([
+        ...allCollections
+          .filter((collection: any) => collection.length > 0)
+          .map((collection: any) =>
+            collection.sort((a: any, b: any) => (a.value > b.value ? 1 : -1))
+          ),
+      ])
     },
     [allCollections, draggedOutcome]
   )
@@ -285,13 +292,15 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
   }
 
   const onReset = useCallback(() => {
-    setAllCollections([...outcomes])
+    const outcomesCloned = lodashClonedeep(outcomes)
+    setAllCollections([...outcomesCloned])
     setAvailableOutcomes([])
     setNewCollection([])
   }, [outcomes])
 
   useEffect(() => {
-    setAllCollections([...outcomes])
+    const outcomesCloned = lodashClonedeep(outcomes)
+    setAllCollections([...outcomesCloned])
   }, [outcomes])
 
   const notEnoughCollections = allCollections.length < 2
