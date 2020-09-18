@@ -308,7 +308,7 @@ export const Contents = ({ position }: Props) => {
           value={
             <>
               <CardTextSm>Outcomes Collections</CardTextSm>
-              <StripedListStyled minHeight="200px">
+              <StripedListStyled minHeight="auto">
                 {numberedOutcomes && numberedOutcomes.length ? (
                   numberedOutcomes
                     .map((value) => {
