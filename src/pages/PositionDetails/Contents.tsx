@@ -13,8 +13,16 @@ import { TokenIcon } from 'components/common/TokenIcon'
 import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
 import { UnwrapModal } from 'components/modals/UnwrapModal'
 import { WrapModal } from 'components/modals/WrapModal'
+import { Outcome } from 'components/partitions/Outcome'
+import { CardTextSm } from 'components/pureStyledComponents/CardText'
+import { OutcomesContainer } from 'components/pureStyledComponents/OutcomesContainer'
 import { Row } from 'components/pureStyledComponents/Row'
-import { StripedList, StripedListItem } from 'components/pureStyledComponents/StripedList'
+import {
+  StripedList,
+  StripedListEmpty,
+  StripedListItem,
+  StripedListItemLessPadding,
+} from 'components/pureStyledComponents/StripedList'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
 import { TitleValue } from 'components/text/TitleValue'
@@ -26,7 +34,7 @@ import { GetPosition_position as Position } from 'types/generatedGQL'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import { formatBigNumber, positionString, truncateStringInTheMiddle } from 'util/tools'
-import { TransferOutcomeOptions } from 'util/types'
+import { OutcomeProps, TransferOutcomeOptions } from 'util/types'
 
 const CollateralText = styled.span`
   color: ${(props) => props.theme.colors.darkerGray};
@@ -64,7 +72,7 @@ const logger = getLogger('Contents')
 
 export const Contents = ({ position }: Props) => {
   const { CTService, signer } = useWeb3ConnectedOrInfura()
-  const { collateralToken, id: positionId } = position
+  const { collateralToken, id: positionId, indexSets } = position
   const { id: collateralTokenAddress } = collateralToken
 
   const history = useHistory()
@@ -114,12 +122,23 @@ export const Contents = ({ position }: Props) => {
 
   const ERC20Amount = new BigNumber('500000000000000000')
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const positionPreview = React.useMemo(() => {
     if (positionCollateral && !loading && !error && balance) {
       return positionString(position.conditionIds, position.indexSets, balance, positionCollateral)
     }
   }, [positionCollateral, position, loading, error, balance])
+
+  const numberedOutcomes = React.useMemo(() => {
+    return indexSets.map((indexSet: string) => {
+      return Number(indexSet)
+        .toString(2)
+        .split('')
+        .reverse()
+        .map((value, index) => (value === '1' ? index + 1 : 0))
+        .filter((n) => !!n)
+        .map((n) => n - 1)
+    })
+  }, [indexSets])
 
   React.useEffect(() => {
     if (positionCollateral) {
@@ -208,6 +227,7 @@ export const Contents = ({ position }: Props) => {
     : 'All done!'
   const fullLoadingTitle = transfer.isFailure() ? 'Error' : transactionTitle
 
+  const outcomesByRow = '15'
   return (
     <CenteredCard
       dropdown={
@@ -279,6 +299,43 @@ export const Contents = ({ position }: Props) => {
                 </CollateralWrapButton>
               </StripedListItem>
             </StripedListStyled>
+          }
+        />
+      </Row>
+      <Row cols="1fr" marginBottomXL>
+        <TitleValue
+          title="Partition"
+          value={
+            <>
+              <CardTextSm>Outcomes Collections</CardTextSm>
+              <StripedListStyled minHeight="auto">
+                {numberedOutcomes && numberedOutcomes.length ? (
+                  numberedOutcomes
+                    .map((value) => {
+                      return value.map((value, id) => {
+                        return { id: id.toString(), value }
+                      })
+                    })
+                    .map((outcomeList: OutcomeProps[], outcomeListIndex: number) => {
+                      return (
+                        <StripedListItemLessPadding key={outcomeListIndex}>
+                          <OutcomesContainer columnGap="0" columns={outcomesByRow}>
+                            {outcomeList.map((outcome: OutcomeProps, outcomeIndex: number) => (
+                              <Outcome
+                                key={outcomeIndex}
+                                lastInRow={outcomesByRow}
+                                outcome={outcome}
+                              />
+                            ))}
+                          </OutcomesContainer>
+                        </StripedListItemLessPadding>
+                      )
+                    })
+                ) : (
+                  <StripedListEmpty>No Collections.</StripedListEmpty>
+                )}
+              </StripedListStyled>
+            </>
           }
         />
       </Row>
