@@ -132,7 +132,8 @@ export const CookiesBanner = () => {
     }
   }, [loadAnalytics, loadGoogleAnalytics])
 
-  return hideCookiesWarning ? null : loadAnalytics === AnalyticsStates.notaccepted ? (
+  return hideCookiesWarning || GOOGLE_ANALYTICS_ID === null ? null : loadAnalytics ===
+    AnalyticsStates.notaccepted ? (
     <Wrapper>
       <Content>
         <Text>
