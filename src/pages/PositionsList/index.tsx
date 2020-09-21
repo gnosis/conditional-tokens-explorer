@@ -256,7 +256,7 @@ export const PositionsList = () => {
   return (
     <>
       <PageTitle>Positions</PageTitle>
-      {isLoading && <InlineLoading />}
+      {isLoading && !error && <InlineLoading />}
       {error && <InfoCard message={error.message} title="Error" />}
       {dataWithToken && !isLoading && !error && (
         <>
