@@ -147,7 +147,6 @@ export const CookiesBanner = () => {
             Accept Cookies
           </ButtonAccept>
         </ButtonContainer>
-
         <ButtonClose
           onClick={() => {
             setHideCookiesWarning(true)
