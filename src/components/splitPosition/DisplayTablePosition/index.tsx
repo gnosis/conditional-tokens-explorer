@@ -108,6 +108,7 @@ export const DisplayTablePositions = ({
       noHeader
       pagination
       paginationPerPage={5}
+      paginationRowsPerPageOptions={[5, 10, 15]}
     />
   )
 }
