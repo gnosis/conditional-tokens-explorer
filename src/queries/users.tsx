@@ -9,6 +9,11 @@ export const UserWithPositionsQuery = gql`
           id
         }
         balance
+        wrappedBalance
+        totalBalance
+        user {
+          id
+        }
       }
     }
   }

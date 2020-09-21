@@ -302,6 +302,7 @@ export const getMergePreview = (
     return positionString(positions[0].conditionIds, newIndexSets, amount, token)
   }
 }
+
 const fetchTokenLogger = getLogger('getTokenSummary')
 export const getTokenSummary = async (
   networkConfig: NetworkConfig,

@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/react-hooks'
+import { ethers } from 'ethers'
 import lodashUniqBy from 'lodash.uniqby'
 import React from 'react'
 
@@ -11,7 +12,8 @@ import { formatBigNumber, getTokenSummary } from 'util/tools'
 import { CollateralFilterOptions, Token } from 'util/types'
 
 export type UserBalanceWithDecimals = {
-  userBalanceWithDecimals: string
+  userBalanceERC1155WithDecimals: string
+  userBalanceERC20WithDecimals: string
 }
 
 export type PositionWithUserBalanceWithDecimals = Position & UserBalanceWithDecimals
@@ -87,32 +89,49 @@ export const usePositions = (options: OptionsToSearch) => {
 
       const fetchUserBalanceWithDecimals = async () => {
         const uniqueCollateralTokens = lodashUniqBy(positionListData, 'collateralToken')
+        const uniqueWrappedTokens = lodashUniqBy(positionListData, 'wrappedToken')
 
-        const collateralTokensPromises = uniqueCollateralTokens.map(async (position: Position) => {
-          const { collateralToken } = position
-          return await getTokenSummary(networkConfig, provider, collateralToken)
-        })
+        const collateralTokensPromises = uniqueCollateralTokens.map(
+          async ({ collateralToken }: Position) =>
+            await getTokenSummary(networkConfig, provider, collateralToken)
+        )
+        const wrappedTokensPromises = uniqueWrappedTokens.map(
+          async ({ wrappedToken }: Position) =>
+            await getTokenSummary(
+              networkConfig,
+              provider,
+              wrappedToken || ethers.constants.HashZero
+            )
+        )
         const collateralTokensResolved = await Promise.all(collateralTokensPromises)
+        const wrappedTokensResolved = await Promise.all(wrappedTokensPromises)
 
         const positionListDataEnhanced = positionListData.map((position: Position) => {
-          const { collateralToken, userBalance } = position
+          const { collateralToken, userBalanceERC20, userBalanceERC1155, wrappedToken } = position
 
           const collateralTokenFound = collateralTokensResolved.filter(
-            (collateralTokenInformation) => {
-              return (
-                collateralTokenInformation.address.toLowerCase() === collateralToken.toLowerCase()
-              )
-            }
+            (collateralTokenInformation) =>
+              collateralTokenInformation?.address.toLowerCase() === collateralToken.toLowerCase()
+          )
+          const wrappedTokenFound = wrappedTokensResolved.filter(
+            (wrappedTokenInformation) =>
+              wrappedTokenInformation?.address.toLowerCase() === wrappedToken?.toLowerCase()
           )
 
-          const userBalanceWithDecimals =
+          const userBalanceERC1155WithDecimals =
             collateralTokenFound.length && collateralTokenFound[0].decimals
-              ? formatBigNumber(userBalance, collateralTokenFound[0].decimals)
-              : userBalance.toString()
+              ? formatBigNumber(userBalanceERC1155, collateralTokenFound[0].decimals)
+              : userBalanceERC1155.toString()
+
+          const userBalanceERC20WithDecimals =
+            wrappedTokenFound.length && wrappedTokenFound && wrappedTokenFound[0].decimals
+              ? formatBigNumber(userBalanceERC20, wrappedTokenFound[0].decimals)
+              : userBalanceERC20.toNumber().toFixed(2)
 
           return {
             ...position,
-            userBalanceWithDecimals,
+            userBalanceERC1155WithDecimals,
+            userBalanceERC20WithDecimals,
           } as PositionWithUserBalanceWithDecimals
         })
         if (!cancelled) {

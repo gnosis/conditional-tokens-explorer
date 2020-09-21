@@ -76,8 +76,8 @@ export const PositionsList = () => {
   const isSearching = positionIdToSearch && (loading || loadingCustomTokens)
 
   const buildMenuForRow = useCallback(
-    (row) => {
-      const { collateralToken, id, userBalance } = row
+    (row: PositionWithUserBalanceWithDecimals) => {
+      const { collateralToken, id, userBalanceERC1155 } = row
 
       const menu = [
         {
@@ -105,7 +105,7 @@ export const PositionsList = () => {
         },
       ]
 
-      if (!userBalance.isZero() && signer) {
+      if (!userBalanceERC1155.isZero() && signer) {
         menu.push({
           text: 'Transfer Outcome Tokens',
           onClick: () => {
@@ -159,14 +159,33 @@ export const PositionsList = () => {
           cell: (row: PositionWithUserBalanceWithDecimals) => (
             <span
               onClick={() => handleRowClick(row)}
-              {...(row.userBalanceWithDecimals ? { title: row.userBalance.toString() } : {})}
+              {...(row.userBalanceERC1155WithDecimals
+                ? { title: row.userBalanceERC1155.toString() }
+                : {})}
             >
-              {row.userBalanceWithDecimals}
+              {row.userBalanceERC1155WithDecimals}
             </span>
           ),
           name: 'ERC1155 Amount',
           right: true,
-          selector: 'userBalance',
+          selector: 'userBalanceERC1155',
+          sortable: true,
+        },
+        {
+          // eslint-disable-next-line react/display-name
+          cell: (row: PositionWithUserBalanceWithDecimals) => (
+            <span
+              onClick={() => handleRowClick(row)}
+              {...(row.userBalanceERC20WithDecimals
+                ? { title: row.userBalanceERC20.toString() }
+                : {})}
+            >
+              {row.userBalanceERC20WithDecimals}
+            </span>
+          ),
+          name: 'ERC20 Amount',
+          right: true,
+          selector: 'userBalanceERC20',
           sortable: true,
         },
       ])

@@ -92,7 +92,7 @@ export const DisplayTablePositions = ({
         maxWidth: '150px',
         minWidth: '150px',
         right: true,
-        selector: 'userBalance',
+        selector: 'userBalanceERC1155',
         sortable: true,
       },
     ]
