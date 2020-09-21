@@ -14,12 +14,12 @@ export const useBalanceForPosition = (positionId: string) => {
       skip: !address || !positionId,
       variables: {
         account: address && address.toLowerCase(),
-        positionId: positionId
+        positionId: positionId,
       },
     }
   )
 
-  let balance = {
+  const balance = {
     balanceERC1155: new BigNumber(0),
     balanceERC20: new BigNumber(0),
     error,
@@ -29,9 +29,9 @@ export const useBalanceForPosition = (positionId: string) => {
 
   if (data && data?.userPositions.length > 0) {
     const userPosition = data.userPositions[0]
-    const {balance: balanceERC1155, wrappedBalance: balanceERC20 } = userPosition
-    balance.balanceERC1155 =  new BigNumber(balanceERC1155)
-    balance.balanceERC20 =  new BigNumber(balanceERC20)
+    const { balance: balanceERC1155, wrappedBalance: balanceERC20 } = userPosition
+    balance.balanceERC1155 = new BigNumber(balanceERC1155)
+    balance.balanceERC20 = new BigNumber(balanceERC20)
   }
 
   return balance

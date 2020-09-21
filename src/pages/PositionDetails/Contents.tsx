@@ -1,7 +1,7 @@
+import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useMemo, useState } from 'react'
 import { useHistory } from 'react-router-dom'
-import { ethers } from 'ethers'
 import styled from 'styled-components'
 
 import { Button } from 'components/buttons/Button'
@@ -75,9 +75,9 @@ const logger = getLogger('Contents')
 export const Contents = (props: Props) => {
   const { CTService, signer } = useWeb3ConnectedOrInfura()
   const history = useHistory()
-  const { position, balanceERC1155, balanceERC20, refetchBalances } = props
+  const { balanceERC20, balanceERC1155, position, refetchBalances } = props
 
-  const { collateralToken, wrappedToken, id: positionId, indexSets } = position
+  const { collateralToken, id: positionId, indexSets, wrappedToken } = position
   const collateralERC1155Address = collateralToken?.id || ethers.constants.HashZero
   const collateralERC20Address = wrappedToken?.id || ethers.constants.HashZero
 
@@ -196,12 +196,7 @@ export const Contents = (props: Props) => {
           const { address: addressTo, amount, positionId } = transferValue
           const addressFrom = await signer.getAddress()
 
-          await CTService.safeTransferFrom(
-            addressFrom,
-            addressTo,
-            positionId,
-            amount
-          )
+          await CTService.safeTransferFrom(addressFrom, addressTo, positionId, amount)
 
           refetchBalances()
           setTransfer(Remote.success(transferValue))

@@ -333,8 +333,8 @@ export const getTokenSummary = async (
       decimals,
       symbol,
     }
-  } catch (err) {
-    logger.error(err)
+  } catch {
+    // Do nothing
   }
 
   return {

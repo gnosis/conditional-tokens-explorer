@@ -80,7 +80,9 @@ export const PositionProvider = (props: Props) => {
     }
   }
 
-  const { balanceERC20, balanceERC1155, refetch: refetchBalances } = useBalanceForPosition(positionId)
+  const { balanceERC20, balanceERC1155, refetch: refetchBalances } = useBalanceForPosition(
+    positionId
+  )
 
   if (position && balanceERC1155 && balanceERC1155.isZero() && checkForEmptyBalanceERC1155) {
     errors.push(PositionErrors.EMPTY_BALANCE_ERC1155_ERROR)
