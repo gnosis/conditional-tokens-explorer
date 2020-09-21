@@ -1,35 +1,38 @@
+import { useQuery } from '@apollo/react-hooks'
 import { BigNumber } from 'ethers/utils'
-import React from 'react'
 
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { UserPositionBalancesQuery } from 'queries/users'
+import { UserPositionBalances } from 'types/generatedGQL'
 
-export const useBalanceForPosition = (positionId: string, refresh?: string) => {
-  const { CTService } = useWeb3ConnectedOrInfura()
+export const useBalanceForPosition = (positionId: string) => {
+  const { address } = useWeb3ConnectedOrInfura()
 
-  const [balance, setBalance] = React.useState<BigNumber>(new BigNumber(0))
-  const [error, setError] = React.useState<Maybe<string>>(null)
-  const [loading, setLoading] = React.useState<boolean>(true)
-
-  React.useEffect(() => {
-    setLoading(true)
-
-    const getBalance = async () => {
-      try {
-        const balance = await CTService.balanceOf(positionId)
-        setBalance(balance)
-      } catch (err) {
-        setError(err)
-      }
+  const { data, error, loading, refetch } = useQuery<UserPositionBalances>(
+    UserPositionBalancesQuery,
+    {
+      skip: !address || !positionId,
+      variables: {
+        account: address && address.toLowerCase(),
+        positionId: positionId
+      },
     }
+  )
 
-    getBalance()
-
-    setLoading(false)
-  }, [CTService, positionId, setBalance, setError, setLoading, refresh])
-
-  return {
-    balance,
+  let balance = {
+    balanceERC1155: new BigNumber(0),
+    balanceERC20: new BigNumber(0),
     error,
     loading,
+    refetch,
   }
+
+  if (data && data?.userPositions.length > 0) {
+    const userPosition = data.userPositions[0]
+    const {balance: balanceERC1155, wrappedBalance: balanceERC20 } = userPosition
+    balance.balanceERC1155 =  new BigNumber(balanceERC1155)
+    balance.balanceERC20 =  new BigNumber(balanceERC20)
+  }
+
+  return balance
 }

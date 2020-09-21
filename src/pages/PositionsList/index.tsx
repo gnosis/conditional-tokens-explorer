@@ -77,7 +77,7 @@ export const PositionsList = () => {
 
   const buildMenuForRow = useCallback(
     (row: PositionWithUserBalanceWithDecimals) => {
-      const { collateralToken, id, userBalanceERC1155, userBalanceERC20 } = row
+      const { collateralToken, id, userBalanceERC20, userBalanceERC1155 } = row
 
       const menu = [
         {
@@ -108,7 +108,7 @@ export const PositionsList = () => {
               setSelectedCollateralToken(collateralToken)
               setOpenTransferOutcomeTokensModal(true)
             },
-          }
+          },
         ]
         menu.push(...menuERC1155)
       }

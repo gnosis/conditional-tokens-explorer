@@ -56,13 +56,15 @@ export enum PositionErrors {
   INVALID_ERROR = `Invalid position`,
   FETCHING_ERROR = `Error fetching position`,
   NOT_FOUND_ERROR = `Position doesn't exist`,
-  EMPTY_BALANCE_ERROR = `User doesn't have position balance`,
+  EMPTY_BALANCE_ERC1155_ERROR = `User doesn't have position balance`,
+  EMPTY_BALANCE_ERC20_ERROR = `User doesn't have erc20 balance`,
 }
 
 export enum BalanceErrors {
   INVALID_ERROR = `Invalid position`,
   FETCHING_ERROR = `Error fetching balance`,
-  EMPTY_BALANCE_ERROR = `User doesn't have position balance`,
+  EMPTY_BALANCE_ERC1155_ERROR = `User doesn't have position balance`,
+  EMPTY_BALANCE_ERC20_ERROR = `User doesn't have erc20 balance`,
 }
 
 export type Errors = ConditionErrors | PositionErrors | BalanceErrors

@@ -105,7 +105,7 @@ export class RealitioService {
       const isFinalized = await this.contract.isFinalized(questionId)
       return isFinalized
     } catch (err) {
-      console.error(
+      logger.error(
         `There was an error querying if the question with id '${questionId}' is finalized`,
         err.message
       )
@@ -124,7 +124,7 @@ export class RealitioService {
       const result: string = await this.contract.resultFor(questionId)
       return result
     } catch (err) {
-      console.error(
+      logger.error(
         `There was an error querying the result for question with id '${questionId}'`,
         err.message
       )

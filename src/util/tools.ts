@@ -103,8 +103,11 @@ export const isPositionErrorFetching = (errors: PositionErrors[]): boolean =>
 export const isPositionErrorNotFound = (errors: PositionErrors[]): boolean =>
   errors.indexOf(PositionErrors.NOT_FOUND_ERROR) > -1
 
-export const isPositionErrorEmptyBalance = (errors: PositionErrors[]): boolean =>
-  errors.indexOf(PositionErrors.EMPTY_BALANCE_ERROR) > -1
+export const isPositionErrorEmptyBalanceERC1155 = (errors: PositionErrors[]): boolean =>
+  errors.indexOf(PositionErrors.EMPTY_BALANCE_ERC1155_ERROR) > -1
+
+export const isPositionErrorEmptyBalanceERC20 = (errors: PositionErrors[]): boolean =>
+  errors.indexOf(PositionErrors.EMPTY_BALANCE_ERC20_ERROR) > -1
 
 export const divBN = (a: BigNumber, b: BigNumber, scale = 10000): number => {
   return a.mul(scale).div(b).toNumber() / scale

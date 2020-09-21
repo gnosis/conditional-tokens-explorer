@@ -18,3 +18,26 @@ export const UserWithPositionsQuery = gql`
     }
   }
 `
+
+export const UserPositionBalancesQuery = gql`
+  query UserPositionBalances($account: ID, $positionId: ID) {
+    userPositions(where: { position: $positionId, user: $account }) {
+      id
+      position {
+        id
+        collateralToken {
+          id
+        }
+        wrappedToken {
+          id
+        }
+      }
+      balance
+      wrappedBalance
+      totalBalance
+      user {
+        id
+      }
+    }
+  }
+`

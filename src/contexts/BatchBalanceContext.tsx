@@ -56,9 +56,9 @@ export const BatchBalanceProvider = (props: Props) => {
 
   useEffect(() => {
     if (checkForEmptyBalance && positionIds.length && balances.length) {
-      removeError(BalanceErrors.EMPTY_BALANCE_ERROR)
+      removeError(BalanceErrors.EMPTY_BALANCE_ERC1155_ERROR)
       if (balances.some((balance) => balance.isZero())) {
-        pushError(BalanceErrors.EMPTY_BALANCE_ERROR)
+        pushError(BalanceErrors.EMPTY_BALANCE_ERC1155_ERROR)
       }
     }
   }, [balances, positionIds, checkForEmptyBalance, removeError, pushError])

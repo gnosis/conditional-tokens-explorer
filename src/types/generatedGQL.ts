@@ -288,6 +288,56 @@ export interface UserWithPositionsVariables {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL query operation: UserPositionBalances
+// ====================================================
+
+export interface UserPositionBalances_userPositions_position_collateralToken {
+  __typename: "CollateralToken";
+  id: string;
+}
+
+export interface UserPositionBalances_userPositions_position_wrappedToken {
+  __typename: "WrappedToken";
+  id: string;
+}
+
+export interface UserPositionBalances_userPositions_position {
+  __typename: "Position";
+  id: string;
+  collateralToken: UserPositionBalances_userPositions_position_collateralToken;
+  wrappedToken: UserPositionBalances_userPositions_position_wrappedToken | null;
+}
+
+export interface UserPositionBalances_userPositions_user {
+  __typename: "User";
+  id: string;
+}
+
+export interface UserPositionBalances_userPositions {
+  __typename: "UserPosition";
+  id: string;
+  position: UserPositionBalances_userPositions_position;
+  balance: any;
+  wrappedBalance: any;
+  totalBalance: any;
+  user: UserPositionBalances_userPositions_user;
+}
+
+export interface UserPositionBalances {
+  userPositions: UserPositionBalances_userPositions[];
+}
+
+export interface UserPositionBalancesVariables {
+  account?: string | null;
+  positionId?: string | null;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL fragment: PositionData
 // ====================================================
 
