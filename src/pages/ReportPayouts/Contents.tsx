@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 
 import { Button } from 'components/buttons'
 import { CenteredCard } from 'components/common/CenteredCard'
+import { Modal } from 'components/common/Modal'
 import { SelectCondition } from 'components/form/SelectCondition'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
@@ -128,6 +129,14 @@ export const Contents: React.FC = () => {
           message={error ? error.message : 'Waiting...'}
           title={error ? 'Error' : 'Report payout'}
         />
+      )}
+      {transactionStatus === Status.Ready && (
+        <Modal
+          isOpen={transactionStatus === Status.Ready}
+          onRequestClose={() => setTransactionStatus(null)}
+          subTitle={'Report completed'}
+          title={'Report Payouts'}
+        ></Modal>
       )}
       <ErrorContainer>
         {payoutEmptyError && <Error>{PAYOUTS_POSITIVE_ERROR}</Error>}

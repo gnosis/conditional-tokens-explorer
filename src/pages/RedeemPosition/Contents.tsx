@@ -4,12 +4,15 @@ import React, { useCallback } from 'react'
 
 import { Button } from 'components/buttons'
 import { CenteredCard } from 'components/common/CenteredCard'
+import { Modal } from 'components/common/Modal'
 import { SelectCondition } from 'components/form/SelectCondition'
 import { SelectPositions } from 'components/form/SelectPositions'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
 import { Row } from 'components/pureStyledComponents/Row'
 import { PositionPreview } from 'components/redeemPosition/PositionPreview'
+import { FullLoading } from 'components/statusInfo/FullLoading'
+import { IconTypes } from 'components/statusInfo/common'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
@@ -26,6 +29,7 @@ export const Contents = () => {
 
   const { clearCondition, condition, errors: conditionErrors } = useConditionContext()
   const [statusTransaction, setStatusTransaction] = React.useState<Maybe<Status>>(null)
+  const [error, setError] = React.useState<Maybe<Error>>(null)
 
   const onRedeem = useCallback(async () => {
     try {
@@ -65,6 +69,7 @@ export const Contents = () => {
 
         clearCondition()
         clearPositions()
+        setError(null)
 
         setStatusTransaction(Status.Ready)
       } else if (status === Web3ContextStatus.Infura) {
@@ -72,6 +77,7 @@ export const Contents = () => {
       }
     } catch (err) {
       setStatusTransaction(Status.Error)
+      setError(err)
       logger.error(err)
     }
   }, [positions, condition, status, CTService, clearCondition, clearPositions, connect])
@@ -110,6 +116,26 @@ export const Contents = () => {
         <ErrorContainer>
           <Error>Position is not related to the condition.</Error>
         </ErrorContainer>
+      )}
+      {(statusTransaction === Status.Loading || statusTransaction === Status.Error) && (
+        <FullLoading
+          actionButton={
+            statusTransaction === Status.Error
+              ? { text: 'OK', onClick: () => setStatusTransaction(null) }
+              : undefined
+          }
+          icon={statusTransaction === Status.Error ? IconTypes.error : IconTypes.spinner}
+          message={statusTransaction === Status.Error ? error?.message : 'Waiting...'}
+          title={statusTransaction === Status.Error ? 'Error' : 'Redeem Positions'}
+        />
+      )}
+      {statusTransaction === Status.Ready && (
+        <Modal
+          isOpen={statusTransaction === Status.Ready}
+          onRequestClose={() => setStatusTransaction(null)}
+          subTitle={'Redeem completed'}
+          title={'Redeem Positions'}
+        ></Modal>
       )}
       <ButtonContainer>
         <Button disabled={disabled} onClick={onRedeem}>
