@@ -277,6 +277,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
               noHeader
               pagination
               paginationPerPage={5}
+              paginationRowsPerPageOptions={[5, 10, 15]}
             />
           )}
           <TitleValue
