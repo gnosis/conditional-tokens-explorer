@@ -77,7 +77,7 @@ export const PositionsList = () => {
 
   const buildMenuForRow = useCallback(
     (row: PositionWithUserBalanceWithDecimals) => {
-      const { collateralToken, id, userBalanceERC1155 } = row
+      const { collateralToken, id, userBalanceERC1155, userBalanceERC20 } = row
 
       const menu = [
         {
@@ -91,29 +91,38 @@ export const PositionsList = () => {
             history.push(`/redeem`)
           },
         },
-        {
-          text: 'Wrap ERC20',
-          onClick: () => {
-            logger.log('wrap not implemented yet')
-          },
-        },
-        {
-          text: 'Unwrap ERC1155',
-          onClick: () => {
-            logger.log('unwrap not implemented yet')
-          },
-        },
       ]
 
       if (!userBalanceERC1155.isZero() && signer) {
-        menu.push({
-          text: 'Transfer Outcome Tokens',
-          onClick: () => {
-            setSelectedPositionId(id)
-            setSelectedCollateralToken(collateralToken)
-            setOpenTransferOutcomeTokensModal(true)
+        const menuERC1155 = [
+          {
+            text: 'Wrap ERC1155',
+            onClick: () => {
+              logger.log('wrap not implemented yet')
+            },
           },
-        })
+          {
+            text: 'Transfer Outcome Tokens',
+            onClick: () => {
+              setSelectedPositionId(id)
+              setSelectedCollateralToken(collateralToken)
+              setOpenTransferOutcomeTokensModal(true)
+            },
+          }
+        ]
+        menu.push(...menuERC1155)
+      }
+
+      if (!userBalanceERC20.isZero() && signer) {
+        const menuERC20 = [
+          {
+            text: 'Unwrap ERC20',
+            onClick: () => {
+              logger.log('unwrap not implemented yet')
+            },
+          },
+        ]
+        menu.push(...menuERC20)
       }
 
       return menu
