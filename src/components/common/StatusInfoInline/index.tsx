@@ -35,8 +35,8 @@ const Description = styled.p<{ color: string }>`
 `
 
 const IconWrapper = styled.div`
-  height: 35px;
-  width: 35px;
+  height: 38px;
+  width: 38px;
 
   > svg {
     display: block;
