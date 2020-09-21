@@ -7,7 +7,7 @@ const Wrapper = styled.svg`
   }
 `
 
-export const AlertIcon: React.FC = (props) => {
+export const WarningIcon: React.FC = (props) => {
   const { ...restProps } = props
 
   return (
