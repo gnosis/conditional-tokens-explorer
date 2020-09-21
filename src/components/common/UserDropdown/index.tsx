@@ -138,8 +138,11 @@ const getNetworkName = (data: Connected): string => {
 }
 
 const getWalletName = (data: Connected): string => {
-  const isMetaMask = data.provider._web3Provider && data.provider._web3Provider.isMetaMask
-  return isMetaMask ? 'MetaMask' : 'WalletConnect'
+  const isMetaMask =
+    Object.prototype.hasOwnProperty.call(data.provider._web3Provider, 'isMetaMask') &&
+    data.provider._web3Provider.isMetaMask
+  const isWalletConnect = Object.prototype.hasOwnProperty.call(data.provider._web3Provider, 'wc')
+  return isMetaMask ? 'MetaMask' : isWalletConnect ? 'WalletConnect' : 'Unknown'
 }
 
 const UserDropdownButton: React.FC<UserDropdownProps> = ({ data }) => {
