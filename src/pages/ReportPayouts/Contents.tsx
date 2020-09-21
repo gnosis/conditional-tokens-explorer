@@ -82,6 +82,7 @@ export const Contents: React.FC = () => {
     const { payouts } = data
     try {
       if (status === Web3ContextStatus.Connected) {
+        setError(null)
         setTransactionStatus(Status.Loading)
 
         const payoutsNumbered = payouts.map((payout: BigNumber) => payout.toNumber())
