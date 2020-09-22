@@ -1,9 +1,9 @@
 import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
 
+import { ErrorIcon } from 'components/icons/ErrorIcon'
+import { WarningIcon } from 'components/icons/WarningIcon'
 import { Card, Icon, IconTypes, Text, Title } from 'components/statusInfo/common'
-import { AlertIcon } from 'components/statusInfo/icons/AlertIcon'
-import { ErrorIcon } from 'components/statusInfo/icons/ErrorIcon'
 
 const Wrapper = styled(Card)`
   margin: auto;
@@ -24,7 +24,7 @@ export const InfoCard: React.FC<Props> = (props) => {
     <Wrapper {...restProps}>
       {title && <Title>{title}</Title>}
       <Icon>
-        {icon === IconTypes.alert && <AlertIcon />}
+        {icon === IconTypes.alert && <WarningIcon />}
         {icon === IconTypes.error && <ErrorIcon />}
       </Icon>
       {message && <Text>{message}</Text>}
