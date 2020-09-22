@@ -14,6 +14,8 @@ import { CollateralFilterOptions, Token } from 'util/types'
 export type UserBalanceWithDecimals = {
   userBalanceERC1155WithDecimals: string
   userBalanceERC20WithDecimals: string
+  userBalanceERC1155Numbered: number
+  userBalanceERC20Numbered: number
   collateralTokenERC1155: Token
   collateralTokenERC20: Token
 }
@@ -134,6 +136,8 @@ export const usePositions = (options: OptionsToSearch) => {
             ...position,
             userBalanceERC1155WithDecimals,
             userBalanceERC20WithDecimals,
+            userBalanceERC1155Numbered: Number(userBalanceERC1155WithDecimals),
+            userBalanceERC20Numbered: Number(userBalanceERC20WithDecimals),
             collateralTokenERC1155: collateralTokenFound.length && collateralTokenFound[0],
             collateralTokenERC20: wrappedTokenFound.length && wrappedTokenFound[0],
           } as PositionWithUserBalanceWithDecimals

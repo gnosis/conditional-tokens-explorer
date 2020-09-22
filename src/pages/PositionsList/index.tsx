@@ -190,7 +190,7 @@ export const PositionsList = () => {
           ),
           name: 'ERC1155 Amount',
           right: true,
-          selector: 'userBalanceERC1155',
+          selector: 'userBalanceERC1155Numbered',
           sortable: true,
         },
         {
@@ -207,7 +207,7 @@ export const PositionsList = () => {
           ),
           name: 'ERC20 Amount',
           right: true,
-          selector: 'userBalanceERC20',
+          selector: 'userBalanceERC20Numbered',
           sortable: true,
         },
       ])
