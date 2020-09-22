@@ -65,7 +65,7 @@ class Wrapper1155Service {
 
   async getWrapped1155(
     conditionalTokenAddress: string,
-    tokenId: string,
+    tokenId: string
   ): Promise<TransactionReceipt> {
     const tx = await this.contract.getWrapped1155(conditionalTokenAddress, tokenId)
     return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)

@@ -22,12 +22,12 @@ export const Wrapper = (props: WrapperProps) => {
     balanceERC20,
     balanceERC1155,
     collateralTokenAddress,
-    wrappedTokenAddress,
     errors,
     loading,
     position,
     refetchBalances,
     setPositionId,
+    wrappedTokenAddress,
   } = usePositionContext()
 
   React.useEffect(() => {
@@ -50,9 +50,9 @@ export const Wrapper = (props: WrapperProps) => {
             balanceERC1155={balanceERC1155}
             balanceERC20={balanceERC20}
             collateralTokenAddress={collateralTokenAddress}
-            wrappedTokenAddress={wrappedTokenAddress}
             position={position}
             refetchBalances={refetchBalances}
+            wrappedTokenAddress={wrappedTokenAddress}
           />
         )
       )}

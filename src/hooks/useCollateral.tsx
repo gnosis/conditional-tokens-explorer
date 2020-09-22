@@ -1,8 +1,8 @@
 import React from 'react'
 
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { Token } from 'util/types'
 import { ERC20Service } from 'services/erc20'
+import { Token } from 'util/types'
 
 export const useCollateral = (
   collateralAddress: string
@@ -22,7 +22,6 @@ export const useCollateral = (
         try {
           const erc20Service = new ERC20Service(provider, collateralAddress)
           const token = await erc20Service.getProfileSummary()
-          console.log(token)
           if (!cancelled) {
             setCollateral(token)
           }

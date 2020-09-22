@@ -76,7 +76,14 @@ const logger = getLogger('Contents')
 export const Contents = (props: Props) => {
   const { CTService, WrapperService, connect, signer } = useWeb3ConnectedOrInfura()
   const history = useHistory()
-  const { balanceERC20, balanceERC1155, position, refetchBalances, collateralTokenAddress, wrappedTokenAddress } = props
+  const {
+    balanceERC20,
+    balanceERC1155,
+    collateralTokenAddress,
+    position,
+    refetchBalances,
+    wrappedTokenAddress,
+  } = props
 
   const { id: positionId, indexSets } = position
 

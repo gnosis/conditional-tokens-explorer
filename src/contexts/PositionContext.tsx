@@ -15,8 +15,8 @@ export interface PositionContext {
   loading: boolean
   balanceERC1155: BigNumber
   balanceERC20: BigNumber
-  collateralTokenAddress: string,
-  wrappedTokenAddress: string,
+  collateralTokenAddress: string
+  wrappedTokenAddress: string
   errors: PositionErrors[]
   refetchBalances: () => void
   setPositionId: (positionId: string) => void
@@ -85,9 +85,13 @@ export const PositionProvider = (props: Props) => {
     }
   }
 
-  const { balanceERC20, balanceERC1155, collateralTokenAddress, wrappedTokenAddress, refetch: refetchBalances } = useBalanceForPosition(
-    positionId
-  )
+  const {
+    balanceERC20,
+    balanceERC1155,
+    collateralTokenAddress,
+    refetch: refetchBalances,
+    wrappedTokenAddress,
+  } = useBalanceForPosition(positionId)
 
   if (position && balanceERC1155 && balanceERC1155.isZero() && checkForEmptyBalanceERC1155) {
     errors.push(PositionErrors.EMPTY_BALANCE_ERC1155_ERROR)
