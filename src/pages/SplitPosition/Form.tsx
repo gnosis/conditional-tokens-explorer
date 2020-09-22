@@ -7,7 +7,7 @@ import { Button } from 'components/buttons/Button'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { Modal } from 'components/common/Modal'
 import { SetAllowance } from 'components/common/SetAllowance'
-import { Warning } from 'components/common/Warning'
+import { StatusInfoInline, StatusInfoType } from 'components/common/StatusInfoInline'
 import { InputAmount } from 'components/form/InputAmount'
 import { InputCondition } from 'components/form/InputCondition'
 import { EditPartitionModal } from 'components/modals/EditPartitionModal'
@@ -261,7 +261,9 @@ export const Form = ({
       </Row>
       {condition && condition.resolved && (
         <Row cols="1fr">
-          <Warning message={'This condition is already resolved.'} />
+          <StatusInfoInline status={StatusInfoType.warning}>
+            This condition is already resolved.
+          </StatusInfoInline>
         </Row>
       )}
       <Row cols="1fr" marginBottomXL>
