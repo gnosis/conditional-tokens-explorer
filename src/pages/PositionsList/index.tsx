@@ -78,13 +78,7 @@ export const PositionsList = () => {
 
   const buildMenuForRow = useCallback(
     (row: PositionWithUserBalanceWithDecimals) => {
-      const {
-        collateralTokenERC20,
-        collateralTokenERC1155,
-        id,
-        userBalanceERC20,
-        userBalanceERC1155,
-      } = row
+      const { collateralTokenERC1155, id, userBalanceERC20, userBalanceERC1155 } = row
 
       const menu = [
         {
@@ -129,7 +123,8 @@ export const PositionsList = () => {
             text: 'Unwrap ERC20',
             onClick: () => {
               setSelectedPositionId(id)
-              setSelectedCollateralToken(collateralTokenERC20)
+              // Must send the original token, not the ERC20
+              setSelectedCollateralToken(collateralTokenERC1155)
               setUserBalance(userBalanceERC20)
               setIsUnwrapModalOpen(true)
             },

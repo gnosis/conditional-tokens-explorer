@@ -168,11 +168,6 @@ export const Contents = (props: Props) => {
     [collateralERC20]
   )
 
-  const ERC20Decimals = useMemo(
-    () => (collateralERC20 && collateralERC20.decimals ? collateralERC20.decimals : 18),
-    [collateralERC20]
-  )
-
   const onWrap = useCallback(
     async (transferValue: TransferOptions) => {
       if (signer) {
@@ -335,7 +330,7 @@ export const Contents = (props: Props) => {
                   <CollateralTextStrong>ERC20:</CollateralTextStrong>{' '}
                   <CollateralTextAmount>
                     {!balanceERC20.isZero()
-                      ? `${formatBigNumber(balanceERC20, ERC20Decimals)} ${ERC20Symbol}`
+                      ? `${formatBigNumber(balanceERC20, ERC1155Decimals)} ${ERC20Symbol}`
                       : 'No unwrapped collateral yet.'}
                   </CollateralTextAmount>
                 </CollateralText>
@@ -407,7 +402,7 @@ export const Contents = (props: Props) => {
       {isUnwrapModalOpen && (
         <UnwrapModal
           balance={balanceERC20}
-          decimals={ERC20Decimals}
+          decimals={ERC1155Decimals}
           isOpen={isUnwrapModalOpen}
           onRequestClose={() => setIsUnwrapModalOpen(false)}
           onUnWrap={onUnwrap}

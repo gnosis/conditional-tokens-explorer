@@ -128,8 +128,8 @@ export const usePositions = (options: OptionsToSearch) => {
               : userBalanceERC1155.toString()
 
           const userBalanceERC20WithDecimals =
-            wrappedTokenFound.length && wrappedTokenFound && wrappedTokenFound[0].decimals
-              ? formatBigNumber(userBalanceERC20, wrappedTokenFound[0].decimals)
+            collateralTokenFound.length && collateralTokenFound[0].decimals
+              ? formatBigNumber(userBalanceERC20, collateralTokenFound[0].decimals) // Using the collateralToken is OK
               : userBalanceERC20.toString()
 
           return {
