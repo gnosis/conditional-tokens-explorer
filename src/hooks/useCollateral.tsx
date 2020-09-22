@@ -38,7 +38,8 @@ export const useCollateral = (
           setLoading(false)
           setCollateral(null)
           if (err.message.indexOf('(') !== -1) {
-            err.message = err.message.split('(')[0]
+            const errorMessage = err.message.split('(')[0]
+            err.message = errorMessage[0].toUpperCase() + errorMessage.substr(1)
           }
           setError(err)
         }
