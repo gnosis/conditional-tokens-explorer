@@ -1,4 +1,3 @@
-import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useMemo, useState } from 'react'
 import { useHistory } from 'react-router-dom'
@@ -34,7 +33,7 @@ import { GetPosition_position as Position } from 'types/generatedGQL'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import { formatBigNumber, positionString, truncateStringInTheMiddle } from 'util/tools'
-import { OutcomeProps, TransferOutcomeOptions } from 'util/types'
+import { OutcomeProps, TransferOptions } from 'util/types'
 
 const CollateralText = styled.span`
   color: ${(props) => props.theme.colors.darkerGray};
@@ -67,30 +66,30 @@ interface Props {
   position: Position
   balanceERC1155: BigNumber
   balanceERC20: BigNumber
+  collateralTokenAddress: string
+  wrappedTokenAddress: string
   refetchBalances: () => void
 }
 
 const logger = getLogger('Contents')
 
 export const Contents = (props: Props) => {
-  const { CTService, signer } = useWeb3ConnectedOrInfura()
+  const { CTService, WrapperService, connect, signer } = useWeb3ConnectedOrInfura()
   const history = useHistory()
-  const { balanceERC20, balanceERC1155, position, refetchBalances } = props
+  const { balanceERC20, balanceERC1155, position, refetchBalances, collateralTokenAddress, wrappedTokenAddress } = props
 
-  const { collateralToken, id: positionId, indexSets, wrappedToken } = position
-  const collateralERC1155Address = collateralToken?.id || ethers.constants.HashZero
-  const collateralERC20Address = wrappedToken?.id || ethers.constants.HashZero
+  const { id: positionId, indexSets } = position
 
   const { setValue } = useLocalStorage('positionid')
 
-  const { collateral: collateralERC1155 } = useCollateral(collateralERC1155Address)
-  const { collateral: collateralERC20 } = useCollateral(collateralERC20Address)
+  const { collateral: collateralERC1155 } = useCollateral(collateralTokenAddress)
+  const { collateral: collateralERC20 } = useCollateral(wrappedTokenAddress)
 
   const [isWrapModalOpen, setIsWrapModalOpen] = useState(false)
   const [isUnwrapModalOpen, setIsUnwrapModalOpen] = useState(false)
   const [openTransferOutcomeTokensModal, setOpenTransferOutcomeTokensModal] = useState(false)
-  const [transfer, setTransfer] = useState<Remote<TransferOutcomeOptions>>(
-    Remote.notAsked<TransferOutcomeOptions>()
+  const [transfer, setTransfer] = useState<Remote<TransferOptions>>(
+    Remote.notAsked<TransferOptions>()
   )
   const [transactionTitle, setTransactionTitle] = useState<string>('')
 
@@ -167,27 +166,60 @@ export const Contents = (props: Props) => {
     [collateralERC20]
   )
 
-  const onWrap = useCallback(() => {
-    setTransfer(Remote.loading())
-    setTransactionTitle('Wrapping ERC1155')
+  const onWrap = useCallback(
+    async (transferValue: TransferOptions) => {
+      if (signer) {
+        try {
+          setTransactionTitle('Wrapping ERC1155')
+          setTransfer(Remote.loading())
 
-    setTimeout(() => {
-      setTransfer(Remote.success({ address: '', amount: new BigNumber(0), positionId: '' }))
-    }, 5000)
-  }, [])
+          const { address: addressTo, amount, positionId } = transferValue
+          const addressFrom = await signer.getAddress()
 
-  const onUnwrap = useCallback(() => {
-    setTransfer(Remote.loading())
-    setTransactionTitle('Unwrapping ERC20')
+          await CTService.safeTransferFrom(addressFrom, addressTo, positionId, amount)
 
-    setTimeout(
-      () => setTransfer(Remote.success({ address: '', amount: new BigNumber(0), positionId: '' })),
-      5000
-    )
-  }, [])
+          refetchBalances()
+
+          setTransfer(Remote.success(transferValue))
+        } catch (err) {
+          logger.error(err)
+          setTransfer(Remote.failure(err))
+        }
+      } else {
+        connect()
+      }
+    },
+    [setTransfer, CTService, connect, refetchBalances, signer]
+  )
+
+  const onUnwrap = useCallback(
+    async (transferValue: TransferOptions) => {
+      if (signer) {
+        try {
+          setTransactionTitle('Unwrapping ERC20')
+          setTransfer(Remote.loading())
+
+          const { address: addressFrom, amount, positionId } = transferValue
+          const addressTo = await signer.getAddress()
+
+          await WrapperService.unwrap(addressFrom, positionId, amount, addressTo)
+
+          refetchBalances()
+
+          setTransfer(Remote.success(transferValue))
+        } catch (err) {
+          logger.error(err)
+          setTransfer(Remote.failure(err))
+        }
+      } else {
+        connect()
+      }
+    },
+    [WrapperService, connect, signer, setTransfer, refetchBalances]
+  )
 
   const onTransferOutcomeTokens = useCallback(
-    async (transferValue: TransferOutcomeOptions) => {
+    async (transferValue: TransferOptions) => {
       if (signer) {
         try {
           setTransfer(Remote.loading())
@@ -212,14 +244,14 @@ export const Contents = (props: Props) => {
   const fullLoadingActionButton = transfer.isSuccess()
     ? {
         buttonType: ButtonType.primary,
-        onClick: () => setTransfer(Remote.notAsked<TransferOutcomeOptions>()),
+        onClick: () => setTransfer(Remote.notAsked<TransferOptions>()),
         text: 'OK',
       }
     : transfer.isFailure()
     ? {
         buttonType: ButtonType.danger,
         text: 'Close',
-        onClick: () => setTransfer(Remote.notAsked<TransferOutcomeOptions>()),
+        onClick: () => setTransfer(Remote.notAsked<TransferOptions>()),
       }
     : undefined
 
@@ -266,8 +298,8 @@ export const Contents = (props: Props) => {
           title="Contract Address"
           value={
             <>
-              {truncateStringInTheMiddle(collateralERC1155Address, 8, 6)}
-              <ButtonCopy value={collateralERC1155Address} />
+              {truncateStringInTheMiddle(collateralTokenAddress, 8, 6)}
+              <ButtonCopy value={collateralTokenAddress} />
             </>
           }
         />
@@ -361,6 +393,7 @@ export const Contents = (props: Props) => {
           isOpen={isWrapModalOpen}
           onRequestClose={() => setIsWrapModalOpen(false)}
           onWrap={onWrap}
+          positionId={positionId}
           tokenSymbol={ERC1155Symbol}
         />
       )}
@@ -371,12 +404,13 @@ export const Contents = (props: Props) => {
           isOpen={isUnwrapModalOpen}
           onRequestClose={() => setIsUnwrapModalOpen(false)}
           onUnWrap={onUnwrap}
+          positionId={positionId}
           tokenSymbol={ERC20Symbol}
         />
       )}
-      {openTransferOutcomeTokensModal && positionId && collateralERC1155Address && (
+      {openTransferOutcomeTokensModal && positionId && collateralTokenAddress && (
         <TransferOutcomeTokensModal
-          collateralToken={collateralERC1155Address}
+          collateralToken={collateralTokenAddress}
           isOpen={openTransferOutcomeTokensModal}
           onRequestClose={() => setOpenTransferOutcomeTokensModal(false)}
           onSubmit={onTransferOutcomeTokens}

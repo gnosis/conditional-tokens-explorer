@@ -129,7 +129,7 @@ export interface SplitStatus {
   collateral: string
 }
 
-export interface TransferOutcomeOptions {
+export interface TransferOptions {
   amount: BigNumber
   address: string
   positionId: string

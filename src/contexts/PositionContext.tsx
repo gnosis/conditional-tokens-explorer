@@ -15,6 +15,8 @@ export interface PositionContext {
   loading: boolean
   balanceERC1155: BigNumber
   balanceERC20: BigNumber
+  collateralTokenAddress: string,
+  wrappedTokenAddress: string,
   errors: PositionErrors[]
   refetchBalances: () => void
   setPositionId: (positionId: string) => void
@@ -27,7 +29,10 @@ export const POSITION_CONTEXT_DEFAULT_VALUE = {
   loading: false,
   balanceERC1155: new BigNumber(0),
   balanceERC20: new BigNumber(0),
+  collateralTokenAddress: '',
+  wrappedTokenAddress: '',
   errors: [],
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   refetchBalances: () => {},
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setPositionId: () => {},
@@ -80,7 +85,7 @@ export const PositionProvider = (props: Props) => {
     }
   }
 
-  const { balanceERC20, balanceERC1155, refetch: refetchBalances } = useBalanceForPosition(
+  const { balanceERC20, balanceERC1155, collateralTokenAddress, wrappedTokenAddress, refetch: refetchBalances } = useBalanceForPosition(
     positionId
   )
 
@@ -114,6 +119,8 @@ export const PositionProvider = (props: Props) => {
     positionId,
     balanceERC1155,
     balanceERC20,
+    collateralTokenAddress,
+    wrappedTokenAddress,
     refetchBalances,
     errors,
     loading,

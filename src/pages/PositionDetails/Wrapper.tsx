@@ -21,6 +21,8 @@ export const Wrapper = (props: WrapperProps) => {
   const {
     balanceERC20,
     balanceERC1155,
+    collateralTokenAddress,
+    wrappedTokenAddress,
     errors,
     loading,
     position,
@@ -47,6 +49,8 @@ export const Wrapper = (props: WrapperProps) => {
           <Contents
             balanceERC1155={balanceERC1155}
             balanceERC20={balanceERC20}
+            collateralTokenAddress={collateralTokenAddress}
+            wrappedTokenAddress={wrappedTokenAddress}
             position={position}
             refetchBalances={refetchBalances}
           />

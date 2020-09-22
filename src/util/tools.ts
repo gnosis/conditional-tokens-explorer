@@ -10,7 +10,6 @@ import {
   GetMultiPositions_positions,
   GetPosition_position,
 } from 'types/generatedGQL'
-import { getLogger } from 'util/logger'
 import { ConditionErrors, PositionErrors, Token } from 'util/types'
 
 export const isAddress = (address: string) => {
@@ -306,12 +305,10 @@ export const getMergePreview = (
   }
 }
 
-const fetchTokenLogger = getLogger('getTokenSummary')
 export const getTokenSummary = async (
   networkConfig: NetworkConfig,
   provider: Provider,
-  collateralToken: string,
-  logger = fetchTokenLogger
+  collateralToken: string
 ): Promise<Token> => {
   try {
     const { decimals, symbol } = networkConfig.getTokenFromAddress(collateralToken)

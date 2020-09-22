@@ -28,7 +28,7 @@ import { useWithToken } from 'hooks/useWithToken'
 import { customStyles } from 'theme/tableCustomStyles'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
-import { CollateralFilterOptions, TransferOutcomeOptions } from 'util/types'
+import { CollateralFilterOptions, TransferOptions } from 'util/types'
 
 const logger = getLogger('PositionsList')
 
@@ -48,8 +48,8 @@ export const PositionsList = () => {
   const [openTransferOutcomeTokensModal, setOpenTransferOutcomeTokensModal] = useState(false)
   const [selectedPositionId, setSelectedPositionId] = useState<string>('')
   const [selectedCollateralToken, setSelectedCollateralToken] = useState<string>('')
-  const [transfer, setTransfer] = useState<Remote<TransferOutcomeOptions>>(
-    Remote.notAsked<TransferOutcomeOptions>()
+  const [transfer, setTransfer] = useState<Remote<TransferOptions>>(
+    Remote.notAsked<TransferOptions>()
   )
 
   const debouncedHandlerPositionIdToSearch = useDebounceCallback((positionIdToSearch) => {
@@ -96,17 +96,17 @@ export const PositionsList = () => {
       if (!userBalanceERC1155.isZero() && signer) {
         const menuERC1155 = [
           {
-            text: 'Wrap ERC1155',
-            onClick: () => {
-              logger.log('wrap not implemented yet')
-            },
-          },
-          {
             text: 'Transfer Outcome Tokens',
             onClick: () => {
               setSelectedPositionId(id)
               setSelectedCollateralToken(collateralToken)
               setOpenTransferOutcomeTokensModal(true)
+            },
+          },
+          {
+            text: 'Wrap ERC1155',
+            onClick: () => {
+              logger.log('wrap not implemented yet')
             },
           },
         ]
@@ -231,7 +231,7 @@ export const PositionsList = () => {
   }, [connectedItems, menu, handleRowClick])
 
   const onTransferOutcomeTokens = useCallback(
-    async (transferValue: TransferOutcomeOptions) => {
+    async (transferValue: TransferOptions) => {
       if (signer) {
         try {
           setTransfer(Remote.loading())
@@ -259,13 +259,13 @@ export const PositionsList = () => {
     ? {
         buttonType: ButtonType.primary,
         text: 'OK',
-        onClick: () => setTransfer(Remote.notAsked<TransferOutcomeOptions>()),
+        onClick: () => setTransfer(Remote.notAsked<TransferOptions>()),
       }
     : transfer.isFailure()
     ? {
         buttonType: ButtonType.danger,
         text: 'Close',
-        onClick: () => setTransfer(Remote.notAsked<TransferOutcomeOptions>()),
+        onClick: () => setTransfer(Remote.notAsked<TransferOptions>()),
       }
     : undefined
 

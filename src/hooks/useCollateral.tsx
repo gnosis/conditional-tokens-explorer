@@ -1,13 +1,13 @@
 import React from 'react'
 
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { getTokenSummary } from 'util/tools'
 import { Token } from 'util/types'
+import { ERC20Service } from 'services/erc20'
 
 export const useCollateral = (
   collateralAddress: string
 ): { collateral: Maybe<Token>; error: Maybe<Error>; loading: boolean } => {
-  const { _type: status, networkConfig, provider } = useWeb3ConnectedOrInfura()
+  const { _type: status, provider } = useWeb3ConnectedOrInfura()
 
   const [collateral, setCollateral] = React.useState<Maybe<Token>>(null)
   const [loading, setLoading] = React.useState(false)
@@ -16,35 +16,31 @@ export const useCollateral = (
   React.useEffect(() => {
     let cancelled = false
 
-    const fetchToken = async (collateral: string) => {
-      if (!collateralAddress) {
-        return null
+    if (collateralAddress) {
+      setLoading(true)
+      const fetchBalanceAndTokenInformation = async () => {
+        try {
+          const erc20Service = new ERC20Service(provider, collateralAddress)
+          const token = await erc20Service.getProfileSummary()
+          console.log(token)
+          if (!cancelled) {
+            setCollateral(token)
+          }
+        } catch (err) {
+          if (!cancelled) {
+            setError(err)
+          }
+        }
+        if (!cancelled) {
+          setLoading(false)
+        }
       }
-      return await getTokenSummary(networkConfig, provider, collateral)
+      fetchBalanceAndTokenInformation()
     }
-
-    setLoading(true)
-
-    fetchToken(collateralAddress)
-      .then((token) => {
-        if (!cancelled) {
-          setCollateral(token)
-          setLoading(false)
-          setError(null)
-        }
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          setLoading(false)
-          setCollateral(null)
-          setError(err)
-        }
-      })
-
     return () => {
       cancelled = true
     }
-  }, [status, provider, collateralAddress, networkConfig])
+  }, [status, provider, collateralAddress])
 
   return { loading, error, collateral }
 }
