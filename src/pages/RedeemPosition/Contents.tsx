@@ -7,13 +7,13 @@ import { CenteredCard } from 'components/common/CenteredCard'
 import { Modal } from 'components/common/Modal'
 import { SelectCondition } from 'components/form/SelectCondition'
 import { SelectPositions } from 'components/form/SelectPositions'
+import { SuccessIcon } from 'components/icons/SuccessIcon'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
 import { Row } from 'components/pureStyledComponents/Row'
 import { PositionPreview } from 'components/redeemPosition/PositionPreview'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
-import { OkIcon } from 'components/statusInfo/icons/OkIcon'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
@@ -137,7 +137,7 @@ export const Contents = () => {
           subTitle={'Redeem completed'}
           title={'Redeem Positions'}
         >
-          <OkIcon />
+          <SuccessIcon />
         </Modal>
       )}
       <ButtonContainer>

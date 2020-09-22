@@ -6,13 +6,13 @@ import { Button } from 'components/buttons'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { Modal } from 'components/common/Modal'
 import { SelectCondition } from 'components/form/SelectCondition'
+import { SuccessIcon } from 'components/icons/SuccessIcon'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
 import { Row } from 'components/pureStyledComponents/Row'
 import { StripedList, StripedListEmpty } from 'components/pureStyledComponents/StripedList'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
-import { OkIcon } from 'components/statusInfo/icons/OkIcon'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { OutcomesTable } from 'pages/ReportPayouts/OutcomesTable'
@@ -138,7 +138,7 @@ export const Contents: React.FC = () => {
           subTitle={'Report completed'}
           title={'Report Payouts'}
         >
-          <OkIcon />
+          <SuccessIcon />
         </Modal>
       )}
       <ErrorContainer>
