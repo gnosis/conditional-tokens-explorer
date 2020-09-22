@@ -13,6 +13,7 @@ import { Row } from 'components/pureStyledComponents/Row'
 import { PositionPreview } from 'components/redeemPosition/PositionPreview'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
+import { OkIcon } from 'components/statusInfo/icons/OkIcon'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
@@ -135,7 +136,9 @@ export const Contents = () => {
           onRequestClose={() => setStatusTransaction(null)}
           subTitle={'Redeem completed'}
           title={'Redeem Positions'}
-        ></Modal>
+        >
+          <OkIcon />
+        </Modal>
       )}
       <ButtonContainer>
         <Button disabled={disabled} onClick={onRedeem}>

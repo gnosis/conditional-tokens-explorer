@@ -12,6 +12,7 @@ import { Row } from 'components/pureStyledComponents/Row'
 import { StripedList, StripedListEmpty } from 'components/pureStyledComponents/StripedList'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
+import { OkIcon } from 'components/statusInfo/icons/OkIcon'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { OutcomesTable } from 'pages/ReportPayouts/OutcomesTable'
@@ -137,7 +138,9 @@ export const Contents: React.FC = () => {
           onRequestClose={() => setTransactionStatus(null)}
           subTitle={'Report completed'}
           title={'Report Payouts'}
-        ></Modal>
+        >
+          <OkIcon />
+        </Modal>
       )}
       <ErrorContainer>
         {payoutEmptyError && <Error>{PAYOUTS_POSITIVE_ERROR}</Error>}
