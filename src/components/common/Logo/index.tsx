@@ -17,7 +17,6 @@ const Wrapper = styled.span`
 
 const LogoSVG = styled.svg`
   height: 35px;
-  margin-right: 10px;
   width: 35px;
 
   .fillColor {
@@ -27,15 +26,20 @@ const LogoSVG = styled.svg`
 `
 
 const Text = styled.span`
-  color: ${(props) => props.theme.colors.primary};
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  text-decoration: none;
-  justify-content: center;
+  display: none;
 
-  .text {
-    transition: color 0.15s linear;
+  @media (min-width: ${(props) => props.theme.themeBreakPoints.md}) {
+    color: ${(props) => props.theme.colors.primary};
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: center;
+    margin-left: 10px;
+    text-decoration: none;
+
+    .text {
+      transition: color 0.15s linear;
+    }
   }
 `
 
