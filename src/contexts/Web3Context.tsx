@@ -125,7 +125,8 @@ export const Web3ContextProvider = ({ children }: Props) => {
       provider.once('networkChanged', async (networkId: number) => {
         logger.log(`Switch network to ${networkId}`)
 
-        if (NetworkConfig.isKnownNetwork(networkId)) {
+        // The sign `plus` is needed, because javascript and reasons
+        if (NetworkConfig.isKnownNetwork(+networkId)) {
           const networkConfig = new NetworkConfig(networkId)
 
           setWeb3Status({
@@ -133,6 +134,7 @@ export const Web3ContextProvider = ({ children }: Props) => {
             networkConfig,
           } as Connected)
         } else {
+          logger.log(`AA`)
           setWeb3Status({
             _type: Web3ContextStatus.Error,
             error: new Error('Unknown network'),
