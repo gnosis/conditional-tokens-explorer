@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 import { Button } from 'components/buttons/Button'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
+import { StatusInfoInline, StatusInfoType } from 'components/common/StatusInfoInline'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 
 const Wrapper = styled.div`
@@ -29,6 +30,10 @@ const UnlockButton = styled(Button)`
   padding-right: 15px;
 `
 
+const StatusInfo = styled(StatusInfoInline)`
+  margin-bottom: 25px;
+`
+
 interface Props {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   collateral: any
@@ -41,7 +46,11 @@ export const SetAllowance = (props: Props) => {
   const { collateral, fetching, finished, onUnlock } = props
   const btnText = fetching ? 'Working...' : finished ? 'Done!' : 'Unlock'
 
-  return (
+  return finished ? (
+    <StatusInfo status={StatusInfoType.success}>
+      <strong>DAI</strong> has been unlocked, you can now interact with the smart contract.
+    </StatusInfo>
+  ) : (
     <Wrapper>
       {fetching ? (
         <InlineLoading height="30px" width="30px" />
