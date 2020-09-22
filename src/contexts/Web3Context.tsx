@@ -8,6 +8,7 @@ import { DEFAULT_NETWORK_ID, INFURA_ID } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 import { RealitioService } from 'services/realitio'
+import { getLogger } from 'util/logger'
 
 export enum Web3ContextStatus {
   NotAsked = 'notAsked',
@@ -81,11 +82,68 @@ const web3Modal = new Web3Modal({
   },
 })
 
+const logger = getLogger('Web3Context')
+
 export const Web3ContextProvider = ({ children }: Props) => {
   const web3StatusDefault: Web3Status = web3Modal.cachedProvider
     ? { _type: Web3ContextStatus.Connecting }
     : { _type: Web3ContextStatus.NotAsked }
   const [web3Status, setWeb3Status] = React.useState<Web3Status>(web3StatusDefault)
+
+  const resetApp = React.useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async (provider: any) => {
+      if (provider.close) {
+        await provider.close()
+      }
+      await web3Modal.clearCachedProvider()
+
+      setWeb3Status({ _type: Web3ContextStatus.NotAsked } as Web3Status)
+    },
+    [setWeb3Status]
+  )
+
+  const subscribeProvider = React.useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (provider: any) => {
+      logger.log('Subscribing to metamask events...')
+
+      provider.once('close', () => {
+        resetApp(provider)
+      })
+
+      provider.once('accountsChanged', async (accounts: string[]) => {
+        const address = accounts[0]
+        logger.log(`Switch account to ${address}`)
+
+        setWeb3Status({
+          ...web3Status,
+          address,
+        } as Connected)
+      })
+
+      provider.once('networkChanged', async (networkId: number) => {
+        logger.log(`Switch network to ${networkId}`)
+
+        // The sign `plus` is needed, because javascript and reasons
+        if (NetworkConfig.isKnownNetwork(+networkId)) {
+          const networkConfig = new NetworkConfig(networkId)
+
+          setWeb3Status({
+            ...web3Status,
+            networkConfig,
+          } as Connected)
+        } else {
+          logger.log(`AA`)
+          setWeb3Status({
+            _type: Web3ContextStatus.Error,
+            error: new Error('Unknown network'),
+          } as ErrorWeb3)
+        }
+      })
+    },
+    [web3Status, resetApp]
+  )
 
   const disconnectWeb3Modal = React.useCallback(async () => {
     if (web3Status._type !== Web3ContextStatus.Connected) {
@@ -93,20 +151,14 @@ export const Web3ContextProvider = ({ children }: Props) => {
     }
 
     try {
-      // See example in this link https://github.com/Web3Modal/web3modal/blob/master/example/src/App.tsx#L533
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const provider = web3Status.provider as any
-      if (provider && provider.close) {
-        provider.close()
-      }
-
-      await web3Modal.clearCachedProvider()
-      setWeb3Status({ _type: Web3ContextStatus.NotAsked } as Web3Status)
+      await resetApp(provider)
     } catch (error) {
       setWeb3Status({ _type: Web3ContextStatus.Error, error } as ErrorWeb3)
       return
     }
-  }, [web3Status])
+  }, [web3Status, resetApp])
 
   const connectWeb3Modal = React.useCallback(async () => {
     if (web3Status._type === Web3ContextStatus.Connected) {
@@ -125,8 +177,12 @@ export const Web3ContextProvider = ({ children }: Props) => {
       const provider = new ethers.providers.Web3Provider(web3Provider)
       const signer = provider.getSigner()
 
+      subscribeProvider(web3Provider)
+
       const networkId = (await provider.getNetwork()).chainId
       if (NetworkConfig.isKnownNetwork(networkId)) {
+        logger.log('Updating connected information...')
+
         const networkConfig = new NetworkConfig(networkId)
         const RtioService = new RealitioService(networkConfig, provider, signer)
         const CTService = new ConditionalTokensService(networkConfig, provider, signer)
@@ -149,7 +205,7 @@ export const Web3ContextProvider = ({ children }: Props) => {
     } catch (error) {
       setWeb3Status({ _type: Web3ContextStatus.Error, error } as ErrorWeb3)
     }
-  }, [web3Status])
+  }, [web3Status, subscribeProvider])
 
   const connectInfura = React.useCallback(async () => {
     if (web3Status._type === Web3ContextStatus.Infura) {
