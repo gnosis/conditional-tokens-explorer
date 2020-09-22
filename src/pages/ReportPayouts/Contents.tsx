@@ -98,9 +98,8 @@ export const Contents: React.FC = () => {
       }
     } catch (err) {
       setError(err)
+      setTransactionStatus(null)
       logger.error(err)
-    } finally {
-      setTransactionStatus(Status.Ready)
     }
   }
 
