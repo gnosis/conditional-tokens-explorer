@@ -23,15 +23,20 @@ export const useCollateral = (
           const erc20Service = new ERC20Service(provider, collateralAddress)
           const token = await erc20Service.getProfileSummary()
           if (!cancelled) {
-            setCollateral(token)
+            if (token) {
+              setCollateral(token)
+            } else {
+              setCollateral(null)
+            }
           }
         } catch (err) {
           if (!cancelled) {
             setError(err)
           }
-        }
-        if (!cancelled) {
-          setLoading(false)
+        } finally {
+          if (!cancelled) {
+            setLoading(false)
+          }
         }
       }
       fetchBalanceAndTokenInformation()
