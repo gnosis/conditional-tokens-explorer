@@ -7,7 +7,7 @@ const Wrapper = styled.svg`
   }
 `
 
-export const OkIcon: React.FC = (props) => {
+export const SuccessIcon: React.FC = (props) => {
   const { ...restProps } = props
 
   return (

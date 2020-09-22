@@ -4,11 +4,11 @@ import styled, { css } from 'styled-components'
 
 import { Button } from 'components/buttons/Button'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
+import { ErrorIcon } from 'components/icons/ErrorIcon'
+import { SuccessIcon } from 'components/icons/SuccessIcon'
+import { WarningIcon } from 'components/icons/WarningIcon'
 import { Spinner } from 'components/statusInfo/Spinner'
 import { Card, Icon, IconTypes, Text, Title } from 'components/statusInfo/common'
-import { AlertIcon } from 'components/statusInfo/icons/AlertIcon'
-import { ErrorIcon } from 'components/statusInfo/icons/ErrorIcon'
-import { OkIcon } from 'components/statusInfo/icons/OkIcon'
 
 const Wrapper = styled.div`
   align-items: center;
@@ -88,9 +88,9 @@ export const FullLoading: React.FC<Props> = (props) => {
       {title && <Title>{title}</Title>}
       <Icon>
         {icon === IconTypes.spinner && <LoadingSpinner />}
-        {icon === IconTypes.alert && <AlertIcon />}
+        {icon === IconTypes.alert && <WarningIcon />}
         {icon === IconTypes.error && <ErrorIcon />}
-        {icon === IconTypes.ok && <OkIcon />}
+        {icon === IconTypes.ok && <SuccessIcon />}
       </Icon>
       {message && <Text>{message}</Text>}
       {actionButton && (

@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import { HashRouter as Router } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
 
+import { CookiesBanner } from 'components/common/CookiesBanner'
 import { Footer, Header } from 'components/layout'
 import { Mainmenu } from 'components/navigation/Mainmenu'
 import { InnerContainer } from 'components/pureStyledComponents/InnerContainer'
@@ -32,6 +33,7 @@ ReactDOM.render(
                 </InnerContainer>
                 <Footer />
               </MainScroll>
+              <CookiesBanner />
             </MainWrapper>
           </Router>
         </ThemeProvider>
