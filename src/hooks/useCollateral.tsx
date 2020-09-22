@@ -2,6 +2,7 @@ import React from 'react'
 
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { getTokenSummary } from 'util/tools'
+import { humanizeMessageError } from 'util/tools'
 import { Token } from 'util/types'
 
 export const useCollateral = (
@@ -37,10 +38,7 @@ export const useCollateral = (
         if (!cancelled) {
           setLoading(false)
           setCollateral(null)
-          if (err.message.indexOf('(') !== -1) {
-            const errorMessage = err.message.split('(')[0]
-            err.message = errorMessage[0].toUpperCase() + errorMessage.substr(1)
-          }
+          err.message = humanizeMessageError(err.message)
           setError(err)
         }
       })

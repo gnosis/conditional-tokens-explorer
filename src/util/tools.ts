@@ -11,7 +11,7 @@ import {
   GetPosition_position,
 } from 'types/generatedGQL'
 import { getLogger } from 'util/logger'
-import { ConditionErrors, PositionErrors, Token } from 'util/types'
+import { CollateralErrors, ConditionErrors, PositionErrors, Token } from 'util/types'
 
 export const isAddress = (address: string) => {
   try {
@@ -338,4 +338,25 @@ export const getTokenSummary = async (
     decimals: 18,
     symbol: '',
   }
+}
+
+export const humanizeMessageError = (error: string): string => {
+  let result = error
+  if (result.indexOf('(') !== -1) {
+    result = result.split('(')[0]
+  }
+
+  if (result.includes('invalid address')) {
+    result = CollateralErrors.INVALID_ADDRESS.toString()
+  } else if (result.includes('ENS name not configured')) {
+    result = CollateralErrors.ENS_NOT_FOUND.toString()
+  } else if (result.includes('contract not deployed')) {
+    result = CollateralErrors.IS_NOT_ERC20.toString()
+  } else if (result.includes('bad address checksum')) {
+    result = CollateralErrors.BAD_ADDRESS_CHECKSUM.toString()
+  } else {
+    result = result[0].toUpperCase() + result.substr(1)
+  }
+
+  return result
 }
