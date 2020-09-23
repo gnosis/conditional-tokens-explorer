@@ -116,13 +116,19 @@ export const Web3ContextProvider = ({ children }: Props) => {
       })
 
       provider.once('accountsChanged', async (accounts: string[]) => {
-        const address = accounts[0]
-        logger.log(`Switch account to ${address}`)
+        if (accounts.length > 0) {
+          const address = accounts[0]
+          logger.log(`Switch account to ${address}`)
 
-        setWeb3Status({
-          ...web3Status,
-          address,
-        } as Connected)
+          setWeb3Status({
+            ...web3Status,
+            address,
+          } as Connected)
+        } else {
+          // Metamask send an `accountsChanged` event when lock account
+          logger.error('accounts is empty')
+          await resetApp(provider)
+        }
       })
 
       provider.once('networkChanged', async (networkId: number) => {
