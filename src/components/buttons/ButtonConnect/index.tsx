@@ -43,11 +43,16 @@ const Text = styled.span`
   margin-right: 10px;
 `
 
+interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
+  className?: string
+}
+
 export const ButtonConnect: React.FC<ButtonHTMLAttributes<HTMLButtonElement>> = (props) => {
+  const { className, ...restProps } = props
   const { connect } = useWeb3Disconnected()
 
   return (
-    <Wrapper className="buttonConnect" onClick={connect} {...props}>
+    <Wrapper className={`buttonConnect ${className}`} onClick={connect} {...restProps}>
       <Text>Connect To Wallet</Text>
       <ChevronRight />
     </Wrapper>
