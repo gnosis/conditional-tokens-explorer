@@ -196,13 +196,17 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
         {
           // eslint-disable-next-line react/display-name
           cell: (row: PositionWithUserBalanceWithDecimalsWithToken) => (
-            <span {...(row.userBalanceWithDecimals ? { title: row.userBalance.toString() } : {})}>
-              {row.userBalanceWithDecimals}
+            <span
+              {...(row.userBalanceERC1155WithDecimals
+                ? { title: row.userBalanceERC1155.toString() }
+                : {})}
+            >
+              {row.userBalanceERC1155WithDecimals}
             </span>
           ),
           name: 'ERC1155 Amount',
           right: true,
-          selector: 'userBalance',
+          selector: 'userBalanceERC1155',
           sortable: true,
         },
       ])
@@ -265,7 +269,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
               data={
                 data
                   ? showOnlyPositionsWithBalance
-                    ? dataWithToken.filter((position) => !position.userBalance.isZero())
+                    ? dataWithToken.filter((position) => !position.userBalanceERC1155.isZero())
                     : dataWithToken
                   : []
               }

@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/react-hooks'
+import { ethers } from 'ethers'
 import lodashUniqBy from 'lodash.uniqby'
 import React from 'react'
 
@@ -11,7 +12,12 @@ import { formatBigNumber, getTokenSummary } from 'util/tools'
 import { CollateralFilterOptions, Token } from 'util/types'
 
 export type UserBalanceWithDecimals = {
-  userBalanceWithDecimals: string
+  userBalanceERC1155WithDecimals: string
+  userBalanceERC20WithDecimals: string
+  userBalanceERC1155Numbered: number
+  userBalanceERC20Numbered: number
+  collateralTokenERC1155: Token
+  collateralTokenERC20: Token
 }
 
 export type PositionWithUserBalanceWithDecimals = Position & UserBalanceWithDecimals
@@ -87,32 +93,73 @@ export const usePositions = (options: OptionsToSearch) => {
 
       const fetchUserBalanceWithDecimals = async () => {
         const uniqueCollateralTokens = lodashUniqBy(positionListData, 'collateralToken')
+        const uniqueWrappedTokens = lodashUniqBy(positionListData, 'wrappedToken')
 
-        const collateralTokensPromises = uniqueCollateralTokens.map(async (position: Position) => {
-          const { collateralToken } = position
-          return await getTokenSummary(networkConfig, provider, collateralToken)
-        })
+        const collateralTokensPromises = uniqueCollateralTokens.map(
+          async ({ collateralToken }: Position) => {
+            try {
+              return await getTokenSummary(networkConfig, provider, collateralToken)
+            } catch (err) {
+              return {
+                address: collateralToken,
+                decimals: 18,
+                symbol: '',
+              }
+            }
+          }
+        )
+        const wrappedTokensPromises = uniqueWrappedTokens.map(
+          async ({ wrappedToken }: Position) => {
+            try {
+              return await getTokenSummary(
+                networkConfig,
+                provider,
+                wrappedToken || ethers.constants.HashZero
+              )
+            } catch (err) {
+              return {
+                address: wrappedToken || ethers.constants.HashZero,
+                decimals: 18,
+                symbol: '',
+              }
+            }
+          }
+        )
         const collateralTokensResolved = await Promise.all(collateralTokensPromises)
+        const wrappedTokensResolved = await Promise.all(wrappedTokensPromises)
 
         const positionListDataEnhanced = positionListData.map((position: Position) => {
-          const { collateralToken, userBalance } = position
+          const { collateralToken, userBalanceERC20, userBalanceERC1155, wrappedToken } = position
 
           const collateralTokenFound = collateralTokensResolved.filter(
-            (collateralTokenInformation) => {
-              return (
-                collateralTokenInformation.address.toLowerCase() === collateralToken.toLowerCase()
-              )
-            }
+            (collateralTokenInformation) =>
+              collateralTokenInformation &&
+              collateralTokenInformation?.address.toLowerCase() === collateralToken.toLowerCase()
+          )
+          const wrappedTokenFound = wrappedTokensResolved.filter(
+            (wrappedTokenInformation) =>
+              wrappedTokenInformation &&
+              wrappedTokenInformation?.address.toLowerCase() === wrappedToken?.toLowerCase()
           )
 
-          const userBalanceWithDecimals =
-            collateralTokenFound.length && collateralTokenFound[0].decimals
-              ? formatBigNumber(userBalance, collateralTokenFound[0].decimals)
-              : userBalance.toString()
+          const userBalanceERC1155WithDecimals =
+            collateralTokenFound && collateralTokenFound.length && collateralTokenFound[0].decimals
+              ? formatBigNumber(userBalanceERC1155, collateralTokenFound[0].decimals)
+              : userBalanceERC1155.toString()
+
+          const userBalanceERC20WithDecimals =
+            collateralTokenFound && collateralTokenFound.length && collateralTokenFound[0].decimals
+              ? formatBigNumber(userBalanceERC20, collateralTokenFound[0].decimals) // Using the collateralToken is OK
+              : userBalanceERC20.toString()
 
           return {
             ...position,
-            userBalanceWithDecimals,
+            userBalanceERC1155WithDecimals,
+            userBalanceERC20WithDecimals,
+            userBalanceERC1155Numbered: Number(userBalanceERC1155WithDecimals),
+            userBalanceERC20Numbered: Number(userBalanceERC20WithDecimals),
+            collateralTokenERC1155: collateralTokenFound.length && collateralTokenFound[0],
+            collateralTokenERC20: wrappedTokenFound.length && wrappedTokenFound[0],
           } as PositionWithUserBalanceWithDecimals
         })
         if (!cancelled) {

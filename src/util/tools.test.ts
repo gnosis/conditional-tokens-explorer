@@ -32,6 +32,10 @@ const positions: GetPosition_position[] = [
       id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
       __typename: 'CollateralToken',
     },
+    wrappedToken: {
+      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      __typename: 'WrappedToken',
+    },
     collection: {
       conditionIds: ['0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f'],
       conditions: [
@@ -76,6 +80,10 @@ const positions: GetPosition_position[] = [
       id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
       __typename: 'CollateralToken',
     },
+    wrappedToken: {
+      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      __typename: 'WrappedToken',
+    },
     collection: {
       conditionIds: ['0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f'],
       conditions: [
@@ -119,6 +127,10 @@ const positions: GetPosition_position[] = [
     collateralToken: {
       id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
       __typename: 'CollateralToken',
+    },
+    wrappedToken: {
+      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      __typename: 'WrappedToken',
     },
     collection: {
       conditionIds: [
@@ -186,6 +198,10 @@ const positions: GetPosition_position[] = [
     collateralToken: {
       id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
       __typename: 'CollateralToken',
+    },
+    wrappedToken: {
+      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      __typename: 'WrappedToken',
     },
     collection: {
       conditionIds: [
@@ -257,6 +273,10 @@ const positionsUSDC: GetPosition_position[] = [
       id: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
       __typename: 'CollateralToken',
     },
+    wrappedToken: {
+      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      __typename: 'WrappedToken',
+    },
     collection: {
       conditionIds: ['0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f'],
       conditions: [
@@ -300,6 +320,10 @@ const positionsUSDC: GetPosition_position[] = [
     collateralToken: {
       id: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
       __typename: 'CollateralToken',
+    },
+    wrappedToken: {
+      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      __typename: 'WrappedToken',
     },
     collection: {
       conditionIds: ['0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f'],
@@ -345,6 +369,10 @@ const positionsUSDC: GetPosition_position[] = [
       id: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
       __typename: 'CollateralToken',
     },
+    wrappedToken: {
+      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      __typename: 'WrappedToken',
+    },
     collection: {
       conditionIds: ['0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f'],
       conditions: [
@@ -388,6 +416,10 @@ const positionsUSDC: GetPosition_position[] = [
     collateralToken: {
       id: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
       __typename: 'CollateralToken',
+    },
+    wrappedToken: {
+      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      __typename: 'WrappedToken',
     },
     collection: {
       conditionIds: [
@@ -455,6 +487,10 @@ const positionsUSDC: GetPosition_position[] = [
     collateralToken: {
       id: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
       __typename: 'CollateralToken',
+    },
+    wrappedToken: {
+      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      __typename: 'WrappedToken',
     },
     collection: {
       conditionIds: [

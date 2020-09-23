@@ -8,6 +8,8 @@ import { Amount } from 'components/form/Amount'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { Row } from 'components/pureStyledComponents/Row'
 import { ZERO_BN } from 'config/constants'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { TransferOptions } from 'util/types'
 
 const FirstRow = styled(Row)`
   padding-top: 12px;
@@ -18,14 +20,25 @@ const ButtonContainerStyled = styled(ButtonContainer)`
 `
 
 interface Props extends ModalProps {
+  positionId: string
   balance: BigNumber
   decimals: number
-  onUnWrap: () => void
+  onUnWrap: (transferValue: TransferOptions) => Promise<void>
   tokenSymbol?: string
 }
 
 export const UnwrapModal: React.FC<Props> = (props) => {
-  const { balance, decimals, onRequestClose, onUnWrap, tokenSymbol, ...restProps } = props
+  const { CTService } = useWeb3ConnectedOrInfura()
+
+  const {
+    balance,
+    decimals,
+    onRequestClose,
+    onUnWrap,
+    positionId,
+    tokenSymbol,
+    ...restProps
+  } = props
 
   const maxBalance = useMemo(() => (balance ? balance : ZERO_BN), [balance])
 
@@ -62,7 +75,12 @@ export const UnwrapModal: React.FC<Props> = (props) => {
         <Button
           disabled={amount.isZero()}
           onClick={(e) => {
-            onUnWrap()
+            const wrapValues = {
+              amount,
+              address: CTService.address,
+              positionId,
+            }
+            onUnWrap(wrapValues)
             if (onRequestClose) onRequestClose(e)
           }}
         >

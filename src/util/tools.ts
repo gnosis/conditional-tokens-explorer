@@ -10,7 +10,6 @@ import {
   GetMultiPositions_positions,
   GetPosition_position,
 } from 'types/generatedGQL'
-import { getLogger } from 'util/logger'
 import { CollateralErrors, ConditionErrors, PositionErrors, Token } from 'util/types'
 
 export const isAddress = (address: string) => {
@@ -103,8 +102,11 @@ export const isPositionErrorFetching = (errors: PositionErrors[]): boolean =>
 export const isPositionErrorNotFound = (errors: PositionErrors[]): boolean =>
   errors.indexOf(PositionErrors.NOT_FOUND_ERROR) > -1
 
-export const isPositionErrorEmptyBalance = (errors: PositionErrors[]): boolean =>
-  errors.indexOf(PositionErrors.EMPTY_BALANCE_ERROR) > -1
+export const isPositionErrorEmptyBalanceERC1155 = (errors: PositionErrors[]): boolean =>
+  errors.indexOf(PositionErrors.EMPTY_BALANCE_ERC1155_ERROR) > -1
+
+export const isPositionErrorEmptyBalanceERC20 = (errors: PositionErrors[]): boolean =>
+  errors.indexOf(PositionErrors.EMPTY_BALANCE_ERC20_ERROR) > -1
 
 export const divBN = (a: BigNumber, b: BigNumber, scale = 10000): number => {
   return a.mul(scale).div(b).toNumber() / scale
@@ -324,12 +326,10 @@ const humanizeMessageError = (error: string): string => {
   return result
 }
 
-const fetchTokenLogger = getLogger('getTokenSummary')
 export const getTokenSummary = async (
   networkConfig: NetworkConfig,
   provider: Provider,
-  collateralToken: string,
-  logger = fetchTokenLogger
+  collateralToken: string
 ): Promise<Token> => {
   try {
     const { decimals, symbol } = networkConfig.getTokenFromAddress(collateralToken)
@@ -338,8 +338,7 @@ export const getTokenSummary = async (
       decimals,
       symbol,
     }
-  } catch(e) {
-    // Do nothing if is not a token from our config, instead we search with erc20Service
+  } catch (e) {
     try {
       const erc20Service = new ERC20Service(provider, collateralToken)
       const { decimals, symbol } = await erc20Service.getProfileSummary()
@@ -351,7 +350,6 @@ export const getTokenSummary = async (
       }
     } catch (err) {
       err.message = humanizeMessageError(err.message)
-      logger.error(err)
       throw Error(err)
     }
   }

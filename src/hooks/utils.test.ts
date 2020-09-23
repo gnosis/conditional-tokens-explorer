@@ -12,6 +12,10 @@ const positions: Positions_positions[] = [
       __typename: 'CollateralToken',
       id: 'token1',
     },
+    wrappedToken: {
+      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      __typename: 'WrappedToken',
+    },
   },
   {
     __typename: 'Position',
@@ -19,6 +23,10 @@ const positions: Positions_positions[] = [
     collateralToken: {
       __typename: 'CollateralToken',
       id: 'token1',
+    },
+    wrappedToken: {
+      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      __typename: 'WrappedToken',
     },
   },
 ]
@@ -34,6 +42,12 @@ const userWithBalance: UserWithPositions_user = {
         id: 'Position1',
       },
       balance: '100',
+      wrappedBalance: '100',
+      totalBalance: '100',
+      user: {
+        __typename: 'User',
+        id: '0x18AD183A875e5A42a60Eb5D3a9D6657C3493d064',
+      },
     },
   ],
 }
@@ -43,12 +57,16 @@ test('marshalPositionListData should return the Positions without balances', asy
     {
       id: 'Position1',
       collateralToken: 'token1',
-      userBalance: ZERO_BN,
+      userBalanceERC1155: ZERO_BN,
+      userBalanceERC20: ZERO_BN,
+      wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
     },
     {
       id: 'Position2',
       collateralToken: 'token1',
-      userBalance: ZERO_BN,
+      userBalanceERC1155: ZERO_BN,
+      userBalanceERC20: ZERO_BN,
+      wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
     },
   ]
 
@@ -60,12 +78,16 @@ test('marshalPositionListData should return the Positions with some balances', a
     {
       id: 'Position1',
       collateralToken: 'token1',
-      userBalance: new BigNumber('100'),
+      userBalanceERC1155: new BigNumber('100'),
+      userBalanceERC20: new BigNumber('100'),
+      wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
     },
     {
       id: 'Position2',
       collateralToken: 'token1',
-      userBalance: ZERO_BN,
+      userBalanceERC1155: ZERO_BN,
+      userBalanceERC20: ZERO_BN,
+      wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
     },
   ]
 

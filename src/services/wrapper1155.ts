@@ -1,8 +1,9 @@
-import { Contract, Signer, ethers } from 'ethers'
-import { Provider, TransactionReceipt } from 'ethers/providers'
+import { Contract, ethers } from 'ethers'
+import { TransactionReceipt } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
 import { CONFIRMATIONS_TO_WAIT } from 'config/constants'
+import { NetworkConfig } from 'config/networkConfig'
 
 const wrapper1155Abi = [
   'function unwrap(address multiToken,uint256 tokenId,uint256 amount,address recipient,bytes data) external',
@@ -12,12 +13,22 @@ const wrapper1155Abi = [
 
 class Wrapper1155Service {
   private contract: Contract
-  constructor(private provider: Provider, private address: string, private signer?: Signer) {
+
+  constructor(
+    private networkConfig: NetworkConfig,
+    private provider: ethers.providers.Provider,
+    private signer?: ethers.Signer
+  ) {
+    const contractAddress = networkConfig.getWrapped1155FactoryAddress()
     if (signer) {
-      this.contract = new ethers.Contract(address, wrapper1155Abi, provider).connect(signer)
+      this.contract = new ethers.Contract(contractAddress, wrapper1155Abi, provider).connect(signer)
     } else {
-      this.contract = new ethers.Contract(address, wrapper1155Abi, provider)
+      this.contract = new ethers.Contract(contractAddress, wrapper1155Abi, provider)
     }
+  }
+
+  get address(): string {
+    return this.contract.address
   }
 
   async unwrap(
@@ -31,7 +42,7 @@ class Wrapper1155Service {
       tokenId,
       amount,
       userAddress,
-      ethers.constants.HashZero
+      '0x'
     )
     return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
   }
