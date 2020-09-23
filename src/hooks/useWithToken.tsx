@@ -27,8 +27,19 @@ export const useWithToken = <T extends WithAddress>(
             typeof item.collateralToken === 'string'
               ? item.collateralToken
               : item.collateralToken.id
-          const token = await getTokenSummary(networkConfig, provider, id)
-          return { ...item, token }
+          try {
+            const token = await getTokenSummary(networkConfig, provider, id)
+            return { ...item, token }
+          } catch (err) {
+            return {
+              ...item,
+              token: {
+                address: id,
+                decimals: 18,
+                symbol: '',
+              },
+            }
+          }
         })
       )
     }

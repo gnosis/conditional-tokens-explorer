@@ -76,10 +76,10 @@ export const Contents = () => {
     }
   }, [positions, condition, status, CTService, clearCondition, clearPositions, connect])
 
-  const { isRelated } = useIsPositionRelatedToCondition(
-    positions.length ? positions[0].id : '',
-    condition?.id || ''
-  )
+  const {
+    isRelated,
+    loading: loadingCheckPositionRelatedToCondition,
+  } = useIsPositionRelatedToCondition(positions.length ? positions[0].id : '', condition?.id || '')
 
   const disabled =
     statusTransaction === Status.Loading ||
@@ -89,7 +89,11 @@ export const Contents = () => {
     !condition ||
     !isRelated
 
-  const nonRelatedPositionAndCondition = !isRelated && !!positions.length && condition
+  const nonRelatedPositionAndCondition = React.useMemo(() => {
+    return (
+      !isRelated && !!(positions.length > 0 && condition) && !loadingCheckPositionRelatedToCondition
+    )
+  }, [isRelated, positions, condition, loadingCheckPositionRelatedToCondition])
 
   return (
     <CenteredCard>

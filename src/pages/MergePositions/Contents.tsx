@@ -58,11 +58,15 @@ export const Contents = () => {
   useEffect(() => {
     let cancelled = false
     if (positions.length && mergeablePositions) {
-      getTokenSummary(networkConfig, provider, positions[0].collateralToken.id).then((token) => {
-        if (!cancelled) {
-          setCollateralToken(token)
-        }
-      })
+      getTokenSummary(networkConfig, provider, positions[0].collateralToken.id)
+        .then((token) => {
+          if (!cancelled) {
+            setCollateralToken(token)
+          }
+        })
+        .catch((err) => {
+          logger.error(err)
+        })
     }
     return () => {
       cancelled = true
