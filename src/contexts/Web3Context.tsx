@@ -137,7 +137,6 @@ export const Web3ContextProvider = ({ children }: Props) => {
             networkConfig,
           } as Connected)
         } else {
-          logger.log(`AA`)
           setWeb3Status({
             _type: Web3ContextStatus.Error,
             error: new Error('Unknown network'),
