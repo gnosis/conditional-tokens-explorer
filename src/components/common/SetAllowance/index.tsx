@@ -10,16 +10,23 @@ const Wrapper = styled.div`
   align-items: center;
   border-radius: 4px;
   border: solid 1px ${(props) => props.theme.colors.primary};
-  display: flex;
   margin-bottom: 25px;
   padding: 13px 16px;
+
+  @media (min-width: ${(props) => props.theme.themeBreakPoints.md}) {
+    display: flex;
+  }
 `
 
 const Description = styled.p`
+  color: ${(props) => props.theme.colors.primary};
   font-size: 15px;
   line-height: 1.2;
-  margin: 0 10px 0 0;
-  color: ${(props) => props.theme.colors.primary};
+  margin: 0 10px 15px 0;
+
+  @media (min-width: ${(props) => props.theme.themeBreakPoints.md}) {
+    margin-bottom: 0;
+  }
 `
 
 const UnlockButton = styled(Button)`
@@ -28,6 +35,11 @@ const UnlockButton = styled(Button)`
   min-width: 125px;
   padding-left: 15px;
   padding-right: 15px;
+  width: 100%;
+
+  @media (min-width: ${(props) => props.theme.themeBreakPoints.md}) {
+    width: auto;
+  }
 `
 
 const StatusInfo = styled(StatusInfoInline)`
