@@ -18,7 +18,17 @@ interface WrapperProps {
 export const Wrapper = (props: WrapperProps) => {
   const { positionId } = props
 
-  const { balance, errors, loading, position, setPositionId } = usePositionContext()
+  const {
+    balanceERC20,
+    balanceERC1155,
+    collateralTokenAddress,
+    errors,
+    loading,
+    position,
+    refetchBalances,
+    setPositionId,
+    wrappedTokenAddress,
+  } = usePositionContext()
 
   React.useEffect(() => {
     setPositionId(positionId)
@@ -35,7 +45,16 @@ export const Wrapper = (props: WrapperProps) => {
       ) : !loading && !position && isPositionErrorFetching(errors) ? (
         <InfoCard message="We couldn't fetch the data for this position..." title="Error" />
       ) : (
-        position && <Contents balance={balance} position={position} />
+        position && (
+          <Contents
+            balanceERC1155={balanceERC1155}
+            balanceERC20={balanceERC20}
+            collateralTokenAddress={collateralTokenAddress}
+            position={position}
+            refetchBalances={refetchBalances}
+            wrappedTokenAddress={wrappedTokenAddress}
+          />
+        )
       )}
     </>
   )

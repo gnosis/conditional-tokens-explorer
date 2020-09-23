@@ -12,7 +12,7 @@ import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { ZERO_BN } from 'config/constants'
 import { useWeb3Connected } from 'contexts/Web3Context'
 import { ERC20Service } from 'services/erc20'
-import { Token, TransferOutcomeOptions } from 'util/types'
+import { Token, TransferOptions } from 'util/types'
 
 const FirstRow = styled(Row)`
   padding-top: 12px;
@@ -30,7 +30,7 @@ const LoadingWrapper = styled.div`
 `
 
 interface Props extends ModalProps {
-  onSubmit: (transfer: TransferOutcomeOptions) => void
+  onSubmit: (transfer: TransferOptions) => void
   positionId: string
   collateralToken: string
 }
@@ -128,7 +128,7 @@ export const TransferOutcomeTokensModal: React.FC<Props> = (props) => {
                 max={balance.toString()}
                 onAmountChange={amountChangeHandler}
                 onUseWalletBalance={useWalletHandler}
-                tokenSymbol={'Outcome Tokens'}
+                tokenSymbol={token.symbol}
               />
             </Row>
           )}

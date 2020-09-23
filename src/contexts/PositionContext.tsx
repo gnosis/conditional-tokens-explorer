@@ -13,8 +13,12 @@ export interface PositionContext {
   position: Maybe<GetPosition_position>
   positionId: string
   loading: boolean
-  balance: Maybe<BigNumber>
+  balanceERC1155: BigNumber
+  balanceERC20: BigNumber
+  collateralTokenAddress: string
+  wrappedTokenAddress: string
   errors: PositionErrors[]
+  refetchBalances: () => void
   setPositionId: (positionId: string) => void
   clearPosition: () => void
 }
@@ -23,8 +27,13 @@ export const POSITION_CONTEXT_DEFAULT_VALUE = {
   position: null,
   positionId: '',
   loading: false,
-  balance: null,
+  balanceERC1155: new BigNumber(0),
+  balanceERC20: new BigNumber(0),
+  collateralTokenAddress: '',
+  wrappedTokenAddress: '',
   errors: [],
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  refetchBalances: () => {},
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setPositionId: () => {},
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -34,12 +43,13 @@ export const POSITION_CONTEXT_DEFAULT_VALUE = {
 const PositionContext = React.createContext<PositionContext>(POSITION_CONTEXT_DEFAULT_VALUE)
 
 interface Props {
-  checkForEmptyBalance?: boolean
+  checkForEmptyBalanceERC1155?: boolean
+  checkForEmptyBalanceERC20?: boolean
   children: React.ReactNode
 }
 
 export const PositionProvider = (props: Props) => {
-  const { checkForEmptyBalance } = props
+  const { checkForEmptyBalanceERC20, checkForEmptyBalanceERC1155 } = props
   const [positionId, setPositionId] = useState('')
   const { getValue } = useLocalStorage('positionid')
 
@@ -75,9 +85,19 @@ export const PositionProvider = (props: Props) => {
     }
   }
 
-  const { balance } = useBalanceForPosition(positionId)
-  if (position && balance && balance.isZero() && checkForEmptyBalance) {
-    errors.push(PositionErrors.EMPTY_BALANCE_ERROR)
+  const {
+    balanceERC20,
+    balanceERC1155,
+    collateralTokenAddress,
+    refetch: refetchBalances,
+    wrappedTokenAddress,
+  } = useBalanceForPosition(positionId)
+
+  if (position && balanceERC1155 && balanceERC1155.isZero() && checkForEmptyBalanceERC1155) {
+    errors.push(PositionErrors.EMPTY_BALANCE_ERC1155_ERROR)
+  }
+  if (position && balanceERC20 && balanceERC20.isZero() && checkForEmptyBalanceERC20) {
+    errors.push(PositionErrors.EMPTY_BALANCE_ERC20_ERROR)
   }
 
   // Validate string position
@@ -101,7 +121,11 @@ export const PositionProvider = (props: Props) => {
   const value = {
     position,
     positionId,
-    balance,
+    balanceERC1155,
+    balanceERC20,
+    collateralTokenAddress,
+    wrappedTokenAddress,
+    refetchBalances,
     errors,
     loading,
     setPositionId: setPositionIdCallback,

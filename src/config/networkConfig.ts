@@ -234,6 +234,10 @@ export class NetworkConfig {
     return networks[this.networkId].contracts.realitioAddress
   }
 
+  getWrapped1155FactoryAddress(): string {
+    return networks[this.networkId].contracts.wrapped1155FactoryAddress
+  }
+
   getTokens(): Token[] {
     return networks[this.networkId].tokens
   }

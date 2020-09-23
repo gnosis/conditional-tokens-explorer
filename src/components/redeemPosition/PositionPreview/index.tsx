@@ -20,13 +20,15 @@ interface Props {
 }
 
 export const PositionPreview = ({ condition, position }: Props) => {
-  const { balance } = useBalanceForPosition(position?.id || '')
+  const { balanceERC1155 } = useBalanceForPosition(position?.id || '')
   const { collateral: token } = useCollateral(position ? position.collateralToken.id : '')
 
   const redeemedBalance = useMemo(
     () =>
-      position && condition ? getRedeemedBalance(position, condition, balance) : new BigNumber(0),
-    [position, condition, balance]
+      position && condition
+        ? getRedeemedBalance(position, condition, balanceERC1155)
+        : new BigNumber(0),
+    [position, condition, balanceERC1155]
   )
 
   const redeemedPreview = useMemo(() => {

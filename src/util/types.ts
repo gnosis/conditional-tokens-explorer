@@ -56,16 +56,25 @@ export enum PositionErrors {
   INVALID_ERROR = `Invalid position`,
   FETCHING_ERROR = `Error fetching position`,
   NOT_FOUND_ERROR = `Position doesn't exist`,
-  EMPTY_BALANCE_ERROR = `User doesn't have position balance`,
+  EMPTY_BALANCE_ERC1155_ERROR = `User doesn't have position balance`,
+  EMPTY_BALANCE_ERC20_ERROR = `User doesn't have erc20 balance`,
 }
 
 export enum BalanceErrors {
   INVALID_ERROR = `Invalid position`,
   FETCHING_ERROR = `Error fetching balance`,
-  EMPTY_BALANCE_ERROR = `User doesn't have position balance`,
+  EMPTY_BALANCE_ERC1155_ERROR = `User doesn't have position balance`,
+  EMPTY_BALANCE_ERC20_ERROR = `User doesn't have erc20 balance`,
 }
 
-export type Errors = ConditionErrors | PositionErrors | BalanceErrors
+export enum CollateralErrors {
+  INVALID_ADDRESS = `Invalid address`,
+  BAD_ADDRESS_CHECKSUM = `Bad address checksum`,
+  ENS_NOT_FOUND = `ENS name not found`,
+  IS_NOT_ERC20 = `The given address in not an ERC20 contract`,
+}
+
+export type Errors = ConditionErrors | PositionErrors | BalanceErrors | CollateralErrors
 
 export type Token = {
   symbol: string
@@ -127,7 +136,7 @@ export interface SplitStatus {
   collateral: string
 }
 
-export interface TransferOutcomeOptions {
+export interface TransferOptions {
   amount: BigNumber
   address: string
   positionId: string
