@@ -25,14 +25,14 @@ const Wrapper = styled.button`
       opacity: 0.5;
     }
 
-    path {
+    .fill {
       fill: ${(props) => props.theme.colors.error};
     }
 
     &:hover {
       color: ${(props) => darken(0.15, props.theme.colors.error)};
 
-      path {
+      .fill {
         fill: ${(props) => darken(0.15, props.theme.colors.error)};
       }
     }

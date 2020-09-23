@@ -34,7 +34,7 @@ const Wrapper = styled.button<{ action: ButtonBulkMoveActions }>`
   user-select: none;
   width: 30px;
 
-  path {
+  .fill {
     fill: ${(props) => props.theme.colors.darkGrey};
     transition: all 0.15s ease-out;
   }
@@ -43,7 +43,7 @@ const Wrapper = styled.button<{ action: ButtonBulkMoveActions }>`
     props.action === ButtonBulkMoveActions.add &&
     `
         border-color: ${props.theme.colors.primary};
-        path {
+        .fill {
           fill: ${props.theme.colors.primary};
         }
       `}
@@ -52,7 +52,7 @@ const Wrapper = styled.button<{ action: ButtonBulkMoveActions }>`
     props.action === ButtonBulkMoveActions.remove &&
     `
         border-color: ${props.theme.colors.error};
-        path {
+        .fill {
           fill: ${props.theme.colors.error};
         }
       `}
@@ -63,7 +63,7 @@ const Wrapper = styled.button<{ action: ButtonBulkMoveActions }>`
       `
         background-color: ${props.theme.colors.primary};
         border-color: ${props.theme.colors.primary};
-        path {
+        .fill {
           fill: #fff;
         }
       `}
@@ -73,7 +73,7 @@ const Wrapper = styled.button<{ action: ButtonBulkMoveActions }>`
       `
         background-color: ${props.theme.colors.error};
         border-color: ${props.theme.colors.error};
-        path {
+        .fill {
           fill: #fff;
         }
       `}
@@ -86,7 +86,7 @@ const Wrapper = styled.button<{ action: ButtonBulkMoveActions }>`
     cursor: not-allowed;
     opacity: 0.5;
 
-    path {
+    .fill {
       fill: ${(props) => props.theme.colors.darkGrey};
     }
   }

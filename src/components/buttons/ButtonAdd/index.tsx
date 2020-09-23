@@ -17,7 +17,7 @@ const Wrapper = styled.button`
   transition: all 0.15s ease-out;
   width: 38px;
 
-  path {
+  .fill {
     fill: ${(props) => props.theme.buttonPrimary.backgroundColor};
   }
 
@@ -25,7 +25,7 @@ const Wrapper = styled.button`
     background-color: ${(props) => props.theme.buttonPrimary.backgroundColor};
     border-color: ${(props) => props.theme.buttonPrimary.borderColor};
 
-    path {
+    .fill {
       fill: #fff;
     }
   }
@@ -36,7 +36,7 @@ const Wrapper = styled.button`
     cursor: not-allowed;
     opacity: 0.5;
 
-    path {
+    .fill {
       fill: ${(props) => props.theme.buttonPrimary.backgroundColor};
     }
   }
