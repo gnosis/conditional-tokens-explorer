@@ -168,7 +168,7 @@ const theme = {
   },
   themeBreakPoints: {
     lg: '992px',
-    md: '768px',
+    md: '769px',
     sm: '480px',
     xl: '1024px',
     xs: '320px',
