@@ -13,11 +13,14 @@ import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { SplitFromType, Token } from 'util/types'
 
 const Controls = styled.div`
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
   margin-bottom: 8px;
   margin-top: -3px;
+
+  @media (min-width: ${(props) => props.theme.themeBreakPoints.md}) {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+  }
 `
 
 const Tabs = styled.div`

@@ -8,13 +8,16 @@ const Wrapper = styled.div<{ flexDirection?: string }>`
 `
 
 const Title = styled.h2<{ flexDirection?: string }>`
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
   margin: ${(props) => (props.flexDirection === 'column' ? '0 0 10px 0' : '0 5px 0 0')};
+
+  @media (min-width: ${(props) => props.theme.themeBreakPoints.md}) {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+  }
 `
 
-const TitleText = styled.span`
+const TitleText = styled.div`
   color: ${(props) => props.theme.colors.darkerGray};
   font-size: 16px;
   font-weight: 600;

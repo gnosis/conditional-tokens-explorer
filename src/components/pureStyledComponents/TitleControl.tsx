@@ -7,11 +7,14 @@ const TitleControlCSS = css`
   font-size: 14px;
   font-weight: 600;
   line-height: 1.2;
-  text-align: right;
   text-decoration: underline;
 
   &:hover {
     text-decoration: none;
+  }
+
+  @media (min-width: ${(props) => props.theme.themeBreakPoints.md}) {
+    text-align: right;
   }
 `
 export const TitleControl = styled.span`

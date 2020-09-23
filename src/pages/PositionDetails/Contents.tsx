@@ -40,7 +40,12 @@ const CollateralText = styled.span`
   font-size: 15px;
   font-weight: 400;
   line-height: 1.2;
+  max-width: 50%;
   text-align: left;
+
+  @media (min-width: ${(props) => props.theme.themeBreakPoints.md}) {
+    max-width: none;
+  }
 `
 
 const CollateralTextStrong = styled.span`
