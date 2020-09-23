@@ -159,8 +159,11 @@ export const PrepareCondition = () => {
                   />
                   {errors.questionId && (
                     <ErrorContainer>
+                      {errors.questionId.type === 'required' && (
+                        <ErrorMessage>Required field</ErrorMessage>
+                      )}
                       {errors.questionId.type === 'pattern' && (
-                        <ErrorMessage>Invalid bytes32 string</ErrorMessage>
+                        <ErrorMessage>Invalid Question Id</ErrorMessage>
                       )}
                     </ErrorContainer>
                   )}
@@ -286,8 +289,11 @@ export const PrepareCondition = () => {
                   />
                   {errors.oracle && (
                     <ErrorContainer>
+                      {errors.oracle.type === 'required' && (
+                        <ErrorMessage>Required field</ErrorMessage>
+                      )}
                       {errors.oracle.type === 'pattern' && (
-                        <ErrorMessage>Invalid address</ErrorMessage>
+                        <ErrorMessage>Please use a valid reporting address</ErrorMessage>
                       )}
                       {errors.oracle.type === 'validate' && (
                         <ErrorMessage>Address checksum failed</ErrorMessage>
