@@ -4,6 +4,7 @@ import styled from 'styled-components'
 
 import { Button } from 'components/buttons'
 import { Modal, ModalProps } from 'components/common/Modal'
+import { StatusInfoInline, StatusInfoType } from 'components/common/StatusInfoInline'
 import { Amount } from 'components/form/Amount'
 import { InputAddress } from 'components/form/InputAddress'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
@@ -38,7 +39,7 @@ interface Props extends ModalProps {
 export const TransferOutcomeTokensModal: React.FC<Props> = (props) => {
   const { collateralToken, onRequestClose, onSubmit, positionId, ...restProps } = props
 
-  const { CTService, provider, signer } = useWeb3Connected()
+  const { CTService, address: addressConnectedUser, provider, signer } = useWeb3Connected()
 
   const [balance, setBalance] = React.useState<BigNumber>(ZERO_BN)
   const [token, setToken] = React.useState<Maybe<Token>>(null)
@@ -73,6 +74,11 @@ export const TransferOutcomeTokensModal: React.FC<Props> = (props) => {
       setAmount(balance)
     }
   }, [balance])
+
+  const isAddressToSendTheConnectedUser = React.useMemo(
+    () => addressConnectedUser.toLowerCase() === address.toLowerCase(),
+    [addressConnectedUser, address]
+  )
 
   React.useEffect(() => {
     let cancelled = false
@@ -118,6 +124,13 @@ export const TransferOutcomeTokensModal: React.FC<Props> = (props) => {
               onErrorChange={errorChangeHandler}
             />
           </FirstRow>
+          {isAddressToSendTheConnectedUser && (
+            <Row cols="1fr">
+              <StatusInfoInline status={StatusInfoType.warning}>
+                The SEND TO field is the current connected wallet
+              </StatusInfoInline>
+            </Row>
+          )}
           {token && token.decimals && (
             <Row cols="1fr">
               <Amount
