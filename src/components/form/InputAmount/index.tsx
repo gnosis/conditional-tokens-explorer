@@ -140,6 +140,7 @@ export const InputAmount = ({
           control={control}
           decimals={decimals}
           disabled={(balance && balance.isZero()) || false}
+          max={(balance && balance.toString()) || undefined}
           name="amount"
           placeholder={balance && balance.isZero() ? 'Please add funds to your wallet...' : '0.00'}
           rules={{ required: true, validate: (amount) => amount.gt(ZERO_BN) }}

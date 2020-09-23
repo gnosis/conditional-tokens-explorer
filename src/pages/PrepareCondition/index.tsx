@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { KeyboardEvent } from 'react'
 import { useForm } from 'react-hook-form'
 import { useHistory } from 'react-router-dom'
 
@@ -208,6 +208,11 @@ export const PrepareCondition = () => {
                     error={errors.outcomesSlotCount && true}
                     name="outcomesSlotCount"
                     onChange={(e) => setNumOutcomes(Number(e.target.value))}
+                    onKeyPress={(event: KeyboardEvent) => {
+                      if (event.key === '.') {
+                        event.preventDefault()
+                      }
+                    }}
                     placeholder="You can add between 2 and 256 outcomes..."
                     ref={register({
                       required: true,

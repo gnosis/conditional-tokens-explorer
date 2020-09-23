@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { Button } from 'components/buttons/Button'
 import { CenteredCard } from 'components/common/CenteredCard'
+import { StatusInfoInline, StatusInfoType } from 'components/common/StatusInfoInline'
 import { Amount } from 'components/form/Amount'
 import { SelectCondition } from 'components/form/SelectCondition'
 import { SelectPositions } from 'components/form/SelectPositions'
@@ -175,6 +176,13 @@ export const Contents = () => {
       <Row cols="1fr">
         <SelectCondition />
       </Row>
+      {condition && condition.resolved && (
+        <Row cols="1fr">
+          <StatusInfoInline status={StatusInfoType.warning}>
+            This condition is already resolved.
+          </StatusInfoInline>
+        </Row>
+      )}
       <Row cols="1fr">
         <Amount
           amount={amount}
