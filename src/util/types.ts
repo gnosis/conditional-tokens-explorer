@@ -67,7 +67,14 @@ export enum BalanceErrors {
   EMPTY_BALANCE_ERC20_ERROR = `User doesn't have erc20 balance`,
 }
 
-export type Errors = ConditionErrors | PositionErrors | BalanceErrors
+export enum CollateralErrors {
+  INVALID_ADDRESS = `Invalid address`,
+  BAD_ADDRESS_CHECKSUM = `Bad address checksum`,
+  ENS_NOT_FOUND = `ENS name not found`,
+  IS_NOT_ERC20 = `The given address in not an ERC20 contract`,
+}
+
+export type Errors = ConditionErrors | PositionErrors | BalanceErrors | CollateralErrors
 
 export type Token = {
   symbol: string

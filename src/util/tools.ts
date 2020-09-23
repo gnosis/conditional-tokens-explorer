@@ -10,7 +10,7 @@ import {
   GetMultiPositions_positions,
   GetPosition_position,
 } from 'types/generatedGQL'
-import { ConditionErrors, PositionErrors, Token } from 'util/types'
+import { CollateralErrors, ConditionErrors, PositionErrors, Token } from 'util/types'
 
 export const isAddress = (address: string) => {
   try {
@@ -305,6 +305,27 @@ export const getMergePreview = (
   }
 }
 
+const humanizeMessageError = (error: string): string => {
+  let result = error
+  if (result.indexOf('(') !== -1) {
+    result = result.split('(')[0]
+  }
+
+  if (result.includes('invalid address')) {
+    result = CollateralErrors.INVALID_ADDRESS.toString()
+  } else if (result.includes('ENS name not configured')) {
+    result = CollateralErrors.ENS_NOT_FOUND.toString()
+  } else if (result.includes('bad address checksum')) {
+    result = CollateralErrors.BAD_ADDRESS_CHECKSUM.toString()
+  } else if (result.includes('contract not deployed')) {
+    result = CollateralErrors.IS_NOT_ERC20.toString()
+  } else {
+    result = result[0].toUpperCase() + result.substr(1)
+  }
+
+  return result
+}
+
 export const getTokenSummary = async (
   networkConfig: NetworkConfig,
   provider: Provider,
@@ -317,26 +338,19 @@ export const getTokenSummary = async (
       decimals,
       symbol,
     }
-  } catch {
-    // Do nothing if is not a token from our config, instead we search with erc20Service
-  }
+  } catch (e) {
+    try {
+      const erc20Service = new ERC20Service(provider, collateralToken)
+      const { decimals, symbol } = await erc20Service.getProfileSummary()
 
-  try {
-    const erc20Service = new ERC20Service(provider, collateralToken)
-    const { decimals, symbol } = await erc20Service.getProfileSummary()
-
-    return {
-      address: collateralToken,
-      decimals,
-      symbol,
+      return {
+        address: collateralToken,
+        decimals,
+        symbol,
+      }
+    } catch (err) {
+      err.message = humanizeMessageError(err.message)
+      throw Error(err)
     }
-  } catch {
-    // Do nothing
-  }
-
-  return {
-    address: collateralToken,
-    decimals: 18,
-    symbol: '',
   }
 }

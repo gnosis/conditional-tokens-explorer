@@ -96,16 +96,34 @@ export const usePositions = (options: OptionsToSearch) => {
         const uniqueWrappedTokens = lodashUniqBy(positionListData, 'wrappedToken')
 
         const collateralTokensPromises = uniqueCollateralTokens.map(
-          async ({ collateralToken }: Position) =>
-            await getTokenSummary(networkConfig, provider, collateralToken)
+          async ({ collateralToken }: Position) => {
+            try {
+              return await getTokenSummary(networkConfig, provider, collateralToken)
+            } catch (err) {
+              return {
+                address: collateralToken,
+                decimals: 18,
+                symbol: '',
+              }
+            }
+          }
         )
         const wrappedTokensPromises = uniqueWrappedTokens.map(
-          async ({ wrappedToken }: Position) =>
-            await getTokenSummary(
-              networkConfig,
-              provider,
-              wrappedToken || ethers.constants.HashZero
-            )
+          async ({ wrappedToken }: Position) => {
+            try {
+              return await getTokenSummary(
+                networkConfig,
+                provider,
+                wrappedToken || ethers.constants.HashZero
+              )
+            } catch (err) {
+              return {
+                address: wrappedToken || ethers.constants.HashZero,
+                decimals: 18,
+                symbol: '',
+              }
+            }
+          }
         )
         const collateralTokensResolved = await Promise.all(collateralTokensPromises)
         const wrappedTokensResolved = await Promise.all(wrappedTokensPromises)
@@ -115,20 +133,22 @@ export const usePositions = (options: OptionsToSearch) => {
 
           const collateralTokenFound = collateralTokensResolved.filter(
             (collateralTokenInformation) =>
+              collateralTokenInformation &&
               collateralTokenInformation?.address.toLowerCase() === collateralToken.toLowerCase()
           )
           const wrappedTokenFound = wrappedTokensResolved.filter(
             (wrappedTokenInformation) =>
+              wrappedTokenInformation &&
               wrappedTokenInformation?.address.toLowerCase() === wrappedToken?.toLowerCase()
           )
 
           const userBalanceERC1155WithDecimals =
-            collateralTokenFound.length && collateralTokenFound[0].decimals
+            collateralTokenFound && collateralTokenFound.length && collateralTokenFound[0].decimals
               ? formatBigNumber(userBalanceERC1155, collateralTokenFound[0].decimals)
               : userBalanceERC1155.toString()
 
           const userBalanceERC20WithDecimals =
-            collateralTokenFound.length && collateralTokenFound[0].decimals
+            collateralTokenFound && collateralTokenFound.length && collateralTokenFound[0].decimals
               ? formatBigNumber(userBalanceERC20, collateralTokenFound[0].decimals) // Using the collateralToken is OK
               : userBalanceERC20.toString()
 
