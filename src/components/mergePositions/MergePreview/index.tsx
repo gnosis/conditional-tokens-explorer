@@ -10,11 +10,14 @@ import { TitleValue } from 'components/text/TitleValue'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { getLogger } from 'util/logger'
 import { arePositionMergeablesByCondition, getMergePreview, getTokenSummary } from 'util/tools'
 
 interface Props {
   amount: BigNumber
 }
+
+const logger = getLogger('MergePreview')
 
 export const MergePreview = ({ amount }: Props) => {
   const { networkConfig, provider } = useWeb3ConnectedOrInfura()
@@ -30,11 +33,15 @@ export const MergePreview = ({ amount }: Props) => {
   useEffect(() => {
     let cancelled = false
     if (canMergePositions && condition && positions.length > 0) {
-      getTokenSummary(networkConfig, provider, positions[0].collateralToken.id).then((token) => {
-        if (!cancelled) {
-          setMergedPosition(getMergePreview(positions, condition, amount, token))
-        }
-      })
+      getTokenSummary(networkConfig, provider, positions[0].collateralToken.id)
+        .then((token) => {
+          if (!cancelled) {
+            setMergedPosition(getMergePreview(positions, condition, amount, token))
+          }
+        })
+        .catch((err) => {
+          logger.error(err)
+        })
     } else {
       setMergedPosition('')
     }
