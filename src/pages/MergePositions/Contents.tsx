@@ -203,7 +203,7 @@ export const Contents = () => {
             status === Status.Error ? { text: 'OK', onClick: () => setStatus(null) } : undefined
           }
           icon={status === Status.Error ? IconTypes.error : IconTypes.spinner}
-          message={status === Status.Error ? error?.message : 'Waiting...'}
+          message={status === Status.Error ? error?.message : 'Working...'}
           title={status === Status.Error ? 'Error' : 'Merge Positions'}
         />
       )}

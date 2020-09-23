@@ -29,6 +29,10 @@ export const dataTableCSS = css`
       }
     }
 
+    .rdt_Table {
+      min-width: fit-content;
+    }
+
     .rdt_TableCol {
       div {
         white-space: nowrap;

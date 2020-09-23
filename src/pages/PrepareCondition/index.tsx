@@ -316,7 +316,7 @@ export const PrepareCondition = () => {
               error ? { text: 'OK', onClick: () => setIsTransactionExecuting(true) } : undefined
             }
             icon={error ? IconTypes.error : IconTypes.spinner}
-            message={error ? error.message : 'Waiting...'}
+            message={error ? error.message : 'Working...'}
             title={error ? 'Error' : 'Prepare Condition'}
           />
         )}

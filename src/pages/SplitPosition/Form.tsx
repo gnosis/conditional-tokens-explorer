@@ -242,7 +242,7 @@ export const Form = ({
   const fullLoadingMessage = status.isFailure()
     ? status.getFailure()
     : status.isLoading()
-    ? 'Waiting...'
+    ? 'Working...'
     : undefined
 
   const splitPositionsTable =

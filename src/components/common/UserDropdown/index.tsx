@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { Button } from 'components/buttons/Button'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
-import { ChevronDown } from 'components/common/UserDropdown/img/ChevronDown'
+import { ChevronDown } from 'components/icons/ChevronDown'
 import { Pill } from 'components/pureStyledComponents/Pill'
 import { Connected, useWeb3Connected } from 'contexts/Web3Context'
 import { truncateStringInTheMiddle } from 'util/tools'
@@ -39,7 +39,7 @@ const DropdownButton = styled.div`
     }
 
     .chevronDown {
-      path {
+      .fill {
         fill: ${(props) => props.theme.colors.darkerGray};
       }
     }
@@ -216,11 +216,11 @@ export const UserDropdown: React.FC = (props) => {
 
   return (
     <Wrapper
-      {...props}
       activeItemHighlight={false}
       dropdownButtonContent={<UserDropdownButton data={data} />}
       dropdownPosition={DropdownPosition.right}
       items={headerDropdownItems}
+      {...props}
     />
   )
 }

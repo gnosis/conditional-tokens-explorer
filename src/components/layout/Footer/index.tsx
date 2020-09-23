@@ -20,11 +20,20 @@ const Wrapper = styled.footer`
 
 const Items = styled.ul`
   &.footerItems {
+    align-items: center;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     list-style: none;
     margin: 0;
-    padding: 0;
+    padding-bottom: 0;
+    padding-left: ${(props) => props.theme.layout.horizontalPadding};
+    padding-right: ${(props) => props.theme.layout.horizontalPadding};
+    padding-top: 0;
+
+    @media (min-width: ${(props) => props.theme.themeBreakPoints.mdPre}) {
+      flex-direction: row;
+      justify-content: center;
+    }
   }
 `
 
@@ -56,10 +65,12 @@ const FooterLink = styled(NavLink)`
 `
 
 const Break = styled.span`
-  margin: 0 6px;
+  @media (min-width: ${(props) => props.theme.themeBreakPoints.mdPre}) {
+    margin: 0 6px;
 
-  &:after {
-    content: '|';
+    &:after {
+      content: '|';
+    }
   }
 `
 

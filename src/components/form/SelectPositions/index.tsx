@@ -1,5 +1,6 @@
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect } from 'react'
+import styled from 'styled-components'
 
 import { ButtonControl, ButtonControlType } from 'components/buttons/ButtonControl'
 import { TextfieldFetchableData } from 'components/form/TextfieldFetchableData'
@@ -22,6 +23,10 @@ import { useWithToken } from 'hooks/useWithToken'
 import { GetMultiPositions_positions } from 'types/generatedGQL'
 import { positionString } from 'util/tools'
 import { Errors } from 'util/types'
+
+const PositionText = styled.span`
+  max-width: calc(100% - 30px);
+`
 
 interface Props {
   title: string
@@ -177,7 +182,7 @@ export const SelectPositions = ({
                 {positionsToDisplay.length ? (
                   positionsToDisplay.map((position: string, index: number) => (
                     <StripedListItem key={index}>
-                      <span>{position}</span>
+                      <PositionText>{position}</PositionText>
                       <ButtonControl
                         buttonType={ButtonControlType.delete}
                         onClick={() => onRemovePosition(positions[index].id)}

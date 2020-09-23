@@ -28,7 +28,7 @@ const Wrapper = styled.button`
     background-color: ${(props) => props.theme.colors.whitesmoke2};
 
     svg {
-      rect {
+      .fill {
         fill: ${(props) => props.theme.colors.darkerGray};
       }
     }

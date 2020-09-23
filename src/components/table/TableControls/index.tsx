@@ -3,16 +3,27 @@ import styled from 'styled-components'
 
 const Wrapper = styled.div`
   align-items: center;
-  display: flex;
+  display: block;
   margin-bottom: 20px;
+
+  @media (min-width: ${(props) => props.theme.themeBreakPoints.md}) {
+    display: flex;
+  }
 `
 
 const Start = styled.div`
-  margin-right: auto;
+  margin-bottom: 10px;
+
+  @media (min-width: ${(props) => props.theme.themeBreakPoints.md}) {
+    margin-bottom: 0;
+    margin-right: auto;
+  }
 `
 
 const End = styled.div`
-  margin-left: auto;
+  @media (min-width: ${(props) => props.theme.themeBreakPoints.md}) {
+    margin-left: auto;
+  }
 `
 
 interface Props {

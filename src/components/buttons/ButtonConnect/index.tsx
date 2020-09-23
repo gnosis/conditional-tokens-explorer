@@ -25,14 +25,14 @@ const Wrapper = styled.button`
       opacity: 0.5;
     }
 
-    path {
+    .fill {
       fill: ${(props) => props.theme.colors.error};
     }
 
     &:hover {
       color: ${(props) => darken(0.15, props.theme.colors.error)};
 
-      path {
+      .fill {
         fill: ${(props) => darken(0.15, props.theme.colors.error)};
       }
     }
@@ -43,11 +43,16 @@ const Text = styled.span`
   margin-right: 10px;
 `
 
+interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
+  className?: string
+}
+
 export const ButtonConnect: React.FC<ButtonHTMLAttributes<HTMLButtonElement>> = (props) => {
+  const { className, ...restProps } = props
   const { connect } = useWeb3Disconnected()
 
   return (
-    <Wrapper className="buttonConnect" onClick={connect} {...props}>
+    <Wrapper className={`buttonConnect ${className}`} onClick={connect} {...restProps}>
       <Text>Connect To Wallet</Text>
       <ChevronRight />
     </Wrapper>

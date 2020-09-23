@@ -27,7 +27,7 @@ const Wrapper = styled.button`
     border-color: ${(props) => props.theme.colors.primary};
 
     svg {
-      path {
+      .fill {
         fill: ${(props) => props.theme.colors.primary};
       }
     }

@@ -3,19 +3,29 @@ import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { InnerContainer } from 'components/pureStyledComponents/InnerContainer'
+import { navItems } from 'config/constants'
 
 const Wrapper = styled.nav`
-  background-color: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 2px 8px 0 rgba(212, 213, 211, 0.7);
-  display: block;
-  flex-shrink: 0;
-  height: 36px;
+  display: none;
+
+  @media (min-width: ${(props) => props.theme.themeBreakPoints.md}) {
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 2px 8px 0 rgba(212, 213, 211, 0.7);
+    display: flex;
+    flex-shrink: 0;
+    height: 36px;
+    max-width: 100%;
+  }
 `
 
 const MenuItems = styled(InnerContainer)`
-  flex-direction: row;
+  flex-direction: column;
   flex-shrink: 0;
-  height: 100%;
+
+  @media (min-width: ${(props) => props.theme.themeBreakPoints.md}) {
+    flex-direction: row;
+    height: 100%;
+  }
 `
 
 const Item = styled(NavLink)`
@@ -52,41 +62,10 @@ const Item = styled(NavLink)`
 `
 
 export const Mainmenu: React.FC = (props) => {
-  const items = [
-    {
-      title: 'Conditions',
-      url: '/conditions',
-    },
-    {
-      title: 'Positions',
-      url: '/positions',
-    },
-    {
-      title: 'Prepare Condition',
-      url: '/prepare',
-    },
-    {
-      title: 'Split Position',
-      url: '/split',
-    },
-    {
-      title: 'Merge Positions',
-      url: '/merge',
-    },
-    {
-      title: 'Report Payouts',
-      url: '/report',
-    },
-    {
-      title: 'Redeem Positions',
-      url: '/redeem',
-    },
-  ]
-
   return (
     <Wrapper {...props}>
       <MenuItems>
-        {items.map((item, index) => {
+        {navItems.map((item, index) => {
           return (
             <Item activeClassName="active" key={index} to={item.url}>
               {item.title}

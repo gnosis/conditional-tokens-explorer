@@ -1,7 +1,11 @@
 import React from 'react'
 import styled from 'styled-components'
 
-const Wrapper = styled.svg``
+const Wrapper = styled.svg`
+  .fill {
+    fill: ${(props) => props.theme.colors.mediumGrey};
+  }
+`
 
 export const Magnifier: React.FC<{ className?: string }> = (props) => (
   <Wrapper
@@ -14,8 +18,8 @@ export const Magnifier: React.FC<{ className?: string }> = (props) => (
   >
     <path d="M0 0h20v20H0z" fill="none" fillRule="evenodd" />
     <path
+      className="fill"
       d="M3.6 8.4a4.8 4.8 0 1 1 4.8 4.8 4.8 4.8 0 0 1-4.8-4.8m14.164 8.234L13.45 12.32a6.414 6.414 0 1 0-1.132 1.132l4.314 4.314a.8.8 0 0 0 1.131-1.131"
-      fill="#b2b5b2"
       fillRule="evenodd"
     />
   </Wrapper>

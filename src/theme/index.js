@@ -1,4 +1,4 @@
-const darkGrey = '#5D6D74'
+const darkGrey = '#5d6d74'
 const darkerGray = '#445055'
 const error = '#db3a3d'
 const errorDark = '#BC3033'
@@ -168,7 +168,8 @@ const theme = {
   },
   themeBreakPoints: {
     lg: '992px',
-    md: '768px',
+    md: '769px',
+    mdPre: '768px',
     sm: '480px',
     xl: '1024px',
     xs: '320px',

@@ -17,7 +17,7 @@ const Wrapper = styled.button<{ light?: boolean }>`
   ${(props) =>
     props.light &&
     `svg {
-      path {
+      .fill {
         fill: #b2b5b2;
       }
     }`}
@@ -28,7 +28,7 @@ const Wrapper = styled.button<{ light?: boolean }>`
 
   &:hover {
     svg {
-      path {
+      .fill {
         fill: ${(props) => props.theme.colors.primary};
       }
     }

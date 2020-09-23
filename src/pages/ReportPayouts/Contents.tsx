@@ -125,7 +125,7 @@ export const Contents: React.FC = () => {
             error ? { text: 'OK', onClick: () => setTransactionStatus(Status.Ready) } : undefined
           }
           icon={error ? IconTypes.error : IconTypes.spinner}
-          message={error ? error.message : 'Waiting...'}
+          message={error ? error.message : 'Working...'}
           title={error ? 'Error' : 'Report payout'}
         />
       )}

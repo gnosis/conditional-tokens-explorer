@@ -77,3 +77,34 @@ export const WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_GANACHE =
 export const CONFIRMATIONS_TO_WAIT = Number(process.env.REACT_APP_CONFIRMATIONS_TO_WAIT || 4)
 
 export const GOOGLE_ANALYTICS_ID = process.env.REACT_APP_GOOGLE_ANALYTICS_ID || null
+
+export const navItems = [
+  {
+    title: 'Conditions',
+    url: '/conditions',
+  },
+  {
+    title: 'Positions',
+    url: '/positions',
+  },
+  {
+    title: 'Prepare Condition',
+    url: '/prepare',
+  },
+  {
+    title: 'Split Position',
+    url: '/split',
+  },
+  {
+    title: 'Merge Positions',
+    url: '/merge',
+  },
+  {
+    title: 'Report Payouts',
+    url: '/report',
+  },
+  {
+    title: 'Redeem Positions',
+    url: '/redeem',
+  },
+]

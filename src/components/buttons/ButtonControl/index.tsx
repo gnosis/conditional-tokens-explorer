@@ -16,17 +16,17 @@ const Wrapper = styled.button`
   padding: 0;
   width: 20px;
 
-  path {
+  .fill {
     fill: ${(props) => props.theme.colors.darkGrey};
   }
 
   &:hover {
-    path {
+    .fill {
       fill: ${(props) => props.theme.colors.primary};
     }
 
     .iconDelete {
-      path {
+      .fill {
         fill: ${(props) => props.theme.colors.delete};
       }
     }
@@ -42,7 +42,7 @@ const Wrapper = styled.button`
     opacity: 0.5;
 
     svg {
-      path {
+      .fill {
         fill: ${(props) => props.theme.colors.darkGrey}!important;
       }
     }

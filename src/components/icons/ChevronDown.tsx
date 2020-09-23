@@ -1,7 +1,11 @@
 import React from 'react'
 import styled from 'styled-components'
 
-const Wrapper = styled.svg``
+const Wrapper = styled.svg`
+  .fill {
+    fill: ${(props) => props.theme.colors.darkGrey};
+  }
+`
 
 export const ChevronDown: React.FC<{ className?: string }> = (props) => (
   <Wrapper
@@ -13,8 +17,8 @@ export const ChevronDown: React.FC<{ className?: string }> = (props) => (
     {...props}
   >
     <path
+      className="fill"
       d="M6.709 5.29l-.06-.054L1.706.292A1 1 0 0 0 .292 1.706L4.586 6 .292 10.293a1 1 0 0 0 1.414 1.414l4.953-4.951.05-.047a1.014 1.014 0 0 0 0-1.42"
-      fill="#5d6d74"
       fillRule="evenodd"
       transform="rotate(90 6 6)"
     />
