@@ -13,6 +13,7 @@ import { SearchField } from 'components/form/SearchField'
 import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
 import { UnwrapModal } from 'components/modals/UnwrapModal'
 import { WrapModal } from 'components/modals/WrapModal'
+import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import { PageTitle } from 'components/pureStyledComponents/PageTitle'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { InfoCard } from 'components/statusInfo/InfoCard'
@@ -221,6 +222,7 @@ export const PositionsList = () => {
         name: 'Position Id',
         selector: 'id',
         sortable: true,
+        minWidth: '250px',
       },
       {
         // eslint-disable-next-line react/display-name
@@ -383,6 +385,7 @@ export const PositionsList = () => {
               customStyles={customStyles}
               data={data || []}
               highlightOnHover
+              noDataComponent={<EmptyContentText>No positions found.</EmptyContentText>}
               noHeader
               onRowClicked={handleRowClick}
               pagination
