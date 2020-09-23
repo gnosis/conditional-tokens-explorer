@@ -7,6 +7,10 @@ const Wrapper = styled.svg`
   position: relative;
   right: auto;
   top: auto;
+
+  .fill {
+    fill: ${(props) => props.theme.colors.error};
+  }
 `
 
 export const ChevronRight: React.FC<{ className?: string }> = (props) => (
@@ -18,9 +22,8 @@ export const ChevronRight: React.FC<{ className?: string }> = (props) => (
     {...props}
   >
     <path
+      className="fill"
       d="M6.71 5.29l-.06-.054L1.707.292A1 1 0 00.293 1.706L4.587 6 .293 10.293a1 1 0 001.414 1.414L6.66 6.756l.05-.047a1.014 1.014 0 000-1.42"
-      data-name="chevron right"
-      fill="#db3a3d"
       fillRule="evenodd"
     />
   </Wrapper>
