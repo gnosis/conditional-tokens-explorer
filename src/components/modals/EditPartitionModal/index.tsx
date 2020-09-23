@@ -92,7 +92,7 @@ const ButtonBulk = styled(ButtonBulkMove)<{ flipVertical?: boolean }>`
       border-color: ${props.theme.colors.primary};
       transform: rotateZ(180deg);
 
-      path {
+      .fill {
         fill: ${props.theme.colors.primary};
       }
   `}
