@@ -8,6 +8,7 @@ import { DEFAULT_NETWORK_ID, INFURA_ID } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 import { RealitioService } from 'services/realitio'
+import { Wrapper1155Service } from 'services/wrapper1155'
 import { getLogger } from 'util/logger'
 
 export enum Web3ContextStatus {
@@ -44,6 +45,7 @@ export type Connected = {
   networkConfig: NetworkConfig
   CTService: ConditionalTokensService
   RtioService: RealitioService
+  WrapperService: Wrapper1155Service
   disconnect: () => void
 }
 
@@ -53,6 +55,7 @@ export type Infura = {
   networkConfig: NetworkConfig
   CTService: ConditionalTokensService
   RtioService: RealitioService
+  WrapperService: Wrapper1155Service
   connect: () => void
 }
 
@@ -186,6 +189,8 @@ export const Web3ContextProvider = ({ children }: Props) => {
         const networkConfig = new NetworkConfig(networkId)
         const RtioService = new RealitioService(networkConfig, provider, signer)
         const CTService = new ConditionalTokensService(networkConfig, provider, signer)
+        const WrapperService = new Wrapper1155Service(networkConfig, provider, signer)
+
         const address = await signer.getAddress()
         setWeb3Status({
           _type: Web3ContextStatus.Connected,
@@ -194,6 +199,7 @@ export const Web3ContextProvider = ({ children }: Props) => {
           networkConfig,
           CTService,
           RtioService,
+          WrapperService,
           address,
         } as Connected)
       } else {
@@ -220,12 +226,14 @@ export const Web3ContextProvider = ({ children }: Props) => {
         const networkConfig = new NetworkConfig(networkId)
         const RtioService = new RealitioService(networkConfig, provider)
         const CTService = new ConditionalTokensService(networkConfig, provider)
+        const WrapperService = new Wrapper1155Service(networkConfig, provider)
         setWeb3Status({
           _type: Web3ContextStatus.Infura,
           provider,
           networkConfig,
           CTService,
           RtioService,
+          WrapperService,
         } as Infura)
       } else {
         setWeb3Status({

@@ -37,6 +37,9 @@ export const buildQueryPositions = (options: PositionsListType = DEFAULT_OPTIONS
       collateralToken {
         id
       }
+      wrappedToken {
+        id
+      }
     }
   }
   `
@@ -49,6 +52,9 @@ const positionFragment = gql`
     indexSets
     activeValue
     collateralToken {
+      id
+    }
+    wrappedToken {
       id
     }
     collection {

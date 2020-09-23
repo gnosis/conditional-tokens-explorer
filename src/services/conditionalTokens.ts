@@ -97,6 +97,10 @@ export class ConditionalTokensService {
     return CTHelpers.getPositionId(collateralToken, collectionId)
   }
 
+  get address(): string {
+    return this.contract.address
+  }
+
   async getPositionsFromPartition(
     partition: BigNumber[],
     parentCollection: string,
@@ -255,7 +259,7 @@ export class ConditionalTokensService {
       addressTo,
       positionId,
       outcomeTokensToTransfer,
-      ethers.constants.HashZero
+      '0x'
     )
     return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
   }
