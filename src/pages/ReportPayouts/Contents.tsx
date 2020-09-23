@@ -4,9 +4,7 @@ import { useForm } from 'react-hook-form'
 
 import { Button } from 'components/buttons'
 import { CenteredCard } from 'components/common/CenteredCard'
-import { Modal } from 'components/common/Modal'
 import { SelectCondition } from 'components/form/SelectCondition'
-import { SuccessIcon } from 'components/icons/SuccessIcon'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
 import { Row } from 'components/pureStyledComponents/Row'
@@ -132,14 +130,16 @@ export const Contents: React.FC = () => {
         />
       )}
       {transactionStatus === Status.Ready && (
-        <Modal
-          isOpen={transactionStatus === Status.Ready}
-          onRequestClose={() => setTransactionStatus(null)}
-          subTitle={'Report completed'}
+        <FullLoading
+          actionButton={
+            transactionStatus === Status.Ready
+              ? { text: 'OK', onClick: () => setTransactionStatus(null) }
+              : undefined
+          }
+          icon={IconTypes.ok}
+          message={'Report Finished'}
           title={'Report Payouts'}
-        >
-          <SuccessIcon />
-        </Modal>
+        />
       )}
       <ErrorContainer>
         {payoutEmptyError && <Error>{PAYOUTS_POSITIVE_ERROR}</Error>}

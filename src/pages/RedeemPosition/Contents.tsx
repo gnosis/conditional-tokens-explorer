@@ -4,10 +4,8 @@ import React, { useCallback } from 'react'
 
 import { Button } from 'components/buttons'
 import { CenteredCard } from 'components/common/CenteredCard'
-import { Modal } from 'components/common/Modal'
 import { SelectCondition } from 'components/form/SelectCondition'
 import { SelectPositions } from 'components/form/SelectPositions'
-import { SuccessIcon } from 'components/icons/SuccessIcon'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
 import { Row } from 'components/pureStyledComponents/Row'
@@ -131,14 +129,16 @@ export const Contents = () => {
         />
       )}
       {statusTransaction === Status.Ready && (
-        <Modal
-          isOpen={statusTransaction === Status.Ready}
-          onRequestClose={() => setStatusTransaction(null)}
-          subTitle={'Redeem completed'}
-          title={'Redeem Positions'}
-        >
-          <SuccessIcon />
-        </Modal>
+        <FullLoading
+          actionButton={
+            statusTransaction === Status.Ready
+              ? { text: 'OK', onClick: () => setStatusTransaction(null) }
+              : undefined
+          }
+          icon={IconTypes.ok}
+          message={'Redeem Finished'}
+          title={'Redeem Position'}
+        />
       )}
       <ButtonContainer>
         <Button disabled={disabled} onClick={onRedeem}>

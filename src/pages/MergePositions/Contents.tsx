@@ -4,12 +4,11 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { Button } from 'components/buttons/Button'
 import { CenteredCard } from 'components/common/CenteredCard'
-import { Modal } from 'components/common/Modal'
-import { TokenIcon } from 'components/common/TokenIcon'
 import { Amount } from 'components/form/Amount'
 import { SelectCondition } from 'components/form/SelectCondition'
 import { SelectPositions } from 'components/form/SelectPositions'
 import { MergePreview } from 'components/mergePositions/MergePreview'
+import { MergeResultModal } from 'components/mergePositions/MergeResultModal'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { Row } from 'components/pureStyledComponents/Row'
 import { FullLoading } from 'components/statusInfo/FullLoading'
@@ -24,8 +23,10 @@ import { getLogger } from 'util/logger'
 import {
   arePositionMergeables,
   arePositionMergeablesByCondition,
+  getFreeIndexSet,
+  getFullIndexSet,
   getTokenSummary,
-  isPositionIdValid,
+  isPartitionFullIndexSet,
   minBigNumber,
 } from 'util/tools'
 import { Status, Token } from 'util/types'
@@ -49,7 +50,7 @@ export const Contents = () => {
   const [status, setStatus] = useState<Maybe<Status>>(null)
   const [error, setError] = useState<Maybe<Error>>(null)
   const [collateralToken, setCollateralToken] = useState<Maybe<Token>>(null)
-  const [mergeResult, setMergeResult] = useState<Maybe<string>>(null)
+  const [mergeResult, setMergeResult] = useState<string>('')
 
   const canMergePositions = useMemo(() => {
     return condition && arePositionMergeablesByCondition(positions, condition)
@@ -135,12 +136,31 @@ export const Contents = () => {
           amount
         )
 
-        //if freeindexset == 0, everything is merged
-        if (parentCollectionId === NULL_PARENT_ID) {
-          setMergeResult(collateralToken.id)
+        // if freeindexset == 0, everything was merged to...
+        if (isPartitionFullIndexSet(condition.outcomeSlotCount, partition)) {
+          if (parentCollectionId === NULL_PARENT_ID) {
+            // original collateral,
+            setMergeResult(collateralToken.id)
+          } else {
+            // or a position
+            setMergeResult(
+              ConditionalTokensService.getPositionId(collateralToken.id, parentCollectionId)
+            )
+          }
         } else {
+          const indexSetOfMergedPosition = new BigNumber(
+            getFreeIndexSet(condition.outcomeSlotCount, partition) ^
+              getFullIndexSet(condition.outcomeSlotCount)
+          )
           setMergeResult(
-            ConditionalTokensService.getPositionId(collateralToken.id, parentCollectionId)
+            ConditionalTokensService.getPositionId(
+              collateralToken.id,
+              ConditionalTokensService.getCollectionId(
+                parentCollectionId,
+                condition.id,
+                indexSetOfMergedPosition
+              )
+            )
           )
         }
 
@@ -160,7 +180,8 @@ export const Contents = () => {
     clearPositions()
     clearCondition()
     updateBalances([])
-    setMergeResult(null)
+    setMergeResult('')
+    setStatus(null)
   }, [clearPositions, clearCondition, updateBalances])
 
   return (
@@ -201,24 +222,14 @@ export const Contents = () => {
           title={status === Status.Error ? 'Error' : 'Merge Positions'}
         />
       )}
-      {status === Status.Ready && mergeResult && (
-        <Modal
+      {status === Status.Ready && collateralToken && (
+        <MergeResultModal
+          amount={amount}
+          closeAction={clearComponent}
+          collateralToken={collateralToken}
           isOpen={status === Status.Ready}
-          onRequestClose={clearComponent}
-          subTitle={
-            isPositionIdValid(mergeResult) ? (
-              `Positions were successfully merged into position ${mergeResult}`
-            ) : collateralToken ? (
-              <>
-                Positions were merged into collateral token{' '}
-                <TokenIcon symbol={collateralToken.symbol}></TokenIcon>
-              </>
-            ) : (
-              `Positions were merged into collateral token ${mergeResult}`
-            )
-          }
-          title={'Merge Positions'}
-        ></Modal>
+          mergeResult={mergeResult}
+        ></MergeResultModal>
       )}
       <ButtonContainer>
         <Button disabled={disabled} onClick={onMerge}>

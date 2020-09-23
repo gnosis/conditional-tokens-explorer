@@ -354,3 +354,22 @@ export const getTokenSummary = async (
     }
   }
 }
+
+export const getFullIndexSet = (outcomeSlotCount: number) => {
+  return (1 << outcomeSlotCount) - 1
+}
+
+export const getFreeIndexSet = (outcomeSlotCount: number, partition: number[]): number => {
+  const fullIndexSet = getFullIndexSet(outcomeSlotCount)
+
+  return partition.reduce((acc, p) => {
+    return acc ^ p
+  }, fullIndexSet)
+}
+export const isPartitionFullIndexSet = (
+  outcomesSlotCount: number,
+  partition: number[]
+): boolean => {
+  const freeIndexSet = getFreeIndexSet(outcomesSlotCount, partition)
+  return freeIndexSet === 0
+}
