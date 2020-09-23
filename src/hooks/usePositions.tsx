@@ -17,6 +17,7 @@ export type UserBalanceWithDecimals = {
   userBalanceERC1155Numbered: number
   userBalanceERC20Numbered: number
   collateralTokenERC1155: Token
+  collateralTokenSymbol: string
   collateralTokenERC20: Token
 }
 
@@ -159,6 +160,10 @@ export const usePositions = (options: OptionsToSearch) => {
             userBalanceERC1155Numbered: Number(userBalanceERC1155WithDecimals),
             userBalanceERC20Numbered: Number(userBalanceERC20WithDecimals),
             collateralTokenERC1155: collateralTokenFound.length && collateralTokenFound[0],
+            collateralTokenSymbol:
+              collateralTokenFound.length && collateralTokenFound[0]
+                ? collateralTokenFound[0].symbol
+                : '',
             collateralTokenERC20: wrappedTokenFound.length && wrappedTokenFound[0],
           } as PositionWithUserBalanceWithDecimals
         })

@@ -236,7 +236,7 @@ export const PositionsList = () => {
           )
         },
         name: 'Collateral',
-        selector: 'collateralToken',
+        selector: 'collateralTokenSymbol',
         sortable: true,
       },
     ]
