@@ -2,6 +2,7 @@ import React from 'react'
 
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { ERC20Service } from 'services/erc20'
+import { humanizeMessageError } from 'util/tools'
 import { Token } from 'util/types'
 
 export const useCollateral = (
@@ -25,12 +26,14 @@ export const useCollateral = (
           if (!cancelled) {
             if (token) {
               setCollateral(token)
+              setError(null)
             } else {
               setCollateral(null)
             }
           }
         } catch (err) {
           if (!cancelled) {
+            err.message = humanizeMessageError(err.message)
             setError(err)
           }
         } finally {

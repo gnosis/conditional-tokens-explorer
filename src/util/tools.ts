@@ -305,8 +305,8 @@ export const getMergePreview = (
   }
 }
 
-const humanizeMessageError = (error: string): string => {
-  let result = error
+export const humanizeMessageError = (error: string): string => {
+  let result = error || ''
   if (result.indexOf('(') !== -1) {
     result = result.split('(')[0]
   }
