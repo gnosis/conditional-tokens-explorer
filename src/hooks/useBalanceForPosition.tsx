@@ -29,7 +29,7 @@ export const useBalanceForPosition = (positionId: string) => {
 
   if (data && data?.userPositions.length > 0) {
     const userPosition = data.userPositions[0]
-    const { balance: balanceERC1155, position, wrappedBalance: balanceERC20 } = userPosition
+    const { balance: balanceERC1155, wrappedBalance: balanceERC20 } = userPosition
     balanceData.balanceERC1155 = new BigNumber(balanceERC1155)
     balanceData.balanceERC20 = new BigNumber(balanceERC20)
   }
