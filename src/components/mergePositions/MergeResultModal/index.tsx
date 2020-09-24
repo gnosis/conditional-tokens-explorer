@@ -32,7 +32,7 @@ export const MergeResultModal = ({
     >
       <DisplayTablePositions
         callbackOnHistoryPush={closeAction}
-        collateral={collateralToken.symbol}
+        collateral={collateralToken.address}
         positionIds={[{ positionId: mergeResult, balance: amount }]}
       />
     </Modal>
