@@ -207,6 +207,7 @@ export const Form = ({
   }, [DEFAULT_VALUES, clearCondition, reset, setStatus])
 
   const {
+    allowanceError,
     allowanceFinished,
     fetchingAllowance,
     shouldDisplayAllowance,
@@ -283,6 +284,7 @@ export const Form = ({
       {isAllowanceVisible && (
         <SetAllowance
           collateral={collateral}
+          error={allowanceError}
           fetching={fetchingAllowance}
           finished={allowanceFinished}
           onUnlock={unlockCollateral}
