@@ -22,7 +22,7 @@ const Wrapper = styled.div`
   padding: 20px;
   position: fixed;
   width: 100%;
-  z-index: 12;
+  z-index: 123;
 `
 
 const Content = styled.div`
@@ -61,9 +61,16 @@ const ButtonContainer = styled.div`
 `
 
 const ButtonAccept = styled(Button)`
-  font-size: 18px;
-  height: 36px;
-  max-width: 170px;
+  &.buttonAccept {
+    bottom: auto;
+    font-size: 18px;
+    height: 36px;
+    left: auto;
+    max-width: 170px;
+    position: relative;
+    right: auto;
+    top: auto;
+  }
 `
 
 const ButtonClose = styled.button`
@@ -144,7 +151,11 @@ export const CookiesBanner = () => {
           support.
         </Text>
         <ButtonContainer>
-          <ButtonAccept buttonType={ButtonType.primaryInverted} onClick={acceptCookies}>
+          <ButtonAccept
+            buttonType={ButtonType.primaryInverted}
+            className="buttonAccept"
+            onClick={acceptCookies}
+          >
             Accept Cookies
           </ButtonAccept>
         </ButtonContainer>
