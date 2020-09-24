@@ -88,9 +88,7 @@ export const PositionProvider = (props: Props) => {
   const {
     balanceERC20,
     balanceERC1155,
-    collateralTokenAddress,
     refetch: refetchBalances,
-    wrappedTokenAddress,
   } = useBalanceForPosition(positionId)
 
   if (position && balanceERC1155 && balanceERC1155.isZero() && checkForEmptyBalanceERC1155) {
@@ -123,8 +121,8 @@ export const PositionProvider = (props: Props) => {
     positionId,
     balanceERC1155,
     balanceERC20,
-    collateralTokenAddress,
-    wrappedTokenAddress,
+    collateralTokenAddress:  position?.collateralToken?.id ?? '',
+    wrappedTokenAddress: position?.wrappedToken?.id ?? '',
     refetchBalances,
     errors,
     loading,

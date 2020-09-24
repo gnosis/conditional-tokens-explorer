@@ -22,8 +22,6 @@ export const useBalanceForPosition = (positionId: string) => {
   const balanceData = {
     balanceERC1155: new BigNumber(0),
     balanceERC20: new BigNumber(0),
-    collateralTokenAddress: '',
-    wrappedTokenAddress: '',
     error,
     loading,
     refetch,
@@ -34,8 +32,6 @@ export const useBalanceForPosition = (positionId: string) => {
     const { balance: balanceERC1155, position, wrappedBalance: balanceERC20 } = userPosition
     balanceData.balanceERC1155 = new BigNumber(balanceERC1155)
     balanceData.balanceERC20 = new BigNumber(balanceERC20)
-    balanceData.collateralTokenAddress = position?.collateralToken?.id ?? ''
-    balanceData.wrappedTokenAddress = position?.wrappedToken?.id ?? ''
   }
 
   return balanceData
