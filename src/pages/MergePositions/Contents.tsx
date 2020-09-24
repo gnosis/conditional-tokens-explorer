@@ -9,11 +9,12 @@ import { Amount } from 'components/form/Amount'
 import { SelectCondition } from 'components/form/SelectCondition'
 import { SelectPositions } from 'components/form/SelectPositions'
 import { MergePreview } from 'components/mergePositions/MergePreview'
+import { MergeResultModal } from 'components/mergePositions/MergeResultModal'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { Row } from 'components/pureStyledComponents/Row'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
-import { ZERO_BN } from 'config/constants'
+import { NULL_PARENT_ID, ZERO_BN } from 'config/constants'
 import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
@@ -23,7 +24,10 @@ import { getLogger } from 'util/logger'
 import {
   arePositionMergeables,
   arePositionMergeablesByCondition,
+  getFreeIndexSet,
+  getFullIndexSet,
   getTokenSummary,
+  isPartitionFullIndexSet,
   minBigNumber,
 } from 'util/tools'
 import { Status, Token } from 'util/types'
@@ -47,6 +51,7 @@ export const Contents = () => {
   const [status, setStatus] = useState<Maybe<Status>>(null)
   const [error, setError] = useState<Maybe<Error>>(null)
   const [collateralToken, setCollateralToken] = useState<Maybe<Token>>(null)
+  const [mergeResult, setMergeResult] = useState<string>('')
 
   const canMergePositions = useMemo(() => {
     return condition && arePositionMergeablesByCondition(positions, condition)
@@ -136,10 +141,33 @@ export const Contents = () => {
           amount
         )
 
-        setAmount(ZERO_BN)
-        clearPositions()
-        clearCondition()
-        updateBalances([])
+        // if freeindexset == 0, everything was merged to...
+        if (isPartitionFullIndexSet(condition.outcomeSlotCount, partition)) {
+          if (parentCollectionId === NULL_PARENT_ID) {
+            // original collateral,
+            setMergeResult(collateralToken.id)
+          } else {
+            // or a position
+            setMergeResult(
+              ConditionalTokensService.getPositionId(collateralToken.id, parentCollectionId)
+            )
+          }
+        } else {
+          const indexSetOfMergedPosition = new BigNumber(
+            getFreeIndexSet(condition.outcomeSlotCount, partition) ^
+              getFullIndexSet(condition.outcomeSlotCount)
+          )
+          setMergeResult(
+            ConditionalTokensService.getPositionId(
+              collateralToken.id,
+              ConditionalTokensService.getCollectionId(
+                parentCollectionId,
+                condition.id,
+                indexSetOfMergedPosition
+              )
+            )
+          )
+        }
 
         setStatus(Status.Ready)
       } else {
@@ -150,17 +178,16 @@ export const Contents = () => {
       setError(err)
       logger.error(err)
     }
-  }, [
-    positions,
-    condition,
-    statusContext,
-    CTService,
-    amount,
-    clearPositions,
-    clearCondition,
-    updateBalances,
-    connect,
-  ])
+  }, [positions, condition, statusContext, CTService, amount, connect])
+
+  const clearComponent = useCallback(() => {
+    setAmount(ZERO_BN)
+    clearPositions()
+    clearCondition()
+    updateBalances([])
+    setMergeResult('')
+    setStatus(null)
+  }, [clearPositions, clearCondition, updateBalances])
 
   return (
     <CenteredCard>
@@ -206,6 +233,15 @@ export const Contents = () => {
           message={status === Status.Error ? error?.message : 'Working...'}
           title={status === Status.Error ? 'Error' : 'Merge Positions'}
         />
+      )}
+      {status === Status.Ready && collateralToken && (
+        <MergeResultModal
+          amount={amount}
+          closeAction={clearComponent}
+          collateralToken={collateralToken}
+          isOpen={status === Status.Ready}
+          mergeResult={mergeResult}
+        ></MergeResultModal>
       )}
       <ButtonContainer>
         <Button disabled={disabled} onClick={onMerge}>
