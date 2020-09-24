@@ -74,6 +74,7 @@ export const usePositions = (options: OptionsToSearch) => {
     refetch: refetchUserPositions,
   } = useQuery<UserWithPositions>(UserWithPositionsQuery, {
     skip: !address,
+    fetchPolicy: 'no-cache',
     variables: {
       account: address,
     },
