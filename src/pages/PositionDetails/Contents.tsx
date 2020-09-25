@@ -336,7 +336,7 @@ export const Contents = (props: Props) => {
                   <CollateralTextAmount>
                     {!balanceERC20.isZero()
                       ? `${formatBigNumber(balanceERC20, ERC1155Decimals)} ${ERC20Symbol}`
-                      : 'No unwrapped collateral yet.'}
+                      : 'None.'}
                   </CollateralTextAmount>
                 </CollateralText>
                 <CollateralWrapButton
