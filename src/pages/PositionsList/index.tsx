@@ -230,7 +230,7 @@ export const PositionsList = () => {
           const { collateralTokenERC1155 } = row
           // Please don't delete this because the tests will explode
           return collateralTokenERC1155 ? (
-            <TokenIcon symbol={collateralTokenERC1155.symbol || ''} />
+            <TokenIcon token={collateralTokenERC1155} />
           ) : (
             row.collateralToken
           )

@@ -300,7 +300,11 @@ export const Contents = (props: Props) => {
             </>
           }
         />
-        <TitleValue title="Collateral Token" value={<TokenIcon symbol={ERC1155Symbol} />} />
+        {collateralERC1155 ? (
+          <TitleValue title="Collateral Token" value={<TokenIcon token={collateralERC1155} />} />
+        ) : (
+          '-'
+        )}
         <TitleValue
           title="Contract Address"
           value={

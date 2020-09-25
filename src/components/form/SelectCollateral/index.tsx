@@ -25,12 +25,13 @@ export const SelectCollateral = ({
 }: SelectCollateralProps) => {
   const { register, setValue, watch } = formMethods
   const watchCollateral = watch('collateral')
-  const [collateral, setCollateral] = useState(tokens[0].symbol)
-  const button = <ButtonSelect content={<TokenIcon symbol={collateral} />} />
-  const dropdownItems = tokens.map(({ address, symbol }) => {
+  const [token, setToken] = useState(tokens[0])
+  const button = <ButtonSelect content={<TokenIcon token={token} />} />
+  const dropdownItems = tokens.map((token: Token) => {
+    const { address } = token
     return (
       <SelectItem
-        content={<TokenIcon symbol={symbol} />}
+        content={<TokenIcon token={token} />}
         key={address}
         name="collateral"
         onClick={() => {
@@ -43,9 +44,9 @@ export const SelectCollateral = ({
   })
 
   useEffect(() => {
-    const token = tokens.find((t) => t.address === watchCollateral)
-    if (token) {
-      setCollateral(token.symbol)
+    const tokenFound = tokens.find((t) => t.address === watchCollateral)
+    if (tokenFound) {
+      setToken(tokenFound)
     } else {
       logger.error('Unknown token', watchCollateral)
     }
