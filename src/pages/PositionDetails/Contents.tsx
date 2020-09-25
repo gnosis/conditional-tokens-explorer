@@ -389,7 +389,7 @@ export const Contents = (props: Props) => {
       </Row>
       <Row cols="1fr" marginBottomXL>
         <TitleValue
-          title="Position"
+          title="Position Preview"
           value={<StripedListItem>{positionPreview || ''} </StripedListItem>}
         />
       </Row>
