@@ -20,7 +20,7 @@ export const useAllowanceState = (allowanceMethods: AllowanceMethods, amount: Bi
   const [hasUnlockedCollateral, setHasUnlockedCollateral] = useState(false)
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const [shouldDisplayAllowance, setShouldDisplayAllowance] = useState(true)
-  const [allowanceError, setAllowanceError] = useState('')
+  const [allowanceError, setAllowanceError] = useState<Maybe<Error>>(null)
 
   const unlockCollateral = useCallback(async () => {
     setAllowance(Remote.loading())
@@ -72,6 +72,6 @@ export const useAllowanceState = (allowanceMethods: AllowanceMethods, amount: Bi
     unlockCollateral,
     shouldDisplayAllowance,
     allowanceFinished,
-    allowanceError: allowanceError,
+    allowanceError,
   }
 }

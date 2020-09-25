@@ -51,15 +51,13 @@ interface Props {
   collateral: any
   fetching: boolean
   finished: boolean
-  error: string
+  error: Maybe<Error>
   onUnlock: () => void
 }
 
 export const SetAllowance = (props: Props) => {
   const { collateral, error, fetching, finished, onUnlock } = props
   const btnText = fetching ? 'Working...' : finished ? 'Done!' : 'Unlock'
-
-  console.log('ERROR: ' + error)
 
   return finished ? (
     <StatusInfo status={StatusInfoType.success}>
