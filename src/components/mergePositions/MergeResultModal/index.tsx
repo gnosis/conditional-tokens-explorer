@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers/utils'
 import React from 'react'
 
 import { Modal } from 'components/common/Modal'
-import { DisplayTablePositions } from 'components/splitPosition/DisplayTablePosition'
+import { DisplayTablePositions } from 'components/form/DisplayTablePosition'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
 import { formatBigNumber, isPositionIdValid } from 'util/tools'

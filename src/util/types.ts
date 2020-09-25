@@ -141,3 +141,7 @@ export interface TransferOptions {
   address: string
   positionId: string
 }
+
+export type ConditionIdsArray = {
+  conditionId: string
+}

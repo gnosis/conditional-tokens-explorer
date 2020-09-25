@@ -5,6 +5,7 @@ import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { usePositionContext } from 'contexts/PositionContext'
 import { Contents } from 'pages/PositionDetails/Contents'
+import { PositionData_conditions } from 'types/generatedGQL'
 import {
   isPositionErrorFetching,
   isPositionErrorInvalid,
@@ -34,6 +35,12 @@ export const Wrapper = (props: WrapperProps) => {
     setPositionId(positionId)
   }, [positionId, setPositionId])
 
+  const conditions = position?.conditions.map((condition: PositionData_conditions) => {
+    return {
+      conditionId: condition.id,
+    }
+  })
+
   return (
     <>
       <PageTitle>Position Details</PageTitle>
@@ -50,6 +57,7 @@ export const Wrapper = (props: WrapperProps) => {
             balanceERC1155={balanceERC1155}
             balanceERC20={balanceERC20}
             collateralTokenAddress={collateralTokenAddress}
+            conditions={conditions || []}
             position={position}
             refetchBalances={refetchBalances}
             wrappedTokenAddress={wrappedTokenAddress}
