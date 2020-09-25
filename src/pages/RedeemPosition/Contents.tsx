@@ -128,7 +128,7 @@ export const Contents = () => {
               : undefined
           }
           icon={statusTransaction === Status.Error ? IconTypes.error : IconTypes.spinner}
-          message={statusTransaction === Status.Error ? error?.message : 'Waiting...'}
+          message={statusTransaction === Status.Error ? error?.message : 'Working...'}
           title={statusTransaction === Status.Error ? 'Error' : 'Redeem Positions'}
         />
       )}
