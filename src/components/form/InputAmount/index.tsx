@@ -9,7 +9,7 @@ import { TitleValue } from 'components/text/TitleValue'
 import { ZERO_BN } from 'config/constants'
 import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
-import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useWithToken } from 'hooks/useWithToken'
 import { SplitFrom, SplitPositionFormMethods } from 'pages/SplitPosition/Form'
 import { ERC20Service } from 'services/erc20'
@@ -58,7 +58,7 @@ export const InputAmount = ({
   positionId,
   splitFrom,
 }: Props) => {
-  const { address, networkConfig, provider, signer } = useWeb3ConnectedOrInfura()
+  const { _type: status, address, networkConfig, provider, signer } = useWeb3ConnectedOrInfura()
   const { loading: positionsLoading, positionIds, positions } = useMultiPositionsContext()
   const { data: positionsWithToken } = useWithToken(positions)
 
@@ -121,17 +121,28 @@ export const InputAmount = ({
     [splitFrom, collateral]
   )
 
+  const isDisconnected = status !== Web3ContextStatus.Connected
+  const placeholder = isDisconnected
+    ? 'Please connect to your wallet...'
+    : balance && balance.isZero()
+    ? 'Please add funds to your wallet...'
+    : '0.00'
+
   return (
     <TitleValue
       title="Amount"
       titleControl={
-        balance && (
-          <TitleControlButton
-            disabled={balance.isZero()}
-            onClick={() => setValue('amount', balance, true)}
-          >
-            Use Wallet Balance (${formatBigNumber(balance, decimals)})
-          </TitleControlButton>
+        isDisconnected || !balance ? (
+          <TitleControlButton disabled>Not Connected To Wallet</TitleControlButton>
+        ) : (
+          balance && (
+            <TitleControlButton
+              disabled={balance.isZero()}
+              onClick={() => setValue('amount', balance, true)}
+            >
+              Use Wallet Balance ${formatBigNumber(balance, decimals)})
+            </TitleControlButton>
+          )
         )
       }
       value={
@@ -139,10 +150,10 @@ export const InputAmount = ({
           as={BigNumberInputWrapper}
           control={control}
           decimals={decimals}
-          disabled={(balance && balance.isZero()) || false}
+          disabled={isDisconnected || (balance && balance.isZero()) || false}
           max={(balance && balance.toString()) || undefined}
           name="amount"
-          placeholder={balance && balance.isZero() ? 'Please add funds to your wallet...' : '0.00'}
+          placeholder={placeholder}
           rules={{ required: true, validate: (amount) => amount.gt(ZERO_BN) }}
           tokenSymbol={tokenSymbol}
         />

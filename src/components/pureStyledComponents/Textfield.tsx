@@ -31,18 +31,22 @@ export const TextfieldCSS = css<TexfieldCSSProps>`
       props.error ? props.theme.textField.errorColor : props.theme.textField.borderColorActive};
   }
 
-  &::placeholder {
-    color: ${(props) => props.theme.textField.colorPlaceholder};
-    font-style: normal;
-    opacity: 1;
-  }
-
   &[disabled],
   &[disabled]:hover {
     background-color: ${(props) => props.theme.textField.backgroundColorActive};
     border-color: ${(props) => props.theme.textField.borderColor};
     cursor: not-allowed;
     opacity: 0.5;
+  }
+
+  &:disabled::placeholder {
+    color: ${(props) => props.theme.textField.color}!important;
+  }
+
+  &::placeholder {
+    color: ${(props) => props.theme.textField.colorPlaceholder};
+    font-style: normal;
+    opacity: 1;
   }
 `
 
