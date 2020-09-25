@@ -34,9 +34,7 @@ import { GetPosition_position as Position } from 'types/generatedGQL'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import { formatBigNumber, positionString, truncateStringInTheMiddle } from 'util/tools'
-import { OutcomeProps, TransferOptions } from 'util/types'
-
-import { ConditionIdsArray } from '../../util/types'
+import { OutcomeProps, TransferOptions, ConditionIdsArray } from 'util/types'
 
 const CollateralText = styled.span`
   color: ${(props) => props.theme.colors.darkerGray};
