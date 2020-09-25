@@ -217,7 +217,7 @@ export const PositionsList = () => {
       {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimals) => (
-          <CellHash onClick={() => handleRowClick(row)} underline value={row.id} />
+          <CellHash href={`/positions/${row.id}`} value={row.id} />
         ),
         name: 'Position Id',
         selector: 'id',
@@ -230,7 +230,10 @@ export const PositionsList = () => {
           const { collateralTokenERC1155 } = row
           // Please don't delete this because the tests will explode
           return collateralTokenERC1155 ? (
-            <TokenIcon symbol={collateralTokenERC1155.symbol || ''} />
+            <TokenIcon
+              onClick={() => handleRowClick(row)}
+              symbol={collateralTokenERC1155.symbol || ''}
+            />
           ) : (
             row.collateralToken
           )

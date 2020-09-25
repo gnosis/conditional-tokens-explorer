@@ -101,13 +101,7 @@ export const ConditionsList: React.FC = () => {
     {
       // eslint-disable-next-line react/display-name
       cell: (row: Conditions_conditions) => (
-        <CellHash
-          onClick={() => {
-            handleRowClick(row)
-          }}
-          underline
-          value={row.id}
-        />
+        <CellHash href={`/conditions/${row.id}`} value={row.id} />
       ),
       name: 'Condition Id',
       selector: 'createTimestamp',

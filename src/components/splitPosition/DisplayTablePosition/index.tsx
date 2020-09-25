@@ -35,16 +35,8 @@ export const DisplayTablePositions = ({
       {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionIdsArray) => {
-          const port = window.location.port !== '' ? `:${window.location.port}` : ''
           return (
-            <CellHash
-              externalLink={`${window.location.protocol}//${window.location.hostname}${port}/#/positions/${row.positionId}`}
-              onClick={() => {
-                handleRowClick(row.positionId)
-              }}
-              underline
-              value={row.positionId}
-            />
+            <CellHash externalLink href={`positions/${row.positionId}`} value={row.positionId} />
           )
         },
         maxWidth: '250px',
@@ -58,7 +50,7 @@ export const DisplayTablePositions = ({
         cell: () => {
           if (!loading) {
             return collateralFetched ? (
-              <TokenIcon symbol={collateralFetched.symbol} />
+              <TokenIcon onClick={() => handleRowClick} symbol={collateralFetched.symbol} />
             ) : (
               <span title={collateral}>{truncateStringInTheMiddle(collateral, 10, 8)}</span>
             )
@@ -96,7 +88,7 @@ export const DisplayTablePositions = ({
         sortable: true,
       },
     ]
-  }, [handleRowClick, collateralFetched, collateral, loading])
+  }, [collateralFetched, handleRowClick, collateral, loading])
 
   return (
     <DataTable
