@@ -305,25 +305,25 @@ export const getMergePreview = (
   }
 }
 
-export const humanizeMessageError = (error: string): string => {
-  let result = error || ''
-  if (result.indexOf('(') !== -1) {
-    result = result.split('(')[0]
+/**
+ * Convert message texts from Error.message from a collateral error messages
+ * it an error is not recognized by enum `CollateralErrors` it will the first message
+ * text and capitalize the firt letter.
+ * @param error Error type to convert message attribute
+ */
+export const humanizeCollateralMessageError = (error: Error) => {
+  if (error.message.includes('invalid address')) {
+    error.message = CollateralErrors.INVALID_ADDRESS.toString()
+  } else if (error.message.includes('ENS name not configured')) {
+    error.message = CollateralErrors.ENS_NOT_FOUND.toString()
+  } else if (error.message.includes('bad address checksum')) {
+    error.message = CollateralErrors.BAD_ADDRESS_CHECKSUM.toString()
+  } else if (error.message.includes('contract not deployed')) {
+    error.message = CollateralErrors.IS_NOT_ERC20.toString()
+  } else if (error.message.indexOf('(') !== -1) {
+    error.message = error.message.split('(')[0]
+    error.message = error.message[0].toUpperCase() + error.message.substr(1)
   }
-
-  if (result.includes('invalid address')) {
-    result = CollateralErrors.INVALID_ADDRESS.toString()
-  } else if (result.includes('ENS name not configured')) {
-    result = CollateralErrors.ENS_NOT_FOUND.toString()
-  } else if (result.includes('bad address checksum')) {
-    result = CollateralErrors.BAD_ADDRESS_CHECKSUM.toString()
-  } else if (result.includes('contract not deployed')) {
-    result = CollateralErrors.IS_NOT_ERC20.toString()
-  } else {
-    result = result[0].toUpperCase() + result.substr(1)
-  }
-
-  return result
 }
 
 export const getTokenSummary = async (
@@ -349,7 +349,7 @@ export const getTokenSummary = async (
         symbol,
       }
     } catch (err) {
-      err.message = humanizeMessageError(err.message)
+      humanizeCollateralMessageError(err)
       throw Error(err)
     }
   }
