@@ -355,7 +355,7 @@ export const Contents = (props: Props) => {
           title="Partition"
           value={
             <>
-              <CardTextSm>Outcomes Collections</CardTextSm>
+              <CardTextSm>Collections</CardTextSm>
               <StripedListStyled minHeight="auto">
                 {numberedOutcomes && numberedOutcomes.length ? (
                   numberedOutcomes
