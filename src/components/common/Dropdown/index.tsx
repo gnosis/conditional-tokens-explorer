@@ -77,7 +77,7 @@ Items.defaultProps = {
   isOpen: false,
 }
 
-export const DropdownItem = styled.div<{ active?: boolean }>`
+export const DropdownItemCSS = css<{ active?: boolean }>`
   align-items: center;
   background-color: ${(props) =>
     props.active
@@ -94,6 +94,7 @@ export const DropdownItem = styled.div<{ active?: boolean }>`
   min-height: ${(props) => props.theme.dropdown.item.height};
   overflow: hidden;
   padding: 10px ${(props) => props.theme.dropdown.item.paddingHorizontal};
+  text-decoration: none;
 
   &:first-child {
     border-top-left-radius: ${(props) => props.theme.cards.borderRadius};
@@ -107,8 +108,23 @@ export const DropdownItem = styled.div<{ active?: boolean }>`
   }
 
   &:hover {
-    background: ${(props) => props.theme.dropdown.item.backgroundColorHover};
+    background-color: ${(props) => props.theme.dropdown.item.backgroundColorHover};
   }
+
+  &:disabled,
+  &[disabled] {
+    &,
+    &:hover {
+      background-color: ${(props) => props.theme.dropdown.item.backgroundColor};
+      cursor: not-allowed;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  }
+`
+
+export const DropdownItem = styled.div<{ active?: boolean }>`
+  ${DropdownItemCSS}
 `
 
 export interface DropdownItemProps {
