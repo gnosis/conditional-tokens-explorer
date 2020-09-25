@@ -206,7 +206,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
           ),
           name: 'ERC1155 Amount',
           right: true,
-          selector: 'userBalanceERC1155',
+          selector: 'userBalanceERC1155Numbered',
           sortable: true,
         },
       ])
@@ -240,7 +240,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
       subTitle={singlePosition ? 'Select one position.' : 'Select multiple positions.'}
       title={'Select Position'}
     >
-      {isLoading && (
+      {isLoading && !error && (
         <LoadingWrapper>
           <InlineLoading message="Loading positions..." />
         </LoadingWrapper>
