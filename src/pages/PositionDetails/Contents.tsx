@@ -34,7 +34,12 @@ import { GetPosition_position as Position } from 'types/generatedGQL'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import { formatBigNumber, positionString, truncateStringInTheMiddle } from 'util/tools'
-import { OutcomeProps, TransferOptions, ConditionIdsArray } from 'util/types'
+import {
+  ConditionIdsArray,
+  LocalStorageManagement,
+  OutcomeProps,
+  TransferOptions,
+} from 'util/types'
 
 const CollateralText = styled.span`
   color: ${(props) => props.theme.colors.darkerGray};
@@ -95,7 +100,7 @@ export const Contents = (props: Props) => {
 
   const { id: positionId, indexSets } = position
 
-  const { setValue } = useLocalStorage('positionid')
+  const { setValue } = useLocalStorage(LocalStorageManagement.PositionId)
 
   const { collateral: collateralERC1155 } = useCollateral(collateralTokenAddress)
   const { collateral: collateralERC20 } = useCollateral(wrappedTokenAddress)

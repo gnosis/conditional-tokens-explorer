@@ -7,7 +7,7 @@ import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { GetPositionQuery } from 'queries/positions'
 import { GetPosition, GetPosition_position } from 'types/generatedGQL'
 import { isPositionIdValid } from 'util/tools'
-import { PositionErrors } from 'util/types'
+import { LocalStorageManagement, PositionErrors } from 'util/types'
 
 export interface PositionContext {
   position: Maybe<GetPosition_position>
@@ -51,7 +51,7 @@ interface Props {
 export const PositionProvider = (props: Props) => {
   const { checkForEmptyBalanceERC20, checkForEmptyBalanceERC1155 } = props
   const [positionId, setPositionId] = useState('')
-  const { getValue } = useLocalStorage('positionid')
+  const { getValue } = useLocalStorage(LocalStorageManagement.PositionId)
 
   const errors = []
   let position: Maybe<GetPosition_position> = null

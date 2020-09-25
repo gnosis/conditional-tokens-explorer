@@ -132,7 +132,7 @@ export class ConditionalTokensService {
     questionId: string,
     oracleAddress: string,
     outcomeSlotCount: number
-  ): Promise<string> {
+  ): Promise<TransactionReceipt> {
     const transactionObject = await this.contract.prepareCondition(
       oracleAddress,
       questionId,
@@ -142,7 +142,7 @@ export class ConditionalTokensService {
         gasLimit: 750000,
       }
     )
-    return transactionObject.hash
+    return this.provider.waitForTransaction(transactionObject.hash, CONFIRMATIONS_TO_WAIT)
   }
 
   async splitPosition(
@@ -271,6 +271,48 @@ export class ConditionalTokensService {
       address: this.contract.address,
       decimals,
       symbol,
+    }
+  }
+
+  async getConditionIdFromEvent(
+    conditionId: string,
+    networkConfig: NetworkConfig
+  ): Promise<string> {
+    const earliestBlockToCheck = networkConfig.getEarliestBlockToCheck()
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const filter: any = this.contract.filters.ConditionPreparation(conditionId)
+
+    const logs = await this.provider.getLogs({
+      ...filter,
+      fromBlock: earliestBlockToCheck,
+      toBlock: 'latest',
+    })
+
+    if (logs.length === 0) {
+      throw new Error(`No ConditionPreparation event found for conditionId '${conditionId}'`)
+    }
+    if (logs.length > 1) {
+      logger.warn(
+        `There should be only one ConditionPreparation event for conditionId '${conditionId}'`
+      )
+    }
+
+    const iface = new ethers.utils.Interface(conditionalTokensAbi)
+    const event = iface.parseLog(logs[0])
+
+    return event.values.conditionId
+  }
+
+  async isConditionCreationEventTriggered(
+    conditionId: string,
+    networkConfig: NetworkConfig
+  ): Promise<boolean> {
+    try {
+      const conditionIdFromEvent = await this.getConditionIdFromEvent(conditionId, networkConfig)
+      return !!conditionIdFromEvent
+    } catch {
+      return false
     }
   }
 }
