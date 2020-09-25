@@ -220,7 +220,7 @@ export const PositionsList = () => {
           <CellHash onClick={() => handleRowClick(row)} underline value={row.id} />
         ),
         name: 'Position Id',
-        selector: 'id',
+        selector: 'createTimestamp',
         sortable: true,
         minWidth: '250px',
       },
