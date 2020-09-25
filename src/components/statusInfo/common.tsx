@@ -6,7 +6,7 @@ export const Title = styled.h1<{ textAlign?: string }>`
   color: ${(props) => props.theme.colors.darkBlue};
   font-size: 22px;
   font-weight: 400;
-  line-height: 1;
+  line-height: 1.3;
   margin: 0;
   text-align: ${(props) => props.textAlign};
   text-transform: capitalize;
