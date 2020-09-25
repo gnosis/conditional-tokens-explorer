@@ -40,7 +40,7 @@ export const useQuestion = (questionId: string, outcomeSlotCount: number) => {
 
     const outcomesSlots = question
       ? question.outcomes
-      : Array.from(Array(outcomeSlotCount), (_, i) => i + 1 + '')
+      : Array.from(Array(outcomeSlotCount), (_, i) => i + '')
 
     if (!cancelled) setOutcomesPrettier(outcomesSlots)
     if (!cancelled) setLoading(false)

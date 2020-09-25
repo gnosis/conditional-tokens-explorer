@@ -78,7 +78,7 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
     () => [
       {
         name: 'Condition Id',
-        selector: 'id',
+        selector: 'createTimestamp',
         sortable: true,
         // eslint-disable-next-line react/display-name
         cell: (row: Conditions_conditions) => truncateStringInTheMiddle(row.id, 8, 6),

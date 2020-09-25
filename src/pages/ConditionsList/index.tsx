@@ -110,7 +110,7 @@ export const ConditionsList: React.FC = () => {
         />
       ),
       name: 'Condition Id',
-      selector: 'id',
+      selector: 'createTimestamp',
       sortable: true,
     },
     {

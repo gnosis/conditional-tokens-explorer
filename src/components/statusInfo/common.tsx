@@ -9,6 +9,7 @@ export const Title = styled.h1<{ textAlign?: string }>`
   line-height: 1;
   margin: 0;
   text-align: ${(props) => props.textAlign};
+  text-transform: capitalize;
 `
 
 Title.defaultProps = {

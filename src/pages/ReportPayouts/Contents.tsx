@@ -81,6 +81,7 @@ export const Contents: React.FC = () => {
     const { payouts } = data
     try {
       if (status === Web3ContextStatus.Connected) {
+        setError(null)
         setTransactionStatus(Status.Loading)
 
         const payoutsNumbered = payouts.map((payout: BigNumber) => payout.toNumber())
@@ -95,9 +96,8 @@ export const Contents: React.FC = () => {
       }
     } catch (err) {
       setError(err)
+      setTransactionStatus(null)
       logger.error(err)
-    } finally {
-      setTransactionStatus(Status.Ready)
     }
   }
 
@@ -127,6 +127,18 @@ export const Contents: React.FC = () => {
           icon={error ? IconTypes.error : IconTypes.spinner}
           message={error ? error.message : 'Working...'}
           title={error ? 'Error' : 'Report payout'}
+        />
+      )}
+      {transactionStatus === Status.Ready && (
+        <FullLoading
+          actionButton={
+            transactionStatus === Status.Ready
+              ? { text: 'OK', onClick: () => setTransactionStatus(null) }
+              : undefined
+          }
+          icon={IconTypes.ok}
+          message={'Report Finished'}
+          title={'Report Payouts'}
         />
       )}
       <ErrorContainer>
