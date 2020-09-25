@@ -226,7 +226,7 @@ export const Form = ({
     }
   }, [splitFromCollateral, isValid, allowanceFinished])
 
-  const outcomesByRow = '15'
+  const outcomesByRow = '14'
 
   const fullLoadingActionButton =
     status.isSuccess() || status.isFailure()

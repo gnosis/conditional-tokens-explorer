@@ -275,7 +275,7 @@ export const Contents = (props: Props) => {
     : 'All done!'
   const fullLoadingTitle = transfer.isFailure() ? 'Error' : transactionTitle
 
-  const outcomesByRow = '15'
+  const outcomesByRow = '14'
   return (
     <CenteredCard
       dropdown={
