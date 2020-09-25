@@ -57,10 +57,12 @@ interface Props {
 export const SetAllowance = (props: Props) => {
   const { collateral, fetching, finished, onUnlock } = props
   const btnText = fetching ? 'Working...' : finished ? 'Done!' : 'Unlock'
+  const tokenSymbol = collateral.symbol
 
   return finished ? (
     <StatusInfo status={StatusInfoType.success}>
-      <strong>DAI</strong> has been unlocked, you can now interact with the smart contract.
+      <strong>{tokenSymbol}</strong> has been unlocked, you can now interact with the smart
+      contract.
     </StatusInfo>
   ) : (
     <Wrapper>
@@ -69,7 +71,7 @@ export const SetAllowance = (props: Props) => {
       ) : (
         <>
           <Description>
-            You need to unlock <strong>{collateral.symbol}</strong> to allow the smart contract to
+            You need to unlock <strong>{tokenSymbol}</strong> to allow the smart contract to
             interact with it. This has to be done for each new token.
           </Description>
           <UnlockButton
