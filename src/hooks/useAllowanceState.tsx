@@ -73,5 +73,6 @@ export const useAllowanceState = (allowanceMethods: AllowanceMethods, amount: Bi
     shouldDisplayAllowance,
     allowanceFinished,
     allowanceError,
+    setAllowanceError,
   }
 }

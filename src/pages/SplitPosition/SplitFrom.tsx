@@ -78,6 +78,7 @@ export const SplitFrom: React.FC<Props> = (props) => {
     formMethods,
     formMethods: { register, setValue },
     onPositionChange,
+    setAllowanceError,
     splitFromCollateral,
     splitFromPosition,
     tokens,
@@ -145,6 +146,7 @@ export const SplitFrom: React.FC<Props> = (props) => {
       </Controls>
       <ToggleableSelectCollateral
         formMethods={formMethods}
+        setAllowanceError={setAllowanceError}
         splitFromCollateral={splitFromCollateral}
         tokens={customToken ? [...tokens, customToken] : [...tokens]}
         visible={splitFromCollateral}
