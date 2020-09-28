@@ -68,6 +68,7 @@ test('position list should show right columns when the user is connected', async
             {
               __typename: 'Position',
               id: 'Position1',
+              createTimestamp: '1571930105',
               collateralToken: {
                 __typename: 'CollateralToken',
                 id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
@@ -77,6 +78,7 @@ test('position list should show right columns when the user is connected', async
             {
               __typename: 'Position',
               id: 'Position2',
+              createTimestamp: '1571930105',
               collateralToken: {
                 __typename: 'CollateralToken',
                 id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
@@ -153,6 +155,7 @@ test('position list shold show right columns when the user is not connected', as
             {
               __typename: 'Position',
               id: 'Position1',
+              createTimestamp: '1571930105',
               collateralToken: {
                 __typename: 'CollateralToken',
                 id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
@@ -162,6 +165,7 @@ test('position list shold show right columns when the user is not connected', as
             {
               __typename: 'Position',
               id: 'Position2',
+              createTimestamp: '1571930105',
               collateralToken: {
                 __typename: 'CollateralToken',
                 id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
