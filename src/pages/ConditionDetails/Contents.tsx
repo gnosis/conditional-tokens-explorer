@@ -92,7 +92,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           dropdownButtonContent={<ButtonDropdownCircle />}
           dropdownPosition={DropdownPosition.right}
           items={dropdownItems.map((item, index) => (
-            <DropdownItemLink key={index} onClick={item.onClick} to={item.href}>
+            <DropdownItemLink key={index} onMouseDown={item.onClick} to={item.href}>
               {item.text}
             </DropdownItemLink>
           ))}

@@ -295,7 +295,7 @@ export const Contents = (props: Props) => {
           items={dropdownItems.map((item, index) => {
             if (item.href) {
               return (
-                <DropdownItemLink key={index} onClick={item.onClick} to={item.href}>
+                <DropdownItemLink key={index} onMouseDown={item.onClick} to={item.href}>
                   {item.text}
                 </DropdownItemLink>
               )
