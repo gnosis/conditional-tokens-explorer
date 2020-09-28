@@ -36,24 +36,26 @@ const ProtectedRoute: React.FC<RouteProps> = (props) => {
 export const Routes: React.FC = () => {
   return (
     <Switch>
-      <ProtectedRoute component={ConditionsList} exact path="/conditions" />
-      <ProtectedRoute component={ConditionDetails} exact path="/conditions/:conditionId" />
-      <ProtectedRoute component={PositionsList} exact path="/positions" />
-      <ProtectedRoute component={PositionDetails} exact path="/positions/:positionId" />
-      <ProtectedRoute component={PrepareCondition} path="/prepare" />
-      <ProtectedRoute component={SplitPosition} path="/split" />
-      <ProtectedRoute component={ReportPayoutsContainer} path="/report" />
-      <ProtectedRoute component={RedeemPosition} path="/redeem" />
-      <ProtectedRoute component={MergePositions} path="/merge" />
-      <ProtectedRoute component={TermsAndConditions} path="/terms-and-conditions" />
-      <ProtectedRoute component={CookiePolicy} path="/cookie-policy" />
-      <ProtectedRoute component={PrivacyPolicy} path="/privacy-policy" />
-      <Route exact path="/">
-        <Redirect to="/conditions" />
-      </Route>
-      <Route path="*">
-        <InfoCard message="Page not found..." title="Error 404" />
-      </Route>
+      <>
+        <ProtectedRoute component={ConditionsList} exact path="/conditions" />
+        <ProtectedRoute component={ConditionDetails} exact path="/conditions/:conditionId" />
+        <ProtectedRoute component={PositionsList} exact path="/positions" />
+        <ProtectedRoute component={PositionDetails} exact path="/positions/:positionId" />
+        <ProtectedRoute component={PrepareCondition} path="/prepare" />
+        <ProtectedRoute component={SplitPosition} path="/split" />
+        <ProtectedRoute component={ReportPayoutsContainer} path="/report" />
+        <ProtectedRoute component={RedeemPosition} path="/redeem" />
+        <ProtectedRoute component={MergePositions} path="/merge" />
+        <ProtectedRoute component={TermsAndConditions} path="/terms-and-conditions" />
+        <ProtectedRoute component={CookiePolicy} path="/cookie-policy" />
+        <ProtectedRoute component={PrivacyPolicy} path="/privacy-policy" />
+        <Route exact path="/">
+          <Redirect to="/conditions" />
+        </Route>
+        <Route path="*">
+          <InfoCard message="Page not found..." title="Error 404" />
+        </Route>
+      </>
     </Switch>
   )
 }
