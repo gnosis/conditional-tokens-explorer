@@ -289,6 +289,7 @@ export const Contents = (props: Props) => {
     <CenteredCard
       dropdown={
         <Dropdown
+          activeItemHighlight={false}
           dropdownButtonContent={<ButtonDropdownCircle />}
           dropdownPosition={DropdownPosition.right}
           items={dropdownItems.map((item, index) => {

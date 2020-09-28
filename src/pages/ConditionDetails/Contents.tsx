@@ -88,6 +88,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
     <CenteredCard
       dropdown={
         <Dropdown
+          activeItemHighlight={false}
           dropdownButtonContent={<ButtonDropdownCircle />}
           dropdownPosition={DropdownPosition.right}
           items={dropdownItems.map((item, index) => (
