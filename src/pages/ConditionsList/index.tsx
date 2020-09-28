@@ -21,7 +21,7 @@ import { customStyles } from 'theme/tableCustomStyles'
 import { Conditions_conditions } from 'types/generatedGQL'
 import { OracleFilterOptions } from 'util/types'
 
-const DropdownItemLink = styled(NavLink)`
+const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
   ${DropdownItemCSS}
 `
 

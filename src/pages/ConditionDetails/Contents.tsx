@@ -23,7 +23,7 @@ const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
 `
 
-const DropdownItemLink = styled(NavLink)`
+const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
   ${DropdownItemCSS}
 `
 

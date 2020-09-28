@@ -35,7 +35,7 @@ import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import { CollateralFilterOptions, Token, TransferOptions } from 'util/types'
 
-const DropdownItemLink = styled(NavLink)`
+const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
   ${DropdownItemCSS}
 `
 
