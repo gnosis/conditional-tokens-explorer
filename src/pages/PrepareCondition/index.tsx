@@ -21,7 +21,6 @@ import { TitleValue } from 'components/text/TitleValue'
 import {
   ADDRESS_REGEX,
   BYTES_REGEX,
-  CONFIRMATIONS_TO_WAIT,
   INTEGER_NUMBER,
   MAX_OUTCOMES,
   MIN_OUTCOMES,
@@ -39,7 +38,7 @@ const patternOutcomesError = 'Decimal numbers are not allowed'
 const logger = getLogger('Prepare Condition')
 
 export const PrepareCondition = () => {
-  const { _type: status, CTService, address, connect, provider } = useWeb3ConnectedOrInfura()
+  const { _type: status, CTService, address, connect } = useWeb3ConnectedOrInfura()
 
   const [numOutcomes, setNumOutcomes] = React.useState(0)
   const [oracleAddress, setOracleAddress] = React.useState('')
@@ -96,8 +95,7 @@ export const PrepareCondition = () => {
         const conditionExists = await CTService.conditionExists(conditionId)
         logger.log(`Condition ID ${conditionId}`)
         if (!conditionExists) {
-          const tx = await CTService.prepareCondition(questionId, oracleAddress, numOutcomes)
-          await provider.waitForTransaction(tx, CONFIRMATIONS_TO_WAIT)
+          await CTService.prepareCondition(questionId, oracleAddress, numOutcomes)
 
           history.push(`/conditions/${conditionId}`)
         } else {

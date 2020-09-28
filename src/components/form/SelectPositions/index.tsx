@@ -23,7 +23,7 @@ import { useWithToken } from 'hooks/useWithToken'
 import isEqual from 'lodash.isequal'
 import { GetMultiPositions_positions } from 'types/generatedGQL'
 import { positionString } from 'util/tools'
-import { Errors } from 'util/types'
+import { Errors, LocalStorageManagement } from 'util/types'
 
 const PositionText = styled.span`
   max-width: calc(100% - 30px);
@@ -81,7 +81,7 @@ export const SelectPositions = ({
     updateBalances,
   } = useBatchBalanceContext()
 
-  const { getValue } = useLocalStorage('positionid')
+  const { getValue } = useLocalStorage(LocalStorageManagement.PositionId)
 
   useEffect(() => {
     const localStoragePosition = getValue()

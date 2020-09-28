@@ -1,11 +1,12 @@
 import { useQuery } from '@apollo/react-hooks'
 import React from 'react'
 
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { GetConditionQuery } from 'queries/conditions'
 import { GetCondition, GetCondition_condition } from 'types/generatedGQL'
 import { isConditionIdValid } from 'util/tools'
-import { ConditionErrors } from 'util/types'
+import { ConditionErrors, LocalStorageManagement } from 'util/types'
 
 export interface ConditionContext {
   clearCondition: () => void
@@ -13,6 +14,7 @@ export interface ConditionContext {
   conditionId: string
   errors: ConditionErrors[]
   loading: boolean
+  isConditionIdEventTriggered: Maybe<boolean>
   setCondition: (condition: GetCondition_condition) => void
   setConditionId: (conditionId: string) => void
 }
@@ -21,6 +23,7 @@ export const CONDITION_CONTEXT_DEFAULT_VALUE = {
   condition: null,
   conditionId: '',
   loading: false,
+  isConditionIdEventTriggered: false,
   errors: [],
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setConditionId: () => {},
@@ -40,11 +43,20 @@ interface Props {
 export const ConditionProvider = (props: Props) => {
   const { checkForConditionNotResolved } = props
 
+  const { CTService, networkConfig } = useWeb3ConnectedOrInfura()
+
   const [conditionId, setConditionId] = React.useState('')
   const [condition, setCondition] = React.useState<Maybe<GetCondition_condition>>(null)
+  const [isConditionIdEventTriggered, setIsConditionIdEventTriggered] = React.useState<
+    Maybe<boolean>
+  >(null)
+  const [
+    isCheckingConditionIdEventTriggered,
+    setIsCheckingConditionIdEventTriggered,
+  ] = React.useState<boolean>(false)
   const [errors, setErrors] = React.useState<ConditionErrors[]>([])
   const [validId, setValidId] = React.useState(false)
-  const { getValue } = useLocalStorage('conditionid')
+  const { getValue } = useLocalStorage(LocalStorageManagement.ConditionId)
 
   const clearErrors = React.useCallback((): void => {
     setErrors([])
@@ -67,6 +79,7 @@ export const ConditionProvider = (props: Props) => {
   const setConditionIdCallback = React.useCallback(
     (conditionId: string): void => {
       clearCondition()
+      removeError(ConditionErrors.INVALID_ERROR)
 
       if (isConditionIdValid(conditionId)) {
         setValidId(true)
@@ -75,7 +88,7 @@ export const ConditionProvider = (props: Props) => {
         pushError(ConditionErrors.INVALID_ERROR)
       }
     },
-    [clearCondition, pushError]
+    [clearCondition, pushError, removeError]
   )
 
   const setConditionCallback = React.useCallback(
@@ -96,17 +109,68 @@ export const ConditionProvider = (props: Props) => {
   )
 
   React.useEffect(() => {
-    const { condition: conditionFromTheGraph } = fetchedCondition ?? { condition: null }
+    let cancelled = false
+    if (conditionId) {
+      setIsCheckingConditionIdEventTriggered(true)
+      const fetchConditionIdEvent = async () => {
+        try {
+          const isConditionCreationEventTriggered = await CTService.isConditionCreationEventTriggered(
+            conditionId,
+            networkConfig
+          )
+          if (!cancelled) setIsConditionIdEventTriggered(isConditionCreationEventTriggered)
+        } catch {
+          if (!cancelled) setIsConditionIdEventTriggered(null)
+        } finally {
+          if (!cancelled) setIsCheckingConditionIdEventTriggered(false)
+        }
+      }
+      fetchConditionIdEvent()
+    }
 
-    if (conditionId && validId && !loading && !conditionFromTheGraph) {
+    return () => {
+      cancelled = true
+    }
+  }, [conditionId, CTService, networkConfig])
+
+  React.useEffect(() => {
+    const { condition: conditionFromTheGraph } = fetchedCondition ?? { condition: null }
+    removeError(ConditionErrors.NOT_FOUND_ERROR)
+    removeError(ConditionErrors.NOT_INDEXED_ERROR)
+
+    if (
+      conditionId &&
+      validId &&
+      !loading &&
+      !conditionFromTheGraph &&
+      isConditionIdEventTriggered
+    ) {
+      pushError(ConditionErrors.NOT_INDEXED_ERROR)
+    }
+
+    if (
+      conditionId &&
+      validId &&
+      !loading &&
+      !conditionFromTheGraph &&
+      isConditionIdEventTriggered !== null &&
+      !isConditionIdEventTriggered
+    ) {
       pushError(ConditionErrors.NOT_FOUND_ERROR)
     }
 
     if (conditionFromTheGraph) {
       setCondition(conditionFromTheGraph)
-      removeError(ConditionErrors.NOT_FOUND_ERROR)
     }
-  }, [fetchedCondition, validId, loading, conditionId, pushError, removeError])
+  }, [
+    fetchedCondition,
+    isConditionIdEventTriggered,
+    validId,
+    loading,
+    conditionId,
+    pushError,
+    removeError,
+  ])
 
   React.useEffect(() => {
     removeError(ConditionErrors.NOT_RESOLVED_ERROR)
@@ -134,9 +198,10 @@ export const ConditionProvider = (props: Props) => {
     condition,
     conditionId,
     errors,
-    loading,
+    loading: loading || isCheckingConditionIdEventTriggered,
     setConditionId: setConditionIdCallback,
     setCondition: setConditionCallback,
+    isConditionIdEventTriggered,
     clearCondition,
   }
 

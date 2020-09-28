@@ -17,7 +17,7 @@ import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { useQuestion } from 'hooks/useQuestion'
 import { GetCondition_condition } from 'types/generatedGQL'
 import { formatTS, getConditionTypeTitle, truncateStringInTheMiddle } from 'util/tools'
-import { ConditionStatus, ConditionType } from 'util/types'
+import { ConditionStatus, ConditionType, LocalStorageManagement } from 'util/types'
 
 const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
@@ -31,7 +31,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
   const { networkConfig } = useWeb3ConnectedOrInfura()
   const history = useHistory()
 
-  const { setValue } = useLocalStorage('conditionid')
+  const { setValue } = useLocalStorage(LocalStorageManagement.ConditionId)
 
   const {
     creator,
