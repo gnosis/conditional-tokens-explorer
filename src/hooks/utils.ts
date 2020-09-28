@@ -5,6 +5,7 @@ import { Positions_positions, UserWithPositions_user } from 'types/generatedGQL'
 
 export interface Position {
   id: string
+  createTimestamp: number
   collateralToken: string
   wrappedToken: Maybe<string>
   userBalanceERC1155: BigNumber
@@ -23,6 +24,7 @@ export const marshalPositionListData = (
       id: position.id,
       collateralToken: position.collateralToken.id,
       wrappedToken: position?.wrappedToken?.id,
+      createTimestamp: position.createTimestamp,
       userBalanceERC1155: userPosition ? new BigNumber(userPosition.balance) : ZERO_BN,
       userBalanceERC20: userPosition ? new BigNumber(userPosition.wrappedBalance) : ZERO_BN,
     } as Position
