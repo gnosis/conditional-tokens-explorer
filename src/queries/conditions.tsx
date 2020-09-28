@@ -37,7 +37,7 @@ export const buildQueryConditions = (options: ConditionsListType = DEFAULT_OPTIO
 
   const query = gql`
       query Conditions ${variablesClause} {
-        conditions(first: 1000 ${whereClause}) {
+        conditions(first: 1000 ${whereClause} , orderBy: createTimestamp, orderDirection: desc) {
           id
           oracle
           questionId

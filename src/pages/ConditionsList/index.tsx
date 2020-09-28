@@ -18,11 +18,11 @@ import { useConditions } from 'hooks/useConditions'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { customStyles } from 'theme/tableCustomStyles'
 import { Conditions_conditions } from 'types/generatedGQL'
-import { OracleFilterOptions } from 'util/types'
+import { LocalStorageManagement, OracleFilterOptions } from 'util/types'
 
 export const ConditionsList: React.FC = () => {
   const history = useHistory()
-  const { setValue } = useLocalStorage('conditionid')
+  const { setValue } = useLocalStorage(LocalStorageManagement.ConditionId)
 
   const [conditionIdToSearch, setConditionIdToSearch] = useState<string>('')
   const [conditionIdToShow, setConditionIdToShow] = useState<string>('')
@@ -110,7 +110,7 @@ export const ConditionsList: React.FC = () => {
         />
       ),
       name: 'Condition Id',
-      selector: 'id',
+      selector: 'createTimestamp',
       sortable: true,
     },
     {

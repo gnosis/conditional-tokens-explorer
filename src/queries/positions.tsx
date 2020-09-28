@@ -32,8 +32,9 @@ export const buildQueryPositions = (options: PositionsListType = DEFAULT_OPTIONS
 
   const query = gql`
   query Positions ${variablesClause} {
-    positions(first: 1000 ${whereClause}) {
+    positions(first: 1000 ${whereClause} , orderBy: createTimestamp, orderDirection: desc) {
       id
+      createTimestamp
       collateralToken {
         id
       }
@@ -51,6 +52,7 @@ const positionFragment = gql`
     id
     indexSets
     activeValue
+    createTimestamp
     collateralToken {
       id
     }
@@ -95,7 +97,7 @@ export const GetPositionQuery = gql`
 
 export const GetMultiPositionsQuery = gql`
   query GetMultiPositions($ids: [ID!]!) {
-    positions(where: { id_in: $ids }) {
+    positions(where: { id_in: $ids } , orderBy: createTimestamp, orderDirection: desc) {
       ...PositionData
     }
   }

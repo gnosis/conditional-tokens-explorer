@@ -10,6 +10,7 @@ import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
+import { DisplayTableConditions } from 'components/form/DisplayTableConditions'
 import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
 import { UnwrapModal } from 'components/modals/UnwrapModal'
 import { WrapModal } from 'components/modals/WrapModal'
@@ -33,7 +34,12 @@ import { GetPosition_position as Position } from 'types/generatedGQL'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import { formatBigNumber, positionString, truncateStringInTheMiddle } from 'util/tools'
-import { OutcomeProps, TransferOptions } from 'util/types'
+import {
+  ConditionIdsArray,
+  LocalStorageManagement,
+  OutcomeProps,
+  TransferOptions,
+} from 'util/types'
 
 const CollateralText = styled.span`
   color: ${(props) => props.theme.colors.darkerGray};
@@ -71,6 +77,7 @@ interface Props {
   position: Position
   balanceERC1155: BigNumber
   balanceERC20: BigNumber
+  conditions: Array<ConditionIdsArray>
   collateralTokenAddress: string
   wrappedTokenAddress: string
   refetchBalances: () => void
@@ -85,6 +92,7 @@ export const Contents = (props: Props) => {
     balanceERC20,
     balanceERC1155,
     collateralTokenAddress,
+    conditions,
     position,
     refetchBalances,
     wrappedTokenAddress,
@@ -92,7 +100,7 @@ export const Contents = (props: Props) => {
 
   const { id: positionId, indexSets } = position
 
-  const { setValue } = useLocalStorage('positionid')
+  const { setValue } = useLocalStorage(LocalStorageManagement.PositionId)
 
   const { collateral: collateralERC1155 } = useCollateral(collateralTokenAddress)
   const { collateral: collateralERC20 } = useCollateral(wrappedTokenAddress)
@@ -276,6 +284,7 @@ export const Contents = (props: Props) => {
   const fullLoadingTitle = transfer.isFailure() ? 'Error' : transactionTitle
 
   const outcomesByRow = '15'
+
   return (
     <CenteredCard
       dropdown={
@@ -317,6 +326,12 @@ export const Contents = (props: Props) => {
       </Row>
       <Row cols="1fr" marginBottomXL>
         <TitleValue
+          title="Condition Ids"
+          value={<DisplayTableConditions conditionIds={conditions} />}
+        />
+      </Row>
+      <Row cols="1fr" marginBottomXL>
+        <TitleValue
           title="Collateral Wrapping"
           value={
             <StripedListStyled maxHeight="auto">
@@ -340,7 +355,7 @@ export const Contents = (props: Props) => {
                   <CollateralTextAmount>
                     {!balanceERC20.isZero()
                       ? `${formatBigNumber(balanceERC20, ERC1155Decimals)} ${ERC20Symbol}`
-                      : 'No unwrapped collateral yet.'}
+                      : 'None.'}
                   </CollateralTextAmount>
                 </CollateralText>
                 <CollateralWrapButton
@@ -359,7 +374,7 @@ export const Contents = (props: Props) => {
           title="Partition"
           value={
             <>
-              <CardTextSm>Outcomes Collections</CardTextSm>
+              <CardTextSm>Collections</CardTextSm>
               <StripedListStyled minHeight="auto">
                 {numberedOutcomes && numberedOutcomes.length ? (
                   numberedOutcomes
@@ -393,7 +408,7 @@ export const Contents = (props: Props) => {
       </Row>
       <Row cols="1fr" marginBottomXL>
         <TitleValue
-          title="Position"
+          title="Position Preview"
           value={<StripedListItem>{positionPreview || ''} </StripedListItem>}
         />
       </Row>

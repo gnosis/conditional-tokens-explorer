@@ -87,6 +87,9 @@ export const isConditionErrorInvalid = (errors: ConditionErrors[]): boolean =>
 export const isConditionErrorFetching = (errors: ConditionErrors[]): boolean =>
   errors.indexOf(ConditionErrors.FETCHING_ERROR) > -1
 
+export const isConditionErrorNotIndexed = (errors: ConditionErrors[]): boolean =>
+  errors.indexOf(ConditionErrors.NOT_INDEXED_ERROR) > -1
+
 export const isConditionErrorNotFound = (errors: ConditionErrors[]): boolean =>
   errors.indexOf(ConditionErrors.NOT_FOUND_ERROR) > -1
 

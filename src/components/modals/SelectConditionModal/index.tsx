@@ -78,7 +78,7 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
     () => [
       {
         name: 'Condition Id',
-        selector: 'id',
+        selector: 'createTimestamp',
         sortable: true,
         // eslint-disable-next-line react/display-name
         cell: (row: Conditions_conditions) => truncateStringInTheMiddle(row.id, 8, 6),
@@ -128,7 +128,7 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
 
   return (
     <Modal subTitle={'Select one condition.'} title={'Select Condition'} {...restProps}>
-      {isLoading && (
+      {isLoading && !error && (
         <LoadingWrapper>
           <InlineLoading message="Loading conditions..." />
         </LoadingWrapper>

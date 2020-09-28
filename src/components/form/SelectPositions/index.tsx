@@ -20,9 +20,10 @@ import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { Position } from 'hooks'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { useWithToken } from 'hooks/useWithToken'
+import isEqual from 'lodash.isequal'
 import { GetMultiPositions_positions } from 'types/generatedGQL'
 import { positionString } from 'util/tools'
-import { Errors } from 'util/types'
+import { Errors, LocalStorageManagement } from 'util/types'
 
 const PositionText = styled.span`
   max-width: calc(100% - 30px);
@@ -39,14 +40,19 @@ const isDataInSync = (
   positionsLoading: boolean,
   balancesLoading: boolean,
   positions: GetMultiPositions_positions[],
-  balances: BigNumber[]
+  balances: BigNumber[],
+  positionsIds: string[]
 ) => {
   return (
     !positionsLoading &&
     !balancesLoading &&
     positions.length &&
     balances.length &&
-    balances.length === positions.length
+    balances.length === positions.length &&
+    isEqual(
+      positionsIds,
+      positions.map((p) => p.id)
+    )
   )
 }
 
@@ -75,7 +81,7 @@ export const SelectPositions = ({
     updateBalances,
   } = useBatchBalanceContext()
 
-  const { getValue } = useLocalStorage('positionid')
+  const { getValue } = useLocalStorage(LocalStorageManagement.PositionId)
 
   useEffect(() => {
     const localStoragePosition = getValue()
@@ -117,7 +123,9 @@ export const SelectPositions = ({
 
   React.useEffect(() => {
     if (positionIds.length > 0) {
-      if (isDataInSync(positionsLoading, balancesLoading, positionsWithToken, balances)) {
+      if (
+        isDataInSync(positionsLoading, balancesLoading, positionsWithToken, balances, positionIds)
+      ) {
         setPositionsToDisplay(
           positionsWithToken.map((position) => {
             const i = positionIds.findIndex((id) => id === position.id)

@@ -5,6 +5,7 @@ import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { usePositionContext } from 'contexts/PositionContext'
 import { Contents } from 'pages/PositionDetails/Contents'
+import { PositionData_conditions } from 'types/generatedGQL'
 import {
   isPositionErrorFetching,
   isPositionErrorInvalid,
@@ -34,27 +35,40 @@ export const Wrapper = (props: WrapperProps) => {
     setPositionId(positionId)
   }, [positionId, setPositionId])
 
+  const conditions = position?.conditions.map((condition: PositionData_conditions) => {
+    return {
+      conditionId: condition.id,
+    }
+  })
+
+  const DisplayErrors = (): JSX.Element => {
+    const isNotLoadingAndThereIsNoPosition: boolean = !loading && !position
+    if (isNotLoadingAndThereIsNoPosition && isPositionErrorNotFound(errors)) {
+      return <InfoCard message="We couldn't find this position..." title="Not Found" />
+    } else if (isNotLoadingAndThereIsNoPosition && isPositionErrorInvalid(errors)) {
+      return <InfoCard message="Position not valid..." title="Error" />
+    } else if (isNotLoadingAndThereIsNoPosition && isPositionErrorFetching(errors)) {
+      return <InfoCard message="We couldn't fetch the data for this position..." title="Error" />
+    } else {
+      return <></>
+    }
+  }
+
   return (
     <>
       <PageTitle>Position Details</PageTitle>
-      {loading && <InlineLoading />}
-      {!loading && !position && isPositionErrorNotFound(errors) ? (
-        <InfoCard message="We couldn't find this position..." title="Not Found" />
-      ) : !loading && !position && isPositionErrorInvalid(errors) ? (
-        <InfoCard message="Position not valid..." title="Error" />
-      ) : !loading && !position && isPositionErrorFetching(errors) ? (
-        <InfoCard message="We couldn't fetch the data for this position..." title="Error" />
-      ) : (
-        position && (
-          <Contents
-            balanceERC1155={balanceERC1155}
-            balanceERC20={balanceERC20}
-            collateralTokenAddress={collateralTokenAddress}
-            position={position}
-            refetchBalances={refetchBalances}
-            wrappedTokenAddress={wrappedTokenAddress}
-          />
-        )
+      {loading && errors.length === 0 && <InlineLoading />}
+      {<DisplayErrors />}
+      {!loading && position && (
+        <Contents
+          balanceERC1155={balanceERC1155}
+          balanceERC20={balanceERC20}
+          collateralTokenAddress={collateralTokenAddress}
+          conditions={conditions || []}
+          position={position}
+          refetchBalances={refetchBalances}
+          wrappedTokenAddress={wrappedTokenAddress}
+        />
       )}
     </>
   )

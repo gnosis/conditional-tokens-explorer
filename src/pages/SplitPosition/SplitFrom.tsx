@@ -10,7 +10,7 @@ import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { Position } from 'hooks'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
-import { SplitFromType, Token } from 'util/types'
+import { LocalStorageManagement, SplitFromType, Token } from 'util/types'
 
 const Controls = styled.div`
   margin-bottom: 8px;
@@ -85,7 +85,7 @@ export const SplitFrom: React.FC<Props> = (props) => {
 
   const { updatePositionIds } = useMultiPositionsContext()
   const { updateBalances } = useBatchBalanceContext()
-  const { getValue } = useLocalStorage('positionid')
+  const { getValue } = useLocalStorage(LocalStorageManagement.PositionId)
 
   const [showCustomCollateralModal, setShowCustomCollateralModal] = useState(false)
   const [showSelectPositionModal, setShowSelectPositionModal] = useState(false)

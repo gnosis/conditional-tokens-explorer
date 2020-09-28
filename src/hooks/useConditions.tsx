@@ -35,7 +35,10 @@ export const useConditions = (options: OptionsToSearch) => {
 
   const query = buildQueryConditions(queryOptions)
 
-  const { data, error, loading } = useQuery<Conditions>(query, { variables: queryOptions })
+  const { data, error, loading } = useQuery<Conditions>(query, {
+    variables: queryOptions,
+    fetchPolicy: 'no-cache',
+  })
 
   return {
     data,
