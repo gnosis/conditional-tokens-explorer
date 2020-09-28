@@ -169,7 +169,7 @@ export const ConditionsList: React.FC = () => {
           dropdownButtonContent={<ButtonDots />}
           dropdownPosition={DropdownPosition.right}
           items={buildMenuForRow(row).map((item, index) => (
-            <DropdownItemLink key={index} onMouseDown={item.onClick} to={item.href}>
+            <DropdownItemLink key={index} onClick={item.onClick} to={item.href}>
               {item.text}
             </DropdownItemLink>
           ))}

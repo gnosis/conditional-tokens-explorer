@@ -174,7 +174,7 @@ export const PositionsList = () => {
             items={buildMenuForRow(row).map((item, index) => {
               if (item.href) {
                 return (
-                  <DropdownItemLink onMouseDown={item.onClick} to={item.href}>
+                  <DropdownItemLink onClick={item.onClick} to={item.href}>
                     {item.text}
                   </DropdownItemLink>
                 )
