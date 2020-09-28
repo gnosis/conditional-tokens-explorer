@@ -132,7 +132,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
           truncateStringInTheMiddle(row.id, 8, 6),
         maxWidth: '170px',
         name: 'Position Id',
-        selector: 'id',
+        selector: 'createTimestamp',
         sortable: true,
       },
       {

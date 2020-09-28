@@ -246,7 +246,7 @@ export const PositionsList = () => {
           <CellHash href={`/positions/${row.id}`} value={row.id} />
         ),
         name: 'Position Id',
-        selector: 'id',
+        selector: 'createTimestamp',
         sortable: true,
         minWidth: '250px',
       },
