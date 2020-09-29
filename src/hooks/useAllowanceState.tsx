@@ -44,6 +44,10 @@ export const useAllowanceState = (allowanceMethods: AllowanceMethods, amount: Bi
     }
   }, [refresh])
 
+  const cleanAllowanceError = useCallback(async () => {
+    setAllowanceError(null)
+  }, [])
+
   useEffect(() => {
     fetchAllowance()
   }, [fetchAllowance])
@@ -73,6 +77,6 @@ export const useAllowanceState = (allowanceMethods: AllowanceMethods, amount: Bi
     shouldDisplayAllowance,
     allowanceFinished,
     allowanceError,
-    setAllowanceError,
+    cleanAllowanceError,
   }
 }

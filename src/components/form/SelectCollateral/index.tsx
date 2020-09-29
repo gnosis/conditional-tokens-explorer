@@ -13,14 +13,14 @@ export interface SelectCollateralProps {
   formMethods: FormContextValues<SplitPositionFormMethods>
   splitFromCollateral: boolean
   tokens: Token[]
-  setAllowanceError: any
+  cleanAllowanceError: () => void
 }
 
 const logger = getLogger('SelectCollateral')
 
 export const SelectCollateral = ({
+  cleanAllowanceError,
   formMethods,
-  setAllowanceError,
   splitFromCollateral,
   tokens,
   ...restProps
@@ -36,7 +36,7 @@ export const SelectCollateral = ({
         key={address}
         name="collateral"
         onClick={() => {
-          setAllowanceError(null)
+          cleanAllowanceError()
           setValue('collateral', address, true)
         }}
         radioRef={register({ required: splitFromCollateral })}

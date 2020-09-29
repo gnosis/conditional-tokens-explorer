@@ -209,8 +209,8 @@ export const Form = ({
   const {
     allowanceError,
     allowanceFinished,
+    cleanAllowanceError,
     fetchingAllowance,
-    setAllowanceError,
     shouldDisplayAllowance,
     unlockCollateral,
   } = useAllowanceState(allowanceMethods, amount)
@@ -273,9 +273,9 @@ export const Form = ({
           title="Split From"
           value={
             <SplitFrom
+              cleanAllowanceError={cleanAllowanceError}
               formMethods={formMethods}
               onPositionChange={setPosition}
-              setAllowanceError={setAllowanceError}
               splitFromCollateral={splitFromCollateral}
               splitFromPosition={splitFromPosition}
               tokens={tokens}
