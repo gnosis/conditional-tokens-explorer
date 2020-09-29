@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react'
-import { useHistory } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { ButtonCopy } from 'components/buttons/ButtonCopy'
 import { ButtonDropdownCircle } from 'components/buttons/ButtonDropdownCircle'
 import { CenteredCard } from 'components/common/CenteredCard'
-import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
+import { Dropdown, DropdownItemCSS, DropdownPosition } from 'components/common/Dropdown'
 import { Pill, PillTypes } from 'components/pureStyledComponents/Pill'
 import { Row } from 'components/pureStyledComponents/Row'
 import { StripedList, StripedListItem } from 'components/pureStyledComponents/StripedList'
@@ -23,13 +23,16 @@ const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
 `
 
+const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
+  ${DropdownItemCSS}
+`
+
 interface Props {
   condition: GetCondition_condition
 }
 
 export const Contents: React.FC<Props> = ({ condition }) => {
   const { networkConfig } = useWeb3ConnectedOrInfura()
-  const history = useHistory()
 
   const { setValue } = useLocalStorage(LocalStorageManagement.ConditionId)
 
@@ -46,28 +49,28 @@ export const Contents: React.FC<Props> = ({ condition }) => {
   const dropdownItems = useMemo(() => {
     return [
       {
+        href: `/split/`,
         onClick: () => {
           setValue(conditionId)
-          history.push(`/split/`)
         },
         text: 'Split Position',
       },
       {
+        href: `/merge/`,
         onClick: () => {
           setValue(conditionId)
-          history.push(`/merge/`)
         },
         text: 'Merge Positions',
       },
       {
+        href: `/report/`,
         onClick: () => {
           setValue(conditionId)
-          history.push(`/report/`)
         },
         text: 'Report Payouts',
       },
     ]
-  }, [history, setValue, conditionId])
+  }, [setValue, conditionId])
 
   const { outcomesPrettier, question } = useQuestion(questionId, outcomeSlotCount)
   const isConditionFromOmen = useIsConditionFromOmen(creator, oracle, question)
@@ -85,12 +88,13 @@ export const Contents: React.FC<Props> = ({ condition }) => {
     <CenteredCard
       dropdown={
         <Dropdown
+          activeItemHighlight={false}
           dropdownButtonContent={<ButtonDropdownCircle />}
           dropdownPosition={DropdownPosition.right}
           items={dropdownItems.map((item, index) => (
-            <DropdownItem key={index} onClick={item.onClick}>
+            <DropdownItemLink key={index} onMouseDown={item.onClick} to={item.href}>
               {item.text}
-            </DropdownItem>
+            </DropdownItemLink>
           ))}
         />
       }

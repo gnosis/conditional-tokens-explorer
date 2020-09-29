@@ -1,10 +1,11 @@
 import { useDebounceCallback } from '@react-hook/debounce'
 import React, { useCallback, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { useHistory } from 'react-router-dom'
+import { NavLink, useHistory } from 'react-router-dom'
+import styled from 'styled-components'
 
 import { ButtonDots } from 'components/buttons/ButtonDots'
-import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
+import { Dropdown, DropdownItemCSS, DropdownPosition } from 'components/common/Dropdown'
 import { OraclesFilterDropdown } from 'components/common/OraclesFilterDropdown'
 import { SearchField } from 'components/form/SearchField'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
@@ -19,6 +20,10 @@ import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { customStyles } from 'theme/tableCustomStyles'
 import { Conditions_conditions } from 'types/generatedGQL'
 import { LocalStorageManagement, OracleFilterOptions } from 'util/types'
+
+const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
+  ${DropdownItemCSS}
+`
 
 export const ConditionsList: React.FC = () => {
   const history = useHistory()
@@ -57,37 +62,38 @@ export const ConditionsList: React.FC = () => {
   const buildMenuForRow = useCallback(
     ({ id }) => {
       const detailsOption = {
+        href: `/conditions/${id}`,
+        onClick: undefined,
         text: 'Details',
-        onClick: () => history.push(`/conditions/${id}`),
       }
 
       const splitOption = {
+        href: `/split/`,
         text: 'Split Position',
         onClick: () => {
           setValue(id)
-          history.push(`/split/`)
         },
       }
 
       const mergeOption = {
+        href: `/merge/`,
         text: 'Merge Positions',
         onClick: () => {
           setValue(id)
-          history.push(`/merge/`)
         },
       }
 
       const reportOption = {
+        href: `/report/`,
         text: 'Report Payouts',
         onClick: () => {
           setValue(id)
-          history.push(`/report/`)
         },
       }
 
       return [detailsOption, splitOption, mergeOption, reportOption]
     },
-    [history, setValue]
+    [setValue]
   )
 
   const handleRowClick = useCallback(
@@ -101,13 +107,7 @@ export const ConditionsList: React.FC = () => {
     {
       // eslint-disable-next-line react/display-name
       cell: (row: Conditions_conditions) => (
-        <CellHash
-          onClick={() => {
-            handleRowClick(row)
-          }}
-          underline
-          value={row.id}
-        />
+        <CellHash href={`/conditions/${row.id}`} value={row.id} />
       ),
       name: 'Condition Id',
       selector: 'createTimestamp',
@@ -169,9 +169,9 @@ export const ConditionsList: React.FC = () => {
           dropdownButtonContent={<ButtonDots />}
           dropdownPosition={DropdownPosition.right}
           items={buildMenuForRow(row).map((item, index) => (
-            <DropdownItem key={index} onClick={item.onClick}>
+            <DropdownItemLink key={index} onMouseDown={item.onClick} to={item.href}>
               {item.text}
-            </DropdownItem>
+            </DropdownItemLink>
           ))}
         />
       ),
