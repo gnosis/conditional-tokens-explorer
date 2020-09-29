@@ -207,7 +207,9 @@ export const Form = ({
   }, [DEFAULT_VALUES, clearCondition, reset, setStatus])
 
   const {
+    allowanceError,
     allowanceFinished,
+    cleanAllowanceError,
     fetchingAllowance,
     shouldDisplayAllowance,
     unlockCollateral,
@@ -271,6 +273,7 @@ export const Form = ({
           title="Split From"
           value={
             <SplitFrom
+              cleanAllowanceError={cleanAllowanceError}
               formMethods={formMethods}
               onPositionChange={setPosition}
               splitFromCollateral={splitFromCollateral}
@@ -283,6 +286,7 @@ export const Form = ({
       {isAllowanceVisible && (
         <SetAllowance
           collateral={collateral}
+          error={allowanceError}
           fetching={fetchingAllowance}
           finished={allowanceFinished}
           onUnlock={unlockCollateral}

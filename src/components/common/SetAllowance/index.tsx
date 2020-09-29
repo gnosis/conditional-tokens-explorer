@@ -51,11 +51,12 @@ interface Props {
   collateral: any
   fetching: boolean
   finished: boolean
+  error: Maybe<Error>
   onUnlock: () => void
 }
 
 export const SetAllowance = (props: Props) => {
-  const { collateral, fetching, finished, onUnlock } = props
+  const { collateral, error, fetching, finished, onUnlock } = props
   const btnText = fetching ? 'Working...' : finished ? 'Done!' : 'Unlock'
   const tokenSymbol = collateral.symbol
 
@@ -63,6 +64,10 @@ export const SetAllowance = (props: Props) => {
     <StatusInfo status={StatusInfoType.success}>
       <strong>{tokenSymbol}</strong> has been unlocked, you can now interact with the smart
       contract.
+    </StatusInfo>
+  ) : error ? (
+    <StatusInfo status={StatusInfoType.error}>
+      There was a problem while trying to unlock {tokenSymbol}.
     </StatusInfo>
   ) : (
     <Wrapper>
