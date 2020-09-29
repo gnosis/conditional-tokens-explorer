@@ -47,7 +47,7 @@ export const DisplayTablePositions = (props: Props) => {
         cell: () => {
           if (!loading) {
             return collateralFetched ? (
-              <TokenIcon onClick={() => handleRowClick} symbol={collateralFetched.symbol} />
+              <TokenIcon onClick={() => handleRowClick} token={collateralFetched} />
             ) : (
               <span title={collateral}>{truncateStringInTheMiddle(collateral, 10, 8)}</span>
             )

@@ -138,7 +138,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
       {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimalsWithToken) => {
-          return row.token.symbol ? <TokenIcon symbol={row.token.symbol} /> : row.collateralToken
+          return row.token.symbol ? <TokenIcon token={row.token} /> : row.collateralToken
         },
         maxWidth: '140px',
         minWidth: '140px',

@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react'
 import DataTable from 'react-data-table-component'
-import { useHistory } from 'react-router-dom'
 
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import { CellHash } from 'components/table/CellHash'
@@ -14,29 +13,19 @@ interface Props {
 
 export const DisplayTableConditions = (props: Props) => {
   const { callbackOnHistoryPush, conditionIds } = props
-  const history = useHistory()
-
-  const handleRowClick = useCallback(
-    (conditionId: string) => {
-      if (typeof callbackOnHistoryPush === 'function') callbackOnHistoryPush()
-      history.push(`/conditions/${conditionId}`)
-    },
-    [history, callbackOnHistoryPush]
-  )
 
   const getColumns = useCallback(() => {
     return [
       {
         // eslint-disable-next-line react/display-name
         cell: (row: ConditionIdsArray) => {
-          const port = window.location.port !== '' ? `:${window.location.port}` : ''
           return (
             <CellHash
-              externalLink={`${window.location.protocol}//${window.location.hostname}${port}/#/conditions/${row.conditionId}`}
+              externalLink
+              href={`conditions/${row.conditionId}`}
               onClick={() => {
-                handleRowClick(row.conditionId)
+                if (typeof callbackOnHistoryPush === 'function') callbackOnHistoryPush()
               }}
-              underline
               value={row.conditionId}
             />
           )
@@ -46,7 +35,7 @@ export const DisplayTableConditions = (props: Props) => {
         sortable: true,
       },
     ]
-  }, [handleRowClick])
+  }, [callbackOnHistoryPush])
 
   return (
     <DataTable

@@ -17,7 +17,7 @@ export const CollateralFilterDropdown = ({ onClick, value }: Props) => {
     ? [
         ...networkConfig.getTokens().map((token: Token) => {
           return {
-            content: <TokenIcon symbol={token.symbol} />,
+            content: <TokenIcon token={token} />,
             onClick: () => {
               onClick(token.symbol, token.address)
             },

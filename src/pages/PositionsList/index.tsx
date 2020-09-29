@@ -256,10 +256,7 @@ export const PositionsList = () => {
           const { collateralTokenERC1155 } = row
           // Please don't delete this because the tests will explode
           return collateralTokenERC1155 ? (
-            <TokenIcon
-              onClick={() => handleRowClick(row)}
-              symbol={collateralTokenERC1155.symbol || ''}
-            />
+            <TokenIcon onClick={() => handleRowClick(row)} token={collateralTokenERC1155} />
           ) : (
             row.collateralToken
           )

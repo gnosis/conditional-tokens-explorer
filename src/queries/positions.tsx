@@ -97,7 +97,7 @@ export const GetPositionQuery = gql`
 
 export const GetMultiPositionsQuery = gql`
   query GetMultiPositions($ids: [ID!]!) {
-    positions(where: { id_in: $ids } , orderBy: createTimestamp, orderDirection: desc) {
+    positions(where: { id_in: $ids }, orderBy: createTimestamp, orderDirection: desc) {
       ...PositionData
     }
   }
