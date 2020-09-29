@@ -282,7 +282,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
               className="outerTableWrapper inlineTable"
               columns={getPositionsColumns()}
               customStyles={customStyles}
-              data={positionList}
+              data={positionList.length ? positionList : []}
               noDataComponent={
                 <EmptyContentText>{`No positions${
                   showOnlyPositionsWithBalance && dataWithToken.length ? ' with balance' : ''
