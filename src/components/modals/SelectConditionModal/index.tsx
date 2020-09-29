@@ -21,7 +21,7 @@ import { TitleValue } from 'components/text/TitleValue'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useConditions } from 'hooks/useConditions'
 import { customStyles } from 'theme/tableCustomStyles'
-import { Conditions_conditions, GetCondition_condition } from 'types/generatedGQL'
+import { Conditions_conditions } from 'types/generatedGQL'
 import { truncateStringInTheMiddle } from 'util/tools'
 
 const LoadingWrapper = styled.div`
@@ -64,7 +64,7 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
     conditionId: conditionIdToSearch,
   })
 
-  const [selectedCondition, setSelectedCondition] = useState<Maybe<GetCondition_condition>>(null)
+  const [selectedCondition, setSelectedCondition] = useState<Maybe<Conditions_conditions>>(null)
   const { setCondition } = useConditionContext()
 
   const isLoading = !conditionIdToSearch && loading
@@ -133,7 +133,7 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
           <InlineLoading message="Loading conditions..." />
         </LoadingWrapper>
       )}
-      {error && <InfoCard message={error.message} title="Error" />}
+      {error && !isLoading && <InfoCard message={error.message} title="Error" />}
       {data && !isLoading && (
         <>
           <TableControls
