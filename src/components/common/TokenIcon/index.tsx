@@ -1,9 +1,11 @@
 import React from 'react'
+import Blockies from 'react-blockies'
 import styled from 'styled-components'
 
 import { BatIcon } from 'components/common/TokenIcon/img/BatIcon'
 import { CDaiIcon } from 'components/common/TokenIcon/img/CDaiIcon'
 import { ChaiIcon } from 'components/common/TokenIcon/img/ChaiIcon'
+import { CustomIcon } from 'components/common/TokenIcon/img/CustomIcon'
 import { DaiIcon } from 'components/common/TokenIcon/img/DaiIcon'
 import { DxdIcon } from 'components/common/TokenIcon/img/DxdIcon'
 import { EtherIcon } from 'components/common/TokenIcon/img/EtherIcon'
@@ -14,7 +16,7 @@ import { UsdcIcon } from 'components/common/TokenIcon/img/UsdcIcon'
 import { UsdtIcon } from 'components/common/TokenIcon/img/UsdtIcon'
 import { WEthIcon } from 'components/common/TokenIcon/img/WEthIcon'
 import { ZrxIcon } from 'components/common/TokenIcon/img/ZrxIcon'
-import Blockies from 'react-blockies'
+import { Token } from 'util/types'
 
 const ICON_DIMENSIONS = '20px'
 
@@ -51,7 +53,12 @@ const Symbol = styled.span`
   margin-left: 8px;
 `
 
-const currenciesData = [
+interface CurrencyData {
+  icon: React.ReactNode
+  symbol: string
+}
+
+const currenciesData: CurrencyData[] = [
   {
     icon: <BatIcon />,
     symbol: 'BAT',
@@ -70,7 +77,6 @@ const currenciesData = [
   },
   {
     icon: <UsdcIcon />,
-    text: 'USDC',
     symbol: 'USDC',
   },
   {
@@ -108,29 +114,64 @@ const currenciesData = [
 ]
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getTokenData = (symbol: string): Array<any> => {
-  return currenciesData.filter((item) => item.symbol.toUpperCase() === symbol.toUpperCase())
+const getTokenData = (symbol: string): Maybe<CurrencyData> => {
+  const currenciesDataFiltered = currenciesData.filter(
+    (item) => item.symbol.toUpperCase() === symbol.toUpperCase()
+  )
+  return currenciesDataFiltered.length > 0 ? currenciesDataFiltered[0] : null
 }
 
 interface Props {
-  symbol: string
+  token: Token
   onClick?: () => void
 }
 
 export const TokenIcon: React.FC<Props> = (props) => {
-  const { onClick, symbol, ...restProps } = props
-  const data = getTokenData(symbol)
+  const { onClick, token, ...restProps } = props
+  const { address, symbol } = token
+  const [isTokenChecked, setIsTokenChecked] = React.useState<Maybe<boolean>>(null)
+  const [isTokenImageExist, setIsTokenImageExist] = React.useState<boolean>(false)
+
+  const currencyData = getTokenData(symbol)
+
+  // Only exist for the mainnet, not for rinkeby
+  const customImageUrl = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${address}/logo.png`
+
+  React.useEffect(() => {
+    let cancelled = false
+
+    const CheckTokenAvailability = async () => {
+      try {
+        const result = await fetch(customImageUrl, { method: 'HEAD' })
+        if (!cancelled) setIsTokenImageExist(result.ok)
+      } catch (err) {
+        if (!cancelled) setIsTokenImageExist(false)
+      }
+      if (!cancelled) setIsTokenChecked(true)
+    }
+    CheckTokenAvailability()
+
+    return () => {
+      cancelled = true
+    }
+  }, [customImageUrl])
 
   return (
-    <Wrapper onClick={onClick} {...restProps}>
-      {data.length > 0 ? (
-        <Icon>{data[0].icon}</Icon>
-      ) : (
-        <CustomIconWrapper>
-          <Blockies scale={2} seed={symbol} size={10} />
-        </CustomIconWrapper>
-      )}
-      <Symbol>{symbol}</Symbol>
-    </Wrapper>
+    <>
+      {isTokenChecked !== null ? (
+        <Wrapper onClick={onClick} {...restProps}>
+          {currencyData ? (
+            <Icon>{currencyData.icon}</Icon>
+          ) : isTokenImageExist ? (
+            <CustomIcon src={customImageUrl} />
+          ) : (
+            <CustomIconWrapper>
+              <Blockies scale={2} seed={symbol} size={10} />
+            </CustomIconWrapper>
+          )}
+          <Symbol>{symbol}</Symbol>
+        </Wrapper>
+      ) : null}
+    </>
   )
 }

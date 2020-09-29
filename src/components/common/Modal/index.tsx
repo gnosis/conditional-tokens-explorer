@@ -22,7 +22,6 @@ const TitleText = styled.h2`
   flex-grow: 1;
   font-size: 22px;
   font-weight: 400;
-  line-height: 1.3;
   margin: 0;
   overflow: hidden;
   padding: 0 10px 0 0;

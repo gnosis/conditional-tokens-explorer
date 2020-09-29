@@ -1,5 +1,6 @@
 import React from 'react'
-import styled from 'styled-components'
+import { NavLink } from 'react-router-dom'
+import styled, { css } from 'styled-components'
 
 import { ButtonCopy } from 'components/buttons/ButtonCopy'
 import { ExternalLinkIcon } from 'components/icons/ExternalLinkIcon'
@@ -10,19 +11,22 @@ const Wrapper = styled.span`
   display: flex;
   flex-grow: 1;
   flex-wrap: nowrap;
-  font-family: 'Roboto Mono', monospace;
-  text-transform: uppercase;
   white-space: nowrap;
 `
 
-const Text = styled.span<{ underline?: boolean }>`
-  ${(props) => props.underline && 'text-decoration: underline;'}
-  ${(props) => props.underline && 'cursor: pointer;'}
+const TextCSS = css`
+  color: ${(props) => props.theme.colors.textColor};
+  font-family: 'Roboto Mono', monospace;
+  text-transform: uppercase;
 `
 
-Text.defaultProps = {
-  underline: false,
-}
+const Text = styled.span`
+  ${TextCSS}
+`
+
+const Link = styled(NavLink)`
+  ${TextCSS}
+`
 
 const ExternalLink = styled.a`
   align-items: center;
@@ -33,33 +37,35 @@ const ExternalLink = styled.a`
 `
 
 interface Props {
-  externalLink?: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onClick?: (row: any) => void
+  externalLink?: boolean
+  href?: string
+  onClick?: () => void
   truncateInTheMiddle?: boolean
-  underline?: boolean
   value: string
 }
 
 export const CellHash: React.FC<Props> = (props) => {
-  const {
-    externalLink,
-    onClick,
-    truncateInTheMiddle = true,
-    underline,
-    value,
-    ...restProps
-  } = props
+  const { externalLink, href, onClick, truncateInTheMiddle = true, value, ...restProps } = props
   const shownValue = truncateInTheMiddle ? truncateStringInTheMiddle(value, 10, 8) : value
+  const port = window.location.port !== '' ? `:${window.location.port}` : ''
 
   return (
     <Wrapper {...restProps}>
-      <Text onClick={onClick} underline={underline}>
-        {shownValue}
-      </Text>
+      {href ? (
+        <Link className="cellHashText" to={href}>
+          {shownValue}
+        </Link>
+      ) : (
+        <Text className="cellHashText" onClick={onClick}>
+          {shownValue}
+        </Text>
+      )}
       <ButtonCopy light value={value} />
       {externalLink && (
-        <ExternalLink href={externalLink} target="_blank">
+        <ExternalLink
+          href={`${window.location.protocol}//${window.location.hostname}${port}/#/${href}`}
+          target="_blank"
+        >
           <ExternalLinkIcon />
         </ExternalLink>
       )}
