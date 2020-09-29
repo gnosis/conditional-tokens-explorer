@@ -38,7 +38,7 @@ export const Wrapper = (props: WrapperProps) => {
           actionButton={{
             buttonType: ButtonType.primary,
             text: 'OK',
-            onClick: () => history.push(`/positions`),
+            onClick: () => history.push(`/conditions`),
           }}
           icon={IconTypes.spinner}
           message="Transaction successfully finished, now waiting for the condition to be indexed. Check again in a few minutes."
