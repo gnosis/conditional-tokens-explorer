@@ -77,15 +77,11 @@ Items.defaultProps = {
   isOpen: false,
 }
 
-export const DropdownItem = styled.div<{ active?: boolean }>`
+export const DropdownItemCSS = css`
   align-items: center;
-  background-color: ${(props) =>
-    props.active
-      ? props.theme.dropdown.item.backgroundColorActive
-      : props.theme.dropdown.item.backgroundColor};
+  background-color: ${(props) => props.theme.dropdown.item.backgroundColor};
   border-bottom: 1px solid ${(props) => props.theme.dropdown.item.borderColor};
-  color: ${(props) =>
-    props.active ? props.theme.dropdown.item.color : props.theme.dropdown.item.colorActive};
+  color: ${(props) => props.theme.dropdown.item.color};
   cursor: pointer;
   display: flex;
   font-size: 14px;
@@ -94,6 +90,12 @@ export const DropdownItem = styled.div<{ active?: boolean }>`
   min-height: ${(props) => props.theme.dropdown.item.height};
   overflow: hidden;
   padding: 10px ${(props) => props.theme.dropdown.item.paddingHorizontal};
+  text-decoration: none;
+
+  &.isActive {
+    background-color: ${(props) => props.theme.dropdown.item.backgroundColorActive};
+    color: ${(props) => props.theme.dropdown.item.colorActive};
+  }
 
   &:first-child {
     border-top-left-radius: ${(props) => props.theme.cards.borderRadius};
@@ -107,8 +109,23 @@ export const DropdownItem = styled.div<{ active?: boolean }>`
   }
 
   &:hover {
-    background: ${(props) => props.theme.dropdown.item.backgroundColorHover};
+    background-color: ${(props) => props.theme.dropdown.item.backgroundColorHover};
   }
+
+  &:disabled,
+  &[disabled] {
+    &,
+    &:hover {
+      background-color: ${(props) => props.theme.dropdown.item.backgroundColor};
+      cursor: not-allowed;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  }
+`
+
+export const DropdownItem = styled.div`
+  ${DropdownItemCSS}
 `
 
 export interface DropdownItemProps {
@@ -194,10 +211,10 @@ export const Dropdown: React.FC<Props> = (props) => {
         {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           items.map((item: any, index: number) => {
-            const isActive = activeItemHighlight && index === currentItemIndex
+            const isActive = activeItemHighlight && index === currentItemIndex && 'isActive'
+
             const dropdownItem = React.cloneElement(item, {
-              active: isActive,
-              className: 'dropdownItem',
+              className: `dropdownItem ${isActive}`,
               key: item.key ? item.key : index,
               onClick: (e) => {
                 e.stopPropagation()

@@ -3,6 +3,7 @@ import { waitFor } from '@testing-library/dom'
 import { render } from '@testing-library/react'
 import React from 'react'
 import { act } from 'react-dom/test-utils'
+import { HashRouter } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
 
 import { NetworkConfig } from 'config/networkConfig'
@@ -39,7 +40,9 @@ const renderWithConnectedProvider = (component: any, query: any) => {
   return render(
     <Web3Context.Provider value={{ status: connectedStatus, connect, disconnect }}>
       <ThemeProvider theme={theme}>
-        <MockedProvider mocks={query}>{component}</MockedProvider>
+        <HashRouter>
+          <MockedProvider mocks={query}>{component}</MockedProvider>
+        </HashRouter>
       </ThemeProvider>
     </Web3Context.Provider>
   )
@@ -50,7 +53,9 @@ const renderWithDisconnectedProvider = (component: any, query: any) => {
   return render(
     <Web3Context.Provider value={{ status: infuraStatus, connect, disconnect }}>
       <ThemeProvider theme={theme}>
-        <MockedProvider mocks={query}>{component}</MockedProvider>
+        <HashRouter>
+          <MockedProvider mocks={query}>{component}</MockedProvider>
+        </HashRouter>
       </ThemeProvider>
     </Web3Context.Provider>
   )

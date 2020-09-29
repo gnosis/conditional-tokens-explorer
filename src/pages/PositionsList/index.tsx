@@ -2,12 +2,18 @@ import { useDebounceCallback } from '@react-hook/debounce'
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { useHistory } from 'react-router-dom'
+import { NavLink, useHistory } from 'react-router-dom'
+import styled from 'styled-components'
 
 import { ButtonDots } from 'components/buttons/ButtonDots'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CollateralFilterDropdown } from 'components/common/CollateralFilterDropdown'
-import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownItemCSS,
+  DropdownPosition,
+} from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
 import { SearchField } from 'components/form/SearchField'
 import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
@@ -28,6 +34,10 @@ import { customStyles } from 'theme/tableCustomStyles'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import { CollateralFilterOptions, LocalStorageManagement, Token, TransferOptions } from 'util/types'
+
+const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
+  ${DropdownItemCSS}
+`
 
 const logger = getLogger('PositionsList')
 
@@ -83,21 +93,24 @@ export const PositionsList = () => {
 
       const menu = [
         {
+          href: `/positions/${id}`,
+          onClick: undefined,
           text: 'Details',
-          onClick: () => history.push(`/positions/${id}`),
         },
         {
+          href: `/redeem`,
           text: 'Redeem',
           onClick: () => {
             setValue(id)
-            history.push(`/redeem`)
           },
         },
       ]
 
       if (!userBalanceERC1155.isZero() && signer) {
-        const menuERC1155 = [
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const menuERC1155: Array<any> = [
           {
+            href: undefined,
             text: 'Transfer Outcome Tokens',
             onClick: () => {
               setSelectedPositionId(id)
@@ -106,6 +119,7 @@ export const PositionsList = () => {
             },
           },
           {
+            href: undefined,
             text: 'Wrap ERC1155',
             onClick: () => {
               setSelectedPositionId(id)
@@ -119,8 +133,10 @@ export const PositionsList = () => {
       }
 
       if (!userBalanceERC20.isZero() && signer) {
-        const menuERC20 = [
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const menuERC20: Array<any> = [
           {
+            href: undefined,
             text: 'Unwrap ERC20',
             onClick: () => {
               setSelectedPositionId(id)
@@ -136,7 +152,7 @@ export const PositionsList = () => {
 
       return menu
     },
-    [history, setValue, signer]
+    [setValue, signer]
   )
 
   const handleRowClick = useCallback(
@@ -155,11 +171,21 @@ export const PositionsList = () => {
             activeItemHighlight={false}
             dropdownButtonContent={<ButtonDots />}
             dropdownPosition={DropdownPosition.right}
-            items={buildMenuForRow(row).map((item, index) => (
-              <DropdownItem key={index} onClick={item.onClick}>
-                {item.text}
-              </DropdownItem>
-            ))}
+            items={buildMenuForRow(row).map((item, index) => {
+              if (item.href) {
+                return (
+                  <DropdownItemLink onMouseDown={item.onClick} to={item.href}>
+                    {item.text}
+                  </DropdownItemLink>
+                )
+              } else {
+                return (
+                  <DropdownItem key={index} onClick={item.onClick}>
+                    {item.text}
+                  </DropdownItem>
+                )
+              }
+            })}
           />
         ),
         name: '',
@@ -217,7 +243,7 @@ export const PositionsList = () => {
       {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimals) => (
-          <CellHash onClick={() => handleRowClick(row)} underline value={row.id} />
+          <CellHash href={`/positions/${row.id}`} value={row.id} />
         ),
         name: 'Position Id',
         selector: 'createTimestamp',
@@ -230,7 +256,10 @@ export const PositionsList = () => {
           const { collateralTokenERC1155 } = row
           // Please don't delete this because the tests will explode
           return collateralTokenERC1155 ? (
-            <TokenIcon symbol={collateralTokenERC1155.symbol || ''} />
+            <TokenIcon
+              onClick={() => handleRowClick(row)}
+              symbol={collateralTokenERC1155.symbol || ''}
+            />
           ) : (
             row.collateralToken
           )

@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useMemo, useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { Button } from 'components/buttons/Button'
@@ -8,7 +8,12 @@ import { ButtonCopy } from 'components/buttons/ButtonCopy'
 import { ButtonDropdownCircle } from 'components/buttons/ButtonDropdownCircle'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CenteredCard } from 'components/common/CenteredCard'
-import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownItemCSS,
+  DropdownPosition,
+} from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
 import { DisplayTableConditions } from 'components/form/DisplayTableConditions'
 import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
@@ -73,21 +78,24 @@ const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
 `
 
+const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
+  ${DropdownItemCSS}
+`
+
 interface Props {
-  position: Position
   balanceERC1155: BigNumber
   balanceERC20: BigNumber
   conditions: Array<ConditionIdsArray>
   collateralTokenAddress: string
-  wrappedTokenAddress: string
+  position: Position
   refetchBalances: () => void
+  wrappedTokenAddress: string
 }
 
 const logger = getLogger('Contents')
 
 export const Contents = (props: Props) => {
   const { CTService, WrapperService, connect, signer } = useWeb3ConnectedOrInfura()
-  const history = useHistory()
   const {
     balanceERC20,
     balanceERC1155,
@@ -116,16 +124,16 @@ export const Contents = (props: Props) => {
   const dropdownItems = useMemo(() => {
     const menu = [
       {
+        href: `/redeem`,
         onClick: () => {
           setValue(positionId)
-          history.push(`/redeem`)
         },
         text: 'Redeem',
       },
       {
+        href: `/split`,
         onClick: () => {
           setValue(positionId)
-          history.push(`/split`)
         },
         text: 'Split',
       },
@@ -133,6 +141,7 @@ export const Contents = (props: Props) => {
 
     if (balanceERC1155 && !balanceERC1155.isZero() && signer) {
       menu.push({
+        href: '',
         text: 'Transfer Outcome Tokens',
         onClick: () => {
           setOpenTransferOutcomeTokensModal(true)
@@ -141,7 +150,7 @@ export const Contents = (props: Props) => {
     }
 
     return menu
-  }, [positionId, history, signer, balanceERC1155, setValue])
+  }, [positionId, signer, balanceERC1155, setValue])
 
   const positionPreview = React.useMemo(() => {
     if (collateralERC1155 && balanceERC1155) {
@@ -283,19 +292,29 @@ export const Contents = (props: Props) => {
     : 'All done!'
   const fullLoadingTitle = transfer.isFailure() ? 'Error' : transactionTitle
 
-  const outcomesByRow = '15'
-
+  const outcomesByRow = '14'
   return (
     <CenteredCard
       dropdown={
         <Dropdown
+          activeItemHighlight={false}
           dropdownButtonContent={<ButtonDropdownCircle />}
           dropdownPosition={DropdownPosition.right}
-          items={dropdownItems.map((item, index) => (
-            <DropdownItem key={index} onClick={item.onClick}>
-              {item.text}
-            </DropdownItem>
-          ))}
+          items={dropdownItems.map((item, index) => {
+            if (item.href) {
+              return (
+                <DropdownItemLink key={index} onMouseDown={item.onClick} to={item.href}>
+                  {item.text}
+                </DropdownItemLink>
+              )
+            } else {
+              return (
+                <DropdownItem key={index} onClick={item.onClick}>
+                  {item.text}
+                </DropdownItem>
+              )
+            }
+          })}
         />
       }
     >
