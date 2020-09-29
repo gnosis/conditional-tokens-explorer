@@ -33,7 +33,7 @@ import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { customStyles } from 'theme/tableCustomStyles'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
-import { CollateralFilterOptions, Token, TransferOptions } from 'util/types'
+import { CollateralFilterOptions, LocalStorageManagement, Token, TransferOptions } from 'util/types'
 
 const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
   ${DropdownItemCSS}
@@ -44,7 +44,7 @@ const logger = getLogger('PositionsList')
 export const PositionsList = () => {
   const { _type: status, CTService, WrapperService, connect, signer } = useWeb3ConnectedOrInfura()
   const history = useHistory()
-  const { setValue } = useLocalStorage('positionid')
+  const { setValue } = useLocalStorage(LocalStorageManagement.PositionId)
 
   const [positionIdToSearch, setPositionIdToSearch] = useState<string>('')
   const [positionIdToShow, setPositionIdToShow] = useState<string>('')

@@ -50,6 +50,7 @@ export enum ConditionErrors {
   FETCHING_ERROR = `Error fetching condition`,
   NOT_FOUND_ERROR = `Condition doesn't exist`,
   NOT_RESOLVED_ERROR = `Condition is not resolved`,
+  NOT_INDEXED_ERROR = `Condition is not indexed yet`,
 }
 
 export enum PositionErrors {
@@ -140,4 +141,13 @@ export interface TransferOptions {
   amount: BigNumber
   address: string
   positionId: string
+}
+
+export type ConditionIdsArray = {
+  conditionId: string
+}
+
+export enum LocalStorageManagement {
+  ConditionId = 'conditionId',
+  PositionId = 'positionId',
 }

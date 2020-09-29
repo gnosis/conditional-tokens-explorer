@@ -11,20 +11,17 @@ import { formatBigNumber, truncateStringInTheMiddle } from 'util/tools'
 import { PositionIdsArray, SplitStatus } from 'util/types'
 
 interface Props extends SplitStatus {
-  callbackOnHistoryPush: () => void
+  callbackOnHistoryPush?: () => void
 }
 
-export const DisplayTablePositions = ({
-  callbackOnHistoryPush,
-  collateral,
-  positionIds,
-}: Props) => {
+export const DisplayTablePositions = (props: Props) => {
+  const { callbackOnHistoryPush, collateral, positionIds } = props
   const history = useHistory()
   const { collateral: collateralFetched, loading } = useCollateral(collateral)
 
   const handleRowClick = useCallback(
     (positionId: string) => {
-      callbackOnHistoryPush()
+      if (typeof callbackOnHistoryPush === 'function') callbackOnHistoryPush()
       history.push(`/positions/${positionId}`)
     },
     [history, callbackOnHistoryPush]
@@ -96,7 +93,7 @@ export const DisplayTablePositions = ({
       columns={getColumns()}
       customStyles={customStyles}
       data={positionIds || []}
-      noDataComponent={<EmptyContentText>{`No positions found.`}</EmptyContentText>}
+      noDataComponent={<EmptyContentText>No positions found.</EmptyContentText>}
       noHeader
       pagination
       paginationPerPage={5}

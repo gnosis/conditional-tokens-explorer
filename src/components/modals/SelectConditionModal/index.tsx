@@ -128,7 +128,7 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
 
   return (
     <Modal subTitle={'Select one condition.'} title={'Select Condition'} {...restProps}>
-      {isLoading && (
+      {isLoading && !error && (
         <LoadingWrapper>
           <InlineLoading message="Loading conditions..." />
         </LoadingWrapper>

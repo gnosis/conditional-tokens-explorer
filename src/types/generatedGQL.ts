@@ -88,6 +88,7 @@ export interface Positions_positions_wrappedToken {
 export interface Positions_positions {
   __typename: "Position";
   id: string;
+  createTimestamp: any;
   collateralToken: Positions_positions_collateralToken;
   wrappedToken: Positions_positions_wrappedToken | null;
 }
@@ -153,6 +154,7 @@ export interface GetPosition_position {
   id: string;
   indexSets: any[];
   activeValue: any;
+  createTimestamp: any;
   collateralToken: GetPosition_position_collateralToken;
   wrappedToken: GetPosition_position_wrappedToken | null;
   collection: GetPosition_position_collection;
@@ -225,6 +227,7 @@ export interface GetMultiPositions_positions {
   id: string;
   indexSets: any[];
   activeValue: any;
+  createTimestamp: any;
   collateralToken: GetMultiPositions_positions_collateralToken;
   wrappedToken: GetMultiPositions_positions_wrappedToken | null;
   collection: GetMultiPositions_positions_collection;
@@ -389,6 +392,7 @@ export interface PositionData {
   id: string;
   indexSets: any[];
   activeValue: any;
+  createTimestamp: any;
   collateralToken: PositionData_collateralToken;
   wrappedToken: PositionData_wrappedToken | null;
   collection: PositionData_collection;
