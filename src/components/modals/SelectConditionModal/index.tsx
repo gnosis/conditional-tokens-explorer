@@ -1,5 +1,5 @@
 import { useDebounceCallback } from '@react-hook/debounce'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import styled from 'styled-components'
 
@@ -65,6 +65,20 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
   })
 
   const [selectedCondition, setSelectedCondition] = useState<Maybe<Conditions_conditions>>(null)
+  const [conditionList, setConditionList] = useState<Conditions_conditions[]>([])
+
+  useEffect(() => {
+    if (!data || !data.conditions) {
+      setConditionList([])
+    } else {
+      if (selectedCondition) {
+        setConditionList(data.conditions.filter(({ id }) => selectedCondition.id !== id))
+      } else {
+        setConditionList(data.conditions)
+      }
+    }
+  }, [selectedCondition, data])
+
   const { setCondition } = useConditionContext()
 
   const isLoading = !conditionIdToSearch && loading
@@ -155,7 +169,7 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
               className="outerTableWrapper inlineTable"
               columns={columns}
               customStyles={customStyles}
-              data={data?.conditions || []}
+              data={conditionList.length ? conditionList : []}
               noDataComponent={<EmptyContentText>No conditions found.</EmptyContentText>}
               noHeader
               pagination
