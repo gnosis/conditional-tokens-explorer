@@ -33,21 +33,8 @@ cd -
 
 # deploy Wrapped1155Factory contract
 cd 1155-to-20
-echo "module.exports = {
-  networks: {
-    development: {
-      host: \"ganache\",
-      port: 8545,
-      network_id: \"*\",
-    }
-  },
-  compilers: {
-    solc: {
-      version: \"0.6.12\",
-    }
-  }
-}" > truffle-config.js
-./node_modules/.bin/truffle migrate --network development
+sed -i 's/localhost/ganache/g' truffle-config.js
+./node_modules/.bin/truffle migrate --network local
 WRAPPED_1155_FACTORY_CONTRACT_ADDRESS=$(jq -r '.networks["50"].address' build/contracts/Wrapped1155Factory.json)
 cd -
 

@@ -22,7 +22,7 @@ RUN apt-get update && apt-get install -y jq && rm -rf /var/lib/apt/lists/* \
   yarn && cd .. \
   && git clone https://github.com/gnosis/1155-to-20 && \
   cd 1155-to-20 && \
-  git checkout 41289b57fc105fac65ec3935af3748a6f5c6d085 && \
+  git checkout ef77f81fde487bc55814ca4e8f9e728a15d69774 && \
   yarn && cd .. \
   && chmod +x prepare_db.sh
 
