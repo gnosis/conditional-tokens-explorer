@@ -1,3 +1,4 @@
-src/types/generatedGQL.ts
+src/types/generatedGQLForCTE.ts
+src/types/generatedGQLForOMEN.ts
 scripts/*.*
 *.d.ts

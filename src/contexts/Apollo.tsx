@@ -1,6 +1,4 @@
 import { ApolloProvider } from '@apollo/react-hooks'
-import React from 'react'
-
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import { ApolloClient } from 'apollo-client'
 import { from, split } from 'apollo-link'
@@ -8,6 +6,8 @@ import { HttpLink } from 'apollo-link-http'
 import apolloLogger from 'apollo-link-logger'
 import { WebSocketLink } from 'apollo-link-ws'
 import { getMainDefinition } from 'apollo-utilities'
+import React from 'react'
+
 import {
   CTE_GRAPH_HTTP_MAINNET,
   CTE_GRAPH_HTTP_RINKEBY,

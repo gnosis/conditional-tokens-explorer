@@ -71,7 +71,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "yarn generateGQLTypes && git add ./src/types/generatedGQL.ts && lint-staged --allow-empty",
+      "pre-commit": "yarn generateGQLTypes && git add ./src/types/generatedGQLForOMEN.ts && git add ./src/types/generatedGQLForCTE.ts && lint-staged --allow-empty",
       "pre-push": "yarn test --watchAll=false --passWithNoTests"
     }
   },

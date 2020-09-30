@@ -8,18 +8,18 @@
 // ====================================================
 
 export interface Conditions_conditions {
-  __typename: 'Condition'
-  id: string
-  oracle: any
-  questionId: any
-  outcomeSlotCount: number
-  resolved: boolean
-  creator: any
-  resolveBlockNumber: any | null
+  __typename: "Condition";
+  id: string;
+  oracle: any;
+  questionId: any;
+  outcomeSlotCount: number;
+  resolved: boolean;
+  creator: any;
+  resolveBlockNumber: any | null;
 }
 
 export interface Conditions {
-  conditions: Conditions_conditions[]
+  conditions: Conditions_conditions[];
 }
 
 /* tslint:disable */
@@ -32,38 +32,38 @@ export interface Conditions {
 // ====================================================
 
 export interface GetCondition_condition_positions_collateralToken {
-  __typename: 'CollateralToken'
-  id: string
+  __typename: "CollateralToken";
+  id: string;
 }
 
 export interface GetCondition_condition_positions {
-  __typename: 'Position'
-  id: string
-  collateralToken: GetCondition_condition_positions_collateralToken
+  __typename: "Position";
+  id: string;
+  collateralToken: GetCondition_condition_positions_collateralToken;
 }
 
 export interface GetCondition_condition {
-  __typename: 'Condition'
-  id: string
-  oracle: any
-  questionId: any
-  outcomeSlotCount: number
-  resolved: boolean
-  creator: any
-  payouts: any[] | null
-  payoutNumerators: any[] | null
-  payoutDenominator: any | null
-  resolveTimestamp: any | null
-  resolveBlockNumber: any | null
-  positions: GetCondition_condition_positions[] | null
+  __typename: "Condition";
+  id: string;
+  oracle: any;
+  questionId: any;
+  outcomeSlotCount: number;
+  resolved: boolean;
+  creator: any;
+  payouts: any[] | null;
+  payoutNumerators: any[] | null;
+  payoutDenominator: any | null;
+  resolveTimestamp: any | null;
+  resolveBlockNumber: any | null;
+  positions: GetCondition_condition_positions[] | null;
 }
 
 export interface GetCondition {
-  condition: GetCondition_condition | null
+  condition: GetCondition_condition | null;
 }
 
 export interface GetConditionVariables {
-  id: string
+  id: string;
 }
 
 /* tslint:disable */
@@ -76,25 +76,25 @@ export interface GetConditionVariables {
 // ====================================================
 
 export interface Positions_positions_collateralToken {
-  __typename: 'CollateralToken'
-  id: string
+  __typename: "CollateralToken";
+  id: string;
 }
 
 export interface Positions_positions_wrappedToken {
-  __typename: 'WrappedToken'
-  id: string
+  __typename: "WrappedToken";
+  id: string;
 }
 
 export interface Positions_positions {
-  __typename: 'Position'
-  id: string
-  createTimestamp: any
-  collateralToken: Positions_positions_collateralToken
-  wrappedToken: Positions_positions_wrappedToken | null
+  __typename: "Position";
+  id: string;
+  createTimestamp: any;
+  collateralToken: Positions_positions_collateralToken;
+  wrappedToken: Positions_positions_wrappedToken | null;
 }
 
 export interface Positions {
-  positions: Positions_positions[]
+  positions: Positions_positions[];
 }
 
 /* tslint:disable */
@@ -107,67 +107,67 @@ export interface Positions {
 // ====================================================
 
 export interface GetPosition_position_collateralToken {
-  __typename: 'CollateralToken'
-  id: string
+  __typename: "CollateralToken";
+  id: string;
 }
 
 export interface GetPosition_position_wrappedToken {
-  __typename: 'WrappedToken'
-  id: string
+  __typename: "WrappedToken";
+  id: string;
 }
 
 export interface GetPosition_position_collection_conditions {
-  __typename: 'Condition'
-  id: string
-  oracle: any
-  questionId: any
-  outcomeSlotCount: number
-  resolved: boolean
-  creator: any
-  payouts: any[] | null
-  payoutNumerators: any[] | null
-  payoutDenominator: any | null
+  __typename: "Condition";
+  id: string;
+  oracle: any;
+  questionId: any;
+  outcomeSlotCount: number;
+  resolved: boolean;
+  creator: any;
+  payouts: any[] | null;
+  payoutNumerators: any[] | null;
+  payoutDenominator: any | null;
 }
 
 export interface GetPosition_position_collection_positions {
-  __typename: 'Position'
-  id: string
+  __typename: "Position";
+  id: string;
 }
 
 export interface GetPosition_position_collection {
-  __typename: 'Collection'
-  id: string
-  conditions: GetPosition_position_collection_conditions[]
-  conditionIds: string[]
-  indexSets: any[]
-  positions: GetPosition_position_collection_positions[] | null
+  __typename: "Collection";
+  id: string;
+  conditions: GetPosition_position_collection_conditions[];
+  conditionIds: string[];
+  indexSets: any[];
+  positions: GetPosition_position_collection_positions[] | null;
 }
 
 export interface GetPosition_position_conditions {
-  __typename: 'Condition'
-  id: string
-  outcomeSlotCount: number
+  __typename: "Condition";
+  id: string;
+  outcomeSlotCount: number;
 }
 
 export interface GetPosition_position {
-  __typename: 'Position'
-  id: string
-  indexSets: any[]
-  activeValue: any
-  createTimestamp: any
-  collateralToken: GetPosition_position_collateralToken
-  wrappedToken: GetPosition_position_wrappedToken | null
-  collection: GetPosition_position_collection
-  conditionIds: string[]
-  conditions: GetPosition_position_conditions[]
+  __typename: "Position";
+  id: string;
+  indexSets: any[];
+  activeValue: any;
+  createTimestamp: any;
+  collateralToken: GetPosition_position_collateralToken;
+  wrappedToken: GetPosition_position_wrappedToken | null;
+  collection: GetPosition_position_collection;
+  conditionIds: string[];
+  conditions: GetPosition_position_conditions[];
 }
 
 export interface GetPosition {
-  position: GetPosition_position | null
+  position: GetPosition_position | null;
 }
 
 export interface GetPositionVariables {
-  id: string
+  id: string;
 }
 
 /* tslint:disable */
@@ -180,67 +180,67 @@ export interface GetPositionVariables {
 // ====================================================
 
 export interface GetMultiPositions_positions_collateralToken {
-  __typename: 'CollateralToken'
-  id: string
+  __typename: "CollateralToken";
+  id: string;
 }
 
 export interface GetMultiPositions_positions_wrappedToken {
-  __typename: 'WrappedToken'
-  id: string
+  __typename: "WrappedToken";
+  id: string;
 }
 
 export interface GetMultiPositions_positions_collection_conditions {
-  __typename: 'Condition'
-  id: string
-  oracle: any
-  questionId: any
-  outcomeSlotCount: number
-  resolved: boolean
-  creator: any
-  payouts: any[] | null
-  payoutNumerators: any[] | null
-  payoutDenominator: any | null
+  __typename: "Condition";
+  id: string;
+  oracle: any;
+  questionId: any;
+  outcomeSlotCount: number;
+  resolved: boolean;
+  creator: any;
+  payouts: any[] | null;
+  payoutNumerators: any[] | null;
+  payoutDenominator: any | null;
 }
 
 export interface GetMultiPositions_positions_collection_positions {
-  __typename: 'Position'
-  id: string
+  __typename: "Position";
+  id: string;
 }
 
 export interface GetMultiPositions_positions_collection {
-  __typename: 'Collection'
-  id: string
-  conditions: GetMultiPositions_positions_collection_conditions[]
-  conditionIds: string[]
-  indexSets: any[]
-  positions: GetMultiPositions_positions_collection_positions[] | null
+  __typename: "Collection";
+  id: string;
+  conditions: GetMultiPositions_positions_collection_conditions[];
+  conditionIds: string[];
+  indexSets: any[];
+  positions: GetMultiPositions_positions_collection_positions[] | null;
 }
 
 export interface GetMultiPositions_positions_conditions {
-  __typename: 'Condition'
-  id: string
-  outcomeSlotCount: number
+  __typename: "Condition";
+  id: string;
+  outcomeSlotCount: number;
 }
 
 export interface GetMultiPositions_positions {
-  __typename: 'Position'
-  id: string
-  indexSets: any[]
-  activeValue: any
-  createTimestamp: any
-  collateralToken: GetMultiPositions_positions_collateralToken
-  wrappedToken: GetMultiPositions_positions_wrappedToken | null
-  collection: GetMultiPositions_positions_collection
-  conditionIds: string[]
-  conditions: GetMultiPositions_positions_conditions[]
+  __typename: "Position";
+  id: string;
+  indexSets: any[];
+  activeValue: any;
+  createTimestamp: any;
+  collateralToken: GetMultiPositions_positions_collateralToken;
+  wrappedToken: GetMultiPositions_positions_wrappedToken | null;
+  collection: GetMultiPositions_positions_collection;
+  conditionIds: string[];
+  conditions: GetMultiPositions_positions_conditions[];
 }
 
 export interface GetMultiPositions {
-  positions: GetMultiPositions_positions[]
+  positions: GetMultiPositions_positions[];
 }
 
 export interface GetMultiPositionsVariables {
-  ids: string[]
+  ids: string[];
 }
 
 /* tslint:disable */
@@ -253,36 +253,36 @@ export interface GetMultiPositionsVariables {
 // ====================================================
 
 export interface UserWithPositions_user_userPositions_position {
-  __typename: 'Position'
-  id: string
+  __typename: "Position";
+  id: string;
 }
 
 export interface UserWithPositions_user_userPositions_user {
-  __typename: 'User'
-  id: string
+  __typename: "User";
+  id: string;
 }
 
 export interface UserWithPositions_user_userPositions {
-  __typename: 'UserPosition'
-  id: string
-  position: UserWithPositions_user_userPositions_position
-  balance: any
-  wrappedBalance: any
-  totalBalance: any
-  user: UserWithPositions_user_userPositions_user
+  __typename: "UserPosition";
+  id: string;
+  position: UserWithPositions_user_userPositions_position;
+  balance: any;
+  wrappedBalance: any;
+  totalBalance: any;
+  user: UserWithPositions_user_userPositions_user;
 }
 
 export interface UserWithPositions_user {
-  __typename: 'User'
-  userPositions: UserWithPositions_user_userPositions[] | null
+  __typename: "User";
+  userPositions: UserWithPositions_user_userPositions[] | null;
 }
 
 export interface UserWithPositions {
-  user: UserWithPositions_user | null
+  user: UserWithPositions_user | null;
 }
 
 export interface UserWithPositionsVariables {
-  account: string
+  account: string;
 }
 
 /* tslint:disable */
@@ -295,44 +295,44 @@ export interface UserWithPositionsVariables {
 // ====================================================
 
 export interface UserPositionBalances_userPositions_position_collateralToken {
-  __typename: 'CollateralToken'
-  id: string
+  __typename: "CollateralToken";
+  id: string;
 }
 
 export interface UserPositionBalances_userPositions_position_wrappedToken {
-  __typename: 'WrappedToken'
-  id: string
+  __typename: "WrappedToken";
+  id: string;
 }
 
 export interface UserPositionBalances_userPositions_position {
-  __typename: 'Position'
-  id: string
-  collateralToken: UserPositionBalances_userPositions_position_collateralToken
-  wrappedToken: UserPositionBalances_userPositions_position_wrappedToken | null
+  __typename: "Position";
+  id: string;
+  collateralToken: UserPositionBalances_userPositions_position_collateralToken;
+  wrappedToken: UserPositionBalances_userPositions_position_wrappedToken | null;
 }
 
 export interface UserPositionBalances_userPositions_user {
-  __typename: 'User'
-  id: string
+  __typename: "User";
+  id: string;
 }
 
 export interface UserPositionBalances_userPositions {
-  __typename: 'UserPosition'
-  id: string
-  position: UserPositionBalances_userPositions_position
-  balance: any
-  wrappedBalance: any
-  totalBalance: any
-  user: UserPositionBalances_userPositions_user
+  __typename: "UserPosition";
+  id: string;
+  position: UserPositionBalances_userPositions_position;
+  balance: any;
+  wrappedBalance: any;
+  totalBalance: any;
+  user: UserPositionBalances_userPositions_user;
 }
 
 export interface UserPositionBalances {
-  userPositions: UserPositionBalances_userPositions[]
+  userPositions: UserPositionBalances_userPositions[];
 }
 
 export interface UserPositionBalancesVariables {
-  account?: string | null
-  positionId?: string | null
+  account?: string | null;
+  positionId?: string | null;
 }
 
 /* tslint:disable */
@@ -345,59 +345,59 @@ export interface UserPositionBalancesVariables {
 // ====================================================
 
 export interface PositionData_collateralToken {
-  __typename: 'CollateralToken'
-  id: string
+  __typename: "CollateralToken";
+  id: string;
 }
 
 export interface PositionData_wrappedToken {
-  __typename: 'WrappedToken'
-  id: string
+  __typename: "WrappedToken";
+  id: string;
 }
 
 export interface PositionData_collection_conditions {
-  __typename: 'Condition'
-  id: string
-  oracle: any
-  questionId: any
-  outcomeSlotCount: number
-  resolved: boolean
-  creator: any
-  payouts: any[] | null
-  payoutNumerators: any[] | null
-  payoutDenominator: any | null
+  __typename: "Condition";
+  id: string;
+  oracle: any;
+  questionId: any;
+  outcomeSlotCount: number;
+  resolved: boolean;
+  creator: any;
+  payouts: any[] | null;
+  payoutNumerators: any[] | null;
+  payoutDenominator: any | null;
 }
 
 export interface PositionData_collection_positions {
-  __typename: 'Position'
-  id: string
+  __typename: "Position";
+  id: string;
 }
 
 export interface PositionData_collection {
-  __typename: 'Collection'
-  id: string
-  conditions: PositionData_collection_conditions[]
-  conditionIds: string[]
-  indexSets: any[]
-  positions: PositionData_collection_positions[] | null
+  __typename: "Collection";
+  id: string;
+  conditions: PositionData_collection_conditions[];
+  conditionIds: string[];
+  indexSets: any[];
+  positions: PositionData_collection_positions[] | null;
 }
 
 export interface PositionData_conditions {
-  __typename: 'Condition'
-  id: string
-  outcomeSlotCount: number
+  __typename: "Condition";
+  id: string;
+  outcomeSlotCount: number;
 }
 
 export interface PositionData {
-  __typename: 'Position'
-  id: string
-  indexSets: any[]
-  activeValue: any
-  createTimestamp: any
-  collateralToken: PositionData_collateralToken
-  wrappedToken: PositionData_wrappedToken | null
-  collection: PositionData_collection
-  conditionIds: string[]
-  conditions: PositionData_conditions[]
+  __typename: "Position";
+  id: string;
+  indexSets: any[];
+  activeValue: any;
+  createTimestamp: any;
+  collateralToken: PositionData_collateralToken;
+  wrappedToken: PositionData_wrappedToken | null;
+  collection: PositionData_collection;
+  conditionIds: string[];
+  conditions: PositionData_conditions[];
 }
 
 /* tslint:disable */

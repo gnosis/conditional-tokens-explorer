@@ -8,16 +8,16 @@
 // ====================================================
 
 export interface GetCategories_categories {
-  __typename: 'Category'
-  id: string
+  __typename: "Category";
+  id: string;
 }
 
 export interface GetCategories {
-  categories: GetCategories_categories[]
+  categories: GetCategories_categories[];
 }
 
 export interface GetCategoriesVariables {
-  first: number
+  first: number;
 }
 
 /* tslint:disable */
