@@ -178,10 +178,11 @@ export const SelectPositions = ({
           <>
             {singlePosition ? (
               <TextfieldFetchableData
-                disabled={true}
                 error={!!errors.length}
                 isFetching={isLoading || balancesLoading}
+                onClick={() => setIsModalOpen(true)}
                 placeholder={'Please select a position...'}
+                readOnly
                 type="text"
                 value={positionsToDisplay.length ? positionsToDisplay[0] : ''}
               />
