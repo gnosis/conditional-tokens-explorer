@@ -57,6 +57,10 @@ export const useWithToken = <T extends WithAddress>(
             setLoading(false)
           }
         })
+    } else {
+      setLoading(true)
+      setDataWithToken([])
+      setLoading(false)
     }
 
     return () => {

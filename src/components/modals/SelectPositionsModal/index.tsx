@@ -66,17 +66,17 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
     []
   )
 
-  const debouncedHandler = useDebounceCallback((positionIdToSearch) => {
+  const debouncedHandlerPositionIdToSearch = useDebounceCallback((positionIdToSearch) => {
     setPositionIdToSearch(positionIdToSearch)
   }, 500)
 
-  const inputHandler = React.useCallback(
+  const onChangePositionId = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.currentTarget
       setPositionIdToShow(value)
-      debouncedHandler(value)
+      debouncedHandlerPositionIdToSearch(value)
     },
-    [debouncedHandler]
+    [debouncedHandlerPositionIdToSearch]
   )
 
   const { data, error, loading } = usePositions({
@@ -267,8 +267,8 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
           <TableControls
             start={
               <Search
-                onChange={inputHandler}
-                placeholder="Search position id..."
+                onChange={onChangePositionId}
+                placeholder="Search by position id..."
                 value={positionIdToShow}
               />
             }
