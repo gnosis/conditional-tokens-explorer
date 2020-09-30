@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers/utils'
 
 import { ZERO_BN } from 'config/constants'
 import { marshalPositionListData } from 'hooks/utils'
-import { Positions_positions, UserWithPositions_user } from 'types/generatedGQL'
+import { Positions_positions, UserWithPositions_user } from 'types/generatedGQLForCTE'
 
 const positions: Positions_positions[] = [
   {

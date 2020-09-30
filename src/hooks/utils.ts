@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers/utils'
 
 import { ZERO_BN } from 'config/constants'
-import { Positions_positions, UserWithPositions_user } from 'types/generatedGQL'
+import { Positions_positions, UserWithPositions_user } from 'types/generatedGQLForCTE'
 
 export interface Position {
   id: string

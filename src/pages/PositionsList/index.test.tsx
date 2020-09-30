@@ -9,8 +9,8 @@ import { ThemeProvider } from 'styled-components'
 import { NetworkConfig } from 'config/networkConfig'
 import { Connected, Infura, Web3Context, Web3ContextStatus } from 'contexts/Web3Context'
 import { PositionsList } from 'pages/PositionsList/index'
-import { PositionsListType, buildQueryPositions } from 'queries/positions'
-import { UserWithPositionsQuery } from 'queries/users'
+import { PositionsListType, buildQueryPositions } from 'queries/CTEPositions'
+import { UserWithPositionsQuery } from 'queries/CTEUsers'
 import theme from 'theme'
 
 const connect = jest.fn()

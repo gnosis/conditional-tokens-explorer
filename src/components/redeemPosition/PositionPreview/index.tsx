@@ -10,7 +10,7 @@ import { TitleValue } from 'components/text/TitleValue'
 import { NetworkConfig } from 'config/networkConfig'
 import { useBalanceForPosition } from 'hooks/useBalanceForPosition'
 import { useCollateral } from 'hooks/useCollateral'
-import { GetCondition_condition, GetPosition_position } from 'types/generatedGQL'
+import { GetCondition_condition, GetPosition_position } from 'types/generatedGQLForCTE'
 import { getRedeemedBalance, getRedeemedPreview } from 'util/tools'
 
 interface Props {

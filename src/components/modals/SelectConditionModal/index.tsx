@@ -21,7 +21,7 @@ import { TitleValue } from 'components/text/TitleValue'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useConditions } from 'hooks/useConditions'
 import { customStyles } from 'theme/tableCustomStyles'
-import { Conditions_conditions, GetCondition_condition } from 'types/generatedGQL'
+import { Conditions_conditions, GetCondition_condition } from 'types/generatedGQLForCTE'
 import { truncateStringInTheMiddle } from 'util/tools'
 
 const LoadingWrapper = styled.div`

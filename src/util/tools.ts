@@ -9,7 +9,7 @@ import {
   GetCondition_condition,
   GetMultiPositions_positions,
   GetPosition_position,
-} from 'types/generatedGQL'
+} from 'types/generatedGQLForCTE'
 import { CollateralErrors, ConditionErrors, PositionErrors, Token } from 'util/types'
 
 export const isAddress = (address: string) => {
@@ -376,3 +376,6 @@ export const isPartitionFullIndexSet = (
   const freeIndexSet = getFreeIndexSet(outcomesSlotCount, partition)
   return freeIndexSet === 0
 }
+
+export const capitalizeOnlyFirstLetter = (str: string) =>
+  str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()

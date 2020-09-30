@@ -1,84 +1,148 @@
-import React from 'react'
+import { useQuery } from '@apollo/react-hooks'
+import lodashOrderby from 'lodash.orderby'
+import React, { useEffect, useMemo, useState } from 'react'
 
 import { ButtonSelect } from 'components/buttons/ButtonSelect'
 import { Dropdown, DropdownPosition } from 'components/common/Dropdown'
 import { SelectItem } from 'components/form/SelectItem'
+import { queryTopCategories } from 'queries/OMENCategories'
+import { GetCategories } from 'types/generatedGQLForOMEN'
+import { Remote } from 'util/remoteData'
+import { capitalizeOnlyFirstLetter } from 'util/tools'
 import { Categories } from 'util/types'
 
 interface Props {
-  onClick: (value: Categories) => void
-  value: Categories
+  onClick: (value: string) => void
+  value: string
+}
+
+interface CategoryItem {
+  text: string
+  onClick: () => void
+  value: string
 }
 
 export const CategoriesDropdown = ({ onClick, value }: Props) => {
-  const categoryItems = [
-    {
-      text: Categories.businessAndFinance,
-      onClick: () => {
-        onClick(Categories.businessAndFinance)
+  const [categories, setCategories] = useState<Remote<CategoryItem[]>>(Remote.notAsked())
+
+  const categoryItems: CategoryItem[] = useMemo(
+    () => [
+      {
+        text: Categories.businessAndFinance,
+        onClick: () => {
+          onClick(Categories.businessAndFinance)
+        },
+        value: Categories.businessAndFinance,
       },
-      value: Categories.businessAndFinance,
-    },
-    {
-      text: Categories.cryptocurrency,
-      onClick: () => {
-        onClick(Categories.cryptocurrency)
+      {
+        text: Categories.cryptocurrency,
+        onClick: () => {
+          onClick(Categories.cryptocurrency)
+        },
+        value: Categories.cryptocurrency,
       },
-      value: Categories.cryptocurrency,
-    },
-    {
-      text: Categories.newsAndPolitics,
-      onClick: () => {
-        onClick(Categories.newsAndPolitics)
+      {
+        text: Categories.newsAndPolitics,
+        onClick: () => {
+          onClick(Categories.newsAndPolitics)
+        },
+        value: Categories.newsAndPolitics,
       },
-      value: Categories.newsAndPolitics,
-    },
-    {
-      text: Categories.scienceAndTech,
-      onClick: () => {
-        onClick(Categories.scienceAndTech)
+      {
+        text: Categories.scienceAndTech,
+        onClick: () => {
+          onClick(Categories.scienceAndTech)
+        },
+        value: Categories.scienceAndTech,
       },
-      value: Categories.scienceAndTech,
-    },
-    {
-      text: Categories.sports,
-      onClick: () => {
-        onClick(Categories.sports)
+      {
+        text: Categories.sports,
+        onClick: () => {
+          onClick(Categories.sports)
+        },
+        value: Categories.sports,
       },
-      value: Categories.sports,
-    },
-    {
-      text: Categories.weather,
-      onClick: () => {
-        onClick(Categories.weather)
+      {
+        text: Categories.weather,
+        onClick: () => {
+          onClick(Categories.weather)
+        },
+        value: Categories.weather,
       },
-      value: Categories.weather,
-    },
-    {
-      text: Categories.miscellaneous,
-      onClick: () => {
-        onClick(Categories.miscellaneous)
+      {
+        text: Categories.miscellaneous,
+        onClick: () => {
+          onClick(Categories.miscellaneous)
+        },
+        value: Categories.miscellaneous,
       },
-      value: Categories.miscellaneous,
+    ],
+    [onClick]
+  )
+
+  const { data: categoriesFromOmen, error: categoriesError, loading: categoriesLoading } = useQuery<
+    GetCategories
+  >(queryTopCategories, {
+    context: { clientName: 'Omen' },
+    variables: {
+      first: 100,
     },
-  ]
+  })
+
+  useEffect(() => {
+    if (categoriesLoading) {
+      setCategories(Remote.loading())
+    } else if (categoriesFromOmen) {
+      const { categories } = categoriesFromOmen
+      const newCategories = [
+        ...categories.map((category) => {
+          const value = capitalizeOnlyFirstLetter(category.id)
+          return {
+            text: value,
+            onClick: () => {
+              onClick(value)
+            },
+            value: value as string,
+          }
+        }),
+        ...categoryItems,
+      ].reduce((acc: CategoryItem[], current: CategoryItem) => {
+        const x = acc.find((item) => item.text === current.text)
+        if (!x) {
+          return acc.concat([current])
+        } else {
+          return acc
+        }
+      }, [])
+
+      setCategories(Remote.success(lodashOrderby(newCategories, ['text'], ['asc'])))
+    } else if (categoriesError) {
+      setCategories(Remote.failure(categoriesError))
+    }
+  }, [categoriesFromOmen, categoriesLoading, categoriesError, categoryItems, onClick])
 
   return (
-    <Dropdown
-      dropdownButtonContent={
-        <ButtonSelect content={categoryItems.filter((item) => item.value === value)[0].text} />
-      }
-      dropdownPosition={DropdownPosition.center}
-      fullWidth
-      items={categoryItems.map((item, index) => (
-        <SelectItem
-          content={item.text}
-          key={index}
-          name="category"
-          onClick={item.onClick}
-          value={item.value.toString()}
+    <>
+      {categories.isSuccess() && categories.hasData() && (
+        <Dropdown
+          dropdownButtonContent={
+            <ButtonSelect
+              content={categories.get().filter((item) => item.value === value)[0].text}
+            />
+          }
+          dropdownPosition={DropdownPosition.center}
+          fullWidth
+          items={categories.get().map((item, index) => (
+            <SelectItem
+              content={item.text}
+              key={index}
+              name="category"
+              onClick={item.onClick}
+              value={item.value.toString()}
+            />
+          ))}
         />
-      ))}
-    />
+      )}
+    </>
   )
 }

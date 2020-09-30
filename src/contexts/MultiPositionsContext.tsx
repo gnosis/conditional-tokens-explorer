@@ -2,8 +2,8 @@ import { useQuery } from '@apollo/react-hooks'
 import React, { useCallback, useEffect, useState } from 'react'
 
 import { useErrors } from 'hooks/useErrors'
-import { GetMultiPositionsQuery } from 'queries/positions'
-import { GetMultiPositions, GetMultiPositions_positions } from 'types/generatedGQL'
+import { GetMultiPositionsQuery } from 'queries/CTEPositions'
+import { GetMultiPositions, GetMultiPositions_positions } from 'types/generatedGQLForCTE'
 import { isPositionIdValid } from 'util/tools'
 import { Errors, PositionErrors } from 'util/types'
 

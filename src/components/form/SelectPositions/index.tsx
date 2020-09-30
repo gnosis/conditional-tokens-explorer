@@ -21,7 +21,7 @@ import { Position } from 'hooks'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { useWithToken } from 'hooks/useWithToken'
 import isEqual from 'lodash.isequal'
-import { GetMultiPositions_positions } from 'types/generatedGQL'
+import { GetMultiPositions_positions } from 'types/generatedGQLForCTE'
 import { positionString } from 'util/tools'
 import { Errors, LocalStorageManagement } from 'util/types'
 

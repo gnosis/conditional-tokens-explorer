@@ -13,7 +13,7 @@ import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Contex
 import { useWithToken } from 'hooks/useWithToken'
 import { SplitFrom, SplitPositionFormMethods } from 'pages/SplitPosition/Form'
 import { ERC20Service } from 'services/erc20'
-import { GetMultiPositions_positions } from 'types/generatedGQL'
+import { GetMultiPositions_positions } from 'types/generatedGQLForCTE'
 import { formatBigNumber } from 'util/tools'
 import { SplitFromType, Token } from 'util/types'
 

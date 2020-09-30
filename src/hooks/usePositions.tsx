@@ -5,9 +5,9 @@ import React from 'react'
 
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { Position, marshalPositionListData } from 'hooks/utils'
-import { PositionsListType, buildQueryPositions } from 'queries/positions'
-import { UserWithPositionsQuery } from 'queries/users'
-import { Positions, UserWithPositions } from 'types/generatedGQL'
+import { PositionsListType, buildQueryPositions } from 'queries/CTEPositions'
+import { UserWithPositionsQuery } from 'queries/CTEUsers'
+import { Positions, UserWithPositions } from 'types/generatedGQLForCTE'
 import { formatBigNumber, getTokenSummary } from 'util/tools'
 import { CollateralFilterOptions, Token } from 'util/types'
 

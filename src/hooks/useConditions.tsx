@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/react-hooks'
 
-import { ConditionsListType, buildQueryConditions } from 'queries/conditions'
-import { Conditions } from 'types/generatedGQL'
+import { ConditionsListType, buildQueryConditions } from 'queries/CTEConditions'
+import { Conditions } from 'types/generatedGQLForCTE'
 import { OracleFilterOptions } from 'util/types'
 
 interface OptionsToSearch {

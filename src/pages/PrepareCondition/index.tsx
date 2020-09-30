@@ -47,7 +47,7 @@ export const PrepareCondition = () => {
   const [error, setError] = React.useState<Maybe<Error>>(null)
   const [conditionType, setConditionType] = React.useState<ConditionType>(ConditionType.custom)
   const [questionType, setQuestionType] = React.useState<QuestionType>(QuestionType.binary)
-  const [category, setCategory] = React.useState(Categories.businessAndFinance)
+  const [category, setCategory] = React.useState<string>(Categories.businessAndFinance)
   const [arbitrator, setArbitrator] = React.useState('realitio')
 
   const [outcomes, setOutcomes] = React.useState<Array<string | undefined>>([])
@@ -252,7 +252,7 @@ export const PrepareCondition = () => {
                 title="Category"
                 value={
                   <CategoriesDropdown
-                    onClick={(value: Categories) => {
+                    onClick={(value: string) => {
                       setCategory(value)
                     }}
                     value={category}

@@ -36,10 +36,10 @@ export enum QuestionType {
 }
 
 export enum Categories {
-  businessAndFinance = 'Business & Finance',
+  businessAndFinance = 'Business & finance',
   cryptocurrency = 'Cryptocurrency',
-  newsAndPolitics = 'News & Politics',
-  scienceAndTech = 'Science & Tech',
+  newsAndPolitics = 'News & politics',
+  scienceAndTech = 'Science & tech',
   sports = 'Sports',
   weather = 'Weather',
   miscellaneous = 'Miscellaneous',

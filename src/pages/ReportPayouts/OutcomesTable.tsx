@@ -8,7 +8,7 @@ import { TableWrapper } from 'components/pureStyledComponents/TableWrapper'
 import { ZERO_BN } from 'config/constants'
 import { useQuestion } from 'hooks/useQuestion'
 import { FormInputs } from 'pages/ReportPayouts/Contents'
-import { GetCondition_condition } from 'types/generatedGQL'
+import { GetCondition_condition } from 'types/generatedGQLForCTE'
 import { divBN } from 'util/tools'
 
 const Wrapper = styled.form``
