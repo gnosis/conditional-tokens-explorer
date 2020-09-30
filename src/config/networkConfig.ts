@@ -135,7 +135,7 @@ const networks: { [K in NetworkIds]: Network } = {
       },
       {
         symbol: 'OWL',
-        address: '0x9187a7788410f54a630407fa994c1555722f9abc',
+        address: '0xa7D1C04fAF998F9161fC9F800a99A809b84cfc9D',
         decimals: 18,
       },
       {
