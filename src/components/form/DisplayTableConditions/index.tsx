@@ -22,7 +22,7 @@ export const DisplayTableConditions = (props: Props) => {
           return (
             <CellHash
               externalLink
-              href={`conditions/${row.conditionId}`}
+              href={`/conditions/${row.conditionId}`}
               onClick={() => {
                 if (typeof callbackOnHistoryPush === 'function') callbackOnHistoryPush()
               }}
