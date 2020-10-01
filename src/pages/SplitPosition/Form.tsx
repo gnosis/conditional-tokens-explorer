@@ -172,8 +172,8 @@ export const Form = ({
             collateral
           )
         } else if (splitFromPosition && position) {
-          collateral = position.collateralToken.id
-          const collectionId = position.collection.id
+          collateral = position.collateralToken?.id
+          const collectionId = position.collection?.id
           await splitPosition(collateral, collectionId, conditionId, partition, amount)
 
           positionIds = await CTService.getPositionsFromPartition(
