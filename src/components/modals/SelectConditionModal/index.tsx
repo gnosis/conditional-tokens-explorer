@@ -1,5 +1,5 @@
 import { useDebounceCallback } from '@react-hook/debounce'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import styled from 'styled-components'
 
@@ -21,7 +21,7 @@ import { TitleValue } from 'components/text/TitleValue'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useConditions } from 'hooks/useConditions'
 import { customStyles } from 'theme/tableCustomStyles'
-import { Conditions_conditions, GetCondition_condition } from 'types/generatedGQLForCTE'
+import { Conditions_conditions } from 'types/generatedGQLForCTE'
 import { truncateStringInTheMiddle } from 'util/tools'
 
 const LoadingWrapper = styled.div`
@@ -64,7 +64,21 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
     conditionId: conditionIdToSearch,
   })
 
-  const [selectedCondition, setSelectedCondition] = useState<Maybe<GetCondition_condition>>(null)
+  const [selectedCondition, setSelectedCondition] = useState<Maybe<Conditions_conditions>>(null)
+  const [conditionList, setConditionList] = useState<Conditions_conditions[]>([])
+
+  useEffect(() => {
+    if (!data || !data.conditions) {
+      setConditionList([])
+    } else {
+      if (selectedCondition) {
+        setConditionList(data.conditions.filter(({ id }) => selectedCondition.id !== id))
+      } else {
+        setConditionList(data.conditions)
+      }
+    }
+  }, [selectedCondition, data])
+
   const { setCondition } = useConditionContext()
 
   const isLoading = !conditionIdToSearch && loading
@@ -133,7 +147,7 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
           <InlineLoading message="Loading conditions..." />
         </LoadingWrapper>
       )}
-      {error && <InfoCard message={error.message} title="Error" />}
+      {error && !isLoading && <InfoCard message={error.message} title="Error" />}
       {data && !isLoading && (
         <>
           <TableControls
@@ -155,7 +169,7 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
               className="outerTableWrapper inlineTable"
               columns={columns}
               customStyles={customStyles}
-              data={data?.conditions || []}
+              data={conditionList.length ? conditionList : []}
               noDataComponent={<EmptyContentText>No conditions found.</EmptyContentText>}
               noHeader
               pagination

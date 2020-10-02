@@ -7,6 +7,17 @@
 // GraphQL query operation: Conditions
 // ====================================================
 
+export interface Conditions_conditions_positions_collateralToken {
+  __typename: "CollateralToken";
+  id: string;
+}
+
+export interface Conditions_conditions_positions {
+  __typename: "Position";
+  id: string;
+  collateralToken: Conditions_conditions_positions_collateralToken;
+}
+
 export interface Conditions_conditions {
   __typename: "Condition";
   id: string;
@@ -15,7 +26,13 @@ export interface Conditions_conditions {
   outcomeSlotCount: number;
   resolved: boolean;
   creator: any;
+  payouts: any[] | null;
+  createTimestamp: any;
+  payoutNumerators: any[] | null;
+  payoutDenominator: any | null;
+  resolveTimestamp: any | null;
   resolveBlockNumber: any | null;
+  positions: Conditions_conditions_positions[] | null;
 }
 
 export interface Conditions {
@@ -51,6 +68,7 @@ export interface GetCondition_condition {
   resolved: boolean;
   creator: any;
   payouts: any[] | null;
+  createTimestamp: any;
   payoutNumerators: any[] | null;
   payoutDenominator: any | null;
   resolveTimestamp: any | null;
@@ -85,12 +103,50 @@ export interface Positions_positions_wrappedToken {
   id: string;
 }
 
+export interface Positions_positions_collection_conditions {
+  __typename: "Condition";
+  id: string;
+  oracle: any;
+  questionId: any;
+  outcomeSlotCount: number;
+  resolved: boolean;
+  creator: any;
+  payouts: any[] | null;
+  payoutNumerators: any[] | null;
+  payoutDenominator: any | null;
+}
+
+export interface Positions_positions_collection_positions {
+  __typename: "Position";
+  id: string;
+}
+
+export interface Positions_positions_collection {
+  __typename: "Collection";
+  id: string;
+  conditions: Positions_positions_collection_conditions[];
+  conditionIds: string[];
+  indexSets: any[];
+  positions: Positions_positions_collection_positions[] | null;
+}
+
+export interface Positions_positions_conditions {
+  __typename: "Condition";
+  id: string;
+  outcomeSlotCount: number;
+}
+
 export interface Positions_positions {
   __typename: "Position";
   id: string;
+  indexSets: any[];
+  activeValue: any;
   createTimestamp: any;
   collateralToken: Positions_positions_collateralToken;
   wrappedToken: Positions_positions_wrappedToken | null;
+  collection: Positions_positions_collection;
+  conditionIds: string[];
+  conditions: Positions_positions_conditions[];
 }
 
 export interface Positions {
@@ -333,6 +389,43 @@ export interface UserPositionBalances {
 export interface UserPositionBalancesVariables {
   account?: string | null;
   positionId?: string | null;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL fragment: ConditionData
+// ====================================================
+
+export interface ConditionData_positions_collateralToken {
+  __typename: "CollateralToken";
+  id: string;
+}
+
+export interface ConditionData_positions {
+  __typename: "Position";
+  id: string;
+  collateralToken: ConditionData_positions_collateralToken;
+}
+
+export interface ConditionData {
+  __typename: "Condition";
+  id: string;
+  oracle: any;
+  questionId: any;
+  outcomeSlotCount: number;
+  resolved: boolean;
+  creator: any;
+  payouts: any[] | null;
+  createTimestamp: any;
+  payoutNumerators: any[] | null;
+  payoutDenominator: any | null;
+  resolveTimestamp: any | null;
+  resolveBlockNumber: any | null;
+  positions: ConditionData_positions[] | null;
 }
 
 /* tslint:disable */

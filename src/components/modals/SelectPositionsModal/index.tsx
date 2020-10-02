@@ -62,18 +62,21 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
   >([])
   const [positionIdToSearch, setPositionIdToSearch] = useState<string>('')
   const [positionIdToShow, setPositionIdToShow] = useState<string>('')
+  const [positionList, setPositionList] = useState<PositionWithUserBalanceWithDecimalsWithToken[]>(
+    []
+  )
 
-  const debouncedHandler = useDebounceCallback((positionIdToSearch) => {
+  const debouncedHandlerPositionIdToSearch = useDebounceCallback((positionIdToSearch) => {
     setPositionIdToSearch(positionIdToSearch)
   }, 500)
 
-  const inputHandler = React.useCallback(
+  const onChangePositionId = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.currentTarget
       setPositionIdToShow(value)
-      debouncedHandler(value)
+      debouncedHandlerPositionIdToSearch(value)
     },
-    [debouncedHandler]
+    [debouncedHandlerPositionIdToSearch]
   )
 
   const { data, error, loading } = usePositions({
@@ -81,6 +84,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
   })
   const { data: dataWithToken, loading: loadingTokens } = useWithToken(data || [])
 
+  // Filter preselectedPositions (stringIds[]) from dataWithToken to merge with currently selected positions.
   useEffect(() => {
     if (
       dataWithToken &&
@@ -96,6 +100,18 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
       })
     }
   }, [preSelectedPositions, dataWithToken])
+
+  // Filter selecteded positions from original list. And positions without balance as indicated by props.
+  useEffect(() => {
+    const selectedPositionsIds = selectedPositions.map(({ id }) => id)
+    const positionsNotSelected = dataWithToken.filter(
+      ({ id }) => !selectedPositionsIds.includes(id)
+    )
+    const positionsNotSelectedFiltered = showOnlyPositionsWithBalance
+      ? positionsNotSelected.filter((position) => !position.userBalanceERC1155.isZero())
+      : positionsNotSelected
+    setPositionList(positionsNotSelectedFiltered)
+  }, [selectedPositions, dataWithToken, showOnlyPositionsWithBalance])
 
   const handleMultiAddClick = useCallback(
     (position: PositionWithUserBalanceWithDecimalsWithToken) => {
@@ -251,8 +267,8 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
           <TableControls
             start={
               <Search
-                onChange={inputHandler}
-                placeholder="Search position id..."
+                onChange={onChangePositionId}
+                placeholder="Search by position id..."
                 value={positionIdToShow}
               />
             }
@@ -266,13 +282,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
               className="outerTableWrapper inlineTable"
               columns={getPositionsColumns()}
               customStyles={customStyles}
-              data={
-                data
-                  ? showOnlyPositionsWithBalance
-                    ? dataWithToken.filter((position) => !position.userBalanceERC1155.isZero())
-                    : dataWithToken
-                  : []
-              }
+              data={positionList.length ? positionList : []}
               noDataComponent={
                 <EmptyContentText>{`No positions${
                   showOnlyPositionsWithBalance && dataWithToken.length ? ' with balance' : ''

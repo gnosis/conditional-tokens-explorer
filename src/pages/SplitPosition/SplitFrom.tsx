@@ -75,6 +75,7 @@ interface Props extends InputPositionProps, SelectCollateralProps {}
 
 export const SplitFrom: React.FC<Props> = (props) => {
   const {
+    cleanAllowanceError,
     formMethods,
     formMethods: { register, setValue },
     onPositionChange,
@@ -144,6 +145,7 @@ export const SplitFrom: React.FC<Props> = (props) => {
         </ToggleableTitleControl>
       </Controls>
       <ToggleableSelectCollateral
+        cleanAllowanceError={cleanAllowanceError}
         formMethods={formMethods}
         splitFromCollateral={splitFromCollateral}
         tokens={customToken ? [...tokens, customToken] : [...tokens]}

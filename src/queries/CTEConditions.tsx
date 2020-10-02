@@ -12,6 +12,29 @@ export const DEFAULT_OPTIONS = {
   oracleNotIn: [],
 }
 
+const conditionFragment = gql`
+  fragment ConditionData on Condition {
+    id
+    oracle
+    questionId
+    outcomeSlotCount
+    resolved
+    creator
+    payouts
+    createTimestamp
+    payoutNumerators
+    payoutDenominator
+    resolveTimestamp
+    resolveBlockNumber
+    positions {
+      id
+      collateralToken {
+        id
+      }
+    }
+  }
+`
+
 export const buildQueryConditions = (options: ConditionsListType = DEFAULT_OPTIONS) => {
   const { conditionId, oracleIn, oracleNotIn } = options
 
@@ -38,15 +61,10 @@ export const buildQueryConditions = (options: ConditionsListType = DEFAULT_OPTIO
   const query = gql`
       query Conditions ${variablesClause} {
         conditions(first: 1000 ${whereClause} , orderBy: createTimestamp, orderDirection: desc) {
-          id
-          oracle
-          questionId
-          outcomeSlotCount
-          resolved
-          creator
-          resolveBlockNumber
+          ...ConditionData
         }
       }
+      ${conditionFragment}
   `
 
   return query
@@ -55,23 +73,8 @@ export const buildQueryConditions = (options: ConditionsListType = DEFAULT_OPTIO
 export const GetConditionQuery = gql`
   query GetCondition($id: ID!) {
     condition(id: $id) {
-      id
-      oracle
-      questionId
-      outcomeSlotCount
-      resolved
-      creator
-      payouts
-      payoutNumerators
-      payoutDenominator
-      resolveTimestamp
-      resolveBlockNumber
-      positions {
-        id
-        collateralToken {
-          id
-        }
-      }
+      ...ConditionData
     }
   }
+  ${conditionFragment}
 `

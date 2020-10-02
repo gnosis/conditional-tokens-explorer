@@ -10,43 +10,6 @@ export const DEFAULT_OPTIONS = {
   collateral: '',
 }
 
-export const buildQueryPositions = (options: PositionsListType = DEFAULT_OPTIONS) => {
-  const { collateral, positionId } = options
-
-  const whereClauseInternal = [
-    positionId ? 'id: $positionId' : '',
-    collateral ? 'collateralToken: $collateral' : '',
-  ]
-    .filter((s) => s.length)
-    .join(',')
-  const whereClause = whereClauseInternal ? `, where: { ${whereClauseInternal} }` : ''
-
-  const variablesClauseInternal = [
-    positionId ? '$positionId: String' : '',
-    collateral ? '$collateral: String' : '',
-  ]
-    .filter((s) => s.length)
-    .join(',')
-
-  const variablesClause = variablesClauseInternal ? `(${variablesClauseInternal})` : ''
-
-  const query = gql`
-  query Positions ${variablesClause} {
-    positions(first: 1000 ${whereClause} , orderBy: createTimestamp, orderDirection: desc) {
-      id
-      createTimestamp
-      collateralToken {
-        id
-      }
-      wrappedToken {
-        id
-      }
-    }
-  }
-  `
-  return query
-}
-
 const positionFragment = gql`
   fragment PositionData on Position {
     id
@@ -85,6 +48,37 @@ const positionFragment = gql`
     }
   }
 `
+
+export const buildQueryPositions = (options: PositionsListType = DEFAULT_OPTIONS) => {
+  const { collateral, positionId } = options
+
+  const whereClauseInternal = [
+    positionId ? 'id: $positionId' : '',
+    collateral ? 'collateralToken: $collateral' : '',
+  ]
+    .filter((s) => s.length)
+    .join(',')
+  const whereClause = whereClauseInternal ? `, where: { ${whereClauseInternal} }` : ''
+
+  const variablesClauseInternal = [
+    positionId ? '$positionId: String' : '',
+    collateral ? '$collateral: String' : '',
+  ]
+    .filter((s) => s.length)
+    .join(',')
+
+  const variablesClause = variablesClauseInternal ? `(${variablesClauseInternal})` : ''
+
+  const query = gql`
+  query Positions ${variablesClause} {
+    positions(first: 1000 ${whereClause} , orderBy: createTimestamp, orderDirection: desc) {
+      ...PositionData
+    }
+  }
+  ${positionFragment}
+  `
+  return query
+}
 
 export const GetPositionQuery = gql`
   query GetPosition($id: ID!) {
