@@ -18,7 +18,7 @@ import {
   WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_MAINNET,
   WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_RINKEBY,
 } from 'config/constants'
-import { NetworkIds, Oracle, Token } from 'util/types'
+import { Arbitrator, NetworkIds, Oracle, Token } from 'util/types'
 
 interface Network {
   earliestBlockToCheck: number
@@ -31,6 +31,8 @@ interface Network {
   graphHttpUri: string
   graphWsUri: string
   oracles: Oracle[]
+  arbitrators: Arbitrator[]
+  realitioTimeout: number
 }
 
 const networks: { [K in NetworkIds]: Network } = {
@@ -104,6 +106,21 @@ const networks: { [K in NetworkIds]: Network } = {
         address: '0x0000000000000000000000000000000000000000',
       },
     ],
+    arbitrators: [
+      {
+        name: 'realitio',
+        description: 'Realit.io',
+        url: 'https://reality.eth.link',
+        address: '0xdc0a2185031ecf89f091a39c63c2857a7d5c301a',
+      },
+      {
+        name: 'kleros',
+        description: 'Kleros',
+        url: 'https://kleros.io/',
+        address: '0xd47f72a2d1d0E91b0Ec5e5f5d02B2dc26d00A14D',
+      },
+    ],
+    realitioTimeout: 86400,
   },
   [NetworkIds.RINKEBY]: {
     earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
@@ -160,6 +177,21 @@ const networks: { [K in NetworkIds]: Network } = {
         address: '0x0000000000000000000000000000000000000000',
       },
     ],
+    arbitrators: [
+      {
+        name: 'realitio',
+        description: 'Realitio Team',
+        url: 'https://reality.eth.link',
+        address: '0x02321745bE4a141E78db6C39834396f8df00e2a0',
+      },
+      {
+        name: 'kleros',
+        description: 'Kleros',
+        url: 'https://kleros.io/',
+        address: '0xcafa054b1b054581faf65adce667bf1c684b6ef0',
+      },
+    ],
+    realitioTimeout: 10,
   },
   [NetworkIds.GANACHE]: {
     earliestBlockToCheck: EARLIEST_GANACHE_BLOCK_TO_CHECK,
@@ -216,6 +248,21 @@ const networks: { [K in NetworkIds]: Network } = {
         address: '0x0000000000000000000000000000000000000000',
       },
     ],
+    arbitrators: [
+      {
+        name: 'realitio',
+        description: 'Realit.io',
+        url: 'https://reality.eth.link',
+        address: '0x0000000000000000000000000000000000000000',
+      },
+      {
+        name: 'kleros',
+        description: 'Kleros',
+        url: 'https://kleros.io/',
+        address: '0x0000000000000000000000000000000000000000',
+      },
+    ],
+    realitioTimeout: 10,
   },
 }
 
@@ -244,6 +291,10 @@ export class NetworkConfig {
 
   getOracles(): Oracle[] {
     return networks[this.networkId].oracles
+  }
+
+  getArbitrators(): Oracle[] {
+    return networks[this.networkId].arbitrators
   }
 
   getGraphUris(): { httpUri: string; wsUri: string } {
@@ -285,5 +336,44 @@ export class NetworkConfig {
       url: '',
       address: '',
     }
+  }
+
+  getArbitratorFromAddress(address: string): Oracle {
+    const arbitrators = networks[this.networkId].arbitrators
+
+    for (const arbitrator of arbitrators) {
+      const arbitratorAddress = arbitrator.address
+      if (arbitratorAddress.toLowerCase() === address.toLowerCase()) {
+        return arbitrator
+      }
+    }
+
+    return {
+      name: 'unknown',
+      description: 'Unknown',
+      url: '',
+      address: '',
+    }
+  }
+
+  getArbitratorFromName(arbitratorName: KnownArbitrator): Arbitrator {
+    const arbitrators = networks[this.networkId].arbitrators
+
+    for (const arbitrator of arbitrators) {
+      if (arbitrator.name === arbitratorName) {
+        return arbitrator
+      }
+    }
+
+    return {
+      name: 'unknown',
+      description: 'Unknown',
+      url: '',
+      address: '',
+    }
+  }
+
+  getRealitioTimeout(): number {
+    return networks[this.networkId].realitioTimeout
   }
 }

@@ -121,3 +121,7 @@ export const navItems = [
     url: '/redeem',
   },
 ]
+
+export const REALITIO_TIMEOUT = process.env.REACT_APP_REALITIO_TIMEOUT
+
+export const SINGLE_SELECT_TEMPLATE_ID = 2
