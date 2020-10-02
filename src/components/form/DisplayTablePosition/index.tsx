@@ -33,7 +33,7 @@ export const DisplayTablePositions = (props: Props) => {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionIdsArray) => {
           return (
-            <CellHash externalLink href={`positions/${row.positionId}`} value={row.positionId} />
+            <CellHash externalLink href={`/positions/${row.positionId}`} value={row.positionId} />
           )
         },
         maxWidth: '250px',

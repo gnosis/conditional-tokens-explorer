@@ -32,7 +32,7 @@ const ExternalLink = styled.a`
   align-items: center;
   display: flex;
   justify-content: center;
-  margin-left: 10px;
+  margin-left: 8px;
   text-decoration: none;
 `
 
@@ -63,7 +63,7 @@ export const CellHash: React.FC<Props> = (props) => {
       <ButtonCopy light value={value} />
       {externalLink && (
         <ExternalLink
-          href={`${window.location.protocol}//${window.location.hostname}${port}/#/${href}`}
+          href={`${window.location.protocol}//${window.location.hostname}${port}/#${href}`}
           target="_blank"
         >
           <ExternalLinkIcon />
