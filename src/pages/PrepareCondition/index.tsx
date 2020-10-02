@@ -56,11 +56,11 @@ export const PrepareCondition = () => {
   const [questionId, setQuestionId] = React.useState('')
   const [questionTitle, setQuestionTitle] = React.useState('')
   const [resolutionDate, setResolutionDate] = React.useState('')
-  const [prepareConditionStatus, setPrepareConditionStatus] = useState<Remote<string>>(
-    Remote.notAsked<string>()
+  const [prepareConditionStatus, setPrepareConditionStatus] = useState<Remote<Maybe<string>>>(
+    Remote.notAsked<Maybe<string>>()
   )
 
-  const [conditionId, setConditionId] = React.useState('')
+  const [conditionId, setConditionId] = React.useState<Maybe<string>>(null)
   const [error, setError] = React.useState<Maybe<Error>>(null)
   const [conditionType, setConditionType] = React.useState<ConditionType>(ConditionType.custom)
   const [category, setCategory] = React.useState<string>(Categories.businessAndFinance)
@@ -89,23 +89,22 @@ export const PrepareCondition = () => {
   const onOutcomeChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setOutcome(e.currentTarget.value)
 
-  const formMethods = useForm<{ outcomesSlotCount: number; oracle: string; questionId: string }>({
-    mode: 'onChange',
-  })
   const {
     errors,
     formState: { isValid },
     register,
     setValue,
-  } = formMethods
+  } = useForm<{ outcomesSlotCount: number; oracle: string; questionId: string }>({
+    mode: 'onChange',
+  })
 
   React.useEffect(() => {
     const checkConditionExist = async () => {
       try {
         let conditionExists = false
-        let conditionId: Maybe<string> = null
+        let conditionIdToUpdate: Maybe<string> = null
         if (questionId && oracleAddress && numOutcomes) {
-          conditionId = ConditionalTokensService.getConditionId(
+          conditionIdToUpdate = ConditionalTokensService.getConditionId(
             questionId,
             oracleAddress,
             numOutcomes
@@ -123,26 +122,22 @@ export const PrepareCondition = () => {
             signerAddress: address,
           }
           const questionId = await RtioService.askQuestionConstant(questionOptions)
-          conditionId = ConditionalTokensService.getConditionId(
+          conditionIdToUpdate = ConditionalTokensService.getConditionId(
             questionId,
             oracleAddress,
             numOutcomes
           )
         }
 
-        logger.log(`Condition ID: ${conditionId}`)
-        if (conditionId) {
-          setConditionId(conditionId)
-          conditionExists = await CTService.conditionExists(conditionId)
-        } else {
-          setConditionId('')
+        logger.log(`Condition ID: ${conditionIdToUpdate}`)
+        if (conditionIdToUpdate) {
+          conditionExists = await CTService.conditionExists(conditionIdToUpdate)
         }
 
         if (conditionExists) {
           throw new Error(conditionAlreadyExist)
-        } else {
-          setPrepareConditionStatus(Remote.notAsked())
         }
+
         setError(null)
       } catch (err) {
         if (err.message.includes(conditionAlreadyExist)) {
@@ -175,8 +170,14 @@ export const PrepareCondition = () => {
 
     try {
       if (status === Web3ContextStatus.Connected && address) {
+        let conditionIdToUpdate: Maybe<string> = null
         if (conditionType === ConditionType.custom) {
           await CTService.prepareCondition(questionId, oracleAddress, numOutcomes)
+          conditionIdToUpdate = ConditionalTokensService.getConditionId(
+            questionId,
+            oracleAddress,
+            numOutcomes
+          )
         } else {
           const openingDateMoment = moment(resolutionDate)
           const questionOptions: QuestionOptions = {
@@ -192,10 +193,15 @@ export const PrepareCondition = () => {
           const questionId = await RtioService.askQuestion(questionOptions)
 
           await CTService.prepareCondition(questionId, oracleAddress, outcomes.length)
+          conditionIdToUpdate = ConditionalTokensService.getConditionId(
+            questionId,
+            oracleAddress,
+            outcomes.length
+          )
         }
-        logger.log(`Condition Id after prepareCondition: ${conditionId}`)
-
-        setPrepareConditionStatus(Remote.success(conditionId))
+        logger.log(`Condition Id after prepareCondition: ${conditionIdToUpdate}`)
+        setConditionId(conditionIdToUpdate)
+        setPrepareConditionStatus(Remote.success(conditionIdToUpdate))
       } else if (status === Web3ContextStatus.Infura) {
         connect()
       }
@@ -220,7 +226,7 @@ export const PrepareCondition = () => {
     ? {
         buttonType: ButtonType.primary,
         onClick: () => {
-          setPrepareConditionStatus(Remote.notAsked<string>())
+          setPrepareConditionStatus(Remote.notAsked<Maybe<string>>())
           if (conditionId) history.push(`/conditions/${conditionId}`)
         },
         text: 'OK',
@@ -229,7 +235,7 @@ export const PrepareCondition = () => {
     ? {
         buttonType: ButtonType.danger,
         text: 'Close',
-        onClick: () => setPrepareConditionStatus(Remote.notAsked<string>()),
+        onClick: () => setPrepareConditionStatus(Remote.notAsked<Maybe<string>>()),
       }
     : undefined
 
@@ -245,8 +251,12 @@ export const PrepareCondition = () => {
     'Working...'
   ) : (
     <>
-      All done! Condition{' '}
-      <span title={conditionId}>{truncateStringInTheMiddle(conditionId, 8, 6)}</span> created .
+      {conditionId && (
+        <>
+          All done! Condition{' '}
+          <span title={conditionId}>{truncateStringInTheMiddle(conditionId, 8, 6)}</span> created .
+        </>
+      )}
     </>
   )
   const fullLoadingTitle = prepareConditionStatus.isFailure() ? 'Error' : 'Prepare Condition'
