@@ -190,6 +190,7 @@ export const PrepareCondition = () => {
           }
 
           const questionId = await RtioService.askQuestion(questionOptions)
+
           await CTService.prepareCondition(questionId, oracleAddress, outcomes.length)
         }
         logger.log(`Condition Id after prepareCondition: ${conditionId}`)

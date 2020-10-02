@@ -4,6 +4,7 @@ import { ApolloClient } from 'apollo-client'
 import { from, split } from 'apollo-link'
 import { HttpLink } from 'apollo-link-http'
 import apolloLogger from 'apollo-link-logger'
+import { RetryLink } from 'apollo-link-retry'
 import { WebSocketLink } from 'apollo-link-ws'
 import { getMainDefinition } from 'apollo-utilities'
 import React from 'react'
@@ -40,7 +41,9 @@ export const ApolloProviderWrapper = ({ children }: Props) => {
 
     if (status._type === Web3ContextStatus.Connected) {
       const { networkConfig } = status
-      ;({ httpUri, wsUri } = networkConfig.getGraphUris())
+      const { OMENhttpUri, OMENwsUri } = networkConfig.getGraphUris()
+      httpUri = OMENhttpUri
+      wsUri = OMENwsUri
     }
 
     const OmenWsLink = new WebSocketLink({
@@ -75,7 +78,9 @@ export const ApolloProviderWrapper = ({ children }: Props) => {
 
     if (status._type === Web3ContextStatus.Connected) {
       const { networkConfig } = status
-      ;({ httpUri, wsUri } = networkConfig.getGraphUris())
+      const { CTEhttpUri, CTEwsUri } = networkConfig.getGraphUris()
+      httpUri = CTEhttpUri
+      wsUri = CTEwsUri
     }
 
     const CTEWsLink = new WebSocketLink({
@@ -99,11 +104,19 @@ export const ApolloProviderWrapper = ({ children }: Props) => {
     )
   }, [status])
 
+  const link = new RetryLink({
+    delay: {
+      initial: 100,
+      max: 2000,
+      jitter: true,
+    },
+    attempts: {
+      max: 5,
+    },
+  }).split((operation) => operation.getContext().clientName === 'Omen', OmenLink, CTELink)
+
   const client = new ApolloClient({
-    link: from([
-      apolloLogger,
-      split((operation) => operation.getContext().clientName === 'Omen', OmenLink, CTELink),
-    ]),
+    link: from([apolloLogger, link]),
     cache: new InMemoryCache(),
     defaultOptions: {
       watchQuery: {

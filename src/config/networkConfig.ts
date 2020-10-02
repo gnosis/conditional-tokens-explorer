@@ -11,6 +11,10 @@ import {
   EARLIEST_GANACHE_BLOCK_TO_CHECK,
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
   EARLIEST_RINKEBY_BLOCK_TO_CHECK,
+  OMEN_GRAPH_HTTP_MAINNET,
+  OMEN_GRAPH_HTTP_RINKEBY,
+  OMEN_GRAPH_WS_MAINNET,
+  OMEN_GRAPH_WS_RINKEBY,
   REALITIO_CONTRACT_ADDRESS_FOR_GANACHE,
   REALITIO_CONTRACT_ADDRESS_FOR_MAINNET,
   REALITIO_CONTRACT_ADDRESS_FOR_RINKEBY,
@@ -28,8 +32,10 @@ interface Network {
     wrapped1155FactoryAddress: string
   }
   tokens: Token[]
-  graphHttpUri: string
-  graphWsUri: string
+  CTEGraphHttpUri: string
+  CTEGraphWsUri: string
+  OMENGraphHttpUri: string
+  OMENGraphWsUri: string
   oracles: Oracle[]
   arbitrators: Arbitrator[]
   realitioTimeout: number
@@ -90,8 +96,10 @@ const networks: { [K in NetworkIds]: Network } = {
         decimals: 18,
       },
     ],
-    graphHttpUri: CTE_GRAPH_HTTP_MAINNET,
-    graphWsUri: CTE_GRAPH_WS_MAINNET,
+    CTEGraphHttpUri: CTE_GRAPH_HTTP_MAINNET,
+    CTEGraphWsUri: CTE_GRAPH_WS_MAINNET,
+    OMENGraphHttpUri: OMEN_GRAPH_HTTP_MAINNET,
+    OMENGraphWsUri: OMEN_GRAPH_WS_MAINNET,
     oracles: [
       {
         name: 'realitio',
@@ -161,8 +169,10 @@ const networks: { [K in NetworkIds]: Network } = {
         decimals: 18,
       },
     ],
-    graphHttpUri: CTE_GRAPH_HTTP_RINKEBY,
-    graphWsUri: CTE_GRAPH_WS_RINKEBY,
+    CTEGraphHttpUri: CTE_GRAPH_HTTP_RINKEBY,
+    CTEGraphWsUri: CTE_GRAPH_WS_RINKEBY,
+    OMENGraphHttpUri: OMEN_GRAPH_HTTP_RINKEBY,
+    OMENGraphWsUri: OMEN_GRAPH_WS_RINKEBY,
     oracles: [
       {
         name: 'realitio',
@@ -232,8 +242,10 @@ const networks: { [K in NetworkIds]: Network } = {
         decimals: 18,
       },
     ],
-    graphHttpUri: CTE_GRAPH_HTTP_GANACHE,
-    graphWsUri: CTE_GRAPH_WS_GANACHE,
+    CTEGraphHttpUri: CTE_GRAPH_HTTP_GANACHE,
+    CTEGraphWsUri: CTE_GRAPH_WS_GANACHE,
+    OMENGraphHttpUri: '',
+    OMENGraphWsUri: '',
     oracles: [
       {
         name: 'realitio',
@@ -297,10 +309,12 @@ export class NetworkConfig {
     return networks[this.networkId].arbitrators
   }
 
-  getGraphUris(): { httpUri: string; wsUri: string } {
-    const httpUri = networks[this.networkId].graphHttpUri
-    const wsUri = networks[this.networkId].graphWsUri
-    return { httpUri, wsUri }
+  getGraphUris(): { CTEhttpUri: string; CTEwsUri: string; OMENhttpUri: string; OMENwsUri: string } {
+    const CTEhttpUri = networks[this.networkId].CTEGraphHttpUri
+    const CTEwsUri = networks[this.networkId].CTEGraphWsUri
+    const OMENhttpUri = networks[this.networkId].OMENGraphHttpUri
+    const OMENwsUri = networks[this.networkId].OMENGraphWsUri
+    return { CTEhttpUri, CTEwsUri, OMENhttpUri, OMENwsUri }
   }
 
   getEarliestBlockToCheck(): number {
