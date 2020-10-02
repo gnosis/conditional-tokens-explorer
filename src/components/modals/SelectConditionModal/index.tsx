@@ -6,7 +6,6 @@ import styled from 'styled-components'
 import { Button } from 'components/buttons/Button'
 import { ButtonControl, ButtonControlType } from 'components/buttons/ButtonControl'
 import { Modal, ModalProps } from 'components/common/Modal'
-import { SearchField } from 'components/form/SearchField'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import {
@@ -14,6 +13,7 @@ import {
   StripedListEmpty,
   StripedListItem,
 } from 'components/pureStyledComponents/StripedList'
+import { SearchField } from 'components/search/SearchField'
 import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { TableControls } from 'components/table/TableControls'

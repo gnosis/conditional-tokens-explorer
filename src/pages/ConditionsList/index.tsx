@@ -7,10 +7,10 @@ import styled from 'styled-components'
 import { ButtonDots } from 'components/buttons/ButtonDots'
 import { Dropdown, DropdownItemCSS, DropdownPosition } from 'components/common/Dropdown'
 import { OraclesFilterDropdown } from 'components/common/OraclesFilterDropdown'
-import { SearchField } from 'components/form/SearchField'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import { PageTitle } from 'components/pureStyledComponents/PageTitle'
 import { Pill, PillTypes } from 'components/pureStyledComponents/Pill'
+import { SearchField } from 'components/search/SearchField'
 import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { CellHash } from 'components/table/CellHash'
@@ -190,19 +190,19 @@ export const ConditionsList: React.FC = () => {
         <>
           <TableControls
             end={
+              <SearchField
+                onChange={onChangeConditionId}
+                placeholder="Search by condition id..."
+                value={conditionIdToShow}
+              />
+            }
+            start={
               <OraclesFilterDropdown
                 onClick={(value: OracleFilterOptions, filter: string[]) => {
                   setSelectedOracleFilter(filter)
                   setSelectedOracleValue(value)
                 }}
                 value={selectedOracleValue}
-              />
-            }
-            start={
-              <SearchField
-                onChange={onChangeConditionId}
-                placeholder="Search by condition id..."
-                value={conditionIdToShow}
               />
             }
           />

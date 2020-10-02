@@ -15,12 +15,12 @@ import {
   DropdownPosition,
 } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
-import { SearchField } from 'components/form/SearchField'
 import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
 import { UnwrapModal } from 'components/modals/UnwrapModal'
 import { WrapModal } from 'components/modals/WrapModal'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import { PageTitle } from 'components/pureStyledComponents/PageTitle'
+import { SearchField } from 'components/search/SearchField'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
@@ -387,19 +387,19 @@ export const PositionsList = () => {
         <>
           <TableControls
             end={
+              <SearchField
+                onChange={onChangePositionId}
+                placeholder="Search by position id..."
+                value={positionIdToShow}
+              />
+            }
+            start={
               <CollateralFilterDropdown
                 onClick={(symbol: string, address: string) => {
                   setSelectedCollateralFilter(address)
                   setSelectedCollateralValue(symbol)
                 }}
                 value={selectedCollateralValue}
-              />
-            }
-            start={
-              <SearchField
-                onChange={onChangePositionId}
-                placeholder="Search by position id..."
-                value={positionIdToShow}
               />
             }
           />
