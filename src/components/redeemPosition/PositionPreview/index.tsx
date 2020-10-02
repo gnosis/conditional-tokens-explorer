@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 
 import {
   StripedList,
@@ -20,8 +20,14 @@ interface Props {
 }
 
 export const PositionPreview = ({ condition, position }: Props) => {
-  const { balanceERC1155 } = useBalanceForPosition(position?.id || '')
+  const { balanceERC1155, refetch } = useBalanceForPosition(position?.id || '')
   const { collateral: token } = useCollateral(position ? position.collateralToken.id : '')
+
+  useEffect(() => {
+    if (position) {
+      refetch()
+    }
+  }, [position, refetch])
 
   const redeemedBalance = useMemo(
     () =>

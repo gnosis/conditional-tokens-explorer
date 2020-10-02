@@ -76,7 +76,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
     positionId: positionIdToSearch,
   })
 
-  // Filter preselectedPositions (stringIds[]) from dataWithToken to merge with currently selected positions.
+  // Filter preselectedPositions (stringIds[]) from data to merge with currently selected positions.
   useEffect(() => {
     if (data && data.length && preSelectedPositions && preSelectedPositions.length) {
       setSelectedPositions((current: Array<PositionWithUserBalanceWithDecimals>) => {
