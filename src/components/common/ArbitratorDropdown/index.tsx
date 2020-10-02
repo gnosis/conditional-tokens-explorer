@@ -3,34 +3,39 @@ import React from 'react'
 import { ButtonSelect } from 'components/buttons/ButtonSelect'
 import { Dropdown, DropdownPosition } from 'components/common/Dropdown'
 import { SelectItem } from 'components/form/SelectItem'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { Arbitrator } from 'util/types'
 
 interface Props {
-  onClick: (value: string) => void
-  value: string
+  onClick: (value: Arbitrator) => void
+  value: Arbitrator
 }
 
 export const ArbitratorDropdown = ({ onClick, value }: Props) => {
-  const arbitratorItems = [
-    {
-      text: 'Realit.io',
+  const { networkConfig } = useWeb3ConnectedOrInfura()
+  const arbitrators: Arbitrator[] = networkConfig.getArbitrators()
+
+  const arbitratorItems = []
+  for (const arbitrator of arbitrators) {
+    const oracleItem = {
+      text: arbitrator.description,
       onClick: () => {
-        onClick('realitio')
+        onClick(arbitrator)
       },
-      value: 'realitio',
-    },
-    {
-      text: 'Kleros',
-      onClick: () => {
-        onClick('kleros')
-      },
-      value: 'kleros',
-    },
-  ]
+      value: arbitrator.name,
+    }
+    arbitratorItems.push(oracleItem)
+  }
 
   return (
     <Dropdown
+      currentItem={arbitratorItems.findIndex(
+        (arbitratorItem) => arbitratorItem.value === value.name
+      )}
       dropdownButtonContent={
-        <ButtonSelect content={arbitratorItems.filter((item) => item.value === value)[0].text} />
+        <ButtonSelect
+          content={arbitratorItems.filter((item) => item.value === value.name)[0].text}
+        />
       }
       dropdownPosition={DropdownPosition.center}
       fullWidth
