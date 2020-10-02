@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 
 import { Button } from 'components/buttons'
 import { CenteredCard } from 'components/common/CenteredCard'
@@ -12,6 +12,7 @@ import { Row } from 'components/pureStyledComponents/Row'
 import { PositionPreview } from 'components/redeemPosition/PositionPreview'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
+import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
@@ -24,11 +25,41 @@ const logger = getLogger('RedeemPosition')
 
 export const Contents = () => {
   const { _type: status, CTService, connect, networkConfig } = useWeb3ConnectedOrInfura()
-  const { clearPositions, errors: positionsErrors, positions } = useMultiPositionsContext()
+  const {
+    clearPositions,
+    errors: positionsErrors,
+    loading: loadingPositions,
+    positions,
+  } = useMultiPositionsContext()
+  const {
+    errors: balancesErrors,
+    loading: loadingBalance,
+    updateBalances,
+  } = useBatchBalanceContext()
 
-  const { clearCondition, condition, errors: conditionErrors } = useConditionContext()
+  const {
+    clearCondition,
+    condition,
+    errors: conditionErrors,
+    loading: loadingCondition,
+  } = useConditionContext()
   const [statusTransaction, setStatusTransaction] = React.useState<Maybe<Status>>(null)
   const [error, setError] = React.useState<Maybe<Error>>(null)
+
+  useEffect(() => {
+    if (positions) {
+      updateBalances(positions.map((p) => p.id))
+    }
+  }, [positions, updateBalances])
+
+  const loading = useMemo(
+    () =>
+      loadingCondition ||
+      loadingBalance ||
+      loadingPositions ||
+      statusTransaction === Status.Loading,
+    [loadingCondition, loadingBalance, loadingPositions, statusTransaction]
+  )
 
   const onRedeem = useCallback(async () => {
     try {
@@ -87,9 +118,10 @@ export const Contents = () => {
   } = useIsPositionRelatedToCondition(positions.length ? positions[0].id : '', condition?.id || '')
 
   const disabled =
-    statusTransaction === Status.Loading ||
+    loading ||
     positionsErrors.length > 0 ||
     conditionErrors.length > 0 ||
+    balancesErrors.length > 0 ||
     !positions.length ||
     !condition ||
     !isRelated
