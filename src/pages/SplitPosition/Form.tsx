@@ -162,6 +162,7 @@ export const Form = ({
         setStatus(Remote.loading())
 
         let positionIds: PositionIdsArray[]
+        let collateralFromSplit: string = collateral
         if (splitFromCollateral) {
           await splitPosition(collateral, NULL_PARENT_ID, conditionId, partition, amount)
 
@@ -169,24 +170,29 @@ export const Form = ({
             partition,
             NULL_PARENT_ID,
             conditionId,
-            collateral
+            collateralFromSplit
           )
-        } else if (splitFromPosition && position) {
-          collateral = position.collateralToken?.id
-          const collectionId = position.collection?.id
-          await splitPosition(collateral, collectionId, conditionId, partition, amount)
+        } else if (
+          splitFromPosition &&
+          position &&
+          position.collateralToken &&
+          position.collection
+        ) {
+          collateralFromSplit = position.collateralToken.id
+          const collectionId = position.collection.id
+          await splitPosition(collateralFromSplit, collectionId, conditionId, partition, amount)
 
           positionIds = await CTService.getPositionsFromPartition(
             partition,
             collectionId,
             conditionId,
-            collateral
+            collateralFromSplit
           )
         } else {
           throw Error('Invalid split origin')
         }
 
-        setStatus(Remote.success({ positionIds, collateral }))
+        setStatus(Remote.success({ positionIds, collateral: collateralFromSplit }))
       } catch (err) {
         logger.error(err)
         setStatus(Remote.failure(err))
