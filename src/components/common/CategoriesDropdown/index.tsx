@@ -117,7 +117,7 @@ export const CategoriesDropdown = ({ onClick, value }: Props) => {
 
       setCategories(Remote.success(lodashOrderby(newCategories, ['text'], ['asc'])))
     } else if (categoriesError) {
-      setCategories(Remote.failure(categoriesError))
+      setCategories(Remote.success(categoryItems))
     }
   }, [categoriesFromOmen, categoriesLoading, categoriesError, categoryItems, onClick])
 
