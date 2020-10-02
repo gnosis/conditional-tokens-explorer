@@ -65,7 +65,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   actionButton?: ActionButtonProps | undefined
   height?: string
   icon?: IconTypes
-  message?: string
+  message?: string | React.ReactNode | undefined
   noOverlay?: boolean
   title?: string
   width?: string
