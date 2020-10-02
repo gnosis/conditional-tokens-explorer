@@ -21,10 +21,8 @@ export type UserBalanceWithDecimals = {
   collateralTokenERC20: Token
 }
 
-export type PositionWithUserBalanceWithDecimals = Position & UserBalanceWithDecimals
-export type PositionWithUserBalanceWithDecimalsWithToken = PositionWithUserBalanceWithDecimals & {
-  token: Token
-}
+export type PositionWithUserBalanceWithDecimals = Position &
+  UserBalanceWithDecimals & { token: Token }
 
 interface OptionsToSearch {
   positionId?: string
@@ -46,7 +44,9 @@ export const usePositions = (options: OptionsToSearch) => {
 
   const [data, setData] = React.useState<Maybe<PositionWithUserBalanceWithDecimals[]>>(null)
   const [address, setAddress] = React.useState<Maybe<string>>(null)
-  const [loadingUserBalanceWithDecimals, setLoadingUserBalanceWithDecimals] = React.useState(true)
+  const [isLoadingUserBalanceWithDecimals, setIsLoadingUserBalanceWithDecimals] = React.useState(
+    true
+  )
 
   const queryOptions: PositionsListType = {}
 
@@ -91,7 +91,7 @@ export const usePositions = (options: OptionsToSearch) => {
     if (positionsData) {
       const positionListData = marshalPositionListData(positionsData.positions, userData?.user)
 
-      setLoadingUserBalanceWithDecimals(true)
+      setIsLoadingUserBalanceWithDecimals(true)
 
       const fetchUserBalanceWithDecimals = async () => {
         const uniqueCollateralTokens = lodashUniqBy(positionListData, 'collateralToken')
@@ -161,6 +161,7 @@ export const usePositions = (options: OptionsToSearch) => {
             userBalanceERC1155Numbered: Number(userBalanceERC1155WithDecimals),
             userBalanceERC20Numbered: Number(userBalanceERC20WithDecimals),
             collateralTokenERC1155: collateralTokenFound.length && collateralTokenFound[0],
+            token: collateralTokenFound.length && collateralTokenFound[0],
             collateralTokenSymbol:
               collateralTokenFound.length && collateralTokenFound[0]
                 ? collateralTokenFound[0].symbol
@@ -170,13 +171,13 @@ export const usePositions = (options: OptionsToSearch) => {
         })
         if (!cancelled) {
           setData(positionListDataEnhanced)
-          setLoadingUserBalanceWithDecimals(false)
+          setIsLoadingUserBalanceWithDecimals(false)
         }
       }
 
       fetchUserBalanceWithDecimals()
     } else {
-      setLoadingUserBalanceWithDecimals(false)
+      setIsLoadingUserBalanceWithDecimals(false)
     }
     return () => {
       cancelled = true
@@ -186,7 +187,7 @@ export const usePositions = (options: OptionsToSearch) => {
   return {
     data,
     error: positionsError || userError,
-    loading: positionsLoading || userLoading || loadingUserBalanceWithDecimals,
+    loading: positionsLoading || userLoading || isLoadingUserBalanceWithDecimals,
     refetchPositions,
     refetchUserPositions,
   }
