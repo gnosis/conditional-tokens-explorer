@@ -15,7 +15,7 @@ import {
   DropdownPosition,
 } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
-import { DisplayTableConditions } from 'components/form/DisplayTableConditions'
+import { DisplayConditionsTableModal } from 'components/modals/DisplayConditionsTableModal'
 import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
 import { UnwrapModal } from 'components/modals/UnwrapModal'
 import { WrapModal } from 'components/modals/WrapModal'
@@ -74,6 +74,15 @@ const CollateralWrapButton = styled(Button)`
   width: 80px;
 `
 
+const MoreWrapButton = styled(Button)`
+  font-size: 14px;
+  font-weight: 600;
+  height: 24px;
+  width: 80px;
+  display: inline-flex;
+  margin: 0 0 0 12px;
+`
+
 const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
 `
@@ -116,6 +125,7 @@ export const Contents = (props: Props) => {
   const [isWrapModalOpen, setIsWrapModalOpen] = useState(false)
   const [isUnwrapModalOpen, setIsUnwrapModalOpen] = useState(false)
   const [openTransferOutcomeTokensModal, setOpenTransferOutcomeTokensModal] = useState(false)
+  const [openDisplayConditionsTableModal, setOpenDisplayConditionsTableModal] = useState(false)
   const [transfer, setTransfer] = useState<Remote<TransferOptions>>(
     Remote.notAsked<TransferOptions>()
   )
@@ -293,6 +303,7 @@ export const Contents = (props: Props) => {
   const fullLoadingTitle = transfer.isFailure() ? 'Error' : transactionTitle
 
   const outcomesByRow = '14'
+
   return (
     <CenteredCard
       dropdown={
@@ -342,13 +353,28 @@ export const Contents = (props: Props) => {
             </>
           }
         />
+        {conditions.length > 0 && (
+          <TitleValue
+            title={conditions.length === 1 ? 'Condition Id' : 'Condition Ids'}
+            value={
+              conditions.length === 1 ? (
+                <>
+                  {truncateStringInTheMiddle(conditions[0].conditionId, 8, 6)}
+                  <ButtonCopy value={conditions[0]} />
+                </>
+              ) : (
+                <>
+                  {truncateStringInTheMiddle(conditions[0].conditionId, 8, 6)}
+                  <MoreWrapButton onClick={() => setOpenDisplayConditionsTableModal(true)}>
+                    More...
+                  </MoreWrapButton>
+                </>
+              )
+            }
+          />
+        )}
       </Row>
-      <Row cols="1fr" marginBottomXL>
-        <TitleValue
-          title="Condition Ids"
-          value={<DisplayTableConditions conditionIds={conditions} />}
-        />
-      </Row>
+
       <Row cols="1fr" marginBottomXL>
         <TitleValue
           title="Collateral Wrapping"
@@ -460,6 +486,13 @@ export const Contents = (props: Props) => {
           onRequestClose={() => setOpenTransferOutcomeTokensModal(false)}
           onSubmit={onTransferOutcomeTokens}
           positionId={positionId}
+        />
+      )}
+      {openDisplayConditionsTableModal && conditions.length > 1 && (
+        <DisplayConditionsTableModal
+          conditions={conditions}
+          isOpen={openDisplayConditionsTableModal}
+          onRequestClose={() => setOpenDisplayConditionsTableModal(false)}
         />
       )}
       {(transfer.isLoading() || transfer.isFailure() || transfer.isSuccess()) && (
