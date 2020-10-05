@@ -15,6 +15,7 @@ import {
   DropdownPosition,
 } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
+import { FiltersSidebar } from 'components/filters/FiltersSidebar'
 import { Switch } from 'components/form/Switch'
 import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
 import { UnwrapModal } from 'components/modals/UnwrapModal'
@@ -439,89 +440,97 @@ export const PositionsList = () => {
     setShowFilters(!showFilters)
   }, [showFilters])
 
+  const showSpinner = (isLoading || isSearching) && !error
+
   return (
     <>
       <PageTitle>Positions</PageTitle>
-      {isLoading && !error && <InlineLoading />}
-      {error && <InfoCard message={error.message} title="Error" />}
-      {data && !isLoading && !error && (
-        <>
-          <TableControls
-            end={
-              <SearchField
-                dropdownItems={dropdownItems}
-                onChange={onChangePositionId}
-                onClear={onClearSearch}
-                value={positionIdToShow}
-              />
-            }
-            start={
-              <Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />
-              // <CollateralFilterDropdown
-              //   onClick={(symbol: string, address: string) => {
-              //     setSelectedCollateralFilter(address)
-              //     setSelectedCollateralValue(symbol)
-              //   }}
-              //   value={selectedCollateralValue}
-              // />
-            }
+      <TableControls
+        end={
+          <SearchField
+            disabled={!data}
+            dropdownItems={dropdownItems}
+            onChange={onChangePositionId}
+            onClear={onClearSearch}
+            value={positionIdToShow}
           />
-          {isSearching && <InlineLoading />}
-          {!isSearching && (
-            <DataTable
-              className="outerTableWrapper"
-              columns={getColumns()}
-              customStyles={customStyles}
-              data={data || []}
-              highlightOnHover
-              noDataComponent={<EmptyContentText>No positions found.</EmptyContentText>}
-              noHeader
-              onRowClicked={handleRowClick}
-              pagination
-              responsive
-            />
-          )}
-          {isWrapModalOpen && selectedCollateralToken && (
-            <WrapModal
-              balance={userBalance}
-              decimals={selectedCollateralToken.decimals}
-              isOpen={isWrapModalOpen}
-              onRequestClose={() => setIsWrapModalOpen(false)}
-              onWrap={onWrap}
-              positionId={selectedPositionId}
-              tokenSymbol={selectedCollateralToken.symbol}
-            />
-          )}
-          {isUnwrapModalOpen && selectedCollateralToken && (
-            <UnwrapModal
-              balance={userBalance}
-              decimals={selectedCollateralToken.decimals}
-              isOpen={isUnwrapModalOpen}
-              onRequestClose={() => setIsUnwrapModalOpen(false)}
-              onUnWrap={onUnwrap}
-              positionId={selectedPositionId}
-              tokenSymbol={selectedCollateralToken.symbol}
-            />
-          )}
-          {isTransferOutcomeModalOpen && selectedPositionId && selectedCollateralToken && (
-            <TransferOutcomeTokensModal
-              collateralToken={selectedCollateralToken.address}
-              isOpen={isTransferOutcomeModalOpen}
-              onRequestClose={() => setIsTransferOutcomeModalOpen(false)}
-              onSubmit={onTransferOutcomeTokens}
-              positionId={selectedPositionId}
-            />
-          )}
-          {(transfer.isLoading() || transfer.isFailure() || transfer.isSuccess()) && (
-            <FullLoading
-              actionButton={fullLoadingActionButton}
-              icon={fullLoadingIcon}
-              message={fullLoadingMessage}
-              title={fullLoadingTitle}
-              width={transfer.isFailure() ? '400px' : '320px'}
-            />
-          )}
-        </>
+        }
+        start={
+          <Switch
+            active={showFilters}
+            disabled={!data}
+            label="Filters"
+            onClick={toggleShowFilters}
+          />
+          // <CollateralFilterDropdown
+          //   onClick={(symbol: string, address: string) => {
+          //     setSelectedCollateralFilter(address)
+          //     setSelectedCollateralValue(symbol)
+          //   }}
+          //   value={selectedCollateralValue}
+          // />
+        }
+      />
+      {error && <InfoCard message={error.message} title="Error" />}
+      {!error && (
+        <DataTable
+          className="outerTableWrapper"
+          columns={getColumns()}
+          customStyles={customStyles}
+          data={showSpinner ? [] : data || []}
+          highlightOnHover
+          noDataComponent={
+            showSpinner ? (
+              <InlineLoading />
+            ) : (
+              <EmptyContentText>No positions found.</EmptyContentText>
+            )
+          }
+          noHeader
+          onRowClicked={handleRowClick}
+          pagination
+          responsive
+        />
+      )}
+      {isWrapModalOpen && selectedCollateralToken && (
+        <WrapModal
+          balance={userBalance}
+          decimals={selectedCollateralToken.decimals}
+          isOpen={isWrapModalOpen}
+          onRequestClose={() => setIsWrapModalOpen(false)}
+          onWrap={onWrap}
+          positionId={selectedPositionId}
+          tokenSymbol={selectedCollateralToken.symbol}
+        />
+      )}
+      {isUnwrapModalOpen && selectedCollateralToken && (
+        <UnwrapModal
+          balance={userBalance}
+          decimals={selectedCollateralToken.decimals}
+          isOpen={isUnwrapModalOpen}
+          onRequestClose={() => setIsUnwrapModalOpen(false)}
+          onUnWrap={onUnwrap}
+          positionId={selectedPositionId}
+          tokenSymbol={selectedCollateralToken.symbol}
+        />
+      )}
+      {isTransferOutcomeModalOpen && selectedPositionId && selectedCollateralToken && (
+        <TransferOutcomeTokensModal
+          collateralToken={selectedCollateralToken.address}
+          isOpen={isTransferOutcomeModalOpen}
+          onRequestClose={() => setIsTransferOutcomeModalOpen(false)}
+          onSubmit={onTransferOutcomeTokens}
+          positionId={selectedPositionId}
+        />
+      )}
+      {(transfer.isLoading() || transfer.isFailure() || transfer.isSuccess()) && (
+        <FullLoading
+          actionButton={fullLoadingActionButton}
+          icon={fullLoadingIcon}
+          message={fullLoadingMessage}
+          title={fullLoadingTitle}
+          width={transfer.isFailure() ? '400px' : '320px'}
+        />
       )}
     </>
   )

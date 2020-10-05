@@ -1,11 +1,13 @@
 import React from 'react'
 import styled from 'styled-components'
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<{ disabled?: boolean }>`
   align-items: center;
-  cursor: pointer;
+  cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
   display: flex;
   justify-content: center;
+  opacity: ${(props) => (props.disabled ? '0.5' : '1')};
+  pointer-events: ${(props) => (props.disabled ? 'none' : 'all')};
 `
 
 const SwitchWrapper = styled.div<{ active: boolean }>`
@@ -43,15 +45,16 @@ const Label = styled.span`
 
 interface Props {
   active: boolean
+  disabled?: boolean
   label?: React.ReactNode
   onClick?: () => void
 }
 
 export const Switch: React.FC<Props> = (props) => {
-  const { active = false, label, onClick, ...restProps } = props
+  const { active = false, disabled, label, onClick, ...restProps } = props
 
   return (
-    <Wrapper onClick={onClick} {...restProps}>
+    <Wrapper disabled={disabled} onClick={onClick} {...restProps}>
       <SwitchWrapper active={active}>
         <Circle active={active} />
       </SwitchWrapper>

@@ -36,7 +36,10 @@ const SearchIconWrapper = styled.label`
 const Input = styled(Textfield)`
   background-color: transparent;
   border-radius: 4px;
+  color: ${(props) => props.theme.colors.textColor};
   flex-grow: 1;
+  font-size: 15px;
+  font-weight: normal;
   height: 100%;
   overflow: hidden;
   padding-left: 0;
@@ -44,6 +47,18 @@ const Input = styled(Textfield)`
   text-overflow: ellipsis;
   white-space: nowrap;
   z-index: 1;
+
+  &::placeholder {
+    color: ${(props) => props.theme.colors.mediumGray};
+    font-size: 15px;
+    font-weight: normal;
+  }
+
+  &:-webkit-autofill:focus {
+    background-color: transparent;
+    color: ${(props) => props.theme.colors.textColor};
+    font-size: 15px;
+  }
 
   &,
   &:focus,
@@ -125,6 +140,7 @@ const ChevronDownStyled = styled(ChevronDown)`
 `
 
 interface Props {
+  disabled?: boolean
   dropdownItems?: Array<{ onClick: () => void; placeholder: string; text: string }>
   onChange: ((event: React.ChangeEvent<HTMLInputElement>) => void) | undefined
   onClear?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
@@ -133,7 +149,7 @@ interface Props {
 }
 
 export const SearchField: React.FC<Props> = (props) => {
-  const { dropdownItems, onChange, onClear, placeholder, value, ...restProps } = props
+  const { disabled, dropdownItems, onChange, onClear, placeholder, value, ...restProps } = props
 
   const [currentItem, setCurrentItem] = useState(0)
 
@@ -143,6 +159,8 @@ export const SearchField: React.FC<Props> = (props) => {
         <Magnifier />
       </SearchIconWrapper>
       <Input
+        autoComplete="off"
+        disabled={disabled}
         id="searchField"
         onChange={onChange}
         placeholder={
@@ -156,13 +174,14 @@ export const SearchField: React.FC<Props> = (props) => {
         value={value}
       />
       {onClear && (
-        <ClearSearchButton onClick={onClear}>
+        <ClearSearchButton disabled={disabled} onClick={onClear}>
           <ClearSearch />
         </ClearSearchButton>
       )}
       {dropdownItems && (
         <Dropdown
           activeItemHighlight={false}
+          disabled={disabled}
           dropdownButtonContent={
             <ButtonDropdown>
               <ClearSearchButtonText>

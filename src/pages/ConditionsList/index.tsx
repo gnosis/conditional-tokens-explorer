@@ -197,7 +197,7 @@ export const ConditionsList: React.FC = () => {
         setSearchBy('all')
       },
       placeholder:
-        'Search by Position Id, Condition Id, Collateral Symbol, Collateral Address, Token Address.',
+        'Search by Condition Id, Question Id, Question Text, Oracle Address, Reporting Address, Creator Address.',
       text: 'All',
     },
     {
@@ -252,50 +252,57 @@ export const ConditionsList: React.FC = () => {
     setShowFilters(!showFilters)
   }, [showFilters])
 
+  const showSpinner = (isLoading || isSearching) && !error
+
   return (
     <>
       <PageTitle>Conditions</PageTitle>
-      {isLoading && <InlineLoading />}
-      {error && <InfoCard message={error.message} title="Error" />}
-      {data && !isLoading && !error && (
-        <>
-          <TableControls
-            end={
-              <SearchField
-                dropdownItems={dropdownItems}
-                onChange={onChangeConditionId}
-                onClear={onClearSearch}
-                placeholder="Search by condition id..."
-                value={conditionIdToShow}
-              />
-            }
-            start={
-              <Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />
-              // <OraclesFilterDropdown
-              //   onClick={(value: OracleFilterOptions, filter: string[]) => {
-              //     setSelectedOracleFilter(filter)
-              //     setSelectedOracleValue(value)
-              //   }}
-              //   value={selectedOracleValue}
-              // />
-            }
+      <TableControls
+        end={
+          <SearchField
+            disabled={!data}
+            dropdownItems={dropdownItems}
+            onChange={onChangeConditionId}
+            onClear={onClearSearch}
+            value={conditionIdToShow}
           />
-          {isSearching && <InlineLoading />}
-          {!isSearching && (
-            <DataTable
-              className="outerTableWrapper"
-              columns={columns}
-              customStyles={customStyles}
-              data={data?.conditions || []}
-              highlightOnHover
-              noDataComponent={<EmptyContentText>No conditions found.</EmptyContentText>}
-              noHeader
-              onRowClicked={handleRowClick}
-              pagination
-              responsive
-            />
-          )}
-        </>
+        }
+        start={
+          <Switch
+            active={showFilters}
+            disabled={!data}
+            label="Filters"
+            onClick={toggleShowFilters}
+          />
+          // <OraclesFilterDropdown
+          //   onClick={(value: OracleFilterOptions, filter: string[]) => {
+          //     setSelectedOracleFilter(filter)
+          //     setSelectedOracleValue(value)
+          //   }}
+          //   value={selectedOracleValue}
+          // />
+        }
+      />
+      {error && <InfoCard message={error.message} title="Error" />}
+      {!error && (
+        <DataTable
+          className="outerTableWrapper"
+          columns={columns}
+          customStyles={customStyles}
+          data={showSpinner ? [] : data?.conditions || []}
+          highlightOnHover
+          noDataComponent={
+            showSpinner ? (
+              <InlineLoading />
+            ) : (
+              <EmptyContentText>No conditions found.</EmptyContentText>
+            )
+          }
+          noHeader
+          onRowClicked={handleRowClick}
+          pagination
+          responsive
+        />
       )}
     </>
   )
