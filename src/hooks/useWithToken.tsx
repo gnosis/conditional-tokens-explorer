@@ -58,9 +58,9 @@ export const useWithToken = <T extends WithAddress>(
           }
         })
     } else {
-      setLoading(true)
-      setDataWithToken([])
-      setLoading(false)
+      if (!cancelled) {
+        setDataWithToken([])
+      }
     }
 
     return () => {
