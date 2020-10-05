@@ -1,7 +1,7 @@
 import { ApolloProvider } from '@apollo/react-hooks'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import { ApolloClient } from 'apollo-client'
-import { from, split } from 'apollo-link'
+import { Operation, from, split } from 'apollo-link'
 import { HttpLink } from 'apollo-link-http'
 import apolloLogger from 'apollo-link-logger'
 import { RetryLink } from 'apollo-link-retry'
@@ -30,6 +30,11 @@ interface Props {
 export const ApolloProviderWrapper = ({ children }: Props) => {
   const { status } = useWeb3Context()
 
+  const isOperationASubscription = ({ query }: Operation) => {
+    const definition = getMainDefinition(query)
+    return definition.kind === 'OperationDefinition' && definition.operation === 'subscription'
+  }
+
   const OmenLink = React.useMemo(() => {
     let httpUri = OMEN_GRAPH_HTTP_MAINNET
     let wsUri = OMEN_GRAPH_WS_MAINNET
@@ -57,14 +62,7 @@ export const ApolloProviderWrapper = ({ children }: Props) => {
       uri: httpUri,
     })
 
-    return split(
-      ({ query }) => {
-        const definition = getMainDefinition(query)
-        return definition.kind === 'OperationDefinition' && definition.operation === 'subscription'
-      },
-      OmenWsLink,
-      OmenHttpLink
-    )
+    return split(isOperationASubscription, OmenWsLink, OmenHttpLink)
   }, [status])
 
   const CTELink = React.useMemo(() => {
@@ -94,14 +92,7 @@ export const ApolloProviderWrapper = ({ children }: Props) => {
       uri: httpUri,
     })
 
-    return split(
-      ({ query }) => {
-        const definition = getMainDefinition(query)
-        return definition.kind === 'OperationDefinition' && definition.operation === 'subscription'
-      },
-      CTEWsLink,
-      CTEHttpLink
-    )
+    return split(isOperationASubscription, CTEWsLink, CTEHttpLink)
   }, [status])
 
   const link = new RetryLink({
