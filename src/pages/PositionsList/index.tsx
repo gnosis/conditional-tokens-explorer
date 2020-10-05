@@ -78,10 +78,15 @@ export const PositionsList = () => {
     [debouncedHandlerPositionIdToSearch]
   )
 
+  const onClearSearch = React.useCallback(() => {
+    setPositionIdToShow('')
+    debouncedHandlerPositionIdToSearch('')
+  }, [debouncedHandlerPositionIdToSearch])
+
   const { data, error, loading, refetchPositions, refetchUserPositions } = usePositions({
-    positionId: positionIdToSearch,
     collateralFilter: selectedCollateralFilter,
     collateralValue: selectedCollateralValue,
+    positionId: positionIdToSearch,
   })
 
   const isLoading = !positionIdToSearch && loading && transfer.isNotAsked()
@@ -389,6 +394,7 @@ export const PositionsList = () => {
             end={
               <SearchField
                 onChange={onChangePositionId}
+                onClear={onClearSearch}
                 placeholder="Search by position id..."
                 value={positionIdToShow}
               />

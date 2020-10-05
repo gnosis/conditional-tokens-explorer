@@ -48,9 +48,11 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
   const { onConfirm, ...restProps } = props
   const [conditionIdToSearch, setConditionIdToSearch] = useState<string>('')
   const [conditionIdToShow, setConditionIdToShow] = useState<string>('')
+
   const debouncedHandler = useDebounceCallback((conditionIdToSearch) => {
     setConditionIdToSearch(conditionIdToSearch)
   }, 500)
+
   const inputHandler = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.currentTarget
@@ -59,6 +61,11 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
     },
     [debouncedHandler]
   )
+
+  const onClearSearch = React.useCallback(() => {
+    setConditionIdToShow('')
+    debouncedHandler('')
+  }, [debouncedHandler])
 
   const { data, error, loading } = useConditions({
     conditionId: conditionIdToSearch,
@@ -154,6 +161,7 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
             start={
               <Search
                 onChange={inputHandler}
+                onClear={onClearSearch}
                 placeholder="Search condition id..."
                 value={conditionIdToShow}
               />

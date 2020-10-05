@@ -50,6 +50,11 @@ export const ConditionsList: React.FC = () => {
     [debouncedHandlerConditionToSearch]
   )
 
+  const onClearSearch = React.useCallback(() => {
+    setConditionIdToShow('')
+    debouncedHandlerConditionToSearch('')
+  }, [debouncedHandlerConditionToSearch])
+
   const { data, error, loading } = useConditions({
     conditionId: conditionIdToSearch,
     oracleValue: selectedOracleValue,
@@ -192,6 +197,7 @@ export const ConditionsList: React.FC = () => {
             end={
               <SearchField
                 onChange={onChangeConditionId}
+                onClear={onClearSearch}
                 placeholder="Search by condition id..."
                 value={conditionIdToShow}
               />

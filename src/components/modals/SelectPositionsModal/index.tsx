@@ -79,6 +79,11 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
     [debouncedHandlerPositionIdToSearch]
   )
 
+  const onClearSearch = React.useCallback(() => {
+    setPositionIdToShow('')
+    debouncedHandlerPositionIdToSearch('')
+  }, [debouncedHandlerPositionIdToSearch])
+
   const { data, error, loading } = usePositions({
     positionId: positionIdToSearch,
   })
@@ -268,6 +273,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
             start={
               <Search
                 onChange={onChangePositionId}
+                onClear={onClearSearch}
                 placeholder="Search by position id..."
                 value={positionIdToShow}
               />
