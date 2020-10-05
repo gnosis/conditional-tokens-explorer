@@ -1,5 +1,6 @@
 import { useQuery } from '@apollo/react-hooks'
 import lodashOrderby from 'lodash.orderby'
+import lodashUniqBy from 'lodash.uniqby'
 import React, { useEffect, useMemo, useState } from 'react'
 
 import { ButtonSelect } from 'components/buttons/ButtonSelect'
@@ -8,7 +9,7 @@ import { SelectItem } from 'components/form/SelectItem'
 import { queryTopCategories } from 'queries/OMENCategories'
 import { GetCategories } from 'types/generatedGQLForOMEN'
 import { Remote } from 'util/remoteData'
-import { capitalizeOnlyFirstLetter } from 'util/tools'
+import { capitalize } from 'util/tools'
 import { Categories } from 'util/types'
 
 interface Props {
@@ -94,27 +95,25 @@ export const CategoriesDropdown = ({ onClick, value }: Props) => {
       setCategories(Remote.loading())
     } else if (categoriesFromOmen) {
       const { categories } = categoriesFromOmen
-      const newCategories = [
-        ...categories.map((category) => {
-          const value = capitalizeOnlyFirstLetter(category.id)
-          return {
-            text: value,
-            onClick: () => {
-              onClick(value)
-            },
-            value: value as string,
-          }
-        }),
-        ...categoryItems,
-      ].reduce((acc: CategoryItem[], current: CategoryItem) => {
-        const x = acc.find((item) => item.text === current.text)
-        if (!x) {
-          return acc.concat([current])
-        } else {
-          return acc
-        }
-      }, [])
+      // First we get unique categories
+      const newCategories = lodashUniqBy(
+        [
+          ...categories.map((category) => {
+            const value = capitalize(category.id)
+            return {
+              text: value,
+              onClick: () => {
+                onClick(value)
+              },
+              value: value,
+            }
+          }),
+          ...categoryItems,
+        ],
+        'text'
+      )
 
+      // Second we order categories by text asc
       setCategories(Remote.success(lodashOrderby(newCategories, ['text'], ['asc'])))
     } else if (categoriesError) {
       setCategories(Remote.success(categoryItems))
