@@ -365,6 +365,7 @@ export const Contents = (props: Props) => {
               ) : (
                 <>
                   {truncateStringInTheMiddle(conditions[0].conditionId, 8, 6)}
+                  <ButtonCopy value={conditions[0]} />
                   <MoreWrapButton onClick={() => setOpenDisplayConditionsTableModal(true)}>
                     More...
                   </MoreWrapButton>
