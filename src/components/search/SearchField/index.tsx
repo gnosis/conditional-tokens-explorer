@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 
 import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
@@ -14,7 +14,7 @@ const Wrapper = styled.div`
   display: flex;
   height: 32px;
   max-width: 100%;
-  min-width: 436px;
+  min-width: 450px;
 
   .dropdown,
   .dropdownButton {
@@ -100,9 +100,10 @@ const ButtonDropdown = styled.button`
   justify-content: center;
   justify-content: space-between;
   line-height: 1.2;
+  max-width: 115px;
+  min-width: 80px;
   outline: none;
   padding: 0 12px;
-  width: 110px;
 
   .fill {
     fill: ${(props) => props.theme.colors.darkerGray};

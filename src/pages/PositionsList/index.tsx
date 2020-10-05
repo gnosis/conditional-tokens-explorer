@@ -383,39 +383,54 @@ export const PositionsList = () => {
 
   const fullLoadingTitle = transfer.isFailure() ? 'Error' : transactionTitle
 
+  const [searchBy, setSearchBy] = useState('all')
   const dropdownItems = [
     {
-      onClick: () => {},
+      onClick: () => {
+        setSearchBy('all')
+      },
       placeholder:
         'Search by Position Id, Condition Id, Collateral Symbol, Collateral Address, Token Address.',
       text: 'All',
     },
     {
-      onClick: () => {},
+      onClick: () => {
+        setSearchBy('positionId')
+      },
       placeholder: 'Search by Position Id',
       text: 'Position Id',
     },
     {
-      onClick: () => {},
+      onClick: () => {
+        setSearchBy('conditionId')
+      },
       placeholder: 'Search by Condition Id',
       text: 'Condition Id',
     },
     {
-      onClick: () => {},
+      onClick: () => {
+        setSearchBy('collateralSymbol')
+      },
       placeholder: 'Search by Collateral Symbol',
       text: 'Collateral Symbol',
     },
     {
-      onClick: () => {},
+      onClick: () => {
+        setSearchBy('collateralAddress')
+      },
       placeholder: 'Search by Collateral Address',
       text: 'Collateral Address',
     },
     {
-      onClick: () => {},
+      onClick: () => {
+        setSearchBy('tokenAddress')
+      },
       placeholder: 'Search by Token Address',
       text: 'Token Address',
     },
   ]
+
+  logger.log(`Search by ${searchBy}`)
 
   return (
     <>

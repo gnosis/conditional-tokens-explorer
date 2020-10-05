@@ -19,11 +19,14 @@ import { useConditions } from 'hooks/useConditions'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { customStyles } from 'theme/tableCustomStyles'
 import { Conditions_conditions } from 'types/generatedGQL'
+import { getLogger } from 'util/logger'
 import { LocalStorageManagement, OracleFilterOptions } from 'util/types'
 
 const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
   ${DropdownItemCSS}
 `
+
+const logger = getLogger('ConditionsList')
 
 export const ConditionsList: React.FC = () => {
   const history = useHistory()
@@ -186,6 +189,62 @@ export const ConditionsList: React.FC = () => {
     },
   ]
 
+  const [searchBy, setSearchBy] = useState('all')
+  const dropdownItems = [
+    {
+      onClick: () => {
+        setSearchBy('all')
+      },
+      placeholder:
+        'Search by Position Id, Condition Id, Collateral Symbol, Collateral Address, Token Address.',
+      text: 'All',
+    },
+    {
+      onClick: () => {
+        setSearchBy('conditionId')
+      },
+      placeholder: 'Search by Condition Id',
+      text: 'Condition Id',
+    },
+    {
+      onClick: () => {
+        setSearchBy('questionId')
+      },
+      placeholder: 'Search by Question Id',
+      text: 'Question Id',
+    },
+    {
+      onClick: () => {
+        setSearchBy('questionText')
+      },
+      placeholder: 'Search by Question Text',
+      text: 'Question Text',
+    },
+    {
+      onClick: () => {
+        setSearchBy('oracleAddress')
+      },
+      placeholder: 'Search by Oracle Address',
+      text: 'Oracle Address',
+    },
+    {
+      onClick: () => {
+        setSearchBy('reportingAddress')
+      },
+      placeholder: 'Search by Reporting Address',
+      text: 'Reporting Address',
+    },
+    {
+      onClick: () => {
+        setSearchBy('creatorAddress')
+      },
+      placeholder: 'Search by Creator Address',
+      text: 'Creator Address',
+    },
+  ]
+
+  logger.log(`Search by ${searchBy}`)
+
   return (
     <>
       <PageTitle>Conditions</PageTitle>
@@ -196,6 +255,7 @@ export const ConditionsList: React.FC = () => {
           <TableControls
             end={
               <SearchField
+                dropdownItems={dropdownItems}
                 onChange={onChangeConditionId}
                 onClear={onClearSearch}
                 placeholder="Search by condition id..."
