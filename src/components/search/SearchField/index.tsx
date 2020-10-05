@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
+import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
+import { ChevronDown } from 'components/icons/ChevronDown'
 import { ClearSearch } from 'components/icons/ClearSearch'
 import { Magnifier } from 'components/icons/Magnifier'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
@@ -13,6 +15,22 @@ const Wrapper = styled.div`
   height: 32px;
   max-width: 100%;
   min-width: 436px;
+
+  .dropdown,
+  .dropdownButton {
+    flex-shrink: 0;
+    height: 100%;
+  }
+`
+
+const SearchIconWrapper = styled.label`
+  align-items: center;
+  display: flex;
+  flex-grow: 0;
+  flex-shrink: 0;
+  height: 100%;
+  justify-content: center;
+  width: 35px;
 `
 
 const Input = styled(Textfield)`
@@ -20,8 +38,11 @@ const Input = styled(Textfield)`
   border-radius: 4px;
   flex-grow: 1;
   height: 100%;
+  overflow: hidden;
   padding-left: 0;
   padding-right: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   z-index: 1;
 
   &,
@@ -31,19 +52,14 @@ const Input = styled(Textfield)`
   }
 `
 
-const SearchIconWrapper = styled.label`
-  align-items: center;
-  display: flex;
-  height: 100%;
-  justify-content: center;
-  width: 35px;
-`
-
 const ClearSearchButton = styled.button`
   align-items: center;
   background-color: transparent;
   border: none;
   cursor: pointer;
+  display: flex;
+  flex-grow: 0;
+  flex-shrink: 0;
   height: 100%;
   justify-content: center;
   outline: none;
@@ -57,7 +73,58 @@ const ClearSearchButton = styled.button`
   }
 `
 
+const ClearSearchButtonText = styled.span`
+  flex-shrink: 0;
+  max-width: calc(100% - 24px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`
+
+const ButtonDropdown = styled.button`
+  align-items: center;
+  background-color: transparent;
+  border-bottom-right-radius: 4px;
+  border-bottom: none;
+  border-left: 1px solid ${(props) => props.theme.colors.mediumGrey};
+  border-right: none;
+  border-top-right-radius: 4px;
+  border-top: none;
+  color: ${(props) => props.theme.colors.darkerGray};
+  cursor: pointer;
+  display: flex;
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 400;
+  height: 100%;
+  justify-content: center;
+  justify-content: space-between;
+  line-height: 1.2;
+  outline: none;
+  padding: 0 12px;
+  width: 110px;
+
+  .fill {
+    fill: ${(props) => props.theme.colors.darkerGray};
+  }
+
+  .isOpen & {
+    background-color: ${(props) => props.theme.colors.primary};
+    color: #fff;
+
+    .fill {
+      fill: #fff;
+    }
+  }
+`
+
+const ChevronDownStyled = styled(ChevronDown)`
+  flex-shrink: 0;
+  margin-left: 12px;
+`
+
 interface Props {
+  dropdownItems?: Array<{ onClick: () => void; placeholder: string; text: string }>
   onChange: ((event: React.ChangeEvent<HTMLInputElement>) => void) | undefined
   onClear?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   placeholder?: string | undefined
@@ -65,7 +132,9 @@ interface Props {
 }
 
 export const SearchField: React.FC<Props> = (props) => {
-  const { onChange, onClear, placeholder, value, ...restProps } = props
+  const { dropdownItems, onChange, onClear, placeholder, value, ...restProps } = props
+
+  const [currentItem, setCurrentItem] = useState(0)
 
   return (
     <Wrapper {...restProps}>
@@ -75,7 +144,13 @@ export const SearchField: React.FC<Props> = (props) => {
       <Input
         id="searchField"
         onChange={onChange}
-        placeholder={placeholder}
+        placeholder={
+          placeholder
+            ? placeholder
+            : dropdownItems && dropdownItems[currentItem].placeholder
+            ? dropdownItems[currentItem].placeholder
+            : ''
+        }
         type="text"
         value={value}
       />
@@ -83,6 +158,31 @@ export const SearchField: React.FC<Props> = (props) => {
         <ClearSearchButton onClick={onClear}>
           <ClearSearch />
         </ClearSearchButton>
+      )}
+      {dropdownItems && (
+        <Dropdown
+          activeItemHighlight={false}
+          dropdownButtonContent={
+            <ButtonDropdown>
+              <ClearSearchButtonText>
+                {dropdownItems && dropdownItems[currentItem].text}
+              </ClearSearchButtonText>
+              <ChevronDownStyled />
+            </ButtonDropdown>
+          }
+          dropdownPosition={DropdownPosition.right}
+          items={dropdownItems.map((item, index) => (
+            <DropdownItem
+              key={index}
+              onMouseDown={() => {
+                item.onClick()
+                setCurrentItem(index)
+              }}
+            >
+              {item.text}
+            </DropdownItem>
+          ))}
+        />
       )}
     </Wrapper>
   )

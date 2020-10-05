@@ -383,6 +383,40 @@ export const PositionsList = () => {
 
   const fullLoadingTitle = transfer.isFailure() ? 'Error' : transactionTitle
 
+  const dropdownItems = [
+    {
+      onClick: () => {},
+      placeholder:
+        'Search by Position Id, Condition Id, Collateral Symbol, Collateral Address, Token Address.',
+      text: 'All',
+    },
+    {
+      onClick: () => {},
+      placeholder: 'Search by Position Id',
+      text: 'Position Id',
+    },
+    {
+      onClick: () => {},
+      placeholder: 'Search by Condition Id',
+      text: 'Condition Id',
+    },
+    {
+      onClick: () => {},
+      placeholder: 'Search by Collateral Symbol',
+      text: 'Collateral Symbol',
+    },
+    {
+      onClick: () => {},
+      placeholder: 'Search by Collateral Address',
+      text: 'Collateral Address',
+    },
+    {
+      onClick: () => {},
+      placeholder: 'Search by Token Address',
+      text: 'Token Address',
+    },
+  ]
+
   return (
     <>
       <PageTitle>Positions</PageTitle>
@@ -393,9 +427,9 @@ export const PositionsList = () => {
           <TableControls
             end={
               <SearchField
+                dropdownItems={dropdownItems}
                 onChange={onChangePositionId}
                 onClear={onClearSearch}
-                placeholder="Search by position id..."
                 value={positionIdToShow}
               />
             }
