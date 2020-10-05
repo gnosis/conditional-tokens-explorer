@@ -7,6 +7,7 @@ import styled from 'styled-components'
 import { ButtonDots } from 'components/buttons/ButtonDots'
 import { Dropdown, DropdownItemCSS, DropdownPosition } from 'components/common/Dropdown'
 import { OraclesFilterDropdown } from 'components/common/OraclesFilterDropdown'
+import { Switch } from 'components/form/Switch'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import { PageTitle } from 'components/pureStyledComponents/PageTitle'
 import { Pill, PillTypes } from 'components/pureStyledComponents/Pill'
@@ -245,6 +246,12 @@ export const ConditionsList: React.FC = () => {
 
   logger.log(`Search by ${searchBy}`)
 
+  const [showFilters, setShowFilters] = useState(false)
+
+  const toggleShowFilters = useCallback(() => {
+    setShowFilters(!showFilters)
+  }, [showFilters])
+
   return (
     <>
       <PageTitle>Conditions</PageTitle>
@@ -263,13 +270,14 @@ export const ConditionsList: React.FC = () => {
               />
             }
             start={
-              <OraclesFilterDropdown
-                onClick={(value: OracleFilterOptions, filter: string[]) => {
-                  setSelectedOracleFilter(filter)
-                  setSelectedOracleValue(value)
-                }}
-                value={selectedOracleValue}
-              />
+              <Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />
+              // <OraclesFilterDropdown
+              //   onClick={(value: OracleFilterOptions, filter: string[]) => {
+              //     setSelectedOracleFilter(filter)
+              //     setSelectedOracleValue(value)
+              //   }}
+              //   value={selectedOracleValue}
+              // />
             }
           />
           {isSearching && <InlineLoading />}

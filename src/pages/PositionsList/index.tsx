@@ -15,6 +15,7 @@ import {
   DropdownPosition,
 } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
+import { Switch } from 'components/form/Switch'
 import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
 import { UnwrapModal } from 'components/modals/UnwrapModal'
 import { WrapModal } from 'components/modals/WrapModal'
@@ -432,6 +433,12 @@ export const PositionsList = () => {
 
   logger.log(`Search by ${searchBy}`)
 
+  const [showFilters, setShowFilters] = useState(false)
+
+  const toggleShowFilters = useCallback(() => {
+    setShowFilters(!showFilters)
+  }, [showFilters])
+
   return (
     <>
       <PageTitle>Positions</PageTitle>
@@ -449,13 +456,14 @@ export const PositionsList = () => {
               />
             }
             start={
-              <CollateralFilterDropdown
-                onClick={(symbol: string, address: string) => {
-                  setSelectedCollateralFilter(address)
-                  setSelectedCollateralValue(symbol)
-                }}
-                value={selectedCollateralValue}
-              />
+              <Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />
+              // <CollateralFilterDropdown
+              //   onClick={(symbol: string, address: string) => {
+              //     setSelectedCollateralFilter(address)
+              //     setSelectedCollateralValue(symbol)
+              //   }}
+              //   value={selectedCollateralValue}
+              // />
             }
           />
           {isSearching && <InlineLoading />}
