@@ -358,7 +358,9 @@ export const Contents = (props: Props) => {
                 <CollateralText>
                   <CollateralTextStrong>ERC1155:</CollateralTextStrong>{' '}
                   <CollateralTextAmount>
-                    {formatBigNumber(balanceERC1155, ERC1155Decimals)} {ERC1155Symbol}
+                    {!balanceERC1155.isZero()
+                      ? `${formatBigNumber(balanceERC1155, ERC1155Decimals)} ${ERC1155Symbol}`
+                      : 'None.'}
                   </CollateralTextAmount>
                 </CollateralText>
                 <CollateralWrapButton
