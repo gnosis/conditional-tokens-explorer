@@ -377,5 +377,5 @@ export const isPartitionFullIndexSet = (
   return freeIndexSet === 0
 }
 
-export const capitalizeOnlyFirstLetter = (str: string) =>
+export const capitalize = (str: string): string =>
   str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
