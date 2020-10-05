@@ -16,12 +16,12 @@ const Input = styled(Textfield)`
   border-color: ${(props) => props.theme.colors.lightGrey};
   flex-grow: 1;
   height: 100%;
-  padding-left: 36px;
+  padding-left: 35px;
   z-index: 1;
 `
 
 const Icon = styled(Magnifier)`
-  left: 12px;
+  left: 8px;
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -39,8 +39,8 @@ export const SearchField: React.FC<Props> = (props) => {
 
   return (
     <Wrapper {...restProps}>
-      <Input onChange={onChange} placeholder={placeholder} type="text" value={value} />
       <Icon />
+      <Input onChange={onChange} placeholder={placeholder} type="text" value={value} />
     </Wrapper>
   )
 }
