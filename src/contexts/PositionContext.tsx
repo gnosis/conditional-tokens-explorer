@@ -4,8 +4,8 @@ import React, { useContext, useState } from 'react'
 
 import { useBalanceForPosition } from 'hooks/useBalanceForPosition'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
-import { GetPositionQuery } from 'queries/positions'
-import { GetPosition, GetPosition_position } from 'types/generatedGQL'
+import { GetPositionQuery } from 'queries/CTEPositions'
+import { GetPosition, GetPosition_position } from 'types/generatedGQLForCTE'
 import { isPositionIdValid } from 'util/tools'
 import { LocalStorageManagement, PositionErrors } from 'util/types'
 

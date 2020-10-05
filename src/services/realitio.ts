@@ -3,9 +3,10 @@ import RealitioTemplateLib from '@realitio/realitio-lib/formatters/template'
 import { Contract, ethers } from 'ethers'
 import { bigNumberify } from 'ethers/utils'
 
+import { REALITIO_TIMEOUT, SINGLE_SELECT_TEMPLATE_ID } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
 import { getLogger } from 'util/logger'
-import { Question, QuestionLog } from 'util/types'
+import { Question, QuestionLog, QuestionOptions } from 'util/types'
 
 const logger = getLogger('Realitio Service')
 
@@ -16,8 +17,13 @@ const realitioAbi = [
   'function resultFor(bytes32 question_id) external view returns (bytes32)',
 ]
 
+const realitioCallAbi = [
+  'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public constant returns (bytes32)',
+]
+
 export class RealitioService {
   private contract: Contract
+  private constantContract: Contract
   private provider: ethers.providers.Provider
 
   constructor(
@@ -34,11 +40,93 @@ export class RealitioService {
     } else {
       this.contract = new ethers.Contract(contractAddress, realitioAbi, providerContext)
     }
+    this.constantContract = new ethers.Contract(contractAddress, realitioCallAbi, providerContext)
     this.provider = providerContext
   }
 
   get address(): string {
     return this.contract.address
+  }
+
+  askQuestion = async (questionOptions: QuestionOptions): Promise<string> => {
+    const {
+      arbitratorAddress,
+      category,
+      networkConfig,
+      openingDateMoment,
+      outcomes,
+      question,
+      signerAddress,
+    } = questionOptions
+
+    const openingTimestamp = openingDateMoment.unix()
+    const questionText = RealitioQuestionLib.encodeText(
+      'single-select',
+      question,
+      outcomes,
+      category
+    )
+
+    const timeoutResolution = REALITIO_TIMEOUT || networkConfig.getRealitioTimeout()
+
+    const args = [
+      SINGLE_SELECT_TEMPLATE_ID,
+      questionText,
+      arbitratorAddress,
+      timeoutResolution,
+      openingTimestamp,
+      0,
+    ]
+
+    const questionId = await this.constantContract.askQuestion(...args, {
+      from: signerAddress,
+    })
+
+    // send the transaction and wait until it's mined
+    const transactionObject = await this.contract.askQuestion(...args, {
+      value: '0x0',
+    })
+    logger.log(`Ask question transaction hash: ${transactionObject.hash}`)
+    await this.provider.waitForTransaction(transactionObject.hash)
+
+    return questionId
+  }
+
+  askQuestionConstant = async (questionOptions: QuestionOptions): Promise<string> => {
+    const {
+      arbitratorAddress,
+      category,
+      networkConfig,
+      openingDateMoment,
+      outcomes,
+      question,
+      signerAddress,
+    } = questionOptions
+
+    const openingTimestamp = openingDateMoment.unix()
+    const questionText = RealitioQuestionLib.encodeText(
+      'single-select',
+      question,
+      outcomes,
+      category
+    )
+
+    const timeoutResolution = REALITIO_TIMEOUT || networkConfig.getRealitioTimeout()
+
+    const args = [
+      SINGLE_SELECT_TEMPLATE_ID,
+      questionText,
+      arbitratorAddress,
+      timeoutResolution,
+      openingTimestamp,
+      0,
+    ]
+
+    const questionId = await this.constantContract.askQuestion(...args, {
+      from: signerAddress,
+    })
+
+    return questionId
   }
 
   async getQuestion(questionId: string, earliestBlockToCheck: number): Promise<Question> {
@@ -94,7 +182,7 @@ export class RealitioService {
       category: category === 'undefined' ? '' : category,
       resolution: new Date(openingTs * 1000),
       arbitratorAddress: arbitrator,
-      outcomes: outcomes,
+      outcomes,
       templateId,
       raw: question,
     }

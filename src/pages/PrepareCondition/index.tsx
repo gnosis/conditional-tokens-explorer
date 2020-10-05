@@ -1,13 +1,13 @@
-import React, { KeyboardEvent } from 'react'
+import React, { KeyboardEvent, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useHistory } from 'react-router-dom'
 
 import { Button } from 'components/buttons/Button'
+import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { ArbitratorDropdown } from 'components/common/ArbitratorDropdown'
 import { CategoriesDropdown } from 'components/common/CategoriesDropdown'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { ConditionTypesDropdown } from 'components/common/ConditionTypesDropdown'
-import { QuestionTypesDropdown } from 'components/common/QuestionTypesDropdown'
 import { AddOutcome } from 'components/form/AddOutcome'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { ErrorContainer, Error as ErrorMessage } from 'components/pureStyledComponents/Error'
@@ -26,32 +26,50 @@ import {
   MIN_OUTCOMES,
 } from 'config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import moment from 'moment'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 import { getLogger } from 'util/logger'
-import { isAddress } from 'util/tools'
-import { Categories, ConditionType, QuestionType } from 'util/types'
+import { Remote } from 'util/remoteData'
+import { isAddress, truncateStringInTheMiddle } from 'util/tools'
+import { Arbitrator, Categories, ConditionType, QuestionOptions } from 'util/types'
 
 const maxOutcomesError = 'Too many outcome slots'
 const minOutcomesError = 'There should be more than one outcome slot'
 const patternOutcomesError = 'Decimal numbers are not allowed'
+const conditionAlreadyExist = 'Condition already exists'
+const questionMustNotExist = 'Question must not exist'
 
 const logger = getLogger('Prepare Condition')
 
 export const PrepareCondition = () => {
-  const { _type: status, CTService, address, connect } = useWeb3ConnectedOrInfura()
+  const {
+    _type: status,
+    CTService,
+    RtioService,
+    address,
+    connect,
+    networkConfig,
+  } = useWeb3ConnectedOrInfura()
 
   const [numOutcomes, setNumOutcomes] = React.useState(0)
   const [oracleAddress, setOracleAddress] = React.useState('')
   const [questionId, setQuestionId] = React.useState('')
-  const [isTransactionExecuting, setIsTransactionExecuting] = React.useState(false)
+  const [questionTitle, setQuestionTitle] = React.useState('')
+  const [resolutionDate, setResolutionDate] = React.useState('')
+  const [prepareConditionStatus, setPrepareConditionStatus] = useState<Remote<Maybe<string>>>(
+    Remote.notAsked<Maybe<string>>()
+  )
+
+  const [conditionId, setConditionId] = React.useState<Maybe<string>>(null)
   const [error, setError] = React.useState<Maybe<Error>>(null)
   const [conditionType, setConditionType] = React.useState<ConditionType>(ConditionType.custom)
-  const [questionType, setQuestionType] = React.useState<QuestionType>(QuestionType.binary)
-  const [category, setCategory] = React.useState(Categories.businessAndFinance)
-  const [arbitrator, setArbitrator] = React.useState('realitio')
+  const [category, setCategory] = React.useState<string>(Categories.businessAndFinance)
+  const [arbitrator, setArbitrator] = React.useState<Arbitrator>(
+    networkConfig.getArbitratorFromName('realitio')
+  )
 
-  const [outcomes, setOutcomes] = React.useState<Array<string | undefined>>([])
-  const [outcome, setOutcome] = React.useState<string | undefined>()
+  const [outcomes, setOutcomes] = React.useState<Array<string>>([])
+  const [outcome, setOutcome] = React.useState<string>('')
 
   const history = useHistory()
 
@@ -80,40 +98,117 @@ export const PrepareCondition = () => {
     mode: 'onChange',
   })
 
-  const conditionId = isValid
-    ? ConditionalTokensService.getConditionId(questionId, oracleAddress, numOutcomes)
-    : null
+  React.useEffect(() => {
+    const checkConditionExist = async () => {
+      try {
+        let conditionExists = false
+        let conditionIdToUpdate: Maybe<string> = null
+        if (questionId && oracleAddress && numOutcomes) {
+          conditionIdToUpdate = ConditionalTokensService.getConditionId(
+            questionId,
+            oracleAddress,
+            numOutcomes
+          )
+        }
+        if (questionTitle && oracleAddress && outcomes.length > 0 && address) {
+          const openingDateMoment = moment(resolutionDate)
+          const questionOptions: QuestionOptions = {
+            arbitratorAddress: arbitrator.address,
+            category,
+            openingDateMoment,
+            outcomes,
+            question: questionTitle,
+            networkConfig,
+            signerAddress: address,
+          }
+          const questionId = await RtioService.askQuestionConstant(questionOptions)
+          conditionIdToUpdate = ConditionalTokensService.getConditionId(
+            questionId,
+            oracleAddress,
+            numOutcomes
+          )
+        }
+
+        logger.log(`Condition ID: ${conditionIdToUpdate}`)
+        if (conditionIdToUpdate) {
+          conditionExists = await CTService.conditionExists(conditionIdToUpdate)
+        }
+
+        if (conditionExists) {
+          throw new Error(conditionAlreadyExist)
+        }
+
+        setError(null)
+      } catch (err) {
+        if (err.message.includes(conditionAlreadyExist)) {
+          setError(err)
+        } else if (err.message.includes(questionMustNotExist.toLowerCase())) {
+          setError(new Error(questionMustNotExist))
+        } else {
+          setError(err.message)
+        }
+      }
+    }
+    checkConditionExist()
+  }, [
+    questionId,
+    oracleAddress,
+    numOutcomes,
+    outcomes,
+    RtioService,
+    address,
+    category,
+    networkConfig,
+    CTService,
+    questionTitle,
+    resolutionDate,
+    arbitrator.address,
+  ])
 
   const prepareCondition = async () => {
-    if (!conditionId) return
-
-    setError(null)
-    setIsTransactionExecuting(true)
+    setPrepareConditionStatus(Remote.loading())
 
     try {
-      if (status === Web3ContextStatus.Connected) {
-        const conditionExists = await CTService.conditionExists(conditionId)
-        logger.log(`Condition ID ${conditionId}`)
-        if (!conditionExists) {
+      if (status === Web3ContextStatus.Connected && address) {
+        let conditionIdToUpdate: Maybe<string> = null
+        if (conditionType === ConditionType.custom) {
           await CTService.prepareCondition(questionId, oracleAddress, numOutcomes)
-
-          history.push(`/conditions/${conditionId}`)
+          conditionIdToUpdate = ConditionalTokensService.getConditionId(
+            questionId,
+            oracleAddress,
+            numOutcomes
+          )
         } else {
-          setError(new Error('Condition already exists'))
+          const openingDateMoment = moment(resolutionDate)
+          const questionOptions: QuestionOptions = {
+            arbitratorAddress: arbitrator.address,
+            category,
+            openingDateMoment,
+            outcomes,
+            question: questionTitle,
+            networkConfig,
+            signerAddress: address,
+          }
+
+          const questionId = await RtioService.askQuestion(questionOptions)
+
+          await CTService.prepareCondition(questionId, oracleAddress, outcomes.length)
+          conditionIdToUpdate = ConditionalTokensService.getConditionId(
+            questionId,
+            oracleAddress,
+            outcomes.length
+          )
         }
+        logger.log(`Condition Id after prepareCondition: ${conditionIdToUpdate}`)
+        setConditionId(conditionIdToUpdate)
+        setPrepareConditionStatus(Remote.success(conditionIdToUpdate))
       } else if (status === Web3ContextStatus.Infura) {
         connect()
       }
-    } catch (e) {
-      setError(e)
-    } finally {
-      setIsTransactionExecuting(false)
+    } catch (err) {
+      setPrepareConditionStatus(Remote.failure(err))
     }
   }
-
-  React.useEffect(() => {
-    setError(null)
-  }, [questionId, oracleAddress, numOutcomes])
 
   const onClickUseMyWallet = () => {
     if (status === Web3ContextStatus.Connected && address) {
@@ -124,7 +219,47 @@ export const PrepareCondition = () => {
     }
   }
 
-  const submitDisabled = !isValid || isTransactionExecuting
+  const submitDisabled =
+    !isValid || prepareConditionStatus.isLoading() || prepareConditionStatus.isFailure() || !!error
+
+  const fullLoadingActionButton = prepareConditionStatus.isSuccess()
+    ? {
+        buttonType: ButtonType.primary,
+        onClick: () => {
+          setPrepareConditionStatus(Remote.notAsked<Maybe<string>>())
+          if (conditionId) history.push(`/conditions/${conditionId}`)
+        },
+        text: 'OK',
+      }
+    : prepareConditionStatus.isFailure()
+    ? {
+        buttonType: ButtonType.danger,
+        text: 'Close',
+        onClick: () => setPrepareConditionStatus(Remote.notAsked<Maybe<string>>()),
+      }
+    : undefined
+
+  const fullLoadingIcon = prepareConditionStatus.isFailure()
+    ? IconTypes.error
+    : prepareConditionStatus.isSuccess()
+    ? IconTypes.ok
+    : IconTypes.spinner
+
+  const fullLoadingMessage = prepareConditionStatus.isFailure() ? (
+    prepareConditionStatus.getFailure()
+  ) : prepareConditionStatus.isLoading() ? (
+    'Working...'
+  ) : (
+    <>
+      {conditionId && (
+        <>
+          All done! Condition{' '}
+          <span title={conditionId}>{truncateStringInTheMiddle(conditionId, 8, 6)}</span> created .
+        </>
+      )}
+    </>
+  )
+  const fullLoadingTitle = prepareConditionStatus.isFailure() ? 'Error' : 'Prepare Condition'
 
   return (
     <>
@@ -174,17 +309,12 @@ export const PrepareCondition = () => {
               <TitleValue
                 title="Question"
                 value={
-                  <Textfield name="question" placeholder="Type in a question..." type="text" />
-                }
-              />
-              <TitleValue
-                title="Question Type"
-                value={
-                  <QuestionTypesDropdown
-                    onClick={(value: QuestionType) => {
-                      setQuestionType(value)
-                    }}
-                    value={questionType}
+                  <Textfield
+                    name="question"
+                    onChange={(e) => setQuestionTitle(e.target.value)}
+                    placeholder="Type in a question..."
+                    ref={register({ required: true })}
+                    type="text"
                   />
                 }
               />
@@ -246,13 +376,23 @@ export const PrepareCondition = () => {
             <>
               <TitleValue
                 title="Resolution Date"
-                value={<Textfield name="resolutionDate" placeholder="MM/DD/YYY" type="date" />}
+                value={
+                  <Textfield
+                    name="resolutionDate"
+                    onChange={(e) => setResolutionDate(e.target.value)}
+                    placeholder="MM/DD/YYYY"
+                    ref={register({
+                      required: true,
+                    })}
+                    type="date"
+                  />
+                }
               />
               <TitleValue
                 title="Category"
                 value={
                   <CategoriesDropdown
-                    onClick={(value: Categories) => {
+                    onClick={(value: string) => {
                       setCategory(value)
                     }}
                     value={category}
@@ -263,7 +403,7 @@ export const PrepareCondition = () => {
                 title="Arbitrator"
                 value={
                   <ArbitratorDropdown
-                    onClick={(value: string) => {
+                    onClick={(value: Arbitrator) => {
                       setArbitrator(value)
                     }}
                     value={arbitrator}
@@ -272,50 +412,49 @@ export const PrepareCondition = () => {
               />
             </>
           )}
-          {conditionType === ConditionType.custom && (
-            <TitleValue
-              title="Reporting Address"
-              titleControl={<TitleControl onClick={onClickUseMyWallet}>Use My Wallet</TitleControl>}
-              value={
-                <>
-                  <Textfield
-                    error={errors.oracle && true}
-                    name="oracle"
-                    onChange={(e) => setOracleAddress(e.target.value)}
-                    placeholder="Type in a valid reporting address..."
-                    ref={register({
-                      required: true,
-                      pattern: ADDRESS_REGEX,
-                      validate: (value: string) => isAddress(value),
-                    })}
-                    type="text"
-                  />
-                  {errors.oracle && (
-                    <ErrorContainer>
-                      {errors.oracle.type === 'required' && (
-                        <ErrorMessage>Required field</ErrorMessage>
-                      )}
-                      {errors.oracle.type === 'pattern' && (
-                        <ErrorMessage>Please use a valid reporting address</ErrorMessage>
-                      )}
-                      {errors.oracle.type === 'validate' && (
-                        <ErrorMessage>Address checksum failed</ErrorMessage>
-                      )}
-                    </ErrorContainer>
-                  )}
-                </>
-              }
-            />
-          )}
-        </Row>
-        {isTransactionExecuting && (
-          <FullLoading
-            actionButton={
-              error ? { text: 'OK', onClick: () => setIsTransactionExecuting(true) } : undefined
+          <TitleValue
+            title="Reporting Address"
+            titleControl={<TitleControl onClick={onClickUseMyWallet}>Use My Wallet</TitleControl>}
+            value={
+              <>
+                <Textfield
+                  error={errors.oracle && true}
+                  name="oracle"
+                  onChange={(e) => setOracleAddress(e.target.value)}
+                  placeholder="Type in a valid reporting address..."
+                  ref={register({
+                    required: true,
+                    pattern: ADDRESS_REGEX,
+                    validate: (value: string) => isAddress(value),
+                  })}
+                  type="text"
+                />
+                {errors.oracle && (
+                  <ErrorContainer>
+                    {errors.oracle.type === 'required' && (
+                      <ErrorMessage>Required field</ErrorMessage>
+                    )}
+                    {errors.oracle.type === 'pattern' && (
+                      <ErrorMessage>Please use a valid reporting address</ErrorMessage>
+                    )}
+                    {errors.oracle.type === 'validate' && (
+                      <ErrorMessage>Address checksum failed</ErrorMessage>
+                    )}
+                  </ErrorContainer>
+                )}
+              </>
             }
-            icon={error ? IconTypes.error : IconTypes.spinner}
-            message={error ? error.message : 'Working...'}
-            title={error ? 'Error' : 'Prepare Condition'}
+          />
+        </Row>
+        {(prepareConditionStatus.isLoading() ||
+          prepareConditionStatus.isFailure() ||
+          prepareConditionStatus.isSuccess()) && (
+          <FullLoading
+            actionButton={fullLoadingActionButton}
+            icon={fullLoadingIcon}
+            message={fullLoadingMessage}
+            title={fullLoadingTitle}
+            width={'400px'}
           />
         )}
         {error && (

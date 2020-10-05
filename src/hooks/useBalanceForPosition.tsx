@@ -2,8 +2,8 @@ import { useQuery } from '@apollo/react-hooks'
 import { BigNumber } from 'ethers/utils'
 
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { UserPositionBalancesQuery } from 'queries/users'
-import { UserPositionBalances } from 'types/generatedGQL'
+import { UserPositionBalancesQuery } from 'queries/CTEUsers'
+import { UserPositionBalances } from 'types/generatedGQLForCTE'
 
 export const useBalanceForPosition = (positionId: string) => {
   const { address } = useWeb3ConnectedOrInfura()

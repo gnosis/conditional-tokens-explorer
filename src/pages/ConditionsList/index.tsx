@@ -19,7 +19,7 @@ import { TableControls } from 'components/table/TableControls'
 import { useConditions } from 'hooks/useConditions'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { customStyles } from 'theme/tableCustomStyles'
-import { Conditions_conditions } from 'types/generatedGQL'
+import { Conditions_conditions } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
 import { LocalStorageManagement, OracleFilterOptions } from 'util/types'
 

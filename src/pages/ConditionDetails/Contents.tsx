@@ -15,7 +15,7 @@ import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useIsConditionFromOmen } from 'hooks/useIsConditionFromOmen'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { useQuestion } from 'hooks/useQuestion'
-import { GetCondition_condition } from 'types/generatedGQL'
+import { GetCondition_condition } from 'types/generatedGQLForCTE'
 import { formatTS, getConditionTypeTitle, truncateStringInTheMiddle } from 'util/tools'
 import { ConditionStatus, ConditionType, LocalStorageManagement } from 'util/types'
 

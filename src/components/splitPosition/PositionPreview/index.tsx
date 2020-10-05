@@ -9,7 +9,7 @@ import {
 } from 'components/pureStyledComponents/StripedList'
 import { TitleValue } from 'components/text/TitleValue'
 import { useCollateral } from 'hooks/useCollateral'
-import { GetPosition_position } from 'types/generatedGQL'
+import { GetPosition_position } from 'types/generatedGQLForCTE'
 import { positionString } from 'util/tools'
 import { SplitFromType, Token } from 'util/types'
 

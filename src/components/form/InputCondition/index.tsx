@@ -4,7 +4,7 @@ import { FormContextValues } from 'react-hook-form'
 import { SelectCondition } from 'components/form/SelectCondition'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { SplitPositionFormMethods } from 'pages/SplitPosition/Form'
-import { GetCondition_condition } from 'types/generatedGQL'
+import { GetCondition_condition } from 'types/generatedGQLForCTE'
 
 interface Props {
   formMethods: FormContextValues<SplitPositionFormMethods>

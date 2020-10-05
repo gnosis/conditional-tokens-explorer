@@ -20,7 +20,7 @@ export const UserWithPositionsQuery = gql`
 `
 
 export const UserPositionBalancesQuery = gql`
-  query UserPositionBalances($account: ID, $positionId: ID) {
+  query UserPositionBalances($account: String, $positionId: String) {
     userPositions(where: { position: $positionId, user: $account }) {
       id
       position {
