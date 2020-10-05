@@ -122,6 +122,11 @@ export class ConditionalTokensService {
 
       const balance = await this.balanceOf(positionId)
 
+      logger.info(`Position: ${positionId} with amount ${balance}`)
+
+      if (balance.isZero()) {
+        throw new Error(`This position id ${positionId} has balance zero.`)
+      }
       return { positionId, balance }
     })
     const partitions = await Promise.all(partitionsPromises)
