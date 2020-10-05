@@ -3,8 +3,8 @@ import React from 'react'
 
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
-import { GetConditionQuery } from 'queries/conditions'
-import { GetCondition, GetCondition_condition } from 'types/generatedGQL'
+import { GetConditionQuery } from 'queries/CTEConditions'
+import { GetCondition, GetCondition_condition } from 'types/generatedGQLForCTE'
 import { isConditionIdValid } from 'util/tools'
 import { ConditionErrors, LocalStorageManagement } from 'util/types'
 

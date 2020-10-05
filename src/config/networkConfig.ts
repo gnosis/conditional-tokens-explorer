@@ -2,15 +2,19 @@ import {
   CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_GANACHE,
   CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_MAINNET,
   CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_RINKEBY,
+  CTE_GRAPH_HTTP_GANACHE,
+  CTE_GRAPH_HTTP_MAINNET,
+  CTE_GRAPH_HTTP_RINKEBY,
+  CTE_GRAPH_WS_GANACHE,
+  CTE_GRAPH_WS_MAINNET,
+  CTE_GRAPH_WS_RINKEBY,
   EARLIEST_GANACHE_BLOCK_TO_CHECK,
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
   EARLIEST_RINKEBY_BLOCK_TO_CHECK,
-  GRAPH_HTTP_GANACHE,
-  GRAPH_HTTP_MAINNET,
-  GRAPH_HTTP_RINKEBY,
-  GRAPH_WS_GANACHE,
-  GRAPH_WS_MAINNET,
-  GRAPH_WS_RINKEBY,
+  OMEN_GRAPH_HTTP_MAINNET,
+  OMEN_GRAPH_HTTP_RINKEBY,
+  OMEN_GRAPH_WS_MAINNET,
+  OMEN_GRAPH_WS_RINKEBY,
   REALITIO_CONTRACT_ADDRESS_FOR_GANACHE,
   REALITIO_CONTRACT_ADDRESS_FOR_MAINNET,
   REALITIO_CONTRACT_ADDRESS_FOR_RINKEBY,
@@ -18,7 +22,7 @@ import {
   WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_MAINNET,
   WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_RINKEBY,
 } from 'config/constants'
-import { NetworkIds, Oracle, Token } from 'util/types'
+import { Arbitrator, NetworkIds, Oracle, Token } from 'util/types'
 
 interface Network {
   earliestBlockToCheck: number
@@ -28,9 +32,13 @@ interface Network {
     wrapped1155FactoryAddress: string
   }
   tokens: Token[]
-  graphHttpUri: string
-  graphWsUri: string
+  CTEGraphHttpUri: string
+  CTEGraphWsUri: string
+  OMENGraphHttpUri: string
+  OMENGraphWsUri: string
   oracles: Oracle[]
+  arbitrators: Arbitrator[]
+  realitioTimeout: number
 }
 
 const networks: { [K in NetworkIds]: Network } = {
@@ -88,8 +96,10 @@ const networks: { [K in NetworkIds]: Network } = {
         decimals: 18,
       },
     ],
-    graphHttpUri: GRAPH_HTTP_MAINNET,
-    graphWsUri: GRAPH_WS_MAINNET,
+    CTEGraphHttpUri: CTE_GRAPH_HTTP_MAINNET,
+    CTEGraphWsUri: CTE_GRAPH_WS_MAINNET,
+    OMENGraphHttpUri: OMEN_GRAPH_HTTP_MAINNET,
+    OMENGraphWsUri: OMEN_GRAPH_WS_MAINNET,
     oracles: [
       {
         name: 'realitio',
@@ -104,6 +114,21 @@ const networks: { [K in NetworkIds]: Network } = {
         address: '0x0000000000000000000000000000000000000000',
       },
     ],
+    arbitrators: [
+      {
+        name: 'realitio',
+        description: 'Realit.io',
+        url: 'https://reality.eth.link',
+        address: '0xdc0a2185031ecf89f091a39c63c2857a7d5c301a',
+      },
+      {
+        name: 'kleros',
+        description: 'Kleros',
+        url: 'https://kleros.io/',
+        address: '0xd47f72a2d1d0E91b0Ec5e5f5d02B2dc26d00A14D',
+      },
+    ],
+    realitioTimeout: 86400,
   },
   [NetworkIds.RINKEBY]: {
     earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
@@ -144,8 +169,10 @@ const networks: { [K in NetworkIds]: Network } = {
         decimals: 18,
       },
     ],
-    graphHttpUri: GRAPH_HTTP_RINKEBY,
-    graphWsUri: GRAPH_WS_RINKEBY,
+    CTEGraphHttpUri: CTE_GRAPH_HTTP_RINKEBY,
+    CTEGraphWsUri: CTE_GRAPH_WS_RINKEBY,
+    OMENGraphHttpUri: OMEN_GRAPH_HTTP_RINKEBY,
+    OMENGraphWsUri: OMEN_GRAPH_WS_RINKEBY,
     oracles: [
       {
         name: 'realitio',
@@ -160,6 +187,21 @@ const networks: { [K in NetworkIds]: Network } = {
         address: '0x0000000000000000000000000000000000000000',
       },
     ],
+    arbitrators: [
+      {
+        name: 'realitio',
+        description: 'Realitio Team',
+        url: 'https://reality.eth.link',
+        address: '0x02321745bE4a141E78db6C39834396f8df00e2a0',
+      },
+      {
+        name: 'kleros',
+        description: 'Kleros',
+        url: 'https://kleros.io/',
+        address: '0xcafa054b1b054581faf65adce667bf1c684b6ef0',
+      },
+    ],
+    realitioTimeout: 10,
   },
   [NetworkIds.GANACHE]: {
     earliestBlockToCheck: EARLIEST_GANACHE_BLOCK_TO_CHECK,
@@ -200,8 +242,10 @@ const networks: { [K in NetworkIds]: Network } = {
         decimals: 18,
       },
     ],
-    graphHttpUri: GRAPH_HTTP_GANACHE,
-    graphWsUri: GRAPH_WS_GANACHE,
+    CTEGraphHttpUri: CTE_GRAPH_HTTP_GANACHE,
+    CTEGraphWsUri: CTE_GRAPH_WS_GANACHE,
+    OMENGraphHttpUri: '',
+    OMENGraphWsUri: '',
     oracles: [
       {
         name: 'realitio',
@@ -216,6 +260,21 @@ const networks: { [K in NetworkIds]: Network } = {
         address: '0x0000000000000000000000000000000000000000',
       },
     ],
+    arbitrators: [
+      {
+        name: 'realitio',
+        description: 'Realit.io',
+        url: 'https://reality.eth.link',
+        address: '0x0000000000000000000000000000000000000000',
+      },
+      {
+        name: 'kleros',
+        description: 'Kleros',
+        url: 'https://kleros.io/',
+        address: '0x0000000000000000000000000000000000000000',
+      },
+    ],
+    realitioTimeout: 10,
   },
 }
 
@@ -246,10 +305,16 @@ export class NetworkConfig {
     return networks[this.networkId].oracles
   }
 
-  getGraphUris(): { httpUri: string; wsUri: string } {
-    const httpUri = networks[this.networkId].graphHttpUri
-    const wsUri = networks[this.networkId].graphWsUri
-    return { httpUri, wsUri }
+  getArbitrators(): Oracle[] {
+    return networks[this.networkId].arbitrators
+  }
+
+  getGraphUris(): { CTEhttpUri: string; CTEwsUri: string; OMENhttpUri: string; OMENwsUri: string } {
+    const CTEhttpUri = networks[this.networkId].CTEGraphHttpUri
+    const CTEwsUri = networks[this.networkId].CTEGraphWsUri
+    const OMENhttpUri = networks[this.networkId].OMENGraphHttpUri
+    const OMENwsUri = networks[this.networkId].OMENGraphWsUri
+    return { CTEhttpUri, CTEwsUri, OMENhttpUri, OMENwsUri }
   }
 
   getEarliestBlockToCheck(): number {
@@ -285,5 +350,44 @@ export class NetworkConfig {
       url: '',
       address: '',
     }
+  }
+
+  getArbitratorFromAddress(address: string): Oracle {
+    const arbitrators = networks[this.networkId].arbitrators
+
+    for (const arbitrator of arbitrators) {
+      const arbitratorAddress = arbitrator.address
+      if (arbitratorAddress.toLowerCase() === address.toLowerCase()) {
+        return arbitrator
+      }
+    }
+
+    return {
+      name: 'unknown',
+      description: 'Unknown',
+      url: '',
+      address: '',
+    }
+  }
+
+  getArbitratorFromName(arbitratorName: KnownArbitrator): Arbitrator {
+    const arbitrators = networks[this.networkId].arbitrators
+
+    for (const arbitrator of arbitrators) {
+      if (arbitrator.name === arbitratorName) {
+        return arbitrator
+      }
+    }
+
+    return {
+      name: 'unknown',
+      description: 'Unknown',
+      url: '',
+      address: '',
+    }
+  }
+
+  getRealitioTimeout(): number {
+    return networks[this.networkId].realitioTimeout
   }
 }

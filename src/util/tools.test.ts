@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers/utils'
 
-import { GetCondition_condition, GetPosition_position } from 'types/generatedGQL'
+import { GetCondition_condition, GetPosition_position } from 'types/generatedGQLForCTE'
 import {
   arePositionMergeables,
   arePositionMergeablesByCondition,

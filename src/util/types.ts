@@ -1,5 +1,8 @@
 import { BigNumber } from 'ethers/utils'
 
+import { NetworkConfig } from 'config/networkConfig'
+import { Moment } from 'moment'
+
 export interface Question {
   id: string
   raw: string
@@ -36,10 +39,10 @@ export enum QuestionType {
 }
 
 export enum Categories {
-  businessAndFinance = 'Business & Finance',
+  businessAndFinance = 'Business & finance',
   cryptocurrency = 'Cryptocurrency',
-  newsAndPolitics = 'News & Politics',
-  scienceAndTech = 'Science & Tech',
+  newsAndPolitics = 'News & politics',
+  scienceAndTech = 'Science & tech',
   sports = 'Sports',
   weather = 'Weather',
   miscellaneous = 'Miscellaneous',
@@ -106,6 +109,13 @@ export type Oracle = {
   address: string
 }
 
+export type Arbitrator = {
+  name: KnownArbitrator
+  description: string
+  url: string
+  address: string
+}
+
 export interface OutcomeProps {
   id: string
   value: number
@@ -150,4 +160,14 @@ export type ConditionIdsArray = {
 export enum LocalStorageManagement {
   ConditionId = 'conditionId',
   PositionId = 'positionId',
+}
+
+export interface QuestionOptions {
+  arbitratorAddress: string
+  category: string
+  openingDateMoment: Moment
+  outcomes: string[]
+  question: string
+  networkConfig: NetworkConfig
+  signerAddress: string
 }

@@ -10,7 +10,7 @@ import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useWithToken } from 'hooks/useWithToken'
 import { SplitPositionFormMethods } from 'pages/SplitPosition/Form'
-import { GetMultiPositions_positions } from 'types/generatedGQL'
+import { GetMultiPositions_positions } from 'types/generatedGQLForCTE'
 import { positionString } from 'util/tools'
 import { Errors } from 'util/types'
 

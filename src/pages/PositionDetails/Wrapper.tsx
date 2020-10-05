@@ -5,7 +5,7 @@ import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { usePositionContext } from 'contexts/PositionContext'
 import { Contents } from 'pages/PositionDetails/Contents'
-import { PositionData_conditions } from 'types/generatedGQL'
+import { PositionData_conditions } from 'types/generatedGQLForCTE'
 import {
   isPositionErrorFetching,
   isPositionErrorInvalid,
