@@ -56,16 +56,16 @@ const ActionButton = styled(Button)`
 `
 
 export interface ActionButtonProps {
-  buttonType?: ButtonType | undefined
+  buttonType?: ButtonType
   onClick: () => void
   text: string
 }
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  actionButton?: ActionButtonProps | undefined
+  actionButton?: ActionButtonProps
   height?: string
   icon?: IconTypes
-  message?: string | React.ReactNode | undefined
+  message?: string | React.ReactNode
   noOverlay?: boolean
   title?: string
   width?: string
