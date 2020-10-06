@@ -74,13 +74,13 @@ const CollateralWrapButton = styled(Button)`
   width: 80px;
 `
 
-const MoreWrapButton = styled(Button)`
+const MoreLink = styled.a`
+  color: ${(props) => props.theme.colors.textColor};
+  text-decoration: underline;
   font-size: 14px;
   font-weight: 600;
-  height: 24px;
-  width: 80px;
-  display: inline-flex;
   margin: 0 0 0 12px;
+  cursor: pointer;
 `
 
 const StripedListStyled = styled(StripedList)`
@@ -366,9 +366,9 @@ export const Contents = (props: Props) => {
                 <>
                   {truncateStringInTheMiddle(conditions[0].conditionId, 8, 6)}
                   <ButtonCopy value={conditions[0]} />
-                  <MoreWrapButton onClick={() => setOpenDisplayConditionsTableModal(true)}>
+                  <MoreLink onClick={() => setOpenDisplayConditionsTableModal(true)}>
                     More...
-                  </MoreWrapButton>
+                  </MoreLink>
                 </>
               )
             }
