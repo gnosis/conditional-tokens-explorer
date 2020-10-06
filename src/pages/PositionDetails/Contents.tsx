@@ -351,12 +351,12 @@ export const Contents = (props: Props) => {
               <ButtonCopy value={positionId} />
             </>
           }
+          valueUppercase
         />
-        {collateralERC1155 ? (
-          <TitleValue title="Collateral Token" value={<TokenIcon token={collateralERC1155} />} />
-        ) : (
-          '-'
-        )}
+        <TitleValue
+          title="Collateral Token"
+          value={collateralERC1155 ? <TokenIcon token={collateralERC1155} /> : '-'}
+        />
         <TitleValue
           title="Contract Address"
           value={
@@ -365,6 +365,7 @@ export const Contents = (props: Props) => {
               <ButtonCopy value={collateralTokenAddress} />
             </>
           }
+          valueUppercase
         />
         {conditions.length > 0 && (
           <TitleValue
@@ -381,6 +382,7 @@ export const Contents = (props: Props) => {
                 </>
               )
             }
+            valueUppercase
           />
         )}
       </Row>
