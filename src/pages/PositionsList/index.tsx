@@ -228,7 +228,7 @@ export const PositionsList = () => {
             title={
               isConnected
                 ? row.userBalanceERC1155.toString()
-                : 'Connect your wallet to access ERC1155 values.'
+                : 'Connect to your wallet to access these values.'
             }
           >
             {isConnected ? row.userBalanceERC1155WithDecimals : '-'}
@@ -247,7 +247,7 @@ export const PositionsList = () => {
             title={
               isConnected
                 ? row.userBalanceERC20.toString()
-                : 'Connect your wallet to access ERC20 values.'
+                : 'Connect to your wallet to access these values.'
             }
           >
             {isConnected ? row.userBalanceERC20WithDecimals : '-'}

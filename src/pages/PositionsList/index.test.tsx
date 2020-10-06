@@ -164,15 +164,12 @@ test('position list should show right columns when the user is connected', async
     const positionIdColumn = await findByText(/Position Id/i)
     expect(positionIdColumn).toBeInTheDocument()
 
-    // const collateralColumn = await findByText(/Collateral/i)
-    // expect(collateralColumn).toBeInTheDocument()
-
     const erc1155Column = await findByText(/ERC1155 Amount/i)
     expect(erc1155Column).toBeInTheDocument()
   })
 })
 
-test('position list shold show right columns when the user is not connected', async () => {
+test('position list should show right columns when the user is not connected', async () => {
   const mockQueryResult = [
     {
       request: {
@@ -186,12 +183,12 @@ test('position list shold show right columns when the user is not connected', as
               id: 'Position1',
               indexSets: [],
               activeValue: null,
-              createTimestamp: '1571930105',
               collateralToken: {
                 __typename: 'CollateralToken',
                 id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
               },
               wrappedToken: null,
+              createTimestamp: '1571930105',
               collection: {
                 __typename: 'Collection',
                 id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
@@ -208,12 +205,12 @@ test('position list shold show right columns when the user is not connected', as
               id: 'Position2',
               indexSets: [],
               activeValue: null,
-              createTimestamp: '1571930105',
               collateralToken: {
                 __typename: 'CollateralToken',
                 id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
               },
               wrappedToken: null,
+              createTimestamp: '1571930105',
               collection: {
                 __typename: 'Collection',
                 id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
@@ -229,9 +226,41 @@ test('position list shold show right columns when the user is not connected', as
         },
       },
     },
+    {
+      request: {
+        query: UserWithPositionsQuery,
+        variables: {
+          account: '0x123',
+        },
+      },
+      result: {
+        data: {
+          user: {
+            __typename: 'User',
+            userPositions: [
+              {
+                __typename: 'UserPosition',
+                id: '0x0',
+                position: {
+                  __typename: 'Position',
+                  id: 'Position1',
+                },
+                balance: '100',
+                wrappedBalance: '0',
+                totalBalance: '100',
+                user: {
+                  id: '0x18ad183a875e5a42a60eb5d3a9d6657c3493d064',
+                  __typename: 'User',
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
   ]
   await act(async () => {
-    const { findByText, getByRole, queryByText } = renderWithDisconnectedProvider(
+    const { findAllByText, findByText, getByRole } = renderWithDisconnectedProvider(
       <PositionsList />,
       mockQueryResult
     )
@@ -240,12 +269,10 @@ test('position list shold show right columns when the user is not connected', as
       expect(getByRole('table')).toBeInTheDocument()
     })
 
-    const positionIdColumn = await findByText(/Position Id/i)
-    expect(positionIdColumn).toBeInTheDocument()
-    //
-    // const collateralColumn = await findByText(/Collateral/i)
-    // expect(collateralColumn).toBeInTheDocument()
+    const positionIdColumn = await findAllByText(/Position Id/i)
+    expect(positionIdColumn.length).toBeGreaterThan(0)
 
-    expect(queryByText(/ERC1155 Amount/i)).toBeNull()
+    const erc1155Column = await findByText(/ERC1155 Amount/i)
+    expect(erc1155Column).toBeInTheDocument()
   })
 })
