@@ -31,7 +31,7 @@ const Search = styled(SearchField)`
   width: 400px;
 `
 
-const logger = getLogger('PositionsListModal')
+const logger = getLogger('ConditionsListModal')
 
 interface Props extends ModalProps {
   isOpen: boolean
@@ -140,6 +140,8 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
 
   const [searchBy, setSearchBy] = useState('all')
   const dropdownItems = useConditionsSearchOptions(setSearchBy)
+
+  logger.log(`Search by ${searchBy}`)
 
   const isLoading = !conditionIdToSearch && loading
   const isSearching = conditionIdToSearch && loading
