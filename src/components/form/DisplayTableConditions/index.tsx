@@ -7,12 +7,12 @@ import { customStyles } from 'theme/tableCustomStyles'
 import { ConditionIdsArray } from 'util/types'
 
 interface Props {
-  conditionIds: Array<ConditionIdsArray>
+  conditions: Array<ConditionIdsArray>
   callbackOnHistoryPush?: () => void
 }
 
 export const DisplayTableConditions = (props: Props) => {
-  const { callbackOnHistoryPush, conditionIds } = props
+  const { callbackOnHistoryPush, conditions } = props
 
   const getColumns = useCallback(() => {
     return [
@@ -42,7 +42,7 @@ export const DisplayTableConditions = (props: Props) => {
       className="outerTableWrapper inlineTable"
       columns={getColumns()}
       customStyles={customStyles}
-      data={conditionIds || []}
+      data={conditions || []}
       noDataComponent={<EmptyContentText>No conditions found.</EmptyContentText>}
       noHeader
       pagination

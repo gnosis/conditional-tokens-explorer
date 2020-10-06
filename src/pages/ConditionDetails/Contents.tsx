@@ -108,6 +108,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
               <ButtonCopy value={conditionId} />
             </>
           }
+          valueUppercase
         />
         <TitleValue
           title="Condition Type"
@@ -132,6 +133,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
               <ButtonCopy value={questionId} />
             </>
           }
+          valueUppercase
         />
       </Row>
       {isConditionFromOmen && (
@@ -169,6 +171,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
               <ButtonCopy value={oracle} />
             </>
           }
+          valueUppercase={isConditionFromOmen ? false : true}
         />
       </Row>
     </CenteredCard>
