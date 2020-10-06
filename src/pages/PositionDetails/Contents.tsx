@@ -358,7 +358,7 @@ export const Contents = (props: Props) => {
           value={collateralERC1155 ? <TokenIcon token={collateralERC1155} /> : '-'}
         />
         <TitleValue
-          title="Contract Address"
+          title="Collateral Address"
           value={
             <>
               {truncateStringInTheMiddle(collateralTokenAddress, 8, 6)}
@@ -396,9 +396,11 @@ export const Contents = (props: Props) => {
                 <CollateralText>
                   <CollateralTextStrong>ERC1155:</CollateralTextStrong>{' '}
                   <CollateralTextAmount>
-                    {!balanceERC1155.isZero()
-                      ? `${formatBigNumber(balanceERC1155, ERC1155Decimals)} ${ERC1155Symbol}`
-                      : 'None.'}
+                    {!balanceERC1155.isZero() ? (
+                      `${formatBigNumber(balanceERC1155, ERC1155Decimals)} ${ERC1155Symbol}`
+                    ) : (
+                      <i>None.</i>
+                    )}
                   </CollateralTextAmount>
                 </CollateralText>
                 <CollateralWrapButton
@@ -412,9 +414,11 @@ export const Contents = (props: Props) => {
                 <CollateralText>
                   <CollateralTextStrong>ERC20:</CollateralTextStrong>{' '}
                   <CollateralTextAmount>
-                    {!balanceERC20.isZero()
-                      ? `${formatBigNumber(balanceERC20, ERC1155Decimals)} ${ERC20Symbol}`
-                      : 'None.'}
+                    {!balanceERC20.isZero() ? (
+                      `${formatBigNumber(balanceERC20, ERC1155Decimals)} ${ERC20Symbol}`
+                    ) : (
+                      <i>None.</i>
+                    )}
                   </CollateralTextAmount>
                 </CollateralText>
                 <CollateralWrapButton
