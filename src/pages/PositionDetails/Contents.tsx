@@ -76,11 +76,11 @@ const CollateralWrapButton = styled(Button)`
 
 const MoreLink = styled.a`
   color: ${(props) => props.theme.colors.textColor};
-  text-decoration: underline;
+  cursor: pointer;
   font-size: 14px;
   font-weight: 600;
   margin: 0 0 0 12px;
-  cursor: pointer;
+  text-decoration: underline;
 `
 
 const StripedListStyled = styled(StripedList)`
@@ -89,6 +89,10 @@ const StripedListStyled = styled(StripedList)`
 
 const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
   ${DropdownItemCSS}
+`
+
+const Link = styled(NavLink)`
+  color: ${(props) => props.theme.colors.textColor};
 `
 
 interface Props {
@@ -304,6 +308,15 @@ export const Contents = (props: Props) => {
 
   const outcomesByRow = '14'
 
+  const conditionIdLink = (id: string) => {
+    return (
+      <>
+        <Link to={`/conditions/${id}`}>{truncateStringInTheMiddle(id, 8, 6)}</Link>
+        <ButtonCopy value={id} />
+      </>
+    )
+  }
+
   return (
     <CenteredCard
       dropdown={
@@ -358,16 +371,12 @@ export const Contents = (props: Props) => {
             title={conditions.length === 1 ? 'Condition Id' : 'Condition Ids'}
             value={
               conditions.length === 1 ? (
-                <>
-                  {truncateStringInTheMiddle(conditions[0].conditionId, 8, 6)}
-                  <ButtonCopy value={conditions[0]} />
-                </>
+                conditionIdLink(conditions[0].conditionId)
               ) : (
                 <>
-                  {truncateStringInTheMiddle(conditions[0].conditionId, 8, 6)}
-                  <ButtonCopy value={conditions[0]} />
+                  {conditionIdLink(conditions[0].conditionId)}
                   <MoreLink onClick={() => setOpenDisplayConditionsTableModal(true)}>
-                    More...
+                    (More...)
                   </MoreLink>
                 </>
               )
