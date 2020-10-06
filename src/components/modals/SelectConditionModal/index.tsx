@@ -6,7 +6,6 @@ import styled from 'styled-components'
 import { Button } from 'components/buttons/Button'
 import { ButtonControl, ButtonControlType } from 'components/buttons/ButtonControl'
 import { Modal, ModalProps } from 'components/common/Modal'
-import { SearchField } from 'components/form/SearchField'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import {
@@ -14,30 +13,25 @@ import {
   StripedListEmpty,
   StripedListItem,
 } from 'components/pureStyledComponents/StripedList'
+import { SearchField } from 'components/search/SearchField'
 import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { TableControls } from 'components/table/TableControls'
 import { TitleValue } from 'components/text/TitleValue'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useConditions } from 'hooks/useConditions'
+import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
 import { Conditions_conditions } from 'types/generatedGQLForCTE'
+import { getLogger } from 'util/logger'
 import { truncateStringInTheMiddle } from 'util/tools'
 
-const LoadingWrapper = styled.div`
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  min-height: 400px;
-`
-
-const SearchingWrapper = styled(LoadingWrapper)`
-  min-height: 348px;
-`
-
 const Search = styled(SearchField)`
-  max-width: 210px;
+  min-width: 0;
+  width: 400px;
 `
+
+const logger = getLogger('ConditionsListModal')
 
 interface Props extends ModalProps {
   isOpen: boolean
@@ -48,9 +42,11 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
   const { onConfirm, ...restProps } = props
   const [conditionIdToSearch, setConditionIdToSearch] = useState<string>('')
   const [conditionIdToShow, setConditionIdToShow] = useState<string>('')
+
   const debouncedHandler = useDebounceCallback((conditionIdToSearch) => {
     setConditionIdToSearch(conditionIdToSearch)
   }, 500)
+
   const inputHandler = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.currentTarget
@@ -59,6 +55,11 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
     },
     [debouncedHandler]
   )
+
+  const onClearSearch = React.useCallback(() => {
+    setConditionIdToShow('')
+    debouncedHandler('')
+  }, [debouncedHandler])
 
   const { data, error, loading } = useConditions({
     conditionId: conditionIdToSearch,
@@ -80,9 +81,6 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
   }, [selectedCondition, data])
 
   const { setCondition } = useConditionContext()
-
-  const isLoading = !conditionIdToSearch && loading
-  const isSearching = conditionIdToSearch && loading
 
   const handleAddClick = useCallback((selected) => {
     setSelectedCondition(selected)
@@ -140,68 +138,71 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
     }
   }, [onConfirm, selectedCondition, setCondition])
 
+  const [searchBy, setSearchBy] = useState('all')
+  const dropdownItems = useConditionsSearchOptions(setSearchBy)
+
+  logger.log(`Search by ${searchBy}`)
+
+  const isLoading = !conditionIdToSearch && loading
+  const isSearching = conditionIdToSearch && loading
+  const showSpinner = (isLoading || isSearching) && !error
+
   return (
     <Modal subTitle={'Select one condition.'} title={'Select Condition'} {...restProps}>
-      {isLoading && !error && (
-        <LoadingWrapper>
-          <InlineLoading message="Loading conditions..." />
-        </LoadingWrapper>
-      )}
+      <TableControls
+        end={
+          <Search
+            dropdownItems={dropdownItems}
+            onChange={inputHandler}
+            onClear={onClearSearch}
+            value={conditionIdToShow}
+          />
+        }
+      />
       {error && !isLoading && <InfoCard message={error.message} title="Error" />}
-      {data && !isLoading && (
-        <>
-          <TableControls
-            start={
-              <Search
-                onChange={inputHandler}
-                placeholder="Search condition id..."
-                value={conditionIdToShow}
-              />
-            }
-          />
-          {isSearching && (
-            <SearchingWrapper>
+      {!error && (
+        <DataTable
+          className="outerTableWrapper inlineTable"
+          columns={columns}
+          customStyles={customStyles}
+          data={showSpinner ? [] : conditionList.length ? conditionList : []}
+          noDataComponent={
+            showSpinner ? (
               <InlineLoading />
-            </SearchingWrapper>
-          )}
-          {!isSearching && (
-            <DataTable
-              className="outerTableWrapper inlineTable"
-              columns={columns}
-              customStyles={customStyles}
-              data={conditionList.length ? conditionList : []}
-              noDataComponent={<EmptyContentText>No conditions found.</EmptyContentText>}
-              noHeader
-              pagination
-              paginationPerPage={5}
-              paginationRowsPerPageOptions={[5, 10, 15]}
-            />
-          )}
-          <TitleValue
-            title="Selected Condition"
-            value={
-              <StripedList maxHeight={selectedCondition ? 'auto' : '44px'}>
-                {selectedCondition ? (
-                  <StripedListItem>
-                    {truncateStringInTheMiddle(selectedCondition.id, 8, 6)}
-                    <ButtonControl
-                      buttonType={ButtonControlType.delete}
-                      onClick={() => setSelectedCondition(null)}
-                    />
-                  </StripedListItem>
-                ) : (
-                  <StripedListEmpty>No condition selected.</StripedListEmpty>
-                )}
-              </StripedList>
-            }
-          />
-          <ButtonContainer>
-            <Button disabled={!selectedCondition} onClick={handleDone}>
-              Done
-            </Button>
-          </ButtonContainer>
-        </>
+            ) : (
+              <EmptyContentText>No conditions found.</EmptyContentText>
+            )
+          }
+          noHeader
+          pagination
+          paginationPerPage={5}
+          paginationRowsPerPageOptions={[5, 10, 15]}
+          responsive
+        />
       )}
+      <TitleValue
+        title="Selected Condition"
+        value={
+          <StripedList maxHeight={selectedCondition ? 'auto' : '44px'}>
+            {selectedCondition ? (
+              <StripedListItem>
+                {truncateStringInTheMiddle(selectedCondition.id, 8, 6)}
+                <ButtonControl
+                  buttonType={ButtonControlType.delete}
+                  onClick={() => setSelectedCondition(null)}
+                />
+              </StripedListItem>
+            ) : (
+              <StripedListEmpty>No condition selected.</StripedListEmpty>
+            )}
+          </StripedList>
+        }
+      />
+      <ButtonContainer>
+        <Button disabled={!selectedCondition} onClick={handleDone}>
+          Done
+        </Button>
+      </ButtonContainer>
     </Modal>
   )
 }

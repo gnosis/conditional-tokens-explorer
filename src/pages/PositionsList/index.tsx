@@ -7,7 +7,6 @@ import styled from 'styled-components'
 
 import { ButtonDots } from 'components/buttons/ButtonDots'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
-import { CollateralFilterDropdown } from 'components/common/CollateralFilterDropdown'
 import {
   Dropdown,
   DropdownItem,
@@ -15,12 +14,19 @@ import {
   DropdownPosition,
 } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
-import { SearchField } from 'components/form/SearchField'
+import { CollateralFilterDropdown } from 'components/filters/CollateralFilterDropdown'
+import { DateFilter } from 'components/filters/DateFilter'
+import { WrappedCollateralFilterDropdown } from 'components/filters/WrappedCollateralFilterDropdown'
+import { Switch } from 'components/form/Switch'
 import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
 import { UnwrapModal } from 'components/modals/UnwrapModal'
 import { WrapModal } from 'components/modals/WrapModal'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import { PageTitle } from 'components/pureStyledComponents/PageTitle'
+import { Sidebar } from 'components/pureStyledComponents/Sidebar'
+import { SidebarRow } from 'components/pureStyledComponents/SidebarRow'
+import { TwoColumnsCollapsibleLayout } from 'components/pureStyledComponents/TwoColumnsCollapsibleLayout'
+import { SearchField } from 'components/search/SearchField'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
@@ -30,10 +36,17 @@ import { TableControls } from 'components/table/TableControls'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { PositionWithUserBalanceWithDecimals, usePositions } from 'hooks'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
+import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
-import { CollateralFilterOptions, LocalStorageManagement, Token, TransferOptions } from 'util/types'
+import {
+  CollateralFilterOptions,
+  LocalStorageManagement,
+  Token,
+  TransferOptions,
+  WrappedCollateralOptions,
+} from 'util/types'
 
 const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
   ${DropdownItemCSS}
@@ -53,6 +66,9 @@ export const PositionsList = () => {
   const [selectedCollateralFilter, setSelectedCollateralFilter] = useState<string>('')
   const [selectedCollateralValue, setSelectedCollateralValue] = useState<string>(
     CollateralFilterOptions.All
+  )
+  const [wrappedCollateral, setWrappedCollateral] = useState<WrappedCollateralOptions>(
+    WrappedCollateralOptions.All
   )
   const [isTransferOutcomeModalOpen, setIsTransferOutcomeModalOpen] = useState(false)
   const [selectedPositionId, setSelectedPositionId] = useState<string>('')
@@ -78,10 +94,15 @@ export const PositionsList = () => {
     [debouncedHandlerPositionIdToSearch]
   )
 
+  const onClearSearch = React.useCallback(() => {
+    setPositionIdToShow('')
+    debouncedHandlerPositionIdToSearch('')
+  }, [debouncedHandlerPositionIdToSearch])
+
   const { data, error, loading, refetchPositions, refetchUserPositions } = usePositions({
-    positionId: positionIdToSearch,
     collateralFilter: selectedCollateralFilter,
     collateralValue: selectedCollateralValue,
+    positionId: positionIdToSearch,
   })
 
   const isLoading = !positionIdToSearch && loading && transfer.isNotAsked()
@@ -196,45 +217,49 @@ export const PositionsList = () => {
   }, [buildMenuForRow])
 
   useEffect(() => {
-    if (status === Web3ContextStatus.Connected) {
-      setConnectedItems([
-        {
-          // eslint-disable-next-line react/display-name
-          cell: (row: PositionWithUserBalanceWithDecimals) => (
-            <span
-              onClick={() => handleRowClick(row)}
-              {...(row.userBalanceERC1155WithDecimals
-                ? { title: row.userBalanceERC1155.toString() }
-                : {})}
-            >
-              {row.userBalanceERC1155WithDecimals}
-            </span>
-          ),
-          name: 'ERC1155 Amount',
-          right: true,
-          selector: 'userBalanceERC1155Numbered',
-          sortable: true,
-        },
-        {
-          // eslint-disable-next-line react/display-name
-          cell: (row: PositionWithUserBalanceWithDecimals) => (
-            <span
-              onClick={() => handleRowClick(row)}
-              {...(row.userBalanceERC20WithDecimals
-                ? { title: row.userBalanceERC20.toString() }
-                : {})}
-            >
-              {row.userBalanceERC20WithDecimals}
-            </span>
-          ),
-          name: 'ERC20 Amount',
-          right: true,
-          selector: 'userBalanceERC20Numbered',
-          sortable: true,
-        },
-      ])
-    }
-  }, [status, buildMenuForRow, handleRowClick])
+    const isConnected = status === Web3ContextStatus.Connected
+
+    setConnectedItems([
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: PositionWithUserBalanceWithDecimals) => (
+          <span
+            onClick={() => handleRowClick(row)}
+            title={
+              isConnected
+                ? row.userBalanceERC1155.toString()
+                : 'Connect to your wallet to access these values.'
+            }
+          >
+            {isConnected ? row.userBalanceERC1155WithDecimals : '-'}
+          </span>
+        ),
+        name: 'ERC1155 Amount',
+        right: true,
+        selector: 'userBalanceERC1155Numbered',
+        sortable: true,
+      },
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: PositionWithUserBalanceWithDecimals) => (
+          <span
+            onClick={() => handleRowClick(row)}
+            title={
+              isConnected
+                ? row.userBalanceERC20.toString()
+                : 'Connect to your wallet to access these values.'
+            }
+          >
+            {isConnected ? row.userBalanceERC20WithDecimals : '-'}
+          </span>
+        ),
+        name: 'ERC20 Amount',
+        right: true,
+        selector: 'userBalanceERC20Numbered',
+        sortable: true,
+      },
+    ])
+  }, [status, handleRowClick])
 
   const getColumns = useCallback(() => {
     // If you move this outside of the useCallback, can cause performance issues as a dep of this useCallback
@@ -378,87 +403,130 @@ export const PositionsList = () => {
 
   const fullLoadingTitle = transfer.isFailure() ? 'Error' : transactionTitle
 
+  const [searchBy, setSearchBy] = useState('all')
+  const dropdownItems = usePositionsSearchOptions(setSearchBy)
+
+  logger.log(`Search by ${searchBy}`)
+
+  const [showFilters, setShowFilters] = useState(false)
+
+  const toggleShowFilters = useCallback(() => {
+    setShowFilters(!showFilters)
+  }, [showFilters])
+
+  const showSpinner = (isLoading || isSearching) && !error
+
   return (
     <>
       <PageTitle>Positions</PageTitle>
-      {isLoading && !error && <InlineLoading />}
-      {error && <InfoCard message={error.message} title="Error" />}
-      {data && !isLoading && !error && (
-        <>
-          <TableControls
-            end={
-              <CollateralFilterDropdown
-                onClick={(symbol: string, address: string) => {
-                  setSelectedCollateralFilter(address)
-                  setSelectedCollateralValue(symbol)
-                }}
-                value={selectedCollateralValue}
-              />
-            }
-            start={
-              <SearchField
-                onChange={onChangePositionId}
-                placeholder="Search by position id..."
-                value={positionIdToShow}
-              />
-            }
+      <TableControls
+        end={
+          <SearchField
+            dropdownItems={dropdownItems}
+            onChange={onChangePositionId}
+            onClear={onClearSearch}
+            value={positionIdToShow}
           />
-          {isSearching && <InlineLoading />}
-          {!isSearching && (
-            <DataTable
-              className="outerTableWrapper"
-              columns={getColumns()}
-              customStyles={customStyles}
-              data={data || []}
-              highlightOnHover
-              noDataComponent={<EmptyContentText>No positions found.</EmptyContentText>}
-              noHeader
-              onRowClicked={handleRowClick}
-              pagination
-              responsive
-            />
+        }
+        start={<Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />}
+      />
+      {error && !isLoading && <InfoCard message={error.message} title="Error" />}
+      {!error && (
+        <TwoColumnsCollapsibleLayout isCollapsed={!showFilters}>
+          {showFilters && (
+            <Sidebar>
+              <SidebarRow>
+                <CollateralFilterDropdown
+                  onClick={(symbol: string, address: string) => {
+                    setSelectedCollateralFilter(address)
+                    setSelectedCollateralValue(symbol)
+                  }}
+                  value={selectedCollateralValue}
+                />
+              </SidebarRow>
+              <SidebarRow>
+                <WrappedCollateralFilterDropdown
+                  onClick={(value: WrappedCollateralOptions) => {
+                    setWrappedCollateral(value)
+                  }}
+                  value={wrappedCollateral}
+                />
+              </SidebarRow>
+              <SidebarRow>
+                <DateFilter
+                  onChangeFrom={() => {
+                    console.error('onChangeFrom not yet implemented...')
+                  }}
+                  onChangeTo={() => {
+                    console.error('onChangeTo not yet implemented...')
+                  }}
+                  onSubmit={() => {
+                    console.error('Filter by date not implemented yet...')
+                  }}
+                  title="Creation Date"
+                />
+              </SidebarRow>
+            </Sidebar>
           )}
-          {isWrapModalOpen && selectedCollateralToken && (
-            <WrapModal
-              balance={userBalance}
-              decimals={selectedCollateralToken.decimals}
-              isOpen={isWrapModalOpen}
-              onRequestClose={() => setIsWrapModalOpen(false)}
-              onWrap={onWrap}
-              positionId={selectedPositionId}
-              tokenSymbol={selectedCollateralToken.symbol}
-            />
-          )}
-          {isUnwrapModalOpen && selectedCollateralToken && (
-            <UnwrapModal
-              balance={userBalance}
-              decimals={selectedCollateralToken.decimals}
-              isOpen={isUnwrapModalOpen}
-              onRequestClose={() => setIsUnwrapModalOpen(false)}
-              onUnWrap={onUnwrap}
-              positionId={selectedPositionId}
-              tokenSymbol={selectedCollateralToken.symbol}
-            />
-          )}
-          {isTransferOutcomeModalOpen && selectedPositionId && selectedCollateralToken && (
-            <TransferOutcomeTokensModal
-              collateralToken={selectedCollateralToken.address}
-              isOpen={isTransferOutcomeModalOpen}
-              onRequestClose={() => setIsTransferOutcomeModalOpen(false)}
-              onSubmit={onTransferOutcomeTokens}
-              positionId={selectedPositionId}
-            />
-          )}
-          {(transfer.isLoading() || transfer.isFailure() || transfer.isSuccess()) && (
-            <FullLoading
-              actionButton={fullLoadingActionButton}
-              icon={fullLoadingIcon}
-              message={fullLoadingMessage}
-              title={fullLoadingTitle}
-              width={transfer.isFailure() ? '400px' : '320px'}
-            />
-          )}
-        </>
+          <DataTable
+            className="outerTableWrapper"
+            columns={getColumns()}
+            customStyles={customStyles}
+            data={showSpinner ? [] : data || []}
+            highlightOnHover
+            noDataComponent={
+              showSpinner ? (
+                <InlineLoading />
+              ) : (
+                <EmptyContentText>No positions found.</EmptyContentText>
+              )
+            }
+            noHeader
+            onRowClicked={handleRowClick}
+            pagination
+            responsive
+          />
+        </TwoColumnsCollapsibleLayout>
+      )}
+      {isWrapModalOpen && selectedCollateralToken && (
+        <WrapModal
+          balance={userBalance}
+          decimals={selectedCollateralToken.decimals}
+          isOpen={isWrapModalOpen}
+          onRequestClose={() => setIsWrapModalOpen(false)}
+          onWrap={onWrap}
+          positionId={selectedPositionId}
+          tokenSymbol={selectedCollateralToken.symbol}
+        />
+      )}
+      {isUnwrapModalOpen && selectedCollateralToken && (
+        <UnwrapModal
+          balance={userBalance}
+          decimals={selectedCollateralToken.decimals}
+          isOpen={isUnwrapModalOpen}
+          onRequestClose={() => setIsUnwrapModalOpen(false)}
+          onUnWrap={onUnwrap}
+          positionId={selectedPositionId}
+          tokenSymbol={selectedCollateralToken.symbol}
+        />
+      )}
+      {isTransferOutcomeModalOpen && selectedPositionId && selectedCollateralToken && (
+        <TransferOutcomeTokensModal
+          collateralToken={selectedCollateralToken.address}
+          isOpen={isTransferOutcomeModalOpen}
+          onRequestClose={() => setIsTransferOutcomeModalOpen(false)}
+          onSubmit={onTransferOutcomeTokens}
+          positionId={selectedPositionId}
+        />
+      )}
+      {(transfer.isLoading() || transfer.isFailure() || transfer.isSuccess()) && (
+        <FullLoading
+          actionButton={fullLoadingActionButton}
+          icon={fullLoadingIcon}
+          message={fullLoadingMessage}
+          title={fullLoadingTitle}
+          width={transfer.isFailure() ? '400px' : '320px'}
+        />
       )}
     </>
   )

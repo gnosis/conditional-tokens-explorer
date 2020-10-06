@@ -7,32 +7,26 @@ import { Button } from 'components/buttons'
 import { ButtonControl, ButtonControlType } from 'components/buttons/ButtonControl'
 import { Modal, ModalProps } from 'components/common/Modal'
 import { TokenIcon } from 'components/common/TokenIcon'
-import { SearchField } from 'components/form/SearchField'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
+import { SearchField } from 'components/search/SearchField'
 import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { TableControls } from 'components/table/TableControls'
 import { TitleValue } from 'components/text/TitleValue'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { PositionWithUserBalanceWithDecimals, usePositions } from 'hooks'
+import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
+import { getLogger } from 'util/logger'
 import { truncateStringInTheMiddle } from 'util/tools'
 
-const LoadingWrapper = styled.div`
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  min-height: 400px;
-`
-
-const SearchingWrapper = styled(LoadingWrapper)`
-  min-height: 348px;
-`
-
 const Search = styled(SearchField)`
-  max-width: 210px;
+  min-width: 0;
+  width: 400px;
 `
+
+const logger = getLogger('PositionsListModal')
 
 interface Props extends ModalProps {
   isOpen: boolean
@@ -71,6 +65,11 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
     },
     [debouncedHandlerPositionIdToSearch]
   )
+
+  const onClearSearch = React.useCallback(() => {
+    setPositionIdToShow('')
+    debouncedHandlerPositionIdToSearch('')
+  }, [debouncedHandlerPositionIdToSearch])
 
   const { data, error, loading } = usePositions({
     positionId: positionIdToSearch,
@@ -226,72 +225,71 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
 
   const isLoading = !positionIdToSearch && loading
   const isSearching = positionIdToSearch && loading
+  const showSpinner = (isLoading || isSearching) && !error
 
-  console.log('isLoading', isLoading)
+  const [searchBy, setSearchBy] = useState('all')
+  const dropdownItems = usePositionsSearchOptions(setSearchBy)
+
+  logger.log(`Search by ${searchBy}`)
+
   return (
     <Modal
-      {...restProps}
       subTitle={singlePosition ? 'Select one position.' : 'Select multiple positions.'}
       title={'Select Position'}
+      {...restProps}
     >
-      {isLoading && !error && (
-        <LoadingWrapper>
-          <InlineLoading message="Loading positions..." />
-        </LoadingWrapper>
-      )}
-      {error && <InfoCard message={error.message} title="Error" />}
-      {data && !isLoading && (
-        <>
-          <TableControls
-            start={
-              <Search
-                onChange={onChangePositionId}
-                placeholder="Search by position id..."
-                value={positionIdToShow}
-              />
-            }
+      <TableControls
+        end={
+          <Search
+            dropdownItems={dropdownItems}
+            onChange={onChangePositionId}
+            onClear={onClearSearch}
+            value={positionIdToShow}
           />
-          {isSearching ? (
-            <SearchingWrapper>
+        }
+      />
+      {error && !isLoading && <InfoCard message={error.message} title="Error" />}
+      {!error && (
+        <DataTable
+          className="outerTableWrapper inlineTable"
+          columns={getPositionsColumns()}
+          customStyles={customStyles}
+          data={showSpinner ? [] : positionList.length ? positionList : []}
+          noDataComponent={
+            showSpinner ? (
               <InlineLoading />
-            </SearchingWrapper>
-          ) : (
-            <DataTable
-              className="outerTableWrapper inlineTable"
-              columns={getPositionsColumns()}
-              customStyles={customStyles}
-              data={positionList.length ? positionList : []}
-              noDataComponent={
-                <EmptyContentText>{`No positions${
-                  showOnlyPositionsWithBalance && data.length ? ' with balance' : ''
-                } found.`}</EmptyContentText>
-              }
-              noHeader
-              pagination
-              paginationPerPage={5}
-              paginationRowsPerPageOptions={[5, 10, 15]}
-            />
-          )}
-          <TitleValue
-            title={singlePosition ? 'Selected Position' : 'Selected Positions'}
-            value={
-              <DataTable
-                className="outerTableWrapper inlineTable"
-                columns={getSelectedColumns()}
-                customStyles={customStyles}
-                data={selectedPositions}
-                noDataComponent={<EmptyContentText>No positions selected.</EmptyContentText>}
-                noHeader
-              />
-            }
-          />
-          <ButtonContainer>
-            <Button disabled={!selectedPositions.length} onClick={handleDone}>
-              Done
-            </Button>
-          </ButtonContainer>
-        </>
+            ) : (
+              <EmptyContentText>{`No positions ${
+                showOnlyPositionsWithBalance && data && data.length ? ' with balance' : ''
+              } found.`}</EmptyContentText>
+            )
+          }
+          noHeader
+          pagination
+          paginationPerPage={5}
+          paginationRowsPerPageOptions={[5, 10, 15]}
+          responsive
+        />
       )}
+      <TitleValue
+        title={singlePosition ? 'Selected Position' : 'Selected Positions'}
+        value={
+          <DataTable
+            className="outerTableWrapper inlineTable"
+            columns={getSelectedColumns()}
+            customStyles={customStyles}
+            data={selectedPositions}
+            noDataComponent={<EmptyContentText>No positions selected.</EmptyContentText>}
+            noHeader
+            responsive
+          />
+        }
+      />
+      <ButtonContainer>
+        <Button disabled={!selectedPositions.length} onClick={handleDone}>
+          Done
+        </Button>
+      </ButtonContainer>
     </Modal>
   )
 }

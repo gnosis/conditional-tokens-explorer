@@ -27,9 +27,25 @@ export enum ConditionStatus {
   Resolved = 'Resolved',
 }
 
+export enum WrappedCollateralOptions {
+  All = 'all',
+  Yes = 'yes',
+  No = 'no',
+}
+
+export enum ValidityOptions {
+  All = 'all',
+  Invalid = 'invalid',
+  Valid = 'valid',
+}
+
 export enum ConditionType {
   omen = 'Omen Condition',
   custom = 'Custom Reporter',
+}
+
+export enum ConditionTypeAll {
+  all = 'All',
 }
 
 export enum QuestionType {
@@ -129,8 +145,15 @@ export enum SplitFromType {
 export enum OracleFilterOptions {
   All = 'all',
   Custom = 'custom',
+  Current = 'current',
   Kleros = 'kleros',
   Realitio = 'realitio',
+}
+
+export enum StatusOptions {
+  All = 'all',
+  Resolved = 'resolved',
+  Open = 'open',
 }
 
 export enum CollateralFilterOptions {
