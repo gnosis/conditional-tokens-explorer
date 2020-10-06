@@ -129,8 +129,15 @@ export enum SplitFromType {
 export enum OracleFilterOptions {
   All = 'all',
   Custom = 'custom',
+  Current = 'current',
   Kleros = 'kleros',
   Realitio = 'realitio',
+}
+
+export enum StatusOptions {
+  All = 'all',
+  Resolved = 'resolved',
+  Open = 'open',
 }
 
 export enum CollateralFilterOptions {

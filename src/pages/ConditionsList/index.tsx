@@ -7,6 +7,7 @@ import styled from 'styled-components'
 import { ButtonDots } from 'components/buttons/ButtonDots'
 import { Dropdown, DropdownItemCSS, DropdownPosition } from 'components/common/Dropdown'
 import { OraclesFilterDropdown } from 'components/filters/OraclesFilterDropdown'
+import { StatusFilterDropdown } from 'components/filters/StatusFilterDropdown'
 import { Switch } from 'components/form/Switch'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import { PageTitle } from 'components/pureStyledComponents/PageTitle'
@@ -25,7 +26,7 @@ import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { customStyles } from 'theme/tableCustomStyles'
 import { Conditions_conditions } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
-import { LocalStorageManagement, OracleFilterOptions } from 'util/types'
+import { LocalStorageManagement, OracleFilterOptions, StatusOptions } from 'util/types'
 
 const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
   ${DropdownItemCSS}
@@ -44,6 +45,7 @@ export const ConditionsList: React.FC = () => {
   const [selectedOracleValue, setSelectedOracleValue] = useState<OracleFilterOptions>(
     OracleFilterOptions.All
   )
+  const [selectedStatus, setSelectedStatus] = useState<StatusOptions>(StatusOptions.All)
 
   const debouncedHandlerConditionToSearch = useDebounceCallback((conditionIdToSearch) => {
     setConditionIdToSearch(conditionIdToSearch)
@@ -233,6 +235,14 @@ export const ConditionsList: React.FC = () => {
                     setSelectedOracleValue(value)
                   }}
                   value={selectedOracleValue}
+                />
+              </SidebarRow>
+              <SidebarRow>
+                <StatusFilterDropdown
+                  onClick={(value: StatusOptions) => {
+                    setSelectedStatus(value)
+                  }}
+                  value={selectedStatus}
                 />
               </SidebarRow>
             </Sidebar>

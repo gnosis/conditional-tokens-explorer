@@ -27,6 +27,14 @@ export const OraclesFilterDropdown = ({ onClick, value }: Props) => {
       value: OracleFilterOptions.All,
     },
     {
+      text: 'Current Wallet',
+      onClick: () => {
+        console.error('Filter By Current Wallet Not Implemented')
+        // onClick(OracleFilterOptions.Current, [])
+      },
+      value: OracleFilterOptions.Current,
+    },
+    {
       text: 'Custom Reporters',
       onClick: () => {
         onClick(OracleFilterOptions.Custom, oraclesAdresses)
