@@ -15,6 +15,7 @@ import {
 } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
 import { CollateralFilterDropdown } from 'components/filters/CollateralFilterDropdown'
+import { DateFilter } from 'components/filters/DateFilter'
 import { WrappedCollateralFilterDropdown } from 'components/filters/WrappedCollateralFilterDropdown'
 import { Switch } from 'components/form/Switch'
 import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
@@ -445,6 +446,20 @@ export const PositionsList = () => {
                     setWrappedCollateral(value)
                   }}
                   value={wrappedCollateral}
+                />
+              </SidebarRow>
+              <SidebarRow>
+                <DateFilter
+                  onChangeFrom={() => {
+                    console.error('onChangeFrom not yet implemented...')
+                  }}
+                  onChangeTo={() => {
+                    console.error('onChangeTo not yet implemented...')
+                  }}
+                  onSubmit={() => {
+                    console.error('Filter by date not implemented yet...')
+                  }}
+                  title="Creation Date"
                 />
               </SidebarRow>
             </Sidebar>

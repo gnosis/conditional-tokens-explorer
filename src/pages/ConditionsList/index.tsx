@@ -7,6 +7,7 @@ import styled from 'styled-components'
 import { ButtonDots } from 'components/buttons/ButtonDots'
 import { Dropdown, DropdownItemCSS, DropdownPosition } from 'components/common/Dropdown'
 import { ConditionTypeFilterDropdown } from 'components/filters/ConditionTypeFilterDropdown'
+import { DateFilter } from 'components/filters/DateFilter'
 import { OraclesFilterDropdown } from 'components/filters/OraclesFilterDropdown'
 import { StatusFilterDropdown } from 'components/filters/StatusFilterDropdown'
 import { ValidityFilterDropdown } from 'components/filters/ValidityFilterDropdown'
@@ -264,6 +265,20 @@ export const ConditionsList: React.FC = () => {
                     setSelectedConditionType(value)
                   }}
                   value={selectedConditionType}
+                />
+              </SidebarRow>
+              <SidebarRow>
+                <DateFilter
+                  onChangeFrom={() => {
+                    console.error('onChangeFrom not yet implemented...')
+                  }}
+                  onChangeTo={() => {
+                    console.error('onChangeTo not yet implemented...')
+                  }}
+                  onSubmit={() => {
+                    console.error('Filter by date not implemented yet...')
+                  }}
+                  title="Creation Date"
                 />
               </SidebarRow>
               <SidebarRow>
