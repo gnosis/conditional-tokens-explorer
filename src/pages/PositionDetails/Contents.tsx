@@ -337,25 +337,34 @@ export const Contents = (props: Props) => {
     )
   }
 
-  const getEtherscanFormattedUrl = (etherscanURL: string, address: string): string => {
-    return networkConfig.networkId === NetworkIds.GANACHE
-      ? '#'
-      : networkConfig.networkId === NetworkIds.MAINNET
-      ? `https://${etherscanURL}${address}`
-      : `https://rinkeby.${etherscanURL}${address}`
-  }
+  const getEtherscanFormattedUrl = useCallback(
+    (etherscanURL: string, address: string): string => {
+      return networkConfig.networkId === NetworkIds.GANACHE
+        ? '#'
+        : networkConfig.networkId === NetworkIds.MAINNET
+        ? `https://${etherscanURL}${address}`
+        : `https://rinkeby.${etherscanURL}${address}`
+    },
+    [networkConfig.networkId]
+  )
 
-  const getEtherscanTokenUrl = (address: string): string => {
-    const etherscanURL = `etherscan.io/token/`
+  const getEtherscanTokenUrl = useCallback(
+    (address: string): string => {
+      const etherscanURL = `etherscan.io/token/`
 
-    return getEtherscanFormattedUrl(etherscanURL, address)
-  }
+      return getEtherscanFormattedUrl(etherscanURL, address)
+    },
+    [getEtherscanFormattedUrl]
+  )
 
-  const getEtherscanContractUrl = (address: string): string => {
-    const etherscanURL = `etherscan.io/address/`
+  const getEtherscanContractUrl = useCallback(
+    (address: string): string => {
+      const etherscanURL = `etherscan.io/address/`
 
-    return getEtherscanFormattedUrl(etherscanURL, address)
-  }
+      return getEtherscanFormattedUrl(etherscanURL, address)
+    },
+    [getEtherscanFormattedUrl]
+  )
 
   return (
     <CenteredCard
