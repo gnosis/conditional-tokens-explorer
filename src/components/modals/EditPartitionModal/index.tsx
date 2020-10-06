@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useCallback, useEffect, useState } from 'react'
 import styled, { withTheme } from 'styled-components'
 
@@ -201,7 +202,6 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
       allCollections[draggedOutcome.collectionFromIndex].splice(draggedOutcome.outcomeIndex, 1)
       allCollections[collectionToIndex].push({ value: draggedOutcome.value, id: draggedOutcome.id })
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setAllCollections([
         ...allCollections
           .filter((collection: any) => collection.length > 0)
