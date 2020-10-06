@@ -7,7 +7,7 @@ import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Drop
 import { ChevronDown } from 'components/icons/ChevronDown'
 import { Pill } from 'components/pureStyledComponents/Pill'
 import { Connected, useWeb3Connected } from 'contexts/Web3Context'
-import { truncateStringInTheMiddle } from 'util/tools'
+import { getNetworkName, truncateStringInTheMiddle } from 'util/tools'
 
 const Wrapper = styled(Dropdown)`
   align-items: center;
@@ -133,15 +133,12 @@ interface UserDropdownProps {
   data: Connected
 }
 
-const getNetworkName = (data: Connected): string => {
-  return data.provider.network.name
-}
-
 const getWalletName = (data: Connected): string => {
   const isMetaMask =
     Object.prototype.hasOwnProperty.call(data.provider._web3Provider, 'isMetaMask') &&
     data.provider._web3Provider.isMetaMask
   const isWalletConnect = Object.prototype.hasOwnProperty.call(data.provider._web3Provider, 'wc')
+
   return isMetaMask ? 'MetaMask' : isWalletConnect ? 'WalletConnect' : 'Unknown'
 }
 
@@ -159,7 +156,7 @@ const UserDropdownButton: React.FC<UserDropdownProps> = ({ data }) => {
       {networkConfig.networkId && (
         <Network>
           <NetworkStatus />
-          <NetworkText>{getNetworkName(data)}</NetworkText>
+          <NetworkText>{getNetworkName(networkConfig.networkId)}</NetworkText>
         </Network>
       )}
     </DropdownButton>
@@ -167,6 +164,8 @@ const UserDropdownButton: React.FC<UserDropdownProps> = ({ data }) => {
 }
 
 const UserDropdownContent: React.FC<UserDropdownProps> = ({ data }) => {
+  const { networkConfig } = data
+
   const items = [
     {
       title: 'Status',
@@ -178,7 +177,7 @@ const UserDropdownContent: React.FC<UserDropdownProps> = ({ data }) => {
     },
     {
       title: 'Network',
-      value: getNetworkName(data),
+      value: getNetworkName(networkConfig.networkId),
     },
   ]
 

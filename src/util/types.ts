@@ -4,22 +4,22 @@ import { NetworkConfig } from 'config/networkConfig'
 import { Moment } from 'moment'
 
 export interface Question {
-  id: string
-  raw: string
-  templateId: number
-  title: string
-  resolution: Date
   arbitratorAddress: string
   category: string
+  id: string
   outcomes: string[]
+  raw: string
+  resolution: Date
+  templateId: number
+  title: string
 }
 
 export interface QuestionLog {
   category: string
   lang: string
+  outcomes?: string[]
   title: string
   type: string
-  outcomes?: string[]
 }
 
 export enum ConditionStatus {
@@ -119,17 +119,17 @@ export enum Status {
 }
 
 export type Oracle = {
-  name: KnownOracle
-  description: string
-  url: string
   address: string
+  description: string
+  name: KnownOracle
+  url: string
 }
 
 export type Arbitrator = {
-  name: KnownArbitrator
-  description: string
-  url: string
   address: string
+  description: string
+  name: KnownArbitrator
+  url: string
 }
 
 export interface OutcomeProps {
