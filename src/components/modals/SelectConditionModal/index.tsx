@@ -20,14 +20,18 @@ import { TableControls } from 'components/table/TableControls'
 import { TitleValue } from 'components/text/TitleValue'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useConditions } from 'hooks/useConditions'
+import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
 import { Conditions_conditions } from 'types/generatedGQLForCTE'
+import { getLogger } from 'util/logger'
 import { truncateStringInTheMiddle } from 'util/tools'
 
 const Search = styled(SearchField)`
   min-width: 0;
-  width: 300px;
+  width: 400px;
 `
+
+const logger = getLogger('PositionsListModal')
 
 interface Props extends ModalProps {
   isOpen: boolean
@@ -134,6 +138,9 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
     }
   }, [onConfirm, selectedCondition, setCondition])
 
+  const [searchBy, setSearchBy] = useState('all')
+  const dropdownItems = useConditionsSearchOptions(setSearchBy)
+
   const isLoading = !conditionIdToSearch && loading
   const isSearching = conditionIdToSearch && loading
   const showSpinner = (isLoading || isSearching) && !error
@@ -143,10 +150,9 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
       <TableControls
         end={
           <Search
-            disabled={!conditionList.length}
+            dropdownItems={dropdownItems}
             onChange={inputHandler}
             onClear={onClearSearch}
-            placeholder="Search condition id..."
             value={conditionIdToShow}
           />
         }

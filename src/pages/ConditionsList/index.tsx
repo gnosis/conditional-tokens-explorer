@@ -17,6 +17,7 @@ import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { CellHash } from 'components/table/CellHash'
 import { TableControls } from 'components/table/TableControls'
 import { useConditions } from 'hooks/useConditions'
+import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { customStyles } from 'theme/tableCustomStyles'
 import { Conditions_conditions } from 'types/generatedGQLForCTE'
@@ -191,58 +192,7 @@ export const ConditionsList: React.FC = () => {
   ]
 
   const [searchBy, setSearchBy] = useState('all')
-  const dropdownItems = [
-    {
-      onClick: () => {
-        setSearchBy('all')
-      },
-      placeholder:
-        'Search by Condition Id, Question Id, Question Text, Oracle Address, Reporting Address, Creator Address.',
-      text: 'All',
-    },
-    {
-      onClick: () => {
-        setSearchBy('conditionId')
-      },
-      placeholder: 'Search by Condition Id',
-      text: 'Condition Id',
-    },
-    {
-      onClick: () => {
-        setSearchBy('questionId')
-      },
-      placeholder: 'Search by Question Id',
-      text: 'Question Id',
-    },
-    {
-      onClick: () => {
-        setSearchBy('questionText')
-      },
-      placeholder: 'Search by Question Text',
-      text: 'Question Text',
-    },
-    {
-      onClick: () => {
-        setSearchBy('oracleAddress')
-      },
-      placeholder: 'Search by Oracle Address',
-      text: 'Oracle Address',
-    },
-    {
-      onClick: () => {
-        setSearchBy('reportingAddress')
-      },
-      placeholder: 'Search by Reporting Address',
-      text: 'Reporting Address',
-    },
-    {
-      onClick: () => {
-        setSearchBy('creatorAddress')
-      },
-      placeholder: 'Search by Creator Address',
-      text: 'Creator Address',
-    },
-  ]
+  const dropdownItems = useConditionsSearchOptions(setSearchBy)
 
   logger.log(`Search by ${searchBy}`)
 
@@ -260,7 +210,6 @@ export const ConditionsList: React.FC = () => {
       <TableControls
         end={
           <SearchField
-            disabled={!data}
             dropdownItems={dropdownItems}
             onChange={onChangeConditionId}
             onClear={onClearSearch}
@@ -270,7 +219,7 @@ export const ConditionsList: React.FC = () => {
         start={
           <Switch
             active={showFilters}
-            disabled={!data}
+            disabled={isLoading}
             label="Filters"
             onClick={toggleShowFilters}
           />

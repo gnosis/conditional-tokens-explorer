@@ -32,6 +32,7 @@ import { TableControls } from 'components/table/TableControls'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { PositionWithUserBalanceWithDecimals, usePositions } from 'hooks'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
+import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
@@ -386,51 +387,7 @@ export const PositionsList = () => {
   const fullLoadingTitle = transfer.isFailure() ? 'Error' : transactionTitle
 
   const [searchBy, setSearchBy] = useState('all')
-  const dropdownItems = [
-    {
-      onClick: () => {
-        setSearchBy('all')
-      },
-      placeholder:
-        'Search by Position Id, Condition Id, Collateral Symbol, Collateral Address, Token Address.',
-      text: 'All',
-    },
-    {
-      onClick: () => {
-        setSearchBy('positionId')
-      },
-      placeholder: 'Search by Position Id',
-      text: 'Position Id',
-    },
-    {
-      onClick: () => {
-        setSearchBy('conditionId')
-      },
-      placeholder: 'Search by Condition Id',
-      text: 'Condition Id',
-    },
-    {
-      onClick: () => {
-        setSearchBy('collateralSymbol')
-      },
-      placeholder: 'Search by Collateral Symbol',
-      text: 'Collateral Symbol',
-    },
-    {
-      onClick: () => {
-        setSearchBy('collateralAddress')
-      },
-      placeholder: 'Search by Collateral Address',
-      text: 'Collateral Address',
-    },
-    {
-      onClick: () => {
-        setSearchBy('tokenAddress')
-      },
-      placeholder: 'Search by Token Address',
-      text: 'Token Address',
-    },
-  ]
+  const dropdownItems = usePositionsSearchOptions(setSearchBy)
 
   logger.log(`Search by ${searchBy}`)
 
@@ -448,7 +405,6 @@ export const PositionsList = () => {
       <TableControls
         end={
           <SearchField
-            disabled={!data}
             dropdownItems={dropdownItems}
             onChange={onChangePositionId}
             onClear={onClearSearch}
@@ -458,7 +414,7 @@ export const PositionsList = () => {
         start={
           <Switch
             active={showFilters}
-            disabled={!data}
+            disabled={isLoading}
             label="Filters"
             onClick={toggleShowFilters}
           />

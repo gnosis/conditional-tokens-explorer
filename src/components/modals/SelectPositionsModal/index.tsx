@@ -16,13 +16,17 @@ import { TableControls } from 'components/table/TableControls'
 import { TitleValue } from 'components/text/TitleValue'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { PositionWithUserBalanceWithDecimals, usePositions } from 'hooks'
+import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
+import { getLogger } from 'util/logger'
 import { truncateStringInTheMiddle } from 'util/tools'
 
 const Search = styled(SearchField)`
   min-width: 0;
-  width: 300px;
+  width: 400px;
 `
+
+const logger = getLogger('PositionsListModal')
 
 interface Props extends ModalProps {
   isOpen: boolean
@@ -223,7 +227,11 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
   const isSearching = positionIdToSearch && loading
   const showSpinner = (isLoading || isSearching) && !error
 
-  console.log('isLoading', isLoading)
+  const [searchBy, setSearchBy] = useState('all')
+  const dropdownItems = usePositionsSearchOptions(setSearchBy)
+
+  logger.log(`Search by ${searchBy}`)
+
   return (
     <Modal
       subTitle={singlePosition ? 'Select one position.' : 'Select multiple positions.'}
@@ -233,10 +241,9 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
       <TableControls
         end={
           <Search
-            disabled={!positionList.length}
+            dropdownItems={dropdownItems}
             onChange={onChangePositionId}
             onClear={onClearSearch}
-            placeholder="Search by position id..."
             value={positionIdToShow}
           />
         }
