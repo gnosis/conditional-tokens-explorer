@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useMemo, useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import { Button } from 'components/buttons/Button'
 import { ButtonCopy } from 'components/buttons/ButtonCopy'
@@ -19,6 +19,7 @@ import { DisplayConditionsTableModal } from 'components/modals/DisplayConditions
 import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
 import { UnwrapModal } from 'components/modals/UnwrapModal'
 import { WrapModal } from 'components/modals/WrapModal'
+import { ExternalLink } from 'components/navigation/ExternalLink'
 import { Outcome } from 'components/partitions/Outcome'
 import { CardTextSm } from 'components/pureStyledComponents/CardText'
 import { OutcomesContainer } from 'components/pureStyledComponents/OutcomesContainer'
@@ -42,6 +43,7 @@ import { formatBigNumber, positionString, truncateStringInTheMiddle } from 'util
 import {
   ConditionIdsArray,
   LocalStorageManagement,
+  NetworkIds,
   OutcomeProps,
   TransferOptions,
 } from 'util/types'
@@ -81,6 +83,10 @@ const MoreLink = styled.a`
   font-weight: 600;
   margin: 0 0 0 12px;
   text-decoration: underline;
+
+  &:hover {
+    text-decoration: none;
+  }
 `
 
 const StripedListStyled = styled(StripedList)`
@@ -91,8 +97,27 @@ const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
   ${DropdownItemCSS}
 `
 
-const Link = styled(NavLink)`
+const LinkCSS = css`
   color: ${(props) => props.theme.colors.textColor};
+  text-decoration: underline;
+
+  &:hover {
+    text-decoration: none;
+  }
+`
+
+const InternalLink = styled(NavLink)`
+  ${LinkCSS}
+`
+
+const Link = styled.a`
+  ${LinkCSS}
+`
+
+const FlexRow = styled.div`
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
 `
 
 interface Props {
@@ -108,7 +133,7 @@ interface Props {
 const logger = getLogger('Contents')
 
 export const Contents = (props: Props) => {
-  const { CTService, WrapperService, connect, signer } = useWeb3ConnectedOrInfura()
+  const { CTService, WrapperService, connect, networkConfig, signer } = useWeb3ConnectedOrInfura()
   const {
     balanceERC20,
     balanceERC1155,
@@ -311,11 +336,19 @@ export const Contents = (props: Props) => {
   const conditionIdLink = (id: string) => {
     return (
       <>
-        <Link to={`/conditions/${id}`}>{truncateStringInTheMiddle(id, 8, 6)}</Link>
+        <InternalLink to={`/conditions/${id}`}>{truncateStringInTheMiddle(id, 8, 6)}</InternalLink>
         <ButtonCopy value={id} />
       </>
     )
   }
+
+  const etehrscanURL = `etherscan.io/address/`
+  const collateralTokenContractURL =
+    networkConfig.networkId === NetworkIds.GANACHE
+      ? '#'
+      : networkConfig.networkId === NetworkIds.MAINNET
+      ? `https://${etehrscanURL}${collateralTokenAddress}`
+      : `https://rinkeby.${etehrscanURL}${collateralTokenAddress}`
 
   return (
     <CenteredCard
@@ -360,10 +393,13 @@ export const Contents = (props: Props) => {
         <TitleValue
           title="Collateral Address"
           value={
-            <>
-              {truncateStringInTheMiddle(collateralTokenAddress, 8, 6)}
+            <FlexRow>
+              <Link href={collateralTokenContractURL}>
+                {truncateStringInTheMiddle(collateralTokenAddress, 8, 6)}
+              </Link>
               <ButtonCopy value={collateralTokenAddress} />
-            </>
+              <ExternalLink href={collateralTokenContractURL} />
+            </FlexRow>
           }
           valueUppercase
         />
