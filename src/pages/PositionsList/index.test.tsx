@@ -1,5 +1,5 @@
 import { MockedProvider } from '@apollo/react-testing'
-import { waitFor } from '@testing-library/dom'
+import { waitFor, within } from '@testing-library/dom'
 import { render } from '@testing-library/react'
 import React from 'react'
 import { act } from 'react-dom/test-utils'
@@ -161,7 +161,8 @@ test('position list should show right columns when the user is connected', async
       expect(getByRole('table')).toBeInTheDocument()
     })
 
-    const positionIdColumn = await findByText(/Position Id/i)
+    const table = getByRole('table')
+    const positionIdColumn = await within(table).findByText(/^Position Id$/i)
     expect(positionIdColumn).toBeInTheDocument()
 
     const erc1155Column = await findByText(/ERC1155 Amount/i)
@@ -260,7 +261,7 @@ test('position list should show right columns when the user is not connected', a
     },
   ]
   await act(async () => {
-    const { findAllByText, findByText, getByRole } = renderWithDisconnectedProvider(
+    const { findByText, getByRole } = renderWithDisconnectedProvider(
       <PositionsList />,
       mockQueryResult
     )
@@ -269,7 +270,8 @@ test('position list should show right columns when the user is not connected', a
       expect(getByRole('table')).toBeInTheDocument()
     })
 
-    const positionIdColumn = await findAllByText(/Position Id/i)
+    const table = getByRole('table')
+    const positionIdColumn = await within(table).findAllByText(/^Position Id$/i)
     expect(positionIdColumn.length).toBeGreaterThan(0)
 
     const erc1155Column = await findByText(/ERC1155 Amount/i)
