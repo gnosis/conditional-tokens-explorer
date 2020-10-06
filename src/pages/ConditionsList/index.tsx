@@ -8,6 +8,7 @@ import { ButtonDots } from 'components/buttons/ButtonDots'
 import { Dropdown, DropdownItemCSS, DropdownPosition } from 'components/common/Dropdown'
 import { ConditionTypeFilterDropdown } from 'components/filters/ConditionTypeFilterDropdown'
 import { DateFilter } from 'components/filters/DateFilter'
+import { MinMaxFilter } from 'components/filters/MinMaxFilter'
 import { OraclesFilterDropdown } from 'components/filters/OraclesFilterDropdown'
 import { StatusFilterDropdown } from 'components/filters/StatusFilterDropdown'
 import { ValidityFilterDropdown } from 'components/filters/ValidityFilterDropdown'
@@ -265,6 +266,20 @@ export const ConditionsList: React.FC = () => {
                     setSelectedConditionType(value)
                   }}
                   value={selectedConditionType}
+                />
+              </SidebarRow>
+              <SidebarRow>
+                <MinMaxFilter
+                  onChangeMax={() => {
+                    console.error('onChangeMax not yet implemented...')
+                  }}
+                  onChangeMin={() => {
+                    console.error('onChangeMin not yet implemented...')
+                  }}
+                  onSubmit={() => {
+                    console.error('Number Of Outcomes filter not implemented yet...')
+                  }}
+                  title="Number Of Outcomes"
                 />
               </SidebarRow>
               <SidebarRow>
