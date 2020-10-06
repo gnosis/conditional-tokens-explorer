@@ -7,7 +7,6 @@ import styled from 'styled-components'
 
 import { ButtonDots } from 'components/buttons/ButtonDots'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
-import { CollateralFilterDropdown } from 'components/common/CollateralFilterDropdown'
 import {
   Dropdown,
   DropdownItem,
@@ -15,13 +14,16 @@ import {
   DropdownPosition,
 } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
-import { FiltersSidebar } from 'components/filters/FiltersSidebar'
+import { CollateralFilterDropdown } from 'components/filters/CollateralFilterDropdown'
 import { Switch } from 'components/form/Switch'
 import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
 import { UnwrapModal } from 'components/modals/UnwrapModal'
 import { WrapModal } from 'components/modals/WrapModal'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import { PageTitle } from 'components/pureStyledComponents/PageTitle'
+import { Sidebar } from 'components/pureStyledComponents/Sidebar'
+import { SidebarRow } from 'components/pureStyledComponents/SidebarRow'
+import { TwoColumnsCollapsibleLayout } from 'components/pureStyledComponents/TwoColumnsCollapsibleLayout'
 import { SearchField } from 'components/search/SearchField'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { InfoCard } from 'components/statusInfo/InfoCard'
@@ -411,42 +413,43 @@ export const PositionsList = () => {
             value={positionIdToShow}
           />
         }
-        start={
-          <Switch
-            active={showFilters}
-            disabled={isLoading}
-            label="Filters"
-            onClick={toggleShowFilters}
-          />
-          // <CollateralFilterDropdown
-          //   onClick={(symbol: string, address: string) => {
-          //     setSelectedCollateralFilter(address)
-          //     setSelectedCollateralValue(symbol)
-          //   }}
-          //   value={selectedCollateralValue}
-          // />
-        }
+        start={<Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />}
       />
       {error && !isLoading && <InfoCard message={error.message} title="Error" />}
       {!error && (
-        <DataTable
-          className="outerTableWrapper"
-          columns={getColumns()}
-          customStyles={customStyles}
-          data={showSpinner ? [] : data || []}
-          highlightOnHover
-          noDataComponent={
-            showSpinner ? (
-              <InlineLoading />
-            ) : (
-              <EmptyContentText>No positions found.</EmptyContentText>
-            )
-          }
-          noHeader
-          onRowClicked={handleRowClick}
-          pagination
-          responsive
-        />
+        <TwoColumnsCollapsibleLayout isCollapsed={!showFilters}>
+          {showFilters && (
+            <Sidebar>
+              <SidebarRow>
+                <CollateralFilterDropdown
+                  onClick={(symbol: string, address: string) => {
+                    setSelectedCollateralFilter(address)
+                    setSelectedCollateralValue(symbol)
+                  }}
+                  value={selectedCollateralValue}
+                />
+              </SidebarRow>
+            </Sidebar>
+          )}
+          <DataTable
+            className="outerTableWrapper"
+            columns={getColumns()}
+            customStyles={customStyles}
+            data={showSpinner ? [] : data || []}
+            highlightOnHover
+            noDataComponent={
+              showSpinner ? (
+                <InlineLoading />
+              ) : (
+                <EmptyContentText>No positions found.</EmptyContentText>
+              )
+            }
+            noHeader
+            onRowClicked={handleRowClick}
+            pagination
+            responsive
+          />
+        </TwoColumnsCollapsibleLayout>
       )}
       {isWrapModalOpen && selectedCollateralToken && (
         <WrapModal

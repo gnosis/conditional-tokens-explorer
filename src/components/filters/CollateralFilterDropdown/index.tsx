@@ -1,8 +1,10 @@
 import React from 'react'
 
 import { ButtonSelectLight } from 'components/buttons/ButtonSelectLight'
-import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
+import { DropdownItem, DropdownPosition } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
+import { FilterDropdown } from 'components/pureStyledComponents/FilterDropdown'
+import { FilterTitle } from 'components/pureStyledComponents/FilterTitle'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { CollateralFilterOptions, Token } from 'util/types'
 
@@ -29,7 +31,7 @@ export const CollateralFilterDropdown = ({ onClick, value }: Props) => {
 
   const tokenItems = [
     {
-      content: 'All Collaterals',
+      content: 'All',
       onClick: () => {
         onClick(CollateralFilterOptions.All, '')
       },
@@ -39,19 +41,22 @@ export const CollateralFilterDropdown = ({ onClick, value }: Props) => {
   ]
 
   return (
-    <Dropdown
-      currentItem={tokenItems.findIndex((tokenItem) => tokenItem.value === value)}
-      dropdownButtonContent={
-        <ButtonSelectLight
-          content={tokenItems.filter((tokenItem) => tokenItem.value === value)[0].content}
-        />
-      }
-      dropdownPosition={DropdownPosition.right}
-      items={tokenItems.map((tokenItem, index) => (
-        <DropdownItem key={index} onClick={tokenItem.onClick}>
-          {tokenItem.content}
-        </DropdownItem>
-      ))}
-    />
+    <>
+      <FilterTitle>Collateral</FilterTitle>
+      <FilterDropdown
+        currentItem={tokenItems.findIndex((tokenItem) => tokenItem.value === value)}
+        dropdownButtonContent={
+          <ButtonSelectLight
+            content={tokenItems.filter((tokenItem) => tokenItem.value === value)[0].content}
+          />
+        }
+        dropdownPosition={DropdownPosition.center}
+        items={tokenItems.map((tokenItem, index) => (
+          <DropdownItem key={index} onClick={tokenItem.onClick}>
+            {tokenItem.content}
+          </DropdownItem>
+        ))}
+      />
+    </>
   )
 }

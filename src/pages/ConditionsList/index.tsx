@@ -6,11 +6,14 @@ import styled from 'styled-components'
 
 import { ButtonDots } from 'components/buttons/ButtonDots'
 import { Dropdown, DropdownItemCSS, DropdownPosition } from 'components/common/Dropdown'
-import { OraclesFilterDropdown } from 'components/common/OraclesFilterDropdown'
+import { OraclesFilterDropdown } from 'components/filters/OraclesFilterDropdown'
 import { Switch } from 'components/form/Switch'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import { PageTitle } from 'components/pureStyledComponents/PageTitle'
 import { Pill, PillTypes } from 'components/pureStyledComponents/Pill'
+import { Sidebar } from 'components/pureStyledComponents/Sidebar'
+import { SidebarRow } from 'components/pureStyledComponents/SidebarRow'
+import { TwoColumnsCollapsibleLayout } from 'components/pureStyledComponents/TwoColumnsCollapsibleLayout'
 import { SearchField } from 'components/search/SearchField'
 import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
@@ -216,42 +219,43 @@ export const ConditionsList: React.FC = () => {
             value={conditionIdToShow}
           />
         }
-        start={
-          <Switch
-            active={showFilters}
-            disabled={isLoading}
-            label="Filters"
-            onClick={toggleShowFilters}
-          />
-          // <OraclesFilterDropdown
-          //   onClick={(value: OracleFilterOptions, filter: string[]) => {
-          //     setSelectedOracleFilter(filter)
-          //     setSelectedOracleValue(value)
-          //   }}
-          //   value={selectedOracleValue}
-          // />
-        }
+        start={<Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />}
       />
       {error && !isLoading && <InfoCard message={error.message} title="Error" />}
       {!error && (
-        <DataTable
-          className="outerTableWrapper"
-          columns={columns}
-          customStyles={customStyles}
-          data={showSpinner ? [] : data?.conditions || []}
-          highlightOnHover
-          noDataComponent={
-            showSpinner ? (
-              <InlineLoading />
-            ) : (
-              <EmptyContentText>No conditions found.</EmptyContentText>
-            )
-          }
-          noHeader
-          onRowClicked={handleRowClick}
-          pagination
-          responsive
-        />
+        <TwoColumnsCollapsibleLayout isCollapsed={!showFilters}>
+          {showFilters && (
+            <Sidebar>
+              <SidebarRow>
+                <OraclesFilterDropdown
+                  onClick={(value: OracleFilterOptions, filter: string[]) => {
+                    setSelectedOracleFilter(filter)
+                    setSelectedOracleValue(value)
+                  }}
+                  value={selectedOracleValue}
+                />
+              </SidebarRow>
+            </Sidebar>
+          )}
+          <DataTable
+            className="outerTableWrapper"
+            columns={columns}
+            customStyles={customStyles}
+            data={showSpinner ? [] : data?.conditions || []}
+            highlightOnHover
+            noDataComponent={
+              showSpinner ? (
+                <InlineLoading />
+              ) : (
+                <EmptyContentText>No conditions found.</EmptyContentText>
+              )
+            }
+            noHeader
+            onRowClicked={handleRowClick}
+            pagination
+            responsive
+          />
+        </TwoColumnsCollapsibleLayout>
       )}
     </>
   )

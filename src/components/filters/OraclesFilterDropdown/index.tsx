@@ -1,7 +1,9 @@
 import React from 'react'
 
 import { ButtonSelectLight } from 'components/buttons/ButtonSelectLight'
-import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
+import { DropdownItem, DropdownPosition } from 'components/common/Dropdown'
+import { FilterDropdown } from 'components/pureStyledComponents/FilterDropdown'
+import { FilterTitle } from 'components/pureStyledComponents/FilterTitle'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { Oracle, OracleFilterOptions } from 'util/types'
 
@@ -18,7 +20,7 @@ export const OraclesFilterDropdown = ({ onClick, value }: Props) => {
 
   const oraclesItems = [
     {
-      text: 'All Reporters / Oracles',
+      text: 'All',
       onClick: () => {
         onClick(OracleFilterOptions.All, [])
       },
@@ -45,17 +47,22 @@ export const OraclesFilterDropdown = ({ onClick, value }: Props) => {
   }
 
   return (
-    <Dropdown
-      currentItem={oraclesItems.findIndex((oracleItem) => oracleItem.value === value)}
-      dropdownButtonContent={
-        <ButtonSelectLight content={oraclesItems.filter((item) => item.value === value)[0].text} />
-      }
-      dropdownPosition={DropdownPosition.right}
-      items={oraclesItems.map((item, index) => (
-        <DropdownItem key={index} onClick={item.onClick}>
-          {item.text}
-        </DropdownItem>
-      ))}
-    />
+    <>
+      <FilterTitle>Reporter / Oracle</FilterTitle>
+      <FilterDropdown
+        currentItem={oraclesItems.findIndex((oracleItem) => oracleItem.value === value)}
+        dropdownButtonContent={
+          <ButtonSelectLight
+            content={oraclesItems.filter((item) => item.value === value)[0].text}
+          />
+        }
+        dropdownPosition={DropdownPosition.center}
+        items={oraclesItems.map((item, index) => (
+          <DropdownItem key={index} onClick={item.onClick}>
+            {item.text}
+          </DropdownItem>
+        ))}
+      />
+    </>
   )
 }
