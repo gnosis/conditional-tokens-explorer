@@ -24,19 +24,9 @@ import { useWithToken } from 'hooks/useWithToken'
 import { customStyles } from 'theme/tableCustomStyles'
 import { truncateStringInTheMiddle } from 'util/tools'
 
-const LoadingWrapper = styled.div`
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  min-height: 400px;
-`
-
-const SearchingWrapper = styled(LoadingWrapper)`
-  min-height: 348px;
-`
-
 const Search = styled(SearchField)`
-  max-width: 210px;
+  min-width: 0;
+  width: 300px;
 `
 
 interface Props extends ModalProps {
@@ -254,72 +244,69 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
 
   const isLoading = !positionIdToSearch && (loading || loadingTokens)
   const isSearching = positionIdToSearch && (loading || loadingTokens)
+  const showSpinner = (isLoading || isSearching) && !error
 
   return (
     <Modal
-      {...restProps}
       subTitle={singlePosition ? 'Select one position.' : 'Select multiple positions.'}
       title={'Select Position'}
+      {...restProps}
     >
-      {isLoading && !error && (
-        <LoadingWrapper>
-          <InlineLoading message="Loading positions..." />
-        </LoadingWrapper>
-      )}
-      {error && <InfoCard message={error.message} title="Error" />}
-      {dataWithToken && !isLoading && (
-        <>
-          <TableControls
-            start={
-              <Search
-                onChange={onChangePositionId}
-                onClear={onClearSearch}
-                placeholder="Search by position id..."
-                value={positionIdToShow}
-              />
-            }
+      <TableControls
+        end={
+          <Search
+            disabled={!positionList.length}
+            onChange={onChangePositionId}
+            onClear={onClearSearch}
+            placeholder="Search by position id..."
+            value={positionIdToShow}
           />
-          {isSearching ? (
-            <SearchingWrapper>
+        }
+      />
+      {error && !isLoading && <InfoCard message={error.message} title="Error" />}
+      {!error && (
+        <DataTable
+          className="outerTableWrapper inlineTable"
+          columns={getPositionsColumns()}
+          customStyles={customStyles}
+          data={showSpinner ? [] : positionList.length ? positionList : []}
+          noDataComponent={
+            showSpinner ? (
               <InlineLoading />
-            </SearchingWrapper>
-          ) : (
-            <DataTable
-              className="outerTableWrapper inlineTable"
-              columns={getPositionsColumns()}
-              customStyles={customStyles}
-              data={positionList.length ? positionList : []}
-              noDataComponent={
-                <EmptyContentText>{`No positions${
-                  showOnlyPositionsWithBalance && dataWithToken.length ? ' with balance' : ''
-                } found.`}</EmptyContentText>
-              }
-              noHeader
-              pagination
-              paginationPerPage={5}
-              paginationRowsPerPageOptions={[5, 10, 15]}
-            />
-          )}
-          <TitleValue
-            title={singlePosition ? 'Selected Position' : 'Selected Positions'}
-            value={
-              <DataTable
-                className="outerTableWrapper inlineTable"
-                columns={getSelectedColumns()}
-                customStyles={customStyles}
-                data={selectedPositions}
-                noDataComponent={<EmptyContentText>No positions selected.</EmptyContentText>}
-                noHeader
-              />
-            }
-          />
-          <ButtonContainer>
-            <Button disabled={!selectedPositions.length} onClick={handleDone}>
-              Done
-            </Button>
-          </ButtonContainer>
-        </>
+            ) : (
+              <EmptyContentText>{`No positions ${
+                showOnlyPositionsWithBalance && dataWithToken && dataWithToken.length
+                  ? ' with balance'
+                  : ''
+              } found.`}</EmptyContentText>
+            )
+          }
+          noHeader
+          pagination
+          paginationPerPage={5}
+          paginationRowsPerPageOptions={[5, 10, 15]}
+          responsive
+        />
       )}
+      <TitleValue
+        title={singlePosition ? 'Selected Position' : 'Selected Positions'}
+        value={
+          <DataTable
+            className="outerTableWrapper inlineTable"
+            columns={getSelectedColumns()}
+            customStyles={customStyles}
+            data={selectedPositions}
+            noDataComponent={<EmptyContentText>No positions selected.</EmptyContentText>}
+            noHeader
+            responsive
+          />
+        }
+      />
+      <ButtonContainer>
+        <Button disabled={!selectedPositions.length} onClick={handleDone}>
+          Done
+        </Button>
+      </ButtonContainer>
     </Modal>
   )
 }

@@ -17,7 +17,7 @@ const SwitchWrapper = styled.div<{ active: boolean }>`
   cursor: pointer;
   height: 20px;
   position: relative;
-  transition: all 0.15 linear;
+  transition: all 0.1s linear;
   width: 36px;
 `
 
@@ -30,7 +30,7 @@ const Circle = styled.div<{ active: boolean }>`
   left: ${(props) => (props.active ? '18px' : '2px')};
   position: absolute;
   top: 2px;
-  transition: all 0.15 linear;
+  transition: all 0.1s linear;
   width: 16px;
 `
 

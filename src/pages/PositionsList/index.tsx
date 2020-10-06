@@ -471,7 +471,7 @@ export const PositionsList = () => {
           // />
         }
       />
-      {error && <InfoCard message={error.message} title="Error" />}
+      {error && !isLoading && <InfoCard message={error.message} title="Error" />}
       {!error && (
         <DataTable
           className="outerTableWrapper"

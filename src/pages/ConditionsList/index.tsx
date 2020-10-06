@@ -283,7 +283,7 @@ export const ConditionsList: React.FC = () => {
           // />
         }
       />
-      {error && <InfoCard message={error.message} title="Error" />}
+      {error && !isLoading && <InfoCard message={error.message} title="Error" />}
       {!error && (
         <DataTable
           className="outerTableWrapper"
