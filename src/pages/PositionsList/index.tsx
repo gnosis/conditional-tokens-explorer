@@ -217,45 +217,49 @@ export const PositionsList = () => {
   }, [buildMenuForRow])
 
   useEffect(() => {
-    if (status === Web3ContextStatus.Connected) {
-      setConnectedItems([
-        {
-          // eslint-disable-next-line react/display-name
-          cell: (row: PositionWithUserBalanceWithDecimals) => (
-            <span
-              onClick={() => handleRowClick(row)}
-              {...(row.userBalanceERC1155WithDecimals
-                ? { title: row.userBalanceERC1155.toString() }
-                : {})}
-            >
-              {row.userBalanceERC1155WithDecimals}
-            </span>
-          ),
-          name: 'ERC1155 Amount',
-          right: true,
-          selector: 'userBalanceERC1155Numbered',
-          sortable: true,
-        },
-        {
-          // eslint-disable-next-line react/display-name
-          cell: (row: PositionWithUserBalanceWithDecimals) => (
-            <span
-              onClick={() => handleRowClick(row)}
-              {...(row.userBalanceERC20WithDecimals
-                ? { title: row.userBalanceERC20.toString() }
-                : {})}
-            >
-              {row.userBalanceERC20WithDecimals}
-            </span>
-          ),
-          name: 'ERC20 Amount',
-          right: true,
-          selector: 'userBalanceERC20Numbered',
-          sortable: true,
-        },
-      ])
-    }
-  }, [status, buildMenuForRow, handleRowClick])
+    const isConnected = status === Web3ContextStatus.Connected
+
+    setConnectedItems([
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: PositionWithUserBalanceWithDecimals) => (
+          <span
+            onClick={() => handleRowClick(row)}
+            title={
+              isConnected
+                ? row.userBalanceERC1155.toString()
+                : 'Connect your wallet to access ERC1155 values.'
+            }
+          >
+            {isConnected ? row.userBalanceERC1155WithDecimals : '-'}
+          </span>
+        ),
+        name: 'ERC1155 Amount',
+        right: true,
+        selector: 'userBalanceERC1155Numbered',
+        sortable: true,
+      },
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: PositionWithUserBalanceWithDecimals) => (
+          <span
+            onClick={() => handleRowClick(row)}
+            title={
+              isConnected
+                ? row.userBalanceERC20.toString()
+                : 'Connect your wallet to access ERC20 values.'
+            }
+          >
+            {isConnected ? row.userBalanceERC20WithDecimals : '-'}
+          </span>
+        ),
+        name: 'ERC20 Amount',
+        right: true,
+        selector: 'userBalanceERC20Numbered',
+        sortable: true,
+      },
+    ])
+  }, [status, handleRowClick])
 
   const getColumns = useCallback(() => {
     // If you move this outside of the useCallback, can cause performance issues as a dep of this useCallback
