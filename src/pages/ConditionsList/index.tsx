@@ -9,6 +9,7 @@ import { Dropdown, DropdownItemCSS, DropdownPosition } from 'components/common/D
 import { ConditionTypeFilterDropdown } from 'components/filters/ConditionTypeFilterDropdown'
 import { OraclesFilterDropdown } from 'components/filters/OraclesFilterDropdown'
 import { StatusFilterDropdown } from 'components/filters/StatusFilterDropdown'
+import { ValidityFilterDropdown } from 'components/filters/ValidityFilterDropdown'
 import { Switch } from 'components/form/Switch'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import { PageTitle } from 'components/pureStyledComponents/PageTitle'
@@ -33,6 +34,7 @@ import {
   LocalStorageManagement,
   OracleFilterOptions,
   StatusOptions,
+  ValidityOptions,
 } from 'util/types'
 
 const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
@@ -56,6 +58,7 @@ export const ConditionsList: React.FC = () => {
   const [selectedConditionType, setSelectedConditionType] = useState<
     ConditionType | ConditionTypeAll
   >(ConditionTypeAll.all)
+  const [validity, setValidity] = useState<ValidityOptions>(ValidityOptions.All)
 
   const debouncedHandlerConditionToSearch = useDebounceCallback((conditionIdToSearch) => {
     setConditionIdToSearch(conditionIdToSearch)
@@ -261,6 +264,14 @@ export const ConditionsList: React.FC = () => {
                     setSelectedConditionType(value)
                   }}
                   value={selectedConditionType}
+                />
+              </SidebarRow>
+              <SidebarRow>
+                <ValidityFilterDropdown
+                  onClick={(value: ValidityOptions) => {
+                    setValidity(value)
+                  }}
+                  value={validity}
                 />
               </SidebarRow>
             </Sidebar>

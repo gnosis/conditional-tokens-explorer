@@ -27,6 +27,12 @@ export enum ConditionStatus {
   Resolved = 'Resolved',
 }
 
+export enum ValidityOptions {
+  All = 'all',
+  Invalid = 'invalid',
+  Valid = 'valid',
+}
+
 export enum ConditionType {
   omen = 'Omen Condition',
   custom = 'Custom Reporter',
