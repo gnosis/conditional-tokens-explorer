@@ -324,8 +324,8 @@ export const Contents = (props: Props) => {
     : transfer.isLoading()
     ? 'Working...'
     : 'All done!'
-  const fullLoadingTitle = transfer.isFailure() ? 'Error' : transactionTitle
 
+  const fullLoadingTitle = transfer.isFailure() ? 'Error' : transactionTitle
   const outcomesByRow = '14'
 
   const conditionIdLink = (id: string) => {
@@ -337,13 +337,25 @@ export const Contents = (props: Props) => {
     )
   }
 
-  const etehrscanURL = `etherscan.io/address/`
-  const collateralTokenContractURL =
-    networkConfig.networkId === NetworkIds.GANACHE
+  const getEtherscanFormattedUrl = (etherscanURL: string, address: string): string => {
+    return networkConfig.networkId === NetworkIds.GANACHE
       ? '#'
       : networkConfig.networkId === NetworkIds.MAINNET
-      ? `https://${etehrscanURL}${collateralTokenAddress}`
-      : `https://rinkeby.${etehrscanURL}${collateralTokenAddress}`
+      ? `https://${etherscanURL}${address}`
+      : `https://rinkeby.${etherscanURL}${address}`
+  }
+
+  const getEtherscanTokenUrl = (address: string): string => {
+    const etherscanURL = `etherscan.io/token/`
+
+    return getEtherscanFormattedUrl(etherscanURL, address)
+  }
+
+  const getEtherscanContractUrl = (address: string): string => {
+    const etherscanURL = `etherscan.io/address/`
+
+    return getEtherscanFormattedUrl(etherscanURL, address)
+  }
 
   return (
     <CenteredCard
@@ -389,11 +401,11 @@ export const Contents = (props: Props) => {
           title="Collateral Address"
           value={
             <FlexRow>
-              <Link href={collateralTokenContractURL}>
+              <Link href={getEtherscanContractUrl(collateralTokenAddress)}>
                 {truncateStringInTheMiddle(collateralTokenAddress, 8, 6)}
               </Link>
               <ButtonCopy value={collateralTokenAddress} />
-              <ExternalLink href={collateralTokenContractURL} />
+              <ExternalLink href={getEtherscanContractUrl(collateralTokenAddress)} />
             </FlexRow>
           }
           valueUppercase
@@ -417,20 +429,19 @@ export const Contents = (props: Props) => {
           />
         )}
       </Row>
-
       <Row cols="1fr" marginBottomXL>
         <TitleValue
-          title="Collateral Wrapping"
+          title="Wrapped Collateral"
           value={
             <StripedListStyled maxHeight="auto">
               <StripedListItem>
                 <CollateralText>
                   <CollateralTextStrong>ERC1155:</CollateralTextStrong>{' '}
                   <CollateralTextAmount>
-                    {!balanceERC1155.isZero() ? (
-                      `${formatBigNumber(balanceERC1155, ERC1155Decimals)} ${ERC1155Symbol}`
-                    ) : (
+                    {balanceERC1155.isZero() ? (
                       <i>None.</i>
+                    ) : (
+                      `${formatBigNumber(balanceERC1155, ERC1155Decimals)} ${ERC1155Symbol}`
                     )}
                   </CollateralTextAmount>
                 </CollateralText>
@@ -445,10 +456,10 @@ export const Contents = (props: Props) => {
                 <CollateralText>
                   <CollateralTextStrong>ERC20:</CollateralTextStrong>{' '}
                   <CollateralTextAmount>
-                    {!balanceERC20.isZero() ? (
-                      `${formatBigNumber(balanceERC20, ERC1155Decimals)} ${ERC20Symbol}`
-                    ) : (
+                    {balanceERC20.isZero() ? (
                       <i>None.</i>
+                    ) : (
+                      `${formatBigNumber(balanceERC20, ERC1155Decimals)} ${ERC20Symbol}`
                     )}
                   </CollateralTextAmount>
                 </CollateralText>
@@ -461,6 +472,25 @@ export const Contents = (props: Props) => {
               </StripedListItem>
             </StripedListStyled>
           }
+        />
+      </Row>
+      <Row cols="1fr" marginBottomXL>
+        <TitleValue
+          title="Wrapped Collateral Address"
+          value={
+            balanceERC20.isZero() ? (
+              <i>None.</i>
+            ) : (
+              <FlexRow>
+                <Link href={getEtherscanTokenUrl(wrappedTokenAddress)}>
+                  {truncateStringInTheMiddle(wrappedTokenAddress, 8, 6)}
+                </Link>
+                <ButtonCopy value={wrappedTokenAddress} />
+                <ExternalLink href={getEtherscanTokenUrl(wrappedTokenAddress)} />
+              </FlexRow>
+            )
+          }
+          valueUppercase={balanceERC20.isZero() ? false : true}
         />
       </Row>
       <Row cols="1fr" marginBottomXL>
