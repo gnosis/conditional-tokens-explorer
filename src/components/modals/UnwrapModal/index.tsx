@@ -65,6 +65,7 @@ export const UnwrapModal: React.FC<Props> = (props) => {
           amount={amount}
           balance={maxBalance}
           decimals={decimals}
+          isFromAPosition
           max={maxBalance.toString()}
           onAmountChange={amountChangeHandler}
           onUseWalletBalance={useWalletHandler}
