@@ -27,6 +27,12 @@ export enum ConditionStatus {
   Resolved = 'Resolved',
 }
 
+export enum WrappedCollateralOptions {
+  All = 'all',
+  Yes = 'yes',
+  No = 'no',
+}
+
 export enum ValidityOptions {
   All = 'all',
   Invalid = 'invalid',

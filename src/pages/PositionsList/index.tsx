@@ -15,6 +15,7 @@ import {
 } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
 import { CollateralFilterDropdown } from 'components/filters/CollateralFilterDropdown'
+import { WrappedCollateralFilterDropdown } from 'components/filters/WrappedCollateralFilterDropdown'
 import { Switch } from 'components/form/Switch'
 import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
 import { UnwrapModal } from 'components/modals/UnwrapModal'
@@ -38,7 +39,13 @@ import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
-import { CollateralFilterOptions, LocalStorageManagement, Token, TransferOptions } from 'util/types'
+import {
+  CollateralFilterOptions,
+  LocalStorageManagement,
+  Token,
+  TransferOptions,
+  WrappedCollateralOptions,
+} from 'util/types'
 
 const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
   ${DropdownItemCSS}
@@ -58,6 +65,9 @@ export const PositionsList = () => {
   const [selectedCollateralFilter, setSelectedCollateralFilter] = useState<string>('')
   const [selectedCollateralValue, setSelectedCollateralValue] = useState<string>(
     CollateralFilterOptions.All
+  )
+  const [wrappedCollateral, setWrappedCollateral] = useState<WrappedCollateralOptions>(
+    WrappedCollateralOptions.All
   )
   const [isTransferOutcomeModalOpen, setIsTransferOutcomeModalOpen] = useState(false)
   const [selectedPositionId, setSelectedPositionId] = useState<string>('')
@@ -427,6 +437,14 @@ export const PositionsList = () => {
                     setSelectedCollateralValue(symbol)
                   }}
                   value={selectedCollateralValue}
+                />
+              </SidebarRow>
+              <SidebarRow>
+                <WrappedCollateralFilterDropdown
+                  onClick={(value: WrappedCollateralOptions) => {
+                    setWrappedCollateral(value)
+                  }}
+                  value={wrappedCollateral}
                 />
               </SidebarRow>
             </Sidebar>
