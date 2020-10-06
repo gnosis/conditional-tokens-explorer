@@ -22,6 +22,7 @@ import { WrapModal } from 'components/modals/WrapModal'
 import { ExternalLink } from 'components/navigation/ExternalLink'
 import { Outcome } from 'components/partitions/Outcome'
 import { CardTextSm } from 'components/pureStyledComponents/CardText'
+import { FlexRow } from 'components/pureStyledComponents/FlexRow'
 import { OutcomesContainer } from 'components/pureStyledComponents/OutcomesContainer'
 import { Row } from 'components/pureStyledComponents/Row'
 import {
@@ -112,12 +113,6 @@ const InternalLink = styled(NavLink)`
 
 const Link = styled.a`
   ${LinkCSS}
-`
-
-const FlexRow = styled.div`
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
 `
 
 interface Props {
@@ -379,10 +374,10 @@ export const Contents = (props: Props) => {
         <TitleValue
           title="Position Id"
           value={
-            <>
+            <FlexRow>
               {truncateStringInTheMiddle(positionId, 8, 6)}
               <ButtonCopy value={positionId} />
-            </>
+            </FlexRow>
           }
           valueUppercase
         />
@@ -408,14 +403,14 @@ export const Contents = (props: Props) => {
             title={conditions.length === 1 ? 'Condition Id' : 'Condition Ids'}
             value={
               conditions.length === 1 ? (
-                conditionIdLink(conditions[0].conditionId)
+                <FlexRow>{conditionIdLink(conditions[0].conditionId)}</FlexRow>
               ) : (
-                <>
+                <FlexRow>
                   {conditionIdLink(conditions[0].conditionId)}
                   <MoreLink onClick={() => setOpenDisplayConditionsTableModal(true)}>
                     (More...)
                   </MoreLink>
-                </>
+                </FlexRow>
               )
             }
             valueUppercase
