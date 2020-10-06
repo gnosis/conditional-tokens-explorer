@@ -6,6 +6,7 @@ import styled from 'styled-components'
 
 import { ButtonDots } from 'components/buttons/ButtonDots'
 import { Dropdown, DropdownItemCSS, DropdownPosition } from 'components/common/Dropdown'
+import { ConditionTypeFilterDropdown } from 'components/filters/ConditionTypeFilterDropdown'
 import { OraclesFilterDropdown } from 'components/filters/OraclesFilterDropdown'
 import { StatusFilterDropdown } from 'components/filters/StatusFilterDropdown'
 import { Switch } from 'components/form/Switch'
@@ -26,7 +27,13 @@ import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { customStyles } from 'theme/tableCustomStyles'
 import { Conditions_conditions } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
-import { LocalStorageManagement, OracleFilterOptions, StatusOptions } from 'util/types'
+import {
+  ConditionType,
+  ConditionTypeAll,
+  LocalStorageManagement,
+  OracleFilterOptions,
+  StatusOptions,
+} from 'util/types'
 
 const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
   ${DropdownItemCSS}
@@ -46,6 +53,9 @@ export const ConditionsList: React.FC = () => {
     OracleFilterOptions.All
   )
   const [selectedStatus, setSelectedStatus] = useState<StatusOptions>(StatusOptions.All)
+  const [selectedConditionType, setSelectedConditionType] = useState<
+    ConditionType | ConditionTypeAll
+  >(ConditionTypeAll.all)
 
   const debouncedHandlerConditionToSearch = useDebounceCallback((conditionIdToSearch) => {
     setConditionIdToSearch(conditionIdToSearch)
@@ -243,6 +253,14 @@ export const ConditionsList: React.FC = () => {
                     setSelectedStatus(value)
                   }}
                   value={selectedStatus}
+                />
+              </SidebarRow>
+              <SidebarRow>
+                <ConditionTypeFilterDropdown
+                  onClick={(value: ConditionType | ConditionTypeAll) => {
+                    setSelectedConditionType(value)
+                  }}
+                  value={selectedConditionType}
                 />
               </SidebarRow>
             </Sidebar>

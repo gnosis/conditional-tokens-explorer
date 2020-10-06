@@ -32,6 +32,10 @@ export enum ConditionType {
   custom = 'Custom Reporter',
 }
 
+export enum ConditionTypeAll {
+  all = 'All',
+}
+
 export enum QuestionType {
   nuancedBinary = 'Nuanced Binary',
   categorical = 'Categorical',
