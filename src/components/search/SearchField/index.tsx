@@ -105,7 +105,7 @@ const ButtonDropdown = styled.button`
   border-right: none;
   border-top-right-radius: 4px;
   border-top: none;
-  color: ${(props) => props.theme.colors.darkerGray};
+  color: ${(props) => props.theme.colors.darkerGrey};
   cursor: pointer;
   display: flex;
   flex-shrink: 0;
@@ -121,7 +121,7 @@ const ButtonDropdown = styled.button`
   padding: 0 12px;
 
   .fill {
-    fill: ${(props) => props.theme.colors.darkerGray};
+    fill: ${(props) => props.theme.colors.darkerGrey};
   }
 
   .isOpen & {

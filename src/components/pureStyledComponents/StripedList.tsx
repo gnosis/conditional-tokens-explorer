@@ -19,7 +19,7 @@ StripedList.defaultProps = {
 export const StripedListItem = styled.div<{ justifyContent?: string }>`
   align-items: center;
   background-color: ${(props) => props.theme.colors.whitesmoke3};
-  color: ${(props) => props.theme.colors.darkerGray};
+  color: ${(props) => props.theme.colors.darkerGrey};
   display: flex;
   flex-wrap: wrap;
   font-size: 15px;

@@ -7,6 +7,7 @@ import { ButtonDropdownCircle } from 'components/buttons/ButtonDropdownCircle'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { Dropdown, DropdownItemCSS, DropdownPosition } from 'components/common/Dropdown'
 import { DisplayTablePositions } from 'components/form/DisplayTablePositions'
+import { FlexRow } from 'components/pureStyledComponents/FlexRow'
 import { Pill, PillTypes } from 'components/pureStyledComponents/Pill'
 import { Row } from 'components/pureStyledComponents/Row'
 import { StripedList, StripedListItem } from 'components/pureStyledComponents/StripedList'
@@ -109,10 +110,10 @@ export const Contents: React.FC<Props> = ({ condition }) => {
         <TitleValue
           title="Condition Id"
           value={
-            <>
+            <FlexRow>
               {truncateStringInTheMiddle(conditionId, 8, 6)}
               <ButtonCopy value={conditionId} />
-            </>
+            </FlexRow>
           }
           valueUppercase
         />
@@ -134,10 +135,10 @@ export const Contents: React.FC<Props> = ({ condition }) => {
         <TitleValue
           title="Question Id"
           value={
-            <>
+            <FlexRow>
               {truncateStringInTheMiddle(questionId, 8, 6)}
               <ButtonCopy value={questionId} />
-            </>
+            </FlexRow>
           }
           valueUppercase
         />
@@ -172,10 +173,10 @@ export const Contents: React.FC<Props> = ({ condition }) => {
         <TitleValue
           title={isConditionFromOmen ? 'Oracle' : 'Reporting Address'}
           value={
-            <>
+            <FlexRow>
               {oracleTitle}
               <ButtonCopy value={oracle} />
-            </>
+            </FlexRow>
           }
           valueUppercase={isConditionFromOmen ? false : true}
         />

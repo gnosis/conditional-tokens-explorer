@@ -17,7 +17,7 @@ const Wrapper = styled.div`
 `
 
 const ConfirmText = styled.p`
-  color: ${(props) => props.theme.colors.darkerGray};
+  color: ${(props) => props.theme.colors.darkerGrey};
   font-size: 16px;
   font-weight: 600;
   line-height: 1.4;
@@ -33,7 +33,7 @@ const ConfirmControls = styled.div`
 `
 
 const ConfirmControl = styled.span`
-  color: ${(props) => props.theme.colors.darkerGray};
+  color: ${(props) => props.theme.colors.darkerGrey};
   cursor: pointer;
   font-size: 15px;
   font-weight: 700;
