@@ -243,7 +243,7 @@ export const Form = ({
     : status.isFailure()
     ? {
         buttonType: ButtonType.danger,
-        text: 'OK',
+        text: 'Close',
         onClick: () => setStatus(Remote.notAsked<SplitStatus>()),
       }
     : undefined

@@ -195,7 +195,7 @@ export const Contents = () => {
       ? {
           buttonType: ButtonType.danger,
           onClick: () => setStatus(null),
-          text: 'OK',
+          text: 'Close',
         }
       : undefined
 
