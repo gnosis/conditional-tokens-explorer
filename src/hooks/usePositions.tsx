@@ -26,6 +26,7 @@ export type PositionWithUserBalanceWithDecimals = Position &
 
 interface OptionsToSearch {
   positionId?: string
+  conditionsIds?: string[]
   collateralValue?: string
   collateralFilter?: string
 }
@@ -40,7 +41,7 @@ export const usePositions = (options: OptionsToSearch) => {
     networkConfig,
     provider,
   } = useWeb3ConnectedOrInfura()
-  const { collateralFilter, collateralValue, positionId } = options
+  const { collateralFilter, collateralValue, conditionsIds, positionId } = options
 
   const [data, setData] = React.useState<Maybe<PositionWithUserBalanceWithDecimals[]>>(null)
   const [address, setAddress] = React.useState<Maybe<string>>(null)
@@ -52,6 +53,10 @@ export const usePositions = (options: OptionsToSearch) => {
 
   if (positionId) {
     queryOptions.positionId = positionId
+  }
+
+  if (conditionsIds) {
+    queryOptions.conditionsIds = conditionsIds
   }
 
   if (collateralValue !== CollateralFilterOptions.All) {

@@ -3,9 +3,11 @@ import gql from 'graphql-tag'
 export interface PositionsListType {
   positionId?: string
   collateral?: string
+  conditionsIds?: string[]
 }
 
 export const DEFAULT_OPTIONS = {
+  conditionIds: [],
   positionId: '',
   collateral: '',
 }
@@ -50,9 +52,10 @@ const positionFragment = gql`
 `
 
 export const buildQueryPositions = (options: PositionsListType = DEFAULT_OPTIONS) => {
-  const { collateral, positionId } = options
+  const { collateral, conditionsIds, positionId } = options
 
   const whereClauseInternal = [
+    conditionsIds && conditionsIds.length ? 'conditionIds_contains: $conditionsIds' : '',
     positionId ? 'id: $positionId' : '',
     collateral ? 'collateralToken: $collateral' : '',
   ]
@@ -61,6 +64,7 @@ export const buildQueryPositions = (options: PositionsListType = DEFAULT_OPTIONS
   const whereClause = whereClauseInternal ? `, where: { ${whereClauseInternal} }` : ''
 
   const variablesClauseInternal = [
+    conditionsIds ? '$conditionsIds: [String]' : '',
     positionId ? '$positionId: String' : '',
     collateral ? '$collateral: String' : '',
   ]

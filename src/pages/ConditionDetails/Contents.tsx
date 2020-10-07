@@ -6,6 +6,7 @@ import { ButtonCopy } from 'components/buttons/ButtonCopy'
 import { ButtonDropdownCircle } from 'components/buttons/ButtonDropdownCircle'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { Dropdown, DropdownItemCSS, DropdownPosition } from 'components/common/Dropdown'
+import { DisplayTablePositions } from 'components/form/DisplayTablePositions'
 import { Pill, PillTypes } from 'components/pureStyledComponents/Pill'
 import { Row } from 'components/pureStyledComponents/Row'
 import { StripedList, StripedListItem } from 'components/pureStyledComponents/StripedList'
@@ -14,6 +15,7 @@ import { INFORMATION_NOT_AVAILABLE } from 'config/constants'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useIsConditionFromOmen } from 'hooks/useIsConditionFromOmen'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
+import { usePositions } from 'hooks/usePositions'
 import { useQuestion } from 'hooks/useQuestion'
 import { GetCondition_condition } from 'types/generatedGQLForCTE'
 import { formatTS, getConditionTypeTitle, truncateStringInTheMiddle } from 'util/tools'
@@ -83,6 +85,9 @@ export const Contents: React.FC<Props> = ({ condition }) => {
   const oracleTitle = isConditionFromOmen
     ? networkConfig.getOracleFromAddress(oracle).description
     : truncateStringInTheMiddle(oracle, 8, 6)
+  const { data: positions, loading: loadingPositions } = usePositions({
+    conditionsIds: [conditionId],
+  })
 
   return (
     <CenteredCard
@@ -174,6 +179,14 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           valueUppercase={isConditionFromOmen ? false : true}
         />
       </Row>
+      {!loadingPositions && positions && positions.length ? (
+        <Row>
+          <TitleValue
+            title={"Condition's split positions"}
+            value={<DisplayTablePositions positions={positions}></DisplayTablePositions>}
+          />
+        </Row>
+      ) : null}
     </CenteredCard>
   )
 }
