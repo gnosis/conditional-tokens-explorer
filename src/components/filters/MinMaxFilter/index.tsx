@@ -2,10 +2,9 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { ButtonFilterSubmit } from 'components/buttons/ButtonFilterSubmit'
+import { ErrorContainer, Error as ErrorMessage } from 'components/pureStyledComponents/Error'
 import { FilterTitle } from 'components/pureStyledComponents/FilterTitle'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
-import { Error as ErrorMessage, ErrorContainer } from 'components/pureStyledComponents/Error'
-
 
 const Wrapper = styled.div``
 
@@ -48,7 +47,7 @@ const TextFieldStyled = styled(Textfield)`
 interface Props {
   onChangeMin?: (event: React.ChangeEvent<HTMLInputElement>) => void
   onChangeMax?: (event: React.ChangeEvent<HTMLInputElement>) => void
-  onSubmit: (min:number, max:number) => void
+  onSubmit: (min: number, max: number) => void
   title: string
 }
 
@@ -73,15 +72,18 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
   }
 
   const onSubmitInternal = () => {
-    if(min && max) onSubmit(min, max)
+    if (min && max) onSubmit(min, max)
   }
 
   // This clear the filters
   React.useEffect(() => {
-    if(!min || !max) onSubmit(0, 0)
+    if (!min || !max) onSubmit(0, 0)
   }, [min, max, onSubmit])
 
-  const errorMessage = React.useMemo(() => (min && max && max < min) ? 'Max should be greater than Min': null, [min, max])
+  const errorMessage = React.useMemo(
+    () => (min && max && max < min ? 'Max should be greater than Min' : null),
+    [min, max]
+  )
   const emptyValues = !min || !max
 
   return (
@@ -89,9 +91,19 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
       <FilterTitle>{title}</FilterTitle>
       <Row>
         <FieldsWrapper>
-          <TextFieldStyled name="min" onChange={onChangeMinInternal} placeholder="Min..." type="number" />
+          <TextFieldStyled
+            name="min"
+            onChange={onChangeMinInternal}
+            placeholder="Min..."
+            type="number"
+          />
           <Dash />
-          <TextFieldStyled name="max" onChange={onChangeMaxInternal} placeholder="Max..." type="number" />
+          <TextFieldStyled
+            name="max"
+            onChange={onChangeMaxInternal}
+            placeholder="Max..."
+            type="number"
+          />
         </FieldsWrapper>
         <ButtonFilterSubmit disabled={!!errorMessage || emptyValues} onClick={onSubmitInternal} />
       </Row>

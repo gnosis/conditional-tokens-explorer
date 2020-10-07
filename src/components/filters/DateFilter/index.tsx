@@ -1,7 +1,9 @@
+import moment from 'moment'
 import React from 'react'
 import styled from 'styled-components'
 
 import { ButtonFilterSubmit } from 'components/buttons/ButtonFilterSubmit'
+import { ErrorContainer, Error as ErrorMessage } from 'components/pureStyledComponents/Error'
 import { FilterTitle } from 'components/pureStyledComponents/FilterTitle'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
 
@@ -38,14 +40,55 @@ const Date = styled(Textfield)`
 `
 
 interface Props {
-  onChangeFrom: () => void
-  onChangeTo: () => void
-  onSubmit: () => void
+  onChangeFrom?: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onChangeTo?: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onSubmit: (from: number, to: number) => void
   title: string
 }
 
 export const DateFilter: React.FC<Props> = (props) => {
   const { onChangeFrom, onChangeTo, onSubmit, title } = props
+
+  const [from, setFrom] = React.useState<Maybe<number>>(null)
+  const [to, setTo] = React.useState<Maybe<number>>(null)
+
+  const onChangeFromInternal = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (typeof onChangeFrom === 'function') {
+      onChangeFrom(event)
+    }
+
+    const fromDateMoment = moment(event.currentTarget.value)
+    const fromTimestamp = fromDateMoment.unix()
+
+    setFrom(fromTimestamp)
+  }
+
+  const onChangeToInternal = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (typeof onChangeTo === 'function') {
+      onChangeTo(event)
+    }
+
+    const toDateMoment = moment(event.currentTarget.value)
+    const toTimestamp = toDateMoment.unix()
+
+    setTo(toTimestamp)
+  }
+
+  const onSubmitInternal = () => {
+    console.log(from, to)
+    if (from && to) onSubmit(from, to)
+  }
+
+  // This clear the filters
+  React.useEffect(() => {
+    if (!from || !to) onSubmit(0, 0)
+  }, [from, to, onSubmit])
+
+  const errorMessage = React.useMemo(
+    () => (to && from && to < from ? 'To should be greater than From' : null),
+    [from, to]
+  )
+  const emptyValues = !from || !to
 
   return (
     <Wrapper>
@@ -53,16 +96,21 @@ export const DateFilter: React.FC<Props> = (props) => {
       <Row>
         <FieldWrapper>
           <Label>From:</Label>
-          <Date name="dateFrom" onChange={onChangeFrom} type="date" />
+          <Date name="dateFrom" onChange={onChangeFromInternal} type="date" />
         </FieldWrapper>
       </Row>
       <Row>
         <FieldWrapper>
           <Label>To:</Label>
-          <Date name="dateTo" onChange={onChangeTo} type="date" />
+          <Date name="dateTo" onChange={onChangeToInternal} type="date" />
         </FieldWrapper>
-        <ButtonFilterSubmit onClick={onSubmit} />
+        <ButtonFilterSubmit disabled={!!errorMessage || emptyValues} onClick={onSubmitInternal} />
       </Row>
+      {errorMessage && (
+        <ErrorContainer>
+          <ErrorMessage>{errorMessage}</ErrorMessage>
+        </ErrorContainer>
+      )}
     </Wrapper>
   )
 }

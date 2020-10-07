@@ -1,3 +1,4 @@
+import moment from 'moment'
 import React, { KeyboardEvent, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useHistory } from 'react-router-dom'
@@ -26,7 +27,6 @@ import {
   MIN_OUTCOMES,
 } from 'config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import moment from 'moment'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'

@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers/utils'
+import { Moment } from 'moment'
 
 import { NetworkConfig } from 'config/networkConfig'
-import { Moment } from 'moment'
 
 export interface Question {
   id: string
@@ -200,6 +200,11 @@ export interface MinMaxOutcomesOptions {
   max: number
 }
 
+export interface FromToCreationDateOptions {
+  from: number
+  to: number
+}
+
 export interface AdvancedFilter {
   ReporterOracle: {
     type: OracleFilterOptions
@@ -207,4 +212,5 @@ export interface AdvancedFilter {
   }
   Status: StatusOptions
   MinMaxOutcomes: Maybe<MinMaxOutcomesOptions>
+  FromToCreationDate: Maybe<FromToCreationDateOptions>
 }

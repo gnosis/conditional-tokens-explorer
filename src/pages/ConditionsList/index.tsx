@@ -31,14 +31,15 @@ import { customStyles } from 'theme/tableCustomStyles'
 import { Conditions_conditions } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
 import {
+  AdvancedFilter,
   ConditionType,
   ConditionTypeAll,
+  FromToCreationDateOptions,
   LocalStorageManagement,
+  MinMaxOutcomesOptions,
   OracleFilterOptions,
   StatusOptions,
   ValidityOptions,
-  AdvancedFilter,
-  MinMaxOutcomesOptions,
 } from 'util/types'
 
 const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
@@ -59,7 +60,12 @@ export const ConditionsList: React.FC = () => {
     OracleFilterOptions.All
   )
   const [selectedStatus, setSelectedStatus] = useState<StatusOptions>(StatusOptions.All)
-  const [selectedMinMaxOutcomes, setSelectedMinMaxOutcomes] = useState<Maybe<MinMaxOutcomesOptions>>(null)
+  const [selectedMinMaxOutcomes, setSelectedMinMaxOutcomes] = useState<
+    Maybe<MinMaxOutcomesOptions>
+  >(null)
+  const [selectedFromToCreationDate, setSelectedFromToCreationDate] = useState<
+    Maybe<FromToCreationDateOptions>
+  >(null)
   const [selectedConditionType, setSelectedConditionType] = useState<
     ConditionType | ConditionTypeAll
   >(ConditionTypeAll.all)
@@ -86,10 +92,11 @@ export const ConditionsList: React.FC = () => {
   const advancedFilters: AdvancedFilter = {
     ReporterOracle: {
       type: selectedOracleValue,
-      value: selectedOracleFilter
+      value: selectedOracleFilter,
     },
     Status: selectedStatus,
-    MinMaxOutcomes: selectedMinMaxOutcomes
+    MinMaxOutcomes: selectedMinMaxOutcomes,
+    FromToCreationDate: selectedFromToCreationDate,
   }
 
   const { data, error, loading } = useConditionsList(advancedFilters)
@@ -279,7 +286,7 @@ export const ConditionsList: React.FC = () => {
               <SidebarRow>
                 <MinMaxFilter
                   onSubmit={(min, max) => {
-                    const value = min && max ? {min, max} : null
+                    const value = min && max ? { min, max } : null
                     setSelectedMinMaxOutcomes(value)
                   }}
                   title="Number Of Outcomes"
@@ -287,14 +294,9 @@ export const ConditionsList: React.FC = () => {
               </SidebarRow>
               <SidebarRow>
                 <DateFilter
-                  onChangeFrom={() => {
-                    console.error('onChangeFrom not yet implemented...')
-                  }}
-                  onChangeTo={() => {
-                    console.error('onChangeTo not yet implemented...')
-                  }}
-                  onSubmit={() => {
-                    console.error('Filter by date not implemented yet...')
+                  onSubmit={(from, to) => {
+                    const value = to && from ? { from, to } : null
+                    setSelectedFromToCreationDate(value)
                   }}
                   title="Creation Date"
                 />

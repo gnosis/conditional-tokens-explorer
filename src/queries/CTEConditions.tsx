@@ -1,5 +1,6 @@
 import gql from 'graphql-tag'
-import { OracleFilterOptions, AdvancedFilter, StatusOptions } from 'util/types'
+
+import { AdvancedFilter, OracleFilterOptions, StatusOptions } from 'util/types'
 
 export interface ConditionsListType {
   conditionId?: string
@@ -16,10 +17,11 @@ export const DEFAULT_OPTIONS = {
 export const DEFAULT_OPTIONS_LIST: AdvancedFilter = {
   ReporterOracle: {
     type: OracleFilterOptions.All,
-    value: []
+    value: [],
   },
   Status: StatusOptions.All,
-  MinMaxOutcomes: null
+  MinMaxOutcomes: null,
+  FromToCreationDate: null,
 }
 
 const conditionFragment = gql`
@@ -45,13 +47,20 @@ const conditionFragment = gql`
   }
 `
 export const buildQueryConditionsList = (advancedFilter: AdvancedFilter = DEFAULT_OPTIONS_LIST) => {
-  const { ReporterOracle, Status, MinMaxOutcomes } = advancedFilter
+  const { FromToCreationDate, MinMaxOutcomes, ReporterOracle, Status } = advancedFilter
 
   const whereClauseInternal = [
     ReporterOracle.type === OracleFilterOptions.Custom ? 'oracle_not_in: $oracleNotIn' : '',
-    ReporterOracle.type === OracleFilterOptions.Current || ReporterOracle.type === OracleFilterOptions.Kleros || ReporterOracle.type === OracleFilterOptions.Realitio ? 'oracle_in: $oracleIn' : '',
+    ReporterOracle.type === OracleFilterOptions.Current ||
+    ReporterOracle.type === OracleFilterOptions.Kleros ||
+    ReporterOracle.type === OracleFilterOptions.Realitio
+      ? 'oracle_in: $oracleIn'
+      : '',
     Status === StatusOptions.Open || Status === StatusOptions.Resolved ? 'resolved: $resolved' : '',
     MinMaxOutcomes ? 'outcomeSlotCount_lte: $maxOutcome , outcomeSlotCount_gte: $minOutcome' : '',
+    FromToCreationDate
+      ? 'createTimestamp_lte: $toCreationDate , createTimestamp_gte: $fromCreationDate'
+      : '',
   ]
     .filter((s) => s.length)
     .join(',')
@@ -60,9 +69,14 @@ export const buildQueryConditionsList = (advancedFilter: AdvancedFilter = DEFAUL
 
   const variablesClauseInternal = [
     ReporterOracle.type === OracleFilterOptions.Custom ? '$oracleNotIn: [String]' : '',
-    ReporterOracle.type === OracleFilterOptions.Current || ReporterOracle.type === OracleFilterOptions.Kleros || ReporterOracle.type === OracleFilterOptions.Realitio ? '$oracleIn: [String]' : '',
+    ReporterOracle.type === OracleFilterOptions.Current ||
+    ReporterOracle.type === OracleFilterOptions.Kleros ||
+    ReporterOracle.type === OracleFilterOptions.Realitio
+      ? '$oracleIn: [String]'
+      : '',
     Status === StatusOptions.Open || Status === StatusOptions.Resolved ? '$resolved: Boolean' : '',
     MinMaxOutcomes ? '$maxOutcome: Int,$minOutcome: Int' : '',
+    FromToCreationDate ? '$toCreationDate: BigInt,$fromCreationDate: BigInt' : '',
   ]
     .filter((s) => s.length)
     .join(',')

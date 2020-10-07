@@ -13,7 +13,7 @@ interface Props {
 }
 
 export const OraclesFilterDropdown = ({ onClick, value }: Props) => {
-  const { networkConfig, address } = useWeb3ConnectedOrInfura()
+  const { address, networkConfig } = useWeb3ConnectedOrInfura()
   const oracles: Oracle[] = networkConfig.getOracles()
 
   const oraclesAdresses: string[] = oracles.map((oracle: Oracle) => oracle.address)
