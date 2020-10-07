@@ -30,9 +30,9 @@ export const Wrapper = styled.div<{ lastInRow?: string }>`
 
 export const OutcomeCircle = styled.div`
   align-items: center;
-  background-color: ${(props) => props.theme.colors.darkerGray};
+  background-color: ${(props) => props.theme.colors.darkerGrey};
   border-radius: 50%;
-  border: 2px solid ${(props) => props.theme.colors.darkerGray};
+  border: 2px solid ${(props) => props.theme.colors.darkerGrey};
   color: #fff;
   display: flex;
   font-size: 13px;
@@ -53,7 +53,7 @@ const OutcomeNumber = styled.span`
 `
 
 const OutcomeHorizontalLine = styled.div`
-  background-color: ${(props) => props.theme.colors.darkerGray};
+  background-color: ${(props) => props.theme.colors.darkerGrey};
   flex-grow: 1;
   flex-shrink: 1;
   height: 2px;
@@ -61,7 +61,7 @@ const OutcomeHorizontalLine = styled.div`
 `
 
 const OutcomeVerticalLine = styled.div`
-  background-color: ${(props) => props.theme.colors.darkerGray};
+  background-color: ${(props) => props.theme.colors.darkerGrey};
   display: none;
   height: 10px;
   left: 50%;
@@ -128,8 +128,8 @@ const BaseOutcome: React.FC<Props> = (props) => {
        */}
       {!disableTooltip && (
         <ReactTooltip
-          arrowColor={theme.colors.darkerGray}
-          backgroundColor={theme.colors.darkerGray}
+          arrowColor={theme.colors.darkerGrey}
+          backgroundColor={theme.colors.darkerGrey}
           border={false}
           className="customTooltip outcomeTooltip"
           delayHide={100}
@@ -160,7 +160,7 @@ export const DraggableOutcome = styled(Outcome)`
 
     &.isDragging {
       background-color: #fff;
-      border-color: ${(props) => props.theme.colors.darkerGray};
+      border-color: ${(props) => props.theme.colors.darkerGrey};
       cursor: move;
     }
   }

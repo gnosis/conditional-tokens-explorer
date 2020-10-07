@@ -15,6 +15,7 @@ import {
   DropdownPosition,
 } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
+import { Tooltip } from 'components/common/Tooltip'
 import { DisplayConditionsTableModal } from 'components/modals/DisplayConditionsTableModal'
 import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
 import { UnwrapModal } from 'components/modals/UnwrapModal'
@@ -50,7 +51,7 @@ import {
 } from 'util/types'
 
 const CollateralText = styled.span`
-  color: ${(props) => props.theme.colors.darkerGray};
+  color: ${(props) => props.theme.colors.darkerGrey};
   font-size: 15px;
   font-weight: 400;
   line-height: 1.2;
@@ -113,6 +114,13 @@ const InternalLink = styled(NavLink)`
 
 const Link = styled.a`
   ${LinkCSS}
+`
+
+const TooltipStyled = styled(Tooltip)`
+  cursor: pointer;
+  margin: 0 0 0 8px;
+  position: relative;
+  top: -1px;
 `
 
 interface Props {
@@ -468,7 +476,13 @@ export const Contents = (props: Props) => {
                     {balanceERC20.isZero() ? (
                       <i>None.</i>
                     ) : (
-                      `${formatBigNumber(balanceERC20, ERC1155Decimals)} ${ERC20Symbol}`
+                      <>
+                        {`${formatBigNumber(balanceERC20, ERC1155Decimals)} ${ERC20Symbol}`}
+                        <TooltipStyled
+                          id="balanceERC20"
+                          text="Wrapped ERC-1155 (Wrapped Multi Token)"
+                        />
+                      </>
                     )}
                   </CollateralTextAmount>
                 </CollateralText>

@@ -35,12 +35,12 @@ const DropdownButton = styled.div`
 
   &:hover {
     .addressText {
-      color: ${(props) => props.theme.colors.darkerGray};
+      color: ${(props) => props.theme.colors.darkerGrey};
     }
 
     .chevronDown {
       .fill {
-        fill: ${(props) => props.theme.colors.darkerGray};
+        fill: ${(props) => props.theme.colors.darkerGrey};
       }
     }
   }
@@ -97,7 +97,7 @@ const DropdownItemStyled = styled(DropdownItem)`
 const Item = styled.div`
   align-items: center;
   border-bottom: 1px solid ${(props) => props.theme.dropdown.item.borderColor};
-  color: ${(props) => props.theme.colors.darkerGray};
+  color: ${(props) => props.theme.colors.darkerGrey};
   display: flex;
   font-size: 13px;
   justify-content: space-between;

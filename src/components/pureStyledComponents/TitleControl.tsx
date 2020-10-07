@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 
 const TitleControlCSS = css`
-  color: ${(props) => props.theme.colors.darkerGray};
+  color: ${(props) => props.theme.colors.darkerGrey};
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
