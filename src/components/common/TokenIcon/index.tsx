@@ -149,12 +149,17 @@ export const TokenIcon: React.FC<Props> = (props) => {
       }
       if (!cancelled) setIsTokenChecked(true)
     }
-    CheckTokenAvailability()
+
+    if (!currencyData) {
+      CheckTokenAvailability()
+    } else {
+      if (!cancelled) setIsTokenChecked(true)
+    }
 
     return () => {
       cancelled = true
     }
-  }, [customImageUrl])
+  }, [currencyData, customImageUrl])
 
   return (
     <>

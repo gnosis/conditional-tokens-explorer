@@ -7,7 +7,7 @@ export interface PositionsListType {
 }
 
 export const DEFAULT_OPTIONS = {
-  conditionIds: [],
+  conditionsIds: [],
   positionId: '',
   collateral: '',
 }
