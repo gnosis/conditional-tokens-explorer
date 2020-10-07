@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
-import { BigNumberInput } from 'components/common/BigNumberInput'
+import { BigNumberInput } from 'components/form/BigNumberInput'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { ZERO_BN } from 'config/constants'
 
