@@ -3,8 +3,8 @@ import styled from 'styled-components'
 
 import { Button } from 'components/buttons/Button'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
-import { StatusInfoInline, StatusInfoType } from 'components/common/StatusInfoInline'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { StatusInfoInline, StatusInfoType } from 'components/statusInfo/StatusInfoInline'
 
 const Wrapper = styled.div`
   align-items: center;

@@ -58,10 +58,10 @@ export const customStyles: IDataTableStyles = {
     selectedHighlightStyle: {
       backgroundColor: theme.colors.whitesmoke3,
       borderBottomColor: `${theme.colors.lightGrey}`,
-      color: theme.colors.darkerGray,
+      color: theme.colors.darkerGrey,
     },
     highlightOnHoverStyle: {
-      color: theme.colors.darkerGray,
+      color: theme.colors.darkerGrey,
       backgroundColor: theme.colors.whitesmoke3,
       transitionDuration: '0.15s',
       transitionProperty: 'background-color',

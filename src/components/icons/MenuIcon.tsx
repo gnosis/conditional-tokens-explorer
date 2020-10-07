@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 const Wrapper = styled.svg`
   .fill {
-    fill: ${(props) => props.theme.colors.darkerGray};
+    fill: ${(props) => props.theme.colors.darkerGrey};
   }
 `
 

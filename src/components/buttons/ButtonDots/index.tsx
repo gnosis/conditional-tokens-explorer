@@ -29,7 +29,7 @@ const Wrapper = styled.button`
 
     svg {
       .fill {
-        fill: ${(props) => props.theme.colors.darkerGray};
+        fill: ${(props) => props.theme.colors.darkerGrey};
       }
     }
   }

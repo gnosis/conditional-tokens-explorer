@@ -285,6 +285,19 @@ export class NetworkConfig {
     return networkId === 1 || networkId === 4 || networkId === 50
   }
 
+  getNetworkName(): string {
+    switch (this.networkId) {
+      case NetworkIds.MAINNET:
+        return 'mainnet'
+      case NetworkIds.RINKEBY:
+        return 'rinkeby'
+      case NetworkIds.GANACHE:
+        return 'ganache'
+      default:
+        return 'unknown'
+    }
+  }
+
   getConditionalTokensAddress(): string {
     return networks[this.networkId].contracts.conditionalTokensAddress
   }

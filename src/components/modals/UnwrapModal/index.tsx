@@ -63,6 +63,7 @@ export const UnwrapModal: React.FC<Props> = (props) => {
       <FirstRow cols="1fr">
         <Amount
           amount={amount}
+          autoFocus
           balance={maxBalance}
           decimals={decimals}
           isFromAPosition

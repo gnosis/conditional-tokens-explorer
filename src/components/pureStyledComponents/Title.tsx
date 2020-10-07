@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 
 export const Title = styled.h2`
-  color: ${(props) => props.theme.colors.darkerGray};
+  color: ${(props) => props.theme.colors.darkerGrey};
   font-size: 16px;
   font-weight: 600;
   line-height: 1.3;
@@ -10,7 +10,7 @@ export const Title = styled.h2`
   text-transform: uppercase;
 
   a {
-    color: ${(props) => props.theme.colors.darkerGray};
+    color: ${(props) => props.theme.colors.darkerGrey};
     text-decoration: underline;
 
     &:hover {

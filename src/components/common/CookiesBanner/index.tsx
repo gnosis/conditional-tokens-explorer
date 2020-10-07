@@ -32,7 +32,7 @@ const Content = styled.div`
 `
 
 const Text = styled.p`
-  color: ${(props) => props.theme.colors.darkerGray};
+  color: ${(props) => props.theme.colors.darkerGrey};
   font-size: 17px;
   font-weight: normal;
   line-height: 1.4;
@@ -46,7 +46,7 @@ const Text = styled.p`
 `
 
 const Link = styled(NavLink)`
-  color: ${(props) => props.theme.colors.darkerGray};
+  color: ${(props) => props.theme.colors.darkerGrey};
   text-decoration: underline;
 
   &:hover {
