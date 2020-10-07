@@ -10,7 +10,7 @@ import {
   GetMultiPositions_positions,
   GetPosition_position,
 } from 'types/generatedGQLForCTE'
-import { CollateralErrors, ConditionErrors, NetworkIds, PositionErrors, Token } from 'util/types'
+import { CollateralErrors, ConditionErrors, PositionErrors, Token } from 'util/types'
 
 export const isAddress = (address: string) => {
   try {
@@ -380,16 +380,3 @@ export const isPartitionFullIndexSet = (
 
 export const capitalize = (str: string): string =>
   str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
-
-export const getNetworkName = (networdId: number) => {
-  switch (networdId) {
-    case NetworkIds.MAINNET:
-      return 'mainnet'
-    case NetworkIds.RINKEBY:
-      return 'rinkeby'
-    case NetworkIds.GANACHE:
-      return 'ganache'
-    default:
-      return 'unknown'
-  }
-}

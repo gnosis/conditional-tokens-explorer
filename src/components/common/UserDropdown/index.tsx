@@ -6,8 +6,8 @@ import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
 import { ChevronDown } from 'components/icons/ChevronDown'
 import { Pill } from 'components/pureStyledComponents/Pill'
-import { Connected, useWeb3Connected } from 'contexts/Web3Context'
-import { getNetworkName, truncateStringInTheMiddle } from 'util/tools'
+import { useWeb3Connected } from 'contexts/Web3Context'
+import { truncateStringInTheMiddle } from 'util/tools'
 
 const Wrapper = styled(Dropdown)`
   align-items: center;
@@ -128,22 +128,18 @@ const StatusPill = styled(Pill)`
   padding-left: 8px;
   padding-right: 8px;
 `
-
-interface UserDropdownProps {
-  data: Connected
-}
-
-const getWalletName = (data: Connected): string => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const getWalletName = (provider: any): string => {
   const isMetaMask =
-    Object.prototype.hasOwnProperty.call(data.provider._web3Provider, 'isMetaMask') &&
-    data.provider._web3Provider.isMetaMask
-  const isWalletConnect = Object.prototype.hasOwnProperty.call(data.provider._web3Provider, 'wc')
+    Object.prototype.hasOwnProperty.call(provider._web3Provider, 'isMetaMask') &&
+    provider._web3Provider.isMetaMask
+  const isWalletConnect = Object.prototype.hasOwnProperty.call(provider._web3Provider, 'wc')
 
   return isMetaMask ? 'MetaMask' : isWalletConnect ? 'WalletConnect' : 'Unknown'
 }
 
-const UserDropdownButton: React.FC<UserDropdownProps> = ({ data }) => {
-  const { address, networkConfig } = data
+const UserDropdownButton = () => {
+  const { address, networkConfig } = useWeb3Connected()
 
   return (
     <DropdownButton>
@@ -156,15 +152,15 @@ const UserDropdownButton: React.FC<UserDropdownProps> = ({ data }) => {
       {networkConfig.networkId && (
         <Network>
           <NetworkStatus />
-          <NetworkText>{getNetworkName(networkConfig.networkId)}</NetworkText>
+          <NetworkText>{networkConfig.getNetworkName()}</NetworkText>
         </Network>
       )}
     </DropdownButton>
   )
 }
 
-const UserDropdownContent: React.FC<UserDropdownProps> = ({ data }) => {
-  const { networkConfig } = data
+const UserDropdownContent = () => {
+  const { disconnect, networkConfig, provider } = useWeb3Connected()
 
   const items = [
     {
@@ -173,11 +169,11 @@ const UserDropdownContent: React.FC<UserDropdownProps> = ({ data }) => {
     },
     {
       title: 'Wallet',
-      value: getWalletName(data),
+      value: getWalletName(provider),
     },
     {
       title: 'Network',
-      value: getNetworkName(networkConfig.networkId),
+      value: networkConfig.getNetworkName(),
     },
   ]
 
@@ -195,7 +191,7 @@ const UserDropdownContent: React.FC<UserDropdownProps> = ({ data }) => {
         <DisconnectButton
           buttonType={ButtonType.danger}
           onClick={() => {
-            data.disconnect()
+            disconnect()
           }}
         >
           Disconnect
@@ -206,17 +202,16 @@ const UserDropdownContent: React.FC<UserDropdownProps> = ({ data }) => {
 }
 
 export const UserDropdown: React.FC = (props) => {
-  const data = useWeb3Connected()
   const headerDropdownItems = [
     <DropdownItemStyled key="1">
-      <UserDropdownContent data={data} />
+      <UserDropdownContent />
     </DropdownItemStyled>,
   ]
 
   return (
     <Wrapper
       activeItemHighlight={false}
-      dropdownButtonContent={<UserDropdownButton data={data} />}
+      dropdownButtonContent={<UserDropdownButton />}
       dropdownPosition={DropdownPosition.right}
       items={headerDropdownItems}
       {...props}
