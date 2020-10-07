@@ -1,5 +1,5 @@
 const darkGrey = '#5d6d74'
-const darkerGray = '#445055'
+const darkerGrey = '#445055'
 const error = '#db3a3d'
 const errorDark = '#BC3033'
 const lightGrey = '#d4d5d3'
@@ -56,7 +56,7 @@ const theme = {
   colors: {
     darkBlue: '#001428',
     darkGrey: darkGrey,
-    darkerGray: darkerGray,
+    darkerGrey: darkerGrey,
     darkestGray: '#081728',
     delete: error,
     error: error,
@@ -81,7 +81,7 @@ const theme = {
       backgroundColorHover: whitesmoke3,
       borderColor: lightGrey,
       color: textColor,
-      colorActive: darkerGray,
+      colorActive: darkerGrey,
       height: '40px',
       paddingHorizontal: '12px',
     },

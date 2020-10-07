@@ -8,7 +8,7 @@ const Wrapper = styled.div<{ flexDirection?: string }>`
 `
 
 const Title = styled.h2<{ flexDirection?: string }>`
-  margin: ${(props) => (props.flexDirection === 'column' ? '0 0 10px 0' : '0 5px 0 0')};
+  margin: ${(props) => (props.flexDirection === 'column' ? '0 0 5px 0' : '0 5px 0 0')};
 
   @media (min-width: ${(props) => props.theme.themeBreakPoints.md}) {
     align-items: center;
@@ -18,7 +18,7 @@ const Title = styled.h2<{ flexDirection?: string }>`
 `
 
 const TitleText = styled.div`
-  color: ${(props) => props.theme.colors.darkerGray};
+  color: ${(props) => props.theme.colors.darkerGrey};
   font-size: 16px;
   font-weight: 600;
   line-height: 1.2;

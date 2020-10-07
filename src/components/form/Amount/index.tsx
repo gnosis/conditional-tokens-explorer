@@ -9,18 +9,20 @@ import { formatBigNumber } from 'util/tools'
 
 interface Props {
   amount: BigNumber
+  autoFocus?: boolean
   balance: BigNumber
   decimals: number
   disabled?: boolean
+  isFromAPosition?: boolean
   max: string
   onAmountChange: (value: BigNumber) => void
   onUseWalletBalance: () => void
   tokenSymbol?: string
-  isFromAPosition?: boolean
 }
 
 export const Amount = ({
   amount,
+  autoFocus,
   balance,
   decimals,
   disabled,
@@ -49,6 +51,7 @@ export const Amount = ({
       }
       value={
         <BigNumberInputWrapper
+          autoFocus={autoFocus}
           decimals={decimals}
           disabled={disabled}
           max={max}
