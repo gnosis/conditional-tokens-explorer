@@ -24,7 +24,7 @@ import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { CellHash } from 'components/table/CellHash'
 import { TableControls } from 'components/table/TableControls'
-import { useConditions } from 'hooks/useConditions'
+import { useConditionsList } from 'hooks/useConditionsList'
 import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { customStyles } from 'theme/tableCustomStyles'
@@ -37,6 +37,8 @@ import {
   OracleFilterOptions,
   StatusOptions,
   ValidityOptions,
+  AdvancedFilter,
+  MinMaxOutcomesOptions,
 } from 'util/types'
 
 const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
@@ -57,6 +59,7 @@ export const ConditionsList: React.FC = () => {
     OracleFilterOptions.All
   )
   const [selectedStatus, setSelectedStatus] = useState<StatusOptions>(StatusOptions.All)
+  const [selectedMinMaxOutcomes, setSelectedMinMaxOutcomes] = useState<Maybe<MinMaxOutcomesOptions>>(null)
   const [selectedConditionType, setSelectedConditionType] = useState<
     ConditionType | ConditionTypeAll
   >(ConditionTypeAll.all)
@@ -80,11 +83,16 @@ export const ConditionsList: React.FC = () => {
     debouncedHandlerConditionToSearch('')
   }, [debouncedHandlerConditionToSearch])
 
-  const { data, error, loading } = useConditions({
-    conditionId: conditionIdToSearch,
-    oracleValue: selectedOracleValue,
-    oracleFilter: selectedOracleFilter,
-  })
+  const advancedFilters: AdvancedFilter = {
+    ReporterOracle: {
+      type: selectedOracleValue,
+      value: selectedOracleFilter
+    },
+    Status: selectedStatus,
+    MinMaxOutcomes: selectedMinMaxOutcomes
+  }
+
+  const { data, error, loading } = useConditionsList(advancedFilters)
 
   const isLoading = !conditionIdToSearch && loading
   const isSearching = conditionIdToSearch && loading
@@ -270,14 +278,9 @@ export const ConditionsList: React.FC = () => {
               </SidebarRow>
               <SidebarRow>
                 <MinMaxFilter
-                  onChangeMax={() => {
-                    console.error('onChangeMax not yet implemented...')
-                  }}
-                  onChangeMin={() => {
-                    console.error('onChangeMin not yet implemented...')
-                  }}
-                  onSubmit={() => {
-                    console.error('Number Of Outcomes filter not implemented yet...')
+                  onSubmit={(min, max) => {
+                    const value = min && max ? {min, max} : null
+                    setSelectedMinMaxOutcomes(value)
                   }}
                   title="Number Of Outcomes"
                 />

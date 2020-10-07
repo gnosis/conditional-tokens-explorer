@@ -13,7 +13,7 @@ interface Props {
 }
 
 export const OraclesFilterDropdown = ({ onClick, value }: Props) => {
-  const { networkConfig } = useWeb3ConnectedOrInfura()
+  const { networkConfig, address } = useWeb3ConnectedOrInfura()
   const oracles: Oracle[] = networkConfig.getOracles()
 
   const oraclesAdresses: string[] = oracles.map((oracle: Oracle) => oracle.address)
@@ -29,8 +29,8 @@ export const OraclesFilterDropdown = ({ onClick, value }: Props) => {
     {
       text: 'Current Wallet',
       onClick: () => {
-        console.error('Filter By Current Wallet Not Implemented')
-        // onClick(OracleFilterOptions.Current, [])
+        const currentWallet = address ? [address] : []
+        onClick(OracleFilterOptions.Current, currentWallet)
       },
       value: OracleFilterOptions.Current,
     },
