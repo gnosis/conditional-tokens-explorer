@@ -35,12 +35,12 @@ export const DisplayTablePositionsWrapper = (props: PropsWrapper) => {
     }
   }, [loading, collateralFetched, positionIds, collateral])
 
-  return (
+  return !loading ? (
     <DisplayTablePositions
       callbackOnHistoryPush={callbackOnHistoryPush}
       positions={positions as PositionWithUserBalanceWithDecimals[]}
     ></DisplayTablePositions>
-  )
+  ) : null
 }
 
 interface Props {
