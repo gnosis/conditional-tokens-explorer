@@ -454,7 +454,6 @@ export const PrepareCondition = () => {
             icon={fullLoadingIcon}
             message={fullLoadingMessage}
             title={fullLoadingTitle}
-            // width={'400px'}
           />
         )}
         {error && (

@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import styled from 'styled-components'
 
 import { Button } from 'components/buttons/Button'
+import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { Modal } from 'components/common/Modal'
 import { SetAllowance } from 'components/common/SetAllowance'
@@ -233,10 +234,19 @@ export const Form = ({
 
   const outcomesByRow = '14'
 
-  const fullLoadingActionButton =
-    status.isSuccess() || status.isFailure()
-      ? { text: 'OK', onClick: () => setStatus(Remote.notAsked<SplitStatus>()) }
-      : undefined
+  const fullLoadingActionButton = status.isSuccess()
+    ? {
+        buttonType: ButtonType.primary,
+        onClick: () => setStatus(Remote.notAsked<SplitStatus>()),
+        text: 'OK',
+      }
+    : status.isFailure()
+    ? {
+        buttonType: ButtonType.danger,
+        text: 'OK',
+        onClick: () => setStatus(Remote.notAsked<SplitStatus>()),
+      }
+    : undefined
 
   const fullLoadingIcon = status.isFailure()
     ? IconTypes.error
@@ -361,7 +371,6 @@ export const Form = ({
           icon={fullLoadingIcon}
           message={fullLoadingMessage}
           title={status.isFailure() ? 'Error' : 'Split positions'}
-          width={status.isFailure() ? '600px' : undefined}
         />
       )}
       {status.isSuccess() && (
