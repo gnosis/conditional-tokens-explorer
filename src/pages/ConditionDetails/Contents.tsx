@@ -11,7 +11,6 @@ import { FlexRow } from 'components/pureStyledComponents/FlexRow'
 import { Pill, PillTypes } from 'components/pureStyledComponents/Pill'
 import { Row } from 'components/pureStyledComponents/Row'
 import { StripedList, StripedListItem } from 'components/pureStyledComponents/StripedList'
-import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { TitleValue } from 'components/text/TitleValue'
 import { INFORMATION_NOT_AVAILABLE } from 'config/constants'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
@@ -181,16 +180,12 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           valueUppercase={isConditionFromOmen ? false : true}
         />
       </Row>
-      {!loadingPositions ? (
-        <Row>
-          <TitleValue
-            title={"Condition's split positions"}
-            value={<DisplayTablePositions positions={positions || []}></DisplayTablePositions>}
-          />
-        </Row>
-      ) : (
-        <InlineLoading></InlineLoading>
-      )}
+      <Row cols="1fr">
+        <TitleValue
+          title={"Condition's split positions"}
+          value={<DisplayTablePositions isLoading={loadingPositions} positions={positions || []} />}
+        />
+      </Row>
     </CenteredCard>
   )
 }

@@ -4,6 +4,7 @@ import { useHistory } from 'react-router-dom'
 
 import { TokenIcon } from 'components/common/TokenIcon'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
+import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { CellHash } from 'components/table/CellHash'
 import { PositionWithUserBalanceWithDecimals } from 'hooks'
 import { useCollateral } from 'hooks/useCollateral'
@@ -45,11 +46,12 @@ export const DisplayTablePositionsWrapper = (props: PropsWrapper) => {
 
 interface Props {
   callbackOnHistoryPush?: () => void
+  isLoading?: boolean
   positions: PositionWithUserBalanceWithDecimals[]
 }
 
 export const DisplayTablePositions = (props: Props) => {
-  const { callbackOnHistoryPush, positions } = props
+  const { callbackOnHistoryPush, isLoading, positions } = props
   const history = useHistory()
 
   const handleRowClick = useCallback(
@@ -110,11 +112,17 @@ export const DisplayTablePositions = (props: Props) => {
 
   return (
     <DataTable
-      className="outerTableWrapper inlineTable"
+      className="outerTableWrapper inlineTable noMarginBottom"
       columns={getColumns()}
       customStyles={customStyles}
-      data={positions || []}
-      noDataComponent={<EmptyContentText>No positions found.</EmptyContentText>}
+      data={isLoading ? [] : positions.length ? positions : []}
+      noDataComponent={
+        isLoading ? (
+          <InlineLoading size="30px" />
+        ) : (
+          <EmptyContentText>No positions found.</EmptyContentText>
+        )
+      }
       noHeader
       pagination
       paginationPerPage={5}

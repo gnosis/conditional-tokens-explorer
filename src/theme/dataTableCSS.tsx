@@ -13,6 +13,10 @@ export const dataTableCSS = css`
     flex-grow: 0;
     min-height: 400px;
 
+    &.noMarginBottom {
+      margin-bottom: 0 !important;
+    }
+
     &.inlineTable {
       border: 1px solid ${(props) => props.theme.colors.lightGrey};
       box-shadow: none;

@@ -201,7 +201,7 @@ export const SelectPositions = ({
                 ) : (
                   <StripedListEmpty>
                     {isLoading && errors.length === 0 ? (
-                      <InlineLoading height="30px" width="30px" />
+                      <InlineLoading size="30px" />
                     ) : (
                       'No positions.'
                     )}
