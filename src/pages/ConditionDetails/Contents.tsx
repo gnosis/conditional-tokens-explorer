@@ -156,7 +156,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
         </>
       )}
       <Row>
-        {isConditionFromOmen && (
+        {isConditionFromOmen && resolved && (
           <TitleValue
             title="Resolution Date"
             value={formatTS(resolveTimestamp) || INFORMATION_NOT_AVAILABLE}
