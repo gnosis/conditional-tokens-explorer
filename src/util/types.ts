@@ -194,3 +194,17 @@ export interface QuestionOptions {
   networkConfig: NetworkConfig
   signerAddress: string
 }
+
+export interface MinMaxOutcomesOptions {
+  min: number
+  max: number
+}
+
+export interface AdvancedFilter {
+  ReporterOracle: {
+    type: OracleFilterOptions
+    value: Array<string>
+  }
+  Status: StatusOptions
+  MinMaxOutcomes: Maybe<MinMaxOutcomesOptions>
+}
