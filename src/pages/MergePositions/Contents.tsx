@@ -200,10 +200,14 @@ export const Contents = () => {
       : undefined
 
   const fullLoadingIcon =
-    status === Status.Error ? IconTypes.error : Status.Loading ? IconTypes.spinner : undefined
+    status === Status.Error
+      ? IconTypes.error
+      : status === Status.Loading
+      ? IconTypes.spinner
+      : undefined
 
   const fullLoadingMessage =
-    status === Status.Error ? error?.message : Status.Loading ? 'Working...' : undefined
+    status === Status.Error ? error?.message : status === Status.Loading ? 'Working...' : undefined
 
   const fullLoadingTitle = status === Status.Error ? 'Error' : 'Merge Positions'
   const isWorking = status === Status.Loading || status === Status.Error
