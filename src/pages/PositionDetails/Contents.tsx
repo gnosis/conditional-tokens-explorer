@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 
@@ -231,6 +231,10 @@ export const Contents = (props: Props) => {
     () => (collateralERC20 && collateralERC20.symbol ? collateralERC20.symbol : ''),
     [collateralERC20]
   )
+
+  const wtmAddress = useMemo(() => (wrappedTokenAddress ? wrappedTokenAddress : ''), [
+    wrappedTokenAddress,
+  ])
 
   const onWrap = useCallback(
     async (transferValue: TransferOptions) => {
@@ -505,11 +509,11 @@ export const Contents = (props: Props) => {
               <i>None.</i>
             ) : (
               <FlexRow>
-                <Link href={getEtherscanTokenUrl(wrappedTokenAddress)}>
-                  {truncateStringInTheMiddle(wrappedTokenAddress, 8, 6)}
+                <Link href={getEtherscanTokenUrl(wtmAddress)}>
+                  {truncateStringInTheMiddle(wtmAddress, 8, 6)}
                 </Link>
-                <ButtonCopy value={wrappedTokenAddress} />
-                <ExternalLink href={getEtherscanTokenUrl(wrappedTokenAddress)} />
+                <ButtonCopy value={wtmAddress} />
+                <ExternalLink href={getEtherscanTokenUrl(wtmAddress)} />
               </FlexRow>
             )
           }
