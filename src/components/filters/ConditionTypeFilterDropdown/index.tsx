@@ -4,34 +4,38 @@ import { ButtonSelectLight } from 'components/buttons/ButtonSelectLight'
 import { DropdownItem, DropdownPosition } from 'components/common/Dropdown'
 import { FilterDropdown } from 'components/pureStyledComponents/FilterDropdown'
 import { FilterTitle } from 'components/pureStyledComponents/FilterTitle'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { ConditionType, ConditionTypeAll } from 'util/types'
 
 interface Props {
-  onClick: (value: ConditionType | ConditionTypeAll) => void
-  value: string
+  onClick: (value: ConditionType | ConditionTypeAll, filter: Maybe<string>) => void
+  value: Maybe<string>
 }
 
 export const ConditionTypeFilterDropdown: React.FC<Props> = (props) => {
+  const { networkConfig } = useWeb3ConnectedOrInfura()
   const { onClick, value } = props
+
+  const oracle = networkConfig.getOracleFromName('realitio' as KnownOracle)
 
   const dropdownItems = [
     {
       onClick: () => {
-        onClick(ConditionTypeAll.all)
+        onClick(ConditionTypeAll.all, null)
       },
       text: 'All',
       value: ConditionTypeAll.all,
     },
     {
       onClick: () => {
-        onClick(ConditionType.omen)
+        onClick(ConditionType.omen, oracle.address)
       },
       text: 'Omen',
       value: ConditionType.omen,
     },
     {
       onClick: () => {
-        onClick(ConditionType.custom)
+        onClick(ConditionType.custom, oracle.address)
       },
       text: 'Open',
       value: ConditionType.custom,

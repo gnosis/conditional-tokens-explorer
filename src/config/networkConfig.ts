@@ -352,6 +352,23 @@ export class NetworkConfig {
     }
   }
 
+  getOracleFromName(oracleName: KnownOracle): Oracle {
+    const oracles = networks[this.networkId].oracles
+
+    for (const oracle of oracles) {
+      if (oracle.name === oracleName) {
+        return oracle
+      }
+    }
+
+    return {
+      name: 'unknown',
+      description: 'Unknown',
+      url: '',
+      address: '',
+    }
+  }
+
   getArbitratorFromAddress(address: string): Oracle {
     const arbitrators = networks[this.networkId].arbitrators
 

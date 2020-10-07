@@ -66,7 +66,10 @@ export const ConditionsList: React.FC = () => {
   const [selectedFromToCreationDate, setSelectedFromToCreationDate] = useState<
     Maybe<FromToCreationDateOptions>
   >(null)
-  const [selectedConditionType, setSelectedConditionType] = useState<
+  const [selectedConditionTypeFilter, setSelectedConditionTypeFilter] = useState<Maybe<string>>(
+    null
+  )
+  const [selectedConditionTypeValue, setSelectedConditionTypeValue] = useState<
     ConditionType | ConditionTypeAll
   >(ConditionTypeAll.all)
   const [validity, setValidity] = useState<ValidityOptions>(ValidityOptions.All)
@@ -93,6 +96,10 @@ export const ConditionsList: React.FC = () => {
     ReporterOracle: {
       type: selectedOracleValue,
       value: selectedOracleFilter,
+    },
+    ConditionType: {
+      type: selectedConditionTypeValue,
+      value: selectedConditionTypeFilter,
     },
     Status: selectedStatus,
     MinMaxOutcomes: selectedMinMaxOutcomes,
@@ -277,10 +284,11 @@ export const ConditionsList: React.FC = () => {
               </SidebarRow>
               <SidebarRow>
                 <ConditionTypeFilterDropdown
-                  onClick={(value: ConditionType | ConditionTypeAll) => {
-                    setSelectedConditionType(value)
+                  onClick={(value: ConditionType | ConditionTypeAll, filter: Maybe<string>) => {
+                    setSelectedConditionTypeFilter(filter)
+                    setSelectedConditionTypeValue(value)
                   }}
-                  value={selectedConditionType}
+                  value={selectedConditionTypeValue}
                 />
               </SidebarRow>
               <SidebarRow>

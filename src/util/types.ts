@@ -210,6 +210,10 @@ export interface AdvancedFilter {
     type: OracleFilterOptions
     value: Array<string>
   }
+  ConditionType: {
+    type: ConditionType | ConditionTypeAll
+    value: Maybe<string>
+  }
   Status: StatusOptions
   MinMaxOutcomes: Maybe<MinMaxOutcomesOptions>
   FromToCreationDate: Maybe<FromToCreationDateOptions>

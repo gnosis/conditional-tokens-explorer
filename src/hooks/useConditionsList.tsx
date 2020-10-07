@@ -2,13 +2,19 @@ import { useQuery } from '@apollo/react-hooks'
 
 import { buildQueryConditionsList } from 'queries/CTEConditions'
 import { Conditions } from 'types/generatedGQLForCTE'
-import { AdvancedFilter, OracleFilterOptions, StatusOptions } from 'util/types'
+import { AdvancedFilter, ConditionType, OracleFilterOptions, StatusOptions } from 'util/types'
 
 /**
  * Return a array of conditions.
  */
 export const useConditionsList = (advancedFilter: AdvancedFilter) => {
-  const { FromToCreationDate, MinMaxOutcomes, ReporterOracle, Status } = advancedFilter
+  const {
+    ConditionType: ConditionTypeFilter,
+    FromToCreationDate,
+    MinMaxOutcomes,
+    ReporterOracle,
+    Status,
+  } = advancedFilter
 
   const query = buildQueryConditionsList(advancedFilter)
 
@@ -30,6 +36,13 @@ export const useConditionsList = (advancedFilter: AdvancedFilter) => {
   if (FromToCreationDate) {
     variables['fromCreationDate'] = FromToCreationDate.from
     variables['toCreationDate'] = FromToCreationDate.to
+  }
+
+  if (
+    ConditionTypeFilter.type === ConditionType.omen ||
+    ConditionTypeFilter.type === ConditionType.custom
+  ) {
+    variables['conditionType'] = ConditionTypeFilter.value
   }
 
   const { data, error, loading } = useQuery<Conditions>(query, {

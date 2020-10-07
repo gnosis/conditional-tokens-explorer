@@ -1,6 +1,12 @@
 import gql from 'graphql-tag'
 
-import { AdvancedFilter, OracleFilterOptions, StatusOptions } from 'util/types'
+import {
+  AdvancedFilter,
+  ConditionType,
+  ConditionTypeAll,
+  OracleFilterOptions,
+  StatusOptions,
+} from 'util/types'
 
 export interface ConditionsListType {
   conditionId?: string
@@ -18,6 +24,10 @@ export const DEFAULT_OPTIONS_LIST: AdvancedFilter = {
   ReporterOracle: {
     type: OracleFilterOptions.All,
     value: [],
+  },
+  ConditionType: {
+    type: ConditionTypeAll.all,
+    value: null,
   },
   Status: StatusOptions.All,
   MinMaxOutcomes: null,
@@ -47,7 +57,13 @@ const conditionFragment = gql`
   }
 `
 export const buildQueryConditionsList = (advancedFilter: AdvancedFilter = DEFAULT_OPTIONS_LIST) => {
-  const { FromToCreationDate, MinMaxOutcomes, ReporterOracle, Status } = advancedFilter
+  const {
+    ConditionType: ConditionTypeFilter,
+    FromToCreationDate,
+    MinMaxOutcomes,
+    ReporterOracle,
+    Status,
+  } = advancedFilter
 
   const whereClauseInternal = [
     ReporterOracle.type === OracleFilterOptions.Custom ? 'oracle_not_in: $oracleNotIn' : '',
@@ -60,6 +76,10 @@ export const buildQueryConditionsList = (advancedFilter: AdvancedFilter = DEFAUL
     MinMaxOutcomes ? 'outcomeSlotCount_lte: $maxOutcome , outcomeSlotCount_gte: $minOutcome' : '',
     FromToCreationDate
       ? 'createTimestamp_lte: $toCreationDate , createTimestamp_gte: $fromCreationDate'
+      : '',
+    ConditionTypeFilter.type === ConditionType.omen ||
+    ConditionTypeFilter.type === ConditionType.custom
+      ? 'oracle: $conditionType'
       : '',
   ]
     .filter((s) => s.length)
@@ -77,6 +97,10 @@ export const buildQueryConditionsList = (advancedFilter: AdvancedFilter = DEFAUL
     Status === StatusOptions.Open || Status === StatusOptions.Resolved ? '$resolved: Boolean' : '',
     MinMaxOutcomes ? '$maxOutcome: Int,$minOutcome: Int' : '',
     FromToCreationDate ? '$toCreationDate: BigInt,$fromCreationDate: BigInt' : '',
+    ConditionTypeFilter.type === ConditionType.omen ||
+    ConditionTypeFilter.type === ConditionType.custom
+      ? '$conditionType: Bytes'
+      : '',
   ]
     .filter((s) => s.length)
     .join(',')
