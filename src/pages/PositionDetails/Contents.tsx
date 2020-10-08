@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useMemo, useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import { Button } from 'components/buttons/Button'
 import { ButtonCopy } from 'components/buttons/ButtonCopy'
@@ -15,12 +15,15 @@ import {
   DropdownPosition,
 } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
+import { Tooltip } from 'components/common/Tooltip'
 import { DisplayConditionsTableModal } from 'components/modals/DisplayConditionsTableModal'
 import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
 import { UnwrapModal } from 'components/modals/UnwrapModal'
 import { WrapModal } from 'components/modals/WrapModal'
+import { ExternalLink } from 'components/navigation/ExternalLink'
 import { Outcome } from 'components/partitions/Outcome'
 import { CardTextSm } from 'components/pureStyledComponents/CardText'
+import { FlexRow } from 'components/pureStyledComponents/FlexRow'
 import { OutcomesContainer } from 'components/pureStyledComponents/OutcomesContainer'
 import { Row } from 'components/pureStyledComponents/Row'
 import {
@@ -42,12 +45,13 @@ import { formatBigNumber, positionString, truncateStringInTheMiddle } from 'util
 import {
   ConditionIdsArray,
   LocalStorageManagement,
+  NetworkIds,
   OutcomeProps,
   TransferOptions,
 } from 'util/types'
 
 const CollateralText = styled.span`
-  color: ${(props) => props.theme.colors.darkerGray};
+  color: ${(props) => props.theme.colors.darkerGrey};
   font-size: 15px;
   font-weight: 400;
   line-height: 1.2;
@@ -81,6 +85,10 @@ const MoreLink = styled.a`
   font-weight: 600;
   margin: 0 0 0 12px;
   text-decoration: underline;
+
+  &:hover {
+    text-decoration: none;
+  }
 `
 
 const StripedListStyled = styled(StripedList)`
@@ -91,8 +99,28 @@ const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
   ${DropdownItemCSS}
 `
 
-const Link = styled(NavLink)`
+const LinkCSS = css`
   color: ${(props) => props.theme.colors.textColor};
+  text-decoration: underline;
+
+  &:hover {
+    text-decoration: none;
+  }
+`
+
+const InternalLink = styled(NavLink)`
+  ${LinkCSS}
+`
+
+const Link = styled.a`
+  ${LinkCSS}
+`
+
+const TooltipStyled = styled(Tooltip)`
+  cursor: pointer;
+  margin: 0 0 0 8px;
+  position: relative;
+  top: -1px;
 `
 
 interface Props {
@@ -108,7 +136,7 @@ interface Props {
 const logger = getLogger('Contents')
 
 export const Contents = (props: Props) => {
-  const { CTService, WrapperService, connect, signer } = useWeb3ConnectedOrInfura()
+  const { CTService, WrapperService, connect, networkConfig, signer } = useWeb3ConnectedOrInfura()
   const {
     balanceERC20,
     balanceERC1155,
@@ -203,6 +231,10 @@ export const Contents = (props: Props) => {
     () => (collateralERC20 && collateralERC20.symbol ? collateralERC20.symbol : ''),
     [collateralERC20]
   )
+
+  const wtmAddress = useMemo(() => (wrappedTokenAddress ? wrappedTokenAddress : ''), [
+    wrappedTokenAddress,
+  ])
 
   const onWrap = useCallback(
     async (transferValue: TransferOptions) => {
@@ -304,18 +336,47 @@ export const Contents = (props: Props) => {
     : transfer.isLoading()
     ? 'Working...'
     : 'All done!'
-  const fullLoadingTitle = transfer.isFailure() ? 'Error' : transactionTitle
 
+  const fullLoadingTitle = transfer.isFailure() ? 'Error' : transactionTitle
   const outcomesByRow = '14'
 
   const conditionIdLink = (id: string) => {
     return (
       <>
-        <Link to={`/conditions/${id}`}>{truncateStringInTheMiddle(id, 8, 6)}</Link>
+        <InternalLink to={`/conditions/${id}`}>{truncateStringInTheMiddle(id, 8, 6)}</InternalLink>
         <ButtonCopy value={id} />
       </>
     )
   }
+
+  const getEtherscanFormattedUrl = useCallback(
+    (etherscanURL: string, address: string): string => {
+      return networkConfig.networkId === NetworkIds.GANACHE
+        ? '#'
+        : networkConfig.networkId === NetworkIds.MAINNET
+        ? `https://${etherscanURL}${address}`
+        : `https://rinkeby.${etherscanURL}${address}`
+    },
+    [networkConfig.networkId]
+  )
+
+  const getEtherscanTokenUrl = useCallback(
+    (address: string): string => {
+      const etherscanURL = `etherscan.io/token/`
+
+      return getEtherscanFormattedUrl(etherscanURL, address)
+    },
+    [getEtherscanFormattedUrl]
+  )
+
+  const getEtherscanContractUrl = useCallback(
+    (address: string): string => {
+      const etherscanURL = `etherscan.io/address/`
+
+      return getEtherscanFormattedUrl(etherscanURL, address)
+    },
+    [getEtherscanFormattedUrl]
+  )
 
   return (
     <CenteredCard
@@ -346,10 +407,10 @@ export const Contents = (props: Props) => {
         <TitleValue
           title="Position Id"
           value={
-            <>
+            <FlexRow>
               {truncateStringInTheMiddle(positionId, 8, 6)}
               <ButtonCopy value={positionId} />
-            </>
+            </FlexRow>
           }
           valueUppercase
         />
@@ -358,12 +419,15 @@ export const Contents = (props: Props) => {
           value={collateralERC1155 ? <TokenIcon token={collateralERC1155} /> : '-'}
         />
         <TitleValue
-          title="Contract Address"
+          title="Collateral Address"
           value={
-            <>
-              {truncateStringInTheMiddle(collateralTokenAddress, 8, 6)}
+            <FlexRow>
+              <Link href={getEtherscanContractUrl(collateralTokenAddress)}>
+                {truncateStringInTheMiddle(collateralTokenAddress, 8, 6)}
+              </Link>
               <ButtonCopy value={collateralTokenAddress} />
-            </>
+              <ExternalLink href={getEtherscanContractUrl(collateralTokenAddress)} />
+            </FlexRow>
           }
           valueUppercase
         />
@@ -372,33 +436,34 @@ export const Contents = (props: Props) => {
             title={conditions.length === 1 ? 'Condition Id' : 'Condition Ids'}
             value={
               conditions.length === 1 ? (
-                conditionIdLink(conditions[0].conditionId)
+                <FlexRow>{conditionIdLink(conditions[0].conditionId)}</FlexRow>
               ) : (
-                <>
+                <FlexRow>
                   {conditionIdLink(conditions[0].conditionId)}
                   <MoreLink onClick={() => setOpenDisplayConditionsTableModal(true)}>
                     (More...)
                   </MoreLink>
-                </>
+                </FlexRow>
               )
             }
             valueUppercase
           />
         )}
       </Row>
-
       <Row cols="1fr" marginBottomXL>
         <TitleValue
-          title="Collateral Wrapping"
+          title="Wrapped Collateral"
           value={
             <StripedListStyled maxHeight="auto">
               <StripedListItem>
                 <CollateralText>
                   <CollateralTextStrong>ERC1155:</CollateralTextStrong>{' '}
                   <CollateralTextAmount>
-                    {!balanceERC1155.isZero()
-                      ? `${formatBigNumber(balanceERC1155, ERC1155Decimals)} ${ERC1155Symbol}`
-                      : 'None.'}
+                    {balanceERC1155.isZero() ? (
+                      <i>None.</i>
+                    ) : (
+                      `${formatBigNumber(balanceERC1155, ERC1155Decimals)} ${ERC1155Symbol}`
+                    )}
                   </CollateralTextAmount>
                 </CollateralText>
                 <CollateralWrapButton
@@ -412,9 +477,17 @@ export const Contents = (props: Props) => {
                 <CollateralText>
                   <CollateralTextStrong>ERC20:</CollateralTextStrong>{' '}
                   <CollateralTextAmount>
-                    {!balanceERC20.isZero()
-                      ? `${formatBigNumber(balanceERC20, ERC1155Decimals)} ${ERC20Symbol}`
-                      : 'None.'}
+                    {balanceERC20.isZero() ? (
+                      <i>None.</i>
+                    ) : (
+                      <>
+                        {`${formatBigNumber(balanceERC20, ERC1155Decimals)} ${ERC20Symbol}`}
+                        <TooltipStyled
+                          id="balanceERC20"
+                          text="Wrapped ERC-1155 (Wrapped Multi Token)"
+                        />
+                      </>
+                    )}
                   </CollateralTextAmount>
                 </CollateralText>
                 <CollateralWrapButton
@@ -426,6 +499,25 @@ export const Contents = (props: Props) => {
               </StripedListItem>
             </StripedListStyled>
           }
+        />
+      </Row>
+      <Row cols="1fr" marginBottomXL>
+        <TitleValue
+          title="Wrapped Collateral Address"
+          value={
+            balanceERC20.isZero() ? (
+              <i>None.</i>
+            ) : (
+              <FlexRow>
+                <Link href={getEtherscanTokenUrl(wtmAddress)}>
+                  {truncateStringInTheMiddle(wtmAddress, 8, 6)}
+                </Link>
+                <ButtonCopy value={wtmAddress} />
+                <ExternalLink href={getEtherscanTokenUrl(wtmAddress)} />
+              </FlexRow>
+            )
+          }
+          valueUppercase={balanceERC20.isZero() ? false : true}
         />
       </Row>
       <Row cols="1fr" marginBottomXL>

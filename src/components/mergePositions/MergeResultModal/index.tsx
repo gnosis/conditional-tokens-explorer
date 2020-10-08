@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers/utils'
 import React from 'react'
 
 import { Modal } from 'components/common/Modal'
-import { DisplayTablePositions } from 'components/form/DisplayTablePosition'
+import { DisplayTablePositionsWrapper } from 'components/form/DisplayTablePositions'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
 import { formatBigNumber, isPositionIdValid } from 'util/tools'
@@ -30,7 +30,7 @@ export const MergeResultModal = ({
       subTitle={`Positions were successfully merged`}
       title={'Merge Positions'}
     >
-      <DisplayTablePositions
+      <DisplayTablePositionsWrapper
         callbackOnHistoryPush={closeAction}
         collateral={collateralToken.address}
         positionIds={[{ positionId: mergeResult, balance: amount }]}

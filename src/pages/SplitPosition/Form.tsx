@@ -7,8 +7,7 @@ import { Button } from 'components/buttons/Button'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { Modal } from 'components/common/Modal'
 import { SetAllowance } from 'components/common/SetAllowance'
-import { StatusInfoInline, StatusInfoType } from 'components/common/StatusInfoInline'
-import { DisplayTablePositions } from 'components/form/DisplayTablePosition'
+import { DisplayTablePositionsWrapper } from 'components/form/DisplayTablePositions'
 import { InputAmount } from 'components/form/InputAmount'
 import { InputCondition } from 'components/form/InputCondition'
 import { EditPartitionModal } from 'components/modals/EditPartitionModal'
@@ -25,6 +24,7 @@ import {
 import { TitleControlButton } from 'components/pureStyledComponents/TitleControl'
 import { PositionPreview } from 'components/splitPosition/PositionPreview'
 import { FullLoading } from 'components/statusInfo/FullLoading'
+import { StatusInfoInline, StatusInfoType } from 'components/statusInfo/StatusInfoInline'
 import { IconTypes } from 'components/statusInfo/common'
 import { TitleValue } from 'components/text/TitleValue'
 import { NULL_PARENT_ID, ZERO_BN } from 'config/constants'
@@ -162,6 +162,7 @@ export const Form = ({
         setStatus(Remote.loading())
 
         let positionIds: PositionIdsArray[]
+        let collateralFromSplit: string = collateral
         if (splitFromCollateral) {
           await splitPosition(collateral, NULL_PARENT_ID, conditionId, partition, amount)
 
@@ -169,27 +170,29 @@ export const Form = ({
             partition,
             NULL_PARENT_ID,
             conditionId,
-            collateral
+            collateralFromSplit
           )
-        } else if (splitFromPosition && position) {
-          const {
-            collateralToken: { id: collateral },
-            collection: { id: collectionId },
-          } = position
-
-          await splitPosition(collateral, collectionId, conditionId, partition, amount)
+        } else if (
+          splitFromPosition &&
+          position &&
+          position.collateralToken &&
+          position.collection
+        ) {
+          collateralFromSplit = position.collateralToken.id
+          const collectionId = position.collection.id
+          await splitPosition(collateralFromSplit, collectionId, conditionId, partition, amount)
 
           positionIds = await CTService.getPositionsFromPartition(
             partition,
             collectionId,
             conditionId,
-            collateral
+            collateralFromSplit
           )
         } else {
           throw Error('Invalid split origin')
         }
 
-        setStatus(Remote.success({ positionIds, collateral }))
+        setStatus(Remote.success({ positionIds, collateral: collateralFromSplit }))
       } catch (err) {
         logger.error(err)
         setStatus(Remote.failure(err))
@@ -249,7 +252,7 @@ export const Form = ({
 
   const splitPositionsTable =
     status.isSuccess() && status.hasData() ? (
-      <DisplayTablePositions
+      <DisplayTablePositionsWrapper
         callbackOnHistoryPush={clearComponent}
         collateral={status.get().collateral}
         positionIds={status.get().positionIds}

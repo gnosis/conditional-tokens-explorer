@@ -39,7 +39,7 @@ const Outcome = styled.input`
   border-left: none;
   border-right: none;
   border-top: none;
-  color: ${(props) => props.theme.colors.darkerGray};
+  color: ${(props) => props.theme.colors.darkerGrey};
   cursor: text;
   flex-grow: 1;
   font-size: 15px;

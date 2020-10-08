@@ -35,7 +35,7 @@ const Circle = styled.div<{ active: boolean }>`
 `
 
 const Label = styled.span`
-  color: ${(props) => props.theme.colors.darkerGray};
+  color: ${(props) => props.theme.colors.darkerGrey};
   font-size: 18px;
   font-weight: 600;
   line-height: 1.2;

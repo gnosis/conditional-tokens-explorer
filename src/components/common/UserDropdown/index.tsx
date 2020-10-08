@@ -6,7 +6,7 @@ import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
 import { ChevronDown } from 'components/icons/ChevronDown'
 import { Pill } from 'components/pureStyledComponents/Pill'
-import { Connected, useWeb3Connected } from 'contexts/Web3Context'
+import { useWeb3Connected } from 'contexts/Web3Context'
 import { truncateStringInTheMiddle } from 'util/tools'
 
 const Wrapper = styled(Dropdown)`
@@ -35,12 +35,12 @@ const DropdownButton = styled.div`
 
   &:hover {
     .addressText {
-      color: ${(props) => props.theme.colors.darkerGray};
+      color: ${(props) => props.theme.colors.darkerGrey};
     }
 
     .chevronDown {
       .fill {
-        fill: ${(props) => props.theme.colors.darkerGray};
+        fill: ${(props) => props.theme.colors.darkerGrey};
       }
     }
   }
@@ -97,7 +97,7 @@ const DropdownItemStyled = styled(DropdownItem)`
 const Item = styled.div`
   align-items: center;
   border-bottom: 1px solid ${(props) => props.theme.dropdown.item.borderColor};
-  color: ${(props) => props.theme.colors.darkerGray};
+  color: ${(props) => props.theme.colors.darkerGrey};
   display: flex;
   font-size: 13px;
   justify-content: space-between;
@@ -128,25 +128,18 @@ const StatusPill = styled(Pill)`
   padding-left: 8px;
   padding-right: 8px;
 `
-
-interface UserDropdownProps {
-  data: Connected
-}
-
-const getNetworkName = (data: Connected): string => {
-  return data.provider.network.name
-}
-
-const getWalletName = (data: Connected): string => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const getWalletName = (provider: any): string => {
   const isMetaMask =
-    Object.prototype.hasOwnProperty.call(data.provider._web3Provider, 'isMetaMask') &&
-    data.provider._web3Provider.isMetaMask
-  const isWalletConnect = Object.prototype.hasOwnProperty.call(data.provider._web3Provider, 'wc')
+    Object.prototype.hasOwnProperty.call(provider._web3Provider, 'isMetaMask') &&
+    provider._web3Provider.isMetaMask
+  const isWalletConnect = Object.prototype.hasOwnProperty.call(provider._web3Provider, 'wc')
+
   return isMetaMask ? 'MetaMask' : isWalletConnect ? 'WalletConnect' : 'Unknown'
 }
 
-const UserDropdownButton: React.FC<UserDropdownProps> = ({ data }) => {
-  const { address, networkConfig } = data
+const UserDropdownButton = () => {
+  const { address, networkConfig } = useWeb3Connected()
 
   return (
     <DropdownButton>
@@ -159,14 +152,16 @@ const UserDropdownButton: React.FC<UserDropdownProps> = ({ data }) => {
       {networkConfig.networkId && (
         <Network>
           <NetworkStatus />
-          <NetworkText>{getNetworkName(data)}</NetworkText>
+          <NetworkText>{networkConfig.getNetworkName()}</NetworkText>
         </Network>
       )}
     </DropdownButton>
   )
 }
 
-const UserDropdownContent: React.FC<UserDropdownProps> = ({ data }) => {
+const UserDropdownContent = () => {
+  const { disconnect, networkConfig, provider } = useWeb3Connected()
+
   const items = [
     {
       title: 'Status',
@@ -174,11 +169,11 @@ const UserDropdownContent: React.FC<UserDropdownProps> = ({ data }) => {
     },
     {
       title: 'Wallet',
-      value: getWalletName(data),
+      value: getWalletName(provider),
     },
     {
       title: 'Network',
-      value: getNetworkName(data),
+      value: networkConfig.getNetworkName(),
     },
   ]
 
@@ -196,7 +191,7 @@ const UserDropdownContent: React.FC<UserDropdownProps> = ({ data }) => {
         <DisconnectButton
           buttonType={ButtonType.danger}
           onClick={() => {
-            data.disconnect()
+            disconnect()
           }}
         >
           Disconnect
@@ -207,17 +202,16 @@ const UserDropdownContent: React.FC<UserDropdownProps> = ({ data }) => {
 }
 
 export const UserDropdown: React.FC = (props) => {
-  const data = useWeb3Connected()
   const headerDropdownItems = [
     <DropdownItemStyled key="1">
-      <UserDropdownContent data={data} />
+      <UserDropdownContent />
     </DropdownItemStyled>,
   ]
 
   return (
     <Wrapper
       activeItemHighlight={false}
-      dropdownButtonContent={<UserDropdownButton data={data} />}
+      dropdownButtonContent={<UserDropdownButton />}
       dropdownPosition={DropdownPosition.right}
       items={headerDropdownItems}
       {...props}

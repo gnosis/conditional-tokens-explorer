@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
-import { BigNumberInput } from 'components/common/BigNumberInput'
+import { BigNumberInput } from 'components/form/BigNumberInput'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { ZERO_BN } from 'config/constants'
 
@@ -38,6 +38,7 @@ const TokenSymbol = styled.span`
 `
 
 interface Props {
+  autoFocus?: boolean
   disabled?: boolean
   decimals?: number
   onChange?: (n: BigNumber) => void
@@ -50,6 +51,7 @@ interface Props {
 
 export const BigNumberInputWrapper: React.FC<Props> = (props) => {
   const {
+    autoFocus,
     decimals = 0,
     disabled,
     max,
@@ -80,7 +82,7 @@ export const BigNumberInputWrapper: React.FC<Props> = (props) => {
         onChange={handleChange}
         placeholder={placeholder}
         renderInput={(props: unknown) => {
-          return <Textfield disabled={disabled} {...props} />
+          return <Textfield autoFocus={autoFocus} disabled={disabled} {...props} />
         }}
         value={value ? value.toString() : ''}
       />

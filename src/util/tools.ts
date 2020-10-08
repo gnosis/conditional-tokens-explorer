@@ -369,6 +369,7 @@ export const getFreeIndexSet = (outcomeSlotCount: number, partition: number[]): 
     return acc ^ p
   }, fullIndexSet)
 }
+
 export const isPartitionFullIndexSet = (
   outcomesSlotCount: number,
   partition: number[]

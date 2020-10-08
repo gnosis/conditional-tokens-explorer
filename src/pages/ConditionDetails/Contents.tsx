@@ -6,6 +6,8 @@ import { ButtonCopy } from 'components/buttons/ButtonCopy'
 import { ButtonDropdownCircle } from 'components/buttons/ButtonDropdownCircle'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { Dropdown, DropdownItemCSS, DropdownPosition } from 'components/common/Dropdown'
+import { DisplayTablePositions } from 'components/form/DisplayTablePositions'
+import { FlexRow } from 'components/pureStyledComponents/FlexRow'
 import { Pill, PillTypes } from 'components/pureStyledComponents/Pill'
 import { Row } from 'components/pureStyledComponents/Row'
 import { StripedList, StripedListItem } from 'components/pureStyledComponents/StripedList'
@@ -14,6 +16,7 @@ import { INFORMATION_NOT_AVAILABLE } from 'config/constants'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useIsConditionFromOmen } from 'hooks/useIsConditionFromOmen'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
+import { usePositions } from 'hooks/usePositions'
 import { useQuestion } from 'hooks/useQuestion'
 import { GetCondition_condition } from 'types/generatedGQLForCTE'
 import { formatTS, getConditionTypeTitle, truncateStringInTheMiddle } from 'util/tools'
@@ -83,6 +86,9 @@ export const Contents: React.FC<Props> = ({ condition }) => {
   const oracleTitle = isConditionFromOmen
     ? networkConfig.getOracleFromAddress(oracle).description
     : truncateStringInTheMiddle(oracle, 8, 6)
+  const { data: positions, loading: loadingPositions } = usePositions({
+    conditionsIds: [conditionId],
+  })
 
   return (
     <CenteredCard
@@ -103,10 +109,10 @@ export const Contents: React.FC<Props> = ({ condition }) => {
         <TitleValue
           title="Condition Id"
           value={
-            <>
+            <FlexRow>
               {truncateStringInTheMiddle(conditionId, 8, 6)}
               <ButtonCopy value={conditionId} />
-            </>
+            </FlexRow>
           }
           valueUppercase
         />
@@ -128,10 +134,10 @@ export const Contents: React.FC<Props> = ({ condition }) => {
         <TitleValue
           title="Question Id"
           value={
-            <>
+            <FlexRow>
               {truncateStringInTheMiddle(questionId, 8, 6)}
               <ButtonCopy value={questionId} />
-            </>
+            </FlexRow>
           }
           valueUppercase
         />
@@ -166,12 +172,18 @@ export const Contents: React.FC<Props> = ({ condition }) => {
         <TitleValue
           title={isConditionFromOmen ? 'Oracle' : 'Reporting Address'}
           value={
-            <>
+            <FlexRow>
               {oracleTitle}
               <ButtonCopy value={oracle} />
-            </>
+            </FlexRow>
           }
           valueUppercase={isConditionFromOmen ? false : true}
+        />
+      </Row>
+      <Row cols="1fr">
+        <TitleValue
+          title={"Condition's split positions"}
+          value={<DisplayTablePositions isLoading={loadingPositions} positions={positions || []} />}
         />
       </Row>
     </CenteredCard>

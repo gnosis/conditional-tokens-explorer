@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 
 import { ButtonCopy } from 'components/buttons/ButtonCopy'
-import { ExternalLinkIcon } from 'components/icons/ExternalLinkIcon'
+import { ExternalLink } from 'components/navigation/ExternalLink'
 import { truncateStringInTheMiddle } from 'util/tools'
 
 const Wrapper = styled.span`
@@ -26,14 +26,6 @@ const Text = styled.span`
 
 const Link = styled(NavLink)`
   ${TextCSS}
-`
-
-const ExternalLink = styled.a`
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  margin-left: 8px;
-  text-decoration: none;
 `
 
 interface Props {
@@ -64,10 +56,7 @@ export const CellHash: React.FC<Props> = (props) => {
       {externalLink && (
         <ExternalLink
           href={`${window.location.protocol}//${window.location.hostname}${port}/#${href}`}
-          target="_blank"
-        >
-          <ExternalLinkIcon />
-        </ExternalLink>
+        />
       )}
     </Wrapper>
   )

@@ -13,6 +13,10 @@ export const dataTableCSS = css`
     flex-grow: 0;
     min-height: 400px;
 
+    &.noMarginBottom {
+      margin-bottom: 0 !important;
+    }
+
     &.inlineTable {
       border: 1px solid ${(props) => props.theme.colors.lightGrey};
       box-shadow: none;
@@ -43,7 +47,7 @@ export const dataTableCSS = css`
       border-bottom-color: ${(props) => props.theme.colors.lightGrey}!important;
 
       &:hover {
-        color: ${(props) => props.theme.colors.darkerGray}!important;
+        color: ${(props) => props.theme.colors.darkerGrey}!important;
       }
 
       &:last-of-type {
