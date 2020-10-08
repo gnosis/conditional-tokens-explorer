@@ -59,8 +59,8 @@ export const usePositions = (options: OptionsToSearch) => {
     queryOptions.conditionsIds = conditionsIds
   }
 
-  if (collateralValue !== CollateralFilterOptions.All) {
-    queryOptions.collateral = collateralFilter
+  if (collateralValue !== CollateralFilterOptions.All && collateralFilter) {
+    queryOptions.collateral = collateralFilter.toLowerCase()
   }
 
   const query = buildQueryPositions(queryOptions)
