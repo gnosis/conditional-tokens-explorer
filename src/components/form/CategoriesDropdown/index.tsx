@@ -2,6 +2,7 @@ import { useQuery } from '@apollo/react-hooks'
 import lodashOrderby from 'lodash.orderby'
 import lodashUniqBy from 'lodash.uniqby'
 import React, { useEffect, useMemo, useState } from 'react'
+import styled from 'styled-components'
 
 import { ButtonSelect } from 'components/buttons/ButtonSelect'
 import { Dropdown, DropdownPosition } from 'components/common/Dropdown'
@@ -11,6 +12,13 @@ import { GetCategories } from 'types/generatedGQLForOMEN'
 import { Remote } from 'util/remoteData'
 import { capitalize } from 'util/tools'
 import { Categories } from 'util/types'
+
+const DropdownStyled = styled(Dropdown)`
+  .dropdownItems {
+    max-height: 200px;
+    overflow: auto;
+  }
+`
 
 interface Props {
   onClick: (value: string) => void
@@ -121,27 +129,36 @@ export const CategoriesDropdown = ({ onClick, value }: Props) => {
   }, [categoriesFromOmen, categoriesLoading, categoriesError, categoryItems, onClick])
 
   return (
-    <>
-      {categories.isSuccess() && categories.hasData() && (
-        <Dropdown
-          dropdownButtonContent={
-            <ButtonSelect
-              content={categories.get().filter((item) => item.value === value)[0].text}
-            />
-          }
-          dropdownPosition={DropdownPosition.center}
-          fullWidth
-          items={categories.get().map((item, index) => (
-            <SelectItem
-              content={item.text}
-              key={index}
-              name="category"
-              onClick={item.onClick}
-              value={item.value.toString()}
-            />
-          ))}
-        />
-      )}
-    </>
+    categories && (
+      <DropdownStyled
+        disabled={!(categories.isSuccess() && categories.hasData())}
+        dropdownButtonContent={
+          <ButtonSelect
+            content={
+              categories.isSuccess() && categories.hasData()
+                ? categories.get().filter((item) => item.value === value)[0].text
+                : 'Loading...'
+            }
+          />
+        }
+        dropdownPosition={DropdownPosition.center}
+        fullWidth
+        items={
+          categories.isSuccess() && categories.hasData()
+            ? categories
+                .get()
+                .map((item, index) => (
+                  <SelectItem
+                    content={item.text}
+                    key={index}
+                    name="category"
+                    onClick={item.onClick}
+                    value={item.value.toString()}
+                  />
+                ))
+            : []
+        }
+      />
+    )
   )
 }
