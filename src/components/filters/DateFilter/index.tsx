@@ -75,7 +75,6 @@ export const DateFilter: React.FC<Props> = (props) => {
   }
 
   const onSubmitInternal = () => {
-    console.log(from, to)
     if (from && to) onSubmit(from, to)
   }
 

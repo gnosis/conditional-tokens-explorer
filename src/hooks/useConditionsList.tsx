@@ -17,7 +17,7 @@ export const useConditionsList = (advancedFilter: AdvancedFilter) => {
   } = advancedFilter
 
   const query = buildQueryConditionsList(advancedFilter)
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const variables: { [k: string]: any } = {}
   if (ReporterOracle.type === OracleFilterOptions.Custom)
     variables['oracleNotIn'] = ReporterOracle.value
