@@ -211,7 +211,6 @@ export enum ConditionSearchOptions {
   QuestionId = 'questionId',
   QuestionText = 'questionText',
   OracleAddress = 'oracleAddress',
-  ReportingAddress = 'reportingAddress',
   CreatorAddress = 'creatorAddress',
 }
 

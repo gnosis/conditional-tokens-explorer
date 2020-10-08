@@ -44,8 +44,8 @@ export const useConditionsList = (advancedFilter: AdvancedFilter) => {
   ) {
     variables['conditionType'] = ConditionTypeFilter.value
   }
-  if ( TextToSearch.value ) {
-    variables['textToSearch'] = TextToSearch.value
+  if (TextToSearch.value) {
+    variables['textToSearch'] = TextToSearch.value.toLowerCase()
   }
 
   const { data, error, loading } = useQuery<Conditions>(query, {

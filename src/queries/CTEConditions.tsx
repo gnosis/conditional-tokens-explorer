@@ -2,12 +2,12 @@ import gql from 'graphql-tag'
 
 import {
   AdvancedFilter,
+  ConditionSearchOptions,
   ConditionType,
   ConditionTypeAll,
   OracleFilterOptions,
   StatusOptions,
 } from 'util/types'
-import { ConditionSearchOptions } from '../util/types'
 
 export interface ConditionsListType {
   conditionId?: string
@@ -36,7 +36,7 @@ export const DEFAULT_OPTIONS_LIST: AdvancedFilter = {
   TextToSearch: {
     type: ConditionSearchOptions.All,
     value: null,
-  }
+  },
 }
 
 const conditionFragment = gql`
@@ -83,9 +83,19 @@ export const buildQueryConditionsList = (advancedFilter: AdvancedFilter = DEFAUL
     FromToCreationDate
       ? 'createTimestamp_lte: $toCreationDate , createTimestamp_gte: $fromCreationDate'
       : '',
-    ConditionTypeFilter.type === ConditionType.omen ||
-    ConditionTypeFilter.type === ConditionType.custom
-      ? 'oracle: $conditionType'
+    ConditionTypeFilter.type === ConditionType.omen ? 'oracle: $conditionType' : '',
+    ConditionTypeFilter.type === ConditionType.custom ? 'oracle_not: $conditionType' : '',
+    TextToSearch.type === ConditionSearchOptions.ConditionId && TextToSearch.value
+      ? 'id: $textToSearch'
+      : '',
+    TextToSearch.type === ConditionSearchOptions.QuestionId && TextToSearch.value
+      ? 'questionId: $textToSearch'
+      : '',
+    TextToSearch.type === ConditionSearchOptions.OracleAddress && TextToSearch.value
+      ? 'oracle: $textToSearch'
+      : '',
+    TextToSearch.type === ConditionSearchOptions.CreatorAddress && TextToSearch.value
+      ? 'creator: $textToSearch'
       : '',
   ]
     .filter((s) => s.length)
@@ -106,6 +116,15 @@ export const buildQueryConditionsList = (advancedFilter: AdvancedFilter = DEFAUL
     ConditionTypeFilter.type === ConditionType.omen ||
     ConditionTypeFilter.type === ConditionType.custom
       ? '$conditionType: Bytes'
+      : '',
+    TextToSearch.type === ConditionSearchOptions.ConditionId && TextToSearch.value
+      ? '$textToSearch: ID'
+      : '',
+    (TextToSearch.type === ConditionSearchOptions.QuestionId ||
+      TextToSearch.type === ConditionSearchOptions.OracleAddress ||
+      TextToSearch.type === ConditionSearchOptions.CreatorAddress) &&
+    TextToSearch.value
+      ? '$textToSearch: Bytes'
       : '',
   ]
     .filter((s) => s.length)

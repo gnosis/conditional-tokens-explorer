@@ -31,6 +31,7 @@ import { Conditions_conditions } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
 import {
   AdvancedFilter,
+  ConditionSearchOptions,
   ConditionType,
   ConditionTypeAll,
   FromToCreationDateOptions,
@@ -39,7 +40,6 @@ import {
   OracleFilterOptions,
   StatusOptions,
 } from 'util/types'
-import { ConditionSearchOptions } from '../../util/types'
 
 const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
   ${DropdownItemCSS}
@@ -72,7 +72,9 @@ export const ConditionsList: React.FC = () => {
     ConditionType | ConditionTypeAll
   >(ConditionTypeAll.all)
 
-  const [searchBy, setSearchBy] = useState<ConditionSearchOptions>(ConditionSearchOptions.All)
+  const [searchBy, setSearchBy] = useState<ConditionSearchOptions>(
+    ConditionSearchOptions.ConditionId
+  )
   const dropdownItems = useConditionsSearchOptions(setSearchBy)
 
   logger.log(`Search by ${searchBy}`)
@@ -110,7 +112,7 @@ export const ConditionsList: React.FC = () => {
     TextToSearch: {
       type: searchBy,
       value: textToSearch,
-    }
+    },
   }
 
   const { data, error, loading } = useConditionsList(advancedFilters)

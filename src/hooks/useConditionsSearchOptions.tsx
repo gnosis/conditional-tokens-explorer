@@ -1,21 +1,25 @@
 import { useEffect, useState } from 'react'
+
 import { ConditionSearchOptions } from 'util/types'
 
-export const useConditionsSearchOptions = (itemAction: (searchFilter: ConditionSearchOptions) => void) => {
+export const useConditionsSearchOptions = (
+  itemAction: (searchFilter: ConditionSearchOptions) => void
+) => {
   const [items, setItems] = useState<
     Array<{ onClick: () => void; placeholder: string; text: string }>
   >()
 
   useEffect(() => {
     setItems([
-      {
-        onClick: () => {
-          itemAction(ConditionSearchOptions.All)
-        },
-        placeholder:
-          'Search by Condition Id, Question Id, Question Text, Oracle Address, Reporting Address, Creator Address.',
-        text: 'All',
-      },
+      // TODO not remove this until the TEXT fields will be created in the subgraph
+      // {
+      //   onClick: () => {
+      //     itemAction(ConditionSearchOptions.All)
+      //   },
+      //   placeholder:
+      //     'Search by Condition Id, Question Id, Question Text, Oracle Address, Reporting Address, Creator Address.',
+      //   text: 'All',
+      // },
       {
         onClick: () => {
           itemAction(ConditionSearchOptions.ConditionId)
@@ -36,13 +40,6 @@ export const useConditionsSearchOptions = (itemAction: (searchFilter: ConditionS
         },
         placeholder: 'Search by Oracle Address',
         text: 'Oracle Address',
-      },
-      {
-        onClick: () => {
-          itemAction(ConditionSearchOptions.ReportingAddress)
-        },
-        placeholder: 'Search by Reporting Address',
-        text: 'Reporting Address',
       },
       {
         onClick: () => {
