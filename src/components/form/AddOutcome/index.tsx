@@ -1,4 +1,4 @@
-import React, { createRef, useEffect, useState } from 'react'
+import React, { createRef, useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { ButtonAdd } from 'components/buttons/ButtonAdd'
@@ -58,6 +58,12 @@ const Outcome = styled.input`
   }
 `
 
+const isOutcomeValid = (outcome: string | undefined): boolean => {
+  if (outcome?.trim().length === 0) return false
+
+  return true
+}
+
 const EditableOutcome: React.FC<{ item: string | undefined; removeOutcome: () => void }> = (
   props
 ) => {
@@ -66,21 +72,41 @@ const EditableOutcome: React.FC<{ item: string | undefined; removeOutcome: () =>
   const [value, setValue] = useState<string | undefined>(item)
   const outcomeField = createRef<HTMLInputElement>()
 
+  const saveSanitizedValue = useCallback(
+    (value: string | undefined) => {
+      setValue(value?.trim())
+    },
+    [setValue]
+  )
+
+  const resetValue = useCallback(() => {
+    saveSanitizedValue(item)
+  }, [saveSanitizedValue, item])
+
   const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && isOutcomeValid(value)) {
       setIsEditing(false)
     }
   }
 
+  const onBlur = () => {
+    if (!isOutcomeValid(value)) {
+      resetValue()
+    } else {
+      saveSanitizedValue(value)
+    }
+    setIsEditing(false)
+  }
+
   useEffect(() => {
-    setValue(item)
-  }, [item])
+    saveSanitizedValue(item)
+  }, [saveSanitizedValue, item])
 
   return (
     <OutcomeWrapper {...restProps}>
       <Outcome
-        onBlur={() => setIsEditing(false)}
-        onChange={(e) => setValue(e.currentTarget.value)}
+        onBlur={onBlur}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.currentTarget.value)}
         onKeyUp={(e: React.KeyboardEvent<HTMLInputElement>) => {
           onPressEnter(e)
         }}
@@ -101,7 +127,11 @@ const EditableOutcome: React.FC<{ item: string | undefined; removeOutcome: () =>
           />
         )}
         {isEditing && (
-          <ButtonControl buttonType={ButtonControlType.ok} onClick={() => setIsEditing(false)} />
+          <ButtonControl
+            buttonType={ButtonControlType.ok}
+            disabled={!isOutcomeValid(value)}
+            onClick={() => setIsEditing(false)}
+          />
         )}
         <ButtonControl buttonType={ButtonControlType.delete} onClick={removeOutcome} />
       </Controls>
@@ -119,8 +149,8 @@ interface Props {
 
 export const AddOutcome: React.FC<Props> = (props) => {
   const { addOutcome, onChange, outcome = '', outcomes, removeOutcome, ...restProps } = props
-  const newOutcomeDisabled = outcomes.length === 256
-  const buttonAddDisabled = !outcome || newOutcomeDisabled
+  const maxOutcomesReached = outcomes.length === 256
+  const buttonAddDisabled = maxOutcomesReached || !isOutcomeValid(outcome)
   const outcomeNameRef = React.createRef<HTMLInputElement>()
 
   const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -137,7 +167,7 @@ export const AddOutcome: React.FC<Props> = (props) => {
         value={
           <NewOutcomeWrapper>
             <Textfield
-              disabled={newOutcomeDisabled}
+              disabled={maxOutcomesReached}
               onChange={onChange}
               onKeyUp={(e: React.KeyboardEvent<HTMLInputElement>) => {
                 onPressEnter(e)
