@@ -11,6 +11,7 @@ import { FlexRow } from 'components/pureStyledComponents/FlexRow'
 import { Pill, PillTypes } from 'components/pureStyledComponents/Pill'
 import { Row } from 'components/pureStyledComponents/Row'
 import { StripedList, StripedListItem } from 'components/pureStyledComponents/StripedList'
+import { FormatHash } from 'components/text/FormatHash'
 import { TitleValue } from 'components/text/TitleValue'
 import { INFORMATION_NOT_AVAILABLE } from 'config/constants'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
@@ -83,9 +84,11 @@ export const Contents: React.FC<Props> = ({ condition }) => {
     category = INFORMATION_NOT_AVAILABLE,
   } = question ?? {}
 
-  const oracleTitle = isConditionFromOmen
-    ? networkConfig.getOracleFromAddress(oracle).description
-    : truncateStringInTheMiddle(oracle, 8, 6)
+  const oracleTitle = isConditionFromOmen ? (
+    networkConfig.getOracleFromAddress(oracle).description
+  ) : (
+    <FormatHash hash={truncateStringInTheMiddle(oracle, 8, 6)} />
+  )
   const { data: positions, loading: loadingPositions } = usePositions({
     conditionsIds: [conditionId],
   })
@@ -110,11 +113,10 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           title="Condition Id"
           value={
             <FlexRow>
-              {truncateStringInTheMiddle(conditionId, 8, 6)}
+              <FormatHash hash={truncateStringInTheMiddle(conditionId, 8, 6)} />
               <ButtonCopy value={conditionId} />
             </FlexRow>
           }
-          valueUppercase
         />
         <TitleValue
           title="Condition Type"
@@ -135,11 +137,10 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           title="Question Id"
           value={
             <FlexRow>
-              {truncateStringInTheMiddle(questionId, 8, 6)}
+              <FormatHash hash={truncateStringInTheMiddle(questionId, 8, 6)} />
               <ButtonCopy value={questionId} />
             </FlexRow>
           }
-          valueUppercase
         />
       </Row>
       {isConditionFromOmen && (
@@ -177,7 +178,6 @@ export const Contents: React.FC<Props> = ({ condition }) => {
               <ButtonCopy value={oracle} />
             </FlexRow>
           }
-          valueUppercase={isConditionFromOmen ? false : true}
         />
       </Row>
       <Row cols="1fr">

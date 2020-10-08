@@ -13,6 +13,7 @@ import { SearchField } from 'components/search/SearchField'
 import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { TableControls } from 'components/table/TableControls'
+import { FormatHash } from 'components/text/FormatHash'
 import { TitleValue } from 'components/text/TitleValue'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { PositionWithUserBalanceWithDecimals, usePositions } from 'hooks'
@@ -121,7 +122,9 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
     () => [
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: PositionWithUserBalanceWithDecimals) => truncateStringInTheMiddle(row.id, 8, 6),
+        cell: (row: PositionWithUserBalanceWithDecimals) => (
+          <FormatHash hash={truncateStringInTheMiddle(row.id, 8, 6)} />
+        ),
         maxWidth: '170px',
         name: 'Position Id',
         selector: 'createTimestamp',

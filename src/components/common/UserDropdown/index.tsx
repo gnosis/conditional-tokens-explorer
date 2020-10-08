@@ -6,6 +6,7 @@ import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
 import { ChevronDown } from 'components/icons/ChevronDown'
 import { Pill } from 'components/pureStyledComponents/Pill'
+import { FormatHash } from 'components/text/FormatHash'
 import { useWeb3Connected } from 'contexts/Web3Context'
 import { truncateStringInTheMiddle } from 'util/tools'
 
@@ -145,7 +146,7 @@ const UserDropdownButton = () => {
     <DropdownButton>
       <Address>
         <AddressText className="addressText" title={address}>
-          {truncateStringInTheMiddle(address, 6, 4)}
+          <FormatHash hash={truncateStringInTheMiddle(address, 6, 4)} />
         </AddressText>{' '}
         <ChevronDown />
       </Address>

@@ -2,7 +2,7 @@ import React, { useCallback } from 'react'
 import DataTable from 'react-data-table-component'
 
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
-import { CellHash } from 'components/table/CellHash'
+import { Hash } from 'components/text/Hash'
 import { customStyles } from 'theme/tableCustomStyles'
 import { ConditionIdsArray } from 'util/types'
 
@@ -20,7 +20,7 @@ export const DisplayTableConditions = (props: Props) => {
         // eslint-disable-next-line react/display-name
         cell: (row: ConditionIdsArray) => {
           return (
-            <CellHash
+            <Hash
               externalLink
               href={`/conditions/${row.conditionId}`}
               onClick={() => {

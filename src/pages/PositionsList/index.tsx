@@ -31,8 +31,8 @@ import { FullLoading } from 'components/statusInfo/FullLoading'
 import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { IconTypes } from 'components/statusInfo/common'
-import { CellHash } from 'components/table/CellHash'
 import { TableControls } from 'components/table/TableControls'
+import { Hash } from 'components/text/Hash'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { PositionWithUserBalanceWithDecimals, usePositions } from 'hooks'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
@@ -268,7 +268,7 @@ export const PositionsList = () => {
       {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimals) => (
-          <CellHash href={`/positions/${row.id}`} value={row.id} />
+          <Hash href={`/positions/${row.id}`} value={row.id} />
         ),
         name: 'Position Id',
         selector: 'createTimestamp',

@@ -17,6 +17,7 @@ import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { TitleControl } from 'components/pureStyledComponents/TitleControl'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
+import { Hash } from 'components/text/Hash'
 import { TitleValue } from 'components/text/TitleValue'
 import {
   ADDRESS_REGEX,
@@ -30,7 +31,7 @@ import moment from 'moment'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
-import { isAddress, truncateStringInTheMiddle } from 'util/tools'
+import { isAddress } from 'util/tools'
 import { Arbitrator, Categories, ConditionType, QuestionOptions } from 'util/types'
 
 const maxOutcomesError = 'Too many outcome slots'
@@ -245,20 +246,11 @@ export const PrepareCondition = () => {
     ? IconTypes.ok
     : IconTypes.spinner
 
-  const fullLoadingMessage = prepareConditionStatus.isFailure() ? (
-    prepareConditionStatus.getFailure()
-  ) : prepareConditionStatus.isLoading() ? (
-    'Working...'
-  ) : (
-    <>
-      {conditionId && (
-        <>
-          All done! Condition{' '}
-          <span title={conditionId}>{truncateStringInTheMiddle(conditionId, 8, 6)}</span> created .
-        </>
-      )}
-    </>
-  )
+  const fullLoadingMessage = prepareConditionStatus.isFailure()
+    ? prepareConditionStatus.getFailure()
+    : prepareConditionStatus.isLoading()
+    ? 'Working...'
+    : conditionId && `All done! Condition ${(<Hash value={conditionId} />)} created.`
   const fullLoadingTitle = prepareConditionStatus.isFailure() ? 'Error' : 'Prepare Condition'
 
   return (
@@ -454,7 +446,6 @@ export const PrepareCondition = () => {
             icon={fullLoadingIcon}
             message={fullLoadingMessage}
             title={fullLoadingTitle}
-            width={'400px'}
           />
         )}
         {error && (

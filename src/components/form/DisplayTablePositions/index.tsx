@@ -5,7 +5,8 @@ import { useHistory } from 'react-router-dom'
 import { TokenIcon } from 'components/common/TokenIcon'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
-import { CellHash } from 'components/table/CellHash'
+import { FormatHash } from 'components/text/FormatHash'
+import { Hash } from 'components/text/Hash'
 import { PositionWithUserBalanceWithDecimals } from 'hooks'
 import { useCollateral } from 'hooks/useCollateral'
 import { customStyles } from 'theme/tableCustomStyles'
@@ -67,7 +68,7 @@ export const DisplayTablePositions = (props: Props) => {
       {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimals) => {
-          return <CellHash externalLink href={`/positions/${row.id}`} value={row.id} />
+          return <Hash externalLink href={`/positions/${row.id}`} value={row.id} />
         },
         maxWidth: '250px',
         minWidth: '250px',
@@ -81,9 +82,10 @@ export const DisplayTablePositions = (props: Props) => {
           return row.token ? (
             <TokenIcon onClick={() => handleRowClick} token={row.token} />
           ) : (
-            <span title={row.collateralToken}>
-              {truncateStringInTheMiddle(row.collateralToken, 10, 8)}
-            </span>
+            <FormatHash
+              hash={truncateStringInTheMiddle(row.collateralToken, 10, 8)}
+              title={row.collateralToken}
+            />
           )
         },
         maxWidth: '150px',
