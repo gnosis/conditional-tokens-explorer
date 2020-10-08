@@ -121,10 +121,7 @@ export const AddOutcome: React.FC<Props> = (props) => {
   const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !buttonAddDisabled) {
       addOutcome()
-
-      if (outcomeNameRef && outcomeNameRef.current) {
-        outcomeNameRef.current.focus()
-      }
+      outcomeNameRef.current?.focus()
     }
   }
 
