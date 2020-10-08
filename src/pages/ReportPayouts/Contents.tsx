@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { Button } from 'components/buttons'
@@ -16,7 +16,7 @@ import { useConditionContext } from 'contexts/ConditionContext'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { OutcomesTable } from 'pages/ReportPayouts/OutcomesTable'
 import { getLogger } from 'util/logger'
-import { Status } from 'util/types'
+import { Remote } from 'util/remoteData'
 
 export interface FormInputs {
   payouts: BigNumber[]
@@ -24,19 +24,15 @@ export interface FormInputs {
 
 const DECIMALS = 2
 
-const ORACLE_NOT_VALID_TO_REPORT_ERROR = 'The connected user is a not allowed to report payouts'
-const PAYOUTS_POSITIVE_ERROR = 'At least one payout must be positive'
-
 const logger = getLogger('ReportPayouts')
 
 export const Contents: React.FC = () => {
   const { clearCondition, condition } = useConditionContext()
   const { _type: status, CTService, address, connect } = useWeb3ConnectedOrInfura()
 
-  const [payoutEmptyError, setPayoutEmptyError] = useState(false)
-  const [transactionStatus, setTransactionStatus] = useState<Maybe<Status>>(null)
-  const [oracleNotValidError, setOracleNotValidError] = useState(false)
-  const [error, setError] = useState<Maybe<Error>>(null)
+  const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<string>>>(
+    Remote.notAsked<Maybe<string>>()
+  )
 
   const isConditionResolved = useMemo(() => condition && condition.resolved, [condition])
   const questionId = useMemo(() => condition && condition.questionId, [condition])
@@ -49,46 +45,41 @@ export const Contents: React.FC = () => {
     watch,
   } = formMethods
 
+  const watchPayouts = watch('payouts')
+
+  const isOracleValidToReportPayout = useMemo(
+    () => address && oracle && oracle.toLowerCase() !== address.toLowerCase(),
+    [address, oracle]
+  )
+  // Validate payouts (positive, at least one non 0)
+  const isPayoutEmpty = useMemo(() => {
+    if (watchPayouts && watchPayouts.length > 0 && dirty) {
+      const nonZero = (currentValue: BigNumber) => !currentValue.isZero()
+      return !watchPayouts.some(nonZero)
+    } else {
+      return false
+    }
+  }, [watchPayouts, dirty])
+
   // Variable used to disable the submit button, check for payouts not empty and the oracle must be valid
   const disableSubmit =
     !dirty ||
-    payoutEmptyError ||
+    isPayoutEmpty ||
     isConditionResolved ||
-    (status === Web3ContextStatus.Connected && oracleNotValidError) ||
-    transactionStatus === Status.Loading
-
-  // Check if the sender is valid
-  useEffect(() => {
-    if (!oracle) return
-    if (status === Web3ContextStatus.Connected && address) {
-      setOracleNotValidError(oracle.toLowerCase() !== address.toLowerCase())
-    } else {
-      setOracleNotValidError(true)
-    }
-  }, [status, address, oracle])
-
-  const watchPayouts = watch('payouts')
-
-  // Validate payouts (positive, at least one non 0)
-  useEffect(() => {
-    if (watchPayouts && watchPayouts.length > 0 && dirty) {
-      const nonZero = (currentValue: BigNumber) => !currentValue.isZero()
-      setPayoutEmptyError(!watchPayouts.some(nonZero))
-    }
-  }, [watchPayouts, dirty])
+    (status === Web3ContextStatus.Connected && isOracleValidToReportPayout) ||
+    transactionStatus.isLoading()
 
   const onSubmit = async (data: FormInputs) => {
     // Validate exist at least one payout
     const { payouts } = data
     try {
       if (status === Web3ContextStatus.Connected) {
-        setError(null)
-        setTransactionStatus(Status.Loading)
+        setTransactionStatus(Remote.loading())
 
         const payoutsNumbered = payouts.map((payout: BigNumber) => payout.toNumber())
         await CTService.reportPayouts(questionId, payoutsNumbered)
 
-        setTransactionStatus(Status.Ready)
+        setTransactionStatus(Remote.success(questionId))
 
         // Setting the condition to '', update the state of the provider and reload the HOC component, works like a reload
         clearCondition()
@@ -96,47 +87,41 @@ export const Contents: React.FC = () => {
         connect()
       }
     } catch (err) {
-      setError(err)
-      setTransactionStatus(Status.Error)
+      setTransactionStatus(Remote.failure(err))
       logger.error(err)
     }
   }
 
-  const fullLoadingActionButton =
-    transactionStatus === Status.Error
-      ? {
-          buttonType: ButtonType.danger,
-          onClick: () => setTransactionStatus(null),
-          text: 'Close',
-        }
-      : transactionStatus === Status.Ready
-      ? {
-          buttonType: ButtonType.primary,
-          onClick: () => setTransactionStatus(null),
-          text: 'OK',
-        }
-      : undefined
+  const fullLoadingActionButton = transactionStatus.isFailure()
+    ? {
+        buttonType: ButtonType.danger,
+        onClick: () => setTransactionStatus(Remote.notAsked<Maybe<string>>()),
+        text: 'Close',
+      }
+    : transactionStatus.isSuccess()
+    ? {
+        buttonType: ButtonType.primary,
+        onClick: () => setTransactionStatus(Remote.notAsked<Maybe<string>>()),
+        text: 'OK',
+      }
+    : undefined
 
-  const fullLoadingMessage =
-    transactionStatus === Status.Error
-      ? error?.message
-      : transactionStatus === Status.Loading
-      ? 'Working...'
-      : 'Report finished!'
+  const fullLoadingMessage = transactionStatus.isFailure()
+    ? transactionStatus.getFailure()
+    : transactionStatus.isLoading()
+    ? 'Working...'
+    : 'Report finished!'
 
-  const fullLoadingTitle = transactionStatus === Status.Error ? 'Error' : 'Report Payouts'
+  const fullLoadingTitle = transactionStatus.isFailure() ? 'Error' : 'Report Payouts'
 
-  const fullLoadingIcon =
-    transactionStatus === Status.Error
-      ? IconTypes.error
-      : transactionStatus === Status.Loading
-      ? IconTypes.spinner
-      : IconTypes.ok
+  const fullLoadingIcon = transactionStatus.isFailure()
+    ? IconTypes.error
+    : transactionStatus.isLoading()
+    ? IconTypes.spinner
+    : IconTypes.ok
 
   const isWorking =
-    transactionStatus === Status.Loading ||
-    transactionStatus === Status.Error ||
-    transactionStatus === Status.Ready
+    transactionStatus.isLoading() || transactionStatus.isFailure() || transactionStatus.isSuccess()
 
   return (
     <CenteredCard>
@@ -165,9 +150,9 @@ export const Contents: React.FC = () => {
       )}
 
       <ErrorContainer>
-        {payoutEmptyError && <Error>{PAYOUTS_POSITIVE_ERROR}</Error>}
-        {status === Web3ContextStatus.Connected && oracleNotValidError && (
-          <Error>{ORACLE_NOT_VALID_TO_REPORT_ERROR}</Error>
+        {isPayoutEmpty && <Error>At least one payout must be positive</Error>}
+        {status === Web3ContextStatus.Connected && isOracleValidToReportPayout && (
+          <Error>The connected user is a not allowed to report payouts</Error>
         )}
       </ErrorContainer>
       <ButtonContainer>
