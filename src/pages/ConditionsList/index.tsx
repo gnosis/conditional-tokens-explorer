@@ -121,38 +121,42 @@ export const ConditionsList: React.FC = () => {
   const isSearching = textToSearch && loading
 
   const buildMenuForRow = useCallback(
-    ({ id }) => {
-      const detailsOption = {
-        href: `/conditions/${id}`,
-        onClick: undefined,
-        text: 'Details',
-      }
+    (row: Conditions_conditions) => {
+      const { id, resolved } = row
 
-      const splitOption = {
-        href: `/split/`,
-        text: 'Split Position',
-        onClick: () => {
-          setValue(id)
+      const menues = [
+        {
+          href: `/conditions/${id}`,
+          text: 'Details',
+          onClick: undefined,
         },
-      }
-
-      const mergeOption = {
-        href: `/merge/`,
-        text: 'Merge Positions',
-        onClick: () => {
-          setValue(id)
+        {
+          href: `/split/`,
+          text: 'Split Position',
+          onClick: () => {
+            setValue(id)
+          },
         },
-      }
-
-      const reportOption = {
-        href: `/report/`,
-        text: 'Report Payouts',
-        onClick: () => {
-          setValue(id)
+        {
+          href: `/merge/`,
+          text: 'Merge Positions',
+          onClick: () => {
+            setValue(id)
+          },
         },
+      ]
+
+      if (!resolved) {
+        menues.push({
+          href: `/report/`,
+          text: 'Report Payouts',
+          onClick: () => {
+            setValue(id)
+          },
+        })
       }
 
-      return [detailsOption, splitOption, mergeOption, reportOption]
+      return menues
     },
     [setValue]
   )
