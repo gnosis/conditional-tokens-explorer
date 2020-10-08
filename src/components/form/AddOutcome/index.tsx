@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { createRef, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { ButtonAdd } from 'components/buttons/ButtonAdd'
@@ -60,6 +60,7 @@ const EditableOutcome: React.FC<{ item: string | undefined; removeOutcome: () =>
   const { item, removeOutcome, ...restProps } = props
   const [isEditing, setIsEditing] = useState(false)
   const [value, setValue] = useState<string | undefined>(item)
+  const outcomeField = createRef<HTMLInputElement>()
 
   const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -80,12 +81,19 @@ const EditableOutcome: React.FC<{ item: string | undefined; removeOutcome: () =>
           onPressEnter(e)
         }}
         readOnly={!isEditing}
+        ref={outcomeField}
         type="text"
         value={value}
       />
       <Controls>
         {!isEditing && (
-          <ButtonControl buttonType={ButtonControlType.edit} onClick={() => setIsEditing(true)} />
+          <ButtonControl
+            buttonType={ButtonControlType.edit}
+            onClick={() => {
+              setIsEditing(true)
+              outcomeField.current?.focus()
+            }}
+          />
         )}
         {isEditing && (
           <ButtonControl buttonType={ButtonControlType.ok} onClick={() => setIsEditing(false)} />
