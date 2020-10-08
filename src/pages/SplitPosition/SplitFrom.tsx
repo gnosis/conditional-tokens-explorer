@@ -94,17 +94,17 @@ export const SplitFrom: React.FC<Props> = (props) => {
   const openCustomCollateralModal = useCallback(() => setShowCustomCollateralModal(true), [])
   const closeCustomCollateralModal = useCallback(() => setShowCustomCollateralModal(false), [])
 
-  const openSelectPositinModal = useCallback(() => setShowSelectPositionModal(true), [])
-  const closeSelectPositinModal = useCallback(() => setShowSelectPositionModal(false), [])
+  const openSelectPositionModal = useCallback(() => setShowSelectPositionModal(true), [])
+  const closeSelectPositionModal = useCallback(() => setShowSelectPositionModal(false), [])
 
   const onSelectPositionModalConfirm = React.useCallback(
     (positions: Array<Position>) => {
       const ids = positions.map((position) => position.id)
       updatePositionIds(ids)
       updateBalances(ids)
-      closeSelectPositinModal()
+      closeSelectPositionModal()
     },
-    [closeSelectPositinModal, updateBalances, updatePositionIds]
+    [closeSelectPositionModal, updateBalances, updatePositionIds]
   )
   const [customToken, setCustomToken] = useState<Maybe<Token>>(null)
 
@@ -140,7 +140,7 @@ export const SplitFrom: React.FC<Props> = (props) => {
         <ToggleableTitleControl onClick={openCustomCollateralModal} visible={splitFromCollateral}>
           Add Custom Collateral
         </ToggleableTitleControl>
-        <ToggleableTitleControl onClick={openSelectPositinModal} visible={splitFromPosition}>
+        <ToggleableTitleControl onClick={openSelectPositionModal} visible={splitFromPosition}>
           Select Position
         </ToggleableTitleControl>
       </Controls>
@@ -152,6 +152,7 @@ export const SplitFrom: React.FC<Props> = (props) => {
         visible={splitFromCollateral}
       />
       <ToggleableInputPosition
+        clickHandler={openSelectPositionModal}
         formMethods={formMethods}
         onPositionChange={onPositionChange}
         splitFromPosition={splitFromPosition}
@@ -168,7 +169,7 @@ export const SplitFrom: React.FC<Props> = (props) => {
         <SelectPositionModal
           isOpen={showSelectPositionModal}
           onConfirm={onSelectPositionModalConfirm}
-          onRequestClose={closeSelectPositinModal}
+          onRequestClose={closeSelectPositionModal}
           preSelectedPositions={[]}
           showOnlyPositionsWithBalance
           singlePosition
