@@ -41,12 +41,16 @@ const Outcome = styled.input`
   border-top: none;
   color: ${(props) => props.theme.colors.darkerGrey};
   cursor: text;
+  display: block;
   flex-grow: 1;
   font-size: 15px;
   font-weight: 400;
   outline: none;
+  overflow: hidden;
   padding-bottom: 5px;
   text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
   &[readOnly] {
     border-bottom-color: transparent;
@@ -82,6 +86,7 @@ const EditableOutcome: React.FC<{ item: string | undefined; removeOutcome: () =>
         }}
         readOnly={!isEditing}
         ref={outcomeField}
+        title={value}
         type="text"
         value={value}
       />
