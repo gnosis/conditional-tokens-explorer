@@ -18,12 +18,16 @@ const NewOutcomeWrapper = styled.div`
   grid-template-columns: 1fr 36px;
 `
 
-const Controls = styled.div`
-  display: grid;
-  grid-template-columns: 20px 20px;
+const Controls = styled.div<{ isEditing: boolean }>`
   column-gap: 15px;
+  display: grid;
+  grid-template-columns: ${(props) => (props.isEditing ? '20px 20px 20px' : '20px 20px')};
   margin-left: 30px;
 `
+
+Controls.defaultProps = {
+  isEditing: false,
+}
 
 const OutcomeWrapper = styled.div`
   align-items: center;
@@ -115,20 +119,10 @@ const EditableOutcome: React.FC<{
     }
   }
 
-  const onBlur = () => {
-    // if (!isOutcomeValueOK) {
-    //   resetValue()
-    // } else {
-    //   saveSanitizedValue(value)
-    // }
-    // setIsEditing(false)
-  }
-
   return (
     <OutcomeWrapper {...restProps}>
       <Outcome
         error={!isOutcomeValueOK}
-        onBlur={onBlur}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.currentTarget.value)}
         onKeyUp={(e: React.KeyboardEvent<HTMLInputElement>) => {
           onPressEnter(e)
@@ -139,7 +133,7 @@ const EditableOutcome: React.FC<{
         type="text"
         value={value}
       />
-      <Controls>
+      <Controls isEditing={isEditing}>
         {!isEditing && (
           <ButtonControl
             buttonType={ButtonControlType.edit}
@@ -147,6 +141,7 @@ const EditableOutcome: React.FC<{
               setIsEditing(true)
               outcomeField.current?.focus()
             }}
+            title="Edit"
           />
         )}
         {isEditing && (
@@ -158,9 +153,27 @@ const EditableOutcome: React.FC<{
                 setIsEditing(false)
               }
             }}
+            title="Save"
           />
         )}
-        <ButtonControl buttonType={ButtonControlType.delete} onClick={removeOutcome} />
+        {isEditing && (
+          <ButtonControl
+            buttonType={ButtonControlType.cancel}
+            onClick={() => {
+              resetValue()
+              setIsEditing(false)
+            }}
+            title="Cancel"
+          />
+        )}
+        <ButtonControl
+          buttonType={ButtonControlType.delete}
+          onClick={() => {
+            removeOutcome()
+            setIsEditing(false)
+          }}
+          title="Remove"
+        />
       </Controls>
     </OutcomeWrapper>
   )
