@@ -214,6 +214,11 @@ export const PrepareCondition = () => {
   ])
 
   const prepareCondition = async () => {
+    if (conditionType === ConditionType.omen && outcomes.length < 2 ) {
+      setError(new Error(`Outcomes must be greater than 1`))
+      return
+    }
+
     setPrepareConditionStatus(Remote.loading())
 
     try {
@@ -287,8 +292,7 @@ export const PrepareCondition = () => {
       : !isValidOmenCondition ||
         prepareConditionStatus.isLoading() ||
         prepareConditionStatus.isFailure() ||
-        !!error ||
-        outcomes.length < 2
+        !!error
 
   const fullLoadingActionButton = prepareConditionStatus.isSuccess()
     ? {
@@ -596,11 +600,6 @@ export const PrepareCondition = () => {
         {error && (
           <ErrorContainer>
             <ErrorMessage>{error.message}</ErrorMessage>
-          </ErrorContainer>
-        )}
-        {conditionType === ConditionType.omen && outcomes.length < 2 && (
-          <ErrorContainer>
-            <ErrorMessage>Outcomes must be greater than 1</ErrorMessage>
           </ErrorContainer>
         )}
         <ButtonContainer>
