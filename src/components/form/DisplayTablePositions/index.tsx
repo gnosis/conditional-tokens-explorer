@@ -119,7 +119,11 @@ export const DisplayTablePositions = (props: Props) => {
       customStyles={customStyles}
       data={isLoading ? [] : positions.length ? positions : []}
       noDataComponent={
-        isLoading ? <InlineLoading /> : <EmptyContentText>No positions found.</EmptyContentText>
+        isLoading ? (
+          <InlineLoading size="30px" />
+        ) : (
+          <EmptyContentText>No positions found.</EmptyContentText>
+        )
       }
       noHeader
       pagination

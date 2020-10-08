@@ -72,7 +72,7 @@ export const SetAllowance = (props: Props) => {
   ) : (
     <Wrapper>
       {fetching ? (
-        <InlineLoading height="30px" width="30px" />
+        <InlineLoading size="30px" />
       ) : (
         <>
           <Description>

@@ -175,7 +175,7 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
           data={showSpinner ? [] : conditionList.length ? conditionList : []}
           noDataComponent={
             showSpinner ? (
-              <InlineLoading />
+              <InlineLoading size="30px" />
             ) : (
               <EmptyContentText>No conditions found.</EmptyContentText>
             )

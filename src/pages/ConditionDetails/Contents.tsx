@@ -6,6 +6,7 @@ import { ButtonCopy } from 'components/buttons/ButtonCopy'
 import { ButtonDropdownCircle } from 'components/buttons/ButtonDropdownCircle'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { Dropdown, DropdownItemCSS, DropdownPosition } from 'components/common/Dropdown'
+import { DisplayTablePositions } from 'components/form/DisplayTablePositions'
 import { FlexRow } from 'components/pureStyledComponents/FlexRow'
 import { Pill, PillTypes } from 'components/pureStyledComponents/Pill'
 import { Row } from 'components/pureStyledComponents/Row'
@@ -16,6 +17,7 @@ import { INFORMATION_NOT_AVAILABLE } from 'config/constants'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useIsConditionFromOmen } from 'hooks/useIsConditionFromOmen'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
+import { usePositions } from 'hooks/usePositions'
 import { useQuestion } from 'hooks/useQuestion'
 import { GetCondition_condition } from 'types/generatedGQLForCTE'
 import { formatTS, getConditionTypeTitle, truncateStringInTheMiddle } from 'util/tools'
@@ -87,6 +89,9 @@ export const Contents: React.FC<Props> = ({ condition }) => {
   ) : (
     <FormatHash hash={truncateStringInTheMiddle(oracle, 8, 6)} />
   )
+  const { data: positions, loading: loadingPositions } = usePositions({
+    conditionsIds: [conditionId],
+  })
 
   return (
     <CenteredCard
@@ -173,6 +178,12 @@ export const Contents: React.FC<Props> = ({ condition }) => {
               <ButtonCopy value={oracle} />
             </FlexRow>
           }
+        />
+      </Row>
+      <Row cols="1fr">
+        <TitleValue
+          title={"Condition's split positions"}
+          value={<DisplayTablePositions isLoading={loadingPositions} positions={positions || []} />}
         />
       </Row>
     </CenteredCard>

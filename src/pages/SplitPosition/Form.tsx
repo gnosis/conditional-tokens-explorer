@@ -8,7 +8,7 @@ import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { Modal } from 'components/common/Modal'
 import { SetAllowance } from 'components/common/SetAllowance'
-import { DisplayTablePositions } from 'components/form/DisplayTablePosition'
+import { DisplayTablePositionsWrapper } from 'components/form/DisplayTablePositions'
 import { InputAmount } from 'components/form/InputAmount'
 import { InputCondition } from 'components/form/InputCondition'
 import { EditPartitionModal } from 'components/modals/EditPartitionModal'
@@ -262,7 +262,7 @@ export const Form = ({
 
   const splitPositionsTable =
     status.isSuccess() && status.hasData() ? (
-      <DisplayTablePositions
+      <DisplayTablePositionsWrapper
         callbackOnHistoryPush={clearComponent}
         collateral={status.get().collateral}
         positionIds={status.get().positionIds}
