@@ -4,6 +4,7 @@ import styled, { css } from 'styled-components'
 
 import { ButtonCopy } from 'components/buttons/ButtonCopy'
 import { ExternalLink } from 'components/navigation/ExternalLink'
+import { FormatHash } from 'components/text/FormatHash'
 import { truncateStringInTheMiddle } from 'util/tools'
 
 const Wrapper = styled.span`
@@ -17,7 +18,6 @@ const Wrapper = styled.span`
 const TextCSS = css`
   color: ${(props) => props.theme.colors.textColor};
   font-family: 'Roboto Mono', monospace;
-  text-transform: uppercase;
 `
 
 const Text = styled.span`
@@ -36,7 +36,7 @@ interface Props {
   value: string
 }
 
-export const CellHash: React.FC<Props> = (props) => {
+export const Hash: React.FC<Props> = (props) => {
   const { externalLink, href, onClick, truncateInTheMiddle = true, value, ...restProps } = props
   const shownValue = truncateInTheMiddle ? truncateStringInTheMiddle(value, 10, 8) : value
   const port = window.location.port !== '' ? `:${window.location.port}` : ''
@@ -44,12 +44,12 @@ export const CellHash: React.FC<Props> = (props) => {
   return (
     <Wrapper {...restProps}>
       {href ? (
-        <Link className="cellHashText" to={href}>
-          {shownValue}
+        <Link className="hashText" to={href}>
+          <FormatHash hash={shownValue} />
         </Link>
       ) : (
-        <Text className="cellHashText" onClick={onClick}>
-          {shownValue}
+        <Text className="hashText" onClick={onClick}>
+          <FormatHash hash={shownValue} />
         </Text>
       )}
       <ButtonCopy light value={value} />

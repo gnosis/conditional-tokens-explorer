@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { FormContextValues } from 'react-hook-form'
 import styled from 'styled-components'
 
@@ -39,9 +39,11 @@ export interface InputPositionProps {
   formMethods: FormContextValues<SplitPositionFormMethods>
   onPositionChange: (position: Maybe<GetMultiPositions_positions>) => void
   splitFromPosition: boolean
+  clickHandler?: () => void
 }
 
 export const InputPosition = ({
+  clickHandler,
   formMethods: { register, setValue },
   onPositionChange,
   splitFromPosition,
@@ -59,6 +61,12 @@ export const InputPosition = ({
   const { balances, errors: balancesErrors, loading: balancesLoading } = useBatchBalanceContext()
 
   const [positionToDisplay, setPositionToDisplay] = React.useState('')
+
+  const handleClick = useCallback(() => {
+    if (clickHandler && typeof clickHandler === 'function') {
+      clickHandler()
+    }
+  }, [clickHandler])
 
   useEffect(() => {
     register('positionId', { required: splitFromPosition })
@@ -104,10 +112,11 @@ export const InputPosition = ({
     <Wrapper {...restProps}>
       <InputWrapper>
         <TextfieldFetchableData
-          disabled={true}
           error={!!errors.length}
           isFetching={balancesLoading}
+          onClick={handleClick}
           placeholder={'Please select a position...'}
+          readOnly
           type="text"
           value={positionToDisplay}
         />

@@ -3,6 +3,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { Button } from 'components/buttons/Button'
+import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { Amount } from 'components/form/Amount'
 import { SelectCondition } from 'components/form/SelectCondition'
@@ -189,6 +190,29 @@ export const Contents = () => {
     setStatus(null)
   }, [clearPositions, clearCondition, updateBalances])
 
+  const fullLoadingActionButton =
+    status === Status.Error
+      ? {
+          buttonType: ButtonType.danger,
+          onClick: () => setStatus(null),
+          text: 'Close',
+        }
+      : undefined
+
+  const fullLoadingIcon =
+    status === Status.Error
+      ? IconTypes.error
+      : status === Status.Loading
+      ? IconTypes.spinner
+      : undefined
+
+  const fullLoadingMessage =
+    status === Status.Error ? error?.message : status === Status.Loading ? 'Working...' : undefined
+
+  const fullLoadingTitle = status === Status.Error ? 'Error' : 'Merge Positions'
+  const isWorking = status === Status.Loading || status === Status.Error
+  const isFinished = status === Status.Ready
+
   return (
     <CenteredCard>
       <Row cols="1fr" marginBottomXL>
@@ -224,17 +248,15 @@ export const Contents = () => {
       <Row cols="1fr">
         <MergePreview amount={amount} />
       </Row>
-      {(status === Status.Loading || status === Status.Error) && (
+      {isWorking && (
         <FullLoading
-          actionButton={
-            status === Status.Error ? { text: 'OK', onClick: () => setStatus(null) } : undefined
-          }
-          icon={status === Status.Error ? IconTypes.error : IconTypes.spinner}
-          message={status === Status.Error ? error?.message : 'Working...'}
-          title={status === Status.Error ? 'Error' : 'Merge Positions'}
+          actionButton={fullLoadingActionButton}
+          icon={fullLoadingIcon}
+          message={fullLoadingMessage}
+          title={fullLoadingTitle}
         />
       )}
-      {status === Status.Ready && collateralToken && (
+      {isFinished && collateralToken && (
         <MergeResultModal
           amount={amount}
           closeAction={clearComponent}

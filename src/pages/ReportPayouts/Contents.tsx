@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { Button } from 'components/buttons'
+import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { SelectCondition } from 'components/form/SelectCondition'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
@@ -96,10 +97,46 @@ export const Contents: React.FC = () => {
       }
     } catch (err) {
       setError(err)
-      setTransactionStatus(null)
+      setTransactionStatus(Status.Error)
       logger.error(err)
     }
   }
+
+  const fullLoadingActionButton =
+    transactionStatus === Status.Error
+      ? {
+          buttonType: ButtonType.danger,
+          onClick: () => setTransactionStatus(null),
+          text: 'Close',
+        }
+      : transactionStatus === Status.Ready
+      ? {
+          buttonType: ButtonType.primary,
+          onClick: () => setTransactionStatus(null),
+          text: 'OK',
+        }
+      : undefined
+
+  const fullLoadingMessage =
+    transactionStatus === Status.Error
+      ? error?.message
+      : transactionStatus === Status.Loading
+      ? 'Working...'
+      : 'Report finished!'
+
+  const fullLoadingTitle = transactionStatus === Status.Error ? 'Error' : 'Report Payouts'
+
+  const fullLoadingIcon =
+    transactionStatus === Status.Error
+      ? IconTypes.error
+      : transactionStatus === Status.Loading
+      ? IconTypes.spinner
+      : IconTypes.ok
+
+  const isWorking =
+    transactionStatus === Status.Loading ||
+    transactionStatus === Status.Error ||
+    transactionStatus === Status.Ready
 
   return (
     <CenteredCard>
@@ -118,29 +155,15 @@ export const Contents: React.FC = () => {
           </StripedListEmpty>
         </StripedList>
       )}
+      {isWorking && (
+        <FullLoading
+          actionButton={fullLoadingActionButton}
+          icon={fullLoadingIcon}
+          message={fullLoadingMessage}
+          title={fullLoadingTitle}
+        />
+      )}
 
-      {transactionStatus === Status.Loading && (
-        <FullLoading
-          actionButton={
-            error ? { text: 'OK', onClick: () => setTransactionStatus(Status.Ready) } : undefined
-          }
-          icon={error ? IconTypes.error : IconTypes.spinner}
-          message={error ? error.message : 'Working...'}
-          title={error ? 'Error' : 'Report payout'}
-        />
-      )}
-      {transactionStatus === Status.Ready && (
-        <FullLoading
-          actionButton={
-            transactionStatus === Status.Ready
-              ? { text: 'OK', onClick: () => setTransactionStatus(null) }
-              : undefined
-          }
-          icon={IconTypes.ok}
-          message={'Report Finished'}
-          title={'Report Payouts'}
-        />
-      )}
       <ErrorContainer>
         {payoutEmptyError && <Error>{PAYOUTS_POSITIVE_ERROR}</Error>}
         {status === Web3ContextStatus.Connected && oracleNotValidError && (

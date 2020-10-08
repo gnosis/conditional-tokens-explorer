@@ -3,6 +3,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import { Button } from 'components/buttons'
+import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { SelectCondition } from 'components/form/SelectCondition'
 import { SelectPositions } from 'components/form/SelectPositions'
@@ -43,7 +44,7 @@ export const Contents = () => {
     errors: conditionErrors,
     loading: loadingCondition,
   } = useConditionContext()
-  const [statusTransaction, setStatusTransaction] = React.useState<Maybe<Status>>(null)
+  const [transactionStatus, setTransactionStatus] = React.useState<Maybe<Status>>(null)
   const [error, setError] = React.useState<Maybe<Error>>(null)
 
   useEffect(() => {
@@ -57,14 +58,14 @@ export const Contents = () => {
       loadingCondition ||
       loadingBalance ||
       loadingPositions ||
-      statusTransaction === Status.Loading,
-    [loadingCondition, loadingBalance, loadingPositions, statusTransaction]
+      transactionStatus === Status.Loading,
+    [loadingCondition, loadingBalance, loadingPositions, transactionStatus]
   )
 
   const onRedeem = useCallback(async () => {
     try {
       if (positions.length && condition && status === Web3ContextStatus.Connected) {
-        setStatusTransaction(Status.Loading)
+        setTransactionStatus(Status.Loading)
 
         const { collateralToken, conditionIds, indexSets } = positions[0]
         const newCollectionsSet = conditionIds.reduce(
@@ -101,12 +102,12 @@ export const Contents = () => {
         clearPositions()
         setError(null)
 
-        setStatusTransaction(Status.Ready)
+        setTransactionStatus(Status.Ready)
       } else if (status === Web3ContextStatus.Infura) {
         connect()
       }
     } catch (err) {
-      setStatusTransaction(Status.Error)
+      setTransactionStatus(Status.Error)
       setError(err)
       logger.error(err)
     }
@@ -132,6 +133,42 @@ export const Contents = () => {
     )
   }, [isRelated, positions, condition, loadingCheckPositionRelatedToCondition])
 
+  const fullLoadingActionButton =
+    transactionStatus === Status.Error
+      ? {
+          buttonType: ButtonType.danger,
+          onClick: () => setTransactionStatus(null),
+          text: 'Close',
+        }
+      : transactionStatus === Status.Ready
+      ? {
+          buttonType: ButtonType.primary,
+          onClick: () => setTransactionStatus(null),
+          text: 'OK',
+        }
+      : undefined
+
+  const fullLoadingMessage =
+    transactionStatus === Status.Error
+      ? error?.message
+      : transactionStatus === Status.Loading
+      ? 'Working...'
+      : 'Redeeming finished!'
+
+  const fullLoadingTitle = transactionStatus === Status.Error ? 'Error' : 'Redeem Positions'
+
+  const fullLoadingIcon =
+    transactionStatus === Status.Error
+      ? IconTypes.error
+      : transactionStatus === Status.Loading
+      ? IconTypes.spinner
+      : IconTypes.ok
+
+  const isWorking =
+    transactionStatus === Status.Loading ||
+    transactionStatus === Status.Error ||
+    transactionStatus === Status.Ready
+
   return (
     <CenteredCard>
       <Row cols="1fr">
@@ -152,28 +189,12 @@ export const Contents = () => {
           <Error>Position is not related to the condition.</Error>
         </ErrorContainer>
       )}
-      {(statusTransaction === Status.Loading || statusTransaction === Status.Error) && (
+      {isWorking && (
         <FullLoading
-          actionButton={
-            statusTransaction === Status.Error
-              ? { text: 'OK', onClick: () => setStatusTransaction(null) }
-              : undefined
-          }
-          icon={statusTransaction === Status.Error ? IconTypes.error : IconTypes.spinner}
-          message={statusTransaction === Status.Error ? error?.message : 'Working...'}
-          title={statusTransaction === Status.Error ? 'Error' : 'Redeem Positions'}
-        />
-      )}
-      {statusTransaction === Status.Ready && (
-        <FullLoading
-          actionButton={
-            statusTransaction === Status.Ready
-              ? { text: 'OK', onClick: () => setStatusTransaction(null) }
-              : undefined
-          }
-          icon={IconTypes.ok}
-          message={'Redeem Finished'}
-          title={'Redeem Position'}
+          actionButton={fullLoadingActionButton}
+          icon={fullLoadingIcon}
+          message={fullLoadingMessage}
+          title={fullLoadingTitle}
         />
       )}
       <ButtonContainer>
