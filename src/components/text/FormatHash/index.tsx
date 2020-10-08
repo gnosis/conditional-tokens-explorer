@@ -14,7 +14,7 @@ interface Props extends HTMLAttributes<HTMLSpanElement> {
 export const FormatHash: React.FC<Props> = (props) => {
   const { hash, ...restProps } = props
 
-  const cleanHash = hash?.toString().toLowerCase().replace('0x', '')
+  const cleanHash = hash.replace(/0x/i, '')
 
   return (
     <Wrapper {...restProps}>
