@@ -257,7 +257,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
           data={showSpinner ? [] : positionList.length ? positionList : []}
           noDataComponent={
             showSpinner ? (
-              <InlineLoading />
+              <InlineLoading size="30px" />
             ) : (
               <EmptyContentText>{`No positions ${
                 showOnlyPositionsWithBalance && data && data.length ? ' with balance' : ''

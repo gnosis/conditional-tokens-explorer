@@ -38,17 +38,16 @@ const Message = styled(Text)`
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   absolute?: boolean
-  height?: string
   message?: string
-  width?: string
+  size?: string
 }
 
 export const InlineLoading: React.FC<Props> = (props: Props) => {
-  const { height, message, width, ...restProps } = props
+  const { message, size, ...restProps } = props
 
   return (
     <Wrapper {...restProps}>
-      <Spinner height={height} width={width} />
+      <Spinner height={size} width={size} />
       {message ? <Message>{message}</Message> : null}
     </Wrapper>
   )
