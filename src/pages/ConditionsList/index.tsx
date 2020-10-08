@@ -38,8 +38,8 @@ import {
   MinMaxOutcomesOptions,
   OracleFilterOptions,
   StatusOptions,
-  ValidityOptions,
 } from 'util/types'
+import { ConditionSearchOptions } from '../../util/types'
 
 const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
   ${DropdownItemCSS}
@@ -51,8 +51,8 @@ export const ConditionsList: React.FC = () => {
   const history = useHistory()
   const { setValue } = useLocalStorage(LocalStorageManagement.ConditionId)
 
-  const [conditionIdToSearch, setConditionIdToSearch] = useState<string>('')
-  const [conditionIdToShow, setConditionIdToShow] = useState<string>('')
+  const [textToSearch, setTextToSearch] = useState<string>('')
+  const [textToShow, setTextToShow] = useState<string>('')
 
   const [selectedOracleFilter, setSelectedOracleFilter] = useState<string[]>([])
   const [selectedOracleValue, setSelectedOracleValue] = useState<OracleFilterOptions>(
@@ -72,23 +72,28 @@ export const ConditionsList: React.FC = () => {
     ConditionType | ConditionTypeAll
   >(ConditionTypeAll.all)
 
-  const debouncedHandlerConditionToSearch = useDebounceCallback((conditionIdToSearch) => {
-    setConditionIdToSearch(conditionIdToSearch)
+  const [searchBy, setSearchBy] = useState<ConditionSearchOptions>(ConditionSearchOptions.All)
+  const dropdownItems = useConditionsSearchOptions(setSearchBy)
+
+  logger.log(`Search by ${searchBy}`)
+
+  const debouncedHandlerTextToSearch = useDebounceCallback((conditionIdToSearch) => {
+    setTextToSearch(conditionIdToSearch)
   }, 500)
 
-  const onChangeConditionId = React.useCallback(
+  const onChangeSearch = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.currentTarget
-      setConditionIdToShow(value)
-      debouncedHandlerConditionToSearch(value)
+      setTextToShow(value)
+      debouncedHandlerTextToSearch(value)
     },
-    [debouncedHandlerConditionToSearch]
+    [debouncedHandlerTextToSearch]
   )
 
   const onClearSearch = React.useCallback(() => {
-    setConditionIdToShow('')
-    debouncedHandlerConditionToSearch('')
-  }, [debouncedHandlerConditionToSearch])
+    setTextToShow('')
+    debouncedHandlerTextToSearch('')
+  }, [debouncedHandlerTextToSearch])
 
   const advancedFilters: AdvancedFilter = {
     ReporterOracle: {
@@ -102,12 +107,16 @@ export const ConditionsList: React.FC = () => {
     Status: selectedStatus,
     MinMaxOutcomes: selectedMinMaxOutcomes,
     FromToCreationDate: selectedFromToCreationDate,
+    TextToSearch: {
+      type: searchBy,
+      value: textToSearch,
+    }
   }
 
   const { data, error, loading } = useConditionsList(advancedFilters)
 
-  const isLoading = !conditionIdToSearch && loading
-  const isSearching = conditionIdToSearch && loading
+  const isLoading = !textToSearch && loading
+  const isSearching = textToSearch && loading
 
   const buildMenuForRow = useCallback(
     ({ id }) => {
@@ -231,11 +240,6 @@ export const ConditionsList: React.FC = () => {
     },
   ]
 
-  const [searchBy, setSearchBy] = useState('all')
-  const dropdownItems = useConditionsSearchOptions(setSearchBy)
-
-  logger.log(`Search by ${searchBy}`)
-
   const [showFilters, setShowFilters] = useState(false)
 
   const toggleShowFilters = useCallback(() => {
@@ -251,9 +255,9 @@ export const ConditionsList: React.FC = () => {
         end={
           <SearchField
             dropdownItems={dropdownItems}
-            onChange={onChangeConditionId}
+            onChange={onChangeSearch}
             onClear={onClearSearch}
-            value={conditionIdToShow}
+            value={textToShow}
           />
         }
         start={<Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />}

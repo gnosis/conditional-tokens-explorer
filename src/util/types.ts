@@ -205,6 +205,16 @@ export interface FromToCreationDateOptions {
   to: number
 }
 
+export enum ConditionSearchOptions {
+  All = 'all',
+  ConditionId = 'conditionId',
+  QuestionId = 'questionId',
+  QuestionText = 'questionText',
+  OracleAddress = 'oracleAddress',
+  ReportingAddress = 'reportingAddress',
+  CreatorAddress = 'creatorAddress',
+}
+
 export interface AdvancedFilter {
   ReporterOracle: {
     type: OracleFilterOptions
@@ -217,4 +227,8 @@ export interface AdvancedFilter {
   Status: StatusOptions
   MinMaxOutcomes: Maybe<MinMaxOutcomesOptions>
   FromToCreationDate: Maybe<FromToCreationDateOptions>
+  TextToSearch: {
+    type: ConditionSearchOptions
+    value: Maybe<string>
+  }
 }

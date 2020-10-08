@@ -7,6 +7,7 @@ import {
   OracleFilterOptions,
   StatusOptions,
 } from 'util/types'
+import { ConditionSearchOptions } from '../util/types'
 
 export interface ConditionsListType {
   conditionId?: string
@@ -32,6 +33,10 @@ export const DEFAULT_OPTIONS_LIST: AdvancedFilter = {
   Status: StatusOptions.All,
   MinMaxOutcomes: null,
   FromToCreationDate: null,
+  TextToSearch: {
+    type: ConditionSearchOptions.All,
+    value: null,
+  }
 }
 
 const conditionFragment = gql`
@@ -63,6 +68,7 @@ export const buildQueryConditionsList = (advancedFilter: AdvancedFilter = DEFAUL
     MinMaxOutcomes,
     ReporterOracle,
     Status,
+    TextToSearch,
   } = advancedFilter
 
   const whereClauseInternal = [

@@ -14,6 +14,7 @@ export const useConditionsList = (advancedFilter: AdvancedFilter) => {
     MinMaxOutcomes,
     ReporterOracle,
     Status,
+    TextToSearch,
   } = advancedFilter
 
   const query = buildQueryConditionsList(advancedFilter)
@@ -37,12 +38,14 @@ export const useConditionsList = (advancedFilter: AdvancedFilter) => {
     variables['fromCreationDate'] = FromToCreationDate.from
     variables['toCreationDate'] = FromToCreationDate.to
   }
-
   if (
     ConditionTypeFilter.type === ConditionType.omen ||
     ConditionTypeFilter.type === ConditionType.custom
   ) {
     variables['conditionType'] = ConditionTypeFilter.value
+  }
+  if ( TextToSearch.value ) {
+    variables['textToSearch'] = TextToSearch.value
   }
 
   const { data, error, loading } = useQuery<Conditions>(query, {
