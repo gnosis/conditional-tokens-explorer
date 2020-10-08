@@ -22,8 +22,8 @@ import { TwoColumnsCollapsibleLayout } from 'components/pureStyledComponents/Two
 import { SearchField } from 'components/search/SearchField'
 import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
-import { CellHash } from 'components/table/CellHash'
 import { TableControls } from 'components/table/TableControls'
+import { Hash } from 'components/text/Hash'
 import { useConditions } from 'hooks/useConditions'
 import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
@@ -136,9 +136,7 @@ export const ConditionsList: React.FC = () => {
   const columns = [
     {
       // eslint-disable-next-line react/display-name
-      cell: (row: Conditions_conditions) => (
-        <CellHash href={`/conditions/${row.id}`} value={row.id} />
-      ),
+      cell: (row: Conditions_conditions) => <Hash href={`/conditions/${row.id}`} value={row.id} />,
       name: 'Condition Id',
       selector: 'createTimestamp',
       sortable: true,
@@ -146,7 +144,7 @@ export const ConditionsList: React.FC = () => {
     {
       // eslint-disable-next-line react/display-name
       cell: (row: Conditions_conditions) => (
-        <CellHash onClick={() => handleRowClick(row)} value={row.oracle} />
+        <Hash onClick={() => handleRowClick(row)} value={row.oracle} />
       ),
       name: 'Reporting Address / Oracle',
       selector: 'oracle',
@@ -155,7 +153,7 @@ export const ConditionsList: React.FC = () => {
     {
       // eslint-disable-next-line react/display-name
       cell: (row: Conditions_conditions) => (
-        <CellHash onClick={() => handleRowClick(row)} value={row.questionId} />
+        <Hash onClick={() => handleRowClick(row)} value={row.questionId} />
       ),
       name: 'Question Id',
       selector: 'questionId',

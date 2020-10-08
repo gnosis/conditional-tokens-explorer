@@ -34,6 +34,7 @@ import {
 } from 'components/pureStyledComponents/StripedList'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
+import { FormatHash } from 'components/text/FormatHash'
 import { TitleValue } from 'components/text/TitleValue'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useCollateral } from 'hooks/useCollateral'
@@ -343,7 +344,9 @@ export const Contents = (props: Props) => {
   const conditionIdLink = (id: string) => {
     return (
       <>
-        <InternalLink to={`/conditions/${id}`}>{truncateStringInTheMiddle(id, 8, 6)}</InternalLink>
+        <InternalLink to={`/conditions/${id}`}>
+          <FormatHash hash={truncateStringInTheMiddle(id, 8, 6)} />
+        </InternalLink>
         <ButtonCopy value={id} />
       </>
     )
@@ -408,11 +411,10 @@ export const Contents = (props: Props) => {
           title="Position Id"
           value={
             <FlexRow>
-              {truncateStringInTheMiddle(positionId, 8, 6)}
+              <FormatHash hash={truncateStringInTheMiddle(positionId, 8, 6)} />
               <ButtonCopy value={positionId} />
             </FlexRow>
           }
-          valueUppercase
         />
         <TitleValue
           title="Collateral Token"
@@ -423,13 +425,12 @@ export const Contents = (props: Props) => {
           value={
             <FlexRow>
               <Link href={getEtherscanContractUrl(collateralTokenAddress)}>
-                {truncateStringInTheMiddle(collateralTokenAddress, 8, 6)}
+                <FormatHash hash={truncateStringInTheMiddle(collateralTokenAddress, 8, 6)} />
               </Link>
               <ButtonCopy value={collateralTokenAddress} />
               <ExternalLink href={getEtherscanContractUrl(collateralTokenAddress)} />
             </FlexRow>
           }
-          valueUppercase
         />
         {conditions.length > 0 && (
           <TitleValue
@@ -446,7 +447,6 @@ export const Contents = (props: Props) => {
                 </FlexRow>
               )
             }
-            valueUppercase
           />
         )}
       </Row>
@@ -510,14 +510,13 @@ export const Contents = (props: Props) => {
             ) : (
               <FlexRow>
                 <Link href={getEtherscanTokenUrl(wtmAddress)}>
-                  {truncateStringInTheMiddle(wtmAddress, 8, 6)}
+                  <FormatHash hash={truncateStringInTheMiddle(wtmAddress, 8, 6)} />
                 </Link>
                 <ButtonCopy value={wtmAddress} />
                 <ExternalLink href={getEtherscanTokenUrl(wtmAddress)} />
               </FlexRow>
             )
           }
-          valueUppercase={balanceERC20.isZero() ? false : true}
         />
       </Row>
       <Row cols="1fr" marginBottomXL>

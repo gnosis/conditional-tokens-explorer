@@ -17,6 +17,7 @@ import { SearchField } from 'components/search/SearchField'
 import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { TableControls } from 'components/table/TableControls'
+import { FormatHash } from 'components/text/FormatHash'
 import { TitleValue } from 'components/text/TitleValue'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useConditions } from 'hooks/useConditions'
@@ -93,21 +94,27 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
         selector: 'createTimestamp',
         sortable: true,
         // eslint-disable-next-line react/display-name
-        cell: (row: Conditions_conditions) => truncateStringInTheMiddle(row.id, 8, 6),
+        cell: (row: Conditions_conditions) => (
+          <FormatHash hash={truncateStringInTheMiddle(row.id, 8, 6)} />
+        ),
       },
       {
         name: 'R. Address / Oracle',
         selector: 'oracle',
         sortable: true,
         // eslint-disable-next-line react/display-name
-        cell: (row: Conditions_conditions) => truncateStringInTheMiddle(row.oracle, 8, 6),
+        cell: (row: Conditions_conditions) => (
+          <FormatHash hash={truncateStringInTheMiddle(row.oracle, 8, 6)} />
+        ),
       },
       {
         name: 'Question Id',
         selector: 'questionId',
         sortable: true,
         // eslint-disable-next-line react/display-name
-        cell: (row: Conditions_conditions) => truncateStringInTheMiddle(row.questionId, 8, 6),
+        cell: (row: Conditions_conditions) => (
+          <FormatHash hash={truncateStringInTheMiddle(row.questionId, 8, 6)} />
+        ),
       },
       {
         button: true,
@@ -186,7 +193,7 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
           <StripedList maxHeight={selectedCondition ? 'auto' : '44px'}>
             {selectedCondition ? (
               <StripedListItem>
-                {truncateStringInTheMiddle(selectedCondition.id, 8, 6)}
+                <FormatHash hash={truncateStringInTheMiddle(selectedCondition.id, 8, 6)} />
                 <ButtonControl
                   buttonType={ButtonControlType.delete}
                   onClick={() => setSelectedCondition(null)}

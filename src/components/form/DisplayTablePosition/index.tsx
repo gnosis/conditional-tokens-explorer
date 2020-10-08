@@ -4,7 +4,8 @@ import { useHistory } from 'react-router-dom'
 
 import { TokenIcon } from 'components/common/TokenIcon'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
-import { CellHash } from 'components/table/CellHash'
+import { FormatHash } from 'components/text/FormatHash'
+import { Hash } from 'components/text/Hash'
 import { useCollateral } from 'hooks/useCollateral'
 import { customStyles } from 'theme/tableCustomStyles'
 import { formatBigNumber, truncateStringInTheMiddle } from 'util/tools'
@@ -32,9 +33,7 @@ export const DisplayTablePositions = (props: Props) => {
       {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionIdsArray) => {
-          return (
-            <CellHash externalLink href={`/positions/${row.positionId}`} value={row.positionId} />
-          )
+          return <Hash externalLink href={`/positions/${row.positionId}`} value={row.positionId} />
         },
         maxWidth: '250px',
         minWidth: '250px',
@@ -49,7 +48,7 @@ export const DisplayTablePositions = (props: Props) => {
             return collateralFetched ? (
               <TokenIcon onClick={() => handleRowClick} token={collateralFetched} />
             ) : (
-              <span title={collateral}>{truncateStringInTheMiddle(collateral, 10, 8)}</span>
+              <FormatHash hash={truncateStringInTheMiddle(collateral, 10, 8)} title={collateral} />
             )
           } else {
             return null
