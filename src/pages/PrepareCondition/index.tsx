@@ -214,7 +214,7 @@ export const PrepareCondition = () => {
   ])
 
   const prepareCondition = async () => {
-    if (conditionType === ConditionType.omen && outcomes.length < 2 ) {
+    if (conditionType === ConditionType.omen && outcomes.length < 2) {
       setError(new Error(`Outcomes must be greater than 1`))
       return
     }
