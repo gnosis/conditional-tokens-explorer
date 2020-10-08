@@ -73,14 +73,12 @@ export const PositionProvider = (props: Props) => {
     }
   )
 
-  if (positionId) {
+  if (positionId && fetchedPosition?.position) {
     const { position: positionFromTheGraph } = fetchedPosition ?? { position: null }
+
     if (positionFromTheGraph) {
       position = positionFromTheGraph
-    }
-
-    // Validate position exist
-    if (!positionFromTheGraph) {
+    } else {
       errors.push(PositionErrors.NOT_FOUND_ERROR)
     }
   }
