@@ -149,8 +149,10 @@ interface Props {
 
 export const AddOutcome: React.FC<Props> = (props) => {
   const { addOutcome, onChange, outcome = '', outcomes, removeOutcome, ...restProps } = props
+  const sanitizedOutcome = outcome.trim()
   const maxOutcomesReached = outcomes.length === 256
-  const buttonAddDisabled = maxOutcomesReached || !isOutcomeValid(outcome)
+  const buttonAddDisabled =
+    maxOutcomesReached || !isOutcomeValid(outcome) || outcomes.includes(sanitizedOutcome)
   const outcomeNameRef = React.createRef<HTMLInputElement>()
 
   const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {

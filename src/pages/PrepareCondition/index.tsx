@@ -75,8 +75,10 @@ export const PrepareCondition = () => {
   const history = useHistory()
 
   const addOutcome = React.useCallback(() => {
+    const sanitizedOutcome = outcome.trim()
+
     setOutcome('')
-    setOutcomes([...outcomes, outcome.trim()])
+    setOutcomes([...outcomes, sanitizedOutcome])
   }, [outcome, outcomes, setOutcomes])
 
   const removeOutcome = React.useCallback(
