@@ -61,6 +61,12 @@ const EditableOutcome: React.FC<{ item: string | undefined; removeOutcome: () =>
   const [isEditing, setIsEditing] = useState(false)
   const [value, setValue] = useState<string | undefined>(item)
 
+  const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      setIsEditing(false)
+    }
+  }
+
   useEffect(() => {
     setValue(item)
   }, [item])
@@ -70,6 +76,9 @@ const EditableOutcome: React.FC<{ item: string | undefined; removeOutcome: () =>
       <Outcome
         onBlur={() => setIsEditing(false)}
         onChange={(e) => setValue(e.currentTarget.value)}
+        onKeyUp={(e: React.KeyboardEvent<HTMLInputElement>) => {
+          onPressEnter(e)
+        }}
         readOnly={!isEditing}
         type="text"
         value={value}
@@ -120,7 +129,7 @@ export const AddOutcome: React.FC<Props> = (props) => {
             <Textfield
               disabled={newOutcomeDisabled}
               onChange={onChange}
-              onKeyUp={(e) => {
+              onKeyUp={(e: React.KeyboardEvent<HTMLInputElement>) => {
                 onPressEnter(e)
               }}
               placeholder="New outcome title..."
