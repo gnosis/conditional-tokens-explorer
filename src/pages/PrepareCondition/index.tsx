@@ -246,19 +246,11 @@ export const PrepareCondition = () => {
     ? IconTypes.ok
     : IconTypes.spinner
 
-  const fullLoadingMessage = prepareConditionStatus.isFailure() ? (
-    prepareConditionStatus.getFailure()
-  ) : prepareConditionStatus.isLoading() ? (
-    'Working...'
-  ) : (
-    <>
-      {conditionId && (
-        <>
-          All done! Condition <Hash value={conditionId} /> created.
-        </>
-      )}
-    </>
-  )
+  const fullLoadingMessage = prepareConditionStatus.isFailure()
+    ? prepareConditionStatus.getFailure()
+    : prepareConditionStatus.isLoading()
+    ? 'Working...'
+    : conditionId && `All done! Condition ${(<Hash value={conditionId} />)} created.`
   const fullLoadingTitle = prepareConditionStatus.isFailure() ? 'Error' : 'Prepare Condition'
 
   return (
