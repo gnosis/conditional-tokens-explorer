@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { ButtonAdd } from 'components/buttons/ButtonAdd'
 import { ButtonControl, ButtonControlType } from 'components/buttons/ButtonControl'
 import { Row } from 'components/pureStyledComponents/Row'
+import { SmallNote } from 'components/pureStyledComponents/SmallNote'
 import {
   StripedList,
   StripedListEmpty,
@@ -225,22 +226,27 @@ export const AddOutcome: React.FC<Props> = (props) => {
       <TitleValue
         title="Outcomes"
         value={
-          <StripedList maxHeight="300px" minHeight="200px">
-            {outcomes.length ? (
-              outcomes.map((item, index) => (
-                <StripedListItem key={index}>
-                  <EditableOutcome
-                    outcomeIndex={index}
-                    outcomeText={item}
-                    outcomes={outcomes}
-                    removeOutcome={() => removeOutcome(index)}
-                  />
-                </StripedListItem>
-              ))
-            ) : (
-              <StripedListEmpty>No outcomes.</StripedListEmpty>
-            )}
-          </StripedList>
+          <>
+            <StripedList maxHeight="300px" minHeight="200px">
+              {outcomes.length ? (
+                outcomes.map((item, index) => (
+                  <StripedListItem key={index}>
+                    <EditableOutcome
+                      outcomeIndex={index}
+                      outcomeText={item}
+                      outcomes={outcomes}
+                      removeOutcome={() => removeOutcome(index)}
+                    />
+                  </StripedListItem>
+                ))
+              ) : (
+                <StripedListEmpty>No outcomes.</StripedListEmpty>
+              )}
+            </StripedList>
+            <SmallNote>
+              <strong>Note:</strong> Omen supports min. 2 and max. 256 outcomes.
+            </SmallNote>
+          </>
         }
       />
     </Row>
