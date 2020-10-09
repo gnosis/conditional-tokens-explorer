@@ -2,6 +2,7 @@ import moment from 'moment'
 import React, { KeyboardEvent, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useHistory } from 'react-router-dom'
+import styled from 'styled-components'
 
 import { Button } from 'components/buttons/Button'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
@@ -17,6 +18,7 @@ import { Row } from 'components/pureStyledComponents/Row'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { TitleControl } from 'components/pureStyledComponents/TitleControl'
 import { FullLoading } from 'components/statusInfo/FullLoading'
+import { StatusInfoInline, StatusInfoType } from 'components/statusInfo/StatusInfoInline'
 import { IconTypes } from 'components/statusInfo/common'
 import { Hash } from 'components/text/Hash'
 import { TitleValue } from 'components/text/TitleValue'
@@ -34,9 +36,6 @@ import { Remote } from 'util/remoteData'
 import { isAddress } from 'util/tools'
 import { Arbitrator, Categories, ConditionType, QuestionOptions } from 'util/types'
 
-const conditionAlreadyExist = 'Condition already exists'
-const questionMustNotExist = 'Question must not exist'
-
 const logger = getLogger('Prepare Condition')
 
 interface CustomConditionType {
@@ -52,6 +51,10 @@ interface OmenConditionType {
   arbitrator: Arbitrator
   oracle: string
 }
+
+const Link = styled.a`
+  color: ${(props) => props.theme.colors.warning};
+`
 
 export const PrepareCondition = () => {
   const {
@@ -69,18 +72,24 @@ export const PrepareCondition = () => {
     Remote.notAsked<Maybe<string>>()
   )
 
+  const [checkForExistingCondition, setCheckForExistingCondition] = useState<Remote<Maybe<string>>>(
+    Remote.notAsked<Maybe<string>>()
+  )
+
   const defaultValuesCustom = {
     questionId: '',
     outcomesSlotCount: null,
     oracle: '',
   }
 
+  const oracle = networkConfig.getOracleFromName('realitio' as KnownOracle)
+
   const defaultValuesOmen = {
     questionTitle: '',
     resolutionDate: null,
     category: Categories.businessAndFinance,
     arbitrator: networkConfig.getArbitratorFromName('realitio'),
-    oracle: networkConfig.getOracleFromName('realitio' as KnownOracle).address,
+    oracle: oracle.address,
   }
 
   const {
@@ -108,9 +117,11 @@ export const PrepareCondition = () => {
     mode: 'onChange',
     defaultValues: defaultValuesOmen,
   })
-  const { isValid: isValidOmenCondition } = formStateOmenCondition
+  const { dirty: isDirtyOmenCondition, isValid: isValidOmenCondition } = formStateOmenCondition
 
   const category = watchOmenCondition('category')
+  const questionTitle = watchOmenCondition('questionTitle')
+  const resolutionDate = watchOmenCondition('resolutionDate')
   const arbitrator = watchOmenCondition('arbitrator')
   const oracleOmenCondition = watchOmenCondition('oracle')
   const questionId = watchCustomCondition('questionId')
@@ -119,6 +130,8 @@ export const PrepareCondition = () => {
 
   const [conditionId, setConditionId] = React.useState<Maybe<string>>(null)
   const [error, setError] = React.useState<Maybe<Error>>(null)
+  const [isConditionAlreadyExist, setErrorConditionAlreadyExist] = React.useState<boolean>(false)
+  const [isQuestionAlreadyExist, setErrorQuestionAlreadyExist] = React.useState<boolean>(false)
   const [conditionType, setConditionType] = React.useState<ConditionType>(ConditionType.custom)
   const [outcomes, setOutcomes] = React.useState<Array<string>>([])
   const [outcome, setOutcome] = React.useState<string>('')
@@ -143,42 +156,49 @@ export const PrepareCondition = () => {
 
   React.useEffect(() => {
     const checkConditionExist = async () => {
+      setCheckForExistingCondition(Remote.loading())
+      setErrorQuestionAlreadyExist(false)
+      setErrorConditionAlreadyExist(false)
+
       try {
         let conditionExists = false
         let conditionIdToUpdate: Maybe<string> = null
-        const { oracle: oracleCustom, outcomesSlotCount, questionId } = getValuesCustomCondition()
-
-        if (questionId && oracleCustom && outcomesSlotCount) {
+        if (questionId && oracleCustomCondition && outcomesSlotCount) {
           conditionIdToUpdate = ConditionalTokensService.getConditionId(
             questionId,
-            oracleCustom,
+            oracleCustomCondition,
             outcomesSlotCount
           )
         }
 
-        const {
-          arbitrator,
-          oracle: oracleOmen,
-          questionTitle,
-          resolutionDate,
-        } = getValuesOmenCondition()
-        if (questionTitle && oracleOmen && outcomes.length > 0 && resolutionDate && address) {
-          const openingDateMoment = moment(resolutionDate + '')
-          const questionOptions: QuestionOptions = {
-            arbitratorAddress: (arbitrator as Arbitrator).address,
-            category,
-            openingDateMoment,
-            outcomes,
-            question: questionTitle + '',
-            networkConfig,
-            signerAddress: address,
+        try {
+          if (
+            questionTitle &&
+            oracleOmenCondition &&
+            outcomes.length > 0 &&
+            resolutionDate &&
+            address
+          ) {
+            const openingDateMoment = moment(resolutionDate + '')
+            const questionOptions: QuestionOptions = {
+              arbitratorAddress: (arbitrator as Arbitrator).address,
+              category,
+              openingDateMoment,
+              outcomes,
+              question: questionTitle + '',
+              networkConfig,
+              signerAddress: address,
+            }
+            const questionId = await RtioService.askQuestionConstant(questionOptions)
+            conditionIdToUpdate = ConditionalTokensService.getConditionId(
+              questionId,
+              oracleOmenCondition + '',
+              outcomes.length
+            )
           }
-          const questionId = await RtioService.askQuestionConstant(questionOptions)
-          conditionIdToUpdate = ConditionalTokensService.getConditionId(
-            questionId,
-            oracleOmen + '',
-            outcomes.length
-          )
+        } catch (err) {
+          setErrorQuestionAlreadyExist(err.message.includes('question must not exist'))
+          logger.error(err)
         }
 
         logger.log(`Condition ID: ${conditionIdToUpdate}`)
@@ -186,20 +206,14 @@ export const PrepareCondition = () => {
           conditionExists = await CTService.conditionExists(conditionIdToUpdate)
         }
 
-        if (conditionExists) {
-          throw new Error(conditionAlreadyExist)
-        }
+        setErrorConditionAlreadyExist(conditionExists)
 
         setError(null)
       } catch (err) {
-        if (err.message.includes(conditionAlreadyExist)) {
-          setError(err)
-        } else if (err.message.includes(questionMustNotExist.toLowerCase())) {
-          setError(new Error(questionMustNotExist))
-        } else {
-          setError(err.message)
-        }
+        setError(err.message)
       }
+
+      setCheckForExistingCondition(Remote.success('Done'))
     }
     checkConditionExist()
   }, [
@@ -207,21 +221,23 @@ export const PrepareCondition = () => {
     RtioService,
     address,
     networkConfig,
+    questionTitle,
     CTService,
     category,
     questionId,
     outcomesSlotCount,
     oracleCustomCondition,
-    getValuesCustomCondition,
-    getValuesOmenCondition,
+    oracleOmenCondition,
+    resolutionDate,
+    arbitrator,
   ])
 
-  const prepareCondition = async () => {
-    if (conditionType === ConditionType.omen && outcomes.length < 2) {
-      setError(new Error(`Outcomes must be greater than 1`))
-      return
-    }
+  const isOutcomesFromOmenConditionInvalid = React.useMemo(
+    () => conditionType === ConditionType.omen && isDirtyOmenCondition && outcomes.length < 2,
+    [conditionType, isDirtyOmenCondition, outcomes]
+  )
 
+  const prepareCondition = async () => {
     setPrepareConditionStatus(Remote.loading())
 
     try {
@@ -291,11 +307,16 @@ export const PrepareCondition = () => {
       ? !isValidCustomCondition ||
         prepareConditionStatus.isLoading() ||
         prepareConditionStatus.isFailure() ||
-        !!error
+        checkForExistingCondition.isLoading() ||
+        checkForExistingCondition.isFailure() ||
+        isConditionAlreadyExist
       : !isValidOmenCondition ||
         prepareConditionStatus.isLoading() ||
         prepareConditionStatus.isFailure() ||
-        !!error
+        checkForExistingCondition.isLoading() ||
+        checkForExistingCondition.isFailure() ||
+        isConditionAlreadyExist ||
+        isQuestionAlreadyExist
 
   const fullLoadingActionButton = prepareConditionStatus.isSuccess()
     ? {
@@ -398,6 +419,26 @@ export const PrepareCondition = () => {
                   </>
                 }
               />
+
+              {isQuestionAlreadyExist && (
+                <StatusInfoInline status={StatusInfoType.warning}>
+                  The question for this condition already exists on{' '}
+                  <Link href={oracle.url} target="_blank">
+                    {oracle.description}
+                  </Link>
+                  . Please change it to a different one.
+                </StatusInfoInline>
+              )}
+            </>
+          )}
+          {isConditionAlreadyExist && (
+            <StatusInfoInline status={StatusInfoType.warning}>
+              Condition already exist. Please use another question ID or change the number of
+              outcomes.
+            </StatusInfoInline>
+          )}
+          {conditionType === ConditionType.omen && (
+            <>
               <AddOutcome
                 addOutcome={addOutcome}
                 onChange={onOutcomeChange}
@@ -405,6 +446,11 @@ export const PrepareCondition = () => {
                 outcomes={outcomes}
                 removeOutcome={removeOutcome}
               />
+              {isOutcomesFromOmenConditionInvalid && (
+                <ErrorContainer>
+                  <ErrorMessage>Outcomes must be greater than 1</ErrorMessage>
+                </ErrorContainer>
+              )}
             </>
           )}
           {conditionType === ConditionType.custom && (
