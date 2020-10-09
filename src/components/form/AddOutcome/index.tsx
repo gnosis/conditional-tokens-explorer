@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { createRef, useCallback, useState } from 'react'
 import styled from 'styled-components'
 
 import { ButtonAdd } from 'components/buttons/ButtonAdd'
@@ -18,12 +18,16 @@ const NewOutcomeWrapper = styled.div`
   grid-template-columns: 1fr 36px;
 `
 
-const Controls = styled.div`
-  display: grid;
-  grid-template-columns: 20px 20px;
+const Controls = styled.div<{ isEditing: boolean }>`
   column-gap: 15px;
+  display: grid;
+  grid-template-columns: ${(props) => (props.isEditing ? '20px 20px 20px' : '20px 20px')};
   margin-left: 30px;
 `
+
+Controls.defaultProps = {
+  isEditing: false,
+}
 
 const OutcomeWrapper = styled.div`
   align-items: center;
@@ -33,55 +37,143 @@ const OutcomeWrapper = styled.div`
   justify-content: space-between;
 `
 
-const Outcome = styled.input`
+const Outcome = styled.input<{ error?: boolean }>`
   background: transparent;
-  border-bottom: 1px solid ${(props) => props.theme.colors.primary};
+  border-bottom: 1px solid
+    ${(props) => (props.error ? props.theme.colors.error : props.theme.colors.primary)};
   border-left: none;
   border-right: none;
   border-top: none;
-  color: ${(props) => props.theme.colors.darkerGrey};
+  color: ${(props) => (props.error ? props.theme.colors.error : props.theme.colors.darkerGrey)};
   cursor: text;
+  display: block;
   flex-grow: 1;
   font-size: 15px;
   font-weight: 400;
   outline: none;
+  overflow: hidden;
   padding-bottom: 5px;
   text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
   &[readOnly] {
     border-bottom-color: transparent;
     cursor: default;
+    pointer-events: none;
   }
 `
 
-const EditableOutcome: React.FC<{ item: string | undefined; removeOutcome: () => void }> = (
-  props
-) => {
-  const { item, removeOutcome, ...restProps } = props
-  const [isEditing, setIsEditing] = useState(false)
-  const [value, setValue] = useState<string | undefined>(item)
+Outcome.defaultProps = {
+  error: false,
+}
 
-  useEffect(() => {
-    setValue(item)
-  }, [item])
+const sanitizedOutcome = (outcome: string | undefined): string | undefined => {
+  return outcome?.trim()
+}
+
+const isOutcomeTextValid = (outcome: string | undefined): boolean => {
+  if (sanitizedOutcome(outcome)?.length === 0) return false
+
+  return true
+}
+
+const EditableOutcome: React.FC<{
+  outcomeIndex: number
+  outcomeText: string | undefined
+  outcomes: Array<string | undefined>
+  removeOutcome: () => void
+}> = (props) => {
+  const { outcomeIndex, outcomeText, outcomes, removeOutcome, ...restProps } = props
+  const [isEditing, setIsEditing] = useState(false)
+  const [value, setValue] = useState<string | undefined>(outcomeText)
+  const outcomeField = createRef<HTMLInputElement>()
+
+  const isOutcomeDuplicated = React.useCallback((): boolean => {
+    return outcomes
+      .filter((item, index) => index !== outcomeIndex)
+      .includes(sanitizedOutcome(value))
+  }, [value, outcomes, outcomeIndex])
+
+  const isOutcomeValueOK = isOutcomeTextValid(value) && !isOutcomeDuplicated()
+
+  const saveSanitizedValue = useCallback(
+    (value: string | undefined) => {
+      setValue(sanitizedOutcome(value))
+    },
+    [setValue]
+  )
+
+  const resetValue = useCallback(() => {
+    saveSanitizedValue(outcomeText)
+  }, [saveSanitizedValue, outcomeText])
+
+  const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && isOutcomeValueOK) {
+      saveSanitizedValue(value)
+      setIsEditing(false)
+    }
+    if (e.key === 'Escape') {
+      resetValue()
+      setIsEditing(false)
+    }
+  }
 
   return (
     <OutcomeWrapper {...restProps}>
       <Outcome
-        onBlur={() => setIsEditing(false)}
-        onChange={(e) => setValue(e.currentTarget.value)}
+        error={!isOutcomeValueOK}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.currentTarget.value)}
+        onKeyUp={(e: React.KeyboardEvent<HTMLInputElement>) => {
+          onPressEnter(e)
+        }}
         readOnly={!isEditing}
+        ref={outcomeField}
+        title={value}
         type="text"
         value={value}
       />
-      <Controls>
+      <Controls isEditing={isEditing}>
         {!isEditing && (
-          <ButtonControl buttonType={ButtonControlType.edit} onClick={() => setIsEditing(true)} />
+          <ButtonControl
+            buttonType={ButtonControlType.edit}
+            onClick={() => {
+              setIsEditing(true)
+              outcomeField.current?.focus()
+            }}
+            title="Edit"
+          />
         )}
         {isEditing && (
-          <ButtonControl buttonType={ButtonControlType.ok} onClick={() => setIsEditing(false)} />
+          <ButtonControl
+            buttonType={ButtonControlType.ok}
+            disabled={!isOutcomeValueOK}
+            onClick={() => {
+              if (isOutcomeValueOK) {
+                setIsEditing(false)
+              }
+            }}
+            title="Save"
+          />
         )}
-        <ButtonControl buttonType={ButtonControlType.delete} onClick={removeOutcome} />
+        {isEditing && (
+          <ButtonControl
+            buttonType={ButtonControlType.cancel}
+            onClick={() => {
+              resetValue()
+              setIsEditing(false)
+            }}
+            title="Cancel"
+          />
+        )}
+        <ButtonControl
+          buttonType={ButtonControlType.delete}
+          onClick={() => {
+            removeOutcome()
+            setIsEditing(false)
+          }}
+          title="Remove"
+        />
       </Controls>
     </OutcomeWrapper>
   )
@@ -97,17 +189,15 @@ interface Props {
 
 export const AddOutcome: React.FC<Props> = (props) => {
   const { addOutcome, onChange, outcome = '', outcomes, removeOutcome, ...restProps } = props
-  const newOutcomeDisabled = outcomes.length === 256
-  const buttonAddDisabled = !outcome || newOutcomeDisabled
+  const maxOutcomesReached = outcomes.length === 256
+  const buttonAddDisabled =
+    maxOutcomesReached || !isOutcomeTextValid(outcome) || outcomes.includes(outcome)
   const outcomeNameRef = React.createRef<HTMLInputElement>()
 
   const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !buttonAddDisabled) {
       addOutcome()
-
-      if (outcomeNameRef && outcomeNameRef.current) {
-        outcomeNameRef.current.focus()
-      }
+      outcomeNameRef.current?.focus()
     }
   }
 
@@ -118,9 +208,9 @@ export const AddOutcome: React.FC<Props> = (props) => {
         value={
           <NewOutcomeWrapper>
             <Textfield
-              disabled={newOutcomeDisabled}
+              disabled={maxOutcomesReached}
               onChange={onChange}
-              onKeyUp={(e) => {
+              onKeyUp={(e: React.KeyboardEvent<HTMLInputElement>) => {
                 onPressEnter(e)
               }}
               placeholder="New outcome title..."
@@ -139,7 +229,12 @@ export const AddOutcome: React.FC<Props> = (props) => {
             {outcomes.length ? (
               outcomes.map((item, index) => (
                 <StripedListItem key={index}>
-                  <EditableOutcome item={item} removeOutcome={() => removeOutcome(index)} />
+                  <EditableOutcome
+                    outcomeIndex={index}
+                    outcomeText={item}
+                    outcomes={outcomes}
+                    removeOutcome={() => removeOutcome(index)}
+                  />
                 </StripedListItem>
               ))
             ) : (

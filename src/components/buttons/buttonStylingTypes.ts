@@ -107,11 +107,11 @@ export const ButtonCSS = css<ButtonCommonProps>`
   display: flex;
   font-size: 20px;
   font-weight: 600;
-  height: 36px;
+  height: 35px;
   justify-content: center;
-  line-height: 1.2;
+  line-height: 1;
   outline: none;
-  padding: 0 30px;
+  padding: 0 25px;
   text-align: center;
   transition: all 0.15s ease-out;
   user-select: none;

@@ -124,8 +124,10 @@ export const PrepareCondition = () => {
   const [outcome, setOutcome] = React.useState<string>('')
 
   const addOutcome = React.useCallback(() => {
+    const sanitizedOutcome = outcome.trim()
+
     setOutcome('')
-    setOutcomes([...outcomes, outcome])
+    setOutcomes([...outcomes, sanitizedOutcome])
   }, [outcome, outcomes, setOutcomes])
 
   const removeOutcome = React.useCallback(
@@ -322,7 +324,11 @@ export const PrepareCondition = () => {
     ? prepareConditionStatus.getFailure()
     : prepareConditionStatus.isLoading()
     ? 'Working...'
-    : conditionId && `All done! Condition ${(<Hash value={conditionId} />)} created.`
+    : conditionId && (
+        <>
+          All done! Condition <Hash value={conditionId} /> created.
+        </>
+      )
   const fullLoadingTitle = prepareConditionStatus.isFailure() ? 'Error' : 'Prepare Condition'
 
   return (

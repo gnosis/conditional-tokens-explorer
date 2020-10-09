@@ -26,8 +26,14 @@ const Wrapper = styled.div<{ isOpen: boolean; disabled: boolean }>`
   }
 `
 
-const Button = styled.div`
+const Button = styled.button`
+  background-color: transparent;
+  border: none;
+  display: block;
+  outline: none;
+  padding: 0;
   user-select: none;
+  width: 100%;
 `
 
 const PositionLeftCSS = css`
