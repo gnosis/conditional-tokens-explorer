@@ -23,7 +23,7 @@ import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { TableControls } from 'components/table/TableControls'
 import { Hash } from 'components/text/Hash'
-import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useConditionsList } from 'hooks/useConditionsList'
 import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
@@ -39,8 +39,6 @@ import {
   OracleFilterOptions,
   StatusOptions,
 } from 'util/types'
-
-import { Web3ContextStatus } from '../../contexts/Web3Context'
 
 const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
   ${DropdownItemCSS}
