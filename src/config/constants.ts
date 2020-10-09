@@ -125,3 +125,7 @@ export const navItems = [
 export const REALITIO_TIMEOUT = process.env.REACT_APP_REALITIO_TIMEOUT
 
 export const SINGLE_SELECT_TEMPLATE_ID = 2
+
+export const MIN_OUTCOMES_ALLOWED = Number(process.env.REACT_APP_MIN_OUTCOMES_ALLOWED || 2)
+
+export const MAX_OUTCOMES_ALLOWED = Number(process.env.REACT_APP_MAX_OUTCOMES_ALLOWED || 256)

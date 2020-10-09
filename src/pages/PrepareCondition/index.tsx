@@ -27,7 +27,9 @@ import {
   BYTES_REGEX,
   INTEGER_NUMBER,
   MAX_OUTCOMES,
+  MAX_OUTCOMES_ALLOWED,
   MIN_OUTCOMES,
+  MIN_OUTCOMES_ALLOWED,
 } from 'config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { ConditionalTokensService } from 'services/conditionalTokens'
@@ -233,7 +235,10 @@ export const PrepareCondition = () => {
   ])
 
   const isOutcomesFromOmenConditionInvalid = React.useMemo(
-    () => conditionType === ConditionType.omen && isDirtyOmenCondition && outcomes.length < 2,
+    () =>
+      conditionType === ConditionType.omen &&
+      isDirtyOmenCondition &&
+      outcomes.length < MIN_OUTCOMES_ALLOWED,
     [conditionType, isDirtyOmenCondition, outcomes]
   )
 
@@ -448,7 +453,10 @@ export const PrepareCondition = () => {
               />
               {isOutcomesFromOmenConditionInvalid && (
                 <ErrorContainer>
-                  <ErrorMessage>Outcomes must be greater than 1</ErrorMessage>
+                  <ErrorMessage>
+                    User is not allowed to create a condition with less than {MIN_OUTCOMES_ALLOWED}{' '}
+                    outcome
+                  </ErrorMessage>
                 </ErrorContainer>
               )}
             </>
@@ -469,7 +477,7 @@ export const PrepareCondition = () => {
                         event.preventDefault()
                       }
                     }}
-                    placeholder="You can add between 2 and 256 outcomes..."
+                    placeholder={`You can add between ${MIN_OUTCOMES_ALLOWED} and ${MAX_OUTCOMES_ALLOWED} outcomes...`}
                     ref={registerCustomCondition({
                       required: true,
                       min: MIN_OUTCOMES,

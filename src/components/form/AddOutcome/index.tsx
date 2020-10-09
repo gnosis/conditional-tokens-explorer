@@ -12,6 +12,7 @@ import {
 } from 'components/pureStyledComponents/StripedList'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { TitleValue } from 'components/text/TitleValue'
+import { MAX_OUTCOMES_ALLOWED, MIN_OUTCOMES_ALLOWED } from 'config/constants'
 
 const NewOutcomeWrapper = styled.div`
   column-gap: 12px;
@@ -190,7 +191,7 @@ interface Props {
 
 export const AddOutcome: React.FC<Props> = (props) => {
   const { addOutcome, onChange, outcome = '', outcomes, removeOutcome, ...restProps } = props
-  const maxOutcomesReached = outcomes.length === 256
+  const maxOutcomesReached = outcomes.length === MAX_OUTCOMES_ALLOWED
   const buttonAddDisabled =
     maxOutcomesReached || !isOutcomeTextValid(outcome) || outcomes.includes(outcome)
   const outcomeNameRef = React.createRef<HTMLInputElement>()
@@ -244,7 +245,8 @@ export const AddOutcome: React.FC<Props> = (props) => {
               )}
             </StripedList>
             <SmallNote>
-              <strong>Note:</strong> Omen supports min. 2 and max. 256 outcomes.
+              <strong>Note:</strong> Omen supports min. {MIN_OUTCOMES_ALLOWED} and max.{' '}
+              {MAX_OUTCOMES_ALLOWED} outcomes.
             </SmallNote>
           </>
         }
