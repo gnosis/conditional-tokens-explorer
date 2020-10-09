@@ -1,6 +1,7 @@
 import React, { ButtonHTMLAttributes } from 'react'
 import styled from 'styled-components'
 
+import { CloseIcon } from 'components/icons/CloseIcon'
 import { IconDelete } from 'components/icons/IconDelete'
 import { IconEdit } from 'components/icons/IconEdit'
 import { IconOk } from 'components/icons/IconOk'
@@ -54,6 +55,7 @@ export enum ButtonControlType {
   delete = 2,
   edit = 3,
   add = 4,
+  cancel = 5,
 }
 
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -70,6 +72,7 @@ export const ButtonControl: React.FC<Props> = (props) => {
       {buttonType === ButtonControlType.ok && <IconOk />}
       {buttonType === ButtonControlType.edit && <IconEdit />}
       {buttonType === ButtonControlType.add && <IconPlus />}
+      {buttonType === ButtonControlType.cancel && <CloseIcon />}
     </Wrapper>
   )
 }
