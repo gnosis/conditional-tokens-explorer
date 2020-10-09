@@ -10,12 +10,13 @@ import { AdvancedFilter, ConditionType, OracleFilterOptions, StatusOptions } fro
 export const useConditionsList = (advancedFilter: AdvancedFilter) => {
   const {
     ConditionType: ConditionTypeFilter,
-    FromToCreationDate,
+    FromCreationDate,
     MaxOutcomes,
     MinOutcomes,
     ReporterOracle,
     Status,
     TextToSearch,
+    ToCreationDate,
   } = advancedFilter
 
   const query = buildQueryConditionsList(advancedFilter)
@@ -33,10 +34,8 @@ export const useConditionsList = (advancedFilter: AdvancedFilter) => {
   if (Status === StatusOptions.Resolved) variables['resolved'] = true
   if (MinOutcomes) variables['minOutcome'] = MinOutcomes
   if (MaxOutcomes) variables['maxOutcome'] = MaxOutcomes
-  if (FromToCreationDate) {
-    variables['fromCreationDate'] = FromToCreationDate.from
-    variables['toCreationDate'] = FromToCreationDate.to
-  }
+  if (FromCreationDate) variables['fromCreationDate'] = FromCreationDate
+  if (ToCreationDate) variables['toCreationDate'] = ToCreationDate
   if (
     ConditionTypeFilter.type === ConditionType.omen ||
     ConditionTypeFilter.type === ConditionType.custom

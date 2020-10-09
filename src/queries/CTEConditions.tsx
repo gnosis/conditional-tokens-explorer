@@ -33,7 +33,8 @@ export const DEFAULT_OPTIONS_LIST: AdvancedFilter = {
   Status: StatusOptions.All,
   MinOutcomes: null,
   MaxOutcomes: null,
-  FromToCreationDate: null,
+  FromCreationDate: null,
+  ToCreationDate: null,
   TextToSearch: {
     type: ConditionSearchOptions.All,
     value: null,
@@ -65,12 +66,13 @@ const conditionFragment = gql`
 export const buildQueryConditionsList = (advancedFilter: AdvancedFilter = DEFAULT_OPTIONS_LIST) => {
   const {
     ConditionType: ConditionTypeFilter,
-    FromToCreationDate,
+    FromCreationDate,
     MaxOutcomes,
     MinOutcomes,
     ReporterOracle,
     Status,
     TextToSearch,
+    ToCreationDate,
   } = advancedFilter
 
   const whereClauseInternal = [
@@ -83,9 +85,8 @@ export const buildQueryConditionsList = (advancedFilter: AdvancedFilter = DEFAUL
     Status === StatusOptions.Open || Status === StatusOptions.Resolved ? 'resolved: $resolved' : '',
     MaxOutcomes ? 'outcomeSlotCount_lte: $maxOutcome' : '',
     MinOutcomes ? 'outcomeSlotCount_gte: $minOutcome' : '',
-    FromToCreationDate
-      ? 'createTimestamp_lte: $toCreationDate , createTimestamp_gte: $fromCreationDate'
-      : '',
+    ToCreationDate ? 'createTimestamp_lte: $toCreationDate' : '',
+    FromCreationDate ? 'createTimestamp_gte: $fromCreationDate' : '',
     ConditionTypeFilter.type === ConditionType.omen ? 'oracle: $conditionType' : '',
     ConditionTypeFilter.type === ConditionType.custom ? 'oracle_not: $conditionType' : '',
     TextToSearch.type === ConditionSearchOptions.ConditionId && TextToSearch.value
@@ -116,7 +117,8 @@ export const buildQueryConditionsList = (advancedFilter: AdvancedFilter = DEFAUL
     Status === StatusOptions.Open || Status === StatusOptions.Resolved ? '$resolved: Boolean' : '',
     MinOutcomes ? '$minOutcome: Int' : '',
     MaxOutcomes ? '$maxOutcome: Int' : '',
-    FromToCreationDate ? '$toCreationDate: BigInt,$fromCreationDate: BigInt' : '',
+    ToCreationDate ? '$toCreationDate: BigInt' : '',
+    FromCreationDate ? '$fromCreationDate: BigInt' : '',
     ConditionTypeFilter.type === ConditionType.omen ||
     ConditionTypeFilter.type === ConditionType.custom
       ? '$conditionType: Bytes'

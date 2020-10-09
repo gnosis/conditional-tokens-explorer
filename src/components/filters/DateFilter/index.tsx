@@ -44,7 +44,7 @@ const Date = styled(Textfield)`
 interface Props {
   onChangeFrom?: (event: React.ChangeEvent<HTMLInputElement>) => void
   onChangeTo?: (event: React.ChangeEvent<HTMLInputElement>) => void
-  onSubmit: (from: number, to: number) => void
+  onSubmit: (from: Maybe<number>, to: Maybe<number>) => void
   title: string
 }
 
@@ -77,19 +77,14 @@ export const DateFilter: React.FC<Props> = (props) => {
   }
 
   const onSubmitInternal = () => {
-    if (from && to) onSubmit(from, to)
+    if (from || to) onSubmit(from, to)
   }
-
-  // This clear the filters
-  React.useEffect(() => {
-    if (!from || !to) onSubmit(0, 0)
-  }, [from, to, onSubmit])
 
   const errorMessage = React.useMemo(
     () => (to && from && to < from ? 'To should be greater than From' : null),
     [from, to]
   )
-  const emptyValues = React.useMemo(() => !from || !to, [from, to])
+  const emptyValues = React.useMemo(() => !from && !to, [from, to])
 
   return (
     <Wrapper>

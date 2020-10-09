@@ -195,11 +195,6 @@ export interface QuestionOptions {
   signerAddress: string
 }
 
-export interface FromToCreationDateOptions {
-  from: number
-  to: number
-}
-
 export enum ConditionSearchOptions {
   All = 'all',
   ConditionId = 'conditionId',
@@ -221,7 +216,8 @@ export interface AdvancedFilter {
   Status: StatusOptions
   MinOutcomes: Maybe<number>
   MaxOutcomes: Maybe<number>
-  FromToCreationDate: Maybe<FromToCreationDateOptions>
+  FromCreationDate: Maybe<number>
+  ToCreationDate: Maybe<number>
   TextToSearch: {
     type: ConditionSearchOptions
     value: Maybe<string>

@@ -34,7 +34,6 @@ import {
   ConditionSearchOptions,
   ConditionType,
   ConditionTypeAll,
-  FromToCreationDateOptions,
   LocalStorageManagement,
   OracleFilterOptions,
   StatusOptions,
@@ -60,9 +59,10 @@ export const ConditionsList: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = React.useState<StatusOptions>(StatusOptions.All)
   const [selectedMinOutcomes, setSelectedMinOutcomes] = React.useState<Maybe<number>>(null)
   const [selectedMaxOutcomes, setSelectedMaxOutcomes] = React.useState<Maybe<number>>(null)
-  const [selectedFromToCreationDate, setSelectedFromToCreationDate] = React.useState<
-    Maybe<FromToCreationDateOptions>
-  >(null)
+  const [selectedFromCreationDate, setSelectedFromCreationDate] = React.useState<Maybe<number>>(
+    null
+  )
+  const [selectedToCreationDate, setSelectedToCreationDate] = React.useState<Maybe<number>>(null)
   const [selectedConditionTypeFilter, setSelectedConditionTypeFilter] = React.useState<
     Maybe<string>
   >(null)
@@ -105,7 +105,8 @@ export const ConditionsList: React.FC = () => {
     setSelectedStatus(StatusOptions.All)
     setSelectedMinOutcomes(null)
     setSelectedMaxOutcomes(null)
-    setSelectedFromToCreationDate(null)
+    setSelectedToCreationDate(null)
+    setSelectedFromCreationDate(null)
     setSearchBy(ConditionSearchOptions.ConditionId)
     setTextToSearch('')
   }, [showFilters])
@@ -122,7 +123,8 @@ export const ConditionsList: React.FC = () => {
     Status: selectedStatus,
     MinOutcomes: selectedMinOutcomes,
     MaxOutcomes: selectedMaxOutcomes,
-    FromToCreationDate: selectedFromToCreationDate,
+    ToCreationDate: selectedToCreationDate,
+    FromCreationDate: selectedFromCreationDate,
     TextToSearch: {
       type: searchBy,
       value: textToSearch,
@@ -321,8 +323,8 @@ export const ConditionsList: React.FC = () => {
               <SidebarRow>
                 <DateFilter
                   onSubmit={(from, to) => {
-                    const value = to && from ? { from, to } : null
-                    setSelectedFromToCreationDate(value)
+                    setSelectedFromCreationDate(from)
+                    setSelectedToCreationDate(to)
                   }}
                   title="Creation Date"
                 />
