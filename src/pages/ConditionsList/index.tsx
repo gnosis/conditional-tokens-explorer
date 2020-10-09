@@ -23,6 +23,7 @@ import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { TableControls } from 'components/table/TableControls'
 import { Hash } from 'components/text/Hash'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useConditionsList } from 'hooks/useConditionsList'
 import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
@@ -39,6 +40,8 @@ import {
   StatusOptions,
 } from 'util/types'
 
+import { Web3ContextStatus } from '../../contexts/Web3Context'
+
 const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
   ${DropdownItemCSS}
 `
@@ -46,6 +49,8 @@ const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
 const logger = getLogger('ConditionsList')
 
 export const ConditionsList: React.FC = () => {
+  const { _type: status } = useWeb3ConnectedOrInfura()
+
   const history = useHistory()
   const { setValue } = useLocalStorage(LocalStorageManagement.ConditionId)
 
@@ -340,6 +345,9 @@ export const ConditionsList: React.FC = () => {
             noDataComponent={
               showSpinner ? (
                 <InlineLoading />
+              ) : status === Web3ContextStatus.Infura &&
+                selectedOracleValue === OracleFilterOptions.Current ? (
+                <EmptyContentText>User is not connected to wallet.</EmptyContentText>
               ) : (
                 <EmptyContentText>No conditions found.</EmptyContentText>
               )
