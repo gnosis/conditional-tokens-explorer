@@ -37,6 +37,8 @@ const FieldWrapper = styled.div`
 const Date = styled(Textfield)`
   font-size: 14px;
   height: 32px;
+  padding-left: 6px;
+  padding-right: 6px;
 `
 
 interface Props {
