@@ -513,14 +513,13 @@ export const PrepareCondition = () => {
                 }
               />
               <TitleValue
-                title="Reporting Address"
+                title="Oracle"
                 value={
                   <>
                     <Textfield
                       error={errorsOmenCondition.oracle && true}
                       name="oracle"
                       onChange={(e) => setValueOmenCondition('oracle', e.target.value, true)}
-                      placeholder="Type in a valid reporting address..."
                       ref={registerOmenCondition({
                         required: true,
                         pattern: ADDRESS_REGEX,
