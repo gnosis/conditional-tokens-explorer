@@ -47,25 +47,31 @@ export const WrapModal: React.FC<Props> = (props) => {
 
   const isSubmitDisabled = amount.isZero()
 
-  const wrap = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLInputElement>
-  ) => {
-    const wrapValues = {
-      amount,
-      address: WrapperService.address,
-      positionId,
-    }
+  const wrap = useCallback(
+    (
+      e: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLInputElement>
+    ) => {
+      const wrapValues = {
+        amount,
+        address: WrapperService.address,
+        positionId,
+      }
 
-    if (isSubmitDisabled) return
+      if (isSubmitDisabled) return
 
-    onWrap(wrapValues)
+      onWrap(wrapValues)
 
-    if (onRequestClose) onRequestClose(e)
-  }
+      if (onRequestClose) onRequestClose(e)
+    },
+    [WrapperService.address, amount, isSubmitDisabled, onRequestClose, onWrap, positionId]
+  )
 
-  const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') wrap(e)
-  }
+  const onPressEnter = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') wrap(e)
+    },
+    [wrap]
+  )
 
   return (
     <Modal

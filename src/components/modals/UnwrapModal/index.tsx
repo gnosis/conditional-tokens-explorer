@@ -55,25 +55,31 @@ export const UnwrapModal: React.FC<Props> = (props) => {
 
   const isSubmitDisabled = amount.isZero()
 
-  const unWrap = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLInputElement>
-  ) => {
-    const unWrapValues = {
-      amount,
-      address: CTService.address,
-      positionId,
-    }
+  const unWrap = useCallback(
+    (
+      e: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLInputElement>
+    ) => {
+      const unWrapValues = {
+        amount,
+        address: CTService.address,
+        positionId,
+      }
 
-    if (isSubmitDisabled) return
+      if (isSubmitDisabled) return
 
-    onUnWrap(unWrapValues)
+      onUnWrap(unWrapValues)
 
-    if (onRequestClose) onRequestClose(e)
-  }
+      if (onRequestClose) onRequestClose(e)
+    },
+    [CTService.address, amount, isSubmitDisabled, onRequestClose, onUnWrap, positionId]
+  )
 
-  const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') unWrap(e)
-  }
+  const onPressEnter = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') unWrap(e)
+    },
+    [unWrap]
+  )
 
   return (
     <Modal
