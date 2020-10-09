@@ -16,12 +16,11 @@ import { TitleValue } from 'components/text/TitleValue'
 import { INFORMATION_NOT_AVAILABLE } from 'config/constants'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useIsConditionFromOmen } from 'hooks/useIsConditionFromOmen'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { usePositions } from 'hooks/usePositions'
 import { useQuestion } from 'hooks/useQuestion'
 import { GetCondition_condition } from 'types/generatedGQLForCTE'
 import { formatTS, getConditionTypeTitle, truncateStringInTheMiddle } from 'util/tools'
-import { ConditionStatus, ConditionType, LocalStorageManagement } from 'util/types'
+import { ConditionStatus, ConditionType } from 'util/types'
 
 const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
@@ -38,8 +37,6 @@ interface Props {
 export const Contents: React.FC<Props> = ({ condition }) => {
   const { networkConfig } = useWeb3ConnectedOrInfura()
 
-  const { setValue } = useLocalStorage(LocalStorageManagement.ConditionId)
-
   const {
     creator,
     id: conditionId,
@@ -54,27 +51,24 @@ export const Contents: React.FC<Props> = ({ condition }) => {
     return [
       {
         href: `/split/`,
-        onClick: () => {
-          setValue(conditionId)
-        },
+        id: conditionId,
+        onClick: undefined,
         text: 'Split Position',
       },
       {
         href: `/merge/`,
-        onClick: () => {
-          setValue(conditionId)
-        },
+        id: conditionId,
+        onClick: undefined,
         text: 'Merge Positions',
       },
       {
         href: `/report/`,
-        onClick: () => {
-          setValue(conditionId)
-        },
+        id: conditionId,
+        onClick: undefined,
         text: 'Report Payouts',
       },
     ]
-  }, [setValue, conditionId])
+  }, [conditionId])
 
   const { outcomesPrettier, question } = useQuestion(questionId, outcomeSlotCount)
   const isConditionFromOmen = useIsConditionFromOmen(creator, oracle, question)
@@ -101,7 +95,11 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           dropdownButtonContent={<ButtonDropdownCircle />}
           dropdownPosition={DropdownPosition.right}
           items={dropdownItems.map((item, index) => (
-            <DropdownItemLink key={index} onMouseDown={item.onClick} to={item.href}>
+            <DropdownItemLink
+              key={index}
+              onMouseDown={item.onClick}
+              to={{ pathname: item.href, state: { conditionid: item.id } }}
+            >
               {item.text}
             </DropdownItemLink>
           ))}

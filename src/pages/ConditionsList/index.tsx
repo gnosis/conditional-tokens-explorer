@@ -26,14 +26,12 @@ import { TableControls } from 'components/table/TableControls'
 import { Hash } from 'components/text/Hash'
 import { useConditions } from 'hooks/useConditions'
 import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { customStyles } from 'theme/tableCustomStyles'
 import { Conditions_conditions } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
 import {
   ConditionType,
   ConditionTypeAll,
-  LocalStorageManagement,
   OracleFilterOptions,
   StatusOptions,
   ValidityOptions,
@@ -47,7 +45,6 @@ const logger = getLogger('ConditionsList')
 
 export const ConditionsList: React.FC = () => {
   const history = useHistory()
-  const { setValue } = useLocalStorage(LocalStorageManagement.ConditionId)
 
   const [conditionIdToSearch, setConditionIdToSearch] = useState<string>('')
   const [conditionIdToShow, setConditionIdToShow] = useState<string>('')
@@ -89,42 +86,37 @@ export const ConditionsList: React.FC = () => {
   const isLoading = !conditionIdToSearch && loading
   const isSearching = conditionIdToSearch && loading
 
-  const buildMenuForRow = useCallback(
-    ({ id }) => {
-      const detailsOption = {
-        href: `/conditions/${id}`,
-        onClick: undefined,
-        text: 'Details',
-      }
+  const buildMenuForRow = useCallback(({ id }) => {
+    const detailsOption = {
+      href: `/conditions/${id}`,
+      onClick: undefined,
+      text: 'Details',
+      id: undefined,
+    }
 
-      const splitOption = {
-        href: `/split/`,
-        text: 'Split Position',
-        onClick: () => {
-          setValue(id)
-        },
-      }
+    const splitOption = {
+      href: `/split/`,
+      text: 'Split Position',
+      onClick: undefined,
+      id,
+    }
 
-      const mergeOption = {
-        href: `/merge/`,
-        text: 'Merge Positions',
-        onClick: () => {
-          setValue(id)
-        },
-      }
+    const mergeOption = {
+      href: `/merge/`,
+      text: 'Merge Positions',
+      onClick: undefined,
+      id,
+    }
 
-      const reportOption = {
-        href: `/report/`,
-        text: 'Report Payouts',
-        onClick: () => {
-          setValue(id)
-        },
-      }
+    const reportOption = {
+      href: `/report/`,
+      text: 'Report Payouts',
+      onClick: undefined,
+      id,
+    }
 
-      return [detailsOption, splitOption, mergeOption, reportOption]
-    },
-    [setValue]
-  )
+    return [detailsOption, splitOption, mergeOption, reportOption]
+  }, [])
 
   const handleRowClick = useCallback(
     (row: Conditions_conditions) => {
@@ -197,7 +189,11 @@ export const ConditionsList: React.FC = () => {
           dropdownButtonContent={<ButtonDots />}
           dropdownPosition={DropdownPosition.right}
           items={buildMenuForRow(row).map((item, index) => (
-            <DropdownItemLink key={index} onMouseDown={item.onClick} to={item.href}>
+            <DropdownItemLink
+              key={index}
+              onMouseDown={item.onClick}
+              to={{ pathname: item.href, state: { conditionid: item.id } }}
+            >
               {item.text}
             </DropdownItemLink>
           ))}

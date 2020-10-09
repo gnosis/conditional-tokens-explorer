@@ -1,13 +1,13 @@
 import { useQuery } from '@apollo/react-hooks'
 import { BigNumber } from 'ethers/utils'
 import React, { useContext, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 
 import { useBalanceForPosition } from 'hooks/useBalanceForPosition'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { GetPositionQuery } from 'queries/CTEPositions'
 import { GetPosition, GetPosition_position } from 'types/generatedGQLForCTE'
 import { isPositionIdValid } from 'util/tools'
-import { LocalStorageManagement, PositionErrors } from 'util/types'
+import { LocationRouterState, PositionErrors } from 'util/types'
 
 export interface PositionContext {
   position: Maybe<GetPosition_position>
@@ -51,7 +51,7 @@ interface Props {
 export const PositionProvider = (props: Props) => {
   const { checkForEmptyBalanceERC20, checkForEmptyBalanceERC1155 } = props
   const [positionId, setPositionId] = useState('')
-  const { getValue } = useLocalStorage(LocalStorageManagement.PositionId)
+  const { state } = useLocation<LocationRouterState>()
 
   const errors = []
   let position: Maybe<GetPosition_position> = null
@@ -106,11 +106,11 @@ export const PositionProvider = (props: Props) => {
   }
 
   React.useEffect(() => {
-    const localStoragePosition = getValue()
-    if (localStoragePosition) {
-      setPositionIdCallback(localStoragePosition)
+    const locationRouterPosition = state?.positionid
+    if (locationRouterPosition) {
+      setPositionIdCallback(locationRouterPosition)
     }
-  }, [getValue, setPositionIdCallback])
+  }, [state, setPositionIdCallback])
 
   const value = {
     position,

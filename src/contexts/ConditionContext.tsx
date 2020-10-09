@@ -1,12 +1,12 @@
 import { useQuery } from '@apollo/react-hooks'
 import React from 'react'
+import { useLocation } from 'react-router-dom'
 
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { GetConditionQuery } from 'queries/CTEConditions'
 import { GetCondition, GetCondition_condition } from 'types/generatedGQLForCTE'
 import { isConditionIdValid } from 'util/tools'
-import { ConditionErrors, LocalStorageManagement } from 'util/types'
+import { ConditionErrors, LocationRouterState } from 'util/types'
 
 export interface ConditionContext {
   clearCondition: () => void
@@ -56,8 +56,8 @@ export const ConditionProvider = (props: Props) => {
   ] = React.useState<boolean>(false)
   const [errors, setErrors] = React.useState<ConditionErrors[]>([])
   const [validId, setValidId] = React.useState(false)
-  const { getValue } = useLocalStorage(LocalStorageManagement.ConditionId)
 
+  const location = useLocation<LocationRouterState>()
   const clearErrors = React.useCallback((): void => {
     setErrors([])
   }, [])
@@ -188,11 +188,11 @@ export const ConditionProvider = (props: Props) => {
   }, [errorFetchingCondition, pushError, removeError])
 
   React.useEffect(() => {
-    const localStorageCondition = getValue()
-    if (localStorageCondition) {
-      setConditionIdCallback(localStorageCondition)
+    const locationRouterCondition = location.state?.conditionid
+    if (locationRouterCondition) {
+      setConditionIdCallback(locationRouterCondition)
     }
-  }, [getValue, setConditionIdCallback])
+  }, [location, setConditionIdCallback])
 
   const value = {
     condition,

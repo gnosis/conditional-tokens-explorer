@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { InputPosition, InputPositionProps } from 'components/form/InputPosition'
@@ -9,8 +10,7 @@ import { TitleControl } from 'components/pureStyledComponents/TitleControl'
 import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { Position } from 'hooks'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
-import { LocalStorageManagement, SplitFromType, Token } from 'util/types'
+import { LocationRouterState, SplitFromType, Token } from 'util/types'
 
 const Controls = styled.div`
   margin-bottom: 8px;
@@ -86,7 +86,7 @@ export const SplitFrom: React.FC<Props> = (props) => {
 
   const { updatePositionIds } = useMultiPositionsContext()
   const { updateBalances } = useBatchBalanceContext()
-  const { getValue } = useLocalStorage(LocalStorageManagement.PositionId)
+  const { state } = useLocation<LocationRouterState>()
 
   const [showCustomCollateralModal, setShowCustomCollateralModal] = useState(false)
   const [showSelectPositionModal, setShowSelectPositionModal] = useState(false)
@@ -115,13 +115,13 @@ export const SplitFrom: React.FC<Props> = (props) => {
   }, [customToken, setValue])
 
   useEffect(() => {
-    const localStoragePosition = getValue()
-    if (localStoragePosition) {
+    const locationRouterPosition = state?.positionid
+    if (locationRouterPosition) {
       setValue('splitFrom', SplitFromType.position, false)
-      updatePositionIds([localStoragePosition])
-      updateBalances([localStoragePosition])
+      updatePositionIds([locationRouterPosition])
+      updateBalances([locationRouterPosition])
     }
-  }, [getValue, updatePositionIds, updateBalances, setValue])
+  }, [updatePositionIds, updateBalances, setValue, state])
 
   return (
     <>

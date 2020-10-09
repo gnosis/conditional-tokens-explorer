@@ -38,18 +38,11 @@ import { FormatHash } from 'components/text/FormatHash'
 import { TitleValue } from 'components/text/TitleValue'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useCollateral } from 'hooks/useCollateral'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { GetPosition_position as Position } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import { formatBigNumber, positionString, truncateStringInTheMiddle } from 'util/tools'
-import {
-  ConditionIdsArray,
-  LocalStorageManagement,
-  NetworkIds,
-  OutcomeProps,
-  TransferOptions,
-} from 'util/types'
+import { ConditionIdsArray, NetworkIds, OutcomeProps, TransferOptions } from 'util/types'
 
 const CollateralText = styled.span`
   color: ${(props) => props.theme.colors.darkerGrey};
@@ -150,8 +143,6 @@ export const Contents = (props: Props) => {
 
   const { id: positionId, indexSets } = position
 
-  const { setValue } = useLocalStorage(LocalStorageManagement.PositionId)
-
   const { collateral: collateralERC1155 } = useCollateral(collateralTokenAddress)
   const { collateral: collateralERC20 } = useCollateral(wrappedTokenAddress)
 
@@ -164,23 +155,28 @@ export const Contents = (props: Props) => {
   )
   const [transactionTitle, setTransactionTitle] = useState<string>('')
 
+  type MenuItem = {
+    href: string
+    onClick?: () => void
+    id?: string
+    text: string
+  }
+
   const dropdownItems = useMemo(() => {
     const menu = [
       {
         href: `/redeem`,
-        onClick: () => {
-          setValue(positionId)
-        },
+        onClick: undefined,
+        id: positionId,
         text: 'Redeem',
       },
       {
         href: `/split`,
-        onClick: () => {
-          setValue(positionId)
-        },
+        onClick: undefined,
+        id: positionId,
         text: 'Split',
       },
-    ]
+    ] as MenuItem[]
 
     if (balanceERC1155 && !balanceERC1155.isZero() && signer) {
       menu.push({
@@ -193,7 +189,7 @@ export const Contents = (props: Props) => {
     }
 
     return menu
-  }, [positionId, signer, balanceERC1155, setValue])
+  }, [positionId, signer, balanceERC1155])
 
   const positionPreview = React.useMemo(() => {
     if (collateralERC1155 && balanceERC1155) {
@@ -391,7 +387,11 @@ export const Contents = (props: Props) => {
           items={dropdownItems.map((item, index) => {
             if (item.href) {
               return (
-                <DropdownItemLink key={index} onMouseDown={item.onClick} to={item.href}>
+                <DropdownItemLink
+                  key={index}
+                  onMouseDown={item.onClick}
+                  to={{ pathname: item.href, state: { positionid: item.id } }}
+                >
                   {item.text}
                 </DropdownItemLink>
               )

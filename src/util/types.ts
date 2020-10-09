@@ -180,10 +180,12 @@ export type ConditionIdsArray = {
   conditionId: string
 }
 
-export enum LocalStorageManagement {
-  ConditionId = 'conditionId',
-  PositionId = 'positionId',
-}
+export type LocationRouterState =
+  | {
+      conditionid?: string
+      positionid?: string
+    }
+  | undefined
 
 export interface QuestionOptions {
   arbitratorAddress: string

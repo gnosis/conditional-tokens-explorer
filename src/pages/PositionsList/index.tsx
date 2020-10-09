@@ -35,14 +35,12 @@ import { TableControls } from 'components/table/TableControls'
 import { Hash } from 'components/text/Hash'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { PositionWithUserBalanceWithDecimals, usePositions } from 'hooks'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import {
   CollateralFilterOptions,
-  LocalStorageManagement,
   Token,
   TransferOptions,
   WrappedCollateralOptions,
@@ -57,7 +55,6 @@ const logger = getLogger('PositionsList')
 export const PositionsList = () => {
   const { _type: status, CTService, WrapperService, connect, signer } = useWeb3ConnectedOrInfura()
   const history = useHistory()
-  const { setValue } = useLocalStorage(LocalStorageManagement.PositionId)
 
   const [positionIdToSearch, setPositionIdToSearch] = useState<string>('')
   const [positionIdToShow, setPositionIdToShow] = useState<string>('')
@@ -116,14 +113,13 @@ export const PositionsList = () => {
         {
           href: `/positions/${id}`,
           onClick: undefined,
+          id: undefined,
           text: 'Details',
         },
         {
           href: `/redeem`,
           text: 'Redeem',
-          onClick: () => {
-            setValue(id)
-          },
+          id,
         },
       ]
 
@@ -173,7 +169,7 @@ export const PositionsList = () => {
 
       return menu
     },
-    [setValue, signer]
+    [signer]
   )
 
   const handleRowClick = useCallback(
@@ -195,7 +191,10 @@ export const PositionsList = () => {
             items={buildMenuForRow(row).map((item, index) => {
               if (item.href) {
                 return (
-                  <DropdownItemLink onMouseDown={item.onClick} to={item.href}>
+                  <DropdownItemLink
+                    onMouseDown={item.onClick}
+                    to={{ pathname: item.href, state: { positionid: item.id } }}
+                  >
                     {item.text}
                   </DropdownItemLink>
                 )

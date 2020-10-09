@@ -1,5 +1,6 @@
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { ButtonControl, ButtonControlType } from 'components/buttons/ButtonControl'
@@ -18,12 +19,11 @@ import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { Position } from 'hooks'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { useWithToken } from 'hooks/useWithToken'
 import isEqual from 'lodash.isequal'
 import { GetMultiPositions_positions } from 'types/generatedGQLForCTE'
 import { positionString } from 'util/tools'
-import { Errors, LocalStorageManagement } from 'util/types'
+import { Errors, LocationRouterState } from 'util/types'
 
 const PositionText = styled.span`
   max-width: calc(100% - 30px);
@@ -81,15 +81,15 @@ export const SelectPositions = ({
     updateBalances,
   } = useBatchBalanceContext()
 
-  const { getValue } = useLocalStorage(LocalStorageManagement.PositionId)
+  const { state } = useLocation<LocationRouterState>()
 
   useEffect(() => {
-    const localStoragePosition = getValue()
-    if (localStoragePosition) {
-      updatePositionIds([localStoragePosition])
-      updateBalances([localStoragePosition])
+    const locationRouterPosition = state?.positionid
+    if (locationRouterPosition) {
+      updatePositionIds([locationRouterPosition])
+      updateBalances([locationRouterPosition])
     }
-  }, [getValue, updatePositionIds, updateBalances])
+  }, [updatePositionIds, updateBalances, state])
 
   const [positionsToDisplay, setPositionsToDisplay] = React.useState<Array<string>>([])
 
