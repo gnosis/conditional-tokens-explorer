@@ -53,6 +53,34 @@ export const UnwrapModal: React.FC<Props> = (props) => {
     }
   }, [maxBalance])
 
+  const isSubmitDisabled = amount.isZero()
+
+  const unWrap = useCallback(
+    (
+      e: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLInputElement>
+    ) => {
+      const unWrapValues = {
+        amount,
+        address: CTService.address,
+        positionId,
+      }
+
+      if (isSubmitDisabled) return
+
+      onUnWrap(unWrapValues)
+
+      if (onRequestClose) onRequestClose(e)
+    },
+    [CTService.address, amount, isSubmitDisabled, onRequestClose, onUnWrap, positionId]
+  )
+
+  const onPressEnter = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') unWrap(e)
+    },
+    [unWrap]
+  )
+
   return (
     <Modal
       onRequestClose={onRequestClose}
@@ -69,23 +97,13 @@ export const UnwrapModal: React.FC<Props> = (props) => {
           isFromAPosition
           max={maxBalance.toString()}
           onAmountChange={amountChangeHandler}
+          onKeyUp={onPressEnter}
           onUseWalletBalance={useWalletHandler}
           tokenSymbol={tokenSymbol}
         />
       </FirstRow>
       <ButtonContainerStyled>
-        <Button
-          disabled={amount.isZero()}
-          onClick={(e) => {
-            const wrapValues = {
-              amount,
-              address: CTService.address,
-              positionId,
-            }
-            onUnWrap(wrapValues)
-            if (onRequestClose) onRequestClose(e)
-          }}
-        >
+        <Button disabled={isSubmitDisabled} onClick={unWrap}>
           Unwrap
         </Button>
       </ButtonContainerStyled>

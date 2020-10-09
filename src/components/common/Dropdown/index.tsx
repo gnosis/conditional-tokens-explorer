@@ -26,7 +26,7 @@ const Wrapper = styled.div<{ isOpen: boolean; disabled: boolean }>`
   }
 `
 
-const Button = styled.button`
+const ButtonContainer = styled.div`
   background-color: transparent;
   border: none;
   display: block;
@@ -203,9 +203,9 @@ export const Dropdown: React.FC<Props> = (props) => {
       ref={node}
       {...restProps}
     >
-      <Button className="dropdownButton" onClick={onButtonClick}>
+      <ButtonContainer className="dropdownButton" onClick={onButtonClick}>
         {dropdownButtonContent}
-      </Button>
+      </ButtonContainer>
       <Items
         className="dropdownItems"
         dropdownDirection={dropdownDirection}

@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React from 'react'
+import React, { InputHTMLAttributes } from 'react'
 
 import { BigNumberInputWrapper } from 'components/form/BigNumberInputWrapper'
 import { TitleControlButton } from 'components/pureStyledComponents/TitleControl'
@@ -7,12 +7,10 @@ import { TitleValue } from 'components/text/TitleValue'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { formatBigNumber } from 'util/tools'
 
-interface Props {
+interface Props extends InputHTMLAttributes<HTMLInputElement> {
   amount: BigNumber
-  autoFocus?: boolean
   balance: BigNumber
   decimals: number
-  disabled?: boolean
   isFromAPosition?: boolean
   max: string
   onAmountChange: (value: BigNumber) => void
@@ -29,6 +27,7 @@ export const Amount = ({
   isFromAPosition = false,
   max,
   onAmountChange,
+  onKeyUp,
   onUseWalletBalance,
   tokenSymbol,
 }: Props) => {
@@ -56,6 +55,7 @@ export const Amount = ({
           disabled={disabled}
           max={max}
           onChange={onAmountChange}
+          onKeyUp={onKeyUp}
           tokenSymbol={tokenSymbol}
           value={amount}
         />

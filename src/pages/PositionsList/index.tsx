@@ -353,7 +353,7 @@ export const PositionsList = () => {
     async (transferValue: TransferOptions) => {
       if (signer) {
         try {
-          setTransactionTitle('Transfer Outcome Tokens')
+          setTransactionTitle('Transfer Tokens')
           setTransfer(Remote.loading())
 
           const { address: addressTo, amount, positionId } = transferValue
@@ -415,6 +415,7 @@ export const PositionsList = () => {
   }, [showFilters])
 
   const showSpinner = (isLoading || isSearching) && !error
+  const isWorking = transfer.isLoading() || transfer.isFailure() || transfer.isSuccess()
 
   return (
     <>
@@ -519,13 +520,12 @@ export const PositionsList = () => {
           positionId={selectedPositionId}
         />
       )}
-      {(transfer.isLoading() || transfer.isFailure() || transfer.isSuccess()) && (
+      {isWorking && (
         <FullLoading
           actionButton={fullLoadingActionButton}
           icon={fullLoadingIcon}
           message={fullLoadingMessage}
           title={fullLoadingTitle}
-          width={transfer.isFailure() ? '400px' : '320px'}
         />
       )}
     </>

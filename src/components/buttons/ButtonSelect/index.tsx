@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 import { ChevronDown } from 'components/icons/ChevronDown'
 
-const Wrapper = styled.div`
+const Wrapper = styled.button`
   align-items: center;
   background-color: ${(props) => props.theme.textField.backgroundColor};
   border-color: ${(props) => props.theme.textField.borderColor};
