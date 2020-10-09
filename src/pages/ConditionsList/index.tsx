@@ -1,5 +1,5 @@
 import { useDebounceCallback } from '@react-hook/debounce'
-import React, { useCallback, useState } from 'react'
+import React from 'react'
 import DataTable from 'react-data-table-component'
 import { NavLink, useHistory } from 'react-router-dom'
 import styled from 'styled-components'
@@ -51,30 +51,31 @@ export const ConditionsList: React.FC = () => {
   const history = useHistory()
   const { setValue } = useLocalStorage(LocalStorageManagement.ConditionId)
 
-  const [textToSearch, setTextToSearch] = useState<string>('')
-  const [textToShow, setTextToShow] = useState<string>('')
+  const [textToSearch, setTextToSearch] = React.useState<string>('')
+  const [textToShow, setTextToShow] = React.useState<string>('')
 
-  const [selectedOracleFilter, setSelectedOracleFilter] = useState<string[]>([])
-  const [selectedOracleValue, setSelectedOracleValue] = useState<OracleFilterOptions>(
+  const [selectedOracleFilter, setSelectedOracleFilter] = React.useState<string[]>([])
+  const [selectedOracleValue, setSelectedOracleValue] = React.useState<OracleFilterOptions>(
     OracleFilterOptions.All
   )
-  const [selectedStatus, setSelectedStatus] = useState<StatusOptions>(StatusOptions.All)
-  const [selectedMinMaxOutcomes, setSelectedMinMaxOutcomes] = useState<
+  const [selectedStatus, setSelectedStatus] = React.useState<StatusOptions>(StatusOptions.All)
+  const [selectedMinMaxOutcomes, setSelectedMinMaxOutcomes] = React.useState<
     Maybe<MinMaxOutcomesOptions>
   >(null)
-  const [selectedFromToCreationDate, setSelectedFromToCreationDate] = useState<
+  const [selectedFromToCreationDate, setSelectedFromToCreationDate] = React.useState<
     Maybe<FromToCreationDateOptions>
   >(null)
-  const [selectedConditionTypeFilter, setSelectedConditionTypeFilter] = useState<Maybe<string>>(
-    null
-  )
-  const [selectedConditionTypeValue, setSelectedConditionTypeValue] = useState<
+  const [selectedConditionTypeFilter, setSelectedConditionTypeFilter] = React.useState<
+    Maybe<string>
+  >(null)
+  const [selectedConditionTypeValue, setSelectedConditionTypeValue] = React.useState<
     ConditionType | ConditionTypeAll
   >(ConditionTypeAll.all)
-
-  const [searchBy, setSearchBy] = useState<ConditionSearchOptions>(
+  const [searchBy, setSearchBy] = React.useState<ConditionSearchOptions>(
     ConditionSearchOptions.ConditionId
   )
+  const [showFilters, setShowFilters] = React.useState(false)
+
   const dropdownItems = useConditionsSearchOptions(setSearchBy)
 
   logger.log(`Search by ${searchBy}`)
@@ -96,6 +97,19 @@ export const ConditionsList: React.FC = () => {
     setTextToShow('')
     debouncedHandlerTextToSearch('')
   }, [debouncedHandlerTextToSearch])
+
+  // Clear the filters
+  React.useEffect(() => {
+    setSelectedOracleValue(OracleFilterOptions.All)
+    setSelectedOracleFilter([])
+    setSelectedConditionTypeValue(ConditionTypeAll.all)
+    setSelectedConditionTypeFilter(null)
+    setSelectedStatus(StatusOptions.All)
+    setSelectedMinMaxOutcomes(null)
+    setSelectedFromToCreationDate(null)
+    setSearchBy(ConditionSearchOptions.ConditionId)
+    setTextToSearch('')
+  }, [showFilters])
 
   const advancedFilters: AdvancedFilter = {
     ReporterOracle: {
@@ -120,7 +134,7 @@ export const ConditionsList: React.FC = () => {
   const isLoading = !textToSearch && loading
   const isSearching = textToSearch && loading
 
-  const buildMenuForRow = useCallback(
+  const buildMenuForRow = React.useCallback(
     (row: Conditions_conditions) => {
       const { id, resolved } = row
 
@@ -161,7 +175,7 @@ export const ConditionsList: React.FC = () => {
     [setValue]
   )
 
-  const handleRowClick = useCallback(
+  const handleRowClick = React.useCallback(
     (row: Conditions_conditions) => {
       history.push(`/conditions/${row.id}`)
     },
@@ -244,9 +258,7 @@ export const ConditionsList: React.FC = () => {
     },
   ]
 
-  const [showFilters, setShowFilters] = useState(false)
-
-  const toggleShowFilters = useCallback(() => {
+  const toggleShowFilters = React.useCallback(() => {
     setShowFilters(!showFilters)
   }, [showFilters])
 
