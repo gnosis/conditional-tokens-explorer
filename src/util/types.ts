@@ -195,11 +195,6 @@ export interface QuestionOptions {
   signerAddress: string
 }
 
-export interface MinMaxOutcomesOptions {
-  min: number
-  max: number
-}
-
 export interface FromToCreationDateOptions {
   from: number
   to: number
@@ -224,7 +219,8 @@ export interface AdvancedFilter {
     value: Maybe<string>
   }
   Status: StatusOptions
-  MinMaxOutcomes: Maybe<MinMaxOutcomesOptions>
+  MinOutcomes: Maybe<number>
+  MaxOutcomes: Maybe<number>
   FromToCreationDate: Maybe<FromToCreationDateOptions>
   TextToSearch: {
     type: ConditionSearchOptions

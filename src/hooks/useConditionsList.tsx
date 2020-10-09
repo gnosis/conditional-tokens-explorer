@@ -11,7 +11,8 @@ export const useConditionsList = (advancedFilter: AdvancedFilter) => {
   const {
     ConditionType: ConditionTypeFilter,
     FromToCreationDate,
-    MinMaxOutcomes,
+    MaxOutcomes,
+    MinOutcomes,
     ReporterOracle,
     Status,
     TextToSearch,
@@ -30,10 +31,8 @@ export const useConditionsList = (advancedFilter: AdvancedFilter) => {
     variables['oracleIn'] = ReporterOracle.value
   if (Status === StatusOptions.Open) variables['resolved'] = false
   if (Status === StatusOptions.Resolved) variables['resolved'] = true
-  if (MinMaxOutcomes) {
-    variables['minOutcome'] = MinMaxOutcomes.min
-    variables['maxOutcome'] = MinMaxOutcomes.max
-  }
+  if (MinOutcomes) variables['minOutcome'] = MinOutcomes
+  if (MaxOutcomes) variables['maxOutcome'] = MaxOutcomes
   if (FromToCreationDate) {
     variables['fromCreationDate'] = FromToCreationDate.from
     variables['toCreationDate'] = FromToCreationDate.to

@@ -47,7 +47,7 @@ const TextFieldStyled = styled(Textfield)`
 interface Props {
   onChangeMin?: (event: React.ChangeEvent<HTMLInputElement>) => void
   onChangeMax?: (event: React.ChangeEvent<HTMLInputElement>) => void
-  onSubmit: (min: number, max: number) => void
+  onSubmit: (min: Maybe<number>, max: Maybe<number>) => void
   title: string
 }
 
@@ -72,19 +72,14 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
   }
 
   const onSubmitInternal = () => {
-    if (min && max) onSubmit(min, max)
+    if (min || max) onSubmit(min, max)
   }
-
-  // This clear the filters
-  React.useEffect(() => {
-    if (!min || !max) onSubmit(0, 0)
-  }, [min, max, onSubmit])
 
   const errorMessage = React.useMemo(
     () => (min && max && max < min ? 'Max should be greater than Min' : null),
     [min, max]
   )
-  const emptyValues = React.useMemo(() => !min || !max, [min, max])
+  const emptyValues = React.useMemo(() => !min && !max, [min, max])
 
   return (
     <Wrapper>

@@ -36,7 +36,6 @@ import {
   ConditionTypeAll,
   FromToCreationDateOptions,
   LocalStorageManagement,
-  MinMaxOutcomesOptions,
   OracleFilterOptions,
   StatusOptions,
 } from 'util/types'
@@ -59,9 +58,8 @@ export const ConditionsList: React.FC = () => {
     OracleFilterOptions.All
   )
   const [selectedStatus, setSelectedStatus] = React.useState<StatusOptions>(StatusOptions.All)
-  const [selectedMinMaxOutcomes, setSelectedMinMaxOutcomes] = React.useState<
-    Maybe<MinMaxOutcomesOptions>
-  >(null)
+  const [selectedMinOutcomes, setSelectedMinOutcomes] = React.useState<Maybe<number>>(null)
+  const [selectedMaxOutcomes, setSelectedMaxOutcomes] = React.useState<Maybe<number>>(null)
   const [selectedFromToCreationDate, setSelectedFromToCreationDate] = React.useState<
     Maybe<FromToCreationDateOptions>
   >(null)
@@ -105,7 +103,8 @@ export const ConditionsList: React.FC = () => {
     setSelectedConditionTypeValue(ConditionTypeAll.all)
     setSelectedConditionTypeFilter(null)
     setSelectedStatus(StatusOptions.All)
-    setSelectedMinMaxOutcomes(null)
+    setSelectedMinOutcomes(null)
+    setSelectedMaxOutcomes(null)
     setSelectedFromToCreationDate(null)
     setSearchBy(ConditionSearchOptions.ConditionId)
     setTextToSearch('')
@@ -121,7 +120,8 @@ export const ConditionsList: React.FC = () => {
       value: selectedConditionTypeFilter,
     },
     Status: selectedStatus,
-    MinMaxOutcomes: selectedMinMaxOutcomes,
+    MinOutcomes: selectedMinOutcomes,
+    MaxOutcomes: selectedMaxOutcomes,
     FromToCreationDate: selectedFromToCreationDate,
     TextToSearch: {
       type: searchBy,
@@ -312,8 +312,8 @@ export const ConditionsList: React.FC = () => {
               <SidebarRow>
                 <MinMaxFilter
                   onSubmit={(min, max) => {
-                    const value = min && max ? { min, max } : null
-                    setSelectedMinMaxOutcomes(value)
+                    setSelectedMinOutcomes(min)
+                    setSelectedMaxOutcomes(max)
                   }}
                   title="Number Of Outcomes"
                 />

@@ -31,7 +31,8 @@ export const DEFAULT_OPTIONS_LIST: AdvancedFilter = {
     value: null,
   },
   Status: StatusOptions.All,
-  MinMaxOutcomes: null,
+  MinOutcomes: null,
+  MaxOutcomes: null,
   FromToCreationDate: null,
   TextToSearch: {
     type: ConditionSearchOptions.All,
@@ -65,7 +66,8 @@ export const buildQueryConditionsList = (advancedFilter: AdvancedFilter = DEFAUL
   const {
     ConditionType: ConditionTypeFilter,
     FromToCreationDate,
-    MinMaxOutcomes,
+    MaxOutcomes,
+    MinOutcomes,
     ReporterOracle,
     Status,
     TextToSearch,
@@ -79,7 +81,8 @@ export const buildQueryConditionsList = (advancedFilter: AdvancedFilter = DEFAUL
       ? 'oracle_in: $oracleIn'
       : '',
     Status === StatusOptions.Open || Status === StatusOptions.Resolved ? 'resolved: $resolved' : '',
-    MinMaxOutcomes ? 'outcomeSlotCount_lte: $maxOutcome , outcomeSlotCount_gte: $minOutcome' : '',
+    MaxOutcomes ? 'outcomeSlotCount_lte: $maxOutcome' : '',
+    MinOutcomes ? 'outcomeSlotCount_gte: $minOutcome' : '',
     FromToCreationDate
       ? 'createTimestamp_lte: $toCreationDate , createTimestamp_gte: $fromCreationDate'
       : '',
@@ -111,7 +114,8 @@ export const buildQueryConditionsList = (advancedFilter: AdvancedFilter = DEFAUL
       ? '$oracleIn: [String]'
       : '',
     Status === StatusOptions.Open || Status === StatusOptions.Resolved ? '$resolved: Boolean' : '',
-    MinMaxOutcomes ? '$maxOutcome: Int,$minOutcome: Int' : '',
+    MinOutcomes ? '$minOutcome: Int' : '',
+    MaxOutcomes ? '$maxOutcome: Int' : '',
     FromToCreationDate ? '$toCreationDate: BigInt,$fromCreationDate: BigInt' : '',
     ConditionTypeFilter.type === ConditionType.omen ||
     ConditionTypeFilter.type === ConditionType.custom
