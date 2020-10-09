@@ -16,7 +16,10 @@ export const ConditionTypeFilterDropdown: React.FC<Props> = (props) => {
   const { networkConfig } = useWeb3ConnectedOrInfura()
   const { onClick, value } = props
 
-  const oracleRealitio = React.useMemo(() => networkConfig.getOracleFromName('realitio' as KnownOracle), [networkConfig])
+  const oracleRealitio = React.useMemo(
+    () => networkConfig.getOracleFromName('realitio' as KnownOracle),
+    [networkConfig]
+  )
 
   const dropdownItems = [
     {
