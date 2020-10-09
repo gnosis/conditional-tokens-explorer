@@ -415,6 +415,7 @@ export const PositionsList = () => {
   }, [showFilters])
 
   const showSpinner = (isLoading || isSearching) && !error
+  const isWorking = transfer.isLoading() || transfer.isFailure() || transfer.isSuccess()
 
   return (
     <>
@@ -519,7 +520,7 @@ export const PositionsList = () => {
           positionId={selectedPositionId}
         />
       )}
-      {(transfer.isLoading() || transfer.isFailure() || transfer.isSuccess()) && (
+      {isWorking && (
         <FullLoading
           actionButton={fullLoadingActionButton}
           icon={fullLoadingIcon}

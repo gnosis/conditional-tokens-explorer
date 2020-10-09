@@ -381,6 +381,8 @@ export const Contents = (props: Props) => {
     [getEtherscanFormattedUrl]
   )
 
+  const isWorking = transfer.isLoading() || transfer.isFailure() || transfer.isSuccess()
+
   return (
     <CenteredCard
       dropdown={
@@ -600,7 +602,7 @@ export const Contents = (props: Props) => {
           onRequestClose={() => setOpenDisplayConditionsTableModal(false)}
         />
       )}
-      {(transfer.isLoading() || transfer.isFailure() || transfer.isSuccess()) && (
+      {isWorking && (
         <FullLoading
           actionButton={fullLoadingActionButton}
           icon={fullLoadingIcon}
