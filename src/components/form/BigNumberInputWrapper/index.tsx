@@ -39,14 +39,15 @@ const TokenSymbol = styled.span`
 
 interface Props {
   autoFocus?: boolean
-  disabled?: boolean
   decimals?: number
-  onChange?: (n: BigNumber) => void
-  tokenSymbol?: string
-  value?: BigNumber
-  placeholder?: string
+  disabled?: boolean
   max?: string
   min?: string
+  onChange?: (n: BigNumber) => void
+  onKeyUp?: (e: React.KeyboardEvent<HTMLInputElement>) => void | undefined
+  placeholder?: string
+  tokenSymbol?: string
+  value?: BigNumber
 }
 
 export const BigNumberInputWrapper: React.FC<Props> = (props) => {
