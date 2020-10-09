@@ -84,7 +84,7 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
     () => (min && max && max < min ? 'Max should be greater than Min' : null),
     [min, max]
   )
-  const emptyValues = React.useMemo( () => !min || !max, [min, max])
+  const emptyValues = React.useMemo(() => !min || !max, [min, max])
 
   return (
     <Wrapper>
