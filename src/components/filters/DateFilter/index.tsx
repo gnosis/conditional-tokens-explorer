@@ -89,7 +89,7 @@ export const DateFilter: React.FC<Props> = (props) => {
     () => (to && from && to < from ? 'To should be greater than From' : null),
     [from, to]
   )
-  const emptyValues = !from || !to
+  const emptyValues = React.useMemo( () => !from || !to, [from, to])
 
   return (
     <Wrapper>
