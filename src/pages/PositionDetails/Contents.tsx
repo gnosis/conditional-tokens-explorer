@@ -294,7 +294,7 @@ export const Contents = (props: Props) => {
       if (signer) {
         try {
           setTransfer(Remote.loading())
-          setTransactionTitle('Transfer Outcome Tokens')
+          setTransactionTitle('Transfer Tokens')
 
           const { address: addressTo, amount, positionId } = transferValue
           const addressFrom = await signer.getAddress()
@@ -606,7 +606,6 @@ export const Contents = (props: Props) => {
           icon={fullLoadingIcon}
           message={fullLoadingMessage}
           title={fullLoadingTitle}
-          width={transfer.isFailure() ? '400px' : '320px'}
         />
       )}
     </CenteredCard>

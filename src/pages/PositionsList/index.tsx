@@ -353,7 +353,7 @@ export const PositionsList = () => {
     async (transferValue: TransferOptions) => {
       if (signer) {
         try {
-          setTransactionTitle('Transfer Outcome Tokens')
+          setTransactionTitle('Transfer Tokens')
           setTransfer(Remote.loading())
 
           const { address: addressTo, amount, positionId } = transferValue
@@ -525,7 +525,6 @@ export const PositionsList = () => {
           icon={fullLoadingIcon}
           message={fullLoadingMessage}
           title={fullLoadingTitle}
-          width={transfer.isFailure() ? '400px' : '320px'}
         />
       )}
     </>
