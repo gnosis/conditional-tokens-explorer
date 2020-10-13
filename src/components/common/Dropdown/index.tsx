@@ -83,7 +83,7 @@ Items.defaultProps = {
   isOpen: false,
 }
 
-export const DropdownItemCSS = css`
+export const DropdownItemCSS = css<{ disabled?: boolean }>`
   align-items: center;
   background-color: ${(props) => props.theme.dropdown.item.backgroundColor};
   border-bottom: 1px solid ${(props) => props.theme.dropdown.item.borderColor};
@@ -130,7 +130,7 @@ export const DropdownItemCSS = css`
   }
 `
 
-export const DropdownItem = styled.div`
+export const DropdownItem = styled.div<{ disabled?: boolean }>`
   ${DropdownItemCSS}
 `
 
