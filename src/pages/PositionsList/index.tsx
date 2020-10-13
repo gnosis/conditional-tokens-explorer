@@ -11,6 +11,7 @@ import {
   Dropdown,
   DropdownItem,
   DropdownItemCSS,
+  DropdownItemProps,
   DropdownPosition,
 } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
@@ -48,7 +49,7 @@ import {
   WrappedCollateralOptions,
 } from 'util/types'
 
-const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
+const DropdownItemLink = styled(NavLink)<DropdownItemProps>`
   ${DropdownItemCSS}
 `
 

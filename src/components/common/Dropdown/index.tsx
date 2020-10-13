@@ -83,7 +83,11 @@ Items.defaultProps = {
   isOpen: false,
 }
 
-export const DropdownItemCSS = css<{ disabled?: boolean }>`
+export interface DropdownItemProps {
+  disabled?: boolean
+}
+
+export const DropdownItemCSS = css<DropdownItemProps>`
   align-items: center;
   background-color: ${(props) => props.theme.dropdown.item.backgroundColor};
   border-bottom: 1px solid ${(props) => props.theme.dropdown.item.borderColor};
@@ -97,6 +101,7 @@ export const DropdownItemCSS = css<{ disabled?: boolean }>`
   overflow: hidden;
   padding: 10px ${(props) => props.theme.dropdown.item.paddingHorizontal};
   text-decoration: none;
+  user-select: none;
 
   &.isActive {
     background-color: ${(props) => props.theme.dropdown.item.backgroundColorActive};
@@ -130,13 +135,12 @@ export const DropdownItemCSS = css<{ disabled?: boolean }>`
   }
 `
 
-export const DropdownItem = styled.div<{ disabled?: boolean }>`
+export const DropdownItem = styled.div<DropdownItemProps>`
   ${DropdownItemCSS}
 `
 
-export interface DropdownItemProps {
-  content: React.ReactNode | string
-  onClick?: () => void
+DropdownItem.defaultProps = {
+  disabled: false,
 }
 
 interface Props extends DOMAttributes<HTMLDivElement> {
