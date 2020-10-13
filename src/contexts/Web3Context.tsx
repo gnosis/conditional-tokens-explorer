@@ -96,9 +96,9 @@ export const Web3ContextProvider = ({ children }: Props) => {
   const resetApp = React.useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async (provider: any) => {
-      if (provider.disconnect) {
-        logger.log('Disconnecting provider')
-        await provider.disconnect()
+      if (provider._web3Provider && provider._web3Provider.disconnect) {
+        logger.log('Disconnecting _web3Provider provider')
+        await provider._web3Provider.disconnect()
       }
 
       if (provider.close) {
