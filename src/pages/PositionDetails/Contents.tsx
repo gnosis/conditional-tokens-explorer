@@ -340,16 +340,15 @@ export const Contents = (props: Props) => {
         },
         text: 'Split',
       },
-    ]
-
-    menu.push({
-      disabled: !userHasBalance || isDisconnected || !isSigner,
-      href: '',
-      text: 'Transfer Outcome Tokens',
-      onClick: () => {
-        setOpenTransferOutcomeTokensModal(true)
+      {
+        disabled: !userHasBalance || isDisconnected || !isSigner,
+        href: '',
+        text: 'Transfer Outcome Tokens',
+        onClick: () => {
+          setOpenTransferOutcomeTokensModal(true)
+        },
       },
-    })
+    ]
 
     return menu
   }, [balanceERC1155, signer, status, setValue, positionId])
