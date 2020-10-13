@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { ButtonAdd } from 'components/buttons/ButtonAdd'
 import { ButtonControl, ButtonControlType } from 'components/buttons/ButtonControl'
 import { Row } from 'components/pureStyledComponents/Row'
+import { SmallNote } from 'components/pureStyledComponents/SmallNote'
 import {
   StripedList,
   StripedListEmpty,
@@ -11,6 +12,7 @@ import {
 } from 'components/pureStyledComponents/StripedList'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { TitleValue } from 'components/text/TitleValue'
+import { MAX_OUTCOMES_ALLOWED, MIN_OUTCOMES_ALLOWED } from 'config/constants'
 
 const NewOutcomeWrapper = styled.div`
   column-gap: 12px;
@@ -189,7 +191,7 @@ interface Props {
 
 export const AddOutcome: React.FC<Props> = (props) => {
   const { addOutcome, onChange, outcome = '', outcomes, removeOutcome, ...restProps } = props
-  const maxOutcomesReached = outcomes.length === 256
+  const maxOutcomesReached = outcomes.length === MAX_OUTCOMES_ALLOWED
   const buttonAddDisabled =
     maxOutcomesReached || !isOutcomeTextValid(outcome) || outcomes.includes(outcome)
   const outcomeNameRef = React.createRef<HTMLInputElement>()
@@ -225,22 +227,28 @@ export const AddOutcome: React.FC<Props> = (props) => {
       <TitleValue
         title="Outcomes"
         value={
-          <StripedList maxHeight="300px" minHeight="200px">
-            {outcomes.length ? (
-              outcomes.map((item, index) => (
-                <StripedListItem key={index}>
-                  <EditableOutcome
-                    outcomeIndex={index}
-                    outcomeText={item}
-                    outcomes={outcomes}
-                    removeOutcome={() => removeOutcome(index)}
-                  />
-                </StripedListItem>
-              ))
-            ) : (
-              <StripedListEmpty>No outcomes.</StripedListEmpty>
-            )}
-          </StripedList>
+          <>
+            <StripedList maxHeight="300px" minHeight="200px">
+              {outcomes.length ? (
+                outcomes.map((item, index) => (
+                  <StripedListItem key={index}>
+                    <EditableOutcome
+                      outcomeIndex={index}
+                      outcomeText={item}
+                      outcomes={outcomes}
+                      removeOutcome={() => removeOutcome(index)}
+                    />
+                  </StripedListItem>
+                ))
+              ) : (
+                <StripedListEmpty>No outcomes.</StripedListEmpty>
+              )}
+            </StripedList>
+            <SmallNote>
+              <strong>Note:</strong> Omen supports min. {MIN_OUTCOMES_ALLOWED} and max.{' '}
+              {MAX_OUTCOMES_ALLOWED} outcomes.
+            </SmallNote>
+          </>
         }
       />
     </Row>

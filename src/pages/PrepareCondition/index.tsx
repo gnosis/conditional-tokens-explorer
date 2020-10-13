@@ -1,6 +1,8 @@
+import moment from 'moment'
 import React, { KeyboardEvent, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { useHistory } from 'react-router-dom'
+import styled from 'styled-components'
 
 import { Button } from 'components/buttons/Button'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
@@ -16,6 +18,7 @@ import { Row } from 'components/pureStyledComponents/Row'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { TitleControl } from 'components/pureStyledComponents/TitleControl'
 import { FullLoading } from 'components/statusInfo/FullLoading'
+import { StatusInfoInline, StatusInfoType } from 'components/statusInfo/StatusInfoInline'
 import { IconTypes } from 'components/statusInfo/common'
 import { Hash } from 'components/text/Hash'
 import { TitleValue } from 'components/text/TitleValue'
@@ -24,23 +27,36 @@ import {
   BYTES_REGEX,
   INTEGER_NUMBER,
   MAX_OUTCOMES,
+  MAX_OUTCOMES_ALLOWED,
   MIN_OUTCOMES,
+  MIN_OUTCOMES_ALLOWED,
 } from 'config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import moment from 'moment'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import { isAddress } from 'util/tools'
 import { Arbitrator, Categories, ConditionType, QuestionOptions } from 'util/types'
 
-const maxOutcomesError = 'Too many outcome slots'
-const minOutcomesError = 'There should be more than one outcome slot'
-const patternOutcomesError = 'Decimal numbers are not allowed'
-const conditionAlreadyExist = 'Condition already exists'
-const questionMustNotExist = 'Question must not exist'
-
 const logger = getLogger('Prepare Condition')
+
+interface CustomConditionType {
+  questionId: string
+  outcomesSlotCount: Maybe<number>
+  oracle: string
+}
+
+interface OmenConditionType {
+  questionTitle: string
+  resolutionDate: Maybe<string>
+  category: string
+  arbitrator: Arbitrator
+  oracle: string
+}
+
+const Link = styled.a`
+  color: ${(props) => props.theme.colors.warning};
+`
 
 export const PrepareCondition = () => {
   const {
@@ -52,27 +68,75 @@ export const PrepareCondition = () => {
     networkConfig,
   } = useWeb3ConnectedOrInfura()
 
-  const [numOutcomes, setNumOutcomes] = React.useState(0)
-  const [oracleAddress, setOracleAddress] = React.useState('')
-  const [questionId, setQuestionId] = React.useState('')
-  const [questionTitle, setQuestionTitle] = React.useState('')
-  const [resolutionDate, setResolutionDate] = React.useState('')
+  const history = useHistory()
+
   const [prepareConditionStatus, setPrepareConditionStatus] = useState<Remote<Maybe<string>>>(
     Remote.notAsked<Maybe<string>>()
   )
 
-  const [conditionId, setConditionId] = React.useState<Maybe<string>>(null)
-  const [error, setError] = React.useState<Maybe<Error>>(null)
-  const [conditionType, setConditionType] = React.useState<ConditionType>(ConditionType.custom)
-  const [category, setCategory] = React.useState<string>(Categories.businessAndFinance)
-  const [arbitrator, setArbitrator] = React.useState<Arbitrator>(
-    networkConfig.getArbitratorFromName('realitio')
+  const [checkForExistingCondition, setCheckForExistingCondition] = useState<Remote<Maybe<string>>>(
+    Remote.notAsked<Maybe<string>>()
   )
 
+  const defaultValuesCustom = {
+    questionId: '',
+    outcomesSlotCount: null,
+    oracle: '',
+  }
+
+  const oracle = networkConfig.getOracleFromName('realitio' as KnownOracle)
+
+  const defaultValuesOmen = {
+    questionTitle: '',
+    resolutionDate: null,
+    category: Categories.businessAndFinance,
+    arbitrator: networkConfig.getArbitratorFromName('realitio'),
+    oracle: oracle.address,
+  }
+
+  const {
+    errors: errorsCustomCondition,
+    formState: formStateCustomCondition,
+    getValues: getValuesCustomCondition,
+    register: registerCustomCondition,
+    setValue: setValueCustomCondition,
+    watch: watchCustomCondition,
+  } = useForm<CustomConditionType>({
+    mode: 'onChange',
+    defaultValues: defaultValuesCustom,
+  })
+  const { isValid: isValidCustomCondition } = formStateCustomCondition
+
+  const {
+    control: omenControl,
+    errors: errorsOmenCondition,
+    formState: formStateOmenCondition,
+    getValues: getValuesOmenCondition,
+    register: registerOmenCondition,
+    setValue: setValueOmenCondition,
+    watch: watchOmenCondition,
+  } = useForm<OmenConditionType>({
+    mode: 'onChange',
+    defaultValues: defaultValuesOmen,
+  })
+  const { dirty: isDirtyOmenCondition, isValid: isValidOmenCondition } = formStateOmenCondition
+
+  const category = watchOmenCondition('category')
+  const questionTitle = watchOmenCondition('questionTitle')
+  const resolutionDate = watchOmenCondition('resolutionDate')
+  const arbitrator = watchOmenCondition('arbitrator')
+  const oracleOmenCondition = watchOmenCondition('oracle')
+  const questionId = watchCustomCondition('questionId')
+  const outcomesSlotCount = watchCustomCondition('outcomesSlotCount')
+  const oracleCustomCondition = watchCustomCondition('oracle')
+
+  const [conditionId, setConditionId] = React.useState<Maybe<string>>(null)
+  const [error, setError] = React.useState<Maybe<Error>>(null)
+  const [isConditionAlreadyExist, setErrorConditionAlreadyExist] = React.useState<boolean>(false)
+  const [isQuestionAlreadyExist, setErrorQuestionAlreadyExist] = React.useState<boolean>(false)
+  const [conditionType, setConditionType] = React.useState<ConditionType>(ConditionType.custom)
   const [outcomes, setOutcomes] = React.useState<Array<string>>([])
   const [outcome, setOutcome] = React.useState<string>('')
-
-  const history = useHistory()
 
   const addOutcome = React.useCallback(() => {
     const sanitizedOutcome = outcome.trim()
@@ -92,44 +156,51 @@ export const PrepareCondition = () => {
   const onOutcomeChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setOutcome(e.currentTarget.value)
 
-  const {
-    errors,
-    formState: { isValid },
-    register,
-    setValue,
-  } = useForm<{ outcomesSlotCount: number; oracle: string; questionId: string }>({
-    mode: 'onChange',
-  })
-
   React.useEffect(() => {
     const checkConditionExist = async () => {
+      setCheckForExistingCondition(Remote.loading())
+      setErrorQuestionAlreadyExist(false)
+      setErrorConditionAlreadyExist(false)
+
       try {
         let conditionExists = false
         let conditionIdToUpdate: Maybe<string> = null
-        if (questionId && oracleAddress && numOutcomes) {
+        if (questionId && oracleCustomCondition && outcomesSlotCount) {
           conditionIdToUpdate = ConditionalTokensService.getConditionId(
             questionId,
-            oracleAddress,
-            numOutcomes
+            oracleCustomCondition,
+            outcomesSlotCount
           )
         }
-        if (questionTitle && oracleAddress && outcomes.length > 0 && address) {
-          const openingDateMoment = moment(resolutionDate)
-          const questionOptions: QuestionOptions = {
-            arbitratorAddress: arbitrator.address,
-            category,
-            openingDateMoment,
-            outcomes,
-            question: questionTitle,
-            networkConfig,
-            signerAddress: address,
+
+        try {
+          if (
+            questionTitle &&
+            oracleOmenCondition &&
+            outcomes.length > 0 &&
+            resolutionDate &&
+            address
+          ) {
+            const openingDateMoment = moment(resolutionDate + '')
+            const questionOptions: QuestionOptions = {
+              arbitratorAddress: (arbitrator as Arbitrator).address,
+              category,
+              openingDateMoment,
+              outcomes,
+              question: questionTitle + '',
+              networkConfig,
+              signerAddress: address,
+            }
+            const questionId = await RtioService.askQuestionConstant(questionOptions)
+            conditionIdToUpdate = ConditionalTokensService.getConditionId(
+              questionId,
+              oracleOmenCondition + '',
+              outcomes.length
+            )
           }
-          const questionId = await RtioService.askQuestionConstant(questionOptions)
-          conditionIdToUpdate = ConditionalTokensService.getConditionId(
-            questionId,
-            oracleAddress,
-            numOutcomes
-          )
+        } catch (err) {
+          setErrorQuestionAlreadyExist(err.message.includes('question must not exist'))
+          logger.error(err)
         }
 
         logger.log(`Condition ID: ${conditionIdToUpdate}`)
@@ -137,36 +208,39 @@ export const PrepareCondition = () => {
           conditionExists = await CTService.conditionExists(conditionIdToUpdate)
         }
 
-        if (conditionExists) {
-          throw new Error(conditionAlreadyExist)
-        }
+        setErrorConditionAlreadyExist(conditionExists)
 
         setError(null)
       } catch (err) {
-        if (err.message.includes(conditionAlreadyExist)) {
-          setError(err)
-        } else if (err.message.includes(questionMustNotExist.toLowerCase())) {
-          setError(new Error(questionMustNotExist))
-        } else {
-          setError(err.message)
-        }
+        setError(err.message)
       }
+
+      setCheckForExistingCondition(Remote.success('Done'))
     }
     checkConditionExist()
   }, [
-    questionId,
-    oracleAddress,
-    numOutcomes,
     outcomes,
     RtioService,
     address,
-    category,
     networkConfig,
-    CTService,
     questionTitle,
+    CTService,
+    category,
+    questionId,
+    outcomesSlotCount,
+    oracleCustomCondition,
+    oracleOmenCondition,
     resolutionDate,
-    arbitrator.address,
+    arbitrator,
   ])
+
+  const isOutcomesFromOmenConditionInvalid = React.useMemo(
+    () =>
+      conditionType === ConditionType.omen &&
+      isDirtyOmenCondition &&
+      outcomes.length < MIN_OUTCOMES_ALLOWED,
+    [conditionType, isDirtyOmenCondition, outcomes]
+  )
 
   const prepareCondition = async () => {
     setPrepareConditionStatus(Remote.loading())
@@ -175,32 +249,44 @@ export const PrepareCondition = () => {
       if (status === Web3ContextStatus.Connected && address) {
         let conditionIdToUpdate: Maybe<string> = null
         if (conditionType === ConditionType.custom) {
-          await CTService.prepareCondition(questionId, oracleAddress, numOutcomes)
-          conditionIdToUpdate = ConditionalTokensService.getConditionId(
-            questionId,
-            oracleAddress,
-            numOutcomes
-          )
-        } else {
-          const openingDateMoment = moment(resolutionDate)
-          const questionOptions: QuestionOptions = {
-            arbitratorAddress: arbitrator.address,
-            category,
-            openingDateMoment,
-            outcomes,
-            question: questionTitle,
-            networkConfig,
-            signerAddress: address,
+          const { oracle: oracleCustom, outcomesSlotCount, questionId } = getValuesCustomCondition()
+          if (outcomesSlotCount) {
+            await CTService.prepareCondition(questionId, oracleCustom, outcomesSlotCount)
+            conditionIdToUpdate = ConditionalTokensService.getConditionId(
+              questionId,
+              oracleCustom,
+              outcomesSlotCount
+            )
           }
+        } else {
+          const {
+            arbitrator,
+            oracle: oracleOmen,
+            questionTitle,
+            resolutionDate,
+          } = getValuesOmenCondition()
 
-          const questionId = await RtioService.askQuestion(questionOptions)
+          if (resolutionDate && questionTitle && oracleOmen) {
+            const openingDateMoment = moment(resolutionDate + '')
+            const questionOptions: QuestionOptions = {
+              arbitratorAddress: (arbitrator as Arbitrator).address,
+              category,
+              openingDateMoment,
+              outcomes,
+              question: questionTitle + '',
+              networkConfig,
+              signerAddress: address,
+            }
 
-          await CTService.prepareCondition(questionId, oracleAddress, outcomes.length)
-          conditionIdToUpdate = ConditionalTokensService.getConditionId(
-            questionId,
-            oracleAddress,
-            outcomes.length
-          )
+            const questionId = await RtioService.askQuestion(questionOptions)
+
+            await CTService.prepareCondition(questionId, oracleOmen + '', outcomes.length)
+            conditionIdToUpdate = ConditionalTokensService.getConditionId(
+              questionId,
+              oracleOmen + '',
+              outcomes.length
+            )
+          }
         }
         logger.log(`Condition Id after prepareCondition: ${conditionIdToUpdate}`)
         setConditionId(conditionIdToUpdate)
@@ -215,15 +301,28 @@ export const PrepareCondition = () => {
 
   const onClickUseMyWallet = () => {
     if (status === Web3ContextStatus.Connected && address) {
-      setValue('oracle', address, true)
-      setOracleAddress(address)
+      setValueCustomCondition('oracle', address, true)
     } else if (status === Web3ContextStatus.Infura) {
       connect()
     }
   }
 
   const submitDisabled =
-    !isValid || prepareConditionStatus.isLoading() || prepareConditionStatus.isFailure() || !!error
+    conditionType === ConditionType.custom
+      ? !isValidCustomCondition ||
+        prepareConditionStatus.isLoading() ||
+        prepareConditionStatus.isFailure() ||
+        checkForExistingCondition.isLoading() ||
+        checkForExistingCondition.isFailure() ||
+        isConditionAlreadyExist
+      : !isValidOmenCondition ||
+        prepareConditionStatus.isLoading() ||
+        prepareConditionStatus.isFailure() ||
+        checkForExistingCondition.isLoading() ||
+        checkForExistingCondition.isFailure() ||
+        isConditionAlreadyExist ||
+        isQuestionAlreadyExist ||
+        isOutcomesFromOmenConditionInvalid
 
   const fullLoadingActionButton = prepareConditionStatus.isSuccess()
     ? {
@@ -281,19 +380,19 @@ export const PrepareCondition = () => {
               value={
                 <>
                   <Textfield
-                    error={errors.questionId && true}
+                    error={errorsCustomCondition.questionId && true}
                     name="questionId"
-                    onChange={(e) => setQuestionId(e.target.value)}
+                    onChange={(e) => setValueCustomCondition('questionId', e.target.value, true)}
                     placeholder="Type in a question Id..."
-                    ref={register({ required: true, pattern: BYTES_REGEX })}
+                    ref={registerCustomCondition({ required: true, pattern: BYTES_REGEX })}
                     type="text"
                   />
-                  {errors.questionId && (
+                  {errorsCustomCondition.questionId && (
                     <ErrorContainer>
-                      {errors.questionId.type === 'required' && (
+                      {errorsCustomCondition.questionId.type === 'required' && (
                         <ErrorMessage>Required field</ErrorMessage>
                       )}
-                      {errors.questionId.type === 'pattern' && (
+                      {errorsCustomCondition.questionId.type === 'pattern' && (
                         <ErrorMessage>Invalid Question Id</ErrorMessage>
                       )}
                     </ErrorContainer>
@@ -307,15 +406,45 @@ export const PrepareCondition = () => {
               <TitleValue
                 title="Question"
                 value={
-                  <Textfield
-                    name="question"
-                    onChange={(e) => setQuestionTitle(e.target.value)}
-                    placeholder="Type in a question..."
-                    ref={register({ required: true })}
-                    type="text"
-                  />
+                  <>
+                    <Textfield
+                      error={errorsOmenCondition.questionTitle && true}
+                      name="questionTitle"
+                      onChange={(e) => setValueOmenCondition('questionTitle', e.target.value, true)}
+                      placeholder="Type in a question..."
+                      ref={registerOmenCondition({ required: true })}
+                      type="text"
+                    />
+                    {errorsOmenCondition.questionTitle && (
+                      <ErrorContainer>
+                        {errorsOmenCondition.questionTitle.type === 'required' && (
+                          <ErrorMessage>Required field</ErrorMessage>
+                        )}
+                      </ErrorContainer>
+                    )}
+                  </>
                 }
               />
+
+              {isQuestionAlreadyExist && (
+                <StatusInfoInline status={StatusInfoType.warning}>
+                  The question for this condition already exists on{' '}
+                  <Link href={oracle.url} target="_blank">
+                    {oracle.description}
+                  </Link>
+                  . Please change it to a different one.
+                </StatusInfoInline>
+              )}
+            </>
+          )}
+          {isConditionAlreadyExist && (
+            <StatusInfoInline status={StatusInfoType.warning}>
+              Condition already exist. Please use another question ID or change the number of
+              outcomes.
+            </StatusInfoInline>
+          )}
+          {conditionType === ConditionType.omen && (
+            <>
               <AddOutcome
                 addOutcome={addOutcome}
                 onChange={onOutcomeChange}
@@ -331,16 +460,18 @@ export const PrepareCondition = () => {
               value={
                 <>
                   <Textfield
-                    error={errors.outcomesSlotCount && true}
+                    error={errorsCustomCondition.outcomesSlotCount && true}
                     name="outcomesSlotCount"
-                    onChange={(e) => setNumOutcomes(Number(e.target.value))}
+                    onChange={(e) =>
+                      setValueCustomCondition('outcomesSlotCount', Number(e.target.value), true)
+                    }
                     onKeyPress={(event: KeyboardEvent) => {
                       if (event.key === '.') {
                         event.preventDefault()
                       }
                     }}
-                    placeholder="You can add between 2 and 256 outcomes..."
-                    ref={register({
+                    placeholder={`You can add between ${MIN_OUTCOMES_ALLOWED} and ${MAX_OUTCOMES_ALLOWED} outcomes...`}
+                    ref={registerCustomCondition({
                       required: true,
                       min: MIN_OUTCOMES,
                       max: MAX_OUTCOMES,
@@ -348,19 +479,19 @@ export const PrepareCondition = () => {
                     })}
                     type="number"
                   />
-                  {errors.outcomesSlotCount && (
+                  {errorsCustomCondition.outcomesSlotCount && (
                     <ErrorContainer>
-                      {errors.outcomesSlotCount.type === 'max' && (
-                        <ErrorMessage>{maxOutcomesError}</ErrorMessage>
+                      {errorsCustomCondition.outcomesSlotCount.type === 'max' && (
+                        <ErrorMessage>Too many outcome slots</ErrorMessage>
                       )}
-                      {errors.outcomesSlotCount.type === 'min' && (
-                        <ErrorMessage>{minOutcomesError}</ErrorMessage>
+                      {errorsCustomCondition.outcomesSlotCount.type === 'min' && (
+                        <ErrorMessage>There should be more than one outcome slot</ErrorMessage>
                       )}
-                      {errors.outcomesSlotCount.type === 'required' && (
+                      {errorsCustomCondition.outcomesSlotCount.type === 'required' && (
                         <ErrorMessage>Required field</ErrorMessage>
                       )}
-                      {errors.outcomesSlotCount.type === 'pattern' && (
-                        <ErrorMessage>{patternOutcomesError}</ErrorMessage>
+                      {errorsCustomCondition.outcomesSlotCount.type === 'pattern' && (
+                        <ErrorMessage>Decimal numbers are not allowed</ErrorMessage>
                       )}
                     </ErrorContainer>
                   )}
@@ -375,24 +506,38 @@ export const PrepareCondition = () => {
               <TitleValue
                 title="Resolution Date"
                 value={
-                  <Textfield
-                    name="resolutionDate"
-                    onChange={(e) => setResolutionDate(e.target.value)}
-                    placeholder="MM/DD/YYYY"
-                    ref={register({
-                      required: true,
-                    })}
-                    type="date"
-                  />
+                  <>
+                    <Textfield
+                      error={errorsOmenCondition.resolutionDate && true}
+                      name="resolutionDate"
+                      onChange={(e) =>
+                        setValueOmenCondition('resolutionDate', e.target.value, true)
+                      }
+                      placeholder="MM/DD/YYYY"
+                      ref={registerOmenCondition({
+                        required: true,
+                      })}
+                      type="date"
+                    />
+                    {errorsOmenCondition.resolutionDate && (
+                      <ErrorContainer>
+                        {errorsOmenCondition.resolutionDate.type === 'required' && (
+                          <ErrorMessage>Required field</ErrorMessage>
+                        )}
+                      </ErrorContainer>
+                    )}
+                  </>
                 }
               />
               <TitleValue
                 title="Category"
                 value={
-                  <CategoriesDropdown
-                    onClick={(value: string) => {
-                      setCategory(value)
-                    }}
+                  <Controller
+                    as={CategoriesDropdown}
+                    control={omenControl}
+                    name="category"
+                    onClick={(value: string) => setValueOmenCondition('category', value, true)}
+                    rules={{ required: true }}
                     value={category}
                   />
                 }
@@ -400,49 +545,90 @@ export const PrepareCondition = () => {
               <TitleValue
                 title="Arbitrator"
                 value={
-                  <ArbitratorDropdown
-                    onClick={(value: Arbitrator) => {
-                      setArbitrator(value)
-                    }}
-                    value={arbitrator}
-                  />
+                  <>
+                    <Controller
+                      as={ArbitratorDropdown}
+                      control={omenControl}
+                      name="arbitrator"
+                      onClick={(value: Arbitrator) =>
+                        setValueOmenCondition('arbitrator', value, true)
+                      }
+                      rules={{ required: true }}
+                      value={arbitrator}
+                    />
+                  </>
+                }
+              />
+              <TitleValue
+                title="Oracle"
+                value={
+                  <>
+                    <Textfield
+                      error={errorsOmenCondition.oracle && true}
+                      name="oracle"
+                      onChange={(e) => setValueOmenCondition('oracle', e.target.value, true)}
+                      ref={registerOmenCondition({
+                        required: true,
+                        pattern: ADDRESS_REGEX,
+                        validate: (value: string) => isAddress(value),
+                      })}
+                      type="text"
+                      value={oracleOmenCondition}
+                      {...(conditionType === ConditionType.omen && { readOnly: true })}
+                    />
+                    {errorsOmenCondition.oracle && (
+                      <ErrorContainer>
+                        {errorsOmenCondition.oracle.type === 'required' && (
+                          <ErrorMessage>Required field</ErrorMessage>
+                        )}
+                        {errorsOmenCondition.oracle.type === 'pattern' && (
+                          <ErrorMessage>Please use a valid reporting address</ErrorMessage>
+                        )}
+                        {errorsOmenCondition.oracle.type === 'validate' && (
+                          <ErrorMessage>Address checksum failed</ErrorMessage>
+                        )}
+                      </ErrorContainer>
+                    )}
+                  </>
                 }
               />
             </>
           )}
-          <TitleValue
-            title="Reporting Address"
-            titleControl={<TitleControl onClick={onClickUseMyWallet}>Use My Wallet</TitleControl>}
-            value={
-              <>
-                <Textfield
-                  error={errors.oracle && true}
-                  name="oracle"
-                  onChange={(e) => setOracleAddress(e.target.value)}
-                  placeholder="Type in a valid reporting address..."
-                  ref={register({
-                    required: true,
-                    pattern: ADDRESS_REGEX,
-                    validate: (value: string) => isAddress(value),
-                  })}
-                  type="text"
-                />
-                {errors.oracle && (
-                  <ErrorContainer>
-                    {errors.oracle.type === 'required' && (
-                      <ErrorMessage>Required field</ErrorMessage>
-                    )}
-                    {errors.oracle.type === 'pattern' && (
-                      <ErrorMessage>Please use a valid reporting address</ErrorMessage>
-                    )}
-                    {errors.oracle.type === 'validate' && (
-                      <ErrorMessage>Address checksum failed</ErrorMessage>
-                    )}
-                  </ErrorContainer>
-                )}
-              </>
-            }
-          />
+          {conditionType === ConditionType.custom && (
+            <TitleValue
+              title="Reporting Address"
+              titleControl={<TitleControl onClick={onClickUseMyWallet}>Use My Wallet</TitleControl>}
+              value={
+                <>
+                  <Textfield
+                    error={errorsCustomCondition.oracle && true}
+                    name="oracle"
+                    onChange={(e) => setValueCustomCondition('oracle', e.target.value, true)}
+                    placeholder="Type in a valid reporting address..."
+                    ref={registerCustomCondition({
+                      required: true,
+                      pattern: ADDRESS_REGEX,
+                      validate: (value: string) => isAddress(value),
+                    })}
+                    type="text"
+                  />
+                  {errorsCustomCondition.oracle && (
+                    <ErrorContainer>
+                      {errorsCustomCondition.oracle.type === 'required' && (
+                        <ErrorMessage>Required field</ErrorMessage>
+                      )}
+                      {errorsCustomCondition.oracle.type === 'pattern' && (
+                        <ErrorMessage>Please use a valid reporting address</ErrorMessage>
+                      )}
+                      {errorsCustomCondition.oracle.type === 'validate' && (
+                        <ErrorMessage>Address checksum failed</ErrorMessage>
+                      )}
+                    </ErrorContainer>
+                  )}
+                </>
+              }
+            />
+          )}
         </Row>
         {(prepareConditionStatus.isLoading() ||
           prepareConditionStatus.isFailure() ||

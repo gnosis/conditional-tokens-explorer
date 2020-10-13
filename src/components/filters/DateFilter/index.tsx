@@ -1,7 +1,9 @@
+import moment from 'moment'
 import React from 'react'
 import styled from 'styled-components'
 
 import { ButtonFilterSubmit } from 'components/buttons/ButtonFilterSubmit'
+import { ErrorContainer, Error as ErrorMessage } from 'components/pureStyledComponents/Error'
 import { FilterTitle } from 'components/pureStyledComponents/FilterTitle'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
 
@@ -35,17 +37,61 @@ const FieldWrapper = styled.div`
 const Date = styled(Textfield)`
   font-size: 14px;
   height: 32px;
+  padding-left: 6px;
+  padding-right: 6px;
 `
 
 interface Props {
-  onChangeFrom: () => void
-  onChangeTo: () => void
-  onSubmit: () => void
+  onChangeFrom?: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onChangeTo?: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onSubmit: (from: Maybe<number>, to: Maybe<number>) => void
   title: string
 }
 
 export const DateFilter: React.FC<Props> = (props) => {
   const { onChangeFrom, onChangeTo, onSubmit, title } = props
+
+  const [from, setFrom] = React.useState<Maybe<number>>(null)
+  const [to, setTo] = React.useState<Maybe<number>>(null)
+
+  const onChangeFromInternal = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (typeof onChangeFrom === 'function') {
+      onChangeFrom(event)
+    }
+
+    const fromDateMoment = moment(event.currentTarget.value)
+    const fromTimestamp = fromDateMoment.unix()
+
+    setFrom(fromTimestamp)
+  }
+
+  const onChangeToInternal = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (typeof onChangeTo === 'function') {
+      onChangeTo(event)
+    }
+
+    const toDateMoment = moment(event.currentTarget.value)
+    const toTimestamp = toDateMoment.unix()
+
+    setTo(toTimestamp)
+  }
+
+  const errorMessage = React.useMemo(
+    () => (to && from && to < from ? 'To should be greater than From' : null),
+    [from, to]
+  )
+  const emptyValues = React.useMemo(() => !from && !to, [from, to])
+  const submitDisabled = !!errorMessage || emptyValues
+
+  const onSubmitInternal = () => {
+    if ((from || to) && !submitDisabled) onSubmit(from, to)
+  }
+
+  const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      onSubmitInternal()
+    }
+  }
 
   return (
     <Wrapper>
@@ -53,16 +99,26 @@ export const DateFilter: React.FC<Props> = (props) => {
       <Row>
         <FieldWrapper>
           <Label>From:</Label>
-          <Date name="dateFrom" onChange={onChangeFrom} type="date" />
+          <Date
+            name="dateFrom"
+            onChange={onChangeFromInternal}
+            onKeyUp={onPressEnter}
+            type="date"
+          />
         </FieldWrapper>
       </Row>
       <Row>
         <FieldWrapper>
           <Label>To:</Label>
-          <Date name="dateTo" onChange={onChangeTo} type="date" />
+          <Date name="dateTo" onChange={onChangeToInternal} onKeyUp={onPressEnter} type="date" />
         </FieldWrapper>
-        <ButtonFilterSubmit onClick={onSubmit} />
+        <ButtonFilterSubmit disabled={submitDisabled} onClick={onSubmitInternal} />
       </Row>
+      {errorMessage && (
+        <ErrorContainer>
+          <ErrorMessage>{errorMessage}</ErrorMessage>
+        </ErrorContainer>
+      )}
     </Wrapper>
   )
 }

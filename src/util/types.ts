@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers/utils'
+import { Moment } from 'moment'
 
 import { NetworkConfig } from 'config/networkConfig'
-import { Moment } from 'moment'
 
 export interface Question {
   arbitratorAddress: string
@@ -193,4 +193,33 @@ export interface QuestionOptions {
   question: string
   networkConfig: NetworkConfig
   signerAddress: string
+}
+
+export enum ConditionSearchOptions {
+  All = 'all',
+  ConditionId = 'conditionId',
+  QuestionId = 'questionId',
+  QuestionText = 'questionText',
+  OracleAddress = 'oracleAddress',
+  CreatorAddress = 'creatorAddress',
+}
+
+export interface AdvancedFilter {
+  ReporterOracle: {
+    type: OracleFilterOptions
+    value: Array<string>
+  }
+  ConditionType: {
+    type: ConditionType | ConditionTypeAll
+    value: Maybe<string>
+  }
+  Status: StatusOptions
+  MinOutcomes: Maybe<number>
+  MaxOutcomes: Maybe<number>
+  FromCreationDate: Maybe<number>
+  ToCreationDate: Maybe<number>
+  TextToSearch: {
+    type: ConditionSearchOptions
+    value: Maybe<string>
+  }
 }

@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { ButtonFilterSubmit } from 'components/buttons/ButtonFilterSubmit'
+import { ErrorContainer, Error as ErrorMessage } from 'components/pureStyledComponents/Error'
 import { FilterTitle } from 'components/pureStyledComponents/FilterTitle'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
 
@@ -44,26 +45,77 @@ const TextFieldStyled = styled(Textfield)`
 `
 
 interface Props {
-  onChangeMin: () => void
-  onChangeMax: () => void
-  onSubmit: () => void
+  onChangeMin?: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onChangeMax?: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onSubmit: (min: Maybe<number>, max: Maybe<number>) => void
   title: string
 }
 
 export const MinMaxFilter: React.FC<Props> = (props) => {
   const { onChangeMax, onChangeMin, onSubmit, title } = props
 
+  const [min, setMin] = React.useState<Maybe<number>>(null)
+  const [max, setMax] = React.useState<Maybe<number>>(null)
+
+  const onChangeMinInternal = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (typeof onChangeMin === 'function') {
+      onChangeMin(event)
+    }
+    setMin(+event.currentTarget.value)
+  }
+
+  const onChangeMaxInternal = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (typeof onChangeMax === 'function') {
+      onChangeMax(event)
+    }
+    setMax(+event.currentTarget.value)
+  }
+
+  const errorMessage = React.useMemo(
+    () => (min && max && max < min ? 'Max should be greater than Min' : null),
+    [min, max]
+  )
+  const emptyValues = React.useMemo(() => !min && !max, [min, max])
+  const submitDisabled = !!errorMessage || emptyValues
+
+  const onSubmitInternal = () => {
+    if ((min || max) && !submitDisabled) onSubmit(min, max)
+  }
+
+  const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      onSubmitInternal()
+    }
+  }
+
   return (
     <Wrapper>
       <FilterTitle>{title}</FilterTitle>
       <Row>
         <FieldsWrapper>
-          <TextFieldStyled name="min" onChange={onChangeMin} placeholder="Min..." type="number" />
+          <TextFieldStyled
+            name="min"
+            onChange={onChangeMinInternal}
+            onKeyUp={onPressEnter}
+            placeholder="Min..."
+            type="number"
+          />
           <Dash />
-          <TextFieldStyled name="max" onChange={onChangeMax} placeholder="Max..." type="number" />
+          <TextFieldStyled
+            name="max"
+            onChange={onChangeMaxInternal}
+            onKeyUp={onPressEnter}
+            placeholder="Max..."
+            type="number"
+          />
         </FieldsWrapper>
-        <ButtonFilterSubmit onClick={onSubmit} />
+        <ButtonFilterSubmit disabled={submitDisabled} onClick={onSubmitInternal} />
       </Row>
+      {errorMessage && (
+        <ErrorContainer>
+          <ErrorMessage>{errorMessage}</ErrorMessage>
+        </ErrorContainer>
+      )}
     </Wrapper>
   )
 }
