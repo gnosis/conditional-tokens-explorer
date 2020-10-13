@@ -180,7 +180,7 @@ export const SearchField: React.FC<Props> = (props) => {
       )}
       {dropdownItems && (
         <Dropdown
-          activeItemHighlight={false}
+          activeItemHighlight={true}
           disabled={disabled}
           dropdownButtonContent={
             <ButtonDropdown>
@@ -194,7 +194,7 @@ export const SearchField: React.FC<Props> = (props) => {
           items={dropdownItems.map((item, index) => (
             <DropdownItem
               key={index}
-              onMouseDown={() => {
+              onClick={() => {
                 item.onClick()
                 setCurrentItem(index)
               }}
