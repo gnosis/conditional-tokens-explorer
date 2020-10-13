@@ -322,6 +322,7 @@ export const Contents = (props: Props) => {
 
   const dropdownItems = useMemo(() => {
     const userHasBalance = balanceERC1155 && !balanceERC1155.isZero()
+    const hasSigner = signer !== null
 
     const menu = [
       {
@@ -341,17 +342,15 @@ export const Contents = (props: Props) => {
         text: 'Split',
       },
     ]
-
-    if (userHasBalance && signer) {
-      menu.push({
-        disabled: !userHasBalance || isDisconnected,
-        href: '',
-        text: 'Transfer Outcome Tokens',
-        onClick: () => {
-          setOpenTransferOutcomeTokensModal(true)
-        },
-      })
-    }
+    console.log(!userHasBalance || isDisconnected || !hasSigner)
+    menu.push({
+      disabled: !userHasBalance || isDisconnected || !hasSigner,
+      href: '',
+      text: 'Transfer Outcome Tokens',
+      onClick: () => {
+        setOpenTransferOutcomeTokensModal(true)
+      },
+    })
 
     return menu
   }, [positionId, signer, balanceERC1155, setValue, isDisconnected])
@@ -409,7 +408,7 @@ export const Contents = (props: Props) => {
             if (item.href) {
               return (
                 <DropdownItemLink
-                  disabled={item.disabled && true}
+                  disabled={item.disabled}
                   key={index}
                   onMouseDown={item.onClick}
                   to={item.href}
@@ -419,7 +418,7 @@ export const Contents = (props: Props) => {
               )
             } else {
               return (
-                <DropdownItem key={index} onClick={item.onClick}>
+                <DropdownItem disabled={item.disabled} key={index} onClick={item.onClick}>
                   {item.text}
                 </DropdownItem>
               )
