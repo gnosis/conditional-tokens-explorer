@@ -321,7 +321,8 @@ export const PrepareCondition = () => {
         checkForExistingCondition.isLoading() ||
         checkForExistingCondition.isFailure() ||
         isConditionAlreadyExist ||
-        isQuestionAlreadyExist
+        isQuestionAlreadyExist ||
+        isOutcomesFromOmenConditionInvalid
 
   const fullLoadingActionButton = prepareConditionStatus.isSuccess()
     ? {
@@ -451,14 +452,6 @@ export const PrepareCondition = () => {
                 outcomes={outcomes}
                 removeOutcome={removeOutcome}
               />
-              {isOutcomesFromOmenConditionInvalid && (
-                <ErrorContainer>
-                  <ErrorMessage>
-                    User is not allowed to create a condition with less than {MIN_OUTCOMES_ALLOWED}{' '}
-                    outcome
-                  </ErrorMessage>
-                </ErrorContainer>
-              )}
             </>
           )}
           {conditionType === ConditionType.custom && (
