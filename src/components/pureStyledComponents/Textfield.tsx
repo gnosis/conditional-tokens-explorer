@@ -33,7 +33,7 @@ export const TextfieldCSS = css<TexfieldCSSProps>`
 
   &[disabled],
   &[disabled]:hover {
-    background-color: ${(props) => props.theme.textField.backgroundColorActive};
+    background-color: ${(props) => props.theme.textField.backgroundColor};
     border-color: ${(props) => props.theme.textField.borderColor};
     cursor: not-allowed;
     opacity: 0.5;
@@ -47,6 +47,14 @@ export const TextfieldCSS = css<TexfieldCSSProps>`
     color: ${(props) => props.theme.textField.colorPlaceholder};
     font-style: normal;
     opacity: 1;
+  }
+
+  &[readonly] {
+    background-color: ${(props) => props.theme.textField.backgroundColor};
+    border-color: ${(props) => props.theme.textField.borderColor};
+    color: ${(props) => props.theme.textField.colorPlaceholder};
+    cursor: default;
+    font-style: italic;
   }
 `
 

@@ -1,5 +1,5 @@
 import { useDebounceCallback } from '@react-hook/debounce'
-import React, { useCallback, useState } from 'react'
+import React from 'react'
 import DataTable from 'react-data-table-component'
 import { NavLink, useHistory } from 'react-router-dom'
 import styled from 'styled-components'
@@ -11,7 +11,6 @@ import { DateFilter } from 'components/filters/DateFilter'
 import { MinMaxFilter } from 'components/filters/MinMaxFilter'
 import { OraclesFilterDropdown } from 'components/filters/OraclesFilterDropdown'
 import { StatusFilterDropdown } from 'components/filters/StatusFilterDropdown'
-import { ValidityFilterDropdown } from 'components/filters/ValidityFilterDropdown'
 import { Switch } from 'components/form/Switch'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import { PageTitle } from 'components/pureStyledComponents/PageTitle'
@@ -24,19 +23,21 @@ import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { TableControls } from 'components/table/TableControls'
 import { Hash } from 'components/text/Hash'
-import { useConditions } from 'hooks/useConditions'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useConditionsList } from 'hooks/useConditionsList'
 import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { customStyles } from 'theme/tableCustomStyles'
 import { Conditions_conditions } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
 import {
+  AdvancedFilter,
+  ConditionSearchOptions,
   ConditionType,
   ConditionTypeAll,
   LocalStorageManagement,
   OracleFilterOptions,
   StatusOptions,
-  ValidityOptions,
 } from 'util/types'
 
 const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
@@ -46,87 +47,140 @@ const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
 const logger = getLogger('ConditionsList')
 
 export const ConditionsList: React.FC = () => {
+  const { _type: status } = useWeb3ConnectedOrInfura()
+
   const history = useHistory()
   const { setValue } = useLocalStorage(LocalStorageManagement.ConditionId)
 
-  const [conditionIdToSearch, setConditionIdToSearch] = useState<string>('')
-  const [conditionIdToShow, setConditionIdToShow] = useState<string>('')
+  const [textToSearch, setTextToSearch] = React.useState<string>('')
+  const [textToShow, setTextToShow] = React.useState<string>('')
 
-  const [selectedOracleFilter, setSelectedOracleFilter] = useState<string[]>([])
-  const [selectedOracleValue, setSelectedOracleValue] = useState<OracleFilterOptions>(
+  const [selectedOracleFilter, setSelectedOracleFilter] = React.useState<string[]>([])
+  const [selectedOracleValue, setSelectedOracleValue] = React.useState<OracleFilterOptions>(
     OracleFilterOptions.All
   )
-  const [selectedStatus, setSelectedStatus] = useState<StatusOptions>(StatusOptions.All)
-  const [selectedConditionType, setSelectedConditionType] = useState<
+  const [selectedStatus, setSelectedStatus] = React.useState<StatusOptions>(StatusOptions.All)
+  const [selectedMinOutcomes, setSelectedMinOutcomes] = React.useState<Maybe<number>>(null)
+  const [selectedMaxOutcomes, setSelectedMaxOutcomes] = React.useState<Maybe<number>>(null)
+  const [selectedFromCreationDate, setSelectedFromCreationDate] = React.useState<Maybe<number>>(
+    null
+  )
+  const [selectedToCreationDate, setSelectedToCreationDate] = React.useState<Maybe<number>>(null)
+  const [selectedConditionTypeFilter, setSelectedConditionTypeFilter] = React.useState<
+    Maybe<string>
+  >(null)
+  const [selectedConditionTypeValue, setSelectedConditionTypeValue] = React.useState<
     ConditionType | ConditionTypeAll
   >(ConditionTypeAll.all)
-  const [validity, setValidity] = useState<ValidityOptions>(ValidityOptions.All)
+  const [searchBy, setSearchBy] = React.useState<ConditionSearchOptions>(
+    ConditionSearchOptions.ConditionId
+  )
+  const [showFilters, setShowFilters] = React.useState(false)
 
-  const debouncedHandlerConditionToSearch = useDebounceCallback((conditionIdToSearch) => {
-    setConditionIdToSearch(conditionIdToSearch)
+  const dropdownItems = useConditionsSearchOptions(setSearchBy)
+
+  logger.log(`Search by ${searchBy}`)
+
+  const debouncedHandlerTextToSearch = useDebounceCallback((conditionIdToSearch) => {
+    setTextToSearch(conditionIdToSearch)
   }, 500)
 
-  const onChangeConditionId = React.useCallback(
+  const onChangeSearch = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.currentTarget
-      setConditionIdToShow(value)
-      debouncedHandlerConditionToSearch(value)
+      setTextToShow(value)
+      debouncedHandlerTextToSearch(value)
     },
-    [debouncedHandlerConditionToSearch]
+    [debouncedHandlerTextToSearch]
   )
 
   const onClearSearch = React.useCallback(() => {
-    setConditionIdToShow('')
-    debouncedHandlerConditionToSearch('')
-  }, [debouncedHandlerConditionToSearch])
+    setTextToShow('')
+    debouncedHandlerTextToSearch('')
+  }, [debouncedHandlerTextToSearch])
 
-  const { data, error, loading } = useConditions({
-    conditionId: conditionIdToSearch,
-    oracleValue: selectedOracleValue,
-    oracleFilter: selectedOracleFilter,
-  })
+  // Clear the filters
+  React.useEffect(() => {
+    setSelectedOracleValue(OracleFilterOptions.All)
+    setSelectedOracleFilter([])
+    setSelectedConditionTypeValue(ConditionTypeAll.all)
+    setSelectedConditionTypeFilter(null)
+    setSelectedStatus(StatusOptions.All)
+    setSelectedMinOutcomes(null)
+    setSelectedMaxOutcomes(null)
+    setSelectedToCreationDate(null)
+    setSelectedFromCreationDate(null)
+    setSearchBy(ConditionSearchOptions.ConditionId)
+    setTextToSearch('')
+  }, [showFilters])
 
-  const isLoading = !conditionIdToSearch && loading
-  const isSearching = conditionIdToSearch && loading
+  const advancedFilters: AdvancedFilter = {
+    ReporterOracle: {
+      type: selectedOracleValue,
+      value: selectedOracleFilter,
+    },
+    ConditionType: {
+      type: selectedConditionTypeValue,
+      value: selectedConditionTypeFilter,
+    },
+    Status: selectedStatus,
+    MinOutcomes: selectedMinOutcomes,
+    MaxOutcomes: selectedMaxOutcomes,
+    ToCreationDate: selectedToCreationDate,
+    FromCreationDate: selectedFromCreationDate,
+    TextToSearch: {
+      type: searchBy,
+      value: textToSearch,
+    },
+  }
 
-  const buildMenuForRow = useCallback(
-    ({ id }) => {
-      const detailsOption = {
-        href: `/conditions/${id}`,
-        onClick: undefined,
-        text: 'Details',
-      }
+  const { data, error, loading } = useConditionsList(advancedFilters)
 
-      const splitOption = {
-        href: `/split/`,
-        text: 'Split Position',
-        onClick: () => {
-          setValue(id)
+  const isLoading = !textToSearch && loading
+  const isSearching = textToSearch && loading
+
+  const buildMenuForRow = React.useCallback(
+    (row: Conditions_conditions) => {
+      const { id, resolved } = row
+
+      const menues = [
+        {
+          href: `/conditions/${id}`,
+          text: 'Details',
+          onClick: undefined,
         },
-      }
-
-      const mergeOption = {
-        href: `/merge/`,
-        text: 'Merge Positions',
-        onClick: () => {
-          setValue(id)
+        {
+          href: `/split/`,
+          text: 'Split Position',
+          onClick: () => {
+            setValue(id)
+          },
         },
-      }
-
-      const reportOption = {
-        href: `/report/`,
-        text: 'Report Payouts',
-        onClick: () => {
-          setValue(id)
+        {
+          href: `/merge/`,
+          text: 'Merge Positions',
+          onClick: () => {
+            setValue(id)
+          },
         },
+      ]
+
+      if (!resolved) {
+        menues.push({
+          href: `/report/`,
+          text: 'Report Payouts',
+          onClick: () => {
+            setValue(id)
+          },
+        })
       }
 
-      return [detailsOption, splitOption, mergeOption, reportOption]
+      return menues
     },
     [setValue]
   )
 
-  const handleRowClick = useCallback(
+  const handleRowClick = React.useCallback(
     (row: Conditions_conditions) => {
       history.push(`/conditions/${row.id}`)
     },
@@ -209,14 +263,7 @@ export const ConditionsList: React.FC = () => {
     },
   ]
 
-  const [searchBy, setSearchBy] = useState('all')
-  const dropdownItems = useConditionsSearchOptions(setSearchBy)
-
-  logger.log(`Search by ${searchBy}`)
-
-  const [showFilters, setShowFilters] = useState(false)
-
-  const toggleShowFilters = useCallback(() => {
+  const toggleShowFilters = React.useCallback(() => {
     setShowFilters(!showFilters)
   }, [showFilters])
 
@@ -229,9 +276,9 @@ export const ConditionsList: React.FC = () => {
         end={
           <SearchField
             dropdownItems={dropdownItems}
-            onChange={onChangeConditionId}
+            onChange={onChangeSearch}
             onClear={onClearSearch}
-            value={conditionIdToShow}
+            value={textToShow}
           />
         }
         start={<Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />}
@@ -260,46 +307,29 @@ export const ConditionsList: React.FC = () => {
               </SidebarRow>
               <SidebarRow>
                 <ConditionTypeFilterDropdown
-                  onClick={(value: ConditionType | ConditionTypeAll) => {
-                    setSelectedConditionType(value)
+                  onClick={(value: ConditionType | ConditionTypeAll, filter: Maybe<string>) => {
+                    setSelectedConditionTypeFilter(filter)
+                    setSelectedConditionTypeValue(value)
                   }}
-                  value={selectedConditionType}
+                  value={selectedConditionTypeValue}
                 />
               </SidebarRow>
               <SidebarRow>
                 <MinMaxFilter
-                  onChangeMax={() => {
-                    console.error('onChangeMax not yet implemented...')
-                  }}
-                  onChangeMin={() => {
-                    console.error('onChangeMin not yet implemented...')
-                  }}
-                  onSubmit={() => {
-                    console.error('Number Of Outcomes filter not implemented yet...')
+                  onSubmit={(min, max) => {
+                    setSelectedMinOutcomes(min)
+                    setSelectedMaxOutcomes(max)
                   }}
                   title="Number Of Outcomes"
                 />
               </SidebarRow>
               <SidebarRow>
                 <DateFilter
-                  onChangeFrom={() => {
-                    console.error('onChangeFrom not yet implemented...')
-                  }}
-                  onChangeTo={() => {
-                    console.error('onChangeTo not yet implemented...')
-                  }}
-                  onSubmit={() => {
-                    console.error('Filter by date not implemented yet...')
+                  onSubmit={(from, to) => {
+                    setSelectedFromCreationDate(from)
+                    setSelectedToCreationDate(to)
                   }}
                   title="Creation Date"
-                />
-              </SidebarRow>
-              <SidebarRow>
-                <ValidityFilterDropdown
-                  onClick={(value: ValidityOptions) => {
-                    setValidity(value)
-                  }}
-                  value={validity}
                 />
               </SidebarRow>
             </Sidebar>
@@ -313,6 +343,9 @@ export const ConditionsList: React.FC = () => {
             noDataComponent={
               showSpinner ? (
                 <InlineLoading />
+              ) : status === Web3ContextStatus.Infura &&
+                selectedOracleValue === OracleFilterOptions.Current ? (
+                <EmptyContentText>User is not connected to wallet.</EmptyContentText>
               ) : (
                 <EmptyContentText>No conditions found.</EmptyContentText>
               )
