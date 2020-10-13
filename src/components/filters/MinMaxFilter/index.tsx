@@ -71,15 +71,22 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
     setMax(+event.currentTarget.value)
   }
 
-  const onSubmitInternal = () => {
-    if (min || max) onSubmit(min, max)
-  }
-
   const errorMessage = React.useMemo(
     () => (min && max && max < min ? 'Max should be greater than Min' : null),
     [min, max]
   )
   const emptyValues = React.useMemo(() => !min && !max, [min, max])
+  const submitDisabled = !!errorMessage || emptyValues
+
+  const onSubmitInternal = () => {
+    if ((min || max) && !submitDisabled) onSubmit(min, max)
+  }
+
+  const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      onSubmitInternal()
+    }
+  }
 
   return (
     <Wrapper>
@@ -89,6 +96,7 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
           <TextFieldStyled
             name="min"
             onChange={onChangeMinInternal}
+            onKeyUp={onPressEnter}
             placeholder="Min..."
             type="number"
           />
@@ -96,11 +104,12 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
           <TextFieldStyled
             name="max"
             onChange={onChangeMaxInternal}
+            onKeyUp={onPressEnter}
             placeholder="Max..."
             type="number"
           />
         </FieldsWrapper>
-        <ButtonFilterSubmit disabled={!!errorMessage || emptyValues} onClick={onSubmitInternal} />
+        <ButtonFilterSubmit disabled={submitDisabled} onClick={onSubmitInternal} />
       </Row>
       {errorMessage && (
         <ErrorContainer>

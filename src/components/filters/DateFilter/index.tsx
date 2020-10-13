@@ -76,15 +76,22 @@ export const DateFilter: React.FC<Props> = (props) => {
     setTo(toTimestamp)
   }
 
-  const onSubmitInternal = () => {
-    if (from || to) onSubmit(from, to)
-  }
-
   const errorMessage = React.useMemo(
     () => (to && from && to < from ? 'To should be greater than From' : null),
     [from, to]
   )
   const emptyValues = React.useMemo(() => !from && !to, [from, to])
+  const submitDisabled = !!errorMessage || emptyValues
+
+  const onSubmitInternal = () => {
+    if ((from || to) && !submitDisabled) onSubmit(from, to)
+  }
+
+  const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      onSubmitInternal()
+    }
+  }
 
   return (
     <Wrapper>
@@ -92,15 +99,20 @@ export const DateFilter: React.FC<Props> = (props) => {
       <Row>
         <FieldWrapper>
           <Label>From:</Label>
-          <Date name="dateFrom" onChange={onChangeFromInternal} type="date" />
+          <Date
+            name="dateFrom"
+            onChange={onChangeFromInternal}
+            onKeyUp={onPressEnter}
+            type="date"
+          />
         </FieldWrapper>
       </Row>
       <Row>
         <FieldWrapper>
           <Label>To:</Label>
-          <Date name="dateTo" onChange={onChangeToInternal} type="date" />
+          <Date name="dateTo" onChange={onChangeToInternal} onKeyUp={onPressEnter} type="date" />
         </FieldWrapper>
-        <ButtonFilterSubmit disabled={!!errorMessage || emptyValues} onClick={onSubmitInternal} />
+        <ButtonFilterSubmit disabled={submitDisabled} onClick={onSubmitInternal} />
       </Row>
       {errorMessage && (
         <ErrorContainer>
