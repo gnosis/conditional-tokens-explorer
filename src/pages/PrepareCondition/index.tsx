@@ -40,6 +40,15 @@ import { Arbitrator, Categories, ConditionType, QuestionOptions } from 'util/typ
 
 const logger = getLogger('Prepare Condition')
 
+const Link = styled.a`
+  color: ${(props) => props.theme.colors.warning};
+  text-decoration: underline;
+
+  &:hover {
+    text-decoration: none;
+  }
+`
+
 interface CustomConditionType {
   questionId: string
   outcomesSlotCount: Maybe<number>
@@ -53,10 +62,6 @@ interface OmenConditionType {
   arbitrator: Arbitrator
   oracle: string
 }
-
-const Link = styled.a`
-  color: ${(props) => props.theme.colors.warning};
-`
 
 export const PrepareCondition = () => {
   const {
@@ -425,7 +430,6 @@ export const PrepareCondition = () => {
                   </>
                 }
               />
-
               {isQuestionAlreadyExist && (
                 <StatusInfoInline status={StatusInfoType.warning}>
                   The question for this condition already exists on{' '}
@@ -529,6 +533,14 @@ export const PrepareCondition = () => {
                   </>
                 }
               />
+              <StatusInfoInline status={StatusInfoType.warning}>
+                Set the market resolution date at least 6 days after the correct outcome will be
+                known and make sure that this market won&apos;t be{' '}
+                <Link href="https://conditional.netlify.app/rules.pdf" target="_blank">
+                  invalid
+                </Link>
+                .
+              </StatusInfoInline>
               <TitleValue
                 title="Category"
                 value={

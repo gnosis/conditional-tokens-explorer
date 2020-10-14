@@ -15,6 +15,7 @@ const Wrapper = styled.div<{ color: string }>`
 `
 
 const Contents = styled.div`
+  flex-grow: 1;
   margin: 0 0 0 10px;
 `
 
@@ -35,6 +36,8 @@ const Description = styled.p<{ color: string }>`
 `
 
 const IconWrapper = styled.div`
+  flex-grow: 0;
+  flex-shrink: 0;
   height: 38px;
   width: 38px;
 
