@@ -163,7 +163,7 @@ export const PrepareCondition = () => {
   const updateOutcome = React.useCallback(
     (value: string, index: number) => {
       const outcomesCloned = lodashClonedeep(outcomes)
-      outcomesCloned[index] = value
+      outcomesCloned[index] = value.trim()
       setOutcomes([...outcomesCloned])
     },
     [outcomes]
@@ -285,6 +285,7 @@ export const PrepareCondition = () => {
 
           if (resolutionDate && questionTitle && oracleOmen) {
             const openingDateMoment = moment(resolutionDate + '')
+            logger.log(`outcomes`, outcomes)
             const questionOptions: QuestionOptions = {
               arbitratorAddress: (arbitrator as Arbitrator).address,
               category,
