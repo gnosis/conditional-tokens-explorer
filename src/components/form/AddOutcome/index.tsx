@@ -136,7 +136,7 @@ const EditableOutcome: React.FC<{
   )
 
   return (
-    <OutcomeWrapper {...restProps}>
+    <OutcomeWrapper title={value} {...restProps}>
       <Outcome
         error={!isOutcomeValueOK}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.currentTarget.value)}
