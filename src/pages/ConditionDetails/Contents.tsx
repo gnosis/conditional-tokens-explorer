@@ -5,7 +5,12 @@ import styled from 'styled-components'
 import { ButtonCopy } from 'components/buttons/ButtonCopy'
 import { ButtonDropdownCircle } from 'components/buttons/ButtonDropdownCircle'
 import { CenteredCard } from 'components/common/CenteredCard'
-import { Dropdown, DropdownItemCSS, DropdownPosition } from 'components/common/Dropdown'
+import {
+  Dropdown,
+  DropdownItemCSS,
+  DropdownItemProps,
+  DropdownPosition,
+} from 'components/common/Dropdown'
 import { DisplayTablePositions } from 'components/form/DisplayTablePositions'
 import { FlexRow } from 'components/pureStyledComponents/FlexRow'
 import { Pill, PillTypes } from 'components/pureStyledComponents/Pill'
@@ -27,7 +32,7 @@ const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
 `
 
-const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
+const DropdownItemLink = styled(NavLink)<DropdownItemProps>`
   ${DropdownItemCSS}
 `
 

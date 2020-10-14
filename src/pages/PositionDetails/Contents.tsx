@@ -12,6 +12,7 @@ import {
   Dropdown,
   DropdownItem,
   DropdownItemCSS,
+  DropdownItemProps,
   DropdownPosition,
 } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
@@ -36,7 +37,7 @@ import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
 import { FormatHash } from 'components/text/FormatHash'
 import { TitleValue } from 'components/text/TitleValue'
-import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useCollateral } from 'hooks/useCollateral'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { GetPosition_position as Position } from 'types/generatedGQLForCTE'
@@ -96,7 +97,7 @@ const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
 `
 
-const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
+const DropdownItemLink = styled(NavLink)<DropdownItemProps>`
   ${DropdownItemCSS}
 `
 
@@ -137,7 +138,14 @@ interface Props {
 const logger = getLogger('Contents')
 
 export const Contents = (props: Props) => {
-  const { CTService, WrapperService, connect, networkConfig, signer } = useWeb3ConnectedOrInfura()
+  const {
+    _type: status,
+    CTService,
+    WrapperService,
+    connect,
+    networkConfig,
+    signer,
+  } = useWeb3ConnectedOrInfura()
   const {
     balanceERC20,
     balanceERC1155,
@@ -164,38 +172,7 @@ export const Contents = (props: Props) => {
   )
   const [transactionTitle, setTransactionTitle] = useState<string>('')
 
-  const dropdownItems = useMemo(() => {
-    const menu = [
-      {
-        href: `/redeem`,
-        onClick: () => {
-          setValue(positionId)
-        },
-        text: 'Redeem',
-      },
-      {
-        href: `/split`,
-        onClick: () => {
-          setValue(positionId)
-        },
-        text: 'Split',
-      },
-    ]
-
-    if (balanceERC1155 && !balanceERC1155.isZero() && signer) {
-      menu.push({
-        href: '',
-        text: 'Transfer Outcome Tokens',
-        onClick: () => {
-          setOpenTransferOutcomeTokensModal(true)
-        },
-      })
-    }
-
-    return menu
-  }, [positionId, signer, balanceERC1155, setValue])
-
-  const positionPreview = React.useMemo(() => {
+  const positionPreview = useMemo(() => {
     if (collateralERC1155 && balanceERC1155) {
       return positionString(
         position.conditionIds,
@@ -206,7 +183,7 @@ export const Contents = (props: Props) => {
     }
   }, [collateralERC1155, position, balanceERC1155])
 
-  const numberedOutcomes = React.useMemo(() => {
+  const numberedOutcomes = useMemo(() => {
     return indexSets.map((indexSet: string) => {
       return Number(indexSet)
         .toString(2)
@@ -341,6 +318,41 @@ export const Contents = (props: Props) => {
   const fullLoadingTitle = transfer.isFailure() ? 'Error' : transactionTitle
   const outcomesByRow = '14'
 
+  const dropdownItems = useMemo(() => {
+    const userHasBalance = balanceERC1155 && !balanceERC1155.isZero()
+    const isSigner = signer !== null
+    const isDisconnected = status !== Web3ContextStatus.Connected
+
+    const menu = [
+      {
+        disabled: !userHasBalance || isDisconnected,
+        href: `/redeem`,
+        onClick: () => {
+          setValue(positionId)
+        },
+        text: 'Redeem',
+      },
+      {
+        disabled: !userHasBalance || isDisconnected,
+        href: `/split`,
+        onClick: () => {
+          setValue(positionId)
+        },
+        text: 'Split',
+      },
+      {
+        disabled: !userHasBalance || isDisconnected || !isSigner,
+        href: '',
+        text: 'Transfer Outcome Tokens',
+        onClick: () => {
+          setOpenTransferOutcomeTokensModal(true)
+        },
+      },
+    ]
+
+    return menu
+  }, [balanceERC1155, signer, status, setValue, positionId])
+
   const conditionIdLink = (id: string) => {
     return (
       <>
@@ -393,13 +405,18 @@ export const Contents = (props: Props) => {
           items={dropdownItems.map((item, index) => {
             if (item.href) {
               return (
-                <DropdownItemLink key={index} onMouseDown={item.onClick} to={item.href}>
+                <DropdownItemLink
+                  disabled={item.disabled}
+                  key={index}
+                  onMouseDown={item.onClick}
+                  to={item.href}
+                >
                   {item.text}
                 </DropdownItemLink>
               )
             } else {
               return (
-                <DropdownItem key={index} onClick={item.onClick}>
+                <DropdownItem disabled={item.disabled} key={index} onClick={item.onClick}>
                   {item.text}
                 </DropdownItem>
               )

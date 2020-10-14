@@ -11,6 +11,7 @@ import {
   Dropdown,
   DropdownItem,
   DropdownItemCSS,
+  DropdownItemProps,
   DropdownPosition,
 } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
@@ -48,7 +49,7 @@ import {
   WrappedCollateralOptions,
 } from 'util/types'
 
-const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
+const DropdownItemLink = styled(NavLink)<DropdownItemProps>`
   ${DropdownItemCSS}
 `
 
@@ -111,6 +112,10 @@ export const PositionsList = () => {
   const buildMenuForRow = useCallback(
     (row: PositionWithUserBalanceWithDecimals) => {
       const { collateralTokenERC1155, id, userBalanceERC20, userBalanceERC1155 } = row
+      const isSigner = signer !== null
+      const userHasERC1155Balance = userBalanceERC1155 && !userBalanceERC1155.isZero()
+      const userHasERC20Balance = userBalanceERC20 && !userBalanceERC20.isZero()
+      const isDisconnected = status !== Web3ContextStatus.Connected
 
       const menu = [
         {
@@ -119,61 +124,59 @@ export const PositionsList = () => {
           text: 'Details',
         },
         {
+          disabled: !userHasERC1155Balance || isDisconnected,
           href: `/redeem`,
           text: 'Redeem',
           onClick: () => {
             setValue(id)
           },
         },
+        {
+          disabled: !userHasERC1155Balance || isDisconnected,
+          href: `/split`,
+          onClick: () => {
+            setValue(id)
+          },
+          text: 'Split',
+        },
+        {
+          disabled: !userHasERC1155Balance || isDisconnected || !isSigner,
+          href: undefined,
+          text: 'Transfer Outcome Tokens',
+          onClick: () => {
+            setSelectedPositionId(id)
+            setSelectedCollateralToken(collateralTokenERC1155)
+            setIsTransferOutcomeModalOpen(true)
+          },
+        },
+        {
+          disabled: !userHasERC1155Balance || isDisconnected || !isSigner,
+          href: undefined,
+          text: 'Wrap ERC1155',
+          onClick: () => {
+            setSelectedPositionId(id)
+            setSelectedCollateralToken(collateralTokenERC1155)
+            setUserBalance(userBalanceERC1155)
+            setIsWrapModalOpen(true)
+          },
+        },
+        {
+          disabled: !userHasERC20Balance || isDisconnected || !isSigner,
+          href: undefined,
+          text: 'Unwrap ERC20',
+          onClick: () => {
+            setSelectedPositionId(id)
+            // Must send the original token, not the ERC20
+            setSelectedCollateralToken(collateralTokenERC1155)
+            setUserBalance(userBalanceERC20)
+            setIsUnwrapModalOpen(true)
+          },
+        },
       ]
-
-      if (!userBalanceERC1155.isZero() && signer) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const menuERC1155: Array<any> = [
-          {
-            href: undefined,
-            text: 'Transfer Outcome Tokens',
-            onClick: () => {
-              setSelectedPositionId(id)
-              setSelectedCollateralToken(collateralTokenERC1155)
-              setIsTransferOutcomeModalOpen(true)
-            },
-          },
-          {
-            href: undefined,
-            text: 'Wrap ERC1155',
-            onClick: () => {
-              setSelectedPositionId(id)
-              setSelectedCollateralToken(collateralTokenERC1155)
-              setUserBalance(userBalanceERC1155)
-              setIsWrapModalOpen(true)
-            },
-          },
-        ]
-        menu.push(...menuERC1155)
-      }
-
-      if (!userBalanceERC20.isZero() && signer) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const menuERC20: Array<any> = [
-          {
-            href: undefined,
-            text: 'Unwrap ERC20',
-            onClick: () => {
-              setSelectedPositionId(id)
-              // Must send the original token, not the ERC20
-              setSelectedCollateralToken(collateralTokenERC1155)
-              setUserBalance(userBalanceERC20)
-              setIsUnwrapModalOpen(true)
-            },
-          },
-        ]
-        menu.push(...menuERC20)
-      }
 
       return menu
     },
-    [setValue, signer]
+    [setValue, signer, status]
   )
 
   const handleRowClick = useCallback(
@@ -195,13 +198,17 @@ export const PositionsList = () => {
             items={buildMenuForRow(row).map((item, index) => {
               if (item.href) {
                 return (
-                  <DropdownItemLink onMouseDown={item.onClick} to={item.href}>
+                  <DropdownItemLink
+                    disabled={item.disabled}
+                    onMouseDown={item.onClick}
+                    to={item.href}
+                  >
                     {item.text}
                   </DropdownItemLink>
                 )
               } else {
                 return (
-                  <DropdownItem key={index} onClick={item.onClick}>
+                  <DropdownItem disabled={item.disabled} key={index} onClick={item.onClick}>
                     {item.text}
                   </DropdownItem>
                 )

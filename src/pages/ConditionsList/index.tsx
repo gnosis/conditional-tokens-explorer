@@ -5,7 +5,12 @@ import { NavLink, useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { ButtonDots } from 'components/buttons/ButtonDots'
-import { Dropdown, DropdownItemCSS, DropdownPosition } from 'components/common/Dropdown'
+import {
+  Dropdown,
+  DropdownItemCSS,
+  DropdownItemProps,
+  DropdownPosition,
+} from 'components/common/Dropdown'
 import { ConditionTypeFilterDropdown } from 'components/filters/ConditionTypeFilterDropdown'
 import { DateFilter } from 'components/filters/DateFilter'
 import { MinMaxFilter } from 'components/filters/MinMaxFilter'
@@ -40,7 +45,7 @@ import {
   StatusOptions,
 } from 'util/types'
 
-const DropdownItemLink = styled(NavLink)<{ isItemActive?: boolean }>`
+const DropdownItemLink = styled(NavLink)<DropdownItemProps>`
   ${DropdownItemCSS}
 `
 

@@ -83,7 +83,11 @@ Items.defaultProps = {
   isOpen: false,
 }
 
-export const DropdownItemCSS = css`
+export interface DropdownItemProps {
+  disabled?: boolean
+}
+
+export const DropdownItemCSS = css<DropdownItemProps>`
   align-items: center;
   background-color: ${(props) => props.theme.dropdown.item.backgroundColor};
   border-bottom: 1px solid ${(props) => props.theme.dropdown.item.borderColor};
@@ -97,10 +101,12 @@ export const DropdownItemCSS = css`
   overflow: hidden;
   padding: 10px ${(props) => props.theme.dropdown.item.paddingHorizontal};
   text-decoration: none;
+  user-select: none;
 
   &.isActive {
     background-color: ${(props) => props.theme.dropdown.item.backgroundColorActive};
     color: ${(props) => props.theme.dropdown.item.colorActive};
+    font-weight: 600;
   }
 
   &:first-child {
@@ -124,19 +130,19 @@ export const DropdownItemCSS = css`
     &:hover {
       background-color: ${(props) => props.theme.dropdown.item.backgroundColor};
       cursor: not-allowed;
+      font-weight: 400;
       opacity: 0.5;
       pointer-events: none;
     }
   }
 `
 
-export const DropdownItem = styled.div`
+export const DropdownItem = styled.div<DropdownItemProps>`
   ${DropdownItemCSS}
 `
 
-export interface DropdownItemProps {
-  content: React.ReactNode | string
-  onClick?: () => void
+DropdownItem.defaultProps = {
+  disabled: false,
 }
 
 interface Props extends DOMAttributes<HTMLDivElement> {
@@ -217,10 +223,9 @@ export const Dropdown: React.FC<Props> = (props) => {
         {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           items.map((item: any, index: number) => {
-            const isActive = activeItemHighlight && index === currentItemIndex && 'isActive'
-
+            const isActive = activeItemHighlight && index === currentItemIndex
             const dropdownItem = React.cloneElement(item, {
-              className: `dropdownItem ${isActive}`,
+              className: `dropdownItem ${isActive && 'isActive'}`,
               key: item.key ? item.key : index,
               onClick: (e) => {
                 e.stopPropagation()
@@ -233,8 +238,8 @@ export const Dropdown: React.FC<Props> = (props) => {
                   return
                 }
 
-                item.props.onClick()
                 setCurrentItemIndex(index)
+                item.props.onClick()
               },
             })
 
