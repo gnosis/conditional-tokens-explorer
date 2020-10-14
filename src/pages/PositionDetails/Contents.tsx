@@ -172,7 +172,7 @@ export const Contents = (props: Props) => {
   )
   const [transactionTitle, setTransactionTitle] = useState<string>('')
 
-  const positionPreview = React.useMemo(() => {
+  const positionPreview = useMemo(() => {
     if (collateralERC1155 && balanceERC1155) {
       return positionString(
         position.conditionIds,
@@ -183,7 +183,7 @@ export const Contents = (props: Props) => {
     }
   }, [collateralERC1155, position, balanceERC1155])
 
-  const numberedOutcomes = React.useMemo(() => {
+  const numberedOutcomes = useMemo(() => {
     return indexSets.map((indexSet: string) => {
       return Number(indexSet)
         .toString(2)
