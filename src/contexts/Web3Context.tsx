@@ -96,9 +96,17 @@ export const Web3ContextProvider = ({ children }: Props) => {
   const resetApp = React.useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async (provider: any) => {
+      if (provider._web3Provider && provider._web3Provider.disconnect) {
+        logger.log('Disconnecting _web3Provider provider')
+        await provider._web3Provider.disconnect()
+      }
+
       if (provider.close) {
+        logger.log('Clossing provider')
         await provider.close()
       }
+
+      logger.log('Clearing cache')
       await web3Modal.clearCachedProvider()
 
       setWeb3Status({ _type: Web3ContextStatus.NotAsked } as Web3Status)
@@ -112,6 +120,12 @@ export const Web3ContextProvider = ({ children }: Props) => {
       logger.log('Subscribing to metamask events...')
 
       provider.once('close', () => {
+        logger.log('Provider is closing...')
+        resetApp(provider)
+      })
+
+      provider.once('disconnect', () => {
+        logger.log('Provider is disconnecting...')
         resetApp(provider)
       })
 
@@ -155,6 +169,7 @@ export const Web3ContextProvider = ({ children }: Props) => {
 
   const disconnectWeb3Modal = React.useCallback(async () => {
     if (web3Status._type !== Web3ContextStatus.Connected) {
+      logger.log('Return because web3Status is not connected')
       return
     }
 
@@ -164,6 +179,7 @@ export const Web3ContextProvider = ({ children }: Props) => {
       await resetApp(provider)
     } catch (error) {
       setWeb3Status({ _type: Web3ContextStatus.Error, error } as ErrorWeb3)
+      logger.error(`Error reseting provider: ${error}`)
       return
     }
   }, [web3Status, resetApp])
