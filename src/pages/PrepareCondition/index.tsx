@@ -312,22 +312,34 @@ export const PrepareCondition = () => {
     }
   }
 
-  const submitDisabled =
-    conditionType === ConditionType.custom
-      ? !isValidCustomCondition ||
-        prepareConditionStatus.isLoading() ||
-        prepareConditionStatus.isFailure() ||
-        checkForExistingCondition.isLoading() ||
-        checkForExistingCondition.isFailure() ||
-        isConditionAlreadyExist
-      : !isValidOmenCondition ||
-        prepareConditionStatus.isLoading() ||
-        prepareConditionStatus.isFailure() ||
-        checkForExistingCondition.isLoading() ||
-        checkForExistingCondition.isFailure() ||
-        isConditionAlreadyExist ||
-        isQuestionAlreadyExist ||
-        isOutcomesFromOmenConditionInvalid
+  const submitDisabled = React.useMemo(
+    () =>
+      conditionType === ConditionType.custom
+        ? !isValidCustomCondition ||
+          prepareConditionStatus.isLoading() ||
+          prepareConditionStatus.isFailure() ||
+          checkForExistingCondition.isLoading() ||
+          checkForExistingCondition.isFailure() ||
+          isConditionAlreadyExist
+        : !isValidOmenCondition ||
+          prepareConditionStatus.isLoading() ||
+          prepareConditionStatus.isFailure() ||
+          checkForExistingCondition.isLoading() ||
+          checkForExistingCondition.isFailure() ||
+          isConditionAlreadyExist ||
+          isQuestionAlreadyExist ||
+          isOutcomesFromOmenConditionInvalid,
+    [
+      isValidCustomCondition,
+      conditionType,
+      isValidOmenCondition,
+      prepareConditionStatus,
+      checkForExistingCondition,
+      isConditionAlreadyExist,
+      isQuestionAlreadyExist,
+      isOutcomesFromOmenConditionInvalid,
+    ]
+  )
 
   const fullLoadingActionButton = prepareConditionStatus.isSuccess()
     ? {
