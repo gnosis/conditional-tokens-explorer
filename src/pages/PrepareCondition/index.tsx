@@ -1,3 +1,4 @@
+import lodashClonedeep from 'lodash.clonedeep'
 import moment from 'moment'
 import React, { KeyboardEvent, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -145,21 +146,32 @@ export const PrepareCondition = () => {
 
   const addOutcome = React.useCallback(() => {
     const sanitizedOutcome = outcome.trim()
-
+    const outcomesCloned = lodashClonedeep(outcomes)
     setOutcome('')
-    setOutcomes([...outcomes, sanitizedOutcome])
+    setOutcomes([...outcomesCloned, sanitizedOutcome])
   }, [outcome, outcomes, setOutcomes])
 
   const removeOutcome = React.useCallback(
     (index: number) => {
-      outcomes.splice(index, 1)
-      setOutcomes([...outcomes])
+      const outcomesCloned = lodashClonedeep(outcomes)
+      outcomesCloned.splice(index, 1)
+      setOutcomes([...outcomesCloned])
     },
     [outcomes]
   )
 
-  const onOutcomeChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+  const updateOutcome = React.useCallback(
+    (value: string, index: number) => {
+      const outcomesCloned = lodashClonedeep(outcomes)
+      outcomesCloned[index] = value
+      setOutcomes([...outcomesCloned])
+    },
+    [outcomes]
+  )
+
+  const onChangeOutcome = (e: React.ChangeEvent<HTMLInputElement>) => {
     setOutcome(e.currentTarget.value)
+  }
 
   React.useEffect(() => {
     const checkConditionExist = async () => {
@@ -463,10 +475,11 @@ export const PrepareCondition = () => {
             <>
               <AddOutcome
                 addOutcome={addOutcome}
-                onChange={onOutcomeChange}
+                onChange={onChangeOutcome}
                 outcome={outcome}
                 outcomes={outcomes}
                 removeOutcome={removeOutcome}
+                updateOutcome={updateOutcome}
               />
             </>
           )}

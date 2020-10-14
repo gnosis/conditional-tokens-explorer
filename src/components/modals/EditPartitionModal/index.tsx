@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import lodashClonedeep from 'lodash.clonedeep'
 import React, { useCallback, useEffect, useState } from 'react'
 import styled, { withTheme } from 'styled-components'
 
@@ -22,7 +23,6 @@ import { SmallNote } from 'components/pureStyledComponents/SmallNote'
 import { StripedList, StripedListEmpty } from 'components/pureStyledComponents/StripedList'
 import { TitleControlButton } from 'components/pureStyledComponents/TitleControl'
 import { TitleValue } from 'components/text/TitleValue'
-import lodashClonedeep from 'lodash.clonedeep'
 import { OutcomeProps } from 'util/types'
 
 const Collections = styled(StripedList)`

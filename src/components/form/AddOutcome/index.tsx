@@ -1,4 +1,4 @@
-import React, { createRef, useCallback, useState } from 'react'
+import React, { createRef, useCallback, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
 import { ButtonAdd } from 'components/buttons/ButtonAdd'
@@ -85,19 +85,23 @@ const EditableOutcome: React.FC<{
   outcomeText: string | undefined
   outcomes: Array<string | undefined>
   removeOutcome: () => void
+  updateOutcome: (value: string, index: number) => void
 }> = (props) => {
-  const { outcomeIndex, outcomeText, outcomes, removeOutcome, ...restProps } = props
+  const { outcomeIndex, outcomeText, outcomes, removeOutcome, updateOutcome, ...restProps } = props
   const [isEditing, setIsEditing] = useState(false)
   const [value, setValue] = useState<string | undefined>(outcomeText)
   const outcomeField = createRef<HTMLInputElement>()
 
-  const isOutcomeDuplicated = React.useCallback((): boolean => {
+  const isOutcomeDuplicated = useCallback((): boolean => {
     return outcomes
       .filter((item, index) => index !== outcomeIndex)
       .includes(sanitizedOutcome(value))
   }, [value, outcomes, outcomeIndex])
 
-  const isOutcomeValueOK = isOutcomeTextValid(value) && !isOutcomeDuplicated()
+  const isOutcomeValueOK = useMemo(() => isOutcomeTextValid(value) && !isOutcomeDuplicated(), [
+    isOutcomeDuplicated,
+    value,
+  ])
 
   const saveSanitizedValue = useCallback(
     (value: string | undefined) => {
@@ -110,16 +114,26 @@ const EditableOutcome: React.FC<{
     saveSanitizedValue(outcomeText)
   }, [saveSanitizedValue, outcomeText])
 
-  const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && isOutcomeValueOK) {
+  const onSave = useCallback(() => {
+    if (value) {
       saveSanitizedValue(value)
       setIsEditing(false)
+      updateOutcome(value, outcomeIndex)
     }
-    if (e.key === 'Escape') {
-      resetValue()
-      setIsEditing(false)
-    }
-  }
+  }, [updateOutcome, setIsEditing, saveSanitizedValue, value, outcomeIndex])
+
+  const onPressEnter = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter' && isOutcomeValueOK) {
+        onSave()
+      }
+      if (e.key === 'Escape') {
+        resetValue()
+        setIsEditing(false)
+      }
+    },
+    [setIsEditing, resetValue, isOutcomeValueOK, onSave]
+  )
 
   return (
     <OutcomeWrapper {...restProps}>
@@ -152,7 +166,7 @@ const EditableOutcome: React.FC<{
             disabled={!isOutcomeValueOK}
             onClick={() => {
               if (isOutcomeValueOK) {
-                setIsEditing(false)
+                onSave()
               }
             }}
             title="Save"
@@ -185,12 +199,21 @@ interface Props {
   addOutcome: () => void
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   outcome: string | undefined
-  outcomes: Array<string | undefined>
+  outcomes: Array<string>
   removeOutcome: (index: number) => void
+  updateOutcome: (value: string, index: number) => void
 }
 
 export const AddOutcome: React.FC<Props> = (props) => {
-  const { addOutcome, onChange, outcome = '', outcomes, removeOutcome, ...restProps } = props
+  const {
+    addOutcome,
+    onChange,
+    outcome = '',
+    outcomes,
+    removeOutcome,
+    updateOutcome,
+    ...restProps
+  } = props
   const maxOutcomesReached = outcomes.length === MAX_OUTCOMES_ALLOWED
   const buttonAddDisabled =
     maxOutcomesReached || !isOutcomeTextValid(outcome) || outcomes.includes(outcome)
@@ -231,12 +254,13 @@ export const AddOutcome: React.FC<Props> = (props) => {
             <StripedList maxHeight="300px" minHeight="200px">
               {outcomes.length ? (
                 outcomes.map((item, index) => (
-                  <StripedListItem key={index}>
+                  <StripedListItem key={`${index}_${item}`}>
                     <EditableOutcome
                       outcomeIndex={index}
                       outcomeText={item}
                       outcomes={outcomes}
                       removeOutcome={() => removeOutcome(index)}
+                      updateOutcome={(value, index) => updateOutcome(value, index)}
                     />
                   </StripedListItem>
                 ))
