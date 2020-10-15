@@ -127,5 +127,10 @@
   "resolutions": {
     "graphql": "^14.7.0"
   },
-  "type": "module"
+  "jest": {
+    "transformIgnorePatterns": [
+      "[/\\\\]node_modules[/\\\\](?!(contract-proxy-kit))[/\\\\].*\\.(js|jsx|mjs|cjs|ts|tsx)$",
+      "^.+\\.module\\.(css|sass|scss)$"
+    ]
+  }
 }
