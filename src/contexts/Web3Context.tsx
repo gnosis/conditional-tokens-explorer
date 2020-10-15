@@ -7,6 +7,7 @@ import WalletConnectProvider from '@walletconnect/web3-provider'
 import { DEFAULT_NETWORK_ID, INFURA_ID } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
 import { ConditionalTokensService } from 'services/conditionalTokens'
+import { CPKService as CPKServiceClass } from 'services/cpk'
 import { RealitioService } from 'services/realitio'
 import { Wrapper1155Service } from 'services/wrapper1155'
 import { getLogger } from 'util/logger'
@@ -46,6 +47,7 @@ export type Connected = {
   CTService: ConditionalTokensService
   RtioService: RealitioService
   WrapperService: Wrapper1155Service
+  CPKService: CPKServiceClass
   disconnect: () => void
 }
 
@@ -56,6 +58,7 @@ export type Infura = {
   CTService: ConditionalTokensService
   RtioService: RealitioService
   WrapperService: Wrapper1155Service
+  CPKService: CPKServiceClass
   connect: () => void
 }
 
@@ -211,6 +214,7 @@ export const Web3ContextProvider = ({ children }: Props) => {
         const RtioService = new RealitioService(networkConfig, provider, signer)
         const CTService = new ConditionalTokensService(networkConfig, provider, signer)
         const WrapperService = new Wrapper1155Service(networkConfig, provider, signer)
+        const CPKService = await CPKServiceClass.create(networkConfig, provider, signer)
 
         const address = await signer.getAddress()
         setWeb3Status({
@@ -221,6 +225,7 @@ export const Web3ContextProvider = ({ children }: Props) => {
           CTService,
           RtioService,
           WrapperService,
+          CPKService,
           address,
         } as Connected)
       } else {
@@ -248,6 +253,7 @@ export const Web3ContextProvider = ({ children }: Props) => {
         const RtioService = new RealitioService(networkConfig, provider)
         const CTService = new ConditionalTokensService(networkConfig, provider)
         const WrapperService = new Wrapper1155Service(networkConfig, provider)
+        const CPKService = await CPKServiceClass.create(networkConfig, provider)
         setWeb3Status({
           _type: Web3ContextStatus.Infura,
           provider,
@@ -255,6 +261,7 @@ export const Web3ContextProvider = ({ children }: Props) => {
           CTService,
           RtioService,
           WrapperService,
+          CPKService,
         } as Infura)
       } else {
         setWeb3Status({

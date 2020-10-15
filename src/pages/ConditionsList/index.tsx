@@ -52,7 +52,7 @@ const DropdownItemLink = styled(NavLink)<DropdownItemProps>`
 const logger = getLogger('ConditionsList')
 
 export const ConditionsList: React.FC = () => {
-  const { _type: status } = useWeb3ConnectedOrInfura()
+  const { _type: status, CPKService, address } = useWeb3ConnectedOrInfura()
 
   const history = useHistory()
   const { setValue } = useLocalStorage(LocalStorageManagement.ConditionId)
@@ -119,25 +119,56 @@ export const ConditionsList: React.FC = () => {
     setTextToSearch('')
   }, [showFilters])
 
-  const advancedFilters: AdvancedFilter = {
-    ReporterOracle: {
-      type: selectedOracleValue,
-      value: selectedOracleFilter,
-    },
-    ConditionType: {
-      type: selectedConditionTypeValue,
-      value: selectedConditionTypeFilter,
-    },
-    Status: selectedStatus,
-    MinOutcomes: selectedMinOutcomes,
-    MaxOutcomes: selectedMaxOutcomes,
-    ToCreationDate: selectedToCreationDate,
-    FromCreationDate: selectedFromCreationDate,
-    TextToSearch: {
-      type: searchBy,
-      value: textToSearch,
-    },
-  }
+  const advancedFilters: AdvancedFilter = React.useMemo(() => {
+    return {
+      ReporterOracle: {
+        type: selectedOracleValue,
+        value: selectedOracleFilter,
+      },
+      ConditionType: {
+        type: selectedConditionTypeValue,
+        value: selectedConditionTypeFilter,
+      },
+      Status: selectedStatus,
+      MinOutcomes: selectedMinOutcomes,
+      MaxOutcomes: selectedMaxOutcomes,
+      ToCreationDate: selectedToCreationDate,
+      FromCreationDate: selectedFromCreationDate,
+      TextToSearch: {
+        type: searchBy,
+        value: textToSearch,
+      },
+    }
+  }, [
+    searchBy,
+    textToSearch,
+    selectedOracleValue,
+    selectedOracleFilter,
+    selectedConditionTypeValue,
+    selectedConditionTypeFilter,
+    selectedStatus,
+    selectedMinOutcomes,
+    selectedMaxOutcomes,
+    selectedToCreationDate,
+    selectedFromCreationDate,
+  ])
+
+  React.useEffect(() => {
+    if (
+      selectedOracleValue === OracleFilterOptions.Current &&
+      status === Web3ContextStatus.Connected &&
+      address
+    ) {
+      setSelectedOracleFilter([address.toLowerCase(), CPKService.address.toLowerCase()])
+    }
+
+    if (
+      selectedOracleValue === OracleFilterOptions.Current &&
+      status === Web3ContextStatus.Infura
+    ) {
+      setSelectedOracleFilter([])
+    }
+  }, [status, CPKService.address, address, selectedOracleValue])
 
   const { data, error, loading } = useConditionsList(advancedFilters)
 
