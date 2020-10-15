@@ -24,12 +24,20 @@ import {
 } from 'config/constants'
 import { Arbitrator, NetworkIds, Oracle, Token } from 'util/types'
 
+type CPKAddresses = {
+  masterCopyAddress: string
+  proxyFactoryAddress: string
+  multiSendAddress: string
+  fallbackHandlerAddress: string
+}
+
 interface Network {
   earliestBlockToCheck: number
   contracts: {
     conditionalTokensAddress: string
     realitioAddress: string
     wrapped1155FactoryAddress: string
+    cpk?: CPKAddresses
   }
   tokens: Token[]
   CTEGraphHttpUri: string
@@ -419,5 +427,10 @@ export class NetworkConfig {
 
   getRealitioTimeout(): number {
     return networks[this.networkId].realitioTimeout
+  }
+
+  getCPKAddresses(): Maybe<CPKAddresses> {
+    const cpkAddresses = networks[this.networkId].contracts.cpk
+    return cpkAddresses || null
   }
 }
