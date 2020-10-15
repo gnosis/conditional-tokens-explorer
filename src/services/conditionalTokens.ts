@@ -108,15 +108,11 @@ export class ConditionalTokensService {
     collateral: string
   ): Promise<PositionIdsArray[]> {
     const partitionsPromises = partition.map(async (indexSet: BigNumber) => {
-      const collectionId = ConditionalTokensService.getCollectionId(
-        parentCollection,
-        conditionId,
-        indexSet
-      )
+      const collectionId = await this.getCollectionId(parentCollection, conditionId, indexSet)
 
       const positionId = ConditionalTokensService.getPositionId(collateral, collectionId)
       logger.info(
-        `conditionId: ${conditionId} / parentCollection: ${parentCollection} / indexSet: ${indexSet.toString()}`
+        `conditionId: ${conditionId} / collectionId ${collectionId} / parentCollection: ${parentCollection} / indexSet: ${indexSet.toString()}`
       )
       logger.info(`Position: ${positionId}`)
 
@@ -179,6 +175,14 @@ export class ConditionalTokensService {
       indexSets
     )
     return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
+  }
+
+  async getCollectionId(
+    parentCollectionId: string,
+    conditionId: string,
+    indexSet: BigNumber
+  ): Promise<string> {
+    return await this.contract.getCollectionId(parentCollectionId, conditionId, indexSet)
   }
 
   async mergePositions(
