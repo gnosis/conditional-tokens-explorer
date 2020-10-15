@@ -108,6 +108,10 @@ export const DateFilter: React.FC<Props> = (props) => {
     [onSubmitInternal]
   )
 
+  React.useEffect(() => {
+    if (!from && !to) onSubmit(from, to)
+  }, [from, to, onSubmit])
+
   return (
     <Wrapper>
       <FilterTitle>{title}</FilterTitle>
