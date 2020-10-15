@@ -184,6 +184,7 @@ const EditableOutcome: React.FC<{
         )}
         <ButtonControl
           buttonType={ButtonControlType.delete}
+          disabled={isEditing}
           onClick={() => {
             removeOutcome()
             setIsEditing(false)

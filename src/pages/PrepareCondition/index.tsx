@@ -37,7 +37,7 @@ import { ConditionalTokensService } from 'services/conditionalTokens'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import { isAddress } from 'util/tools'
-import { Arbitrator, Categories, ConditionType, QuestionOptions } from 'util/types'
+import { Arbitrator, ConditionType, QuestionOptions } from 'util/types'
 
 const logger = getLogger('Prepare Condition')
 
@@ -59,7 +59,7 @@ interface CustomConditionType {
 interface OmenConditionType {
   questionTitle: string
   resolutionDate: Maybe<string>
-  category: string
+  category: Maybe<string>
   arbitrator: Arbitrator
   oracle: string
 }
@@ -95,7 +95,7 @@ export const PrepareCondition = () => {
   const defaultValuesOmen = {
     questionTitle: '',
     resolutionDate: null,
-    category: Categories.businessAndFinance,
+    category: null,
     arbitrator: networkConfig.getArbitratorFromName('realitio'),
     oracle: oracle.address,
   }
@@ -196,7 +196,8 @@ export const PrepareCondition = () => {
             oracleOmenCondition &&
             outcomes.length > 0 &&
             resolutionDate &&
-            address
+            address &&
+            category
           ) {
             const openingDateMoment = moment(resolutionDate + '')
             const questionOptions: QuestionOptions = {
@@ -283,7 +284,7 @@ export const PrepareCondition = () => {
             resolutionDate,
           } = getValuesOmenCondition()
 
-          if (resolutionDate && questionTitle && oracleOmen) {
+          if (resolutionDate && questionTitle && oracleOmen && category) {
             const openingDateMoment = moment(resolutionDate + '')
             logger.log(`outcomes`, outcomes)
             const questionOptions: QuestionOptions = {
