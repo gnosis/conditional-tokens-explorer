@@ -126,5 +126,6 @@
   },
   "resolutions": {
     "graphql": "^14.7.0"
-  }
+  },
+  "type": "module"
 }

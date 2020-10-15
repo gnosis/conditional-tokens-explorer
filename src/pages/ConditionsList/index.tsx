@@ -157,7 +157,8 @@ export const ConditionsList: React.FC = () => {
     if (
       selectedOracleValue === OracleFilterOptions.Current &&
       status === Web3ContextStatus.Connected &&
-      address
+      address &&
+      CPKService
     ) {
       setSelectedOracleFilter([address.toLowerCase(), CPKService.address.toLowerCase()])
     }
@@ -168,7 +169,7 @@ export const ConditionsList: React.FC = () => {
     ) {
       setSelectedOracleFilter([])
     }
-  }, [status, CPKService.address, address, selectedOracleValue])
+  }, [status, CPKService, address, selectedOracleValue])
 
   const { data, error, loading } = useConditionsList(advancedFilters)
 

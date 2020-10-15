@@ -58,7 +58,6 @@ export type Infura = {
   CTService: ConditionalTokensService
   RtioService: RealitioService
   WrapperService: Wrapper1155Service
-  CPKService: CPKServiceClass
   connect: () => void
 }
 
@@ -253,7 +252,6 @@ export const Web3ContextProvider = ({ children }: Props) => {
         const RtioService = new RealitioService(networkConfig, provider)
         const CTService = new ConditionalTokensService(networkConfig, provider)
         const WrapperService = new Wrapper1155Service(networkConfig, provider)
-        const CPKService = await CPKServiceClass.create(networkConfig, provider)
         setWeb3Status({
           _type: Web3ContextStatus.Infura,
           provider,
@@ -261,7 +259,6 @@ export const Web3ContextProvider = ({ children }: Props) => {
           CTService,
           RtioService,
           WrapperService,
-          CPKService,
         } as Infura)
       } else {
         setWeb3Status({
@@ -313,6 +310,7 @@ export const useWeb3ConnectedOrInfura = () => {
     return {
       ...status,
       address: status._type === Web3ContextStatus.Connected ? status.address : null,
+      CPKService: status._type === Web3ContextStatus.Connected ? status.CPKService : null,
       signer: status._type === Web3ContextStatus.Connected ? status.signer : null,
       connect,
       disconnect,

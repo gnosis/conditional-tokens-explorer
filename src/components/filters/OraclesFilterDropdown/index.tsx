@@ -32,9 +32,8 @@ export const OraclesFilterDropdown = ({ onClick, value }: Props) => {
     {
       text: 'Current Wallet',
       onClick: () => {
-        const currentWallet = address
-          ? [address.toLowerCase(), CPKService.address.toLowerCase()]
-          : []
+        const currentWallet =
+          address && CPKService ? [address.toLowerCase(), CPKService.address.toLowerCase()] : []
         logger.log(`Current Wallet`, currentWallet)
         onClick(OracleFilterOptions.Current, currentWallet)
       },
