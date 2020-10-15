@@ -208,7 +208,7 @@ export const ConditionsList: React.FC = () => {
         cell: (row: Conditions_conditions) => (
           <Hash onClick={() => handleRowClick(row)} value={row.oracle} />
         ),
-        name: 'Reporting Address / Oracle',
+        name: 'Reporter / Oracle',
         selector: 'oracle',
         sortable: true,
       },
