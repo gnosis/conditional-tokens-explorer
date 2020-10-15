@@ -52,7 +52,7 @@ const DropdownItemLink = styled(NavLink)<DropdownItemProps>`
 const logger = getLogger('ConditionsList')
 
 export const ConditionsList: React.FC = () => {
-  const { _type: status } = useWeb3ConnectedOrInfura()
+  const { _type: status, CPKService, address } = useWeb3ConnectedOrInfura()
 
   const history = useHistory()
   const { setValue } = useLocalStorage(LocalStorageManagement.ConditionId)
@@ -119,30 +119,62 @@ export const ConditionsList: React.FC = () => {
     setTextToSearch('')
   }, [showFilters])
 
-  const advancedFilters: AdvancedFilter = {
-    ReporterOracle: {
-      type: selectedOracleValue,
-      value: selectedOracleFilter,
-    },
-    ConditionType: {
-      type: selectedConditionTypeValue,
-      value: selectedConditionTypeFilter,
-    },
-    Status: selectedStatus,
-    MinOutcomes: selectedMinOutcomes,
-    MaxOutcomes: selectedMaxOutcomes,
-    ToCreationDate: selectedToCreationDate,
-    FromCreationDate: selectedFromCreationDate,
-    TextToSearch: {
-      type: searchBy,
-      value: textToSearch,
-    },
-  }
+  const advancedFilters: AdvancedFilter = React.useMemo(() => {
+    return {
+      ReporterOracle: {
+        type: selectedOracleValue,
+        value: selectedOracleFilter,
+      },
+      ConditionType: {
+        type: selectedConditionTypeValue,
+        value: selectedConditionTypeFilter,
+      },
+      Status: selectedStatus,
+      MinOutcomes: selectedMinOutcomes,
+      MaxOutcomes: selectedMaxOutcomes,
+      ToCreationDate: selectedToCreationDate,
+      FromCreationDate: selectedFromCreationDate,
+      TextToSearch: {
+        type: searchBy,
+        value: textToSearch,
+      },
+    }
+  }, [
+    searchBy,
+    textToSearch,
+    selectedOracleValue,
+    selectedOracleFilter,
+    selectedConditionTypeValue,
+    selectedConditionTypeFilter,
+    selectedStatus,
+    selectedMinOutcomes,
+    selectedMaxOutcomes,
+    selectedToCreationDate,
+    selectedFromCreationDate,
+  ])
+
+  React.useEffect(() => {
+    if (
+      selectedOracleValue === OracleFilterOptions.Current &&
+      status === Web3ContextStatus.Connected &&
+      address &&
+      CPKService
+    ) {
+      setSelectedOracleFilter([address.toLowerCase(), CPKService.address.toLowerCase()])
+    }
+
+    if (
+      selectedOracleValue === OracleFilterOptions.Current &&
+      status === Web3ContextStatus.Infura
+    ) {
+      setSelectedOracleFilter([])
+    }
+  }, [status, CPKService, address, selectedOracleValue])
 
   const { data, error, loading } = useConditionsList(advancedFilters)
 
-  const isLoading = !textToSearch && loading
-  const isSearching = textToSearch && loading
+  const isLoading = React.useMemo(() => !textToSearch && loading, [textToSearch, loading])
+  const isSearching = React.useMemo(() => textToSearch && loading, [textToSearch, loading])
 
   const buildMenuForRow = React.useCallback(
     (row: Conditions_conditions) => {
@@ -192,87 +224,102 @@ export const ConditionsList: React.FC = () => {
     [history]
   )
 
-  const columns = [
-    {
-      // eslint-disable-next-line react/display-name
-      cell: (row: Conditions_conditions) => <Hash href={`/conditions/${row.id}`} value={row.id} />,
-      name: 'Condition Id',
-      selector: 'createTimestamp',
-      sortable: true,
-    },
-    {
-      // eslint-disable-next-line react/display-name
-      cell: (row: Conditions_conditions) => (
-        <Hash onClick={() => handleRowClick(row)} value={row.oracle} />
-      ),
-      name: 'Reporting Address / Oracle',
-      selector: 'oracle',
-      sortable: true,
-    },
-    {
-      // eslint-disable-next-line react/display-name
-      cell: (row: Conditions_conditions) => (
-        <Hash onClick={() => handleRowClick(row)} value={row.questionId} />
-      ),
-      name: 'Question Id',
-      selector: 'questionId',
-      sortable: true,
-    },
-    {
-      maxWidth: '150px',
-      name: 'Outcomes',
-      right: true,
-      selector: 'outcomeSlotCount',
-      sortable: true,
-    },
-    {
-      center: true,
-      name: 'Status',
-      selector: 'resolved',
-      sortable: true,
-      width: '150px',
-      // eslint-disable-next-line react/display-name
-      cell: (row: Conditions_conditions) =>
-        row.resolved ? (
-          <Pill onClick={() => handleRowClick(row)} type={PillTypes.primary}>
-            Resolved
-          </Pill>
-        ) : (
-          <Pill onClick={() => handleRowClick(row)} type={PillTypes.open}>
-            Open
-          </Pill>
+  const columns = React.useMemo(
+    () => [
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: Conditions_conditions) => (
+          <Hash href={`/conditions/${row.id}`} value={row.id} />
         ),
-      sortFunction: (a: Conditions_conditions, b: Conditions_conditions) => {
-        const valA = a.resolved ? 2 : 1
-        const valB = b.resolved ? 2 : 1
-        return valA - valB
+        name: 'Condition Id',
+        selector: 'createTimestamp',
+        sortable: true,
       },
-    },
-    {
-      // eslint-disable-next-line react/display-name
-      cell: (row: Conditions_conditions) => (
-        <Dropdown
-          activeItemHighlight={false}
-          dropdownButtonContent={<ButtonDots />}
-          dropdownPosition={DropdownPosition.right}
-          items={buildMenuForRow(row).map((item, index) => (
-            <DropdownItemLink key={index} onMouseDown={item.onClick} to={item.href}>
-              {item.text}
-            </DropdownItemLink>
-          ))}
-        />
-      ),
-      name: '',
-      width: '60px',
-      right: true,
-    },
-  ]
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: Conditions_conditions) => (
+          <Hash onClick={() => handleRowClick(row)} value={row.oracle} />
+        ),
+        name: 'Reporter / Oracle',
+        selector: 'oracle',
+        sortable: true,
+      },
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: Conditions_conditions) => (
+          <Hash onClick={() => handleRowClick(row)} value={row.questionId} />
+        ),
+        name: 'Question Id',
+        selector: 'questionId',
+        sortable: true,
+      },
+      {
+        maxWidth: '150px',
+        name: 'Outcomes',
+        right: true,
+        selector: 'outcomeSlotCount',
+        sortable: true,
+      },
+      {
+        center: true,
+        name: 'Status',
+        selector: 'resolved',
+        sortable: true,
+        width: '150px',
+        // eslint-disable-next-line react/display-name
+        cell: (row: Conditions_conditions) =>
+          row.resolved ? (
+            <Pill onClick={() => handleRowClick(row)} type={PillTypes.primary}>
+              Resolved
+            </Pill>
+          ) : (
+            <Pill onClick={() => handleRowClick(row)} type={PillTypes.open}>
+              Open
+            </Pill>
+          ),
+        sortFunction: (a: Conditions_conditions, b: Conditions_conditions) => {
+          const valA = a.resolved ? 2 : 1
+          const valB = b.resolved ? 2 : 1
+          return valA - valB
+        },
+      },
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: Conditions_conditions) => (
+          <Dropdown
+            activeItemHighlight={false}
+            dropdownButtonContent={<ButtonDots />}
+            dropdownPosition={DropdownPosition.right}
+            items={buildMenuForRow(row).map((item, index) => (
+              <DropdownItemLink key={index} onMouseDown={item.onClick} to={item.href}>
+                {item.text}
+              </DropdownItemLink>
+            ))}
+          />
+        ),
+        name: '',
+        width: '60px',
+        right: true,
+      },
+    ],
+    [buildMenuForRow, handleRowClick]
+  )
 
   const toggleShowFilters = React.useCallback(() => {
     setShowFilters(!showFilters)
   }, [showFilters])
 
-  const showSpinner = (isLoading || isSearching) && !error
+  const showSpinner = React.useMemo(() => (isLoading || isSearching) && !error, [
+    isLoading,
+    isSearching,
+    error,
+  ])
+
+  // This is a HACK until this issue was resolved https://github.com/gnosis/hg-subgraph/issues/23
+  const isBytes32Error = React.useMemo(
+    () => error && error.message.includes('Failed to decode `Bytes` value: `Odd number of digits`'),
+    [error]
+  )
 
   return (
     <>
@@ -288,8 +335,8 @@ export const ConditionsList: React.FC = () => {
         }
         start={<Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />}
       />
-      {error && !isLoading && <InfoCard message={error.message} title="Error" />}
-      {!error && (
+      {error && !isBytes32Error && !isLoading && <InfoCard message={error.message} title="Error" />}
+      {(!error || isBytes32Error) && (
         <TwoColumnsCollapsibleLayout isCollapsed={!showFilters}>
           {showFilters && (
             <Sidebar>

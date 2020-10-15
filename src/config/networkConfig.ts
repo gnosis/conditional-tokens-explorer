@@ -24,12 +24,20 @@ import {
 } from 'config/constants'
 import { Arbitrator, NetworkIds, Oracle, Token } from 'util/types'
 
+type CPKAddresses = {
+  masterCopyAddress: string
+  proxyFactoryAddress: string
+  multiSendAddress: string
+  fallbackHandlerAddress: string
+}
+
 interface Network {
   earliestBlockToCheck: number
   contracts: {
     conditionalTokensAddress: string
     realitioAddress: string
     wrapped1155FactoryAddress: string
+    cpk?: CPKAddresses
   }
   tokens: Token[]
   CTEGraphHttpUri: string
@@ -102,30 +110,30 @@ const networks: { [K in NetworkIds]: Network } = {
     OMENGraphWsUri: OMEN_GRAPH_WS_MAINNET,
     oracles: [
       {
-        name: 'realitio',
-        description: 'Realit.io',
-        url: 'https://realit.io/',
-        address: '0x0e414d014a77971f4eaa22ab58e6d84d16ea838e',
-      },
-      {
         name: 'kleros',
         description: 'Kleros',
         url: 'https://kleros.io/',
         address: '0x0000000000000000000000000000000000000000',
       },
-    ],
-    arbitrators: [
       {
         name: 'realitio',
         description: 'Realit.io',
-        url: 'https://reality.eth.link',
-        address: '0xdc0a2185031ecf89f091a39c63c2857a7d5c301a',
+        url: 'https://realit.io/',
+        address: '0x0e414d014a77971f4eaa22ab58e6d84d16ea838e',
       },
+    ],
+    arbitrators: [
       {
         name: 'kleros',
         description: 'Kleros',
         url: 'https://kleros.io/',
         address: '0xd47f72a2d1d0E91b0Ec5e5f5d02B2dc26d00A14D',
+      },
+      {
+        name: 'realitio',
+        description: 'Realit.io',
+        url: 'https://reality.eth.link',
+        address: '0xdc0a2185031ecf89f091a39c63c2857a7d5c301a',
       },
     ],
     realitioTimeout: 86400,
@@ -175,30 +183,30 @@ const networks: { [K in NetworkIds]: Network } = {
     OMENGraphWsUri: OMEN_GRAPH_WS_RINKEBY,
     oracles: [
       {
-        name: 'realitio',
-        description: 'Realit.io',
-        url: 'https://realit.io/',
-        address: '0x576b76eebe6b5411c0ef310e65de9bff8a60130f',
-      },
-      {
         name: 'kleros',
         description: 'Kleros',
         url: 'https://kleros.io/',
         address: '0x0000000000000000000000000000000000000000',
       },
-    ],
-    arbitrators: [
       {
         name: 'realitio',
-        description: 'Realitio Team',
-        url: 'https://reality.eth.link',
-        address: '0x02321745bE4a141E78db6C39834396f8df00e2a0',
+        description: 'Realit.io',
+        url: 'https://realit.io/',
+        address: '0x576b76eebe6b5411c0ef310e65de9bff8a60130f',
       },
+    ],
+    arbitrators: [
       {
         name: 'kleros',
         description: 'Kleros',
         url: 'https://kleros.io/',
         address: '0xcafa054b1b054581faf65adce667bf1c684b6ef0',
+      },
+      {
+        name: 'realitio',
+        description: 'Realitio Team',
+        url: 'https://reality.eth.link',
+        address: '0x02321745bE4a141E78db6C39834396f8df00e2a0',
       },
     ],
     realitioTimeout: 10,
@@ -248,29 +256,29 @@ const networks: { [K in NetworkIds]: Network } = {
     OMENGraphWsUri: '',
     oracles: [
       {
+        name: 'kleros',
+        description: 'Kleros',
+        url: 'https://kleros.io/',
+        address: '0x0000000000000000000000000000000000000000',
+      },
+      {
         name: 'realitio',
         description: 'Realit.io',
         url: 'https://realit.io/',
         address: '0xDb56f2e9369E0D7bD191099125a3f6C370F8ed15',
       },
+    ],
+    arbitrators: [
       {
         name: 'kleros',
         description: 'Kleros',
         url: 'https://kleros.io/',
         address: '0x0000000000000000000000000000000000000000',
       },
-    ],
-    arbitrators: [
       {
         name: 'realitio',
         description: 'Realit.io',
         url: 'https://reality.eth.link',
-        address: '0x0000000000000000000000000000000000000000',
-      },
-      {
-        name: 'kleros',
-        description: 'Kleros',
-        url: 'https://kleros.io/',
         address: '0x0000000000000000000000000000000000000000',
       },
     ],
@@ -419,5 +427,10 @@ export class NetworkConfig {
 
   getRealitioTimeout(): number {
     return networks[this.networkId].realitioTimeout
+  }
+
+  getCPKAddresses(): Maybe<CPKAddresses> {
+    const cpkAddresses = networks[this.networkId].contracts.cpk
+    return cpkAddresses || null
   }
 }

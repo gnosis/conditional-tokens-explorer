@@ -6,6 +6,7 @@ import { ButtonFilterSubmit } from 'components/buttons/ButtonFilterSubmit'
 import { ErrorContainer, Error as ErrorMessage } from 'components/pureStyledComponents/Error'
 import { FilterTitle } from 'components/pureStyledComponents/FilterTitle'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
+import { getLogger } from 'util/logger'
 
 const Wrapper = styled.div``
 
@@ -48,33 +49,41 @@ interface Props {
   title: string
 }
 
+const logger = getLogger('DateFilter')
+
 export const DateFilter: React.FC<Props> = (props) => {
   const { onChangeFrom, onChangeTo, onSubmit, title } = props
 
   const [from, setFrom] = React.useState<Maybe<number>>(null)
   const [to, setTo] = React.useState<Maybe<number>>(null)
 
-  const onChangeFromInternal = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (typeof onChangeFrom === 'function') {
-      onChangeFrom(event)
-    }
+  const onChangeFromInternal = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (typeof onChangeFrom === 'function') {
+        onChangeFrom(event)
+      }
 
-    const fromDateMoment = moment(event.currentTarget.value)
-    const fromTimestamp = fromDateMoment.unix()
+      const fromDateMoment = moment(event.currentTarget.value).utc()
+      const fromTimestamp = fromDateMoment.unix()
 
-    setFrom(fromTimestamp)
-  }
+      setFrom(fromTimestamp)
+    },
+    [onChangeFrom]
+  )
 
-  const onChangeToInternal = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (typeof onChangeTo === 'function') {
-      onChangeTo(event)
-    }
+  const onChangeToInternal = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (typeof onChangeTo === 'function') {
+        onChangeTo(event)
+      }
 
-    const toDateMoment = moment(event.currentTarget.value)
-    const toTimestamp = toDateMoment.unix()
+      const toDateMoment = moment(event.currentTarget.value).utc().add(24, 'hours')
+      const toTimestamp = toDateMoment.unix()
 
-    setTo(toTimestamp)
-  }
+      setTo(toTimestamp)
+    },
+    [onChangeTo]
+  )
 
   const errorMessage = React.useMemo(
     () => (to && from && to < from ? 'To should be greater than From' : null),
@@ -83,15 +92,25 @@ export const DateFilter: React.FC<Props> = (props) => {
   const emptyValues = React.useMemo(() => !from && !to, [from, to])
   const submitDisabled = !!errorMessage || emptyValues
 
-  const onSubmitInternal = () => {
-    if ((from || to) && !submitDisabled) onSubmit(from, to)
-  }
-
-  const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      onSubmitInternal()
+  const onSubmitInternal = React.useCallback(() => {
+    if ((from || to) && !submitDisabled) {
+      logger.log(from, to)
+      onSubmit(from, to)
     }
-  }
+  }, [from, to, onSubmit, submitDisabled])
+
+  const onPressEnter = React.useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        onSubmitInternal()
+      }
+    },
+    [onSubmitInternal]
+  )
+
+  React.useEffect(() => {
+    if (!from && !to) onSubmit(from, to)
+  }, [from, to, onSubmit])
 
   return (
     <Wrapper>
