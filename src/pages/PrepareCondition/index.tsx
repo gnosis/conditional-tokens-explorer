@@ -590,8 +590,7 @@ export const PrepareCondition = () => {
                       {...(conditionType === ConditionType.omen && { readOnly: true })}
                     />
                     <SmallNote>
-                      <strong>Note:</strong> Realit.io is used the default oracle for Omen
-                      conditions.
+                      <strong>Note:</strong> Realit.io is the default oracle for Omen conditions.
                     </SmallNote>
                     {errorsOmenCondition.oracle && (
                       <ErrorContainer>
