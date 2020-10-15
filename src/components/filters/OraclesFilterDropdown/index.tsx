@@ -41,18 +41,18 @@ export const OraclesFilterDropdown = ({ onClick, value }: Props) => {
       },
       value: OracleFilterOptions.Custom,
     },
+    ...oracles
+      .filter((item) => item.name !== OracleFilterOptions.Kleros)
+      .map((item) => {
+        return {
+          text: item.description,
+          onClick: () => {
+            onClick(item.name as OracleFilterOptions, [item.address.toLowerCase()])
+          },
+          value: item.name as OracleFilterOptions,
+        }
+      }),
   ]
-
-  for (const oracle of oracles) {
-    const oracleItem = {
-      text: oracle.description,
-      onClick: () => {
-        onClick(oracle.name as OracleFilterOptions, [oracle.address.toLowerCase()])
-      },
-      value: oracle.name as OracleFilterOptions,
-    }
-    oraclesItems.push(oracleItem)
-  }
 
   return (
     <>
