@@ -57,36 +57,52 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
   const [min, setMin] = React.useState<Maybe<number>>(null)
   const [max, setMax] = React.useState<Maybe<number>>(null)
 
-  const onChangeMinInternal = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (typeof onChangeMin === 'function') {
-      onChangeMin(event)
-    }
-    setMin(+event.currentTarget.value)
-  }
+  const onChangeMinInternal = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (typeof onChangeMin === 'function') {
+        onChangeMin(event)
+      }
+      setMin(+event.currentTarget.value)
+    },
+    [onChangeMin]
+  )
 
-  const onChangeMaxInternal = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (typeof onChangeMax === 'function') {
-      onChangeMax(event)
-    }
-    setMax(+event.currentTarget.value)
-  }
+  const onChangeMaxInternal = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (typeof onChangeMax === 'function') {
+        onChangeMax(event)
+      }
+      setMax(+event.currentTarget.value)
+    },
+    [onChangeMax]
+  )
 
   const errorMessage = React.useMemo(
     () => (min && max && max < min ? 'Max should be greater than Min' : null),
     [min, max]
   )
   const emptyValues = React.useMemo(() => !min && !max, [min, max])
-  const submitDisabled = !!errorMessage || emptyValues
+  const submitDisabled = React.useMemo(() => !!errorMessage || emptyValues, [
+    errorMessage,
+    emptyValues,
+  ])
 
-  const onSubmitInternal = () => {
+  React.useEffect(() => {
+    if (!min && !max) onSubmit(min, max)
+  }, [min, max, onSubmit])
+
+  const onSubmitInternal = React.useCallback(() => {
     if ((min || max) && !submitDisabled) onSubmit(min, max)
-  }
+  }, [min, max, submitDisabled, onSubmit])
 
-  const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      onSubmitInternal()
-    }
-  }
+  const onPressEnter = React.useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        onSubmitInternal()
+      }
+    },
+    [onSubmitInternal]
+  )
 
   return (
     <Wrapper>
