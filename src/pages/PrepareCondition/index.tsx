@@ -92,11 +92,11 @@ export const PrepareCondition = () => {
   const oracle = networkConfig.getOracleFromName('realitio' as KnownOracle)
 
   const defaultValuesOmen = {
+    arbitrator: networkConfig.getArbitratorFromName('kleros'),
+    category: Categories.businessAndFinance,
+    oracle: oracle.address,
     questionTitle: '',
     resolutionDate: null,
-    category: Categories.businessAndFinance,
-    arbitrator: networkConfig.getArbitratorFromName('realitio'),
-    oracle: oracle.address,
   }
 
   const {
