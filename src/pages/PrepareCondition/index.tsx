@@ -15,6 +15,7 @@ import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer
 import { ErrorContainer, Error as ErrorMessage } from 'components/pureStyledComponents/Error'
 import { PageTitle } from 'components/pureStyledComponents/PageTitle'
 import { Row } from 'components/pureStyledComponents/Row'
+import { SmallNote } from 'components/pureStyledComponents/SmallNote'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { TitleControl } from 'components/pureStyledComponents/TitleControl'
 import { FullLoading } from 'components/statusInfo/FullLoading'
@@ -92,11 +93,11 @@ export const PrepareCondition = () => {
   const oracle = networkConfig.getOracleFromName('realitio' as KnownOracle)
 
   const defaultValuesOmen = {
+    arbitrator: networkConfig.getArbitratorFromName('kleros'),
+    category: Categories.businessAndFinance,
+    oracle: oracle.address,
     questionTitle: '',
     resolutionDate: null,
-    category: Categories.businessAndFinance,
-    arbitrator: networkConfig.getArbitratorFromName('realitio'),
-    oracle: oracle.address,
   }
 
   const {
@@ -588,6 +589,9 @@ export const PrepareCondition = () => {
                       value={oracleOmenCondition}
                       {...(conditionType === ConditionType.omen && { readOnly: true })}
                     />
+                    <SmallNote>
+                      <strong>Note:</strong> Realit.io is the default oracle for Omen conditions.
+                    </SmallNote>
                     {errorsOmenCondition.oracle && (
                       <ErrorContainer>
                         {errorsOmenCondition.oracle.type === 'required' && (
