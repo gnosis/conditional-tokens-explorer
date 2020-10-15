@@ -2,7 +2,7 @@ import { IDataTableStyles } from 'react-data-table-component'
 
 import theme from 'theme/index'
 
-const horizontalPadding = '15px'
+const horizontalPadding = '25px'
 
 export const customStyles: IDataTableStyles = {
   table: {
