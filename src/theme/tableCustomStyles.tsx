@@ -43,6 +43,7 @@ export const customStyles: IDataTableStyles = {
       lineHeight: '1.2',
       paddingLeft: horizontalPadding,
       paddingRight: horizontalPadding,
+      whiteSpace: 'nowrap',
     },
   },
   rows: {
