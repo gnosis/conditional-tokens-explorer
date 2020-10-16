@@ -1,3 +1,4 @@
+import lodashClonedeep from 'lodash.clonedeep'
 import moment from 'moment'
 import React, { KeyboardEvent, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -37,7 +38,7 @@ import { ConditionalTokensService } from 'services/conditionalTokens'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import { isAddress } from 'util/tools'
-import { Arbitrator, Categories, ConditionType, QuestionOptions } from 'util/types'
+import { Arbitrator, ConditionType, QuestionOptions } from 'util/types'
 
 const logger = getLogger('Prepare Condition')
 
@@ -59,7 +60,7 @@ interface CustomConditionType {
 interface OmenConditionType {
   questionTitle: string
   resolutionDate: Maybe<string>
-  category: string
+  category: Maybe<string>
   arbitrator: Arbitrator
   oracle: string
 }
@@ -94,7 +95,7 @@ export const PrepareCondition = () => {
 
   const defaultValuesOmen = {
     arbitrator: networkConfig.getArbitratorFromName('kleros'),
-    category: Categories.businessAndFinance,
+    category: null,
     oracle: oracle.address,
     questionTitle: '',
     resolutionDate: null,
@@ -146,21 +147,32 @@ export const PrepareCondition = () => {
 
   const addOutcome = React.useCallback(() => {
     const sanitizedOutcome = outcome.trim()
-
+    const outcomesCloned = lodashClonedeep(outcomes)
     setOutcome('')
-    setOutcomes([...outcomes, sanitizedOutcome])
+    setOutcomes([...outcomesCloned, sanitizedOutcome])
   }, [outcome, outcomes, setOutcomes])
 
   const removeOutcome = React.useCallback(
     (index: number) => {
-      outcomes.splice(index, 1)
-      setOutcomes([...outcomes])
+      const outcomesCloned = lodashClonedeep(outcomes)
+      outcomesCloned.splice(index, 1)
+      setOutcomes([...outcomesCloned])
     },
     [outcomes]
   )
 
-  const onOutcomeChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+  const updateOutcome = React.useCallback(
+    (value: string, index: number) => {
+      const outcomesCloned = lodashClonedeep(outcomes)
+      outcomesCloned[index] = value.trim()
+      setOutcomes([...outcomesCloned])
+    },
+    [outcomes]
+  )
+
+  const onChangeOutcome = (e: React.ChangeEvent<HTMLInputElement>) => {
     setOutcome(e.currentTarget.value)
+  }
 
   React.useEffect(() => {
     const checkConditionExist = async () => {
@@ -185,7 +197,8 @@ export const PrepareCondition = () => {
             oracleOmenCondition &&
             outcomes.length > 0 &&
             resolutionDate &&
-            address
+            address &&
+            category
           ) {
             const openingDateMoment = moment(resolutionDate + '')
             const questionOptions: QuestionOptions = {
@@ -272,8 +285,9 @@ export const PrepareCondition = () => {
             resolutionDate,
           } = getValuesOmenCondition()
 
-          if (resolutionDate && questionTitle && oracleOmen) {
+          if (resolutionDate && questionTitle && oracleOmen && category) {
             const openingDateMoment = moment(resolutionDate + '')
+            logger.log(`outcomes`, outcomes)
             const questionOptions: QuestionOptions = {
               arbitratorAddress: (arbitrator as Arbitrator).address,
               category,
@@ -313,22 +327,34 @@ export const PrepareCondition = () => {
     }
   }
 
-  const submitDisabled =
-    conditionType === ConditionType.custom
-      ? !isValidCustomCondition ||
-        prepareConditionStatus.isLoading() ||
-        prepareConditionStatus.isFailure() ||
-        checkForExistingCondition.isLoading() ||
-        checkForExistingCondition.isFailure() ||
-        isConditionAlreadyExist
-      : !isValidOmenCondition ||
-        prepareConditionStatus.isLoading() ||
-        prepareConditionStatus.isFailure() ||
-        checkForExistingCondition.isLoading() ||
-        checkForExistingCondition.isFailure() ||
-        isConditionAlreadyExist ||
-        isQuestionAlreadyExist ||
-        isOutcomesFromOmenConditionInvalid
+  const submitDisabled = React.useMemo(
+    () =>
+      conditionType === ConditionType.custom
+        ? !isValidCustomCondition ||
+          prepareConditionStatus.isLoading() ||
+          prepareConditionStatus.isFailure() ||
+          checkForExistingCondition.isLoading() ||
+          checkForExistingCondition.isFailure() ||
+          isConditionAlreadyExist
+        : !isValidOmenCondition ||
+          prepareConditionStatus.isLoading() ||
+          prepareConditionStatus.isFailure() ||
+          checkForExistingCondition.isLoading() ||
+          checkForExistingCondition.isFailure() ||
+          isConditionAlreadyExist ||
+          isQuestionAlreadyExist ||
+          isOutcomesFromOmenConditionInvalid,
+    [
+      isValidCustomCondition,
+      conditionType,
+      isValidOmenCondition,
+      prepareConditionStatus,
+      checkForExistingCondition,
+      isConditionAlreadyExist,
+      isQuestionAlreadyExist,
+      isOutcomesFromOmenConditionInvalid,
+    ]
+  )
 
   const fullLoadingActionButton = prepareConditionStatus.isSuccess()
     ? {
@@ -452,10 +478,11 @@ export const PrepareCondition = () => {
             <>
               <AddOutcome
                 addOutcome={addOutcome}
-                onChange={onOutcomeChange}
+                onChange={onChangeOutcome}
                 outcome={outcome}
                 outcomes={outcomes}
                 removeOutcome={removeOutcome}
+                updateOutcome={updateOutcome}
               />
             </>
           )}

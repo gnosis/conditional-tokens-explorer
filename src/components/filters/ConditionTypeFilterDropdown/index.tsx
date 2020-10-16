@@ -33,7 +33,7 @@ export const ConditionTypeFilterDropdown: React.FC<Props> = (props) => {
       onClick: () => {
         onClick(ConditionType.omen, oracleRealitio.address)
       },
-      text: 'Omen',
+      text: 'Omen Condition',
       value: ConditionType.omen,
     },
     {

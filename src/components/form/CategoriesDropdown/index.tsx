@@ -22,7 +22,7 @@ const DropdownStyled = styled(Dropdown)`
 
 interface Props {
   onClick: (value: string) => void
-  value: string
+  value: Maybe<string>
 }
 
 interface CategoryItem {
@@ -107,13 +107,13 @@ export const CategoriesDropdown = ({ onClick, value }: Props) => {
       const newCategories = lodashUniqBy(
         [
           ...categories.map((category) => {
-            const value = capitalize(category.id)
+            const valueCapitalized = capitalize(category.id)
             return {
-              text: value,
+              text: valueCapitalized,
               onClick: () => {
-                onClick(value)
+                onClick(valueCapitalized)
               },
-              value: value,
+              value: valueCapitalized,
             }
           }),
           ...categoryItems,
@@ -136,7 +136,13 @@ export const CategoriesDropdown = ({ onClick, value }: Props) => {
           <ButtonSelect
             content={
               categories.isSuccess() && categories.hasData()
-                ? categories.get().filter((item) => item.value === value)[0].text
+                ? categories.get().filter((item, index) => {
+                    if (value) {
+                      return item.value === value
+                    } else {
+                      return index === 0
+                    }
+                  })[0].text
                 : 'Loading...'
             }
           />
