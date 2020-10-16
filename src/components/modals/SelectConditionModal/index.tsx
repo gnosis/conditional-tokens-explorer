@@ -99,7 +99,7 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
         ),
       },
       {
-        name: 'R. Address / Oracle',
+        name: 'Reporter / Oracle',
         selector: 'oracle',
         sortable: true,
         // eslint-disable-next-line react/display-name

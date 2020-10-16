@@ -31,6 +31,12 @@ export const dataTableCSS = css`
         max-height: 39px;
         min-height: 39px;
       }
+
+      .rdt_TableCol,
+      .rdt_TableCell {
+        padding-left: 15px;
+        padding-right: 15px;
+      }
     }
 
     .rdt_Table {
