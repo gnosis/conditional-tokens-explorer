@@ -35,6 +35,7 @@ import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { customStyles } from 'theme/tableCustomStyles'
 import { Conditions_conditions } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
+import { formatTSSimple } from 'util/tools'
 import {
   AdvancedFilter,
   ConditionSearchOptions,
@@ -254,10 +255,18 @@ export const ConditionsList: React.FC = () => {
         sortable: true,
       },
       {
-        maxWidth: '150px',
+        maxWidth: '100px',
         name: 'Outcomes',
         right: true,
         selector: 'outcomeSlotCount',
+        sortable: true,
+      },
+      {
+        cell: (row: Conditions_conditions) => formatTSSimple(row.createTimestamp),
+        maxWidth: '150px',
+        name: 'Creation',
+        right: true,
+        selector: 'createTimestamp',
         sortable: true,
       },
       {

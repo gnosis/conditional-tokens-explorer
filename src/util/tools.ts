@@ -81,6 +81,10 @@ export const formatTS = (timestamp: number): string => {
   return moment.unix(timestamp).utc().format('YYYY-MM-DD - HH:mm [UTC]')
 }
 
+export const formatTSSimple = (timestamp: number): string => {
+  return moment.unix(timestamp).utc().format('YYYY-MM-DD')
+}
+
 export const isConditionErrorInvalid = (errors: ConditionErrors[]): boolean =>
   errors.indexOf(ConditionErrors.INVALID_ERROR) > -1
 
