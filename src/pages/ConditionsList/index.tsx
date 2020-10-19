@@ -233,8 +233,7 @@ export const ConditionsList: React.FC = () => {
           <Hash href={`/conditions/${row.id}`} value={row.id} />
         ),
         name: 'Condition Id',
-        selector: 'createTimestamp',
-        sortable: true,
+        sortable: false,
       },
       {
         // eslint-disable-next-line react/display-name
@@ -264,7 +263,7 @@ export const ConditionsList: React.FC = () => {
       {
         cell: (row: Conditions_conditions) => formatTSSimple(row.createTimestamp),
         maxWidth: '150px',
-        name: 'Creation',
+        name: 'Creation Date',
         right: true,
         selector: 'createTimestamp',
         sortable: true,
