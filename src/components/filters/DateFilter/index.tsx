@@ -6,6 +6,7 @@ import { ButtonFilterSubmit } from 'components/buttons/ButtonFilterSubmit'
 import { ErrorContainer, Error as ErrorMessage } from 'components/pureStyledComponents/Error'
 import { FilterTitle } from 'components/pureStyledComponents/FilterTitle'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
+import { MAX_DATE, MIN_DATE } from 'config/constants'
 import { getLogger } from 'util/logger'
 
 const Wrapper = styled.div``
@@ -46,15 +47,13 @@ interface Props {
   onChangeFrom?: (event: React.ChangeEvent<HTMLInputElement>) => void
   onChangeTo?: (event: React.ChangeEvent<HTMLInputElement>) => void
   onSubmit: (from: Maybe<number>, to: Maybe<number>) => void
-  minDate?: string
-  maxDate?: string
   title: string
 }
 
 const logger = getLogger('DateFilter')
 
 export const DateFilter: React.FC<Props> = (props) => {
-  const { maxDate, minDate, onChangeFrom, onChangeTo, onSubmit, title } = props
+  const { onChangeFrom, onChangeTo, onSubmit, title } = props
   const toDate = useRef<HTMLInputElement>(null)
   const fromDate = useRef<HTMLInputElement>(null)
 
@@ -138,8 +137,8 @@ export const DateFilter: React.FC<Props> = (props) => {
         <FieldWrapper>
           <Label>From:</Label>
           <Date
-            max={maxDate}
-            min={minDate}
+            max={MAX_DATE}
+            min={MIN_DATE}
             name="dateFrom"
             onChange={onChangeFromInternal}
             onKeyUp={onPressEnter}
@@ -152,8 +151,8 @@ export const DateFilter: React.FC<Props> = (props) => {
         <FieldWrapper>
           <Label>To:</Label>
           <Date
-            max={maxDate}
-            min={minDate}
+            max={MAX_DATE}
+            min={MIN_DATE}
             name="dateTo"
             onChange={onChangeToInternal}
             onKeyUp={onPressEnter}

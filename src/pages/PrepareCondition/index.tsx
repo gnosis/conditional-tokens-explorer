@@ -28,8 +28,10 @@ import {
   ADDRESS_REGEX,
   BYTES_REGEX,
   INTEGER_NUMBER,
+  MAX_DATE,
   MAX_OUTCOMES,
   MAX_OUTCOMES_ALLOWED,
+  MIN_DATE,
   MIN_OUTCOMES,
   MIN_OUTCOMES_ALLOWED,
 } from 'config/constants'
@@ -115,11 +117,13 @@ export const PrepareCondition = () => {
   const { isValid: isValidCustomCondition } = formStateCustomCondition
 
   const {
+    clearError: clearErrorOmenCondition,
     control: omenControl,
     errors: errorsOmenCondition,
     formState: formStateOmenCondition,
     getValues: getValuesOmenCondition,
     register: registerOmenCondition,
+    setError: setErrorOmenCondition,
     setValue: setValueOmenCondition,
     watch: watchOmenCondition,
   } = useForm<OmenConditionType>({
@@ -541,10 +545,21 @@ export const PrepareCondition = () => {
                   <>
                     <Textfield
                       error={errorsOmenCondition.resolutionDate && true}
+                      max={MAX_DATE}
+                      min={MIN_DATE}
                       name="resolutionDate"
-                      onChange={(e) =>
-                        setValueOmenCondition('resolutionDate', e.target.value, true)
-                      }
+                      onChange={(e) => {
+                        clearErrorOmenCondition('resolutionDate')
+                        if (e.target.checkValidity()) {
+                          setValueOmenCondition('resolutionDate', e.target.value, true)
+                        } else if (e.target.valueAsDate) {
+                          setErrorOmenCondition(
+                            'resolutionDate',
+                            'validity',
+                            'Invalid date or out of range'
+                          )
+                        }
+                      }}
                       placeholder="MM/DD/YYYY"
                       ref={registerOmenCondition({
                         required: true,
@@ -555,6 +570,9 @@ export const PrepareCondition = () => {
                       <ErrorContainer>
                         {errorsOmenCondition.resolutionDate.type === 'required' && (
                           <ErrorMessage>Required field</ErrorMessage>
+                        )}
+                        {errorsOmenCondition.resolutionDate.type === 'validity' && (
+                          <ErrorMessage>{errorsOmenCondition.resolutionDate.message}</ErrorMessage>
                         )}
                       </ErrorContainer>
                     )}

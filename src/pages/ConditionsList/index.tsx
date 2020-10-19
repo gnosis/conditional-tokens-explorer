@@ -377,8 +377,6 @@ export const ConditionsList: React.FC = () => {
               </SidebarRow>
               <SidebarRow>
                 <DateFilter
-                  maxDate="2030-01-01"
-                  minDate="2015-07-30"
                   onSubmit={(from, to) => {
                     setSelectedFromCreationDate(from)
                     setSelectedToCreationDate(to)
