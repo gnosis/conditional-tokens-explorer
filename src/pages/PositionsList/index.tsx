@@ -19,6 +19,7 @@ import { CollateralFilterDropdown } from 'components/filters/CollateralFilterDro
 import { DateFilter } from 'components/filters/DateFilter'
 import { WrappedCollateralFilterDropdown } from 'components/filters/WrappedCollateralFilterDropdown'
 import { Switch } from 'components/form/Switch'
+import { DisplayConditionsTableModal } from 'components/modals/DisplayConditionsTableModal'
 import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
 import { UnwrapModal } from 'components/modals/UnwrapModal'
 import { WrapModal } from 'components/modals/WrapModal'
@@ -48,7 +49,10 @@ import {
   Token,
   TransferOptions,
   WrappedCollateralOptions,
+  ConditionIdsArray,
 } from 'util/types'
+
+import { ConditionInformation } from 'hooks/utils'
 
 const DropdownItemLink = styled(NavLink)<DropdownItemProps>`
   ${DropdownItemCSS}
@@ -95,6 +99,9 @@ export const PositionsList = () => {
   const [isWrapModalOpen, setIsWrapModalOpen] = useState(false)
   const [isUnwrapModalOpen, setIsUnwrapModalOpen] = useState(false)
   const [userBalance, setUserBalance] = useState(new BigNumber(0))
+
+  const [openDisplayConditionsTableModal, setOpenDisplayConditionsTableModal] = useState(false)
+  const [conditionsTableModal, setConditionsTableModal] = useState<Array<ConditionIdsArray>>([])
 
   const debouncedHandlerPositionIdToSearch = useDebounceCallback((positionIdToSearch) => {
     setPositionIdToSearch(positionIdToSearch)
@@ -335,7 +342,21 @@ export const PositionsList = () => {
                   href={`/conditions/${conditions[0].conditionId}`}
                   value={conditions[0].conditionId}
                 />
-                <MoreLink onClick={() => true}>(More...)</MoreLink>
+                <MoreLink
+                  onClick={() => {
+                    const conditionIds: ConditionIdsArray[] = conditions.map(
+                      (condition: ConditionInformation) => {
+                        return {
+                          conditionId: condition.conditionId,
+                        }
+                      }
+                    )
+                    setOpenDisplayConditionsTableModal(true)
+                    setConditionsTableModal(conditionIds)
+                  }}
+                >
+                  (More...)
+                </MoreLink>
               </>
             )
           }
@@ -610,6 +631,16 @@ export const PositionsList = () => {
           onRequestClose={() => setIsTransferOutcomeModalOpen(false)}
           onSubmit={onTransferOutcomeTokens}
           positionId={selectedPositionId}
+        />
+      )}
+      {openDisplayConditionsTableModal && (
+        <DisplayConditionsTableModal
+          conditions={conditionsTableModal}
+          isOpen={openDisplayConditionsTableModal}
+          onRequestClose={() => {
+            setOpenDisplayConditionsTableModal(false)
+            setConditionsTableModal([])
+          }}
         />
       )}
       {isWorking && (
