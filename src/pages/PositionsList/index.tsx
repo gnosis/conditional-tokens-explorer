@@ -54,6 +54,19 @@ const DropdownItemLink = styled(NavLink)<DropdownItemProps>`
   ${DropdownItemCSS}
 `
 
+const MoreLink = styled.a`
+  color: ${(props) => props.theme.colors.textColor};
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 0 12px;
+  text-decoration: underline;
+
+  &:hover {
+    text-decoration: none;
+  }
+`
+
 const logger = getLogger('PositionsList')
 
 export const PositionsList = () => {
@@ -303,6 +316,71 @@ export const PositionsList = () => {
         name: 'Creation Date',
         selector: 'createTimestamp',
         sortable: true,
+      },
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: PositionWithUserBalanceWithDecimals) => {
+          const { conditions } = row
+          if (conditions.length === 1) {
+            return (
+              <Hash
+                href={`/conditions/${conditions[0].conditionId}`}
+                value={conditions[0].conditionId}
+              />
+            )
+          } else {
+            return (
+              <>
+                <Hash
+                  href={`/conditions/${conditions[0].conditionId}`}
+                  value={conditions[0].conditionId}
+                />
+                <MoreLink onClick={() => true}>(More...)</MoreLink>
+              </>
+            )
+          }
+        },
+        name: 'Condition Id',
+        sortable: false,
+        minWidth: '350px',
+      },
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: PositionWithUserBalanceWithDecimals) => {
+          const { conditions } = row
+          if (conditions.length === 1) {
+            return <Hash value={conditions[0].oracle} />
+          } else {
+            return (
+              <>
+                <Hash value={conditions[0].oracle} />
+                <MoreLink onClick={() => true}>(More...)</MoreLink>
+              </>
+            )
+          }
+        },
+        name: 'Oracle',
+        sortable: false,
+        minWidth: '350px',
+      },
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: PositionWithUserBalanceWithDecimals) => {
+          const { conditions } = row
+          if (conditions.length === 1) {
+            return <Hash value={conditions[0].questionId} />
+          } else {
+            return (
+              <>
+                <Hash value={conditions[0].questionId} />
+                <MoreLink onClick={() => true}>(More...)</MoreLink>
+              </>
+            )
+          }
+        },
+        name: 'Question Id',
+        sortable: false,
+        minWidth: '350px',
       },
     ]
 
