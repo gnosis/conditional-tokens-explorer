@@ -557,7 +557,7 @@ export const PrepareCondition = () => {
                           setErrorOmenCondition(
                             'resolutionDate',
                             'validity',
-                            'Invalid date or out of range'
+                            `Invalid date or out of range. Valid dates are from today (${today}) to ${MAX_DATE}`
                           )
                         }
                       }}
