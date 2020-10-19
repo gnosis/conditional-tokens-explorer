@@ -31,7 +31,6 @@ import {
   MAX_DATE,
   MAX_OUTCOMES,
   MAX_OUTCOMES_ALLOWED,
-  MIN_DATE,
   MIN_OUTCOMES,
   MIN_OUTCOMES_ALLOWED,
 } from 'config/constants'
@@ -360,6 +359,8 @@ export const PrepareCondition = () => {
     ]
   )
 
+  const today = React.useMemo(() => moment().format('YYYY-MM-DD'), [])
+
   const fullLoadingActionButton = prepareConditionStatus.isSuccess()
     ? {
         buttonType: ButtonType.primary,
@@ -546,7 +547,7 @@ export const PrepareCondition = () => {
                     <Textfield
                       error={errorsOmenCondition.resolutionDate && true}
                       max={MAX_DATE}
-                      min={MIN_DATE}
+                      min={today}
                       name="resolutionDate"
                       onChange={(e) => {
                         clearErrorOmenCondition('resolutionDate')
