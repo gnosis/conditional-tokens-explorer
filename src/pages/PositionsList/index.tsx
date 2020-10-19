@@ -41,6 +41,7 @@ import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
+import { formatTSSimple } from 'util/tools'
 import {
   CollateralFilterOptions,
   LocalStorageManagement,
@@ -278,8 +279,7 @@ export const PositionsList = () => {
           <Hash href={`/positions/${row.id}`} value={row.id} />
         ),
         name: 'Position Id',
-        selector: 'createTimestamp',
-        sortable: true,
+        sortable: false,
         minWidth: '250px',
       },
       {
@@ -295,6 +295,13 @@ export const PositionsList = () => {
         },
         name: 'Collateral',
         selector: 'collateralTokenSymbol',
+        sortable: true,
+      },
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: PositionWithUserBalanceWithDecimals) => formatTSSimple(row.createTimestamp),
+        name: 'Creation Date',
+        selector: 'createTimestamp',
         sortable: true,
       },
     ]
