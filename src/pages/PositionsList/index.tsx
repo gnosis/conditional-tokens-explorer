@@ -19,7 +19,7 @@ import { CollateralFilterDropdown } from 'components/filters/CollateralFilterDro
 import { DateFilter } from 'components/filters/DateFilter'
 import { WrappedCollateralFilterDropdown } from 'components/filters/WrappedCollateralFilterDropdown'
 import { Switch } from 'components/form/Switch'
-import { DisplayConditionsTableModal } from 'components/modals/DisplayConditionsTableModal'
+import { DisplayHashesTableModal } from 'components/modals/DisplayHashesTableModal'
 import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
 import { UnwrapModal } from 'components/modals/UnwrapModal'
 import { WrapModal } from 'components/modals/WrapModal'
@@ -39,20 +39,19 @@ import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Contex
 import { PositionWithUserBalanceWithDecimals, usePositions } from 'hooks'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
+import { ConditionInformation } from 'hooks/utils'
 import { customStyles } from 'theme/tableCustomStyles'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import { formatTSSimple } from 'util/tools'
 import {
   CollateralFilterOptions,
+  HashArray,
   LocalStorageManagement,
   Token,
   TransferOptions,
   WrappedCollateralOptions,
-  ConditionIdsArray,
 } from 'util/types'
-
-import { ConditionInformation } from 'hooks/utils'
 
 const DropdownItemLink = styled(NavLink)<DropdownItemProps>`
   ${DropdownItemCSS}
@@ -100,8 +99,11 @@ export const PositionsList = () => {
   const [isUnwrapModalOpen, setIsUnwrapModalOpen] = useState(false)
   const [userBalance, setUserBalance] = useState(new BigNumber(0))
 
-  const [openDisplayConditionsTableModal, setOpenDisplayConditionsTableModal] = useState(false)
-  const [conditionsTableModal, setConditionsTableModal] = useState<Array<ConditionIdsArray>>([])
+  const [openDisplayHashesTableModal, setOpenDisplayHashesTableModal] = useState(false)
+  const [hashesTableModal, setHashesTableModal] = useState<Array<HashArray>>([])
+  const [titleTableModal, setTitleTableModal] = useState('')
+  const [urlTableModal, setUrlTableModal] = useState('')
+  const [titleModal, setTitleModal] = useState('')
 
   const debouncedHandlerPositionIdToSearch = useDebounceCallback((positionIdToSearch) => {
     setPositionIdToSearch(positionIdToSearch)
@@ -344,15 +346,18 @@ export const PositionsList = () => {
                 />
                 <MoreLink
                   onClick={() => {
-                    const conditionIds: ConditionIdsArray[] = conditions.map(
+                    const hashes: HashArray[] = conditions.map(
                       (condition: ConditionInformation) => {
                         return {
-                          conditionId: condition.conditionId,
+                          hash: condition.conditionId,
                         }
                       }
                     )
-                    setOpenDisplayConditionsTableModal(true)
-                    setConditionsTableModal(conditionIds)
+                    setOpenDisplayHashesTableModal(true)
+                    setHashesTableModal(hashes)
+                    setTitleTableModal('Condition Id')
+                    setTitleModal('Conditions')
+                    setUrlTableModal('conditions')
                   }}
                 >
                   (More...)
@@ -375,7 +380,24 @@ export const PositionsList = () => {
             return (
               <>
                 <Hash value={conditions[0].oracle} />
-                <MoreLink onClick={() => true}>(More...)</MoreLink>
+                <MoreLink
+                  onClick={() => {
+                    const hashes: HashArray[] = conditions.map(
+                      (condition: ConditionInformation) => {
+                        return {
+                          hash: condition.oracle,
+                        }
+                      }
+                    )
+                    setOpenDisplayHashesTableModal(true)
+                    setHashesTableModal(hashes)
+                    setTitleTableModal('Oracle Id')
+                    setTitleModal('Oracles')
+                    setUrlTableModal('')
+                  }}
+                >
+                  (More...)
+                </MoreLink>
               </>
             )
           }
@@ -394,7 +416,24 @@ export const PositionsList = () => {
             return (
               <>
                 <Hash value={conditions[0].questionId} />
-                <MoreLink onClick={() => true}>(More...)</MoreLink>
+                <MoreLink
+                  onClick={() => {
+                    const hashes: HashArray[] = conditions.map(
+                      (condition: ConditionInformation) => {
+                        return {
+                          hash: condition.questionId,
+                        }
+                      }
+                    )
+                    setOpenDisplayHashesTableModal(true)
+                    setHashesTableModal(hashes)
+                    setTitleTableModal('Question Id')
+                    setTitleModal('Questions')
+                    setUrlTableModal('')
+                  }}
+                >
+                  (More...)
+                </MoreLink>
               </>
             )
           }
@@ -633,14 +672,18 @@ export const PositionsList = () => {
           positionId={selectedPositionId}
         />
       )}
-      {openDisplayConditionsTableModal && (
-        <DisplayConditionsTableModal
-          conditions={conditionsTableModal}
-          isOpen={openDisplayConditionsTableModal}
+      {openDisplayHashesTableModal && (
+        <DisplayHashesTableModal
+          hashes={hashesTableModal}
+          isOpen={openDisplayHashesTableModal}
           onRequestClose={() => {
-            setOpenDisplayConditionsTableModal(false)
-            setConditionsTableModal([])
+            setOpenDisplayHashesTableModal(false)
+            setHashesTableModal([])
+            setTitleTableModal('')
           }}
+          title={titleModal}
+          titleTable={titleTableModal}
+          url={urlTableModal}
         />
       )}
       {isWorking && (
