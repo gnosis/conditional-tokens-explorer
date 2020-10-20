@@ -36,7 +36,7 @@ import { customStyles } from 'theme/tableCustomStyles'
 import { Conditions_conditions } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
 import {
-  AdvancedFilter,
+  AdvancedFilterConditions,
   ConditionSearchOptions,
   ConditionType,
   ConditionTypeAll,
@@ -119,7 +119,7 @@ export const ConditionsList: React.FC = () => {
     setTextToSearch('')
   }, [showFilters])
 
-  const advancedFilters: AdvancedFilter = React.useMemo(() => {
+  const advancedFilters: AdvancedFilterConditions = React.useMemo(() => {
     return {
       ReporterOracle: {
         type: selectedOracleValue,
