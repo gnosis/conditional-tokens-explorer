@@ -1,7 +1,7 @@
 import gql from 'graphql-tag'
 
 import {
-  AdvancedFilter,
+  AdvancedFilterConditions,
   ConditionSearchOptions,
   ConditionType,
   ConditionTypeAll,
@@ -21,7 +21,7 @@ export const DEFAULT_OPTIONS = {
   oracleNotIn: [],
 }
 
-export const DEFAULT_OPTIONS_LIST: AdvancedFilter = {
+export const DEFAULT_OPTIONS_LIST: AdvancedFilterConditions = {
   ReporterOracle: {
     type: OracleFilterOptions.All,
     value: [],
@@ -36,7 +36,7 @@ export const DEFAULT_OPTIONS_LIST: AdvancedFilter = {
   FromCreationDate: null,
   ToCreationDate: null,
   TextToSearch: {
-    type: ConditionSearchOptions.All,
+    type: ConditionSearchOptions.ConditionId,
     value: null,
   },
 }
@@ -63,7 +63,7 @@ const conditionFragment = gql`
     }
   }
 `
-export const buildQueryConditionsList = (advancedFilter: AdvancedFilter = DEFAULT_OPTIONS_LIST) => {
+export const buildQueryConditionsList = (advancedFilter: AdvancedFilterConditions = DEFAULT_OPTIONS_LIST) => {
   const {
     ConditionType: ConditionTypeFilter,
     FromCreationDate,
