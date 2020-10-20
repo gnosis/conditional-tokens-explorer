@@ -204,7 +204,7 @@ export enum ConditionSearchOptions {
   CreatorAddress = 'creatorAddress',
 }
 
-export interface AdvancedFilter {
+export interface AdvancedFilterConditions {
   ReporterOracle: {
     type: OracleFilterOptions
     value: Array<string>
@@ -220,6 +220,27 @@ export interface AdvancedFilter {
   ToCreationDate: Maybe<number>
   TextToSearch: {
     type: ConditionSearchOptions
+    value: Maybe<string>
+  }
+}
+
+export enum PositionSearchOptions {
+  All = 'all',
+  ConditionId = 'conditionId',
+  PositionId = 'positionId',
+  CollateralSymbol = 'collateralSymbol',
+  CollateralAddress = 'collateralAddress',
+}
+
+export interface AdvancedFilterPosition {
+  CollateralValue: {
+    type: Maybe<string>,
+    value: Maybe<string>,
+  },
+  FromCreationDate: Maybe<number>
+  ToCreationDate: Maybe<number>
+  TextToSearch: {
+    type: PositionSearchOptions
     value: Maybe<string>
   }
 }
