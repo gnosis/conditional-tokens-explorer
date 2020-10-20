@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { PositionSearchOptions } from 'util/types'
 
-export const usePositionsSearchOptions = (itemAction: (searchFilter: string) => void) => {
+export const usePositionsSearchOptions = (itemAction: (searchFilter: PositionSearchOptions) => void) => {
   const [items, setItems] = useState<
     Array<{ onClick: () => void; placeholder: string; text: string }>
   >()
