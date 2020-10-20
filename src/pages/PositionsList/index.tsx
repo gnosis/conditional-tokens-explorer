@@ -330,20 +330,13 @@ export const PositionsList = () => {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimals) => {
           const { conditions } = row
+          const conditionId = conditions[0]?.conditionId ?? ''
           if (conditions.length === 1) {
-            return (
-              <Hash
-                href={`/conditions/${conditions[0].conditionId}`}
-                value={conditions[0].conditionId}
-              />
-            )
+            return <Hash href={`/conditions/${conditionId}`} value={conditionId} />
           } else {
             return (
               <>
-                <Hash
-                  href={`/conditions/${conditions[0].conditionId}`}
-                  value={conditions[0].conditionId}
-                />
+                <Hash href={`/conditions/${conditionId}`} value={conditionId} />
                 <MoreLink
                   onClick={() => {
                     const hashes: HashArray[] = conditions.map(
@@ -374,12 +367,13 @@ export const PositionsList = () => {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimals) => {
           const { conditions } = row
+          const oracle = conditions[0]?.oracle ?? ''
           if (conditions.length === 1) {
-            return <Hash value={conditions[0].oracle} />
+            return <Hash value={oracle} />
           } else {
             return (
               <>
-                <Hash value={conditions[0].oracle} />
+                <Hash value={oracle} />
                 <MoreLink
                   onClick={() => {
                     const hashes: HashArray[] = conditions.map(
@@ -410,12 +404,13 @@ export const PositionsList = () => {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimals) => {
           const { conditions } = row
+          const questionId = conditions[0]?.questionId ?? ''
           if (conditions.length === 1) {
-            return <Hash value={conditions[0].questionId} />
+            return <Hash value={questionId} />
           } else {
             return (
               <>
-                <Hash value={conditions[0].questionId} />
+                <Hash value={questionId} />
                 <MoreLink
                   onClick={() => {
                     const hashes: HashArray[] = conditions.map(
