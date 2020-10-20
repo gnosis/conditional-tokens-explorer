@@ -1,11 +1,12 @@
 import moment from 'moment'
-import React from 'react'
+import React, { useRef } from 'react'
 import styled from 'styled-components'
 
 import { ButtonFilterSubmit } from 'components/buttons/ButtonFilterSubmit'
 import { ErrorContainer, Error as ErrorMessage } from 'components/pureStyledComponents/Error'
 import { FilterTitle } from 'components/pureStyledComponents/FilterTitle'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
+import { MAX_DATE, MIN_DATE } from 'config/constants'
 import { getLogger } from 'util/logger'
 
 const Wrapper = styled.div``
@@ -53,6 +54,8 @@ const logger = getLogger('DateFilter')
 
 export const DateFilter: React.FC<Props> = (props) => {
   const { onChangeFrom, onChangeTo, onSubmit, title } = props
+  const toDate = useRef<HTMLInputElement>(null)
+  const fromDate = useRef<HTMLInputElement>(null)
 
   const [from, setFrom] = React.useState<Maybe<number>>(null)
   const [to, setTo] = React.useState<Maybe<number>>(null)
@@ -85,12 +88,30 @@ export const DateFilter: React.FC<Props> = (props) => {
     [onChangeTo]
   )
 
-  const errorMessage = React.useMemo(
-    () => (to && from && to < from ? 'To should be greater than From' : null),
+  const emptyValues = React.useMemo(() => !from && !to, [from, to])
+  const validDates = React.useMemo(() => {
+    if (fromDate && fromDate.current && toDate && toDate.current) {
+      return toDate.current.checkValidity() && fromDate.current.checkValidity()
+    } else {
+      return true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [from, to])
+
+  const fromGreaterThanToError = React.useMemo(
+    () =>
+      to && from && to < from ? <ErrorMessage>To should be greater than From</ErrorMessage> : null,
     [from, to]
   )
-  const emptyValues = React.useMemo(() => !from && !to, [from, to])
-  const submitDisabled = !!errorMessage || emptyValues
+  const datesValidityError = React.useMemo(
+    () =>
+      !validDates ? (
+        <ErrorMessage>{`Invalid date or out of range. Valid dates are from ${MIN_DATE} to ${MAX_DATE}`}</ErrorMessage>
+      ) : null,
+    [validDates]
+  )
+
+  const submitDisabled = !!fromGreaterThanToError || emptyValues || !!datesValidityError
 
   const onSubmitInternal = React.useCallback(() => {
     if ((from || to) && !submitDisabled) {
@@ -119,9 +140,12 @@ export const DateFilter: React.FC<Props> = (props) => {
         <FieldWrapper>
           <Label>From:</Label>
           <Date
+            max={MAX_DATE}
+            min={MIN_DATE}
             name="dateFrom"
             onChange={onChangeFromInternal}
             onKeyUp={onPressEnter}
+            ref={fromDate}
             type="date"
           />
         </FieldWrapper>
@@ -129,13 +153,22 @@ export const DateFilter: React.FC<Props> = (props) => {
       <Row>
         <FieldWrapper>
           <Label>To:</Label>
-          <Date name="dateTo" onChange={onChangeToInternal} onKeyUp={onPressEnter} type="date" />
+          <Date
+            max={MAX_DATE}
+            min={MIN_DATE}
+            name="dateTo"
+            onChange={onChangeToInternal}
+            onKeyUp={onPressEnter}
+            ref={toDate}
+            type="date"
+          />
         </FieldWrapper>
         <ButtonFilterSubmit disabled={submitDisabled} onClick={onSubmitInternal} />
       </Row>
-      {errorMessage && (
+      {(!!datesValidityError || !!fromGreaterThanToError) && (
         <ErrorContainer>
-          <ErrorMessage>{errorMessage}</ErrorMessage>
+          {datesValidityError}
+          {fromGreaterThanToError}
         </ErrorContainer>
       )}
     </Wrapper>
