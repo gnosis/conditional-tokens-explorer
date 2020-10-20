@@ -70,7 +70,6 @@ export const DisplayTablePositions = (props: Props) => {
         cell: (row: PositionWithUserBalanceWithDecimals) => {
           return <Hash externalLink href={`/positions/${row.id}`} value={row.id} />
         },
-        maxWidth: '250px',
         minWidth: '250px',
         name: 'Position Id',
         selector: (row: PositionWithUserBalanceWithDecimals) => row.id,
@@ -88,8 +87,8 @@ export const DisplayTablePositions = (props: Props) => {
             />
           )
         },
-        maxWidth: '150px',
-        minWidth: '150px',
+        maxWidth: '120px',
+        minWidth: '120px',
         name: 'Collateral',
         selector: 'collateralToken',
         sortable: true,
