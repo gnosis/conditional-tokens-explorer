@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 
+import { PositionSearchOptions } from 'util/types'
+
 export const usePositionsSearchOptions = (itemAction: (searchFilter: string) => void) => {
   const [items, setItems] = useState<
     Array<{ onClick: () => void; placeholder: string; text: string }>
@@ -7,48 +9,42 @@ export const usePositionsSearchOptions = (itemAction: (searchFilter: string) => 
 
   useEffect(() => {
     setItems([
+      // TODO not remove this until the TEXT fields will be created in the subgraph. Thegraph doesnt't support OR operator
+      // {
+      //   onClick: () => {
+      //     itemAction('all')
+      //   },
+      //   placeholder:
+      //     'Search by Position Id, Condition Id, Collateral Symbol, Collateral Address, Token Address.',
+      //   text: 'All',
+      // },
       {
         onClick: () => {
-          itemAction('all')
-        },
-        placeholder:
-          'Search by Position Id, Condition Id, Collateral Symbol, Collateral Address, Token Address.',
-        text: 'All',
-      },
-      {
-        onClick: () => {
-          itemAction('positionId')
+          itemAction(PositionSearchOptions.PositionId)
         },
         placeholder: 'Search by Position Id',
         text: 'Position Id',
       },
       {
         onClick: () => {
-          itemAction('conditionId')
+          itemAction(PositionSearchOptions.ConditionId)
         },
         placeholder: 'Search by Condition Id',
         text: 'Condition Id',
       },
       {
         onClick: () => {
-          itemAction('collateralSymbol')
+          itemAction(PositionSearchOptions.CollateralSymbol)
         },
         placeholder: 'Search by Collateral Symbol',
         text: 'Collateral Symbol',
       },
       {
         onClick: () => {
-          itemAction('collateralAddress')
+          itemAction(PositionSearchOptions.CollateralAddress)
         },
         placeholder: 'Search by Collateral Address',
         text: 'Collateral Address',
-      },
-      {
-        onClick: () => {
-          itemAction('tokenAddress')
-        },
-        placeholder: 'Search by Token Address',
-        text: 'Token Address',
       },
     ])
   }, [itemAction])
