@@ -1,6 +1,6 @@
 import { Contract, Signer, ethers } from 'ethers'
 import { Provider, TransactionResponse } from 'ethers/providers'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, toUtf8String } from 'ethers/utils'
 
 import { Token } from 'util/types'
 
@@ -15,13 +15,27 @@ const erc20Abi = [
   'function transfer(address to, uint256 value) public returns (bool)',
 ]
 
+const erc20Bytes32Abi = [
+  'function allowance(address owner, address spender) external view returns (uint256)',
+  'function approve(address spender, uint256 amount) external returns (bool)',
+  'function balanceOf(address owner) external view returns (uint256)',
+  'function symbol() external view returns (bytes32)',
+  'function name() external view returns (string)',
+  'function decimals() external view returns (uint8)',
+  'function transferFrom(address sender, address recipient, uint256 amount) public returns (bool)',
+  'function transfer(address to, uint256 value) public returns (bool)',
+]
+
 class ERC20Service {
   private contract: Contract
+  private contractBytes32: Contract
   constructor(private provider: Provider, private address: string, private signer?: Signer) {
     if (signer) {
       this.contract = new ethers.Contract(address, erc20Abi, provider).connect(signer)
+      this.contractBytes32 = new ethers.Contract(address, erc20Bytes32Abi, provider).connect(signer)
     } else {
       this.contract = new ethers.Contract(address, erc20Abi, provider)
+      this.contractBytes32 = new ethers.Contract(address, erc20Bytes32Abi, provider)
     }
   }
 
@@ -54,7 +68,15 @@ class ERC20Service {
   }
 
   getProfileSummary = async (): Promise<Token> => {
-    const [decimals, symbol] = await Promise.all([this.contract.decimals(), this.contract.symbol()])
+    const decimals = await this.contract.decimals()
+    let symbol = ''
+
+    try {
+      symbol = await this.contract.symbol()
+    } catch (err) {
+      const hexString = await this.contractBytes32.symbol()
+      symbol = toUtf8String(hexString)
+    }
 
     return {
       address: this.contract.address,
