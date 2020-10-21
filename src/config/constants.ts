@@ -129,3 +129,6 @@ export const SINGLE_SELECT_TEMPLATE_ID = 2
 export const MIN_OUTCOMES_ALLOWED = Number(process.env.REACT_APP_MIN_OUTCOMES_ALLOWED || 2)
 
 export const MAX_OUTCOMES_ALLOWED = Number(process.env.REACT_APP_MAX_OUTCOMES_ALLOWED || 256)
+
+export const MAX_DATE = '2030-01-01'
+export const MIN_DATE = '2015-07-30'

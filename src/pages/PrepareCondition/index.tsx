@@ -28,6 +28,7 @@ import {
   ADDRESS_REGEX,
   BYTES_REGEX,
   INTEGER_NUMBER,
+  MAX_DATE,
   MAX_OUTCOMES,
   MAX_OUTCOMES_ALLOWED,
   MIN_OUTCOMES,
@@ -120,6 +121,7 @@ export const PrepareCondition = () => {
     formState: formStateOmenCondition,
     getValues: getValuesOmenCondition,
     register: registerOmenCondition,
+    setError: setErrorOmenCondition,
     setValue: setValueOmenCondition,
     watch: watchOmenCondition,
   } = useForm<OmenConditionType>({
@@ -356,6 +358,8 @@ export const PrepareCondition = () => {
     ]
   )
 
+  const today = React.useMemo(() => moment().format('YYYY-MM-DD'), [])
+
   const fullLoadingActionButton = prepareConditionStatus.isSuccess()
     ? {
         buttonType: ButtonType.primary,
@@ -542,12 +546,18 @@ export const PrepareCondition = () => {
                     <Textfield
                       error={errorsOmenCondition.resolutionDate && true}
                       name="resolutionDate"
-                      onChange={(e) =>
-                        setValueOmenCondition('resolutionDate', e.target.value, true)
-                      }
+                      onChange={(e) => {
+                        if (e.target.checkValidity()) {
+                          setValueOmenCondition('resolutionDate', e.target.value, true)
+                        } else {
+                          setErrorOmenCondition('resolutionDate', 'validity')
+                        }
+                      }}
                       placeholder="MM/DD/YYYY"
                       ref={registerOmenCondition({
                         required: true,
+                        min: today,
+                        max: MAX_DATE,
                       })}
                       type="date"
                     />
@@ -555,6 +565,11 @@ export const PrepareCondition = () => {
                       <ErrorContainer>
                         {errorsOmenCondition.resolutionDate.type === 'required' && (
                           <ErrorMessage>Required field</ErrorMessage>
+                        )}
+                        {['min', 'max', 'validity'].includes(
+                          errorsOmenCondition.resolutionDate.type
+                        ) && (
+                          <ErrorMessage>{`Invalid date or out of range. Valid dates are from today (${today}) to ${MAX_DATE}`}</ErrorMessage>
                         )}
                       </ErrorContainer>
                     )}

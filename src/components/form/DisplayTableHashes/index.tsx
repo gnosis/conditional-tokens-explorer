@@ -4,46 +4,46 @@ import DataTable from 'react-data-table-component'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import { Hash } from 'components/text/Hash'
 import { customStyles } from 'theme/tableCustomStyles'
-import { ConditionIdsArray } from 'util/types'
+import { HashArray } from 'util/types'
 
 interface Props {
-  conditions: Array<ConditionIdsArray>
+  hashes: Array<HashArray>
   callbackOnHistoryPush?: () => void
+  titleTable: string
+  url: string
 }
 
-export const DisplayTableConditions = (props: Props) => {
-  const { callbackOnHistoryPush, conditions } = props
+export const DisplayTableHashes = (props: Props) => {
+  const { callbackOnHistoryPush, hashes, titleTable, url } = props
 
   const getColumns = useCallback(() => {
     return [
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: ConditionIdsArray) => {
+        cell: (row: HashArray) => {
           return (
             <Hash
               externalLink
-              href={`/conditions/${row.conditionId}`}
+              {...(url && { href: `/${url}/${row.hash}` })}
               onClick={() => {
                 if (typeof callbackOnHistoryPush === 'function') callbackOnHistoryPush()
               }}
-              value={row.conditionId}
+              value={row.hash}
             />
           )
         },
-        name: 'Condition Id',
-        selector: 'createTimestamp',
-        sortable: true,
+        name: titleTable,
       },
     ]
-  }, [callbackOnHistoryPush])
+  }, [callbackOnHistoryPush, titleTable, url])
 
   return (
     <DataTable
       className="outerTableWrapper inlineTable"
       columns={getColumns()}
       customStyles={customStyles}
-      data={conditions || []}
-      noDataComponent={<EmptyContentText>No conditions found.</EmptyContentText>}
+      data={hashes || []}
+      noDataComponent={<EmptyContentText>No {titleTable.toLowerCase()} found.</EmptyContentText>}
       noHeader
       pagination
       paginationPerPage={5}

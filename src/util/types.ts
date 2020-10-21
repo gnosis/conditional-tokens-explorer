@@ -176,8 +176,8 @@ export interface TransferOptions {
   positionId: string
 }
 
-export type ConditionIdsArray = {
-  conditionId: string
+export type HashArray = {
+  hash: string
 }
 
 export enum LocalStorageManagement {

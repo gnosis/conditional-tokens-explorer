@@ -3,29 +3,32 @@ import styled from 'styled-components'
 
 import { Button } from 'components/buttons'
 import { Modal, ModalProps } from 'components/common/Modal'
-import { DisplayTableConditions } from 'components/form/DisplayTableConditions'
+import { DisplayTableHashes } from 'components/form/DisplayTableHashes'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
-import { ConditionIdsArray } from 'util/types'
+import { HashArray } from 'util/types'
 
 const ButtonContainerStyled = styled(ButtonContainer)`
   margin-top: 100px;
 `
 
 interface Props extends ModalProps {
-  conditions: Array<ConditionIdsArray>
+  hashes: Array<HashArray>
+  title: string
+  titleTable: string
+  url: string
 }
 
-export const DisplayConditionsTableModal = (props: Props) => {
-  const { conditions, onRequestClose, ...restProps } = props
+export const DisplayHashesTableModal = (props: Props) => {
+  const { hashes, onRequestClose, title, titleTable, url, ...restProps } = props
 
   return (
     <Modal
       onRequestClose={onRequestClose}
       style={{ content: { width: '500px' } }}
-      title={'Conditions'}
+      title={title}
       {...restProps}
     >
-      <DisplayTableConditions conditions={conditions} />
+      <DisplayTableHashes hashes={hashes} titleTable={titleTable} url={url} />
       <ButtonContainerStyled>
         <Button onClick={onRequestClose}>Close</Button>
       </ButtonContainerStyled>

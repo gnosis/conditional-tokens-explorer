@@ -62,6 +62,8 @@ const positionFragment = gql`
     conditionIds
     conditions {
       id
+      oracle
+      questionId
       outcomeSlotCount
     }
   }
