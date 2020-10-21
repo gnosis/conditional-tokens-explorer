@@ -47,7 +47,7 @@ export const useConditionsList = (advancedFilter: AdvancedFilterConditions) => {
   }
 
   const { data, error, loading } = useQuery<Conditions>(query, {
-    variables: variables,
+    variables,
     fetchPolicy: 'no-cache',
   })
 
