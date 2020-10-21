@@ -234,13 +234,14 @@ export enum PositionSearchOptions {
 
 export interface AdvancedFilterPosition {
   CollateralValue: {
-    type: Maybe<string>,
-    value: Maybe<string>,
-  },
+    type: Maybe<string>
+    value: Maybe<string>
+  }
   FromCreationDate: Maybe<number>
   ToCreationDate: Maybe<number>
   TextToSearch: {
     type: PositionSearchOptions
     value: Maybe<string>
   }
+  WrappedCollateral: WrappedCollateralOptions
 }
