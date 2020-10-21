@@ -368,7 +368,12 @@ export const PositionsList = () => {
         cell: (row: PositionWithUserBalanceWithDecimals) => {
           const { conditions } = row
           const oracle = conditions[0]?.oracle ?? ''
-          if (conditions.length === 1) {
+
+          const allOraclesAreEqual = conditions.every(
+            (condition: ConditionInformation) =>
+              condition.oracle.toLowerCase() === oracle.toLowerCase()
+          )
+          if (conditions.length === 1 || allOraclesAreEqual) {
             return <Hash value={oracle} />
           } else {
             return (
@@ -405,7 +410,13 @@ export const PositionsList = () => {
         cell: (row: PositionWithUserBalanceWithDecimals) => {
           const { conditions } = row
           const questionId = conditions[0]?.questionId ?? ''
-          if (conditions.length === 1) {
+
+          const allQuestionIdAreEqual = conditions.every(
+            (condition: ConditionInformation) =>
+              condition.questionId.toLowerCase() === questionId.toLowerCase()
+          )
+
+          if (conditions.length === 1 || allQuestionIdAreEqual) {
             return <Hash value={questionId} />
           } else {
             return (
