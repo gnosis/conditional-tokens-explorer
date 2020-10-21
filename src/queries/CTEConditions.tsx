@@ -63,7 +63,9 @@ const conditionFragment = gql`
     }
   }
 `
-export const buildQueryConditionsList = (advancedFilter: AdvancedFilterConditions = DEFAULT_OPTIONS_LIST) => {
+export const buildQueryConditionsList = (
+  advancedFilter: AdvancedFilterConditions = DEFAULT_OPTIONS_LIST
+) => {
   const {
     ConditionType: ConditionTypeFilter,
     FromCreationDate,
