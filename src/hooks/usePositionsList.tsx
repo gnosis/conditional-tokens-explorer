@@ -8,9 +8,9 @@ import { Position, marshalPositionListData } from 'hooks/utils'
 import { buildQueryPositionsList } from 'queries/CTEPositions'
 import { UserWithPositionsQuery } from 'queries/CTEUsers'
 import { Positions, UserWithPositions } from 'types/generatedGQLForCTE'
+import { Remote } from 'util/remoteData'
 import { formatBigNumber, getTokenSummary } from 'util/tools'
 import { AdvancedFilterPosition, PositionSearchOptions, Token } from 'util/types'
-import { Remote } from 'util/remoteData'
 
 export type UserBalanceWithDecimals = {
   userBalanceERC1155WithDecimals: string
