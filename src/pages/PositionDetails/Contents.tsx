@@ -17,7 +17,7 @@ import {
 } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
 import { Tooltip } from 'components/common/Tooltip'
-import { DisplayConditionsTableModal } from 'components/modals/DisplayConditionsTableModal'
+import { DisplayHashesTableModal } from 'components/modals/DisplayHashesTableModal'
 import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
 import { UnwrapModal } from 'components/modals/UnwrapModal'
 import { WrapModal } from 'components/modals/WrapModal'
@@ -45,7 +45,7 @@ import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import { formatBigNumber, positionString, truncateStringInTheMiddle } from 'util/tools'
 import {
-  ConditionIdsArray,
+  HashArray,
   LocalStorageManagement,
   NetworkIds,
   OutcomeProps,
@@ -128,7 +128,7 @@ const TooltipStyled = styled(Tooltip)`
 interface Props {
   balanceERC1155: BigNumber
   balanceERC20: BigNumber
-  conditions: Array<ConditionIdsArray>
+  conditions: Array<HashArray>
   collateralTokenAddress: string
   position: Position
   refetchBalances: () => void
@@ -456,10 +456,10 @@ export const Contents = (props: Props) => {
             title={conditions.length === 1 ? 'Condition Id' : 'Condition Ids'}
             value={
               conditions.length === 1 ? (
-                <FlexRow>{conditionIdLink(conditions[0].conditionId)}</FlexRow>
+                <FlexRow>{conditionIdLink(conditions[0].hash)}</FlexRow>
               ) : (
                 <FlexRow>
-                  {conditionIdLink(conditions[0].conditionId)}
+                  {conditionIdLink(conditions[0].hash)}
                   <MoreLink onClick={() => setOpenDisplayConditionsTableModal(true)}>
                     (More...)
                   </MoreLink>
@@ -613,10 +613,13 @@ export const Contents = (props: Props) => {
         />
       )}
       {openDisplayConditionsTableModal && conditions.length > 1 && (
-        <DisplayConditionsTableModal
-          conditions={conditions}
+        <DisplayHashesTableModal
+          hashes={conditions}
           isOpen={openDisplayConditionsTableModal}
           onRequestClose={() => setOpenDisplayConditionsTableModal(false)}
+          title="Conditions"
+          titleTable="Condition Id"
+          url="condition"
         />
       )}
       {isWorking && (

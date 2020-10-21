@@ -4,6 +4,47 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL query operation: ConditionsList
+// ====================================================
+
+export interface ConditionsList_conditions_positions_collateralToken {
+  __typename: "CollateralToken";
+  id: string;
+}
+
+export interface ConditionsList_conditions_positions {
+  __typename: "Position";
+  id: string;
+  collateralToken: ConditionsList_conditions_positions_collateralToken;
+}
+
+export interface ConditionsList_conditions {
+  __typename: "Condition";
+  id: string;
+  oracle: any;
+  questionId: any;
+  outcomeSlotCount: number;
+  resolved: boolean;
+  creator: any;
+  payouts: any[] | null;
+  createTimestamp: any;
+  payoutNumerators: any[] | null;
+  payoutDenominator: any | null;
+  resolveTimestamp: any | null;
+  resolveBlockNumber: any | null;
+  positions: ConditionsList_conditions_positions[] | null;
+}
+
+export interface ConditionsList {
+  conditions: ConditionsList_conditions[];
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL query operation: Conditions
 // ====================================================
 
@@ -133,6 +174,8 @@ export interface Positions_positions_collection {
 export interface Positions_positions_conditions {
   __typename: "Condition";
   id: string;
+  oracle: any;
+  questionId: any;
   outcomeSlotCount: number;
 }
 
@@ -202,6 +245,8 @@ export interface GetPosition_position_collection {
 export interface GetPosition_position_conditions {
   __typename: "Condition";
   id: string;
+  oracle: any;
+  questionId: any;
   outcomeSlotCount: number;
 }
 
@@ -275,6 +320,8 @@ export interface GetMultiPositions_positions_collection {
 export interface GetMultiPositions_positions_conditions {
   __typename: "Condition";
   id: string;
+  oracle: any;
+  questionId: any;
   outcomeSlotCount: number;
 }
 
@@ -477,6 +524,8 @@ export interface PositionData_collection {
 export interface PositionData_conditions {
   __typename: "Condition";
   id: string;
+  oracle: any;
+  questionId: any;
   outcomeSlotCount: number;
 }
 

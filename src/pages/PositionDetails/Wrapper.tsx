@@ -37,7 +37,7 @@ export const Wrapper = (props: WrapperProps) => {
 
   const conditions = position?.conditions.map((condition: PositionData_conditions) => {
     return {
-      conditionId: condition.id,
+      hash: condition.id,
     }
   })
 

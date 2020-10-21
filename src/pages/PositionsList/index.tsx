@@ -19,6 +19,7 @@ import { CollateralFilterDropdown } from 'components/filters/CollateralFilterDro
 import { DateFilter } from 'components/filters/DateFilter'
 import { WrappedCollateralFilterDropdown } from 'components/filters/WrappedCollateralFilterDropdown'
 import { Switch } from 'components/form/Switch'
+import { DisplayHashesTableModal } from 'components/modals/DisplayHashesTableModal'
 import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
 import { UnwrapModal } from 'components/modals/UnwrapModal'
 import { WrapModal } from 'components/modals/WrapModal'
@@ -38,11 +39,14 @@ import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Contex
 import { PositionWithUserBalanceWithDecimals, usePositions } from 'hooks'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
+import { ConditionInformation } from 'hooks/utils'
 import { customStyles } from 'theme/tableCustomStyles'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
+import { formatTSSimple } from 'util/tools'
 import {
   CollateralFilterOptions,
+  HashArray,
   LocalStorageManagement,
   Token,
   TransferOptions,
@@ -51,6 +55,19 @@ import {
 
 const DropdownItemLink = styled(NavLink)<DropdownItemProps>`
   ${DropdownItemCSS}
+`
+
+const MoreLink = styled.a`
+  color: ${(props) => props.theme.colors.textColor};
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 0 12px;
+  text-decoration: underline;
+
+  &:hover {
+    text-decoration: none;
+  }
 `
 
 const logger = getLogger('PositionsList')
@@ -81,6 +98,12 @@ export const PositionsList = () => {
   const [isWrapModalOpen, setIsWrapModalOpen] = useState(false)
   const [isUnwrapModalOpen, setIsUnwrapModalOpen] = useState(false)
   const [userBalance, setUserBalance] = useState(new BigNumber(0))
+
+  const [openDisplayHashesTableModal, setOpenDisplayHashesTableModal] = useState(false)
+  const [hashesTableModal, setHashesTableModal] = useState<Array<HashArray>>([])
+  const [titleTableModal, setTitleTableModal] = useState('')
+  const [urlTableModal, setUrlTableModal] = useState('')
+  const [titleModal, setTitleModal] = useState('')
 
   const debouncedHandlerPositionIdToSearch = useDebounceCallback((positionIdToSearch) => {
     setPositionIdToSearch(positionIdToSearch)
@@ -278,8 +301,7 @@ export const PositionsList = () => {
           <Hash href={`/positions/${row.id}`} value={row.id} />
         ),
         name: 'Position Id',
-        selector: 'createTimestamp',
-        sortable: true,
+        sortable: false,
         minWidth: '250px',
       },
       {
@@ -296,6 +318,135 @@ export const PositionsList = () => {
         name: 'Collateral',
         selector: 'collateralTokenSymbol',
         sortable: true,
+      },
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: PositionWithUserBalanceWithDecimals) => formatTSSimple(row.createTimestamp),
+        name: 'Creation Date',
+        selector: 'createTimestamp',
+        sortable: true,
+      },
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: PositionWithUserBalanceWithDecimals) => {
+          const { conditions } = row
+          const conditionId = conditions[0]?.conditionId ?? ''
+          if (conditions.length === 1) {
+            return <Hash href={`/conditions/${conditionId}`} value={conditionId} />
+          } else {
+            return (
+              <>
+                <Hash href={`/conditions/${conditionId}`} value={conditionId} />
+                <MoreLink
+                  onClick={() => {
+                    const hashes: HashArray[] = conditions.map(
+                      (condition: ConditionInformation) => {
+                        return {
+                          hash: condition.conditionId,
+                        }
+                      }
+                    )
+                    setOpenDisplayHashesTableModal(true)
+                    setHashesTableModal(hashes)
+                    setTitleTableModal('Condition Id')
+                    setTitleModal('Conditions')
+                    setUrlTableModal('conditions')
+                  }}
+                >
+                  (More...)
+                </MoreLink>
+              </>
+            )
+          }
+        },
+        name: 'Condition Id',
+        sortable: false,
+        minWidth: '350px',
+      },
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: PositionWithUserBalanceWithDecimals) => {
+          const { conditions } = row
+          const oracle = conditions[0]?.oracle ?? ''
+
+          const allOraclesAreEqual = conditions.every(
+            (condition: ConditionInformation) =>
+              condition.oracle.toLowerCase() === oracle.toLowerCase()
+          )
+          if (conditions.length === 1 || allOraclesAreEqual) {
+            return <Hash value={oracle} />
+          } else {
+            return (
+              <>
+                <Hash value={oracle} />
+                <MoreLink
+                  onClick={() => {
+                    const hashes: HashArray[] = conditions.map(
+                      (condition: ConditionInformation) => {
+                        return {
+                          hash: condition.oracle,
+                        }
+                      }
+                    )
+                    setOpenDisplayHashesTableModal(true)
+                    setHashesTableModal(hashes)
+                    setTitleTableModal('Oracle Id')
+                    setTitleModal('Oracles')
+                    setUrlTableModal('')
+                  }}
+                >
+                  (More...)
+                </MoreLink>
+              </>
+            )
+          }
+        },
+        name: 'Oracle',
+        sortable: false,
+        minWidth: '350px',
+      },
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: PositionWithUserBalanceWithDecimals) => {
+          const { conditions } = row
+          const questionId = conditions[0]?.questionId ?? ''
+
+          const allQuestionIdAreEqual = conditions.every(
+            (condition: ConditionInformation) =>
+              condition.questionId.toLowerCase() === questionId.toLowerCase()
+          )
+
+          if (conditions.length === 1 || allQuestionIdAreEqual) {
+            return <Hash value={questionId} />
+          } else {
+            return (
+              <>
+                <Hash value={questionId} />
+                <MoreLink
+                  onClick={() => {
+                    const hashes: HashArray[] = conditions.map(
+                      (condition: ConditionInformation) => {
+                        return {
+                          hash: condition.questionId,
+                        }
+                      }
+                    )
+                    setOpenDisplayHashesTableModal(true)
+                    setHashesTableModal(hashes)
+                    setTitleTableModal('Question Id')
+                    setTitleModal('Questions')
+                    setUrlTableModal('')
+                  }}
+                >
+                  (More...)
+                </MoreLink>
+              </>
+            )
+          }
+        },
+        name: 'Question Id',
+        sortable: false,
+        minWidth: '350px',
       },
     ]
 
@@ -525,6 +676,20 @@ export const PositionsList = () => {
           onRequestClose={() => setIsTransferOutcomeModalOpen(false)}
           onSubmit={onTransferOutcomeTokens}
           positionId={selectedPositionId}
+        />
+      )}
+      {openDisplayHashesTableModal && (
+        <DisplayHashesTableModal
+          hashes={hashesTableModal}
+          isOpen={openDisplayHashesTableModal}
+          onRequestClose={() => {
+            setOpenDisplayHashesTableModal(false)
+            setHashesTableModal([])
+            setTitleTableModal('')
+          }}
+          title={titleModal}
+          titleTable={titleTableModal}
+          url={urlTableModal}
         />
       )}
       {isWorking && (

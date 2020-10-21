@@ -139,7 +139,7 @@ export const buildQueryConditionsList = (advancedFilter: AdvancedFilter = DEFAUL
   const variablesClause = variablesClauseInternal ? `(${variablesClauseInternal})` : ''
 
   const query = gql`
-      query Conditions ${variablesClause} {
+      query ConditionsList ${variablesClause} {
         conditions(first: 1000 ${whereClause} , orderBy: createTimestamp, orderDirection: desc) {
           ...ConditionData
         }
