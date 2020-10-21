@@ -11,7 +11,7 @@ export const useConditionsSearchOptions = (
 
   useEffect(() => {
     setItems([
-      // TODO not remove this until the TEXT fields will be created in the subgraph
+      // TODO not remove this until the TEXT fields will be created in the subgraph. Thegraph doesnt't support OR operator
       // {
       //   onClick: () => {
       //     itemAction(ConditionSearchOptions.All)

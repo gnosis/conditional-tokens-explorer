@@ -35,15 +35,18 @@ import { IconTypes } from 'components/statusInfo/common'
 import { TableControls } from 'components/table/TableControls'
 import { Hash } from 'components/text/Hash'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { PositionWithUserBalanceWithDecimals, usePositions } from 'hooks'
+import { PositionWithUserBalanceWithDecimals } from 'hooks'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
+import { usePositionsList } from 'hooks/usePositionsList'
 import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import {
+  AdvancedFilterPosition,
   CollateralFilterOptions,
   LocalStorageManagement,
+  PositionSearchOptions,
   Token,
   TransferOptions,
   WrappedCollateralOptions,
@@ -60,14 +63,17 @@ export const PositionsList = () => {
   const history = useHistory()
   const { setValue } = useLocalStorage(LocalStorageManagement.PositionId)
 
-  const [positionIdToSearch, setPositionIdToSearch] = useState<string>('')
-  const [positionIdToShow, setPositionIdToShow] = useState<string>('')
+  const [textToSearch, setTextToSearch] = useState<string>('')
+  const [textToShow, setTextToShow] = useState<string>('')
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [connectedItems, setConnectedItems] = useState<Array<any>>([])
   const [selectedCollateralFilter, setSelectedCollateralFilter] = useState<string>('')
   const [selectedCollateralValue, setSelectedCollateralValue] = useState<string>(
     CollateralFilterOptions.All
   )
+  const [selectedFromCreationDate, setSelectedFromCreationDate] = useState<Maybe<number>>(null)
+  const [selectedToCreationDate, setSelectedToCreationDate] = useState<Maybe<number>>(null)
   const [wrappedCollateral, setWrappedCollateral] = useState<WrappedCollateralOptions>(
     WrappedCollateralOptions.All
   )
@@ -82,32 +88,71 @@ export const PositionsList = () => {
   const [isUnwrapModalOpen, setIsUnwrapModalOpen] = useState(false)
   const [userBalance, setUserBalance] = useState(new BigNumber(0))
 
+  const [searchBy, setSearchBy] = useState<PositionSearchOptions>(PositionSearchOptions.PositionId)
+  const [showFilters, setShowFilters] = useState(false)
+
   const debouncedHandlerPositionIdToSearch = useDebounceCallback((positionIdToSearch) => {
-    setPositionIdToSearch(positionIdToSearch)
+    setTextToSearch(positionIdToSearch)
   }, 500)
 
-  const onChangePositionId = React.useCallback(
+  const onChangeSearch = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.currentTarget
-      setPositionIdToShow(value)
+      setTextToShow(value)
       debouncedHandlerPositionIdToSearch(value)
     },
     [debouncedHandlerPositionIdToSearch]
   )
 
-  const onClearSearch = React.useCallback(() => {
-    setPositionIdToShow('')
+  // Clear the filters
+  useEffect(() => {
+    setSelectedToCreationDate(null)
+    setSelectedFromCreationDate(null)
+    setSearchBy(PositionSearchOptions.PositionId)
+    setTextToSearch('')
+    setSelectedCollateralFilter('')
+    setSelectedCollateralValue(CollateralFilterOptions.All)
+  }, [showFilters])
+
+  const advancedFiltersPosition: AdvancedFilterPosition = useMemo(() => {
+    return {
+      CollateralValue: {
+        type: selectedCollateralValue,
+        value: selectedCollateralFilter,
+      },
+      ToCreationDate: selectedToCreationDate,
+      FromCreationDate: selectedFromCreationDate,
+      TextToSearch: {
+        type: searchBy,
+        value: textToSearch,
+      },
+      WrappedCollateral: wrappedCollateral,
+    }
+  }, [
+    wrappedCollateral,
+    selectedCollateralValue,
+    selectedCollateralFilter,
+    selectedToCreationDate,
+    selectedFromCreationDate,
+    searchBy,
+    textToSearch,
+  ])
+
+  const onClearSearch = useCallback(() => {
+    setTextToShow('')
     debouncedHandlerPositionIdToSearch('')
   }, [debouncedHandlerPositionIdToSearch])
 
-  const { data, error, loading, refetchPositions, refetchUserPositions } = usePositions({
-    collateralFilter: selectedCollateralFilter,
-    collateralValue: selectedCollateralValue,
-    positionId: positionIdToSearch,
-  })
+  const { data, error, loading, refetchPositions, refetchUserPositions } = usePositionsList(
+    advancedFiltersPosition
+  )
 
-  const isLoading = !positionIdToSearch && loading && transfer.isNotAsked()
-  const isSearching = positionIdToSearch && loading
+  const isLoading = useMemo(() => !textToSearch && loading && transfer.isNotAsked(), [
+    textToSearch,
+    loading,
+    transfer,
+  ])
+  const isSearching = useMemo(() => textToSearch && loading, [textToSearch, loading])
 
   const buildMenuForRow = useCallback(
     (row: PositionWithUserBalanceWithDecimals) => {
@@ -382,47 +427,66 @@ export const PositionsList = () => {
     [signer, CTService, connect, refetchUserPositions, refetchPositions]
   )
 
-  const fullLoadingActionButton = transfer.isSuccess()
-    ? {
-        buttonType: ButtonType.primary,
-        text: 'OK',
-        onClick: () => setTransfer(Remote.notAsked<TransferOptions>()),
-      }
-    : transfer.isFailure()
-    ? {
-        buttonType: ButtonType.danger,
-        text: 'Close',
-        onClick: () => setTransfer(Remote.notAsked<TransferOptions>()),
-      }
-    : undefined
+  const fullLoadingActionButton = useMemo(
+    () =>
+      transfer.isSuccess()
+        ? {
+            buttonType: ButtonType.primary,
+            text: 'OK',
+            onClick: () => setTransfer(Remote.notAsked<TransferOptions>()),
+          }
+        : transfer.isFailure()
+        ? {
+            buttonType: ButtonType.danger,
+            text: 'Close',
+            onClick: () => setTransfer(Remote.notAsked<TransferOptions>()),
+          }
+        : undefined,
+    [transfer, setTransfer]
+  )
 
-  const fullLoadingIcon = transfer.isFailure()
-    ? IconTypes.error
-    : transfer.isSuccess()
-    ? IconTypes.ok
-    : IconTypes.spinner
+  const fullLoadingIcon = useMemo(
+    () =>
+      transfer.isFailure()
+        ? IconTypes.error
+        : transfer.isSuccess()
+        ? IconTypes.ok
+        : IconTypes.spinner,
+    [transfer]
+  )
 
-  const fullLoadingMessage = transfer.isFailure()
-    ? transfer.getFailure()
-    : transfer.isLoading()
-    ? 'Working...'
-    : 'All done!'
+  const fullLoadingMessage = useMemo(
+    () =>
+      transfer.isFailure()
+        ? transfer.getFailure()
+        : transfer.isLoading()
+        ? 'Working...'
+        : 'All done!',
+    [transfer]
+  )
 
-  const fullLoadingTitle = transfer.isFailure() ? 'Error' : transactionTitle
+  const fullLoadingTitle = useMemo(() => (transfer.isFailure() ? 'Error' : transactionTitle), [
+    transfer,
+    transactionTitle,
+  ])
 
-  const [searchBy, setSearchBy] = useState('all')
   const dropdownItems = usePositionsSearchOptions(setSearchBy)
 
   logger.log(`Search by ${searchBy}`)
-
-  const [showFilters, setShowFilters] = useState(false)
 
   const toggleShowFilters = useCallback(() => {
     setShowFilters(!showFilters)
   }, [showFilters])
 
-  const showSpinner = (isLoading || isSearching) && !error
-  const isWorking = transfer.isLoading() || transfer.isFailure() || transfer.isSuccess()
+  const showSpinner = useMemo(() => (isLoading || isSearching) && !error, [
+    isLoading,
+    isSearching,
+    error,
+  ])
+  const isWorking = useMemo(
+    () => transfer.isLoading() || transfer.isFailure() || transfer.isSuccess(),
+    [transfer]
+  )
 
   return (
     <>
@@ -431,9 +495,9 @@ export const PositionsList = () => {
         end={
           <SearchField
             dropdownItems={dropdownItems}
-            onChange={onChangePositionId}
+            onChange={onChangeSearch}
             onClear={onClearSearch}
-            value={positionIdToShow}
+            value={textToShow}
           />
         }
         start={<Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />}
@@ -462,14 +526,9 @@ export const PositionsList = () => {
               </SidebarRow>
               <SidebarRow>
                 <DateFilter
-                  onChangeFrom={() => {
-                    console.error('onChangeFrom not yet implemented...')
-                  }}
-                  onChangeTo={() => {
-                    console.error('onChangeTo not yet implemented...')
-                  }}
-                  onSubmit={() => {
-                    console.error('Filter by date not implemented yet...')
+                  onSubmit={(from, to) => {
+                    setSelectedFromCreationDate(from)
+                    setSelectedToCreationDate(to)
                   }}
                   title="Creation Date"
                 />
