@@ -89,7 +89,7 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
 
   React.useEffect(() => {
     setData(Remote.loading())
-    if (positionsData && userData) {
+    if (positionsData) {
       const positionListData = marshalPositionListData(positionsData.positions, userData?.user)
 
       const fetchUserBalanceWithDecimals = async () => {
