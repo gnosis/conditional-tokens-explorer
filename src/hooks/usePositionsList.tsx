@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/react-hooks'
 import { ethers } from 'ethers'
 import lodashUniqBy from 'lodash.uniqby'
-import React from 'react'
+import React, { useState } from 'react'
 
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { Position, marshalPositionListData } from 'hooks/utils'
@@ -10,6 +10,7 @@ import { UserWithPositionsQuery } from 'queries/CTEUsers'
 import { Positions, UserWithPositions } from 'types/generatedGQLForCTE'
 import { formatBigNumber, getTokenSummary } from 'util/tools'
 import { AdvancedFilterPosition, PositionSearchOptions, Token } from 'util/types'
+import { Remote } from 'util/remoteData'
 
 export type UserBalanceWithDecimals = {
   userBalanceERC1155WithDecimals: string
@@ -35,11 +36,10 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
     provider,
   } = useWeb3ConnectedOrInfura()
 
-  const [data, setData] = React.useState<Maybe<PositionWithUserBalanceWithDecimals[]>>(null)
-  const [address, setAddress] = React.useState<Maybe<string>>(null)
-  const [isLoadingUserBalanceWithDecimals, setIsLoadingUserBalanceWithDecimals] = React.useState(
-    true
+  const [data, setData] = useState<Remote<Maybe<PositionWithUserBalanceWithDecimals[]>>>(
+    Remote.notAsked<Maybe<PositionWithUserBalanceWithDecimals[]>>()
   )
+  const [address, setAddress] = React.useState<Maybe<string>>(null)
 
   const { CollateralValue, FromCreationDate, TextToSearch, ToCreationDate } = advancedFilter
 
@@ -67,19 +67,13 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
     variables['collateralSearch'] = CollateralValue?.value.toLowerCase()
   }
 
-  const {
-    data: positionsData,
-    error: positionsError,
-    loading: positionsLoading,
-    refetch: refetchPositions,
-  } = useQuery<Positions>(query, { variables })
+  const { data: positionsData, error: positionsError, refetch: refetchPositions } = useQuery<
+    Positions
+  >(query, { fetchPolicy: 'no-cache', variables })
 
-  const {
-    data: userData,
-    error: userError,
-    loading: userLoading,
-    refetch: refetchUserPositions,
-  } = useQuery<UserWithPositions>(UserWithPositionsQuery, {
+  const { data: userData, error: userError, refetch: refetchUserPositions } = useQuery<
+    UserWithPositions
+  >(UserWithPositionsQuery, {
     skip: !address,
     fetchPolicy: 'no-cache',
     variables: {
@@ -94,11 +88,9 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
   }, [status, addressFromWallet])
 
   React.useEffect(() => {
-    let cancelled = false
-    if (positionsData) {
+    setData(Remote.loading())
+    if (positionsData && userData) {
       const positionListData = marshalPositionListData(positionsData.positions, userData?.user)
-
-      setIsLoadingUserBalanceWithDecimals(true)
 
       const fetchUserBalanceWithDecimals = async () => {
         const uniqueCollateralTokens = lodashUniqBy(positionListData, 'collateralToken')
@@ -176,25 +168,20 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
             collateralTokenERC20: wrappedTokenFound.length && wrappedTokenFound[0],
           } as PositionWithUserBalanceWithDecimals
         })
-        if (!cancelled) {
-          setData(positionListDataEnhanced)
-          setIsLoadingUserBalanceWithDecimals(false)
-        }
+
+        setData(Remote.success(positionListDataEnhanced))
       }
 
       fetchUserBalanceWithDecimals()
-    } else {
-      setIsLoadingUserBalanceWithDecimals(false)
-    }
-    return () => {
-      cancelled = true
     }
   }, [positionsData, userData, networkConfig, provider])
 
+  const error = React.useMemo(() => positionsError || userError, [positionsError, userError])
+
   return {
-    data,
-    error: positionsError || userError,
-    loading: positionsLoading || userLoading || isLoadingUserBalanceWithDecimals,
+    data: data.isSuccess() && data.get(),
+    error,
+    loading: !data.isSuccess(),
     refetchPositions,
     refetchUserPositions,
   }
