@@ -230,6 +230,7 @@ export enum PositionSearchOptions {
   PositionId = 'positionId',
   CollateralSymbol = 'collateralSymbol',
   CollateralAddress = 'collateralAddress',
+  WrappedCollateralAddress = 'wrappedCollateralAddress',
 }
 
 export interface AdvancedFilterPosition {

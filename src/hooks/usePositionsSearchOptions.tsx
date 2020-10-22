@@ -48,6 +48,13 @@ export const usePositionsSearchOptions = (
         placeholder: 'Search by Collateral Address',
         text: 'Collateral Address',
       },
+      {
+        onClick: () => {
+          itemAction(PositionSearchOptions.WrappedCollateralAddress)
+        },
+        placeholder: 'Search by Wrapped Collateral Address',
+        text: 'Wrapped Collateral Address',
+      },
     ])
   }, [itemAction])
 

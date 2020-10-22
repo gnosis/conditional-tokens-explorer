@@ -54,7 +54,8 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
   }
   if (
     (TextToSearch.type === PositionSearchOptions.PositionId ||
-      TextToSearch.type === PositionSearchOptions.CollateralAddress) &&
+      TextToSearch.type === PositionSearchOptions.CollateralAddress ||
+      TextToSearch.type === PositionSearchOptions.WrappedCollateralAddress) &&
     TextToSearch.value
   ) {
     variables['textToSearch'] = TextToSearch?.value.toLowerCase()

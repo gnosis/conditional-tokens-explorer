@@ -94,6 +94,9 @@ export const buildQueryPositionsList = (
     TextToSearch.value
       ? 'collateralToken: $textToSearch'
       : '',
+    TextToSearch.type === PositionSearchOptions.WrappedCollateralAddress && TextToSearch.value
+      ? 'wrappedTokenAddress_contains: $textToSearch'
+      : '',
     WrappedCollateral === WrappedCollateralOptions.Yes ? 'wrappedTokenAddress_not: null' : '',
     WrappedCollateral === WrappedCollateralOptions.No ? 'wrappedTokenAddress: null' : '',
   ]
@@ -116,6 +119,9 @@ export const buildQueryPositionsList = (
       TextToSearch.type === PositionSearchOptions.CollateralAddress) &&
     TextToSearch.value
       ? '$textToSearch: ID!'
+      : '',
+    TextToSearch.type === PositionSearchOptions.WrappedCollateralAddress && TextToSearch.value
+      ? '$textToSearch: String'
       : '',
   ]
     .filter((s) => s.length)
