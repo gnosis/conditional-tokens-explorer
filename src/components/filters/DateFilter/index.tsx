@@ -66,7 +66,7 @@ export const DateFilter: React.FC<Props> = (props) => {
         onChangeFrom(event)
       }
 
-      const fromDateMoment = moment(event.currentTarget.value).utc()
+      const fromDateMoment = moment(event.currentTarget.value).utc().startOf('day')
       const fromTimestamp = fromDateMoment.unix()
 
       setFrom(fromTimestamp)
@@ -80,7 +80,7 @@ export const DateFilter: React.FC<Props> = (props) => {
         onChangeTo(event)
       }
 
-      const toDateMoment = moment(event.currentTarget.value).utc().add(24, 'hours')
+      const toDateMoment = moment(event.currentTarget.value).utc().endOf('day')
       const toTimestamp = toDateMoment.unix()
 
       setTo(toTimestamp)
