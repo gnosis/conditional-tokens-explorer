@@ -1,6 +1,11 @@
 import gql from 'graphql-tag'
 
-import { AdvancedFilterPosition, PositionSearchOptions, WrappedCollateralOptions, CollateralFilterOptions } from 'util/types'
+import {
+  AdvancedFilterPosition,
+  CollateralFilterOptions,
+  PositionSearchOptions,
+  WrappedCollateralOptions,
+} from 'util/types'
 
 export interface PositionsListType {
   positionId?: string
