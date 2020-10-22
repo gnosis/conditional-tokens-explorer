@@ -158,6 +158,7 @@ export enum StatusOptions {
 
 export enum CollateralFilterOptions {
   All = 'all',
+  Custom = 'custom',
 }
 
 export type PositionIdsArray = {
@@ -204,7 +205,7 @@ export enum ConditionSearchOptions {
   CreatorAddress = 'creatorAddress',
 }
 
-export interface AdvancedFilter {
+export interface AdvancedFilterConditions {
   ReporterOracle: {
     type: OracleFilterOptions
     value: Array<string>
@@ -222,4 +223,27 @@ export interface AdvancedFilter {
     type: ConditionSearchOptions
     value: Maybe<string>
   }
+}
+
+export enum PositionSearchOptions {
+  All = 'all',
+  ConditionId = 'conditionId',
+  PositionId = 'positionId',
+  CollateralSymbol = 'collateralSymbol',
+  CollateralAddress = 'collateralAddress',
+  WrappedCollateralAddress = 'wrappedCollateralAddress',
+}
+
+export interface AdvancedFilterPosition {
+  CollateralValue: {
+    type: Maybe<string>
+    value: Maybe<string[]>
+  }
+  FromCreationDate: Maybe<number>
+  ToCreationDate: Maybe<number>
+  TextToSearch: {
+    type: PositionSearchOptions
+    value: Maybe<string>
+  }
+  WrappedCollateral: WrappedCollateralOptions
 }

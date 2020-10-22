@@ -9,7 +9,7 @@ import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { CollateralFilterOptions, Token } from 'util/types'
 
 interface Props {
-  onClick: (symbol: string, address: string) => void
+  onClick: (symbol: string, address: Maybe<string[]>) => void
   value: string
 }
 
@@ -21,7 +21,7 @@ export const CollateralFilterDropdown = ({ onClick, value }: Props) => {
           return {
             content: <TokenIcon token={token} />,
             onClick: () => {
-              onClick(token.symbol, token.address)
+              onClick(token.symbol, [token.address.toLowerCase()])
             },
             value: token.symbol,
           }
@@ -33,9 +33,19 @@ export const CollateralFilterDropdown = ({ onClick, value }: Props) => {
     {
       content: 'All',
       onClick: () => {
-        onClick(CollateralFilterOptions.All, '')
+        onClick(CollateralFilterOptions.All, null)
       },
       value: CollateralFilterOptions.All,
+    },
+    {
+      content: 'Custom',
+      onClick: () => {
+        onClick(
+          CollateralFilterOptions.Custom,
+          networkConfig.getTokens().map((token: Token) => token.address.toLowerCase())
+        )
+      },
+      value: CollateralFilterOptions.Custom,
     },
     ...tokensList,
   ]

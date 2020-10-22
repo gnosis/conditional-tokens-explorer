@@ -425,6 +425,22 @@ export class NetworkConfig {
     }
   }
 
+  getTokenFromName(tokenName: string): Token {
+    const tokens = networks[this.networkId].tokens
+
+    for (const token of tokens) {
+      if (token.symbol.toLowerCase() === tokenName.toLowerCase()) {
+        return token
+      }
+    }
+
+    return {
+      symbol: 'unknown',
+      address: '',
+      decimals: 18,
+    }
+  }
+
   getRealitioTimeout(): number {
     return networks[this.networkId].realitioTimeout
   }
