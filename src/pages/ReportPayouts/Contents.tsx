@@ -73,7 +73,7 @@ export const Contents: React.FC = () => {
     // Validate exist at least one payout
     const { payouts } = data
     try {
-      if (status === Web3ContextStatus.Connected) {
+      if (status === Web3ContextStatus.Connected && questionId) {
         setTransactionStatus(Remote.loading())
 
         const payoutsNumbered = payouts.map((payout: BigNumber) => payout.toNumber())
