@@ -1,6 +1,6 @@
 import gql from 'graphql-tag'
 
-import { AdvancedFilterPosition, PositionSearchOptions, WrappedCollateralOptions } from 'util/types'
+import { AdvancedFilterPosition, PositionSearchOptions, WrappedCollateralOptions, CollateralFilterOptions } from 'util/types'
 
 export interface PositionsListType {
   positionId?: string
@@ -82,7 +82,14 @@ export const buildQueryPositionsList = (
   const whereClauseInternal = [
     ToCreationDate ? 'createTimestamp_lte: $toCreationDate' : '',
     FromCreationDate ? 'createTimestamp_gte: $fromCreationDate' : '',
-    CollateralValue.value ? 'collateralToken: $collateralSearch' : '',
+    CollateralValue.type !== CollateralFilterOptions.All &&
+    CollateralValue.type !== CollateralFilterOptions.Custom &&
+    CollateralValue.value
+      ? 'collateralTokenAddress_in: $collateralSearch'
+      : '',
+    CollateralValue.type === CollateralFilterOptions.Custom && CollateralValue.value
+      ? 'collateralTokenAddress_not_in: $collateralSearch'
+      : '',
     TextToSearch.type === PositionSearchOptions.PositionId && TextToSearch.value
       ? 'id: $textToSearch'
       : '',
@@ -108,7 +115,7 @@ export const buildQueryPositionsList = (
   const variablesClauseInternal = [
     ToCreationDate ? '$toCreationDate: BigInt' : '',
     FromCreationDate ? '$fromCreationDate: BigInt' : '',
-    CollateralValue.value ? '$collateralSearch: ID' : '',
+    CollateralValue.value ? '$collateralSearch: [String]' : '',
     TextToSearch.type === PositionSearchOptions.PositionId && TextToSearch.value
       ? '$textToSearch: ID'
       : '',

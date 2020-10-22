@@ -65,7 +65,7 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
     variables['textToSearch'] = token?.address.toLowerCase()
   }
   if (CollateralValue.value) {
-    variables['collateralSearch'] = CollateralValue?.value.toLowerCase()
+    variables['collateralSearch'] = CollateralValue?.value
   }
 
   const { data: positionsData, error: positionsError, refetch: refetchPositions } = useQuery<

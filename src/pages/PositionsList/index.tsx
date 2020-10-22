@@ -85,7 +85,7 @@ export const PositionsList = () => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [connectedItems, setConnectedItems] = useState<Array<any>>([])
-  const [selectedCollateralFilter, setSelectedCollateralFilter] = useState<string>('')
+  const [selectedCollateralFilter, setSelectedCollateralFilter] = useState<Maybe<string[]>>(null)
   const [selectedCollateralValue, setSelectedCollateralValue] = useState<string>(
     CollateralFilterOptions.All
   )
@@ -133,8 +133,9 @@ export const PositionsList = () => {
     setSelectedFromCreationDate(null)
     setSearchBy(PositionSearchOptions.PositionId)
     setTextToSearch('')
-    setSelectedCollateralFilter('')
+    setSelectedCollateralFilter(null)
     setSelectedCollateralValue(CollateralFilterOptions.All)
+    setWrappedCollateral(WrappedCollateralOptions.All)
   }, [showFilters])
 
   const advancedFiltersPosition: AdvancedFilterPosition = useMemo(() => {
@@ -660,7 +661,7 @@ export const PositionsList = () => {
             <Sidebar>
               <SidebarRow>
                 <CollateralFilterDropdown
-                  onClick={(symbol: string, address: string) => {
+                  onClick={(symbol: string, address: Maybe<string[]>) => {
                     setSelectedCollateralFilter(address)
                     setSelectedCollateralValue(symbol)
                   }}

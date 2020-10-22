@@ -158,6 +158,7 @@ export enum StatusOptions {
 
 export enum CollateralFilterOptions {
   All = 'all',
+  Custom = 'custom',
 }
 
 export type PositionIdsArray = {
@@ -236,7 +237,7 @@ export enum PositionSearchOptions {
 export interface AdvancedFilterPosition {
   CollateralValue: {
     type: Maybe<string>
-    value: Maybe<string>
+    value: Maybe<string[]>
   }
   FromCreationDate: Maybe<number>
   ToCreationDate: Maybe<number>
