@@ -5,6 +5,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
+import { ButtonCopy } from 'components/buttons'
 import { Button } from 'components/buttons/Button'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CenteredCard } from 'components/common/CenteredCard'
@@ -254,6 +255,8 @@ export const PrepareCondition = () => {
 
     const checkConditionExist = async () => {
       if (conditionIdPreview) {
+        setCheckForExistingCondition(Remote.loading())
+
         const conditionExists = await CTService.conditionExists(conditionIdPreview)
         if (!cancelled) {
           setErrorConditionAlreadyExist(conditionExists)
@@ -264,7 +267,6 @@ export const PrepareCondition = () => {
       }
     }
 
-    setCheckForExistingCondition(Remote.loading())
     checkConditionExist()
 
     return () => {
@@ -411,6 +413,15 @@ export const PrepareCondition = () => {
       )
   const fullLoadingTitle = prepareConditionStatus.isFailure() ? 'Error' : 'Prepare Condition'
 
+  const fullLoadingCheckCondititionMessage = checkForExistingCondition.isLoading()
+    ? 'Checking if condition exists'
+    : 'All done'
+
+  const fullLoadingCheckConditionIcon = checkForExistingCondition.isFailure()
+    ? IconTypes.error
+    : prepareConditionStatus.isSuccess()
+    ? IconTypes.ok
+    : IconTypes.spinner
   return (
     <>
       <PageTitle>Prepare Condition</PageTitle>
@@ -489,15 +500,7 @@ export const PrepareCondition = () => {
               )}
             </>
           )}
-          {isConditionAlreadyExist && (
-            <StatusInfoInline status={StatusInfoType.warning}>
-              Condition{' '}
-              <Link href={`#/conditions/${conditionIdPreview}`} target="_blank">
-                {conditionIdPreview}
-              </Link>{' '}
-              already exist. Please use another question ID or change the number of outcomes.
-            </StatusInfoInline>
-          )}
+
           {conditionType === ConditionType.omen && (
             <>
               <AddOutcome
@@ -724,10 +727,29 @@ export const PrepareCondition = () => {
           </ErrorContainer>
         )}
 
-        {conditionIdPreview && !submitDisabled && (
-          <StatusInfoInline status={StatusInfoType.success}>
-            Condition preview: {conditionIdPreview}
-          </StatusInfoInline>
+        {checkForExistingCondition.isLoading() ? (
+          <FullLoading
+            icon={fullLoadingCheckConditionIcon}
+            message={fullLoadingCheckCondititionMessage}
+            title={fullLoadingTitle}
+          />
+        ) : conditionIdPreview ? (
+          isConditionAlreadyExist ? (
+            <StatusInfoInline status={StatusInfoType.warning} title="Duplicated Condition">
+              Condition{' '}
+              <Hash href={`#/conditions/${conditionIdPreview}`} value={conditionIdPreview}></Hash>
+              already exists. Please use another question ID or change the number of outcomes.
+            </StatusInfoInline>
+          ) : (
+            !submitDisabled && (
+              <StatusInfoInline status={StatusInfoType.success} title="Condition Id Preview">
+                {conditionIdPreview}
+                <ButtonCopy value={conditionIdPreview} />
+              </StatusInfoInline>
+            )
+          )
+        ) : (
+          <></>
         )}
 
         <ButtonContainer>
