@@ -37,11 +37,15 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
   } = useWeb3ConnectedOrInfura()
 
   const [data, setData] = useState<Remote<Maybe<PositionWithUserBalanceWithDecimals[]>>>(
-    Remote.notAsked<Maybe<PositionWithUserBalanceWithDecimals[]>>()
+    Remote.loading()
   )
   const [address, setAddress] = React.useState<Maybe<string>>(null)
 
   const { CollateralValue, FromCreationDate, TextToSearch, ToCreationDate } = advancedFilter
+
+  React.useEffect(() => {
+    setData(Remote.loading())
+  }, [advancedFilter])
 
   const query = buildQueryPositionsList(advancedFilter)
 
@@ -68,9 +72,12 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
     variables['collateralSearch'] = CollateralValue?.value
   }
 
-  const { data: positionsData, error: positionsError, refetch: refetchPositions } = useQuery<
-    Positions
-  >(query, { fetchPolicy: 'no-cache', variables })
+  const {
+    data: positionsData,
+    error: positionsError,
+    loading: loadingPositions,
+    refetch: refetchPositions,
+  } = useQuery<Positions>(query, { fetchPolicy: 'no-cache', variables })
 
   const { data: userData, error: userError, refetch: refetchUserPositions } = useQuery<
     UserWithPositions
@@ -90,7 +97,8 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
 
   React.useEffect(() => {
     setData(Remote.loading())
-    if (positionsData) {
+    // The use of loadingPositions act as a blocker when the useQuery is executing again
+    if (positionsData && !loadingPositions) {
       const positionListData = marshalPositionListData(positionsData.positions, userData?.user)
 
       const fetchUserBalanceWithDecimals = async () => {
@@ -172,17 +180,16 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
 
         setData(Remote.success(positionListDataEnhanced))
       }
-
       fetchUserBalanceWithDecimals()
     }
-  }, [positionsData, userData, networkConfig, provider])
+  }, [loadingPositions, positionsData, userData, networkConfig, provider])
 
   const error = React.useMemo(() => positionsError || userError, [positionsError, userError])
 
   return {
     data: data.isSuccess() && data.get(),
     error,
-    loading: !data.isSuccess(),
+    loading: data.isLoading(),
     refetchPositions,
     refetchUserPositions,
   }

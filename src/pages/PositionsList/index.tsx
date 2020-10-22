@@ -624,8 +624,6 @@ export const PositionsList = () => {
 
   const dropdownItems = usePositionsSearchOptions(setSearchBy)
 
-  logger.log(`Search by ${searchBy}`)
-
   const toggleShowFilters = useCallback(() => {
     setShowFilters(!showFilters)
   }, [showFilters])
