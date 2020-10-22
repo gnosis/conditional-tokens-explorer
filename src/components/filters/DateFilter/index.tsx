@@ -90,13 +90,13 @@ export const DateFilter: React.FC<Props> = (props) => {
 
   const emptyValues = React.useMemo(() => !from && !to, [from, to])
   const validDates = React.useMemo(() => {
-    if (fromDate && fromDate.current && toDate && toDate.current) {
+    if (from && to && fromDate && fromDate.current && toDate && toDate.current) {
       return toDate.current.checkValidity() && fromDate.current.checkValidity()
     } else {
       return true
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [from, to])
+  }, [from, to, fromDate, toDate])
 
   const fromGreaterThanToError = React.useMemo(
     () =>
