@@ -16,6 +16,8 @@ import { UsdcIcon } from 'components/common/TokenIcon/img/UsdcIcon'
 import { UsdtIcon } from 'components/common/TokenIcon/img/UsdtIcon'
 import { WEthIcon } from 'components/common/TokenIcon/img/WEthIcon'
 import { ZrxIcon } from 'components/common/TokenIcon/img/ZrxIcon'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { Remote } from 'util/remoteData'
 import { Token } from 'util/types'
 
 const ICON_DIMENSIONS = '20px'
@@ -113,14 +115,6 @@ const currenciesData: CurrencyData[] = [
   },
 ]
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getTokenData = (symbol: string): Maybe<CurrencyData> => {
-  const currenciesDataFiltered = currenciesData.filter(
-    (item) => item.symbol.toUpperCase() === symbol.toUpperCase()
-  )
-  return currenciesDataFiltered.length > 0 ? currenciesDataFiltered[0] : null
-}
-
 interface Props {
   token: Token
   onClick?: () => void
@@ -129,54 +123,52 @@ interface Props {
 export const TokenIcon: React.FC<Props> = (props) => {
   const { onClick, token, ...restProps } = props
   const { address, symbol } = token
-  const [isTokenChecked, setIsTokenChecked] = React.useState<Maybe<boolean>>(null)
-  const [isTokenImageExist, setIsTokenImageExist] = React.useState<boolean>(false)
 
-  const currencyData = getTokenData(symbol)
+  const { networkConfig } = useWeb3ConnectedOrInfura()
+
+  const [data, setData] = React.useState<Remote<boolean>>(Remote.notAsked<boolean>())
+
+  const currencyData = React.useMemo(() => {
+    const currenciesDataFiltered = currenciesData.filter(
+      (item) => item.symbol.toUpperCase() === symbol.toUpperCase()
+    )
+    return currenciesDataFiltered.length > 0 ? currenciesDataFiltered[0] : null
+  }, [symbol])
 
   // Only exist for the mainnet, not for rinkeby
-  const customImageUrl = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${address}/logo.png`
+  const customImageUrl = React.useMemo(
+    () =>
+      `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${address}/logo.png`,
+    [address]
+  )
 
   React.useEffect(() => {
-    let cancelled = false
-
     const CheckTokenAvailability = async () => {
       try {
         const result = await fetch(customImageUrl, { method: 'HEAD' })
-        if (!cancelled) setIsTokenImageExist(result.ok)
+        setData(Remote.success(result.ok))
       } catch (err) {
-        if (!cancelled) setIsTokenImageExist(false)
+        setData(Remote.success(false))
       }
-      if (!cancelled) setIsTokenChecked(true)
     }
 
-    if (!currencyData) {
+    if (!currencyData && networkConfig.networkId === 1) {
       CheckTokenAvailability()
-    } else {
-      if (!cancelled) setIsTokenChecked(true)
     }
-
-    return () => {
-      cancelled = true
-    }
-  }, [currencyData, customImageUrl])
+  }, [currencyData, customImageUrl, networkConfig.networkId])
 
   return (
-    <>
-      {isTokenChecked !== null ? (
-        <Wrapper onClick={onClick} {...restProps}>
-          {currencyData ? (
-            <Icon>{currencyData.icon}</Icon>
-          ) : isTokenImageExist ? (
-            <CustomIcon src={customImageUrl} />
-          ) : (
-            <CustomIconWrapper>
-              <Blockies scale={2} seed={symbol} size={10} />
-            </CustomIconWrapper>
-          )}
-          <Symbol>{symbol}</Symbol>
-        </Wrapper>
-      ) : null}
-    </>
+    <Wrapper onClick={onClick} {...restProps}>
+      {currencyData ? (
+        <Icon>{currencyData.icon}</Icon>
+      ) : data.isSuccess() && data.get() ? (
+        <CustomIcon src={customImageUrl} />
+      ) : (
+        <CustomIconWrapper>
+          <Blockies scale={2} seed={symbol} size={10} />
+        </CustomIconWrapper>
+      )}
+      <Symbol>{symbol}</Symbol>
+    </Wrapper>
   )
 }
