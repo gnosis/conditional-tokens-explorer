@@ -53,15 +53,7 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
   const variables: { [k: string]: any } = {}
   if (FromCreationDate) variables['fromCreationDate'] = FromCreationDate
   if (ToCreationDate) variables['toCreationDate'] = ToCreationDate
-  if (TextToSearch.type === PositionSearchOptions.ConditionId && TextToSearch.value) {
-    variables['textToSearch'] = [TextToSearch?.value.toLowerCase()]
-  }
-  if (
-    (TextToSearch.type === PositionSearchOptions.PositionId ||
-      TextToSearch.type === PositionSearchOptions.CollateralAddress ||
-      TextToSearch.type === PositionSearchOptions.WrappedCollateralAddress) &&
-    TextToSearch.value
-  ) {
+  if (TextToSearch.type !== PositionSearchOptions.CollateralSymbol && TextToSearch.value) {
     variables['textToSearch'] = TextToSearch?.value.toLowerCase()
   }
   if (TextToSearch.type === PositionSearchOptions.CollateralSymbol && TextToSearch.value) {

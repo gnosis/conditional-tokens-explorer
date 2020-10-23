@@ -92,16 +92,16 @@ export const buildQueryConditionsList = (
     ConditionTypeFilter.type === ConditionType.omen ? 'oracle: $conditionType' : '',
     ConditionTypeFilter.type === ConditionType.custom ? 'oracle_not: $conditionType' : '',
     TextToSearch.type === ConditionSearchOptions.ConditionId && TextToSearch.value
-      ? 'id: $textToSearch'
+      ? 'conditionId_contains: $textToSearch'
       : '',
     TextToSearch.type === ConditionSearchOptions.QuestionId && TextToSearch.value
-      ? 'questionId: $textToSearch'
+      ? 'questionId_contains: $textToSearch'
       : '',
     TextToSearch.type === ConditionSearchOptions.OracleAddress && TextToSearch.value
-      ? 'oracle: $textToSearch'
+      ? 'oracle_contains: $textToSearch'
       : '',
     TextToSearch.type === ConditionSearchOptions.CreatorAddress && TextToSearch.value
-      ? 'creator: $textToSearch'
+      ? 'creator_contains: $textToSearch'
       : '',
   ]
     .filter((s) => s.length)
@@ -125,15 +125,7 @@ export const buildQueryConditionsList = (
     ConditionTypeFilter.type === ConditionType.custom
       ? '$conditionType: Bytes'
       : '',
-    TextToSearch.type === ConditionSearchOptions.ConditionId && TextToSearch.value
-      ? '$textToSearch: ID'
-      : '',
-    (TextToSearch.type === ConditionSearchOptions.QuestionId ||
-      TextToSearch.type === ConditionSearchOptions.OracleAddress ||
-      TextToSearch.type === ConditionSearchOptions.CreatorAddress) &&
-    TextToSearch.value
-      ? '$textToSearch: Bytes'
-      : '',
+    TextToSearch.value ? '$textToSearch: String' : '',
   ]
     .filter((s) => s.length)
     .join(',')
