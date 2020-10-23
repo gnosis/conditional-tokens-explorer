@@ -82,6 +82,7 @@ export const PositionsList = () => {
 
   const [textToSearch, setTextToSearch] = useState<string>('')
   const [textToShow, setTextToShow] = useState<string>('')
+  const [resetPagination, setResetPagination] = React.useState<boolean>(false)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [connectedItems, setConnectedItems] = useState<Array<any>>([])
@@ -129,16 +130,20 @@ export const PositionsList = () => {
 
   // Clear the filters
   useEffect(() => {
-    setSelectedToCreationDate(null)
-    setSelectedFromCreationDate(null)
-    setSearchBy(PositionSearchOptions.PositionId)
-    setTextToSearch('')
-    setSelectedCollateralFilter(null)
-    setSelectedCollateralValue(CollateralFilterOptions.All)
-    setWrappedCollateral(WrappedCollateralOptions.All)
+    if (!showFilters) {
+      setResetPagination(!resetPagination)
+      setSelectedToCreationDate(null)
+      setSelectedFromCreationDate(null)
+      setSearchBy(PositionSearchOptions.PositionId)
+      setTextToSearch('')
+      setSelectedCollateralFilter(null)
+      setSelectedCollateralValue(CollateralFilterOptions.All)
+      setWrappedCollateral(WrappedCollateralOptions.All)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showFilters])
 
-  const advancedFiltersPosition: AdvancedFilterPosition = useMemo(() => {
+  const advancedFilters: AdvancedFilterPosition = useMemo(() => {
     return {
       CollateralValue: {
         type: selectedCollateralValue,
@@ -168,7 +173,7 @@ export const PositionsList = () => {
   }, [debouncedHandlerPositionIdToSearch])
 
   const { data, error, loading, refetchPositions, refetchUserPositions } = usePositionsList(
-    advancedFiltersPosition
+    advancedFilters
   )
 
   const isLoading = useMemo(() => !textToSearch && loading && transfer.isNotAsked(), [
@@ -638,6 +643,27 @@ export const PositionsList = () => {
     [transfer]
   )
 
+  React.useEffect(() => {
+    if (
+      textToSearch !== '' ||
+      wrappedCollateral !== WrappedCollateralOptions.All ||
+      selectedCollateralValue !== CollateralFilterOptions.All ||
+      selectedCollateralFilter ||
+      selectedToCreationDate ||
+      selectedFromCreationDate
+    ) {
+      setResetPagination(!resetPagination)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    textToSearch,
+    wrappedCollateral,
+    selectedCollateralValue,
+    selectedCollateralFilter,
+    selectedToCreationDate,
+    selectedFromCreationDate,
+  ])
+
   return (
     <>
       <PageTitle>Positions</PageTitle>
@@ -701,6 +727,7 @@ export const PositionsList = () => {
             noHeader
             onRowClicked={handleRowClick}
             pagination
+            paginationResetDefaultPage={resetPagination}
             responsive
           />
         </TwoColumnsCollapsibleLayout>
