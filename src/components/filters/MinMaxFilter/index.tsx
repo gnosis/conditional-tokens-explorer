@@ -96,7 +96,7 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
     if ((min || max) && !submitDisabled) onSubmit(min, max)
   }, [min, max, submitDisabled, onSubmit])
 
-  const onPressEnter = React.useCallback(
+  const onKeyUp = React.useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter') {
         onSubmitInternal()
@@ -104,6 +104,12 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
     },
     [onSubmitInternal]
   )
+
+  const onKeyPress = React.useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === '.' || e.key === '-') {
+      e.preventDefault()
+    }
+  }, [])
 
   return (
     <Wrapper>
@@ -115,7 +121,8 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
             min={MIN_OUTCOMES_ALLOWED}
             name="min"
             onChange={onChangeMinInternal}
-            onKeyUp={onPressEnter}
+            onKeyPress={onKeyPress}
+            onKeyUp={onKeyUp}
             placeholder="Min..."
             type="number"
           />
@@ -125,7 +132,8 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
             max={MAX_OUTCOMES_ALLOWED}
             name="max"
             onChange={onChangeMaxInternal}
-            onKeyUp={onPressEnter}
+            onKeyPress={onKeyPress}
+            onKeyUp={onKeyUp}
             placeholder="Max..."
             type="number"
           />
