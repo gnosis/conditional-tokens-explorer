@@ -21,11 +21,11 @@ export interface ConditionsList_conditions_positions {
 export interface ConditionsList_conditions {
   __typename: "Condition";
   id: string;
-  oracle: any;
-  questionId: any;
+  oracle: string;
+  questionId: string;
   outcomeSlotCount: number;
   resolved: boolean;
-  creator: any;
+  creator: string;
   payouts: any[] | null;
   createTimestamp: any;
   payoutNumerators: any[] | null;
@@ -62,11 +62,11 @@ export interface Conditions_conditions_positions {
 export interface Conditions_conditions {
   __typename: "Condition";
   id: string;
-  oracle: any;
-  questionId: any;
+  oracle: string;
+  questionId: string;
   outcomeSlotCount: number;
   resolved: boolean;
-  creator: any;
+  creator: string;
   payouts: any[] | null;
   createTimestamp: any;
   payoutNumerators: any[] | null;
@@ -103,11 +103,11 @@ export interface GetCondition_condition_positions {
 export interface GetCondition_condition {
   __typename: "Condition";
   id: string;
-  oracle: any;
-  questionId: any;
+  oracle: string;
+  questionId: string;
   outcomeSlotCount: number;
   resolved: boolean;
-  creator: any;
+  creator: string;
   payouts: any[] | null;
   createTimestamp: any;
   payoutNumerators: any[] | null;
@@ -147,11 +147,11 @@ export interface Positions_positions_wrappedToken {
 export interface Positions_positions_collection_conditions {
   __typename: "Condition";
   id: string;
-  oracle: any;
-  questionId: any;
+  oracle: string;
+  questionId: string;
   outcomeSlotCount: number;
   resolved: boolean;
-  creator: any;
+  creator: string;
   payouts: any[] | null;
   payoutNumerators: any[] | null;
   payoutDenominator: any | null;
@@ -174,8 +174,8 @@ export interface Positions_positions_collection {
 export interface Positions_positions_conditions {
   __typename: "Condition";
   id: string;
-  oracle: any;
-  questionId: any;
+  oracle: string;
+  questionId: string;
   outcomeSlotCount: number;
 }
 
@@ -218,11 +218,11 @@ export interface GetPosition_position_wrappedToken {
 export interface GetPosition_position_collection_conditions {
   __typename: "Condition";
   id: string;
-  oracle: any;
-  questionId: any;
+  oracle: string;
+  questionId: string;
   outcomeSlotCount: number;
   resolved: boolean;
-  creator: any;
+  creator: string;
   payouts: any[] | null;
   payoutNumerators: any[] | null;
   payoutDenominator: any | null;
@@ -245,8 +245,8 @@ export interface GetPosition_position_collection {
 export interface GetPosition_position_conditions {
   __typename: "Condition";
   id: string;
-  oracle: any;
-  questionId: any;
+  oracle: string;
+  questionId: string;
   outcomeSlotCount: number;
 }
 
@@ -293,11 +293,11 @@ export interface GetMultiPositions_positions_wrappedToken {
 export interface GetMultiPositions_positions_collection_conditions {
   __typename: "Condition";
   id: string;
-  oracle: any;
-  questionId: any;
+  oracle: string;
+  questionId: string;
   outcomeSlotCount: number;
   resolved: boolean;
-  creator: any;
+  creator: string;
   payouts: any[] | null;
   payoutNumerators: any[] | null;
   payoutDenominator: any | null;
@@ -320,8 +320,8 @@ export interface GetMultiPositions_positions_collection {
 export interface GetMultiPositions_positions_conditions {
   __typename: "Condition";
   id: string;
-  oracle: any;
-  questionId: any;
+  oracle: string;
+  questionId: string;
   outcomeSlotCount: number;
 }
 
@@ -461,11 +461,11 @@ export interface ConditionData_positions {
 export interface ConditionData {
   __typename: "Condition";
   id: string;
-  oracle: any;
-  questionId: any;
+  oracle: string;
+  questionId: string;
   outcomeSlotCount: number;
   resolved: boolean;
-  creator: any;
+  creator: string;
   payouts: any[] | null;
   createTimestamp: any;
   payoutNumerators: any[] | null;
@@ -497,11 +497,11 @@ export interface PositionData_wrappedToken {
 export interface PositionData_collection_conditions {
   __typename: "Condition";
   id: string;
-  oracle: any;
-  questionId: any;
+  oracle: string;
+  questionId: string;
   outcomeSlotCount: number;
   resolved: boolean;
-  creator: any;
+  creator: string;
   payouts: any[] | null;
   payoutNumerators: any[] | null;
   payoutDenominator: any | null;
@@ -524,8 +524,8 @@ export interface PositionData_collection {
 export interface PositionData_conditions {
   __typename: "Condition";
   id: string;
-  oracle: any;
-  questionId: any;
+  oracle: string;
+  questionId: string;
   outcomeSlotCount: number;
 }
 

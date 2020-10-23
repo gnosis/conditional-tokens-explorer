@@ -16,6 +16,7 @@ import {
 import { SearchField } from 'components/search/SearchField'
 import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { SpinnerSize } from 'components/statusInfo/common'
 import { TableControls } from 'components/table/TableControls'
 import { FormatHash } from 'components/text/FormatHash'
 import { TitleValue } from 'components/text/TitleValue'
@@ -175,7 +176,7 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
           data={showSpinner ? [] : conditionList.length ? conditionList : []}
           noDataComponent={
             showSpinner ? (
-              <InlineLoading size="30px" />
+              <InlineLoading size={SpinnerSize.small} />
             ) : (
               <EmptyContentText>No conditions found.</EmptyContentText>
             )

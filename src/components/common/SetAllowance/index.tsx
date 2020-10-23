@@ -5,6 +5,7 @@ import { Button } from 'components/buttons/Button'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { StatusInfoInline, StatusInfoType } from 'components/statusInfo/StatusInfoInline'
+import { SpinnerSize } from 'components/statusInfo/common'
 
 const Wrapper = styled.div`
   align-items: center;
@@ -72,7 +73,7 @@ export const SetAllowance = (props: Props) => {
   ) : (
     <Wrapper>
       {fetching ? (
-        <InlineLoading size="30px" />
+        <InlineLoading size={SpinnerSize.small} />
       ) : (
         <>
           <Description>

@@ -13,6 +13,7 @@ import {
 } from 'components/pureStyledComponents/StripedList'
 import { TitleControl } from 'components/pureStyledComponents/TitleControl'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { SpinnerSize } from 'components/statusInfo/common'
 import { TitleValue } from 'components/text/TitleValue'
 import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
@@ -201,7 +202,7 @@ export const SelectPositions = ({
                 ) : (
                   <StripedListEmpty>
                     {isLoading && errors.length === 0 ? (
-                      <InlineLoading size="30px" />
+                      <InlineLoading size={SpinnerSize.small} />
                     ) : (
                       'No positions.'
                     )}

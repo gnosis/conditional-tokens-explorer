@@ -48,7 +48,7 @@ export const TextfieldFetchableData: React.FC<Props> = (props) => {
       {isFetching && (
         <SpinnerWrapper>
           <Text>Fetching…</Text>
-          <Spinner height="36px" width="22px" />
+          <Spinner size="36px" />
         </SpinnerWrapper>
       )}
     </Wrapper>

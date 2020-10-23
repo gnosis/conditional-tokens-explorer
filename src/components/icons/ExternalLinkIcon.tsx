@@ -7,12 +7,6 @@ const Wrapper = styled.svg`
   .fill {
     fill: ${(props) => props.theme.colors.mediumGrey};
   }
-
-  &:hover {
-    .fill {
-      fill: ${(props) => props.theme.colors.primary};
-    }
-  }
 `
 
 export const ExternalLinkIcon: React.FC<{ className?: string }> = (props) => (

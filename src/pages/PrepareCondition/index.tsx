@@ -5,6 +5,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
+import { ButtonCopy } from 'components/buttons'
 import { Button } from 'components/buttons/Button'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CenteredCard } from 'components/common/CenteredCard'
@@ -50,6 +51,11 @@ const Link = styled.a`
   &:hover {
     text-decoration: none;
   }
+`
+
+const ButtonCopyStyled = styled(ButtonCopy)`
+  position: relative;
+  top: 1px;
 `
 
 interface CustomConditionType {
@@ -143,6 +149,7 @@ export const PrepareCondition = () => {
   const [error, setError] = React.useState<Maybe<Error>>(null)
   const [isConditionAlreadyExist, setErrorConditionAlreadyExist] = React.useState<boolean>(false)
   const [isQuestionAlreadyExist, setErrorQuestionAlreadyExist] = React.useState<boolean>(false)
+  const [conditionIdPreview, setConditionIdPreview] = React.useState<Maybe<string>>(null)
   const [conditionType, setConditionType] = React.useState<ConditionType>(ConditionType.custom)
   const [outcomes, setOutcomes] = React.useState<Array<string>>([])
   const [outcome, setOutcome] = React.useState<string>('')
@@ -177,19 +184,19 @@ export const PrepareCondition = () => {
   }
 
   React.useEffect(() => {
-    const checkConditionExist = async () => {
-      setCheckForExistingCondition(Remote.loading())
+    const getConditionIdPreview = async () => {
       setErrorQuestionAlreadyExist(false)
       setErrorConditionAlreadyExist(false)
+      setConditionIdPreview(null)
 
       try {
-        let conditionExists = false
-        let conditionIdToUpdate: Maybe<string> = null
         if (questionId && oracleCustomCondition && outcomesSlotCount) {
-          conditionIdToUpdate = ConditionalTokensService.getConditionId(
-            questionId,
-            oracleCustomCondition,
-            outcomesSlotCount
+          setConditionIdPreview(
+            ConditionalTokensService.getConditionId(
+              questionId,
+              oracleCustomCondition,
+              outcomesSlotCount
+            )
           )
         }
 
@@ -213,10 +220,12 @@ export const PrepareCondition = () => {
               signerAddress: address,
             }
             const questionId = await RtioService.askQuestionConstant(questionOptions)
-            conditionIdToUpdate = ConditionalTokensService.getConditionId(
-              questionId,
-              oracleOmenCondition + '',
-              outcomes.length
+            setConditionIdPreview(
+              ConditionalTokensService.getConditionId(
+                questionId,
+                oracleOmenCondition + '',
+                outcomes.length
+              )
             )
           }
         } catch (err) {
@@ -224,21 +233,12 @@ export const PrepareCondition = () => {
           logger.error(err)
         }
 
-        logger.log(`Condition ID: ${conditionIdToUpdate}`)
-        if (conditionIdToUpdate) {
-          conditionExists = await CTService.conditionExists(conditionIdToUpdate)
-        }
-
-        setErrorConditionAlreadyExist(conditionExists)
-
         setError(null)
       } catch (err) {
         setError(err.message)
       }
-
-      setCheckForExistingCondition(Remote.success('Done'))
     }
-    checkConditionExist()
+    getConditionIdPreview()
   }, [
     outcomes,
     RtioService,
@@ -254,6 +254,30 @@ export const PrepareCondition = () => {
     resolutionDate,
     arbitrator,
   ])
+
+  React.useEffect(() => {
+    let cancelled = false
+
+    const checkConditionExist = async () => {
+      if (conditionIdPreview) {
+        setCheckForExistingCondition(Remote.loading())
+
+        const conditionExists = await CTService.conditionExists(conditionIdPreview)
+        if (!cancelled) {
+          setErrorConditionAlreadyExist(conditionExists)
+          setCheckForExistingCondition(Remote.success('Done'))
+
+          logger.log(`Condition ID: ${conditionIdPreview}`)
+        }
+      }
+    }
+
+    checkConditionExist()
+
+    return () => {
+      cancelled = true
+    }
+  }, [CTService, conditionIdPreview])
 
   const isOutcomesFromOmenConditionInvalid = React.useMemo(
     () =>
@@ -394,6 +418,37 @@ export const PrepareCondition = () => {
       )
   const fullLoadingTitle = prepareConditionStatus.isFailure() ? 'Error' : 'Prepare Condition'
 
+  const newCustomConditionStatusInfo = checkForExistingCondition.isLoading()
+    ? {
+        title: 'Checking existing conditions...',
+        status: StatusInfoType.working,
+        contents: undefined,
+      }
+    : conditionIdPreview && isConditionAlreadyExist
+    ? {
+        title: 'Duplicated Condition',
+        status: StatusInfoType.warning,
+        contents: (
+          <>
+            Condition{' '}
+            <Hash href={`#/conditions/${conditionIdPreview}`} value={conditionIdPreview}></Hash>{' '}
+            already exists. Please use another question ID or change the number of outcomes.
+          </>
+        ),
+      }
+    : !submitDisabled
+    ? {
+        title: 'Condition Id Preview',
+        status: StatusInfoType.success,
+        contents: (
+          <>
+            {conditionIdPreview}
+            <ButtonCopyStyled value={conditionIdPreview} />
+          </>
+        ),
+      }
+    : undefined
+
   return (
     <>
       <PageTitle>Prepare Condition</PageTitle>
@@ -471,12 +526,6 @@ export const PrepareCondition = () => {
                 </StatusInfoInline>
               )}
             </>
-          )}
-          {isConditionAlreadyExist && (
-            <StatusInfoInline status={StatusInfoType.warning}>
-              Condition already exist. Please use another question ID or change the number of
-              outcomes.
-            </StatusInfoInline>
           )}
           {conditionType === ConditionType.omen && (
             <>
@@ -702,6 +751,14 @@ export const PrepareCondition = () => {
           <ErrorContainer>
             <ErrorMessage>{error.message}</ErrorMessage>
           </ErrorContainer>
+        )}
+        {newCustomConditionStatusInfo && (
+          <StatusInfoInline
+            status={newCustomConditionStatusInfo.status}
+            title={newCustomConditionStatusInfo.title}
+          >
+            {newCustomConditionStatusInfo.contents}
+          </StatusInfoInline>
         )}
         <ButtonContainer>
           <Button disabled={submitDisabled} onClick={prepareCondition}>

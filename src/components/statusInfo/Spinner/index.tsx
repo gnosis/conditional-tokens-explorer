@@ -2,6 +2,7 @@ import React, { HTMLAttributes } from 'react'
 import styled, { keyframes } from 'styled-components'
 
 import { SpinnerSVG } from 'components/statusInfo/Spinner/img/SpinnerSVG'
+import { SpinnerSize } from 'components/statusInfo/common'
 
 const rotate = keyframes`
   from {
@@ -12,12 +13,12 @@ const rotate = keyframes`
   }
 `
 
-const Wrapper = styled.div<{ height: string | undefined; width: string | undefined }>`
+const Wrapper = styled.div<{ size?: SpinnerSize | string | undefined }>`
   animation: ${rotate} 2s linear infinite;
   flex-grow: 0;
   flex-shrink: 0;
-  height: ${(props) => props.height};
-  width: ${(props) => props.width};
+  height: ${(props) => props.size};
+  width: ${(props) => props.size};
 
   svg {
     height: 100%;
@@ -26,20 +27,18 @@ const Wrapper = styled.div<{ height: string | undefined; width: string | undefin
 `
 
 Wrapper.defaultProps = {
-  height: '48px',
-  width: '48px',
+  size: SpinnerSize.regular,
 }
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  height?: string | undefined
-  width?: string | undefined
+  size?: SpinnerSize | string | undefined
 }
 
 export const Spinner: React.FC<Props> = (props: Props) => {
-  const { height, width, ...restProps } = props
+  const { size, ...restProps } = props
 
   return (
-    <Wrapper height={height} width={width} {...restProps}>
+    <Wrapper size={size} {...restProps}>
       <SpinnerSVG />
     </Wrapper>
   )

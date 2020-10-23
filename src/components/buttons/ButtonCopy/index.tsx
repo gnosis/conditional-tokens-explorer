@@ -9,7 +9,7 @@ const Wrapper = styled.button<{ light?: boolean }>`
   border: none;
   cursor: pointer;
   height: 15px;
-  margin: 0 0 0 12px;
+  margin: 0 0 0 8px;
   outline: none;
   padding: 0;
   width: 13px;
@@ -27,11 +27,7 @@ const Wrapper = styled.button<{ light?: boolean }>`
   }
 
   &:hover {
-    svg {
-      .fill {
-        fill: ${(props) => props.theme.colors.primary};
-      }
-    }
+    filter: brightness(50%);
   }
 
   &[disabled],
@@ -51,7 +47,7 @@ export const ButtonCopy: React.FC<ButtonCopyProps> = (props) => {
 
   return (
     <CopyToClipboard text={value}>
-      <Wrapper light={light} {...restProps}>
+      <Wrapper className="buttonCopy" light={light} {...restProps}>
         <CopyIcon />
       </Wrapper>
     </CopyToClipboard>
