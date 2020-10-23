@@ -37,8 +37,9 @@ export const CollateralFilterDropdown = ({ onClick, value }: Props) => {
       },
       value: CollateralFilterOptions.All,
     },
+    ...tokensList,
     {
-      content: 'Custom',
+      content: 'Custom Token',
       onClick: () => {
         onClick(
           CollateralFilterOptions.Custom,
@@ -47,7 +48,6 @@ export const CollateralFilterDropdown = ({ onClick, value }: Props) => {
       },
       value: CollateralFilterOptions.Custom,
     },
-    ...tokensList,
   ]
 
   return (
