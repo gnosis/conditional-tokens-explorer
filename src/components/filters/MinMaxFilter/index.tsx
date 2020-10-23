@@ -5,6 +5,7 @@ import { ButtonFilterSubmit } from 'components/buttons/ButtonFilterSubmit'
 import { ErrorContainer, Error as ErrorMessage } from 'components/pureStyledComponents/Error'
 import { FilterTitle } from 'components/pureStyledComponents/FilterTitle'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
+import { MAX_OUTCOMES_ALLOWED, MIN_OUTCOMES_ALLOWED } from 'config/constants'
 
 const Wrapper = styled.div``
 
@@ -110,6 +111,7 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
       <Row>
         <FieldsWrapper>
           <TextFieldStyled
+            min={MIN_OUTCOMES_ALLOWED}
             name="min"
             onChange={onChangeMinInternal}
             onKeyUp={onPressEnter}
@@ -118,6 +120,7 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
           />
           <Dash />
           <TextFieldStyled
+            max={MAX_OUTCOMES_ALLOWED}
             name="max"
             onChange={onChangeMaxInternal}
             onKeyUp={onPressEnter}
