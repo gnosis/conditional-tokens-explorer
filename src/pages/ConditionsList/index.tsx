@@ -60,6 +60,7 @@ export const ConditionsList: React.FC = () => {
 
   const [textToSearch, setTextToSearch] = React.useState<string>('')
   const [textToShow, setTextToShow] = React.useState<string>('')
+  const [resetPagination, setResetPagination] = React.useState<boolean>(false)
 
   const [selectedOracleFilter, setSelectedOracleFilter] = React.useState<string[]>([])
   const [selectedOracleValue, setSelectedOracleValue] = React.useState<OracleFilterOptions>(
@@ -107,17 +108,21 @@ export const ConditionsList: React.FC = () => {
 
   // Clear the filters
   React.useEffect(() => {
-    setSelectedOracleValue(OracleFilterOptions.All)
-    setSelectedOracleFilter([])
-    setSelectedConditionTypeValue(ConditionTypeAll.all)
-    setSelectedConditionTypeFilter(null)
-    setSelectedStatus(StatusOptions.All)
-    setSelectedMinOutcomes(null)
-    setSelectedMaxOutcomes(null)
-    setSelectedToCreationDate(null)
-    setSelectedFromCreationDate(null)
-    setSearchBy(ConditionSearchOptions.ConditionId)
-    setTextToSearch('')
+    if (!showFilters) {
+      setResetPagination(!resetPagination)
+      setSelectedOracleValue(OracleFilterOptions.All)
+      setSelectedOracleFilter([])
+      setSelectedConditionTypeValue(ConditionTypeAll.all)
+      setSelectedConditionTypeFilter(null)
+      setSelectedStatus(StatusOptions.All)
+      setSelectedMinOutcomes(null)
+      setSelectedMaxOutcomes(null)
+      setSelectedToCreationDate(null)
+      setSelectedFromCreationDate(null)
+      setSearchBy(ConditionSearchOptions.ConditionId)
+      setTextToSearch('')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showFilters])
 
   const advancedFilters: AdvancedFilterConditions = React.useMemo(() => {
@@ -329,6 +334,35 @@ export const ConditionsList: React.FC = () => {
     [error]
   )
 
+  React.useEffect(() => {
+    if (
+      textToSearch !== '' ||
+      selectedOracleValue !== OracleFilterOptions.All ||
+      selectedOracleFilter.length !== 0 ||
+      selectedConditionTypeValue !== ConditionTypeAll.all ||
+      selectedConditionTypeFilter ||
+      selectedStatus !== StatusOptions.All ||
+      selectedMinOutcomes ||
+      selectedMaxOutcomes ||
+      selectedToCreationDate ||
+      selectedFromCreationDate
+    ) {
+      setResetPagination(!resetPagination)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    textToSearch,
+    selectedOracleValue,
+    selectedOracleFilter,
+    selectedConditionTypeValue,
+    selectedConditionTypeFilter,
+    selectedStatus,
+    selectedMinOutcomes,
+    selectedMaxOutcomes,
+    selectedToCreationDate,
+    selectedFromCreationDate,
+  ])
+
   return (
     <>
       <PageTitle>Conditions</PageTitle>
@@ -353,6 +387,7 @@ export const ConditionsList: React.FC = () => {
                   onClick={(value: OracleFilterOptions, filter: string[]) => {
                     setSelectedOracleFilter(filter)
                     setSelectedOracleValue(value)
+                    setResetPagination(!resetPagination)
                   }}
                   value={selectedOracleValue}
                 />
@@ -413,6 +448,7 @@ export const ConditionsList: React.FC = () => {
             noHeader
             onRowClicked={handleRowClick}
             pagination
+            paginationResetDefaultPage={resetPagination}
             responsive
           />
         </TwoColumnsCollapsibleLayout>
