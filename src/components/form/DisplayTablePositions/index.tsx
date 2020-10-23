@@ -5,6 +5,7 @@ import { useHistory } from 'react-router-dom'
 import { TokenIcon } from 'components/common/TokenIcon'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { SpinnerSize } from 'components/statusInfo/common'
 import { FormatHash } from 'components/text/FormatHash'
 import { Hash } from 'components/text/Hash'
 import { PositionWithUserBalanceWithDecimals } from 'hooks'
@@ -119,7 +120,7 @@ export const DisplayTablePositions = (props: Props) => {
       data={isLoading ? [] : positions.length ? positions : []}
       noDataComponent={
         isLoading ? (
-          <InlineLoading size="30px" />
+          <InlineLoading size={SpinnerSize.small} />
         ) : (
           <EmptyContentText>No positions found.</EmptyContentText>
         )

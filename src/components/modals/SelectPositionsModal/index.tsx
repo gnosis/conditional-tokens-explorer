@@ -12,6 +12,7 @@ import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentTe
 import { SearchField } from 'components/search/SearchField'
 import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { SpinnerSize } from 'components/statusInfo/common'
 import { TableControls } from 'components/table/TableControls'
 import { FormatHash } from 'components/text/FormatHash'
 import { TitleValue } from 'components/text/TitleValue'
@@ -260,7 +261,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
           data={showSpinner ? [] : positionList.length ? positionList : []}
           noDataComponent={
             showSpinner ? (
-              <InlineLoading size="30px" />
+              <InlineLoading size={SpinnerSize.small} />
             ) : (
               <EmptyContentText>{`No positions ${
                 showOnlyPositionsWithBalance && data && data.length ? ' with balance' : ''

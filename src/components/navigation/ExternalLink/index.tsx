@@ -9,6 +9,10 @@ const Wrapper = styled.a`
   justify-content: center;
   margin-left: 8px;
   text-decoration: none;
+
+  &:hover {
+    filter: brightness(50%);
+  }
 `
 
 interface Props {
@@ -16,10 +20,10 @@ interface Props {
 }
 
 export const ExternalLink: React.FC<Props> = (props) => {
-  const { href } = props
+  const { href, ...restProps } = props
 
   return (
-    <Wrapper href={href} target="_blank">
+    <Wrapper href={href} target="_blank" {...restProps}>
       <ExternalLinkIcon />
     </Wrapper>
   )

@@ -9,7 +9,7 @@ import { truncateStringInTheMiddle } from 'util/tools'
 
 const Wrapper = styled.span`
   align-items: center;
-  display: flex;
+  display: inline-flex;
   flex-grow: 1;
   flex-wrap: nowrap;
   white-space: nowrap;
@@ -26,6 +26,16 @@ const Text = styled.span`
 
 const Link = styled(NavLink)`
   ${TextCSS}
+`
+
+const ButtonCopyStyled = styled(ButtonCopy)`
+  position: relative;
+  top: 1px;
+`
+
+const ExternalLinkStyled = styled(ExternalLink)`
+  position: relative;
+  top: 1px;
 `
 
 interface Props {
@@ -52,9 +62,9 @@ export const Hash: React.FC<Props> = (props) => {
           <FormatHash hash={shownValue} />
         </Text>
       )}
-      <ButtonCopy light value={value} />
+      <ButtonCopyStyled light value={value} />
       {externalLink && (
-        <ExternalLink
+        <ExternalLinkStyled
           href={`${window.location.protocol}//${window.location.hostname}${port}/#${href}`}
         />
       )}

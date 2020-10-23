@@ -53,6 +53,11 @@ const Link = styled.a`
   }
 `
 
+const ButtonCopyStyled = styled(ButtonCopy)`
+  position: relative;
+  top: 1px;
+`
+
 interface CustomConditionType {
   questionId: string
   outcomesSlotCount: Maybe<number>
@@ -413,15 +418,37 @@ export const PrepareCondition = () => {
       )
   const fullLoadingTitle = prepareConditionStatus.isFailure() ? 'Error' : 'Prepare Condition'
 
-  const fullLoadingCheckCondititionMessage = checkForExistingCondition.isLoading()
-    ? 'Checking if condition exists'
-    : 'All done'
+  const newCustomConditionStatusInfo = checkForExistingCondition.isLoading()
+    ? {
+        title: 'Checking existing conditions...',
+        status: StatusInfoType.working,
+        contents: undefined,
+      }
+    : conditionIdPreview && isConditionAlreadyExist
+    ? {
+        title: 'Duplicated Condition',
+        status: StatusInfoType.warning,
+        contents: (
+          <>
+            Condition{' '}
+            <Hash href={`#/conditions/${conditionIdPreview}`} value={conditionIdPreview}></Hash>{' '}
+            already exists. Please use another question ID or change the number of outcomes.
+          </>
+        ),
+      }
+    : !submitDisabled
+    ? {
+        title: 'Condition Id Preview',
+        status: StatusInfoType.success,
+        contents: (
+          <>
+            {conditionIdPreview}
+            <ButtonCopyStyled value={conditionIdPreview} />
+          </>
+        ),
+      }
+    : undefined
 
-  const fullLoadingCheckConditionIcon = checkForExistingCondition.isFailure()
-    ? IconTypes.error
-    : prepareConditionStatus.isSuccess()
-    ? IconTypes.ok
-    : IconTypes.spinner
   return (
     <>
       <PageTitle>Prepare Condition</PageTitle>
@@ -500,7 +527,6 @@ export const PrepareCondition = () => {
               )}
             </>
           )}
-
           {conditionType === ConditionType.omen && (
             <>
               <AddOutcome
@@ -726,32 +752,14 @@ export const PrepareCondition = () => {
             <ErrorMessage>{error.message}</ErrorMessage>
           </ErrorContainer>
         )}
-
-        {checkForExistingCondition.isLoading() ? (
-          <FullLoading
-            icon={fullLoadingCheckConditionIcon}
-            message={fullLoadingCheckCondititionMessage}
-            title={fullLoadingTitle}
-          />
-        ) : conditionIdPreview ? (
-          isConditionAlreadyExist ? (
-            <StatusInfoInline status={StatusInfoType.warning} title="Duplicated Condition">
-              Condition{' '}
-              <Hash href={`#/conditions/${conditionIdPreview}`} value={conditionIdPreview}></Hash>
-              already exists. Please use another question ID or change the number of outcomes.
-            </StatusInfoInline>
-          ) : (
-            !submitDisabled && (
-              <StatusInfoInline status={StatusInfoType.success} title="Condition Id Preview">
-                {conditionIdPreview}
-                <ButtonCopy value={conditionIdPreview} />
-              </StatusInfoInline>
-            )
-          )
-        ) : (
-          <></>
+        {newCustomConditionStatusInfo && (
+          <StatusInfoInline
+            status={newCustomConditionStatusInfo.status}
+            title={newCustomConditionStatusInfo.title}
+          >
+            {newCustomConditionStatusInfo.contents}
+          </StatusInfoInline>
         )}
-
         <ButtonContainer>
           <Button disabled={submitDisabled} onClick={prepareCondition}>
             Prepare
