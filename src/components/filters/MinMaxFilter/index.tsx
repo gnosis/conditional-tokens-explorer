@@ -111,6 +111,7 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
       <Row>
         <FieldsWrapper>
           <TextFieldStyled
+            autoComplete="off"
             min={MIN_OUTCOMES_ALLOWED}
             name="min"
             onChange={onChangeMinInternal}
@@ -120,6 +121,7 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
           />
           <Dash />
           <TextFieldStyled
+            autoComplete="off"
             max={MAX_OUTCOMES_ALLOWED}
             name="max"
             onChange={onChangeMaxInternal}

@@ -471,6 +471,7 @@ export const PrepareCondition = () => {
               value={
                 <>
                   <Textfield
+                    autoComplete="off"
                     error={errorsCustomCondition.questionId && true}
                     name="questionId"
                     onChange={(e) => setValueCustomCondition('questionId', e.target.value, true)}
@@ -499,6 +500,7 @@ export const PrepareCondition = () => {
                 value={
                   <>
                     <Textfield
+                      autoComplete="off"
                       error={errorsOmenCondition.questionTitle && true}
                       name="questionTitle"
                       onChange={(e) => setValueOmenCondition('questionTitle', e.target.value, true)}
@@ -668,6 +670,7 @@ export const PrepareCondition = () => {
                 value={
                   <>
                     <Textfield
+                      autoComplete="off"
                       error={errorsOmenCondition.oracle && true}
                       name="oracle"
                       onChange={(e) => setValueOmenCondition('oracle', e.target.value, true)}
@@ -708,6 +711,7 @@ export const PrepareCondition = () => {
               value={
                 <>
                   <Textfield
+                    autoComplete="off"
                     error={errorsCustomCondition.oracle && true}
                     name="oracle"
                     onChange={(e) => setValueCustomCondition('oracle', e.target.value, true)}
