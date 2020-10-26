@@ -2510,6 +2510,11 @@
     semver "^7.3.2"
     tsutils "^3.17.1"
 
+"@uniswap/default-token-list@^1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@uniswap/default-token-list/-/default-token-list-1.5.0.tgz#daa07575e2ae6bf92441e64af32122e3847ffcb7"
+  integrity sha512-TF5U+9ED6N+qrJKfoocci2vJ0u/57cxeUrnoDazqzLnGcoAp9FVMyi+n0ebz6Ka1AqFCIXkHGwQy+8GVQFTQdw==
+
 "@walletconnect/client@^1.3.1":
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/@walletconnect/client/-/client-1.3.1.tgz#5b8160fe15615ca7017a6be1b125d885e39ddf12"
