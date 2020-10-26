@@ -425,20 +425,10 @@ export class NetworkConfig {
     }
   }
 
-  getTokenFromName(tokenName: string): Token {
+  getTokenFromName(tokenName: string): Token | undefined {
     const tokens = networks[this.networkId].tokens
 
-    for (const token of tokens) {
-      if (token.symbol.toLowerCase() === tokenName.toLowerCase()) {
-        return token
-      }
-    }
-
-    return {
-      symbol: 'unknown',
-      address: '',
-      decimals: 18,
-    }
+    return tokens.find((token: Token) => token.symbol.toLowerCase() === tokenName.toLowerCase())
   }
 
   getRealitioTimeout(): number {
