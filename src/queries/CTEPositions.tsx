@@ -130,7 +130,7 @@ export const buildQueryPositionsList = (
     (TextToSearch.type === PositionSearchOptions.CollateralSymbol ||
       TextToSearch.type === PositionSearchOptions.CollateralAddress) &&
     TextToSearch.value
-      ? '$textToSearch: ID!'
+      ? '$textToSearch: String'
       : '',
   ]
     .filter((s) => s.length)

@@ -43,10 +43,6 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
 
   const { CollateralValue, FromCreationDate, TextToSearch, ToCreationDate } = advancedFilter
 
-  React.useEffect(() => {
-    setData(Remote.loading())
-  }, [advancedFilter])
-
   const query = buildQueryPositionsList(advancedFilter)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -54,11 +50,11 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
   if (FromCreationDate) variables['fromCreationDate'] = FromCreationDate
   if (ToCreationDate) variables['toCreationDate'] = ToCreationDate
   if (TextToSearch.type !== PositionSearchOptions.CollateralSymbol && TextToSearch.value) {
-    variables['textToSearch'] = TextToSearch?.value.toLowerCase()
+    variables['textToSearch'] = TextToSearch.value.toLowerCase()
   }
   if (TextToSearch.type === PositionSearchOptions.CollateralSymbol && TextToSearch.value) {
     const token = networkConfig.getTokenFromName(TextToSearch.value)
-    variables['textToSearch'] = token?.address.toLowerCase()
+    variables['textToSearch'] = token?.address.toLowerCase() ?? ethers.constants.HashZero
   }
   if (CollateralValue.value) {
     variables['collateralSearch'] = CollateralValue?.value
@@ -88,9 +84,9 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
   }, [status, addressFromWallet])
 
   React.useEffect(() => {
-    setData(Remote.loading())
     // The use of loadingPositions act as a blocker when the useQuery is executing again
     if (positionsData && !loadingPositions) {
+      setData(Remote.loading())
       const positionListData = marshalPositionListData(positionsData.positions, userData?.user)
 
       const fetchUserBalanceWithDecimals = async () => {
