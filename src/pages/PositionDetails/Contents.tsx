@@ -43,7 +43,7 @@ import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { GetPosition_position as Position } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
-import { formatBigNumber, positionString, truncateStringInTheMiddle } from 'util/tools'
+import { formatBigNumber, formatTS, positionString, truncateStringInTheMiddle } from 'util/tools'
 import {
   HashArray,
   LocalStorageManagement,
@@ -156,7 +156,7 @@ export const Contents = (props: Props) => {
     wrappedTokenAddress,
   } = props
 
-  const { id: positionId, indexSets } = position
+  const { createTimestamp, id: positionId, indexSets } = position
 
   const { setValue } = useLocalStorage(LocalStorageManagement.PositionId)
 
@@ -451,6 +451,7 @@ export const Contents = (props: Props) => {
             </FlexRow>
           }
         />
+        <TitleValue title="Create Date" value={formatTS(createTimestamp)} />
         {conditions.length > 0 && (
           <TitleValue
             title={conditions.length === 1 ? 'Condition Id' : 'Condition Ids'}

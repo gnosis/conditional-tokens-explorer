@@ -46,10 +46,12 @@ export const Contents: React.FC<Props> = ({ condition }) => {
   const { setValue } = useLocalStorage(LocalStorageManagement.ConditionId)
 
   const {
+    createTimestamp,
     creator,
     id: conditionId,
     oracle,
     outcomeSlotCount,
+    payouts,
     questionId,
     resolveTimestamp,
     resolved,
@@ -135,6 +137,16 @@ export const Contents: React.FC<Props> = ({ condition }) => {
             </Pill>
           }
         />
+        <TitleValue title="Create Date" value={formatTS(createTimestamp)} />
+        <TitleValue
+          title="Creator"
+          value={
+            <FlexRow>
+              <FormatHash hash={truncateStringInTheMiddle(creator, 8, 6)} />
+              <ButtonCopy value={creator} />
+            </FlexRow>
+          }
+        />
         {isConditionFromOmen && (
           <TitleValue title="Question Type" value={getConditionTypeTitle(templateId)} />
         )}
@@ -159,7 +171,9 @@ export const Contents: React.FC<Props> = ({ condition }) => {
               value={
                 <StripedListStyled>
                   {outcomesPrettier.map((outcome: string, index: number) => (
-                    <StripedListItem key={index}>{outcome}</StripedListItem>
+                    <StripedListItem key={index}>
+                      {resolved && payouts ? `${outcome} - ${payouts[index]}%` : outcome}
+                    </StripedListItem>
                   ))}
                 </StripedListStyled>
               }
