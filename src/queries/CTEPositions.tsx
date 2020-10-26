@@ -96,15 +96,15 @@ export const buildQueryPositionsList = (
       ? 'collateralTokenAddress_not_in: $collateralSearch'
       : '',
     TextToSearch.type === PositionSearchOptions.PositionId && TextToSearch.value
-      ? 'id: $textToSearch'
+      ? 'positionId_contains: $textToSearch'
       : '',
     TextToSearch.type === PositionSearchOptions.ConditionId && TextToSearch.value
-      ? 'conditionIds_contains: $textToSearch'
+      ? 'conditionIdsStr_contains: $textToSearch'
       : '',
     (TextToSearch.type === PositionSearchOptions.CollateralSymbol ||
       TextToSearch.type === PositionSearchOptions.CollateralAddress) &&
     TextToSearch.value
-      ? 'collateralToken: $textToSearch'
+      ? 'collateralTokenAddress_contains: $textToSearch'
       : '',
     TextToSearch.type === PositionSearchOptions.WrappedCollateralAddress && TextToSearch.value
       ? 'wrappedTokenAddress_contains: $textToSearch'
@@ -121,18 +121,15 @@ export const buildQueryPositionsList = (
     ToCreationDate ? '$toCreationDate: BigInt' : '',
     FromCreationDate ? '$fromCreationDate: BigInt' : '',
     CollateralValue.value ? '$collateralSearch: [String]' : '',
-    TextToSearch.type === PositionSearchOptions.PositionId && TextToSearch.value
-      ? '$textToSearch: ID'
-      : '',
-    TextToSearch.type === PositionSearchOptions.ConditionId && TextToSearch.value
-      ? '$textToSearch: [ID]'
+    (TextToSearch.type === PositionSearchOptions.PositionId ||
+      TextToSearch.type === PositionSearchOptions.ConditionId ||
+      TextToSearch.type === PositionSearchOptions.WrappedCollateralAddress) &&
+    TextToSearch.value
+      ? '$textToSearch: String'
       : '',
     (TextToSearch.type === PositionSearchOptions.CollateralSymbol ||
       TextToSearch.type === PositionSearchOptions.CollateralAddress) &&
     TextToSearch.value
-      ? '$textToSearch: ID!'
-      : '',
-    TextToSearch.type === PositionSearchOptions.WrappedCollateralAddress && TextToSearch.value
       ? '$textToSearch: String'
       : '',
   ]
