@@ -167,6 +167,9 @@ export const Contents = (props: Props) => {
   const [isUnwrapModalOpen, setIsUnwrapModalOpen] = useState(false)
   const [openTransferOutcomeTokensModal, setOpenTransferOutcomeTokensModal] = useState(false)
   const [openDisplayConditionsTableModal, setOpenDisplayConditionsTableModal] = useState(false)
+  const [openDisplayQuestionIdsTableModal, setOpenDisplayQuestionIdsTableModal] = useState(false)
+  const [openDisplayOraclesIdsTableModal, setOpenDisplayOraclesIdsTableModal] = useState(false)
+
   const [transfer, setTransfer] = useState<Remote<TransferOptions>>(
     Remote.notAsked<TransferOptions>()
   )
@@ -460,6 +463,43 @@ export const Contents = (props: Props) => {
           }
         />
         <TitleValue title="Create Date" value={formatTS(createTimestamp)} />
+        <TitleValue
+          title={questionIds.length === 1 ? 'Question Id' : 'Question Ids'}
+          value={
+            questionIds.length === 1 ? (
+              <FlexRow>
+                <FormatHash hash={truncateStringInTheMiddle(questionIds[0], 8, 6)} />
+                <ButtonCopy value={questionIds[0]} />
+              </FlexRow>
+            ) : (
+              <FlexRow>
+                <FormatHash hash={truncateStringInTheMiddle(questionIds[0], 8, 6)} />
+                <MoreLink onClick={() => setOpenDisplayQuestionIdsTableModal(true)}>
+                  (More...)
+                </MoreLink>
+              </FlexRow>
+            )
+          }
+        />
+        <TitleValue
+          title={questionIds.length === 1 ? 'Oracle' : 'Oracles'}
+          value={
+            oraclesIds.length === 1 ? (
+              <FlexRow>
+                <FormatHash hash={truncateStringInTheMiddle(oraclesIds[0], 8, 6)} />
+                <ButtonCopy value={oraclesIds[0]} />
+              </FlexRow>
+            ) : (
+              <FlexRow>
+                <FormatHash hash={truncateStringInTheMiddle(oraclesIds[0], 8, 6)} />
+                <MoreLink onClick={() => setOpenDisplayOraclesIdsTableModal(true)}>
+                  (More...)
+                </MoreLink>
+              </FlexRow>
+            )
+          }
+        />
+
         {conditions.length > 0 && (
           <TitleValue
             title={conditions.length === 1 ? 'Condition Id' : 'Condition Ids'}
@@ -629,6 +669,30 @@ export const Contents = (props: Props) => {
           title="Conditions"
           titleTable="Condition Id"
           url="condition"
+        />
+      )}
+      {openDisplayOraclesIdsTableModal && oraclesIds.length > 1 && (
+        <DisplayHashesTableModal
+          hashes={oraclesIds.map((id) => {
+            return { hash: id }
+          })}
+          isOpen={openDisplayOraclesIdsTableModal}
+          onRequestClose={() => setOpenDisplayOraclesIdsTableModal(false)}
+          title="Oracles"
+          titleTable="Oracle Id"
+          url=""
+        />
+      )}
+      {openDisplayQuestionIdsTableModal && questionIds.length > 1 && (
+        <DisplayHashesTableModal
+          hashes={questionIds.map((id) => {
+            return { hash: id }
+          })}
+          isOpen={openDisplayQuestionIdsTableModal}
+          onRequestClose={() => setOpenDisplayQuestionIdsTableModal(false)}
+          title="Question Ids"
+          titleTable="Question Id"
+          url=""
         />
       )}
       {isWorking && (
