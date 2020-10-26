@@ -1,4 +1,5 @@
 import { BigNumber } from 'ethers/utils'
+import uniqby from 'lodash.uniqby'
 import React, { useCallback, useMemo, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled, { css } from 'styled-components'
@@ -157,7 +158,6 @@ export const Contents = (props: Props) => {
   } = props
 
   const { createTimestamp, id: positionId, indexSets } = position
-
   const { setValue } = useLocalStorage(LocalStorageManagement.PositionId)
 
   const { collateral: collateralERC1155 } = useCollateral(collateralTokenAddress)
@@ -171,6 +171,14 @@ export const Contents = (props: Props) => {
     Remote.notAsked<TransferOptions>()
   )
   const [transactionTitle, setTransactionTitle] = useState<string>('')
+
+  const oraclesIds = useMemo(() => uniqby(position.conditions, 'oracle').map((c) => c.oracle), [
+    position,
+  ])
+  const questionIds = useMemo(
+    () => uniqby(position.conditions, 'questionId').map((c) => c.questionId),
+    [position]
+  )
 
   const positionPreview = useMemo(() => {
     if (collateralERC1155 && balanceERC1155) {
