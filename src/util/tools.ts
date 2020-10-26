@@ -338,20 +338,22 @@ export const getTokenSummary = async (
   provider: Provider,
   collateralToken: string
 ): Promise<Token> => {
-  try {
-    const { decimals, symbol } = networkConfig.getTokenFromAddress(collateralToken)
+  const token = networkConfig.getTokenFromAddress(collateralToken)
+
+  if (token) {
+    const { address, decimals, symbol } = token
     return {
-      address: collateralToken,
+      address,
       decimals,
       symbol,
     }
-  } catch (e) {
+  } else {
     try {
       const erc20Service = new ERC20Service(provider, collateralToken)
-      const { decimals, symbol } = await erc20Service.getProfileSummary()
+      const { address, decimals, symbol } = await erc20Service.getProfileSummary()
 
       return {
-        address: collateralToken,
+        address,
         decimals,
         symbol,
       }
