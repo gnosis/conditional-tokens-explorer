@@ -6,6 +6,7 @@ import styled, { css } from 'styled-components'
 import { Button } from 'components/buttons/Button'
 import { ButtonCopy } from 'components/buttons/ButtonCopy'
 import { ButtonDropdownCircle } from 'components/buttons/ButtonDropdownCircle'
+import { ButtonExpand } from 'components/buttons/ButtonExpand'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CenteredCard } from 'components/common/CenteredCard'
 import {
@@ -460,9 +461,7 @@ export const Contents = (props: Props) => {
               ) : (
                 <FlexRow>
                   {conditionIdLink(conditions[0].hash)}
-                  <MoreLink onClick={() => setOpenDisplayConditionsTableModal(true)}>
-                    (More...)
-                  </MoreLink>
+                  <ButtonExpand onClick={() => setOpenDisplayConditionsTableModal(true)} />
                 </FlexRow>
               )
             }
