@@ -34,8 +34,7 @@ export const useCollateral = (
         } catch (err) {
           if (!cancelled) {
             setCollateral(null)
-            humanizeCollateralMessageError(err)
-            setError(err)
+            setError(humanizeCollateralMessageError(err))
           }
         } finally {
           if (!cancelled) {
