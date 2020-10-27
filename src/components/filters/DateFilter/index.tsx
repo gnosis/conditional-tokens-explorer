@@ -66,8 +66,7 @@ export const DateFilter: React.FC<Props> = (props) => {
         onChangeFrom(event)
       }
 
-      const fromDateMoment = moment(event.currentTarget.value).utc().startOf('day')
-      const fromTimestamp = fromDateMoment.unix()
+      const fromTimestamp = moment(event.currentTarget.value).utc().startOf('day').unix()
 
       setFrom(fromTimestamp)
     },
@@ -80,8 +79,7 @@ export const DateFilter: React.FC<Props> = (props) => {
         onChangeTo(event)
       }
 
-      const toDateMoment = moment(event.currentTarget.value).utc().endOf('day')
-      const toTimestamp = toDateMoment.unix()
+      const toTimestamp = moment(event.currentTarget.value).utc().endOf('day').unix()
 
       setTo(toTimestamp)
     },
@@ -89,14 +87,23 @@ export const DateFilter: React.FC<Props> = (props) => {
   )
 
   const emptyValues = React.useMemo(() => !from && !to, [from, to])
-  const validDates = React.useMemo(() => {
-    if (fromDate && fromDate.current && toDate && toDate.current) {
-      return toDate.current.checkValidity() && fromDate.current.checkValidity()
+  const validFromDate = React.useMemo(() => {
+    if (fromDate && fromDate.current && fromDate.current.value) {
+      return fromDate.current.checkValidity()
     } else {
       return true
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [from, to])
+  }, [from])
+
+  const validToDate = React.useMemo(() => {
+    if (toDate && toDate.current && toDate.current.value) {
+      return toDate.current.checkValidity()
+    } else {
+      return true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [to])
 
   const fromGreaterThanToError = React.useMemo(
     () =>
@@ -105,10 +112,10 @@ export const DateFilter: React.FC<Props> = (props) => {
   )
   const datesValidityError = React.useMemo(
     () =>
-      !validDates ? (
+      !validToDate || !validFromDate ? (
         <ErrorMessage>{`Invalid date or out of range. Valid dates are from ${MIN_DATE} to ${MAX_DATE}`}</ErrorMessage>
       ) : null,
-    [validDates]
+    [validToDate, validFromDate]
   )
 
   const submitDisabled = !!fromGreaterThanToError || emptyValues || !!datesValidityError
