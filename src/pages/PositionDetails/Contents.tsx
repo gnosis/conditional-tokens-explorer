@@ -81,19 +81,6 @@ const CollateralWrapButton = styled(Button)`
   width: 80px;
 `
 
-const MoreLink = styled.a`
-  color: ${(props) => props.theme.colors.textColor};
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  margin: 0 0 0 12px;
-  text-decoration: underline;
-
-  &:hover {
-    text-decoration: none;
-  }
-`
-
 const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
 `
