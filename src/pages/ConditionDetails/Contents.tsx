@@ -19,7 +19,7 @@ import { StripedList, StripedListItem } from 'components/pureStyledComponents/St
 import { FormatHash } from 'components/text/FormatHash'
 import { TitleValue } from 'components/text/TitleValue'
 import { INFORMATION_NOT_AVAILABLE } from 'config/constants'
-import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useIsConditionFromOmen } from 'hooks/useIsConditionFromOmen'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { usePositions } from 'hooks/usePositions'
@@ -41,7 +41,7 @@ interface Props {
 }
 
 export const Contents: React.FC<Props> = ({ condition }) => {
-  const { networkConfig } = useWeb3ConnectedOrInfura()
+  const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
 
   const { setValue } = useLocalStorage(LocalStorageManagement.ConditionId)
 
@@ -55,6 +55,8 @@ export const Contents: React.FC<Props> = ({ condition }) => {
     resolved,
   } = condition
 
+  const isConnected = useMemo(() => status === Web3ContextStatus.Connected, [status])
+
   const dropdownItems = useMemo(() => {
     return [
       {
@@ -63,6 +65,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           setValue(conditionId)
         },
         text: 'Split Position',
+        disabled: !isConnected,
       },
       {
         href: `/merge/`,
@@ -70,6 +73,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           setValue(conditionId)
         },
         text: 'Merge Positions',
+        disabled: !isConnected,
       },
       {
         href: `/report/`,
@@ -77,9 +81,10 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           setValue(conditionId)
         },
         text: 'Report Payouts',
+        disabled: resolved || !isConnected,
       },
     ]
-  }, [setValue, conditionId])
+  }, [setValue, conditionId, resolved, isConnected])
 
   const { outcomesPrettier, question } = useQuestion(questionId, outcomeSlotCount)
   const isConditionFromOmen = useIsConditionFromOmen(creator, oracle, question)
@@ -89,11 +94,16 @@ export const Contents: React.FC<Props> = ({ condition }) => {
     category = INFORMATION_NOT_AVAILABLE,
   } = question ?? {}
 
-  const oracleTitle = isConditionFromOmen ? (
-    networkConfig.getOracleFromAddress(oracle).description
-  ) : (
-    <FormatHash hash={truncateStringInTheMiddle(oracle, 8, 6)} />
+  const oracleTitle = useMemo(
+    () =>
+      isConditionFromOmen ? (
+        networkConfig.getOracleFromAddress(oracle).description
+      ) : (
+        <FormatHash hash={truncateStringInTheMiddle(oracle, 8, 6)} />
+      ),
+    [networkConfig, oracle, isConditionFromOmen]
   )
+
   const { data: positions, loading: loadingPositions } = usePositions({
     conditionsIds: [conditionId],
   })
@@ -106,7 +116,12 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           dropdownButtonContent={<ButtonDropdownCircle />}
           dropdownPosition={DropdownPosition.right}
           items={dropdownItems.map((item, index) => (
-            <DropdownItemLink key={index} onMouseDown={item.onClick} to={item.href}>
+            <DropdownItemLink
+              disabled={item.disabled}
+              key={index}
+              onMouseDown={item.onClick}
+              to={item.href}
+            >
               {item.text}
             </DropdownItemLink>
           ))}
