@@ -14,7 +14,7 @@ const Wrapper = styled.div`
   display: flex;
   height: 32px;
   max-width: 100%;
-  min-width: 450px;
+  width: 450px;
 
   .dropdown,
   .dropdownButton {
@@ -38,6 +38,7 @@ const Input = styled(Textfield)`
   border-radius: 4px;
   color: ${(props) => props.theme.colors.textColor};
   flex-grow: 1;
+  flex-shrink: 1;
   font-size: 15px;
   font-weight: normal;
   height: 100%;
@@ -115,7 +116,7 @@ const ButtonDropdown = styled.button`
   justify-content: center;
   justify-content: space-between;
   line-height: 1.2;
-  max-width: 115px;
+  max-width: 170px;
   min-width: 80px;
   outline: none;
   padding: 0 12px;
