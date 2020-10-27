@@ -1,5 +1,5 @@
 import { useDebounceCallback } from '@react-hook/debounce'
-import React from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { NavLink, useHistory } from 'react-router-dom'
 import styled from 'styled-components'
@@ -58,31 +58,29 @@ export const ConditionsList: React.FC = () => {
   const history = useHistory()
   const { setValue } = useLocalStorage(LocalStorageManagement.ConditionId)
 
-  const [textToSearch, setTextToSearch] = React.useState<string>('')
-  const [textToShow, setTextToShow] = React.useState<string>('')
-  const [resetPagination, setResetPagination] = React.useState<boolean>(false)
+  const [textToSearch, setTextToSearch] = useState<string>('')
+  const [textToShow, setTextToShow] = useState<string>('')
+  const [resetPagination, setResetPagination] = useState<boolean>(false)
 
-  const [selectedOracleFilter, setSelectedOracleFilter] = React.useState<string[]>([])
-  const [selectedOracleValue, setSelectedOracleValue] = React.useState<OracleFilterOptions>(
+  const [selectedOracleFilter, setSelectedOracleFilter] = useState<string[]>([])
+  const [selectedOracleValue, setSelectedOracleValue] = useState<OracleFilterOptions>(
     OracleFilterOptions.All
   )
-  const [selectedStatus, setSelectedStatus] = React.useState<StatusOptions>(StatusOptions.All)
-  const [selectedMinOutcomes, setSelectedMinOutcomes] = React.useState<Maybe<number>>(null)
-  const [selectedMaxOutcomes, setSelectedMaxOutcomes] = React.useState<Maybe<number>>(null)
-  const [selectedFromCreationDate, setSelectedFromCreationDate] = React.useState<Maybe<number>>(
+  const [selectedStatus, setSelectedStatus] = useState<StatusOptions>(StatusOptions.All)
+  const [selectedMinOutcomes, setSelectedMinOutcomes] = useState<Maybe<number>>(null)
+  const [selectedMaxOutcomes, setSelectedMaxOutcomes] = useState<Maybe<number>>(null)
+  const [selectedFromCreationDate, setSelectedFromCreationDate] = useState<Maybe<number>>(null)
+  const [selectedToCreationDate, setSelectedToCreationDate] = useState<Maybe<number>>(null)
+  const [selectedConditionTypeFilter, setSelectedConditionTypeFilter] = useState<Maybe<string>>(
     null
   )
-  const [selectedToCreationDate, setSelectedToCreationDate] = React.useState<Maybe<number>>(null)
-  const [selectedConditionTypeFilter, setSelectedConditionTypeFilter] = React.useState<
-    Maybe<string>
-  >(null)
-  const [selectedConditionTypeValue, setSelectedConditionTypeValue] = React.useState<
+  const [selectedConditionTypeValue, setSelectedConditionTypeValue] = useState<
     ConditionType | ConditionTypeAll
   >(ConditionTypeAll.all)
-  const [searchBy, setSearchBy] = React.useState<ConditionSearchOptions>(
+  const [searchBy, setSearchBy] = useState<ConditionSearchOptions>(
     ConditionSearchOptions.ConditionId
   )
-  const [showFilters, setShowFilters] = React.useState(false)
+  const [showFilters, setShowFilters] = useState(false)
 
   const dropdownItems = useConditionsSearchOptions(setSearchBy)
 
@@ -92,7 +90,7 @@ export const ConditionsList: React.FC = () => {
     setTextToSearch(conditionIdToSearch)
   }, 500)
 
-  const onChangeSearch = React.useCallback(
+  const onChangeSearch = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.currentTarget
       setTextToShow(value)
@@ -101,13 +99,13 @@ export const ConditionsList: React.FC = () => {
     [debouncedHandlerTextToSearch]
   )
 
-  const onClearSearch = React.useCallback(() => {
+  const onClearSearch = useCallback(() => {
     setTextToShow('')
     debouncedHandlerTextToSearch('')
   }, [debouncedHandlerTextToSearch])
 
   // Clear the filters
-  React.useEffect(() => {
+  useEffect(() => {
     if (!showFilters) {
       setResetPagination(!resetPagination)
       setSelectedOracleValue(OracleFilterOptions.All)
@@ -125,7 +123,7 @@ export const ConditionsList: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showFilters])
 
-  const advancedFilters: AdvancedFilterConditions = React.useMemo(() => {
+  const advancedFilters: AdvancedFilterConditions = useMemo(() => {
     return {
       ReporterOracle: {
         type: selectedOracleValue,
@@ -159,7 +157,7 @@ export const ConditionsList: React.FC = () => {
     selectedFromCreationDate,
   ])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       selectedOracleValue === OracleFilterOptions.Current &&
       status === Web3ContextStatus.Connected &&
@@ -179,14 +177,15 @@ export const ConditionsList: React.FC = () => {
 
   const { data, error, loading } = useConditionsList(advancedFilters)
 
-  const isLoading = React.useMemo(() => !textToSearch && loading, [textToSearch, loading])
-  const isSearching = React.useMemo(() => textToSearch && loading, [textToSearch, loading])
+  const isLoading = useMemo(() => !textToSearch && loading, [textToSearch, loading])
+  const isSearching = useMemo(() => textToSearch && loading, [textToSearch, loading])
+  const isConnected = useMemo(() => status === Web3ContextStatus.Connected, [status])
 
-  const buildMenuForRow = React.useCallback(
+  const buildMenuForRow = useCallback(
     (row: Conditions_conditions) => {
       const { id, resolved } = row
 
-      const menues = [
+      const menu = [
         {
           href: `/conditions/${id}`,
           text: 'Details',
@@ -198,6 +197,7 @@ export const ConditionsList: React.FC = () => {
           onClick: () => {
             setValue(id)
           },
+          disabled: !isConnected,
         },
         {
           href: `/merge/`,
@@ -205,32 +205,31 @@ export const ConditionsList: React.FC = () => {
           onClick: () => {
             setValue(id)
           },
+          disabled: !isConnected,
         },
-      ]
-
-      if (!resolved) {
-        menues.push({
+        {
           href: `/report/`,
           text: 'Report Payouts',
           onClick: () => {
             setValue(id)
           },
-        })
-      }
+          disabled: resolved || !isConnected,
+        },
+      ]
 
-      return menues
+      return menu
     },
-    [setValue]
+    [setValue, isConnected]
   )
 
-  const handleRowClick = React.useCallback(
+  const handleRowClick = useCallback(
     (row: Conditions_conditions) => {
       history.push(`/conditions/${row.id}`)
     },
     [history]
   )
 
-  const columns = React.useMemo(
+  const columns = useMemo(
     () => [
       {
         // eslint-disable-next-line react/display-name
@@ -304,7 +303,12 @@ export const ConditionsList: React.FC = () => {
             dropdownButtonContent={<ButtonDots />}
             dropdownPosition={DropdownPosition.right}
             items={buildMenuForRow(row).map((item, index) => (
-              <DropdownItemLink key={index} onMouseDown={item.onClick} to={item.href}>
+              <DropdownItemLink
+                disabled={item.disabled}
+                key={index}
+                onMouseDown={item.onClick}
+                to={item.href}
+              >
                 {item.text}
               </DropdownItemLink>
             ))}
@@ -318,23 +322,23 @@ export const ConditionsList: React.FC = () => {
     [buildMenuForRow, handleRowClick]
   )
 
-  const toggleShowFilters = React.useCallback(() => {
+  const toggleShowFilters = useCallback(() => {
     setShowFilters(!showFilters)
   }, [showFilters])
 
-  const showSpinner = React.useMemo(() => (isLoading || isSearching) && !error, [
+  const showSpinner = useMemo(() => (isLoading || isSearching) && !error, [
     isLoading,
     isSearching,
     error,
   ])
 
   // This is a HACK until this issue was resolved https://github.com/gnosis/hg-subgraph/issues/23
-  const isBytes32Error = React.useMemo(
+  const isBytes32Error = useMemo(
     () => error && error.message.includes('Failed to decode `Bytes` value: `Odd number of digits`'),
     [error]
   )
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       textToSearch !== '' ||
       selectedOracleValue !== OracleFilterOptions.All ||

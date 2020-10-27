@@ -1,3 +1,4 @@
+import UniswapTokens from '@uniswap/default-token-list'
 import {
   CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_GANACHE,
   CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_MAINNET,
@@ -322,6 +323,10 @@ export class NetworkConfig {
     return networks[this.networkId].tokens
   }
 
+  getTokensFromUniswap() {
+    return UniswapTokens.tokens
+  }
+
   getOracles(): Oracle[] {
     return networks[this.networkId].oracles
   }
@@ -342,17 +347,31 @@ export class NetworkConfig {
     return networks[this.networkId].earliestBlockToCheck
   }
 
-  getTokenFromAddress(address: string): Token {
+  getTokenFromAddress(address: string): Maybe<Token> {
     const tokens = networks[this.networkId].tokens
 
-    for (const token of tokens) {
-      const tokenAddress = token.address
-      if (tokenAddress.toLowerCase() === address.toLowerCase()) {
-        return token
+    const tokenFromDefaultList = tokens.find((token: Token) =>
+      token.address.toLowerCase().includes(address.toLowerCase())
+    )
+    if (tokenFromDefaultList) {
+      return tokenFromDefaultList
+    }
+
+    const tokenFromUniswap = this.getTokensFromUniswap().find(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (token: any) =>
+        token.address.toLowerCase().includes(address.toLowerCase()) &&
+        token.chainId === this.networkId
+    )
+    if (tokenFromUniswap) {
+      return {
+        symbol: tokenFromUniswap.symbol,
+        address: tokenFromUniswap.address,
+        decimals: tokenFromUniswap.decimals,
       }
     }
 
-    throw new Error(`Couldn't find token with address '${address}' in network '${this.networkId}'`)
+    return null
   }
 
   getOracleFromAddress(address: string): Oracle {
@@ -425,10 +444,31 @@ export class NetworkConfig {
     }
   }
 
-  getTokenFromName(tokenName: string): Token | undefined {
+  getTokenFromName(tokenName: string): Maybe<Token> {
     const tokens = networks[this.networkId].tokens
 
-    return tokens.find((token: Token) => token.symbol.toLowerCase() === tokenName.toLowerCase())
+    const tokenFromDefaultList = tokens.find((token: Token) =>
+      token.symbol.toLowerCase().includes(tokenName.toLowerCase())
+    )
+    if (tokenFromDefaultList) {
+      return tokenFromDefaultList
+    }
+
+    const tokenFromUniswap = this.getTokensFromUniswap().find(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (token: any) =>
+        token.symbol.toLowerCase().includes(tokenName.toLowerCase()) &&
+        token.chainId === this.networkId
+    )
+    if (tokenFromUniswap) {
+      return {
+        symbol: tokenFromUniswap.symbol,
+        address: tokenFromUniswap.address,
+        decimals: tokenFromUniswap.decimals,
+      }
+    }
+
+    return null
   }
 
   getRealitioTimeout(): number {
