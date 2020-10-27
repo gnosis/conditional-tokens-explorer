@@ -62,7 +62,7 @@ export const Hash: React.FC<Props> = (props) => {
         </Text>
       )}
       <ButtonCopyStyled light value={value} />
-      {externalLink && (
+      {externalLink && href && (
         <ExternalLinkStyled
           href={`${window.location.protocol}//${window.location.hostname}${port}/#${href}`}
         />

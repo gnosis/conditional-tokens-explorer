@@ -74,7 +74,7 @@ export const PositionsList = () => {
 
   const [textToSearch, setTextToSearch] = useState<string>('')
   const [textToShow, setTextToShow] = useState<string>('')
-  const [resetPagination, setResetPagination] = React.useState<boolean>(false)
+  const [resetPagination, setResetPagination] = useState<boolean>(false)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [connectedItems, setConnectedItems] = useState<Array<any>>([])
@@ -175,13 +175,14 @@ export const PositionsList = () => {
   ])
   const isSearching = useMemo(() => textToSearch && loading, [textToSearch, loading])
 
+  const isConnected = useMemo(() => status === Web3ContextStatus.Connected, [status])
+  const isSigner = useMemo(() => signer !== null, [signer])
+
   const buildMenuForRow = useCallback(
     (row: PositionWithUserBalanceWithDecimals) => {
       const { collateralTokenERC1155, id, userBalanceERC20, userBalanceERC1155 } = row
-      const isSigner = signer !== null
       const userHasERC1155Balance = userBalanceERC1155 && !userBalanceERC1155.isZero()
       const userHasERC20Balance = userBalanceERC20 && !userBalanceERC20.isZero()
-      const isDisconnected = status !== Web3ContextStatus.Connected
 
       const menu = [
         {
@@ -190,7 +191,7 @@ export const PositionsList = () => {
           text: 'Details',
         },
         {
-          disabled: !userHasERC1155Balance || isDisconnected,
+          disabled: !userHasERC1155Balance || !isConnected,
           href: `/redeem`,
           text: 'Redeem',
           onClick: () => {
@@ -198,7 +199,7 @@ export const PositionsList = () => {
           },
         },
         {
-          disabled: !userHasERC1155Balance || isDisconnected,
+          disabled: !userHasERC1155Balance || !isConnected,
           href: `/split`,
           onClick: () => {
             setValue(id)
@@ -206,7 +207,7 @@ export const PositionsList = () => {
           text: 'Split',
         },
         {
-          disabled: !userHasERC1155Balance || isDisconnected || !isSigner,
+          disabled: !userHasERC1155Balance || !isConnected || !isSigner,
           href: undefined,
           text: 'Transfer Outcome Tokens',
           onClick: () => {
@@ -216,7 +217,7 @@ export const PositionsList = () => {
           },
         },
         {
-          disabled: !userHasERC1155Balance || isDisconnected || !isSigner,
+          disabled: !userHasERC1155Balance || !isConnected || !isSigner,
           href: undefined,
           text: 'Wrap ERC1155',
           onClick: () => {
@@ -227,7 +228,7 @@ export const PositionsList = () => {
           },
         },
         {
-          disabled: !userHasERC20Balance || isDisconnected || !isSigner,
+          disabled: !userHasERC20Balance || !isConnected || !isSigner,
           href: undefined,
           text: 'Unwrap ERC20',
           onClick: () => {
@@ -242,7 +243,7 @@ export const PositionsList = () => {
 
       return menu
     },
-    [setValue, signer, status]
+    [setValue, isConnected, isSigner]
   )
 
   const handleRowClick = useCallback(
@@ -290,8 +291,6 @@ export const PositionsList = () => {
   }, [buildMenuForRow])
 
   useEffect(() => {
-    const isConnected = status === Web3ContextStatus.Connected
-
     setConnectedItems([
       {
         // eslint-disable-next-line react/display-name
@@ -332,7 +331,7 @@ export const PositionsList = () => {
         sortable: true,
       },
     ])
-  }, [status, handleRowClick])
+  }, [status, handleRowClick, isConnected])
 
   const getColumns = useCallback(() => {
     // If you move this outside of the useCallback, can cause performance issues as a dep of this useCallback
@@ -630,7 +629,7 @@ export const PositionsList = () => {
     [transfer]
   )
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       textToSearch !== '' ||
       wrappedCollateral !== WrappedCollateralOptions.All ||

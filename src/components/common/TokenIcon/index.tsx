@@ -126,7 +126,7 @@ export const TokenIcon: React.FC<Props> = (props) => {
 
   const { networkConfig } = useWeb3ConnectedOrInfura()
 
-  const [data, setData] = React.useState<Remote<boolean>>(Remote.notAsked<boolean>())
+  const [data, setData] = React.useState<Remote<boolean>>(Remote.loading<boolean>())
 
   const currencyData = React.useMemo(() => {
     const currenciesDataFiltered = currenciesData.filter(
@@ -146,24 +146,30 @@ export const TokenIcon: React.FC<Props> = (props) => {
     const CheckTokenAvailability = async () => {
       try {
         const result = await fetch(customImageUrl, { method: 'HEAD' })
-        setData(Remote.success(result.ok))
+        if (result.ok) {
+          setData(Remote.success(result.ok))
+        } else {
+          throw new Error('Error fetching image')
+        }
       } catch (err) {
-        setData(Remote.success(false))
+        setData(Remote.failure(err))
       }
     }
 
     if (!currencyData && networkConfig.networkId === 1) {
       CheckTokenAvailability()
+    } else {
+      setData(Remote.notAsked())
     }
   }, [currencyData, customImageUrl, networkConfig.networkId])
 
   return (
     <Wrapper onClick={onClick} {...restProps}>
-      {currencyData ? (
-        <Icon>{currencyData.icon}</Icon>
-      ) : data.isSuccess() && data.get() ? (
+      {currencyData && <Icon>{currencyData.icon}</Icon>}
+      {!currencyData && networkConfig.networkId === 1 && data.isSuccess() && (
         <CustomIcon src={customImageUrl} />
-      ) : (
+      )}
+      {!currencyData && (data.isNotAsked() || data.isFailure()) && (
         <CustomIconWrapper>
           <Blockies scale={2} seed={symbol} size={10} />
         </CustomIconWrapper>

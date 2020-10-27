@@ -1,4 +1,5 @@
 import { BigNumber } from 'ethers/utils'
+import uniqby from 'lodash.uniqby'
 import React, { useCallback, useMemo, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled, { css } from 'styled-components'
@@ -44,7 +45,7 @@ import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { GetPosition_position as Position } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
-import { formatBigNumber, positionString, truncateStringInTheMiddle } from 'util/tools'
+import { formatBigNumber, formatTS, positionString, truncateStringInTheMiddle } from 'util/tools'
 import {
   HashArray,
   LocalStorageManagement,
@@ -144,8 +145,7 @@ export const Contents = (props: Props) => {
     wrappedTokenAddress,
   } = props
 
-  const { id: positionId, indexSets } = position
-
+  const { createTimestamp, id: positionId, indexSets } = position
   const { setValue } = useLocalStorage(LocalStorageManagement.PositionId)
 
   const { collateral: collateralERC1155 } = useCollateral(collateralTokenAddress)
@@ -155,10 +155,21 @@ export const Contents = (props: Props) => {
   const [isUnwrapModalOpen, setIsUnwrapModalOpen] = useState(false)
   const [openTransferOutcomeTokensModal, setOpenTransferOutcomeTokensModal] = useState(false)
   const [openDisplayConditionsTableModal, setOpenDisplayConditionsTableModal] = useState(false)
+  const [openDisplayQuestionIdsTableModal, setOpenDisplayQuestionIdsTableModal] = useState(false)
+  const [openDisplayOraclesIdsTableModal, setOpenDisplayOraclesIdsTableModal] = useState(false)
+
   const [transfer, setTransfer] = useState<Remote<TransferOptions>>(
     Remote.notAsked<TransferOptions>()
   )
   const [transactionTitle, setTransactionTitle] = useState<string>('')
+
+  const oraclesIds = useMemo(() => uniqby(position.conditions, 'oracle').map((c) => c.oracle), [
+    position,
+  ])
+  const questionIds = useMemo(
+    () => uniqby(position.conditions, 'questionId').map((c) => c.questionId),
+    [position]
+  )
 
   const positionPreview = useMemo(() => {
     if (collateralERC1155 && balanceERC1155) {
@@ -306,14 +317,15 @@ export const Contents = (props: Props) => {
   const fullLoadingTitle = transfer.isFailure() ? 'Error' : transactionTitle
   const outcomesByRow = '14'
 
+  const isConnected = useMemo(() => status === Web3ContextStatus.Connected, [status])
+  const isSigner = useMemo(() => signer !== null, [signer])
+
   const dropdownItems = useMemo(() => {
     const userHasBalance = balanceERC1155 && !balanceERC1155.isZero()
-    const isSigner = signer !== null
-    const isDisconnected = status !== Web3ContextStatus.Connected
 
     const menu = [
       {
-        disabled: !userHasBalance || isDisconnected,
+        disabled: !userHasBalance || !isConnected,
         href: `/redeem`,
         onClick: () => {
           setValue(positionId)
@@ -321,7 +333,7 @@ export const Contents = (props: Props) => {
         text: 'Redeem',
       },
       {
-        disabled: !userHasBalance || isDisconnected,
+        disabled: !userHasBalance || !isConnected,
         href: `/split`,
         onClick: () => {
           setValue(positionId)
@@ -329,7 +341,7 @@ export const Contents = (props: Props) => {
         text: 'Split',
       },
       {
-        disabled: !userHasBalance || isDisconnected || !isSigner,
+        disabled: !userHasBalance || !isConnected || !isSigner,
         href: '',
         text: 'Transfer Outcome Tokens',
         onClick: () => {
@@ -339,7 +351,7 @@ export const Contents = (props: Props) => {
     ]
 
     return menu
-  }, [balanceERC1155, signer, status, setValue, positionId])
+  }, [balanceERC1155, setValue, positionId, isConnected, isSigner])
 
   const conditionIdLink = (id: string) => {
     return (
@@ -439,6 +451,44 @@ export const Contents = (props: Props) => {
             </FlexRow>
           }
         />
+        <TitleValue title="Creation Date" value={formatTS(createTimestamp)} />
+        <TitleValue
+          title={questionIds.length === 1 ? 'Question Id' : 'Question Ids'}
+          value={
+            questionIds.length === 1 ? (
+              <FlexRow>
+                <FormatHash hash={truncateStringInTheMiddle(questionIds[0], 8, 6)} />
+                <ButtonCopy value={questionIds[0]} />
+              </FlexRow>
+            ) : (
+              <FlexRow>
+                <FormatHash hash={truncateStringInTheMiddle(questionIds[0], 8, 6)} />
+                <MoreLink onClick={() => setOpenDisplayQuestionIdsTableModal(true)}>
+                  (More...)
+                </MoreLink>
+              </FlexRow>
+            )
+          }
+        />
+        <TitleValue
+          title={questionIds.length === 1 ? 'Oracle' : 'Oracles'}
+          value={
+            oraclesIds.length === 1 ? (
+              <FlexRow>
+                <FormatHash hash={truncateStringInTheMiddle(oraclesIds[0], 8, 6)} />
+                <ButtonCopy value={oraclesIds[0]} />
+              </FlexRow>
+            ) : (
+              <FlexRow>
+                <FormatHash hash={truncateStringInTheMiddle(oraclesIds[0], 8, 6)} />
+                <MoreLink onClick={() => setOpenDisplayOraclesIdsTableModal(true)}>
+                  (More...)
+                </MoreLink>
+              </FlexRow>
+            )
+          }
+        />
+
         {conditions.length > 0 && (
           <TitleValue
             title={conditions.length === 1 ? 'Condition Id' : 'Condition Ids'}
@@ -606,6 +656,30 @@ export const Contents = (props: Props) => {
           title="Conditions"
           titleTable="Condition Id"
           url="condition"
+        />
+      )}
+      {openDisplayOraclesIdsTableModal && oraclesIds.length > 1 && (
+        <DisplayHashesTableModal
+          hashes={oraclesIds.map((id) => {
+            return { hash: id }
+          })}
+          isOpen={openDisplayOraclesIdsTableModal}
+          onRequestClose={() => setOpenDisplayOraclesIdsTableModal(false)}
+          title="Oracles"
+          titleTable="Oracle Id"
+          url=""
+        />
+      )}
+      {openDisplayQuestionIdsTableModal && questionIds.length > 1 && (
+        <DisplayHashesTableModal
+          hashes={questionIds.map((id) => {
+            return { hash: id }
+          })}
+          isOpen={openDisplayQuestionIdsTableModal}
+          onRequestClose={() => setOpenDisplayQuestionIdsTableModal(false)}
+          title="Question Ids"
+          titleTable="Question Id"
+          url=""
         />
       )}
       {isWorking && (
