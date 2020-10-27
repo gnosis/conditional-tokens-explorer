@@ -88,9 +88,21 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
     emptyValues,
   ])
 
+  const validateBounds = React.useCallback(() => {
+    if (min) {
+      setMin(Math.trunc(min))
+      if (min < MIN_OUTCOMES_ALLOWED) setMin(MIN_OUTCOMES_ALLOWED)
+    }
+
+    if (max) {
+      setMax(Math.trunc(max))
+      if (max > MAX_OUTCOMES_ALLOWED) setMax(MAX_OUTCOMES_ALLOWED)
+    }
+  }, [max, min])
+
   React.useEffect(() => {
-    if (!min && !max) onSubmit(min, max)
-  }, [min, max, onSubmit])
+    validateBounds()
+  }, [validateBounds])
 
   const onSubmitInternal = React.useCallback(() => {
     if ((min || max) && !submitDisabled) onSubmit(min, max)
