@@ -374,6 +374,7 @@ export const PositionsList = () => {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimals) => formatTSSimple(row.createTimestamp),
         name: 'Creation Date',
+        right: true,
         selector: 'createTimestamp',
         sortable: true,
       },
