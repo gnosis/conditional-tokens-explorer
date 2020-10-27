@@ -462,7 +462,7 @@ export const Contents = (props: Props) => {
             </FlexRow>
           }
         />
-        <TitleValue title="Create Date" value={formatTS(createTimestamp)} />
+        <TitleValue title="Creation Date" value={formatTS(createTimestamp)} />
         <TitleValue
           title={questionIds.length === 1 ? 'Question Id' : 'Question Ids'}
           value={

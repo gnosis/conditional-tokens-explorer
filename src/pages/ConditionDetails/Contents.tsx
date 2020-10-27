@@ -137,9 +137,9 @@ export const Contents: React.FC<Props> = ({ condition }) => {
             </Pill>
           }
         />
-        <TitleValue title="Create Date" value={formatTS(createTimestamp)} />
+        <TitleValue title="Creation Date" value={formatTS(createTimestamp)} />
         <TitleValue
-          title="Creator"
+          title="Creator Address"
           value={
             <FlexRow>
               <FormatHash hash={truncateStringInTheMiddle(creator, 8, 6)} />
