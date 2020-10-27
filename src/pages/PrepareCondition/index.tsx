@@ -36,6 +36,7 @@ import {
   MIN_OUTCOMES_ALLOWED,
 } from 'config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { Prompt } from 'react-router'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
@@ -119,7 +120,10 @@ export const PrepareCondition = () => {
     mode: 'onChange',
     defaultValues: defaultValuesCustom,
   })
-  const { isValid: isValidCustomCondition } = formStateCustomCondition
+  const {
+    dirty: isDirtyCustomCondition,
+    isValid: isValidCustomCondition,
+  } = formStateCustomCondition
 
   const {
     control: omenControl,
@@ -765,6 +769,14 @@ export const PrepareCondition = () => {
             Prepare
           </Button>
         </ButtonContainer>
+        <Prompt
+          message="Are you sure you want to leave this page? The changes you made will be lost?"
+          when={
+            conditionType === ConditionType.custom
+              ? isDirtyCustomCondition
+              : isDirtyOmenCondition || outcomes.length > 0
+          }
+        />
       </CenteredCard>
     </>
   )
