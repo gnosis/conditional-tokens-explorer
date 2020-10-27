@@ -29,7 +29,17 @@ export const SplitPosition = () => {
       amount: BigNumber
     ) => {
       if (status === Web3ContextStatus.Connected && collateral) {
-        await CTService.splitPosition(collateral, parentCollection, conditionId, partition, amount)
+        try {
+          await CTService.splitPosition(
+            collateral,
+            parentCollection,
+            conditionId,
+            partition,
+            amount
+          )
+        } catch (err) {
+          throw err
+        }
       } else {
         connect()
       }
