@@ -33,6 +33,7 @@ import { useConditionContext } from 'contexts/ConditionContext'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { AllowanceMethods, useAllowanceState } from 'hooks/useAllowanceState'
 import { SplitFrom } from 'pages/SplitPosition/SplitFrom'
+import { Prompt } from 'react-router'
 import { GetCondition_condition, GetPosition_position } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
@@ -94,13 +95,9 @@ export const Form = ({
     defaultValues: DEFAULT_VALUES,
   })
 
-  const {
-    formState: { isValid },
-    getValues,
-    handleSubmit,
-    reset,
-    watch,
-  } = formMethods
+  const { formState, getValues, handleSubmit, reset, watch } = formMethods
+
+  const { dirty, isValid } = formState
 
   const [outcomeSlot, setOutcomeSlot] = useState(0)
   const [conditionIdToPreviewShow, setConditionIdToPreviewShow] = useState('')
@@ -404,6 +401,10 @@ export const Form = ({
           outcomes={numberedOutcomes}
         />
       )}
+      <Prompt
+        message="Are you sure you want to leave this page? The changes you made will be lost?"
+        when={dirty}
+      />
     </CenteredCard>
   )
 }
