@@ -329,14 +329,15 @@ export const Contents = (props: Props) => {
   const fullLoadingTitle = transfer.isFailure() ? 'Error' : transactionTitle
   const outcomesByRow = '14'
 
+  const isConnected = useMemo(() => status === Web3ContextStatus.Connected, [status])
+  const isSigner = useMemo(() => signer !== null, [signer])
+
   const dropdownItems = useMemo(() => {
     const userHasBalance = balanceERC1155 && !balanceERC1155.isZero()
-    const isSigner = signer !== null
-    const isDisconnected = status !== Web3ContextStatus.Connected
 
     const menu = [
       {
-        disabled: !userHasBalance || isDisconnected,
+        disabled: !userHasBalance || !isConnected,
         href: `/redeem`,
         onClick: () => {
           setValue(positionId)
@@ -344,7 +345,7 @@ export const Contents = (props: Props) => {
         text: 'Redeem',
       },
       {
-        disabled: !userHasBalance || isDisconnected,
+        disabled: !userHasBalance || !isConnected,
         href: `/split`,
         onClick: () => {
           setValue(positionId)
@@ -352,7 +353,7 @@ export const Contents = (props: Props) => {
         text: 'Split',
       },
       {
-        disabled: !userHasBalance || isDisconnected || !isSigner,
+        disabled: !userHasBalance || !isConnected || !isSigner,
         href: '',
         text: 'Transfer Outcome Tokens',
         onClick: () => {
@@ -362,7 +363,7 @@ export const Contents = (props: Props) => {
     ]
 
     return menu
-  }, [balanceERC1155, signer, status, setValue, positionId])
+  }, [balanceERC1155, setValue, positionId, isConnected, isSigner])
 
   const conditionIdLink = (id: string) => {
     return (
