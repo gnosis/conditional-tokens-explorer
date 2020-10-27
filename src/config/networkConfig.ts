@@ -447,11 +447,11 @@ export class NetworkConfig {
   getTokenFromName(tokenName: string): Maybe<Token> {
     const tokens = networks[this.networkId].tokens
 
-    const tokenDefault = tokens.find((token: Token) =>
+    const tokenFromDefaultList = tokens.find((token: Token) =>
       token.symbol.toLowerCase().includes(tokenName.toLowerCase())
     )
-    if (tokenDefault) {
-      return tokenDefault
+    if (tokenFromDefaultList) {
+      return tokenFromDefaultList
     }
 
     const tokenFromUniswap = this.getTokensFromUniswap().find(
