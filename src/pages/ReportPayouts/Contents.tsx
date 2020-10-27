@@ -1,6 +1,7 @@
 import { BigNumber } from 'ethers/utils'
 import React, { useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { Prompt } from 'react-router'
 
 import { Button } from 'components/buttons'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
@@ -17,7 +18,6 @@ import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Contex
 import { OutcomesTable } from 'pages/ReportPayouts/OutcomesTable'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
-import { Prompt } from 'react-router'
 
 export interface FormInputs {
   payouts: BigNumber[]
