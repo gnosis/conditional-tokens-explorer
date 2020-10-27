@@ -87,6 +87,11 @@ const ClearSearchButton = styled.button`
       fill: #000;
     }
   }
+
+  &[disabled] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
 `
 
 const ClearSearchButtonText = styled.span`
@@ -113,7 +118,6 @@ const ButtonDropdown = styled.button`
   font-size: 14px;
   font-weight: 400;
   height: 100%;
-  justify-content: center;
   justify-content: space-between;
   line-height: 1.2;
   max-width: 170px;
@@ -175,7 +179,7 @@ export const SearchField: React.FC<Props> = (props) => {
         value={value}
       />
       {onClear && (
-        <ClearSearchButton disabled={disabled} onClick={onClear}>
+        <ClearSearchButton disabled={!value || disabled} onClick={onClear}>
           <ClearSearch />
         </ClearSearchButton>
       )}
