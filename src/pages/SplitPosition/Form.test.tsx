@@ -3,6 +3,7 @@ import { render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { BigNumber } from 'ethers/utils'
 import React, { ReactElement } from 'react'
+import { HashRouter as Router } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
 
 import { ZERO_BN } from 'config/constants'
@@ -34,11 +35,13 @@ const connectedStatus = {
 const defaultToken = tokens[0]
 const renderWithConnectedProvider = (component: ReactElement) => (
   <Web3Context.Provider value={{ status: connectedStatus, connect, disconnect }}>
-    <ThemeProvider theme={theme}>
-      <MockedProvider>
-        <div id={'root'}>{component}</div>
-      </MockedProvider>
-    </ThemeProvider>
+    <Router>
+      <ThemeProvider theme={theme}>
+        <MockedProvider>
+          <div id={'root'}>{component}</div>
+        </MockedProvider>
+      </ThemeProvider>
+    </Router>
   </Web3Context.Provider>
 )
 
