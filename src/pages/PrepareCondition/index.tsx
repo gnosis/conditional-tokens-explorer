@@ -2,6 +2,7 @@ import lodashClonedeep from 'lodash.clonedeep'
 import moment from 'moment'
 import React, { KeyboardEvent, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { Prompt } from 'react-router'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -36,7 +37,6 @@ import {
   MIN_OUTCOMES_ALLOWED,
 } from 'config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { Prompt } from 'react-router'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
