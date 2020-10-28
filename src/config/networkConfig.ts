@@ -458,6 +458,7 @@ export class NetworkConfig {
           token.symbol.toLowerCase().includes(tokenSymbol.toLowerCase()) &&
           token.chainId === this.networkId
       )
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .map((token: any) => token.address.toLowerCase())
 
     return [...tokensFromDefaultList, ...tokensFromUniswap]
