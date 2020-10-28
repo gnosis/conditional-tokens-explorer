@@ -6,6 +6,7 @@ import { NavLink, useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { ButtonDots } from 'components/buttons/ButtonDots'
+import { ButtonExpand } from 'components/buttons/ButtonExpand'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import {
   Dropdown,
@@ -60,17 +61,8 @@ const DropdownItemLink = styled(NavLink)<DropdownItemProps>`
   ${DropdownItemCSS}
 `
 
-const MoreLink = styled.a`
-  color: ${(props) => props.theme.colors.textColor};
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  margin: 0 0 0 12px;
-  text-decoration: underline;
-
-  &:hover {
-    text-decoration: none;
-  }
+const ButtonExpandStyled = styled(ButtonExpand)`
+  margin-right: auto;
 `
 
 const logger = getLogger('PositionsList')
@@ -373,6 +365,7 @@ export const PositionsList = () => {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimals) => formatTSSimple(row.createTimestamp),
         name: 'Creation Date',
+        right: true,
         selector: 'createTimestamp',
         sortable: true,
       },
@@ -387,7 +380,7 @@ export const PositionsList = () => {
             return (
               <>
                 <Hash href={`/conditions/${conditionId}`} value={conditionId} />
-                <MoreLink
+                <ButtonExpandStyled
                   onClick={() => {
                     const hashes: HashArray[] = conditions.map(
                       (condition: ConditionInformation) => {
@@ -402,9 +395,7 @@ export const PositionsList = () => {
                     setTitleModal('Conditions')
                     setUrlTableModal('conditions')
                   }}
-                >
-                  (More...)
-                </MoreLink>
+                />
               </>
             )
           }
@@ -429,7 +420,7 @@ export const PositionsList = () => {
             return (
               <>
                 <Hash value={oracle} />
-                <MoreLink
+                <ButtonExpandStyled
                   onClick={() => {
                     const hashes: HashArray[] = conditions.map(
                       (condition: ConditionInformation) => {
@@ -444,9 +435,7 @@ export const PositionsList = () => {
                     setTitleModal('Oracles')
                     setUrlTableModal('')
                   }}
-                >
-                  (More...)
-                </MoreLink>
+                />
               </>
             )
           }
@@ -472,7 +461,7 @@ export const PositionsList = () => {
             return (
               <>
                 <Hash value={questionId} />
-                <MoreLink
+                <ButtonExpandStyled
                   onClick={() => {
                     const hashes: HashArray[] = conditions.map(
                       (condition: ConditionInformation) => {
@@ -487,9 +476,7 @@ export const PositionsList = () => {
                     setTitleModal('Questions')
                     setUrlTableModal('')
                   }}
-                >
-                  (More...)
-                </MoreLink>
+                />
               </>
             )
           }

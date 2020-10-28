@@ -10,7 +10,6 @@ import { truncateStringInTheMiddle } from 'util/tools'
 const Wrapper = styled.span`
   align-items: center;
   display: inline-flex;
-  flex-grow: 1;
   flex-wrap: nowrap;
   white-space: nowrap;
 `
