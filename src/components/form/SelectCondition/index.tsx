@@ -50,6 +50,7 @@ export const SelectCondition: React.FC<Props> = (props) => {
         value={
           <>
             <TextfieldFetchableData
+              autoComplete="off"
               error={!!errors.length}
               isFetching={loading}
               onChange={inputHandler}

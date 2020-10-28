@@ -14,7 +14,7 @@ const Wrapper = styled.div`
   display: flex;
   height: 32px;
   max-width: 100%;
-  min-width: 450px;
+  width: 450px;
 
   .dropdown,
   .dropdownButton {
@@ -38,6 +38,7 @@ const Input = styled(Textfield)`
   border-radius: 4px;
   color: ${(props) => props.theme.colors.textColor};
   flex-grow: 1;
+  flex-shrink: 1;
   font-size: 15px;
   font-weight: normal;
   height: 100%;
@@ -86,6 +87,11 @@ const ClearSearchButton = styled.button`
       fill: #000;
     }
   }
+
+  &[disabled] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
 `
 
 const ClearSearchButtonText = styled.span`
@@ -112,10 +118,9 @@ const ButtonDropdown = styled.button`
   font-size: 14px;
   font-weight: 400;
   height: 100%;
-  justify-content: center;
   justify-content: space-between;
   line-height: 1.2;
-  max-width: 115px;
+  max-width: 170px;
   min-width: 80px;
   outline: none;
   padding: 0 12px;
@@ -174,7 +179,7 @@ export const SearchField: React.FC<Props> = (props) => {
         value={value}
       />
       {onClear && (
-        <ClearSearchButton disabled={disabled} onClick={onClear}>
+        <ClearSearchButton disabled={!value || disabled} onClick={onClear}>
           <ClearSearch />
         </ClearSearchButton>
       )}
