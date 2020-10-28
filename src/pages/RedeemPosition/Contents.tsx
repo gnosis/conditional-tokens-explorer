@@ -1,6 +1,7 @@
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useEffect, useMemo } from 'react'
+import { Prompt } from 'react-router'
 
 import { Button } from 'components/buttons'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
@@ -202,6 +203,10 @@ export const Contents = () => {
           Redeem
         </Button>
       </ButtonContainer>
+      <Prompt
+        message="Are you sure you want to leave this page? The changes you made will be lost?"
+        when={!!condition || positions.length > 0}
+      />
     </CenteredCard>
   )
 }

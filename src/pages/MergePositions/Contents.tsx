@@ -1,6 +1,7 @@
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { Prompt } from 'react-router'
 
 import { Button } from 'components/buttons/Button'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
@@ -270,6 +271,10 @@ export const Contents = () => {
           Merge
         </Button>
       </ButtonContainer>
+      <Prompt
+        message="Are you sure you want to leave this page? The changes you made will be lost?"
+        when={positions.length > 0 || !!condition || !amount.isZero()}
+      />
     </CenteredCard>
   )
 }

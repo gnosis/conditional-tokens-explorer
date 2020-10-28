@@ -1,6 +1,7 @@
 import { BigNumber } from 'ethers/utils'
 import React, { useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { Prompt } from 'react-router'
 
 import { Button } from 'components/buttons'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
@@ -160,6 +161,10 @@ export const Contents: React.FC = () => {
           Report
         </Button>
       </ButtonContainer>
+      <Prompt
+        message="Are you sure you want to leave this page? The changes you made will be lost?"
+        when={dirty || !!condition}
+      />
     </CenteredCard>
   )
 }
