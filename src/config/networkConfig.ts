@@ -71,7 +71,7 @@ const networks: { [K in NetworkIds]: Network } = {
       },
       {
         symbol: 'CDAI',
-        address: '0xa4c993e32876795abf80842adb0a241bb0eecd47',
+        address: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643',
         decimals: 18,
       },
       {
@@ -444,22 +444,24 @@ export class NetworkConfig {
     }
   }
 
-  getTokenFromName(tokenName: string): Maybe<Token> {
+  getTokenFromName(tokenSymbol: string): Maybe<Token> {
     const tokens = networks[this.networkId].tokens
 
     const tokenFromDefaultList = tokens.find((token: Token) =>
-      token.symbol.toLowerCase().includes(tokenName.toLowerCase())
+      token.symbol.toLowerCase().includes(tokenSymbol.toLowerCase())
     )
+    console.log(tokenFromDefaultList)
     if (tokenFromDefaultList) {
       return tokenFromDefaultList
     }
 
     const tokenFromUniswap = this.getTokensFromUniswap().find(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (token: any) =>
-        token.symbol.toLowerCase().includes(tokenName.toLowerCase()) &&
-        token.chainId === this.networkId
-    )
+      (token: any) => {
+        console.log(token.symbol)
+        return token.symbol.toLowerCase().includes(tokenSymbol.toLowerCase()) && token.chainId === this.networkId
+      })
+    console.log(tokenFromUniswap, tokenSymbol)
     if (tokenFromUniswap) {
       return {
         symbol: tokenFromUniswap.symbol,
