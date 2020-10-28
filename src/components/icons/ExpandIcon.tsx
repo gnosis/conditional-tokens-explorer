@@ -10,9 +10,9 @@ const Wrapper = styled.svg`
 export const ExpandIcon: React.FC<{ className?: string }> = (props) => (
   <Wrapper
     className={`expandIcon ${props.className}`}
-    height="15"
+    height="14"
     viewBox="0 0 540.09 540.09"
-    width="15"
+    width="14"
     xmlns="http://www.w3.org/2000/svg"
     {...props}
   >

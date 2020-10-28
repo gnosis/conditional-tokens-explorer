@@ -463,9 +463,7 @@ export const Contents = (props: Props) => {
             ) : (
               <FlexRow>
                 <FormatHash hash={truncateStringInTheMiddle(questionIds[0], 8, 6)} />
-                <MoreLink onClick={() => setOpenDisplayQuestionIdsTableModal(true)}>
-                  (More...)
-                </MoreLink>
+                <ButtonExpand onClick={() => setOpenDisplayQuestionIdsTableModal(true)} />
               </FlexRow>
             )
           }
@@ -481,9 +479,7 @@ export const Contents = (props: Props) => {
             ) : (
               <FlexRow>
                 <FormatHash hash={truncateStringInTheMiddle(oraclesIds[0], 8, 6)} />
-                <MoreLink onClick={() => setOpenDisplayOraclesIdsTableModal(true)}>
-                  (More...)
-                </MoreLink>
+                <ButtonExpand onClick={() => setOpenDisplayOraclesIdsTableModal(true)} />
               </FlexRow>
             )
           }
