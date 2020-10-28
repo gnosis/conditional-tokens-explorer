@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import styled from 'styled-components'
 
+import BN from 'bn.js'
 import { Button } from 'components/buttons/Button'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CenteredCard } from 'components/common/CenteredCard'
@@ -147,8 +148,11 @@ export const Form = ({
   const partition = useMemo(() => {
     return numberedOutcomes.map((collection: Array<OutcomeProps>) => {
       const collectionExtract = collection.map((item) => item.id).sort((a, b) => +a - +b) //ascending sort
-      const indexSet = collectionExtract.reduce((acc, indexSet) => acc | +indexSet, 0)
-      return new BigNumber(indexSet)
+      const indexSet = collectionExtract.reduce(
+        (acc, indexSet) => acc.or(new BN(indexSet)),
+        new BN(0)
+      )
+      return new BigNumber(indexSet.toString(10))
     })
   }, [numberedOutcomes])
 
