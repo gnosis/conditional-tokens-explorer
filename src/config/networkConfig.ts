@@ -444,33 +444,23 @@ export class NetworkConfig {
     }
   }
 
-  getTokenFromName(tokenSymbol: string): Maybe<Token> {
+  getMultipleTokenAddressesFromSymbol(tokenSymbol: string): string[] {
     const tokens = networks[this.networkId].tokens
 
-    const tokenFromDefaultList = tokens.find((token: Token) =>
-      token.symbol.toLowerCase().includes(tokenSymbol.toLowerCase())
-    )
-    console.log(tokenFromDefaultList)
-    if (tokenFromDefaultList) {
-      return tokenFromDefaultList
-    }
+    const tokensFromDefaultList = tokens
+      .filter((token: Token) => token.symbol.toLowerCase().includes(tokenSymbol.toLowerCase()))
+      .map((token: Token) => token.address.toLowerCase())
 
-    const tokenFromUniswap = this.getTokensFromUniswap().find(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (token: any) => {
-        console.log(token.symbol)
-        return token.symbol.toLowerCase().includes(tokenSymbol.toLowerCase()) && token.chainId === this.networkId
-      })
-    console.log(tokenFromUniswap, tokenSymbol)
-    if (tokenFromUniswap) {
-      return {
-        symbol: tokenFromUniswap.symbol,
-        address: tokenFromUniswap.address,
-        decimals: tokenFromUniswap.decimals,
-      }
-    }
+    const tokensFromUniswap = this.getTokensFromUniswap()
+      .filter(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (token: any) =>
+          token.symbol.toLowerCase().includes(tokenSymbol.toLowerCase()) &&
+          token.chainId === this.networkId
+      )
+      .map((token: any) => token.address.toLowerCase())
 
-    return null
+    return [...tokensFromDefaultList, ...tokensFromUniswap]
   }
 
   getRealitioTimeout(): number {
