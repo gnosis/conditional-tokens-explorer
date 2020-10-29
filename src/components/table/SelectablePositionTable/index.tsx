@@ -27,6 +27,10 @@ const Search = styled(SearchField)`
   width: 400px;
 `
 
+const TableControlsStyled = styled(TableControls)`
+  padding-top: 13px;
+`
+
 interface Props {
   title?: string
 }
@@ -136,7 +140,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
       title={title}
       value={
         <>
-          <TableControls
+          <TableControlsStyled
             end={
               <Search
                 dropdownItems={dropdownItems}
