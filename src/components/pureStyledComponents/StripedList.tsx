@@ -58,6 +58,7 @@ export const StripedListEmpty = styled.div`
   display: flex;
   flex-grow: 1;
   font-size: 15px;
+  font-weight: 600;
   height: 100%;
   justify-content: center;
   line-height: 1.5;

@@ -21,7 +21,7 @@ export const dataTableCSS = css`
       border: 1px solid ${(props) => props.theme.colors.lightGrey};
       border-radius: 4px;
       box-shadow: none;
-      margin-bottom: 32px;
+      margin-bottom: 24px;
       min-height: 280px;
 
       .rdt_TableHeadRow {

@@ -176,6 +176,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
             columns={defaultColumns}
             customStyles={customStyles}
             data={showSpinner ? [] : positionList.length ? positionList : []}
+            highlightOnHover
             noDataComponent={
               showSpinner ? (
                 <InlineLoading size={SpinnerSize.small} />
@@ -189,6 +190,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
             pagination
             paginationPerPage={5}
             paginationRowsPerPageOptions={[5, 10, 15]}
+            pointerOnHover
             responsive
           />
         </>

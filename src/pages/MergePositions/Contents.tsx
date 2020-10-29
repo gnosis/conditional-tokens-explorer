@@ -10,6 +10,7 @@ import { Amount } from 'components/form/Amount'
 import { SelectCondition } from 'components/form/SelectCondition'
 import { MergePreview } from 'components/mergePositions/MergePreview'
 import { MergeResultModal } from 'components/mergePositions/MergeResultModal'
+import { MergeWith } from 'components/mergePositions/MergeWith'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { Row } from 'components/pureStyledComponents/Row'
 import { FullLoading } from 'components/statusInfo/FullLoading'
@@ -46,9 +47,7 @@ export const Contents = () => {
   } = useWeb3ConnectedOrInfura()
 
   const { clearPositions, errors: positionsErrors, positions } = useMultiPositionsContext()
-
   const { balances, errors: balancesErrors, updateBalances } = useBatchBalanceContext()
-
   const { clearCondition, condition, errors: conditionErrors } = useConditionContext()
   const [status, setStatus] = useState<Maybe<Status>>(null)
   const [error, setError] = useState<Maybe<Error>>(null)
@@ -210,6 +209,25 @@ export const Contents = () => {
   const fullLoadingMessage =
     status === Status.Error ? error?.message : status === Status.Loading ? 'Working...' : undefined
 
+  const mergeablePositionsArray: Array<any> = [
+    {
+      position: '[DAI C: 0xb67f….ffa7 O: 0|1] x 10',
+    },
+    {
+      position: '[DAI C: 0xb67f….ffa7 O: 6|7|10] x 10',
+    },
+    {
+      position: '[DAI C: 0xb67f….ffa7 O: 2|4] x 10',
+    },
+    {
+      position: '[DAI C: 0xb67f….ffa7 O: 3|5|9|8] x 10',
+    },
+  ]
+
+  const onMergeableItemClick = (item: any, index: number) => {
+    console.log(item.position, index)
+  }
+
   const fullLoadingTitle = status === Status.Error ? 'Error' : 'Merge Positions'
   const isWorking = status === Status.Loading || status === Status.Error
   const isFinished = status === Status.Ready
@@ -217,6 +235,9 @@ export const Contents = () => {
   return (
     <CenteredCard>
       <SelectablePositionTable />
+      <Row cols="1fr" marginBottomXL>
+        <MergeWith mergeablePositions={mergeablePositionsArray} onClick={onMergeableItemClick} />
+      </Row>
       <Row cols="1fr">
         <SelectCondition />
       </Row>
