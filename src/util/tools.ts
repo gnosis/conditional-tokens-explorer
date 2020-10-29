@@ -10,7 +10,7 @@ import {
   GetMultiPositions_positions,
   GetPosition_position,
 } from 'types/generatedGQLForCTE'
-import { CollateralErrors, ConditionErrors, PositionErrors, Token } from 'util/types'
+import { CollateralErrors, ConditionErrors, PositionErrors, Token, NetworkIds } from 'util/types'
 
 export const isAddress = (address: string) => {
   try {
@@ -394,3 +394,10 @@ export const isPartitionFullIndexSet = (
 
 export const capitalize = (str: string): string =>
   str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+
+export const getRealityQuestionUrl = (networkConfig: NetworkConfig, questionId: string) => {
+  const oracle = networkConfig.getOracleFromName('reality')
+  return networkConfig.networkId === NetworkIds.GANACHE
+    ? '#'
+    : `${oracle.url}app/#!/question/${questionId}`
+}

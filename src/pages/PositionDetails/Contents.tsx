@@ -41,11 +41,18 @@ import { FormatHash } from 'components/text/FormatHash'
 import { TitleValue } from 'components/text/TitleValue'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useCollateral } from 'hooks/useCollateral'
+import { useIsConditionFromOmen } from 'hooks/useIsConditionFromOmen'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { GetPosition_position as Position } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
-import { formatBigNumber, formatTS, positionString, truncateStringInTheMiddle } from 'util/tools'
+import {
+  formatBigNumber,
+  formatTS,
+  getRealityQuestionUrl,
+  positionString,
+  truncateStringInTheMiddle,
+} from 'util/tools'
 import {
   HashArray,
   LocalStorageManagement,
@@ -163,13 +170,17 @@ export const Contents = (props: Props) => {
   )
   const [transactionTitle, setTransactionTitle] = useState<string>('')
 
-  const oraclesIds = useMemo(() => uniqby(position.conditions, 'oracle').map((c) => c.oracle), [
+  const oracleIds = useMemo(() => uniqby(position.conditions, 'oracle').map((c) => c.oracle), [
     position,
   ])
   const questionIds = useMemo(
     () => uniqby(position.conditions, 'questionId').map((c) => c.questionId),
     [position]
   )
+
+  const areQuestionIdsMoreThanOne = useMemo(() => questionIds.length > 1, [questionIds])
+  const areOracleIdsMoreThanOne = useMemo(() => oracleIds.length > 1, [oracleIds])
+  const areConditionsMoreThanOne = useMemo(() => conditions.length > 1, [conditions])
 
   const positionPreview = useMemo(() => {
     if (collateralERC1155 && balanceERC1155) {
@@ -193,6 +204,8 @@ export const Contents = (props: Props) => {
         .map((n) => n - 1)
     })
   }, [indexSets])
+
+  const isConditionFromOmen = useIsConditionFromOmen(oracleIds[0])
 
   const ERC1155Symbol = useMemo(
     () => (collateralERC1155 && collateralERC1155.symbol ? collateralERC1155.symbol : ''),
@@ -319,10 +332,9 @@ export const Contents = (props: Props) => {
 
   const isConnected = useMemo(() => status === Web3ContextStatus.Connected, [status])
   const isSigner = useMemo(() => signer !== null, [signer])
-  const userHasBalance = useMemo( () => balanceERC1155 && !balanceERC1155.isZero(), [balanceERC1155])
+  const userHasBalance = useMemo(() => balanceERC1155 && !balanceERC1155.isZero(), [balanceERC1155])
 
   const dropdownItems = useMemo(() => {
-
     const menu = [
       {
         disabled: !userHasBalance || !isConnected,
@@ -395,6 +407,29 @@ export const Contents = (props: Props) => {
 
   const isWorking = transfer.isLoading() || transfer.isFailure() || transfer.isSuccess()
 
+  const oracleTitle = useMemo(() => {
+    if (isConditionFromOmen) {
+      return areQuestionIdsMoreThanOne ? 'Oracles' : 'Oracle'
+    } else {
+      return areQuestionIdsMoreThanOne ? 'Reporting Addresses' : 'Reporting Address'
+    }
+  }, [isConditionFromOmen, areQuestionIdsMoreThanOne])
+
+  const oracleName = useMemo(
+    () =>
+      isConditionFromOmen ? (
+        networkConfig.getOracleFromAddress(oracleIds[0]).description
+      ) : (
+        <FormatHash hash={truncateStringInTheMiddle(oracleIds[0], 8, 6)} />
+      ),
+    [networkConfig, oracleIds, isConditionFromOmen]
+  )
+
+  const getRealityQuestionUrlMemoized = useCallback(
+    (questionId: string): string => getRealityQuestionUrl(networkConfig, questionId),
+    [networkConfig]
+  )
+
   return (
     <CenteredCard
       dropdown={
@@ -453,43 +488,38 @@ export const Contents = (props: Props) => {
         />
         <TitleValue title="Creation Date" value={formatTS(createTimestamp)} />
         <TitleValue
-          title={questionIds.length === 1 ? 'Question Id' : 'Question Ids'}
+          title={areQuestionIdsMoreThanOne ? 'Question Ids' : 'Question Id'}
           value={
-            questionIds.length === 1 ? (
-              <FlexRow>
-                <FormatHash hash={truncateStringInTheMiddle(questionIds[0], 8, 6)} />
-                <ButtonCopy value={questionIds[0]} />
-              </FlexRow>
-            ) : (
-              <FlexRow>
-                <FormatHash hash={truncateStringInTheMiddle(questionIds[0], 8, 6)} />
+            <FlexRow>
+              <FormatHash hash={truncateStringInTheMiddle(questionIds[0], 8, 6)} />
+              {!areQuestionIdsMoreThanOne && <ButtonCopy value={questionIds[0]} />}
+              {areQuestionIdsMoreThanOne && (
                 <ButtonExpand onClick={() => setOpenDisplayQuestionIdsTableModal(true)} />
-              </FlexRow>
-            )
+              )}
+            </FlexRow>
           }
         />
         <TitleValue
-          title={questionIds.length === 1 ? 'Oracle' : 'Oracles'}
+          title={oracleTitle}
           value={
-            oraclesIds.length === 1 ? (
-              <FlexRow>
-                <FormatHash hash={truncateStringInTheMiddle(oraclesIds[0], 8, 6)} />
-                <ButtonCopy value={oraclesIds[0]} />
-              </FlexRow>
-            ) : (
-              <FlexRow>
-                <FormatHash hash={truncateStringInTheMiddle(oraclesIds[0], 8, 6)} />
+            <FlexRow>
+              {oracleName}
+              {!areOracleIdsMoreThanOne && <ButtonCopy value={oracleIds[0]} />}
+              {areOracleIdsMoreThanOne && (
                 <ButtonExpand onClick={() => setOpenDisplayOraclesIdsTableModal(true)} />
-              </FlexRow>
-            )
+              )}
+              {isConditionFromOmen && (
+                <ExternalLink href={getRealityQuestionUrlMemoized(questionIds[0])} />
+              )}
+            </FlexRow>
           }
         />
 
         {conditions.length > 0 && (
           <TitleValue
-            title={conditions.length === 1 ? 'Condition Id' : 'Condition Ids'}
+            title={!areConditionsMoreThanOne ? 'Condition Id' : 'Condition Ids'}
             value={
-              conditions.length === 1 ? (
+              !areConditionsMoreThanOne ? (
                 <FlexRow>{conditionIdLink(conditions[0].hash)}</FlexRow>
               ) : (
                 <FlexRow>
@@ -644,7 +674,7 @@ export const Contents = (props: Props) => {
           positionId={positionId}
         />
       )}
-      {openDisplayConditionsTableModal && conditions.length > 1 && (
+      {openDisplayConditionsTableModal && areConditionsMoreThanOne && (
         <DisplayHashesTableModal
           hashes={conditions}
           isOpen={openDisplayConditionsTableModal}
@@ -654,9 +684,9 @@ export const Contents = (props: Props) => {
           url="condition"
         />
       )}
-      {openDisplayOraclesIdsTableModal && oraclesIds.length > 1 && (
+      {openDisplayOraclesIdsTableModal && areOracleIdsMoreThanOne && (
         <DisplayHashesTableModal
-          hashes={oraclesIds.map((id) => {
+          hashes={oracleIds.map((id) => {
             return { hash: id }
           })}
           isOpen={openDisplayOraclesIdsTableModal}
@@ -666,7 +696,7 @@ export const Contents = (props: Props) => {
           url=""
         />
       )}
-      {openDisplayQuestionIdsTableModal && questionIds.length > 1 && (
+      {openDisplayQuestionIdsTableModal && areQuestionIdsMoreThanOne && (
         <DisplayHashesTableModal
           hashes={questionIds.map((id) => {
             return { hash: id }

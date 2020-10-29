@@ -12,6 +12,7 @@ import {
   DropdownPosition,
 } from 'components/common/Dropdown'
 import { DisplayTablePositions } from 'components/form/DisplayTablePositions'
+import { ExternalLink } from 'components/navigation/ExternalLink'
 import { FlexRow } from 'components/pureStyledComponents/FlexRow'
 import { Pill, PillTypes } from 'components/pureStyledComponents/Pill'
 import { Row } from 'components/pureStyledComponents/Row'
@@ -25,9 +26,13 @@ import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { usePositions } from 'hooks/usePositions'
 import { useQuestion } from 'hooks/useQuestion'
 import { GetCondition_condition } from 'types/generatedGQLForCTE'
-import { formatTS, getConditionTypeTitle, truncateStringInTheMiddle } from 'util/tools'
-import { ConditionStatus, ConditionType, LocalStorageManagement, NetworkIds } from 'util/types'
-import { ExternalLink } from 'components/navigation/ExternalLink'
+import {
+  formatTS,
+  getConditionTypeTitle,
+  getRealityQuestionUrl,
+  truncateStringInTheMiddle,
+} from 'util/tools'
+import { ConditionStatus, ConditionType, LocalStorageManagement } from 'util/types'
 
 const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
@@ -90,14 +95,14 @@ export const Contents: React.FC<Props> = ({ condition }) => {
   }, [setValue, conditionId, resolved, isConnected])
 
   const { outcomesPrettier, question } = useQuestion(questionId, outcomeSlotCount)
-  const isConditionFromOmen = useIsConditionFromOmen(creator, oracle, question)
+  const isConditionFromOmen = useIsConditionFromOmen(oracle)
   const {
     templateId = null,
     title = INFORMATION_NOT_AVAILABLE,
     category = INFORMATION_NOT_AVAILABLE,
   } = question ?? {}
 
-  const oracleTitle = useMemo(
+  const oracleName = useMemo(
     () =>
       isConditionFromOmen ? (
         networkConfig.getOracleFromAddress(oracle).description
@@ -111,13 +116,8 @@ export const Contents: React.FC<Props> = ({ condition }) => {
     conditionsIds: [conditionId],
   })
 
-  const getRealityQuestionUrl = useCallback(
-    (questionId: string): string => {
-      const oracle = networkConfig.getOracleFromName('reality')
-      return networkConfig.networkId === NetworkIds.GANACHE
-        ? '#'
-        : `${oracle.url}app/#!/question/${questionId}`
-    },
+  const getRealityQuestionUrlMemoized = useCallback(
+    (questionId: string): string => getRealityQuestionUrl(networkConfig, questionId),
     [networkConfig]
   )
 
@@ -216,9 +216,11 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           title={isConditionFromOmen ? 'Oracle' : 'Reporting Address'}
           value={
             <FlexRow>
-              {oracleTitle}
+              {oracleName}
               <ButtonCopy value={oracle} />
-              {isConditionFromOmen && <ExternalLink href={getRealityQuestionUrl(questionId)} />}
+              {isConditionFromOmen && (
+                <ExternalLink href={getRealityQuestionUrlMemoized(questionId)} />
+              )}
             </FlexRow>
           }
         />
