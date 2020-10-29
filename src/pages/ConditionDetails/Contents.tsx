@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -26,7 +26,8 @@ import { usePositions } from 'hooks/usePositions'
 import { useQuestion } from 'hooks/useQuestion'
 import { GetCondition_condition } from 'types/generatedGQLForCTE'
 import { formatTS, getConditionTypeTitle, truncateStringInTheMiddle } from 'util/tools'
-import { ConditionStatus, ConditionType, LocalStorageManagement } from 'util/types'
+import { ConditionStatus, ConditionType, LocalStorageManagement, NetworkIds } from 'util/types'
+import { ExternalLink } from 'components/navigation/ExternalLink'
 
 const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
@@ -109,6 +110,16 @@ export const Contents: React.FC<Props> = ({ condition }) => {
   const { data: positions, loading: loadingPositions } = usePositions({
     conditionsIds: [conditionId],
   })
+
+  const getRealityQuestionUrl = useCallback(
+    (questionId: string): string => {
+      const oracle = networkConfig.getOracleFromName('reality')
+      return networkConfig.networkId === NetworkIds.GANACHE
+        ? '#'
+        : `${oracle.url}app/#!/question/${questionId}`
+    },
+    [networkConfig]
+  )
 
   return (
     <CenteredCard
@@ -207,6 +218,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
             <FlexRow>
               {oracleTitle}
               <ButtonCopy value={oracle} />
+              {isConditionFromOmen && <ExternalLink href={getRealityQuestionUrl(questionId)} />}
             </FlexRow>
           }
         />
