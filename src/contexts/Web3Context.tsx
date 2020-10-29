@@ -8,7 +8,7 @@ import { DEFAULT_NETWORK_ID, INFURA_ID } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 import { CPKService as CPKServiceClass } from 'services/cpk'
-import { RealitioService } from 'services/realitio'
+import { RealityService } from 'services/reality'
 import { Wrapper1155Service } from 'services/wrapper1155'
 import { getLogger } from 'util/logger'
 
@@ -45,7 +45,7 @@ export type Connected = {
   signer: JsonRpcSigner
   networkConfig: NetworkConfig
   CTService: ConditionalTokensService
-  RtioService: RealitioService
+  RtyService: RealityService
   WrapperService: Wrapper1155Service
   CPKService: CPKServiceClass
   disconnect: () => void
@@ -56,7 +56,7 @@ export type Infura = {
   provider: InfuraProvider
   networkConfig: NetworkConfig
   CTService: ConditionalTokensService
-  RtioService: RealitioService
+  RtyService: RealityService
   WrapperService: Wrapper1155Service
   connect: () => void
 }
@@ -210,7 +210,7 @@ export const Web3ContextProvider = ({ children }: Props) => {
         logger.log('Updating connected information...')
 
         const networkConfig = new NetworkConfig(networkId)
-        const RtioService = new RealitioService(networkConfig, provider, signer)
+        const RtyService = new RealityService(networkConfig, provider, signer)
         const CTService = new ConditionalTokensService(networkConfig, provider, signer)
         const WrapperService = new Wrapper1155Service(networkConfig, provider, signer)
         const CPKService = await CPKServiceClass.create(networkConfig, provider, signer)
@@ -222,7 +222,7 @@ export const Web3ContextProvider = ({ children }: Props) => {
           signer,
           networkConfig,
           CTService,
-          RtioService,
+          RtyService,
           WrapperService,
           CPKService,
           address,
@@ -249,7 +249,7 @@ export const Web3ContextProvider = ({ children }: Props) => {
       const networkId = (await provider.getNetwork()).chainId
       if (NetworkConfig.isKnownNetwork(networkId)) {
         const networkConfig = new NetworkConfig(networkId)
-        const RtioService = new RealitioService(networkConfig, provider)
+        const RtyService = new RealityService(networkConfig, provider)
         const CTService = new ConditionalTokensService(networkConfig, provider)
         const WrapperService = new Wrapper1155Service(networkConfig, provider)
         setWeb3Status({
@@ -257,7 +257,7 @@ export const Web3ContextProvider = ({ children }: Props) => {
           provider,
           networkConfig,
           CTService,
-          RtioService,
+          RtyService,
           WrapperService,
         } as Infura)
       } else {

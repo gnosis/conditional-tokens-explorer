@@ -77,7 +77,7 @@ export const PrepareCondition = () => {
   const {
     _type: status,
     CTService,
-    RtioService,
+    RtyService,
     address,
     connect,
     networkConfig,
@@ -99,7 +99,7 @@ export const PrepareCondition = () => {
     oracle: '',
   }
 
-  const oracle = networkConfig.getOracleFromName('realitio' as KnownOracle)
+  const oracle = networkConfig.getOracleFromName('reality' as KnownOracle)
 
   const defaultValuesOmen = {
     arbitrator: networkConfig.getArbitratorFromName('kleros'),
@@ -223,7 +223,7 @@ export const PrepareCondition = () => {
               networkConfig,
               signerAddress: address,
             }
-            const questionId = await RtioService.askQuestionConstant(questionOptions)
+            const questionId = await RtyService.askQuestionConstant(questionOptions)
             setConditionIdPreview(
               ConditionalTokensService.getConditionId(
                 questionId,
@@ -245,7 +245,7 @@ export const PrepareCondition = () => {
     getConditionIdPreview()
   }, [
     outcomes,
-    RtioService,
+    RtyService,
     address,
     networkConfig,
     questionTitle,
@@ -328,7 +328,7 @@ export const PrepareCondition = () => {
               signerAddress: address,
             }
 
-            const questionId = await RtioService.askQuestion(questionOptions)
+            const questionId = await RtyService.askQuestion(questionOptions)
 
             await CTService.prepareCondition(questionId, oracleOmen + '', outcomes.length)
             conditionIdToUpdate = ConditionalTokensService.getConditionId(
@@ -688,7 +688,7 @@ export const PrepareCondition = () => {
                       {...(conditionType === ConditionType.omen && { readOnly: true })}
                     />
                     <SmallNote>
-                      <strong>Note:</strong> Realit.io is the default oracle for Omen conditions.
+                      <strong>Note:</strong> Reality.eth is the default oracle for Omen conditions.
                     </SmallNote>
                     {errorsOmenCondition.oracle && (
                       <ErrorContainer>

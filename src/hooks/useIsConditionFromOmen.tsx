@@ -11,13 +11,12 @@ export const useIsConditionFromOmen = (
 ): boolean => {
   const { networkConfig } = useWeb3ConnectedOrInfura()
 
-  // This apparently should also check if condition creator is a contract but it seems it doesn't work - TODO: Confirm this idea
   const isConditionFromOmen = React.useMemo(() => {
     const defaultValue = false
     try {
       if (question) {
         const oracle = networkConfig.getOracleFromAddress(oracleAddress)
-        return oracle.name === ('realitio' as KnownOracle)
+        return oracle.name === ('reality' as KnownOracle)
       } else {
         return defaultValue
       }

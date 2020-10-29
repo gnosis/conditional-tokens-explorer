@@ -147,7 +147,7 @@ export enum OracleFilterOptions {
   Custom = 'custom',
   Current = 'current',
   Kleros = 'kleros',
-  Realitio = 'realitio',
+  Reality = 'reality',
 }
 
 export enum StatusOptions {

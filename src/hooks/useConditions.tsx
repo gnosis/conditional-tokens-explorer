@@ -28,7 +28,7 @@ export const useConditions = (options: OptionsToSearch) => {
 
   if (
     oracleValue &&
-    [OracleFilterOptions.Kleros, OracleFilterOptions.Realitio].indexOf(oracleValue) > -1
+    [OracleFilterOptions.Kleros, OracleFilterOptions.Reality].indexOf(oracleValue) > -1
   ) {
     queryOptions.oracleIn = oracleFilter
   }

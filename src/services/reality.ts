@@ -3,25 +3,25 @@ import RealitioTemplateLib from '@realitio/realitio-lib/formatters/template'
 import { Contract, ethers } from 'ethers'
 import { bigNumberify } from 'ethers/utils'
 
-import { REALITIO_TIMEOUT, SINGLE_SELECT_TEMPLATE_ID } from 'config/constants'
+import { REALITY_TIMEOUT, SINGLE_SELECT_TEMPLATE_ID } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
 import { getLogger } from 'util/logger'
 import { Question, QuestionLog, QuestionOptions } from 'util/types'
 
-const logger = getLogger('Realitio Service')
+const logger = getLogger('Reality Service')
 
-const realitioAbi = [
+const realityAbi = [
   'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public payable returns (bytes32)',
   'event LogNewQuestion(bytes32 indexed question_id, address indexed user, uint256 template_id, string question, bytes32 indexed content_hash, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce, uint256 created)',
   'function isFinalized(bytes32 question_id) view public returns (bool)',
   'function resultFor(bytes32 question_id) external view returns (bytes32)',
 ]
 
-const realitioCallAbi = [
+const realityCallAbi = [
   'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public constant returns (bytes32)',
 ]
 
-export class RealitioService {
+export class RealityService {
   private contract: Contract
   private constantContract: Contract
   private provider: ethers.providers.Provider
@@ -31,16 +31,16 @@ export class RealitioService {
     private providerContext: ethers.providers.Provider,
     private signer?: ethers.Signer
   ) {
-    const contractAddress = networkConfig.getRealitioAddress()
+    const contractAddress = networkConfig.getRealityAddress()
 
     if (signer) {
-      this.contract = new ethers.Contract(contractAddress, realitioAbi, providerContext).connect(
+      this.contract = new ethers.Contract(contractAddress, realityAbi, providerContext).connect(
         signer
       )
     } else {
-      this.contract = new ethers.Contract(contractAddress, realitioAbi, providerContext)
+      this.contract = new ethers.Contract(contractAddress, realityAbi, providerContext)
     }
-    this.constantContract = new ethers.Contract(contractAddress, realitioCallAbi, providerContext)
+    this.constantContract = new ethers.Contract(contractAddress, realityCallAbi, providerContext)
     this.provider = providerContext
   }
 
@@ -67,7 +67,7 @@ export class RealitioService {
       category
     )
 
-    const timeoutResolution = REALITIO_TIMEOUT || networkConfig.getRealitioTimeout()
+    const timeoutResolution = REALITY_TIMEOUT || networkConfig.getRealityTimeout()
 
     const args = [
       SINGLE_SELECT_TEMPLATE_ID,
@@ -111,7 +111,7 @@ export class RealitioService {
       category
     )
 
-    const timeoutResolution = REALITIO_TIMEOUT || networkConfig.getRealitioTimeout()
+    const timeoutResolution = REALITY_TIMEOUT || networkConfig.getRealityTimeout()
 
     const args = [
       SINGLE_SELECT_TEMPLATE_ID,
@@ -145,7 +145,7 @@ export class RealitioService {
       logger.info(`There should be only one LogNewQuestion event for questionId '${questionId}'`)
     }
 
-    const iface = new ethers.utils.Interface(realitioAbi)
+    const iface = new ethers.utils.Interface(realityAbi)
     const event = iface.parseLog(logs[0])
 
     const { arbitrator, opening_ts: openingTs, question } = event.values
