@@ -39,7 +39,7 @@ export const DisplayTableHashes = (props: Props) => {
 
   return (
     <DataTable
-      className="outerTableWrapper inlineTable"
+      className="outerTableWrapper condensedTable"
       columns={getColumns()}
       customStyles={customStyles}
       data={hashes || []}

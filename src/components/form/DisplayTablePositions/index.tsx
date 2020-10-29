@@ -114,7 +114,7 @@ export const DisplayTablePositions = (props: Props) => {
 
   return (
     <DataTable
-      className="outerTableWrapper inlineTable noMarginBottom"
+      className="outerTableWrapper condensedTable noMarginBottom"
       columns={getColumns()}
       customStyles={customStyles}
       data={isLoading ? [] : positions.length ? positions : []}

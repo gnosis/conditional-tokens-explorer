@@ -170,7 +170,7 @@ export const SelectConditionModal: React.FC<Props> = (props) => {
       {error && !isLoading && <InfoCard message={error.message} title="Error" />}
       {!error && (
         <DataTable
-          className="outerTableWrapper inlineTable"
+          className="outerTableWrapper condensedTable"
           columns={columns}
           customStyles={customStyles}
           data={showSpinner ? [] : conditionList.length ? conditionList : []}

@@ -172,7 +172,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
             </CompactFiltersLayout>
           )}
           <DataTable
-            className="outerTableWrapper inlineTable"
+            className="outerTableWrapper condensedTable"
             columns={defaultColumns}
             customStyles={customStyles}
             data={showSpinner ? [] : positionList.length ? positionList : []}
