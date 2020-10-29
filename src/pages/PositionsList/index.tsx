@@ -349,12 +349,12 @@ export const PositionsList = () => {
       {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimals) => {
-          const { collateralTokenERC1155 } = row
+          const { collateralToken, collateralTokenERC1155 } = row
           // Please don't delete this because the tests will explode
           return collateralTokenERC1155 ? (
             <TokenIcon onClick={() => handleRowClick(row)} token={collateralTokenERC1155} />
           ) : (
-            row.collateralToken
+            collateralToken
           )
         },
         name: 'Collateral',
