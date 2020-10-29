@@ -426,7 +426,7 @@ export const Contents = (props: Props) => {
   )
 
   const getRealityQuestionUrlMemoized = useCallback(
-    (questionId: string): string => getRealityQuestionUrl(networkConfig, questionId),
+    (questionId: string): string => getRealityQuestionUrl(questionId, networkConfig),
     [networkConfig]
   )
 

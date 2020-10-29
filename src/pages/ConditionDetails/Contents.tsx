@@ -117,7 +117,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
   })
 
   const getRealityQuestionUrlMemoized = useCallback(
-    (questionId: string): string => getRealityQuestionUrl(networkConfig, questionId),
+    (questionId: string): string => getRealityQuestionUrl(questionId, networkConfig),
     [networkConfig]
   )
 
