@@ -14,6 +14,9 @@ import {
 } from 'types/generatedGQLForCTE'
 import { CollateralErrors, ConditionErrors, PositionErrors, Token } from 'util/types'
 
+const ZERO_BN = new BN(0)
+const ONE_BN = new BN(1)
+
 export const isAddress = (address: string) => {
   try {
     getAddress(address)
@@ -123,11 +126,6 @@ export const divBN = (a: BigNumber, b: BigNumber, scale = 10000): number => {
 
 export const mulBN = (a: BigNumber, b: number, scale = 10000): BigNumber => {
   return a.mul(Math.round(b * scale)).div(scale)
-}
-
-export const getIndexSets = (outcomesCount: number) => {
-  const range = (length: number) => [...Array(length)].map((x, i) => i)
-  return range(outcomesCount).map((x) => 1 << x)
 }
 
 export const positionString = (
@@ -253,15 +251,8 @@ export const isDisjointPartition = (partition: string[], outcomeSlotCount: numbe
   const fullIndexSet = getFullIndexSet(outcomeSlotCount)
   let freeIndexSet = fullIndexSet
 
-  // TODO Check this cases in the contract
-  for (let i = 0; i < partition.length; i++) {
-    const indexSet = partition[i]
-    if (indexSet === '0') {
-      isDisjoint = false
-      break
-    }
-
-    if (indexSet > fullIndexSet) {
+  for (const indexSet of partition) {
+    if (!validIndexSet(fullIndexSet, indexSet)) {
       isDisjoint = false
       break
     }
@@ -286,8 +277,28 @@ export const isFullIndexSetPartition = (partition: string[], outcomeSlotCount: n
   return partitionSum === fullIndexSet
 }
 
-export const minBigNumber = (values: BigNumber[]) =>
-  values.reduce((min, value) => (min.lte(value) ? min : value), values[0])
+// All implementation details are hidden behind string type
+export const getFullIndexSet = (outcomeSlotCount: number) => {
+  return ONE_BN.shln(outcomeSlotCount).sub(ONE_BN).toString()
+}
+
+export const getFreeIndexSet = (outcomeSlotCount: number, partition: string[]): string => {
+  const fullIndexSet = new BN(getFullIndexSet(outcomeSlotCount))
+
+  return partition
+    .reduce((acc, p) => {
+      return acc.xor(new BN(p))
+    }, fullIndexSet)
+    .toString()
+}
+
+export const isPartitionFullIndexSet = (
+  outcomesSlotCount: number,
+  partition: string[]
+): boolean => {
+  const freeIndexSet = new BN(getFreeIndexSet(outcomesSlotCount, partition))
+  return freeIndexSet.eq(ZERO_BN)
+}
 
 export const orIndexSets = (indexSetA: string, indexSetB: string) => {
   const a = new BN(indexSetA)
@@ -307,6 +318,12 @@ export const xorIndexSets = (indexSetA: string, indexSetB: string) => {
   const b = new BN(indexSetB)
 
   return a.xor(b).toString()
+}
+
+const validIndexSet = (fullIndexSet: string, indexSetA: string) => {
+  const fullIndexSetBN = new BN(fullIndexSet)
+  const indexSetABN = new BN(indexSetA)
+  return indexSetABN.gt(ZERO_BN) && indexSetABN.lte(fullIndexSetBN)
 }
 
 export const getMergePreview = (
@@ -333,6 +350,9 @@ export const getMergePreview = (
     return positionString(positions[0].conditionIds, newIndexSets, amount, token)
   }
 }
+
+export const minBigNumber = (values: BigNumber[]) =>
+  values.reduce((min, value) => (min.lte(value) ? min : value), values[0])
 
 /**
  * Convert message texts from Error.message from a collateral error messages
@@ -392,30 +412,6 @@ export const getTokenSummary = async (
       throw Error(err)
     }
   }
-}
-
-// TODO Hide implementation details behind string type
-export const getFullIndexSet = (outcomeSlotCount: number) => {
-  const ONE_BN = new BN(1)
-  return ONE_BN.shln(outcomeSlotCount).sub(ONE_BN).toString()
-}
-
-export const getFreeIndexSet = (outcomeSlotCount: number, partition: string[]): string => {
-  const fullIndexSet = new BN(getFullIndexSet(outcomeSlotCount))
-
-  return partition
-    .reduce((acc, p) => {
-      return acc.xor(new BN(p))
-    }, fullIndexSet)
-    .toString()
-}
-
-export const isPartitionFullIndexSet = (
-  outcomesSlotCount: number,
-  partition: string[]
-): boolean => {
-  const freeIndexSet = getFreeIndexSet(outcomesSlotCount, partition)
-  return freeIndexSet === '0'
 }
 
 export const capitalize = (str: string): string =>
