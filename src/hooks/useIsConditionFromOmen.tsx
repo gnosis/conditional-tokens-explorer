@@ -1,29 +1,20 @@
 import React from 'react'
 
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { Question } from 'util/types'
 
 // We check if the owner is a contract, if is a contract is from Safe, and omen use safe, we can say the origin is from omen, maybe we can improve this in the future
-export const useIsConditionFromOmen = (
-  conditionCreatorAddress: string,
-  oracleAddress: string,
-  question: Maybe<Question>
-): boolean => {
+export const useIsConditionFromOmen = (oracleAddress: string): boolean => {
   const { networkConfig } = useWeb3ConnectedOrInfura()
 
   const isConditionFromOmen = React.useMemo(() => {
     const defaultValue = false
     try {
-      if (question) {
-        const oracle = networkConfig.getOracleFromAddress(oracleAddress)
-        return oracle.name === ('reality' as KnownOracle)
-      } else {
-        return defaultValue
-      }
+      const oracle = networkConfig.getOracleFromAddress(oracleAddress)
+      return oracle.name === ('reality' as KnownOracle)
     } catch (err) {
       return defaultValue
     }
-  }, [question, networkConfig, oracleAddress])
+  }, [networkConfig, oracleAddress])
 
   return isConditionFromOmen
 }
