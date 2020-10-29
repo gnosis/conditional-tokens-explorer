@@ -30,6 +30,7 @@ import {
   getTokenSummary,
   isPartitionFullIndexSet,
   minBigNumber,
+  xorIndexSets,
 } from 'util/tools'
 import { Status, Token } from 'util/types'
 
@@ -155,8 +156,10 @@ export const Contents = () => {
           }
         } else {
           const indexSetOfMergedPosition = new BigNumber(
-            getFreeIndexSet(condition.outcomeSlotCount, partition) ^
+            xorIndexSets(
+              getFreeIndexSet(condition.outcomeSlotCount, partition),
               getFullIndexSet(condition.outcomeSlotCount)
+            )
           )
           setMergeResult(
             ConditionalTokensService.getPositionId(
