@@ -37,9 +37,8 @@ import { IconTypes } from 'components/statusInfo/common'
 import { TableControls } from 'components/table/TableControls'
 import { Hash } from 'components/text/Hash'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { PositionWithUserBalanceWithDecimals } from 'hooks'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
-import { usePositionsList } from 'hooks/usePositionsList'
+import { PositionWithUserBalanceWithDecimals, usePositionsList } from 'hooks/usePositionsList'
 import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
 import { ConditionInformation } from 'hooks/utils'
 import { customStyles } from 'theme/tableCustomStyles'
@@ -349,12 +348,12 @@ export const PositionsList = () => {
       {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimals) => {
-          const { collateralTokenERC1155 } = row
+          const { collateralToken, collateralTokenERC1155 } = row
           // Please don't delete this because the tests will explode
           return collateralTokenERC1155 ? (
             <TokenIcon onClick={() => handleRowClick(row)} token={collateralTokenERC1155} />
           ) : (
-            row.collateralToken
+            collateralToken
           )
         },
         name: 'Collateral',

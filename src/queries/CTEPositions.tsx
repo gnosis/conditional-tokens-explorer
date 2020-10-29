@@ -101,10 +101,11 @@ export const buildQueryPositionsList = (
     TextToSearch.type === PositionSearchOptions.ConditionId && TextToSearch.value
       ? 'conditionIdsStr_contains: $textToSearch'
       : '',
-    (TextToSearch.type === PositionSearchOptions.CollateralSymbol ||
-      TextToSearch.type === PositionSearchOptions.CollateralAddress) &&
-    TextToSearch.value
+    TextToSearch.type === PositionSearchOptions.CollateralAddress && TextToSearch.value
       ? 'collateralTokenAddress_contains: $textToSearch'
+      : '',
+    TextToSearch.type === PositionSearchOptions.CollateralSymbol && TextToSearch.value
+      ? 'collateralTokenAddress_in: $textToSearch'
       : '',
     TextToSearch.type === PositionSearchOptions.WrappedCollateralAddress && TextToSearch.value
       ? 'wrappedTokenAddress_contains: $textToSearch'
@@ -127,10 +128,11 @@ export const buildQueryPositionsList = (
     TextToSearch.value
       ? '$textToSearch: String'
       : '',
-    (TextToSearch.type === PositionSearchOptions.CollateralSymbol ||
-      TextToSearch.type === PositionSearchOptions.CollateralAddress) &&
-    TextToSearch.value
+    TextToSearch.type === PositionSearchOptions.CollateralAddress && TextToSearch.value
       ? '$textToSearch: String'
+      : '',
+    TextToSearch.type === PositionSearchOptions.CollateralSymbol && TextToSearch.value
+      ? '$textToSearch: [String]'
       : '',
   ]
     .filter((s) => s.length)
