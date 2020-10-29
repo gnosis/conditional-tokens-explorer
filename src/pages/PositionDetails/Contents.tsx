@@ -319,9 +319,9 @@ export const Contents = (props: Props) => {
 
   const isConnected = useMemo(() => status === Web3ContextStatus.Connected, [status])
   const isSigner = useMemo(() => signer !== null, [signer])
+  const userHasBalance = useMemo( () => balanceERC1155 && !balanceERC1155.isZero(), [balanceERC1155])
 
   const dropdownItems = useMemo(() => {
-    const userHasBalance = balanceERC1155 && !balanceERC1155.isZero()
 
     const menu = [
       {
@@ -351,7 +351,7 @@ export const Contents = (props: Props) => {
     ]
 
     return menu
-  }, [balanceERC1155, setValue, positionId, isConnected, isSigner])
+  }, [balanceERC1155, setValue, positionId, isConnected, isSigner, userHasBalance])
 
   const conditionIdLink = (id: string) => {
     return (
