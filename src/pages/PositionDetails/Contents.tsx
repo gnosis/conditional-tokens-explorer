@@ -45,7 +45,13 @@ import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { GetPosition_position as Position } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
-import { formatBigNumber, formatTS, positionString, truncateStringInTheMiddle } from 'util/tools'
+import {
+  formatBigNumber,
+  formatTS,
+  indexSetToBase2,
+  positionString,
+  truncateStringInTheMiddle,
+} from 'util/tools'
 import {
   HashArray,
   LocalStorageManagement,
@@ -184,8 +190,7 @@ export const Contents = (props: Props) => {
 
   const numberedOutcomes = useMemo(() => {
     return indexSets.map((indexSet: string) => {
-      return Number(indexSet)
-        .toString(2)
+      return indexSetToBase2(indexSet)
         .split('')
         .reverse()
         .map((value, index) => (value === '1' ? index + 1 : 0))

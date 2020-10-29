@@ -149,7 +149,7 @@ const outcomeString = (indexSet: string) =>
     .reduce((acc, e, i) => (e !== '0' ? [...acc, i] : acc), new Array<number>())
     .join('|')
 
-const indexSetToBase2 = (indexSet: string) => {
+export const indexSetToBase2 = (indexSet: string) => {
   return new BN(indexSet).toString(2)
 }
 export const getRedeemedBalance = (
