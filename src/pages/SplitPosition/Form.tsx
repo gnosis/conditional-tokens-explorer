@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form'
 import { Prompt } from 'react-router'
 import styled from 'styled-components'
 
-import BN from 'bn.js'
 import { Button } from 'components/buttons/Button'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CenteredCard } from 'components/common/CenteredCard'
@@ -38,7 +37,7 @@ import { SplitFrom } from 'pages/SplitPosition/SplitFrom'
 import { GetCondition_condition, GetPosition_position } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
-import { trivialPartition, truncateStringInTheMiddle } from 'util/tools'
+import { indexSetFromOutcomes, trivialPartition, truncateStringInTheMiddle } from 'util/tools'
 import { OutcomeProps, PositionIdsArray, SplitFromType, SplitStatus, Token } from 'util/types'
 
 const StripedListStyled = styled(StripedList)`
@@ -143,14 +142,8 @@ export const Form = ({
   }, [originalPartition, setNumberedOutcomes])
 
   const partition = useMemo(() => {
-    return numberedOutcomes.map((collection: Array<OutcomeProps>) => {
-      const collectionExtract = collection.map((item) => item.id).sort((a, b) => +a - +b) //ascending sort
-      const indexSet = collectionExtract.reduce(
-        (acc, indexSet) => acc.or(new BN(indexSet)),
-        new BN(0)
-      )
-      return new BigNumber(indexSet.toString(10))
-    })
+    const outcomes = numberedOutcomes.map((collection) => collection.map((c) => c.id))
+    return outcomes.map(indexSetFromOutcomes).map((o) => new BigNumber(o))
   }, [numberedOutcomes])
 
   const onEditPartitionSave = useCallback((numberedOutcomes: Array<Array<OutcomeProps>>) => {

@@ -351,6 +351,14 @@ export const getMergePreview = (
   }
 }
 
+export const indexSetFromOutcomes = (outcomes: string[]): string => {
+  return outcomes
+    .map((outcome) => new BN(outcome))
+    .sort((a, b) => a.cmp(b))
+    .reduce((acc, indexSet) => acc.or(indexSet))
+    .toString()
+}
+
 export const minBigNumber = (values: BigNumber[]) =>
   values.reduce((min, value) => (min.lte(value) ? min : value), values[0])
 

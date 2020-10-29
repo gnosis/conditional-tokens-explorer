@@ -7,6 +7,8 @@ import {
   getMergePreview,
   getRedeemedBalance,
   getRedeemedPreview,
+  indexSetFromOutcomes,
+  indexSetsByCondition,
   isConditionFullIndexSet,
   isDisjointPartition,
   isFullIndexSetPartition,
@@ -814,4 +816,11 @@ test('getMergePreview should return new position when merging non fullIndexSet p
       } as Token
     )
   ).toStrictEqual('[USDC C:0xf583ac...20856f O:1|2] x10.00')
+})
+
+test('indexSetFromOutcomes should return ORed values', async () => {
+  expect(indexSetFromOutcomes(['1', '2', '4', '8', '16'])).toBe('31')
+  expect(
+    indexSetFromOutcomes(['1606938044258990275541962092341162602522202993782792835301376', '4'])
+  ).toBe('1606938044258990275541962092341162602522202993782792835301380')
 })
