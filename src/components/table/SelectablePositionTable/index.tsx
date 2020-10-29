@@ -4,8 +4,12 @@ import DataTable from 'react-data-table-component'
 import styled from 'styled-components'
 
 import { TokenIcon } from 'components/common/TokenIcon'
+import { CollateralFilterDropdown } from 'components/filters/CollateralFilterDropdown'
+import { DateFilter } from 'components/filters/DateFilter'
+import { WrappedCollateralFilterDropdown } from 'components/filters/WrappedCollateralFilterDropdown'
 import { SearchField } from 'components/form/SearchField'
 import { Switch } from 'components/form/Switch'
+import { CompactFiltersLayout } from 'components/pureStyledComponents/CompactFiltersLayout'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { SpinnerSize } from 'components/statusInfo/common'
@@ -16,6 +20,7 @@ import { PositionWithUserBalanceWithDecimals, usePositions } from 'hooks'
 import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
 import { truncateStringInTheMiddle } from 'util/tools'
+import { CollateralFilterOptions, WrappedCollateralOptions } from 'util/types'
 
 const Search = styled(SearchField)`
   min-width: 0;
@@ -31,6 +36,15 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
   const [positionIdToSearch, setPositionIdToSearch] = useState<string>('')
   const [positionIdToShow, setPositionIdToShow] = useState<string>('')
   const [positionList, setPositionList] = useState<PositionWithUserBalanceWithDecimals[]>([])
+  const [selectedCollateralFilter, setSelectedCollateralFilter] = useState<Maybe<string[]>>(null)
+  const [selectedCollateralValue, setSelectedCollateralValue] = useState<string>(
+    CollateralFilterOptions.All
+  )
+  const [wrappedCollateral, setWrappedCollateral] = useState<WrappedCollateralOptions>(
+    WrappedCollateralOptions.All
+  )
+  const [selectedFromCreationDate, setSelectedFromCreationDate] = useState<Maybe<number>>(null)
+  const [selectedToCreationDate, setSelectedToCreationDate] = useState<Maybe<number>>(null)
 
   const debouncedHandlerPositionIdToSearch = useDebounceCallback((positionIdToSearch) => {
     setPositionIdToSearch(positionIdToSearch)
@@ -96,7 +110,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
             {row.userBalanceERC1155WithDecimals}
           </span>
         ),
-        name: 'ERC1155 Amount',
+        name: 'ERC1155',
         right: true,
         selector: 'userBalanceERC1155Numbered',
         sortable: true,
@@ -133,7 +147,30 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
             }
             start={<Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />}
           />
-
+          {showFilters && (
+            <CompactFiltersLayout>
+              <CollateralFilterDropdown
+                onClick={(symbol: string, address: Maybe<string[]>) => {
+                  setSelectedCollateralFilter(address)
+                  setSelectedCollateralValue(symbol)
+                }}
+                value={selectedCollateralValue}
+              />
+              <WrappedCollateralFilterDropdown
+                onClick={(value: WrappedCollateralOptions) => {
+                  setWrappedCollateral(value)
+                }}
+                value={wrappedCollateral}
+              />
+              <DateFilter
+                onSubmit={(from, to) => {
+                  setSelectedFromCreationDate(from)
+                  setSelectedToCreationDate(to)
+                }}
+                title="Creation Date"
+              />
+            </CompactFiltersLayout>
+          )}
           <DataTable
             className="outerTableWrapper inlineTable"
             columns={defaultColumns}
