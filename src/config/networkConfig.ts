@@ -71,7 +71,7 @@ const networks: { [K in NetworkIds]: Network } = {
       },
       {
         symbol: 'CDAI',
-        address: '0xa4c993e32876795abf80842adb0a241bb0eecd47',
+        address: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643',
         decimals: 18,
       },
       {
@@ -444,31 +444,24 @@ export class NetworkConfig {
     }
   }
 
-  getTokenFromName(tokenName: string): Maybe<Token> {
+  getMultipleTokenAddressesFromSymbol(tokenSymbol: string): string[] {
     const tokens = networks[this.networkId].tokens
 
-    const tokenFromDefaultList = tokens.find((token: Token) =>
-      token.symbol.toLowerCase().includes(tokenName.toLowerCase())
-    )
-    if (tokenFromDefaultList) {
-      return tokenFromDefaultList
-    }
+    const tokensFromDefaultList = tokens
+      .filter((token: Token) => token.symbol.toLowerCase().includes(tokenSymbol.toLowerCase()))
+      .map((token: Token) => token.address.toLowerCase())
 
-    const tokenFromUniswap = this.getTokensFromUniswap().find(
+    const tokensFromUniswap = this.getTokensFromUniswap()
+      .filter(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (token: any) =>
+          token.symbol.toLowerCase().includes(tokenSymbol.toLowerCase()) &&
+          token.chainId === this.networkId
+      )
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (token: any) =>
-        token.symbol.toLowerCase().includes(tokenName.toLowerCase()) &&
-        token.chainId === this.networkId
-    )
-    if (tokenFromUniswap) {
-      return {
-        symbol: tokenFromUniswap.symbol,
-        address: tokenFromUniswap.address,
-        decimals: tokenFromUniswap.decimals,
-      }
-    }
+      .map((token: any) => token.address.toLowerCase())
 
-    return null
+    return [...tokensFromDefaultList, ...tokensFromUniswap]
   }
 
   getRealitioTimeout(): number {
