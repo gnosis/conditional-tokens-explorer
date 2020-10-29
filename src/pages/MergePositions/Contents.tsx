@@ -8,7 +8,6 @@ import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { Amount } from 'components/form/Amount'
 import { SelectCondition } from 'components/form/SelectCondition'
-import { SelectPositions } from 'components/form/SelectPositions'
 import { MergePreview } from 'components/mergePositions/MergePreview'
 import { MergeResultModal } from 'components/mergePositions/MergeResultModal'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
@@ -16,6 +15,7 @@ import { Row } from 'components/pureStyledComponents/Row'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { StatusInfoInline, StatusInfoType } from 'components/statusInfo/StatusInfoInline'
 import { IconTypes } from 'components/statusInfo/common'
+import { SelectablePositionTable } from 'components/table/SelectablePositionTable'
 import { NULL_PARENT_ID, ZERO_BN } from 'config/constants'
 import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useConditionContext } from 'contexts/ConditionContext'
@@ -216,15 +216,7 @@ export const Contents = () => {
 
   return (
     <CenteredCard>
-      <Row cols="1fr" marginBottomXL>
-        <SelectPositions
-          callbackToBeExecutedOnRemoveAction={() => {
-            setAmount(ZERO_BN)
-          }}
-          showOnlyPositionsWithBalance
-          title="Positions"
-        />
-      </Row>
+      <SelectablePositionTable />
       <Row cols="1fr">
         <SelectCondition />
       </Row>
