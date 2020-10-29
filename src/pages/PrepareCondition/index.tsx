@@ -2,6 +2,7 @@ import lodashClonedeep from 'lodash.clonedeep'
 import moment from 'moment'
 import React, { KeyboardEvent, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { Prompt } from 'react-router'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -119,7 +120,10 @@ export const PrepareCondition = () => {
     mode: 'onChange',
     defaultValues: defaultValuesCustom,
   })
-  const { isValid: isValidCustomCondition } = formStateCustomCondition
+  const {
+    dirty: isDirtyCustomCondition,
+    isValid: isValidCustomCondition,
+  } = formStateCustomCondition
 
   const {
     control: omenControl,
@@ -471,6 +475,7 @@ export const PrepareCondition = () => {
               value={
                 <>
                   <Textfield
+                    autoComplete="off"
                     error={errorsCustomCondition.questionId && true}
                     name="questionId"
                     onChange={(e) => setValueCustomCondition('questionId', e.target.value, true)}
@@ -499,6 +504,7 @@ export const PrepareCondition = () => {
                 value={
                   <>
                     <Textfield
+                      autoComplete="off"
                       error={errorsOmenCondition.questionTitle && true}
                       name="questionTitle"
                       onChange={(e) => setValueOmenCondition('questionTitle', e.target.value, true)}
@@ -668,6 +674,7 @@ export const PrepareCondition = () => {
                 value={
                   <>
                     <Textfield
+                      autoComplete="off"
                       error={errorsOmenCondition.oracle && true}
                       name="oracle"
                       onChange={(e) => setValueOmenCondition('oracle', e.target.value, true)}
@@ -708,6 +715,7 @@ export const PrepareCondition = () => {
               value={
                 <>
                   <Textfield
+                    autoComplete="off"
                     error={errorsCustomCondition.oracle && true}
                     name="oracle"
                     onChange={(e) => setValueCustomCondition('oracle', e.target.value, true)}
@@ -765,6 +773,14 @@ export const PrepareCondition = () => {
             Prepare
           </Button>
         </ButtonContainer>
+        <Prompt
+          message="Are you sure you want to leave this page? The changes you made will be lost?"
+          when={
+            conditionType === ConditionType.custom
+              ? isDirtyCustomCondition
+              : isDirtyOmenCondition || outcomes.length > 0
+          }
+        />
       </CenteredCard>
     </>
   )

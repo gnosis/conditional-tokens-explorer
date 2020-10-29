@@ -7,6 +7,9 @@ const horizontalPadding = '25px'
 export const customStyles: IDataTableStyles = {
   table: {
     style: {
+      borderBottomColor: theme.colors.lightGrey,
+      borderBottomStyle: 'solid',
+      borderBottomWidth: '1px',
       flexGrow: 1,
     },
   },
@@ -74,9 +77,9 @@ export const customStyles: IDataTableStyles = {
   pagination: {
     style: {
       backgroundColor: theme.cards.backgroundColor,
-      borderTopColor: theme.colors.lightGrey,
+      borderTopColor: 'transparent',
       borderTopStyle: 'solid',
-      borderTopWidth: '1px',
+      borderTopWidth: '0',
       color: theme.colors.textColor,
       flexGrow: 0,
       fontSize: '13px',

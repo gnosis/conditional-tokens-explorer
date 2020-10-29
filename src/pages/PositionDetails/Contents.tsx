@@ -7,6 +7,7 @@ import styled, { css } from 'styled-components'
 import { Button } from 'components/buttons/Button'
 import { ButtonCopy } from 'components/buttons/ButtonCopy'
 import { ButtonDropdownCircle } from 'components/buttons/ButtonDropdownCircle'
+import { ButtonExpand } from 'components/buttons/ButtonExpand'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CenteredCard } from 'components/common/CenteredCard'
 import {
@@ -79,19 +80,6 @@ const CollateralWrapButton = styled(Button)`
   font-weight: 600;
   height: 24px;
   width: 80px;
-`
-
-const MoreLink = styled.a`
-  color: ${(props) => props.theme.colors.textColor};
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  margin: 0 0 0 12px;
-  text-decoration: underline;
-
-  &:hover {
-    text-decoration: none;
-  }
 `
 
 const StripedListStyled = styled(StripedList)`
@@ -475,9 +463,7 @@ export const Contents = (props: Props) => {
             ) : (
               <FlexRow>
                 <FormatHash hash={truncateStringInTheMiddle(questionIds[0], 8, 6)} />
-                <MoreLink onClick={() => setOpenDisplayQuestionIdsTableModal(true)}>
-                  (More...)
-                </MoreLink>
+                <ButtonExpand onClick={() => setOpenDisplayQuestionIdsTableModal(true)} />
               </FlexRow>
             )
           }
@@ -493,9 +479,7 @@ export const Contents = (props: Props) => {
             ) : (
               <FlexRow>
                 <FormatHash hash={truncateStringInTheMiddle(oraclesIds[0], 8, 6)} />
-                <MoreLink onClick={() => setOpenDisplayOraclesIdsTableModal(true)}>
-                  (More...)
-                </MoreLink>
+                <ButtonExpand onClick={() => setOpenDisplayOraclesIdsTableModal(true)} />
               </FlexRow>
             )
           }
@@ -510,9 +494,7 @@ export const Contents = (props: Props) => {
               ) : (
                 <FlexRow>
                   {conditionIdLink(conditions[0].hash)}
-                  <MoreLink onClick={() => setOpenDisplayConditionsTableModal(true)}>
-                    (More...)
-                  </MoreLink>
+                  <ButtonExpand onClick={() => setOpenDisplayConditionsTableModal(true)} />
                 </FlexRow>
               )
             }

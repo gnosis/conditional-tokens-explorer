@@ -1,12 +1,13 @@
 import CTHelpersConstructor from '@gnosis.pm/conditional-tokens-contracts/utils/id-helpers'
 import { Contract, ethers } from 'ethers'
-import { TransactionReceipt } from 'ethers/providers'
+import { TransactionReceipt, TransactionResponse } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 import Web3Utils from 'web3-utils'
 
 import { CONFIRMATIONS_TO_WAIT } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
 import { getLogger } from 'util/logger'
+import { improveErrorMessage } from 'util/tools'
 import { PositionIdsArray, Token } from 'util/types'
 
 const logger = getLogger('Conditional Tokens')
@@ -147,8 +148,8 @@ export class ConditionalTokensService {
     conditionId: string,
     partition: BigNumber[],
     amount: BigNumber
-  ): Promise<TransactionReceipt> {
-    const tx = await this.contract.splitPosition(
+  ): Promise<TransactionReceipt | void> {
+    const tx: TransactionResponse = await this.contract.splitPosition(
       collateralToken,
       parentCollectionId,
       conditionId,
@@ -159,7 +160,19 @@ export class ConditionalTokensService {
         gasLimit: 2750000, // TODO - should we try to precalculate this?
       }
     )
-    return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
+
+    logger.log(`Transaction hash: ${tx.hash}`)
+
+    return tx
+      .wait(CONFIRMATIONS_TO_WAIT)
+      .then((receipt: TransactionReceipt) => {
+        logger.log(`Transaction was mined in block ${receipt}`)
+        return receipt
+      })
+      .catch((error) => {
+        logger.error(error)
+        throw improveErrorMessage(error)
+      })
   }
 
   async redeemPositions(

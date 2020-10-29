@@ -6,6 +6,7 @@ import { NavLink, useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { ButtonDots } from 'components/buttons/ButtonDots'
+import { ButtonExpand } from 'components/buttons/ButtonExpand'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import {
   Dropdown,
@@ -18,6 +19,7 @@ import { TokenIcon } from 'components/common/TokenIcon'
 import { CollateralFilterDropdown } from 'components/filters/CollateralFilterDropdown'
 import { DateFilter } from 'components/filters/DateFilter'
 import { WrappedCollateralFilterDropdown } from 'components/filters/WrappedCollateralFilterDropdown'
+import { SearchField } from 'components/form/SearchField'
 import { Switch } from 'components/form/Switch'
 import { DisplayHashesTableModal } from 'components/modals/DisplayHashesTableModal'
 import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
@@ -28,7 +30,6 @@ import { PageTitle } from 'components/pureStyledComponents/PageTitle'
 import { Sidebar } from 'components/pureStyledComponents/Sidebar'
 import { SidebarRow } from 'components/pureStyledComponents/SidebarRow'
 import { TwoColumnsCollapsibleLayout } from 'components/pureStyledComponents/TwoColumnsCollapsibleLayout'
-import { SearchField } from 'components/search/SearchField'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
@@ -60,17 +61,8 @@ const DropdownItemLink = styled(NavLink)<DropdownItemProps>`
   ${DropdownItemCSS}
 `
 
-const MoreLink = styled.a`
-  color: ${(props) => props.theme.colors.textColor};
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  margin: 0 0 0 12px;
-  text-decoration: underline;
-
-  &:hover {
-    text-decoration: none;
-  }
+const ButtonExpandStyled = styled(ButtonExpand)`
+  margin-right: auto;
 `
 
 const logger = getLogger('PositionsList')
@@ -373,6 +365,7 @@ export const PositionsList = () => {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimals) => formatTSSimple(row.createTimestamp),
         name: 'Creation Date',
+        right: true,
         selector: 'createTimestamp',
         sortable: true,
       },
@@ -387,7 +380,7 @@ export const PositionsList = () => {
             return (
               <>
                 <Hash href={`/conditions/${conditionId}`} value={conditionId} />
-                <MoreLink
+                <ButtonExpandStyled
                   onClick={() => {
                     const hashes: HashArray[] = conditions.map(
                       (condition: ConditionInformation) => {
@@ -402,9 +395,7 @@ export const PositionsList = () => {
                     setTitleModal('Conditions')
                     setUrlTableModal('conditions')
                   }}
-                >
-                  (More...)
-                </MoreLink>
+                />
               </>
             )
           }
@@ -429,7 +420,7 @@ export const PositionsList = () => {
             return (
               <>
                 <Hash value={oracle} />
-                <MoreLink
+                <ButtonExpandStyled
                   onClick={() => {
                     const hashes: HashArray[] = conditions.map(
                       (condition: ConditionInformation) => {
@@ -444,9 +435,7 @@ export const PositionsList = () => {
                     setTitleModal('Oracles')
                     setUrlTableModal('')
                   }}
-                >
-                  (More...)
-                </MoreLink>
+                />
               </>
             )
           }
@@ -472,7 +461,7 @@ export const PositionsList = () => {
             return (
               <>
                 <Hash value={questionId} />
-                <MoreLink
+                <ButtonExpandStyled
                   onClick={() => {
                     const hashes: HashArray[] = conditions.map(
                       (condition: ConditionInformation) => {
@@ -487,9 +476,7 @@ export const PositionsList = () => {
                     setTitleModal('Questions')
                     setUrlTableModal('')
                   }}
-                >
-                  (More...)
-                </MoreLink>
+                />
               </>
             )
           }

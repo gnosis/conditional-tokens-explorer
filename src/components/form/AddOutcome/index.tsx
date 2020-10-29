@@ -138,6 +138,7 @@ const EditableOutcome: React.FC<{
   return (
     <OutcomeWrapper title={value} {...restProps}>
       <Outcome
+        autoComplete="off"
         error={!isOutcomeValueOK}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.currentTarget.value)}
         onKeyUp={(e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -234,6 +235,7 @@ export const AddOutcome: React.FC<Props> = (props) => {
         value={
           <NewOutcomeWrapper>
             <Textfield
+              autoComplete="off"
               disabled={maxOutcomesReached}
               onChange={onChange}
               onKeyUp={(e: React.KeyboardEvent<HTMLInputElement>) => {

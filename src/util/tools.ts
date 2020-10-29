@@ -349,10 +349,18 @@ export const humanizeCollateralMessageError = (error: Error) => {
     error.message = CollateralErrors.BAD_ADDRESS_CHECKSUM.toString()
   } else if (error.message.includes('contract not deployed')) {
     error.message = CollateralErrors.IS_NOT_ERC20.toString()
-  } else if (error.message.indexOf('(') !== -1) {
+  } else {
+    error = improveErrorMessage(error)
+  }
+  return error
+}
+
+export const improveErrorMessage = (error: Error): Error => {
+  if (error.message.indexOf('(') !== -1) {
     error.message = error.message.split('(')[0]
     error.message = error.message[0].toUpperCase() + error.message.substr(1)
   }
+  return error
 }
 
 export const getTokenSummary = async (

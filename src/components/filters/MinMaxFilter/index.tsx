@@ -5,6 +5,7 @@ import { ButtonFilterSubmit } from 'components/buttons/ButtonFilterSubmit'
 import { ErrorContainer, Error as ErrorMessage } from 'components/pureStyledComponents/Error'
 import { FilterTitle } from 'components/pureStyledComponents/FilterTitle'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
+import { MAX_OUTCOMES_ALLOWED, MIN_OUTCOMES_ALLOWED } from 'config/constants'
 
 const Wrapper = styled.div``
 
@@ -87,15 +88,23 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
     emptyValues,
   ])
 
+  const validateBounds = React.useCallback(() => {
+    const minTrunc = min !== null ? Math.trunc(min) : null
+    const maxTrunc = max !== null ? Math.trunc(max) : null
+
+    setMin(minTrunc !== null && minTrunc < MIN_OUTCOMES_ALLOWED ? MIN_OUTCOMES_ALLOWED : minTrunc)
+    setMax(maxTrunc !== null && maxTrunc > MAX_OUTCOMES_ALLOWED ? MAX_OUTCOMES_ALLOWED : maxTrunc)
+  }, [max, min])
+
   React.useEffect(() => {
-    if (!min && !max) onSubmit(min, max)
-  }, [min, max, onSubmit])
+    validateBounds()
+  }, [validateBounds])
 
   const onSubmitInternal = React.useCallback(() => {
     if ((min || max) && !submitDisabled) onSubmit(min, max)
   }, [min, max, submitDisabled, onSubmit])
 
-  const onPressEnter = React.useCallback(
+  const onKeyUp = React.useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter') {
         onSubmitInternal()
@@ -104,23 +113,35 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
     [onSubmitInternal]
   )
 
+  const onKeyPress = React.useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === '.' || e.key === '-') {
+      e.preventDefault()
+    }
+  }, [])
+
   return (
     <Wrapper>
       <FilterTitle>{title}</FilterTitle>
       <Row>
         <FieldsWrapper>
           <TextFieldStyled
+            autoComplete="off"
+            min={MIN_OUTCOMES_ALLOWED}
             name="min"
             onChange={onChangeMinInternal}
-            onKeyUp={onPressEnter}
+            onKeyPress={onKeyPress}
+            onKeyUp={onKeyUp}
             placeholder="Min..."
             type="number"
           />
           <Dash />
           <TextFieldStyled
+            autoComplete="off"
+            max={MAX_OUTCOMES_ALLOWED}
             name="max"
             onChange={onChangeMaxInternal}
-            onKeyUp={onPressEnter}
+            onKeyPress={onKeyPress}
+            onKeyUp={onKeyUp}
             placeholder="Max..."
             type="number"
           />
