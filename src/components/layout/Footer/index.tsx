@@ -84,24 +84,29 @@ export const Footer: React.FC = (props) => {
   const items = [
     {
       externalLink: true,
-      title: `©${year} Gnosis`,
+      text: `©${year} Gnosis`,
       url: 'https://gnosis.io/',
     },
     {
-      title: 'Terms & Conditions',
+      text: 'Terms & Conditions',
       url: '/terms-and-conditions',
     },
     {
-      title: 'Privacy Policy',
+      text: 'Privacy Policy',
       url: '/privacy-policy',
     },
     {
-      title: 'Cookie Policy',
+      text: 'Cookie Policy',
       url: '/cookie-policy',
     },
     {
       externalLink: true,
-      title: `v${version}`,
+      text: `Documentation`,
+      url: 'https://docs.gnosis.io/conditionaltokens/',
+    },
+    {
+      externalLink: true,
+      text: `v${version}`,
       url: 'https://github.com/gnosis/conditional-tokens-explorer/',
     },
   ]
@@ -112,15 +117,17 @@ export const Footer: React.FC = (props) => {
         {items.map((item, index) => {
           return (
             <Item key={index}>
-              {item.externalLink && item.url && (
-                <ExternalLink href={item.url} rel="noopener noreferrer" target="_blank">
-                  {item.title}
-                </ExternalLink>
+              {item.url ? (
+                item.externalLink ? (
+                  <ExternalLink href={item.url} rel="noopener noreferrer" target="_blank">
+                    {item.text}
+                  </ExternalLink>
+                ) : (
+                  <FooterLink to={item.url}>{item.text}</FooterLink>
+                )
+              ) : (
+                <Text>{item.text}</Text>
               )}
-              {!item.externalLink && item.url && (
-                <FooterLink to={item.url}>{item.title}</FooterLink>
-              )}
-              {!item.externalLink && !item.url && <Text>{item.title}</Text>}
               <Break className="break" />
             </Item>
           )

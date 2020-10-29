@@ -1,6 +1,6 @@
 {
   "name": "conditional-tokens-factory",
-  "version": "0.1.0",
+  "version": "0.5",
   "private": true,
   "dependencies": {
     "@apollo/react-hooks": "^3.1.5",
