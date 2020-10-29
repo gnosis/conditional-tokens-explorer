@@ -351,7 +351,7 @@ export const Contents = (props: Props) => {
     ]
 
     return menu
-  }, [balanceERC1155, setValue, positionId, isConnected, isSigner, userHasBalance])
+  }, [setValue, positionId, isConnected, isSigner, userHasBalance])
 
   const conditionIdLink = (id: string) => {
     return (
