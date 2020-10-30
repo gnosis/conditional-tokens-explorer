@@ -291,11 +291,11 @@ export const PrepareCondition = () => {
     [conditionType, isDirtyOmenCondition, outcomes]
   )
 
-  const prepareCondition = async () => {
-    setPrepareConditionStatus(Remote.loading())
+  const prepareCondition = useCallback(async () => {
 
     try {
       if (status === Web3ContextStatus.Connected && address) {
+        setPrepareConditionStatus(Remote.loading())
         let conditionIdToUpdate: Maybe<string> = null
         if (conditionType === ConditionType.custom) {
           const { oracle: oracleCustom, outcomesSlotCount, questionId } = getValuesCustomCondition()
@@ -347,15 +347,27 @@ export const PrepareCondition = () => {
     } catch (err) {
       setPrepareConditionStatus(Remote.failure(err))
     }
-  }
+  }, [
+    CTService,
+    RtyService,
+    address,
+    category,
+    conditionType,
+    connect,
+    getValuesCustomCondition,
+    getValuesOmenCondition,
+    networkConfig,
+    outcomes,
+    status,
+  ])
 
-  const onClickUseMyWallet = () => {
+  const onClickUseMyWallet = useCallback(() => {
     if (status === Web3ContextStatus.Connected && address) {
       setValueCustomCondition('oracle', address, true)
     } else if (status === Web3ContextStatus.Infura) {
       connect()
     }
-  }
+  }, [address, connect, setValueCustomCondition, status])
 
   const submitDisabled = useMemo(
     () =>
@@ -388,8 +400,9 @@ export const PrepareCondition = () => {
 
   const today = useMemo(() => moment().format('YYYY-MM-DD'), [])
 
-  const fullLoadingActionButton = prepareConditionStatus.isSuccess()
-    ? {
+  const fullLoadingActionButton = useMemo(() => {
+    if (prepareConditionStatus.isSuccess()) {
+      return {
         buttonType: ButtonType.primary,
         onClick: () => {
           setPrepareConditionStatus(Remote.notAsked<Maybe<string>>())
@@ -397,39 +410,51 @@ export const PrepareCondition = () => {
         },
         text: 'OK',
       }
-    : prepareConditionStatus.isFailure()
-    ? {
+    } else if (prepareConditionStatus.isFailure()) {
+      return {
         buttonType: ButtonType.danger,
         text: 'Close',
         onClick: () => setPrepareConditionStatus(Remote.notAsked<Maybe<string>>()),
       }
-    : undefined
+    } else {
+      return undefined
+    }
+  }, [conditionId, history, prepareConditionStatus])
 
-  const fullLoadingIcon = prepareConditionStatus.isFailure()
-    ? IconTypes.error
-    : prepareConditionStatus.isSuccess()
-    ? IconTypes.ok
-    : IconTypes.spinner
+  const fullLoadingIcon = useMemo(() => {
+    return prepareConditionStatus.isFailure()
+      ? IconTypes.error
+      : prepareConditionStatus.isSuccess()
+      ? IconTypes.ok
+      : IconTypes.spinner
+  }, [prepareConditionStatus])
 
-  const fullLoadingMessage = prepareConditionStatus.isFailure()
-    ? prepareConditionStatus.getFailure()
-    : prepareConditionStatus.isLoading()
-    ? 'Working...'
-    : conditionId && (
-        <>
-          All done! Condition <Hash value={conditionId} /> created.
-        </>
-      )
-  const fullLoadingTitle = prepareConditionStatus.isFailure() ? 'Error' : 'Prepare Condition'
+  const fullLoadingMessage = useMemo(() => {
+    return prepareConditionStatus.isFailure()
+      ? prepareConditionStatus.getFailure()
+      : prepareConditionStatus.isLoading()
+      ? 'Working...'
+      : conditionId && (
+          <>
+            All done! Condition <Hash value={conditionId} /> created.
+          </>
+        )
+  }, [conditionId, prepareConditionStatus])
 
-  const newCustomConditionStatusInfo = checkForExistingCondition.isLoading()
-    ? {
+  const fullLoadingTitle = useMemo(
+    () => (prepareConditionStatus.isFailure() ? 'Error' : 'Prepare Condition'),
+    [prepareConditionStatus]
+  )
+
+  const newCustomConditionStatusInfo = useMemo(() => {
+    if (checkForExistingCondition.isLoading()) {
+      return {
         title: 'Checking existing conditions...',
         status: StatusInfoType.working,
         contents: undefined,
       }
-    : conditionIdPreview && isConditionAlreadyExist
-    ? {
+    } else if (conditionIdPreview && isConditionAlreadyExist) {
+      return {
         title: 'Duplicated Condition',
         status: StatusInfoType.warning,
         contents: (
@@ -440,8 +465,8 @@ export const PrepareCondition = () => {
           </>
         ),
       }
-    : !submitDisabled
-    ? {
+    } else if (conditionIdPreview) {
+      return {
         title: 'Condition Id Preview',
         status: StatusInfoType.success,
         contents: (
@@ -451,7 +476,10 @@ export const PrepareCondition = () => {
           </>
         ),
       }
-    : undefined
+    } else {
+      return undefined
+    }
+  }, [checkForExistingCondition, conditionIdPreview, isConditionAlreadyExist])
 
   return (
     <>
@@ -777,8 +805,8 @@ export const PrepareCondition = () => {
           message="Are you sure you want to leave this page? The changes you made will be lost?"
           when={
             conditionType === ConditionType.custom
-              ? (isDirtyCustomCondition) &&  prepareConditionStatus.isNotAsked()
-              : (isDirtyOmenCondition || outcomes.length > 0) &&  prepareConditionStatus.isNotAsked()
+              ? isDirtyCustomCondition && prepareConditionStatus.isNotAsked()
+              : (isDirtyOmenCondition || outcomes.length > 0) && prepareConditionStatus.isNotAsked()
           }
         />
       </CenteredCard>
