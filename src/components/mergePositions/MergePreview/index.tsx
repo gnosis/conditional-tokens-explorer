@@ -60,7 +60,7 @@ export const MergePreview = ({ amount }: Props) => {
               <strong>{mergedPosition}</strong>
             </StripedListItem>
           ) : (
-            <StripedListEmpty>No merged positions yet.</StripedListEmpty>
+            <StripedListEmpty>No merged positions.</StripedListEmpty>
           )}
         </StripedList>
       }

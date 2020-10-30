@@ -7,6 +7,7 @@ import { Button } from 'components/buttons/Button'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { Amount } from 'components/form/Amount'
+import { ConditionsDropdown } from 'components/form/ConditionsDropdown'
 import { SelectCondition } from 'components/form/SelectCondition'
 import { MergePreview } from 'components/mergePositions/MergePreview'
 import { MergeResultModal } from 'components/mergePositions/MergeResultModal'
@@ -224,7 +225,23 @@ export const Contents = () => {
     },
   ]
 
+  const [selectedConditionId, setSelectedConditionId] = useState<string | undefined>()
+  const [conditionIds, setConditionIds] = useState<Array<string> | undefined>()
+  const [isLoadingConditionIds, setIsLoadingConditionIds] = useState<boolean>(false)
+  const onConditionIdSelect = (conditionId: string) => {
+    setSelectedConditionId(conditionId)
+    console.log(conditionId)
+  }
+
   const onMergeableItemClick = (item: any, index: number) => {
+    setConditionIds([
+      '0xc857ba826f1503552ed33578cd90c66029cc81b7d56bb06dcc8fbac21757f8ce',
+      '0x463623d0b1399ce72cfb02f5d616b7664c0aaf8e488a6bdd980c19c0542f3c53',
+      '0xac302a138fa8668be8038e4b1556a2cf1040a42353145fdd0ffb4fa19bea23f7',
+      '0x7e73fa4e7c1e2b443084c242c0c49207e36985a27a58a3d934209cc9665ad5c0',
+      '0x87602f63bb274009a02cbbe4f7567a9727e4be8c0a1127a98ecc7a17d83e0a13',
+      '0xd3a743bbc6816895593ce25f77e7b59fe6afeeff40933db8a0ef180d4e6e49c5',
+    ])
     console.log(item.position, index)
   }
 
@@ -239,7 +256,11 @@ export const Contents = () => {
         <MergeWith mergeablePositions={mergeablePositionsArray} onClick={onMergeableItemClick} />
       </Row>
       <Row cols="1fr">
-        <SelectCondition />
+        <ConditionsDropdown
+          conditions={conditionIds}
+          onClick={onConditionIdSelect}
+          value={selectedConditionId}
+        />
       </Row>
       {condition && condition.resolved && (
         <Row cols="1fr">
