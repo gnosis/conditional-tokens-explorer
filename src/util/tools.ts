@@ -2,8 +2,10 @@ import { Provider } from 'ethers/providers'
 import { BigNumber, formatUnits, getAddress } from 'ethers/utils'
 import moment from 'moment-timezone'
 
+import BN from 'bn.js'
 import { BYTES_REGEX } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
+import zipObject from 'lodash.zipobject'
 import { ERC20Service } from 'services/erc20'
 import {
   GetCondition_condition,
@@ -11,6 +13,9 @@ import {
   GetPosition_position,
 } from 'types/generatedGQLForCTE'
 import { CollateralErrors, ConditionErrors, NetworkIds, PositionErrors, Token } from 'util/types'
+
+const ZERO_BN = new BN(0)
+const ONE_BN = new BN(1)
 
 export const isAddress = (address: string) => {
   try {
@@ -123,35 +128,30 @@ export const mulBN = (a: BigNumber, b: number, scale = 10000): BigNumber => {
   return a.mul(Math.round(b * scale)).div(scale)
 }
 
-export const getIndexSets = (outcomesCount: number) => {
-  const range = (length: number) => [...Array(length)].map((x, i) => i)
-  return range(outcomesCount).map((x) => 1 << x)
-}
-
 export const positionString = (
   conditionIds: string[],
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  indexSets: any[],
+  indexSets: string[],
   balance: BigNumber,
   token: Token
 ) => {
   return `[${token.symbol.toUpperCase()} ${conditionIds
     .map((conditionId, i) => {
-      return `C:${truncateStringInTheMiddle(conditionId, 8, 6)} O:${outcomeString(
-        parseInt(indexSets[i], 10)
-      )}`
+      return `C:${truncateStringInTheMiddle(conditionId, 8, 6)} O:${outcomeString(indexSets[i])}`
     })
     .join(' & ')}] x${formatBigNumber(balance, token.decimals, 2)}`
 }
 
-const outcomeString = (indexSet: number) =>
-  indexSet
-    .toString(2)
+const outcomeString = (indexSet: string) =>
+  indexSetToBase2(indexSet)
     .split('')
     .reverse()
     .reduce((acc, e, i) => (e !== '0' ? [...acc, i] : acc), new Array<number>())
     .join('|')
 
+export const indexSetToBase2 = (indexSet: string) => {
+  return new BN(indexSet).toString(2)
+}
 export const getRedeemedBalance = (
   position: GetPosition_position,
   resolvedCondition: GetCondition_condition,
@@ -161,7 +161,7 @@ export const getRedeemedBalance = (
   const indexSet = position.indexSets[conditionIndex]
 
   const { payouts } = resolvedCondition
-  const positionOutcomes = parseInt(indexSet, 10).toString(2).split('').reverse()
+  const positionOutcomes = indexSetToBase2(indexSet).split('').reverse()
 
   return positionOutcomes.reduce((acc, posOutcome, i) => {
     const payout = payouts?.[i] as Maybe<string>
@@ -217,14 +217,18 @@ export const arePositionMergeablesByCondition = (
   return arePositionMergeables(positions) && isConditionDisjoint(positions, condition)
 }
 
+// TODO This is used with the assumption that our desired condition is common to that position.
+// But we only check that every position has a condition in common
+// An option is to check if this dictionary is undefined for some conditionId.
+export const indexSetsByCondition = (position: GetMultiPositions_positions) => {
+  return zipObject(position.conditionIds, position.indexSets as string[])
+}
+
 export const isConditionFullIndexSet = (
   positions: GetMultiPositions_positions[],
   condition: GetCondition_condition
 ) => {
-  const partition = positions.reduce((acc, position) => {
-    const conditionIndex = position.conditionIds.findIndex((id) => condition.id === id)
-    return [...acc, Number(position.indexSets[conditionIndex])]
-  }, [] as number[])
+  const partition = positions.map((position) => indexSetsByCondition(position)[condition.id])
 
   return isFullIndexSetPartition(partition, condition.outcomeSlotCount)
 }
@@ -233,57 +237,94 @@ export const isConditionDisjoint = (
   positions: GetMultiPositions_positions[],
   condition: GetCondition_condition
 ) => {
-  const partition = positions.reduce((acc, position) => {
-    const conditionIndex = position.conditionIds.findIndex((id) => condition.id === id)
-    return [...acc, Number(position.indexSets[conditionIndex])]
-  }, [] as number[])
+  const partition = positions.map((position) => indexSetsByCondition(position)[condition.id])
 
   return isDisjointPartition(partition, condition.outcomeSlotCount)
 }
 
-export const isDisjointPartition = (partition: number[], outcomeSlotCount: number) => {
+export const isDisjointPartition = (partition: string[], outcomeSlotCount: number) => {
   if (partition.length <= 1 || outcomeSlotCount === 0) {
     return false
   }
 
   let isDisjoint = true
-  const fullIndexSet = (1 << outcomeSlotCount) - 1
+  const fullIndexSet = getFullIndexSet(outcomeSlotCount)
   let freeIndexSet = fullIndexSet
 
-  for (let i = 0; i < partition.length; i++) {
-    const indexSet = partition[i]
-    if (indexSet === 0) {
+  for (const indexSet of partition) {
+    if (!validIndexSet(fullIndexSet, indexSet)) {
       isDisjoint = false
       break
     }
 
-    if (indexSet > fullIndexSet) {
+    if (andIndexSets(indexSet, freeIndexSet) !== indexSet) {
       isDisjoint = false
       break
     }
-
-    if ((indexSet & freeIndexSet) !== indexSet) {
-      isDisjoint = false
-      break
-    }
-    freeIndexSet ^= indexSet
+    freeIndexSet = xorIndexSets(freeIndexSet, indexSet)
   }
   return isDisjoint
 }
 
-export const isFullIndexSetPartition = (partition: number[], outcomeSlotCount: number) => {
+export const isFullIndexSetPartition = (partition: string[], outcomeSlotCount: number) => {
   if (!isDisjointPartition(partition, outcomeSlotCount)) {
     return false
   }
 
-  const fullIndexSet = (1 << outcomeSlotCount) - 1
-  const partitionSum = partition.reduce((acc, indexSet) => acc + indexSet, 0)
+  const fullIndexSet = getFullIndexSet(outcomeSlotCount)
+  const partitionSum = partition.reduce((acc, indexSet) => orIndexSets(acc, indexSet))
 
   return partitionSum === fullIndexSet
 }
 
-export const minBigNumber = (values: BigNumber[]) =>
-  values.reduce((min, value) => (min.lte(value) ? min : value), values[0])
+// All implementation details are hidden behind string type
+export const getFullIndexSet = (outcomeSlotCount: number) => {
+  return ONE_BN.shln(outcomeSlotCount).sub(ONE_BN).toString()
+}
+
+export const getFreeIndexSet = (outcomeSlotCount: number, partition: string[]): string => {
+  const fullIndexSet = new BN(getFullIndexSet(outcomeSlotCount))
+
+  return partition
+    .reduce((acc, p) => {
+      return acc.xor(new BN(p))
+    }, fullIndexSet)
+    .toString()
+}
+
+export const isPartitionFullIndexSet = (
+  outcomesSlotCount: number,
+  partition: string[]
+): boolean => {
+  const freeIndexSet = new BN(getFreeIndexSet(outcomesSlotCount, partition))
+  return freeIndexSet.eq(ZERO_BN)
+}
+
+export const orIndexSets = (indexSetA: string, indexSetB: string) => {
+  const a = new BN(indexSetA)
+  const b = new BN(indexSetB)
+
+  return a.or(b).toString()
+}
+export const andIndexSets = (indexSetA: string, indexSetB: string) => {
+  const a = new BN(indexSetA)
+  const b = new BN(indexSetB)
+
+  return a.and(b).toString()
+}
+
+export const xorIndexSets = (indexSetA: string, indexSetB: string) => {
+  const a = new BN(indexSetA)
+  const b = new BN(indexSetB)
+
+  return a.xor(b).toString()
+}
+
+const validIndexSet = (fullIndexSet: string, indexSetA: string) => {
+  const fullIndexSetBN = new BN(fullIndexSet)
+  const indexSetABN = new BN(indexSetA)
+  return indexSetABN.gt(ZERO_BN) && indexSetABN.lte(fullIndexSetBN)
+}
 
 export const getMergePreview = (
   positions: GetPosition_position[],
@@ -295,22 +336,31 @@ export const getMergePreview = (
     return getRedeemedPreview(positions[0], condition, amount, token)
   } else {
     // this assumes all positions have same conditions set order
-    const newIndexSets = Array.from(new Array(positions[0].indexSets.length), (_, i) =>
-      Number(positions[0].indexSets[i])
-    )
-    for (let i = 1; i < positions.length; i++) {
-      const position = positions[i]
-      position.conditionIds.reduce((acc, id, i) => {
-        if (id === condition.id) {
-          acc[i] += Number(position.indexSets[i])
-        }
+    const conditionIndex = positions[0].conditionIds.findIndex((id) => id === condition.id)
 
-        return acc
-      }, newIndexSets)
-    }
+    // For all positions sum values on their indexSets corresponding to the given condition
+    const newIndexSet = positions
+      .map((position) => indexSetsByCondition(position)[condition.id])
+      .reduce((acc, val) => orIndexSets(acc, val))
+
+    // Maintain all indexSet the same except for the ones changed
+    const newIndexSets = positions[0].indexSets.map((indexSet, index) =>
+      index === conditionIndex ? newIndexSet : indexSet
+    )
     return positionString(positions[0].conditionIds, newIndexSets, amount, token)
   }
 }
+
+export const indexSetFromOutcomes = (outcomes: string[]): string => {
+  return outcomes
+    .map((outcome) => new BN(outcome))
+    .sort((a, b) => a.cmp(b))
+    .reduce((acc, indexSet) => acc.or(indexSet))
+    .toString()
+}
+
+export const minBigNumber = (values: BigNumber[]) =>
+  values.reduce((min, value) => (min.lte(value) ? min : value), values[0])
 
 /**
  * Convert message texts from Error.message from a collateral error messages
@@ -370,26 +420,6 @@ export const getTokenSummary = async (
       throw Error(err)
     }
   }
-}
-
-export const getFullIndexSet = (outcomeSlotCount: number) => {
-  return (1 << outcomeSlotCount) - 1
-}
-
-export const getFreeIndexSet = (outcomeSlotCount: number, partition: number[]): number => {
-  const fullIndexSet = getFullIndexSet(outcomeSlotCount)
-
-  return partition.reduce((acc, p) => {
-    return acc ^ p
-  }, fullIndexSet)
-}
-
-export const isPartitionFullIndexSet = (
-  outcomesSlotCount: number,
-  partition: number[]
-): boolean => {
-  const freeIndexSet = getFreeIndexSet(outcomesSlotCount, partition)
-  return freeIndexSet === 0
 }
 
 export const capitalize = (str: string): string =>
