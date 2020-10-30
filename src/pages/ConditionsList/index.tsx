@@ -261,8 +261,7 @@ export const ConditionsList: React.FC = () => {
           return oracleName
         },
         name: 'Reporter / Oracle',
-        selector: 'oracle',
-        sortable: true,
+        sortable: false,
       },
       {
         // eslint-disable-next-line react/display-name
