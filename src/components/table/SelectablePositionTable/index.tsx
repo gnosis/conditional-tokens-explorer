@@ -33,11 +33,13 @@ const TableControlsStyled = styled(TableControls)`
 `
 
 interface Props {
+  onRowClicked?: (row: PositionWithUserBalanceWithDecimals) => void
+  selectedPositionId?: string
   title?: string
 }
 
 export const SelectablePositionTable: React.FC<Props> = (props) => {
-  const { title = 'Positions', ...restProps } = props
+  const { onRowClicked, selectedPositionId, title = 'Positions', ...restProps } = props
   const [positionIdToSearch, setPositionIdToSearch] = useState<string>('')
   const [positionIdToShow, setPositionIdToShow] = useState<string>('')
   const [positionList, setPositionList] = useState<PositionWithUserBalanceWithDecimals[]>([])
@@ -86,7 +88,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
       {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimals) => {
-          return <RadioButton />
+          return <RadioButton checked={selectedPositionId === row.id} />
         },
         maxWidth: '12px',
         minWidth: '12px',
@@ -129,7 +131,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
         sortable: true,
       },
     ],
-    []
+    [selectedPositionId]
   )
 
   const [showFilters, setShowFilters] = useState(false)
@@ -200,6 +202,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
               )
             }
             noHeader
+            onRowClicked={onRowClicked}
             pagination
             paginationPerPage={5}
             paginationRowsPerPageOptions={[5, 10, 15]}

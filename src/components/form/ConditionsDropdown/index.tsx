@@ -14,17 +14,23 @@ const ButtonText = styled.span`
   white-space: nowrap;
 `
 
+const IdsDropdown = styled(Dropdown)`
+  .dropdownItems {
+    width: 100%;
+  }
+`
+
 interface Props {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   conditions: Array<any> | undefined
-  loading?: boolean
+  isLoading?: boolean
   onClick: (conditionId: string) => void
   title?: string
   value: string | undefined
 }
 
 export const ConditionsDropdown: React.FC<Props> = (props) => {
-  const { conditions, loading, onClick, title = 'Condition ID', value, ...restProps } = props
+  const { conditions, isLoading, onClick, title = 'Condition ID', value, ...restProps } = props
 
   const dropdownItems =
     conditions && conditions.length
@@ -45,16 +51,16 @@ export const ConditionsDropdown: React.FC<Props> = (props) => {
     <TitleValue
       title={title}
       value={
-        <Dropdown
+        <IdsDropdown
           currentItem={currentIndex}
-          disabled={!dropdownItems}
+          disabled={!dropdownItems || isLoading}
           dropdownButtonContent={
             <Button
               content={
-                loading ? (
-                  'Loading...'
-                ) : dropdownItems?.length ? (
+                dropdownItems && dropdownItems.length ? (
                   <ButtonText>{dropdownItems[currentIndex].value}</ButtonText>
+                ) : isLoading ? (
+                  'Loading...'
                 ) : (
                   'No conditions available for positions...'
                 )

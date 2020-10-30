@@ -22,6 +22,7 @@ import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { PositionWithUserBalanceWithDecimals } from 'hooks'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 import { getLogger } from 'util/logger'
 import {
@@ -210,41 +211,57 @@ export const Contents = () => {
     status === Status.Error ? error?.message : status === Status.Loading ? 'Working...' : undefined
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mergeablePositionsArray: Array<any> = [
-    {
-      position: '[DAI C: 0xb67f….ffa7 O: 0|1] x 10',
-    },
-    {
-      position: '[DAI C: 0xb67f….ffa7 O: 6|7|10] x 10',
-    },
-    {
-      position: '[DAI C: 0xb67f….ffa7 O: 2|4] x 10',
-    },
-    {
-      position: '[DAI C: 0xb67f….ffa7 O: 3|5|9|8] x 10',
-    },
-  ]
+  const [mergeablePositionsList, setMergeablePositionsList] = useState<Array<any> | undefined>()
 
   const [selectedConditionId, setSelectedConditionId] = useState<string | undefined>()
   const [conditionIds, setConditionIds] = useState<Array<string> | undefined>()
   const [isLoadingConditionIds, setIsLoadingConditionIds] = useState<boolean>(false)
-  const onConditionIdSelect = (conditionId: string) => {
+  const [isLoadingMergeablePositions, setIsLoadingMergeablePositions] = useState<boolean>(false)
+  const onConditionIdSelect = useCallback((conditionId: string) => {
     setSelectedConditionId(conditionId)
-    console.log(conditionId)
-  }
+    logger.log(conditionId)
+  }, [])
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onMergeableItemClick = (item: any, index: number) => {
-    setConditionIds([
-      '0xc857ba826f1503552ed33578cd90c66029cc81b7d56bb06dcc8fbac21757f8ce',
-      '0x463623d0b1399ce72cfb02f5d616b7664c0aaf8e488a6bdd980c19c0542f3c53',
-      '0xac302a138fa8668be8038e4b1556a2cf1040a42353145fdd0ffb4fa19bea23f7',
-      '0x7e73fa4e7c1e2b443084c242c0c49207e36985a27a58a3d934209cc9665ad5c0',
-      '0x87602f63bb274009a02cbbe4f7567a9727e4be8c0a1127a98ecc7a17d83e0a13',
-      '0xd3a743bbc6816895593ce25f77e7b59fe6afeeff40933db8a0ef180d4e6e49c5',
-    ])
-    console.log(item.position, index)
-  }
+  const onMergeableItemClick = useCallback((item: any, index: number) => {
+    logger.log(item.position, index)
+  }, [])
+
+  const [selectedPositionId, setSelectedPositionId] = useState<string | undefined>()
+  const onRowClicked = useCallback((row: PositionWithUserBalanceWithDecimals) => {
+    setSelectedPositionId(row.id)
+
+    setIsLoadingConditionIds(true)
+    setIsLoadingMergeablePositions(true)
+
+    setTimeout(() => {
+      setIsLoadingConditionIds(false)
+      setIsLoadingMergeablePositions(false)
+
+      setMergeablePositionsList([
+        {
+          position: '[DAI C: 0xb67f….ffa7 O: 0|1] x 10',
+        },
+        {
+          position: '[DAI C: 0xb67f….ffa7 O: 6|7|10] x 10',
+        },
+        {
+          position: '[DAI C: 0xb67f….ffa7 O: 2|4] x 10',
+        },
+        {
+          position: '[DAI C: 0xb67f….ffa7 O: 3|5|9|8] x 10',
+        },
+      ])
+      setConditionIds([
+        '0xc857ba826f1503552ed33578cd90c66029cc81b7d56bb06dcc8fbac21757f8ce',
+        '0x463623d0b1399ce72cfb02f5d616b7664c0aaf8e488a6bdd980c19c0542f3c53',
+        '0xac302a138fa8668be8038e4b1556a2cf1040a42353145fdd0ffb4fa19bea23f7',
+        '0x7e73fa4e7c1e2b443084c242c0c49207e36985a27a58a3d934209cc9665ad5c0',
+        '0x87602f63bb274009a02cbbe4f7567a9727e4be8c0a1127a98ecc7a17d83e0a13',
+        '0xd3a743bbc6816895593ce25f77e7b59fe6afeeff40933db8a0ef180d4e6e49c5',
+      ])
+    }, 3000)
+  }, [])
 
   const fullLoadingTitle = status === Status.Error ? 'Error' : 'Merge Positions'
   const isWorking = status === Status.Loading || status === Status.Error
@@ -252,13 +269,21 @@ export const Contents = () => {
 
   return (
     <CenteredCard>
-      <SelectablePositionTable />
+      <SelectablePositionTable
+        onRowClicked={onRowClicked}
+        selectedPositionId={selectedPositionId}
+      />
       <Row cols="1fr" marginBottomXL>
-        <MergeWith mergeablePositions={mergeablePositionsArray} onClick={onMergeableItemClick} />
+        <MergeWith
+          isLoading={isLoadingMergeablePositions}
+          mergeablePositions={mergeablePositionsList}
+          onClick={onMergeableItemClick}
+        />
       </Row>
       <Row cols="1fr">
         <ConditionsDropdown
           conditions={conditionIds}
+          isLoading={isLoadingConditionIds}
           onClick={onConditionIdSelect}
           value={selectedConditionId}
         />

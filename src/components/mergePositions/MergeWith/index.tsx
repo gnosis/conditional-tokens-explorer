@@ -31,7 +31,9 @@ const MergeableStripedListItemText = styled.span`
 
 const MergeableItem: React.FC<{
   index: number
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   item: any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onClick: (item: any, index: number) => void
 }> = (props) => {
   const { index, item, onClick, ...restProps } = props
@@ -52,7 +54,9 @@ const MergeableItem: React.FC<{
 
 interface Props {
   isLoading?: boolean
-  mergeablePositions: Array<any>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  mergeablePositions: Array<any> | undefined
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onClick: (item: any, index: number) => void
 }
 
@@ -65,7 +69,7 @@ export const MergeWith: React.FC<Props> = (props) => {
         title="Merge With"
         value={
           <StripedList minHeight="158px">
-            {mergeablePositions.length ? (
+            {mergeablePositions && mergeablePositions.length ? (
               mergeablePositions.map((item, index) => (
                 <MergeableItem index={index} item={item} key={index} onClick={onClick} />
               ))
