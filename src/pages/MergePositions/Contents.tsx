@@ -8,7 +8,6 @@ import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { Amount } from 'components/form/Amount'
 import { ConditionsDropdown } from 'components/form/ConditionsDropdown'
-import { SelectCondition } from 'components/form/SelectCondition'
 import { MergePreview } from 'components/mergePositions/MergePreview'
 import { MergeResultModal } from 'components/mergePositions/MergeResultModal'
 import { MergeWith } from 'components/mergePositions/MergeWith'
@@ -210,6 +209,7 @@ export const Contents = () => {
   const fullLoadingMessage =
     status === Status.Error ? error?.message : status === Status.Loading ? 'Working...' : undefined
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mergeablePositionsArray: Array<any> = [
     {
       position: '[DAI C: 0xb67f….ffa7 O: 0|1] x 10',
@@ -233,6 +233,7 @@ export const Contents = () => {
     console.log(conditionId)
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onMergeableItemClick = (item: any, index: number) => {
     setConditionIds([
       '0xc857ba826f1503552ed33578cd90c66029cc81b7d56bb06dcc8fbac21757f8ce',

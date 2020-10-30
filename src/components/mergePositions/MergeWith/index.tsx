@@ -30,9 +30,9 @@ const MergeableStripedListItemText = styled.span`
 `
 
 const MergeableItem: React.FC<{
-  onClick: (item: any, index: number) => void
-  item: any
   index: number
+  item: any
+  onClick: (item: any, index: number) => void
 }> = (props) => {
   const { index, item, onClick, ...restProps } = props
   const [selected, setSelected] = useState(false)

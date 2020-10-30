@@ -11,6 +11,7 @@ import { SearchField } from 'components/form/SearchField'
 import { Switch } from 'components/form/Switch'
 import { CompactFiltersLayout } from 'components/pureStyledComponents/CompactFiltersLayout'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
+import { RadioButton } from 'components/pureStyledComponents/RadioButton'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { SpinnerSize } from 'components/statusInfo/common'
 import { TableControls } from 'components/table/TableControls'
@@ -82,6 +83,14 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const defaultColumns: Array<any> = useMemo(
     () => [
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: PositionWithUserBalanceWithDecimals) => {
+          return <RadioButton />
+        },
+        maxWidth: '12px',
+        minWidth: '12px',
+      },
       {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimals) => (

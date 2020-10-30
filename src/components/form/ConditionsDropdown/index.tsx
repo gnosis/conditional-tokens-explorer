@@ -15,6 +15,7 @@ const ButtonText = styled.span`
 `
 
 interface Props {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   conditions: Array<any> | undefined
   loading?: boolean
   onClick: (conditionId: string) => void
