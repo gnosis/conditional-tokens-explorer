@@ -4,7 +4,7 @@ import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { Question } from 'util/types'
 
 export const useQuestion = (questionId: string, outcomeSlotCount: number) => {
-  const { RtioService, networkConfig } = useWeb3ConnectedOrInfura()
+  const { RtyService, networkConfig } = useWeb3ConnectedOrInfura()
 
   const [question, setQuestion] = React.useState<Maybe<Question>>(null)
   const [outcomesPrettier, setOutcomesPrettier] = React.useState<string[]>([])
@@ -18,7 +18,7 @@ export const useQuestion = (questionId: string, outcomeSlotCount: number) => {
     const getQuestion = async (questionId: string) => {
       try {
         const earliestBlockToCheck = networkConfig.getEarliestBlockToCheck()
-        const question = await RtioService.getQuestion(questionId, earliestBlockToCheck)
+        const question = await RtyService.getQuestion(questionId, earliestBlockToCheck)
         if (!cancelled) setQuestion(question)
       } catch (err) {
         setError(err)
@@ -32,7 +32,7 @@ export const useQuestion = (questionId: string, outcomeSlotCount: number) => {
     return () => {
       cancelled = true
     }
-  }, [RtioService, networkConfig, questionId])
+  }, [RtyService, networkConfig, questionId])
 
   React.useEffect(() => {
     let cancelled = false

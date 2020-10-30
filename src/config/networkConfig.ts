@@ -16,9 +16,9 @@ import {
   OMEN_GRAPH_HTTP_RINKEBY,
   OMEN_GRAPH_WS_MAINNET,
   OMEN_GRAPH_WS_RINKEBY,
-  REALITIO_CONTRACT_ADDRESS_FOR_GANACHE,
-  REALITIO_CONTRACT_ADDRESS_FOR_MAINNET,
-  REALITIO_CONTRACT_ADDRESS_FOR_RINKEBY,
+  REALITY_CONTRACT_ADDRESS_FOR_GANACHE,
+  REALITY_CONTRACT_ADDRESS_FOR_MAINNET,
+  REALITY_CONTRACT_ADDRESS_FOR_RINKEBY,
   WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_GANACHE,
   WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_MAINNET,
   WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_RINKEBY,
@@ -36,7 +36,7 @@ interface Network {
   earliestBlockToCheck: number
   contracts: {
     conditionalTokensAddress: string
-    realitioAddress: string
+    realityAddress: string
     wrapped1155FactoryAddress: string
     cpk?: CPKAddresses
   }
@@ -47,7 +47,7 @@ interface Network {
   OMENGraphWsUri: string
   oracles: Oracle[]
   arbitrators: Arbitrator[]
-  realitioTimeout: number
+  realityTimeout: number
 }
 
 const networks: { [K in NetworkIds]: Network } = {
@@ -55,7 +55,7 @@ const networks: { [K in NetworkIds]: Network } = {
     earliestBlockToCheck: EARLIEST_MAINNET_BLOCK_TO_CHECK,
     contracts: {
       conditionalTokensAddress: CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_MAINNET,
-      realitioAddress: REALITIO_CONTRACT_ADDRESS_FOR_MAINNET,
+      realityAddress: REALITY_CONTRACT_ADDRESS_FOR_MAINNET,
       wrapped1155FactoryAddress: WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_MAINNET,
     },
     tokens: [
@@ -117,9 +117,9 @@ const networks: { [K in NetworkIds]: Network } = {
         address: '0x0000000000000000000000000000000000000000',
       },
       {
-        name: 'realitio',
-        description: 'Realit.io',
-        url: 'https://realit.io/',
+        name: 'reality',
+        description: 'Reality.eth',
+        url: 'http://reality.eth.link/',
         address: '0x0e414d014a77971f4eaa22ab58e6d84d16ea838e',
       },
     ],
@@ -131,19 +131,19 @@ const networks: { [K in NetworkIds]: Network } = {
         address: '0xd47f72a2d1d0E91b0Ec5e5f5d02B2dc26d00A14D',
       },
       {
-        name: 'realitio',
-        description: 'Realit.io',
-        url: 'https://reality.eth.link',
+        name: 'reality',
+        description: 'Reality.eth',
+        url: 'https://reality.eth.link/',
         address: '0xdc0a2185031ecf89f091a39c63c2857a7d5c301a',
       },
     ],
-    realitioTimeout: 86400,
+    realityTimeout: 86400,
   },
   [NetworkIds.RINKEBY]: {
     earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
     contracts: {
       conditionalTokensAddress: CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_RINKEBY,
-      realitioAddress: REALITIO_CONTRACT_ADDRESS_FOR_RINKEBY,
+      realityAddress: REALITY_CONTRACT_ADDRESS_FOR_RINKEBY,
       wrapped1155FactoryAddress: WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_RINKEBY,
     },
     tokens: [
@@ -190,9 +190,9 @@ const networks: { [K in NetworkIds]: Network } = {
         address: '0x0000000000000000000000000000000000000000',
       },
       {
-        name: 'realitio',
-        description: 'Realit.io',
-        url: 'https://realit.io/',
+        name: 'reality',
+        description: 'Reality.eth',
+        url: 'https://reality.eth.link/',
         address: '0x576b76eebe6b5411c0ef310e65de9bff8a60130f',
       },
     ],
@@ -204,19 +204,19 @@ const networks: { [K in NetworkIds]: Network } = {
         address: '0xcafa054b1b054581faf65adce667bf1c684b6ef0',
       },
       {
-        name: 'realitio',
-        description: 'Realitio Team',
-        url: 'https://reality.eth.link',
+        name: 'reality',
+        description: 'Reality.eth',
+        url: 'https://reality.eth.link/',
         address: '0x02321745bE4a141E78db6C39834396f8df00e2a0',
       },
     ],
-    realitioTimeout: 10,
+    realityTimeout: 10,
   },
   [NetworkIds.GANACHE]: {
     earliestBlockToCheck: EARLIEST_GANACHE_BLOCK_TO_CHECK,
     contracts: {
       conditionalTokensAddress: CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_GANACHE,
-      realitioAddress: REALITIO_CONTRACT_ADDRESS_FOR_GANACHE,
+      realityAddress: REALITY_CONTRACT_ADDRESS_FOR_GANACHE,
       wrapped1155FactoryAddress: WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_GANACHE,
     },
     tokens: [
@@ -263,9 +263,9 @@ const networks: { [K in NetworkIds]: Network } = {
         address: '0x0000000000000000000000000000000000000000',
       },
       {
-        name: 'realitio',
-        description: 'Realit.io',
-        url: 'https://realit.io/',
+        name: 'reality',
+        description: 'Reality.eth',
+        url: 'https://reality.eth.link/',
         address: '0xDb56f2e9369E0D7bD191099125a3f6C370F8ed15',
       },
     ],
@@ -277,13 +277,13 @@ const networks: { [K in NetworkIds]: Network } = {
         address: '0x0000000000000000000000000000000000000000',
       },
       {
-        name: 'realitio',
-        description: 'Realit.io',
-        url: 'https://reality.eth.link',
+        name: 'reality',
+        description: 'Reality.eth',
+        url: 'https://reality.eth.link/',
         address: '0x0000000000000000000000000000000000000000',
       },
     ],
-    realitioTimeout: 10,
+    realityTimeout: 10,
   },
 }
 
@@ -311,8 +311,8 @@ export class NetworkConfig {
     return networks[this.networkId].contracts.conditionalTokensAddress
   }
 
-  getRealitioAddress(): string {
-    return networks[this.networkId].contracts.realitioAddress
+  getRealityAddress(): string {
+    return networks[this.networkId].contracts.realityAddress
   }
 
   getWrapped1155FactoryAddress(): string {
@@ -464,8 +464,8 @@ export class NetworkConfig {
     return [...tokensFromDefaultList, ...tokensFromUniswap]
   }
 
-  getRealitioTimeout(): number {
-    return networks[this.networkId].realitioTimeout
+  getRealityTimeout(): number {
+    return networks[this.networkId].realityTimeout
   }
 
   getCPKAddresses(): Maybe<CPKAddresses> {

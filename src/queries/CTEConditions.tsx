@@ -81,7 +81,7 @@ export const buildQueryConditionsList = (
     ReporterOracle.type === OracleFilterOptions.Custom ? 'oracle_not_in: $oracleNotIn' : '',
     ReporterOracle.type === OracleFilterOptions.Current ||
     ReporterOracle.type === OracleFilterOptions.Kleros ||
-    ReporterOracle.type === OracleFilterOptions.Realitio
+    ReporterOracle.type === OracleFilterOptions.Reality
       ? 'oracle_in: $oracleIn'
       : '',
     Status === StatusOptions.Open || Status === StatusOptions.Resolved ? 'resolved: $resolved' : '',
@@ -113,7 +113,7 @@ export const buildQueryConditionsList = (
     ReporterOracle.type === OracleFilterOptions.Custom ? '$oracleNotIn: [String]' : '',
     ReporterOracle.type === OracleFilterOptions.Current ||
     ReporterOracle.type === OracleFilterOptions.Kleros ||
-    ReporterOracle.type === OracleFilterOptions.Realitio
+    ReporterOracle.type === OracleFilterOptions.Reality
       ? '$oracleIn: [String]'
       : '',
     Status === StatusOptions.Open || Status === StatusOptions.Resolved ? '$resolved: Boolean' : '',
