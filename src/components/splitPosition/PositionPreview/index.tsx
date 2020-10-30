@@ -47,7 +47,7 @@ export const PositionPreview = ({
 
     if (splitFromCollateral && partition && partition.length > 0) {
       return partition.map((indexSet) => {
-        return positionString([conditionId], [indexSet], amount, selectedCollateral)
+        return positionString([conditionId], [indexSet.toString()], amount, selectedCollateral)
       })
     }
 
@@ -55,7 +55,7 @@ export const PositionPreview = ({
       return partition.map((indexSet) => {
         return positionString(
           [...position.conditionIds, conditionId],
-          [...[position.indexSets], indexSet],
+          [...[position.indexSets].map((i) => i.toString()), indexSet.toString()],
           amount,
           positionCollateral
         )

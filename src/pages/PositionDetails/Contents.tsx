@@ -50,6 +50,7 @@ import {
   formatBigNumber,
   formatTS,
   getRealityQuestionUrl,
+  indexSetToBase2,
   positionString,
   truncateStringInTheMiddle,
 } from 'util/tools'
@@ -195,8 +196,7 @@ export const Contents = (props: Props) => {
 
   const numberedOutcomes = useMemo(() => {
     return indexSets.map((indexSet: string) => {
-      return Number(indexSet)
-        .toString(2)
+      return indexSetToBase2(indexSet)
         .split('')
         .reverse()
         .map((value, index) => (value === '1' ? index + 1 : 0))

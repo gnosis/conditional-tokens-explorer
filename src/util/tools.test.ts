@@ -7,6 +7,8 @@ import {
   getMergePreview,
   getRedeemedBalance,
   getRedeemedPreview,
+  indexSetFromOutcomes,
+  indexSetsByCondition,
   isConditionFullIndexSet,
   isDisjointPartition,
   isFullIndexSetPartition,
@@ -17,7 +19,7 @@ import { Token } from 'util/types'
 
 test('positionString should return the rigth Positions string', async () => {
   expect(
-    positionString(['0x123', '0x345'], [1, 5], new BigNumber(`${1e19}`), {
+    positionString(['0x123', '0x345'], [1, 5].map(String), new BigNumber(`${1e19}`), {
       symbol: 'DAI',
       address: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
       decimals: 18,
@@ -750,35 +752,35 @@ test('#isConditionFullIndexSet - should be true', async () => {
 })
 
 test('isDisjointPartition should work', async () => {
-  expect(isDisjointPartition([0b001], 3)).toEqual(false)
+  expect(isDisjointPartition([0b001].map(String), 3)).toEqual(false)
 
-  expect(isDisjointPartition([0b001, 0b100], 0)).toEqual(false)
+  expect(isDisjointPartition([0b001, 0b100].map(String), 0)).toEqual(false)
 
-  expect(isDisjointPartition([0b101, 0b01, 0b10], 2)).toEqual(false)
+  expect(isDisjointPartition([0b101, 0b01, 0b10].map(String), 2)).toEqual(false)
 
-  expect(isDisjointPartition([0b00, 0b01, 0b10], 2)).toEqual(false)
+  expect(isDisjointPartition([0b00, 0b01, 0b10].map(String), 2)).toEqual(false)
 
-  expect(isDisjointPartition([0b101, 0b001], 3)).toEqual(false)
+  expect(isDisjointPartition([0b101, 0b001].map(String), 3)).toEqual(false)
 
-  expect(isDisjointPartition([0b100, 0b001], 3)).toEqual(true)
+  expect(isDisjointPartition([0b100, 0b001].map(String), 3)).toEqual(true)
 })
 
 test('isFullIndexSetPartition should work', async () => {
-  expect(isFullIndexSetPartition([0b001], 3)).toEqual(false)
+  expect(isFullIndexSetPartition([0b001].map(String), 3)).toEqual(false)
 
-  expect(isFullIndexSetPartition([0b001, 0b100], 0)).toEqual(false)
+  expect(isFullIndexSetPartition([0b001, 0b100].map(String), 0)).toEqual(false)
 
-  expect(isFullIndexSetPartition([0b101, 0b01, 0b10], 2)).toEqual(false)
+  expect(isFullIndexSetPartition([0b101, 0b01, 0b10].map(String), 2)).toEqual(false)
 
-  expect(isFullIndexSetPartition([0b00, 0b01, 0b10], 2)).toEqual(false)
+  expect(isFullIndexSetPartition([0b00, 0b01, 0b10].map(String), 2)).toEqual(false)
 
-  expect(isFullIndexSetPartition([0b101, 0b001], 3)).toEqual(false)
+  expect(isFullIndexSetPartition([0b101, 0b001].map(String), 3)).toEqual(false)
 
-  expect(isFullIndexSetPartition([0b100, 0b001], 3)).toEqual(false)
+  expect(isFullIndexSetPartition([0b100, 0b001].map(String), 3)).toEqual(false)
 
-  expect(isFullIndexSetPartition([0b100, 0b001, 0b010], 3)).toEqual(true)
+  expect(isFullIndexSetPartition([0b100, 0b001, 0b010].map(String), 3)).toEqual(true)
 
-  expect(isFullIndexSetPartition([0b110, 0b001], 3)).toEqual(true)
+  expect(isFullIndexSetPartition([0b110, 0b001].map(String), 3)).toEqual(true)
 })
 
 test('getMergePreview should return new position when merging fullIndexSet partition', async () => {
@@ -814,4 +816,11 @@ test('getMergePreview should return new position when merging non fullIndexSet p
       } as Token
     )
   ).toStrictEqual('[USDC C:0xf583ac...20856f O:1|2] x10.00')
+})
+
+test('indexSetFromOutcomes should return ORed values', async () => {
+  expect(indexSetFromOutcomes(['1', '2', '4', '8', '16'])).toBe('31')
+  expect(
+    indexSetFromOutcomes(['1606938044258990275541962092341162602522202993782792835301376', '4'])
+  ).toBe('1606938044258990275541962092341162602522202993782792835301380')
 })

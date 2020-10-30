@@ -48,7 +48,6 @@ import {
   StatusOptions,
 } from 'util/types'
 
-
 const DropdownItemLink = styled(NavLink)<DropdownItemProps>`
   ${DropdownItemCSS}
 `
