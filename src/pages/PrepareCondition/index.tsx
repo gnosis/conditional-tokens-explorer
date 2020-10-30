@@ -435,7 +435,7 @@ export const PrepareCondition = () => {
         contents: (
           <>
             Condition{' '}
-            <Hash href={`#/conditions/${conditionIdPreview}`} value={conditionIdPreview}></Hash>{' '}
+            <Hash href={`/conditions/${conditionIdPreview}`} value={conditionIdPreview}></Hash>{' '}
             already exists. Please use another question ID or change the number of outcomes.
           </>
         ),
