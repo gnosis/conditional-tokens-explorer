@@ -128,6 +128,13 @@ export const CategoriesDropdown = ({ onClick, value }: Props) => {
     }
   }, [categoriesFromOmen, categoriesLoading, categoriesError, categoryItems, onClick])
 
+  useEffect(() => {
+    if (!value && categories.isSuccess() && categories.hasData()) {
+      const categoriesData = categories.get()
+      if (categoriesData.length > 0) categoriesData[0].onClick()
+    }
+  }, [categories, value])
+
   return (
     categories && (
       <DropdownStyled
