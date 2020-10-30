@@ -4,6 +4,7 @@ import DataTable from 'react-data-table-component'
 import { NavLink, useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
+import { ButtonCopy } from 'components/buttons/ButtonCopy'
 import { ButtonDots } from 'components/buttons/ButtonDots'
 import {
   Dropdown,
@@ -18,6 +19,7 @@ import { OraclesFilterDropdown } from 'components/filters/OraclesFilterDropdown'
 import { StatusFilterDropdown } from 'components/filters/StatusFilterDropdown'
 import { SearchField } from 'components/form/SearchField'
 import { Switch } from 'components/form/Switch'
+import { ExternalLink } from 'components/navigation/ExternalLink'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import { PageTitle } from 'components/pureStyledComponents/PageTitle'
 import { Pill, PillTypes } from 'components/pureStyledComponents/Pill'
@@ -35,7 +37,7 @@ import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { customStyles } from 'theme/tableCustomStyles'
 import { Conditions_conditions } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
-import { formatTSSimple } from 'util/tools'
+import { formatTSSimple, getRealityQuestionUrl, isOracleRealitio } from 'util/tools'
 import {
   AdvancedFilterConditions,
   ConditionSearchOptions,
@@ -46,6 +48,7 @@ import {
   StatusOptions,
 } from 'util/types'
 
+
 const DropdownItemLink = styled(NavLink)<DropdownItemProps>`
   ${DropdownItemCSS}
 `
@@ -53,7 +56,7 @@ const DropdownItemLink = styled(NavLink)<DropdownItemProps>`
 const logger = getLogger('ConditionsList')
 
 export const ConditionsList: React.FC = () => {
-  const { _type: status, CPKService, address } = useWeb3ConnectedOrInfura()
+  const { _type: status, CPKService, address, networkConfig } = useWeb3ConnectedOrInfura()
 
   const history = useHistory()
   const { setValue } = useLocalStorage(LocalStorageManagement.ConditionId)
@@ -241,9 +244,23 @@ export const ConditionsList: React.FC = () => {
       },
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: Conditions_conditions) => (
-          <Hash onClick={() => handleRowClick(row)} value={row.oracle} />
-        ),
+        cell: (row: Conditions_conditions) => {
+          const { oracle, questionId } = row
+
+          const isConditionFromOmen = isOracleRealitio(oracle, networkConfig)
+
+          const oracleName = isConditionFromOmen ? (
+            <>
+              {networkConfig.getOracleFromAddress(oracle).description}
+              <ButtonCopy value={oracle} />
+              <ExternalLink href={getRealityQuestionUrl(questionId, networkConfig)} />
+            </>
+          ) : (
+            <Hash onClick={() => handleRowClick(row)} value={oracle} />
+          )
+
+          return oracleName
+        },
         name: 'Reporter / Oracle',
         selector: 'oracle',
         sortable: true,
@@ -319,7 +336,7 @@ export const ConditionsList: React.FC = () => {
         right: true,
       },
     ],
-    [buildMenuForRow, handleRowClick]
+    [buildMenuForRow, handleRowClick, networkConfig]
   )
 
   const toggleShowFilters = useCallback(() => {
