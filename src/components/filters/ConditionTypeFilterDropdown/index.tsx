@@ -16,8 +16,8 @@ export const ConditionTypeFilterDropdown: React.FC<Props> = (props) => {
   const { networkConfig } = useWeb3ConnectedOrInfura()
   const { onClick, value } = props
 
-  const oracleRealitio = React.useMemo(
-    () => networkConfig.getOracleFromName('realitio' as KnownOracle),
+  const oracleReality = React.useMemo(
+    () => networkConfig.getOracleFromName('reality' as KnownOracle),
     [networkConfig]
   )
 
@@ -31,14 +31,14 @@ export const ConditionTypeFilterDropdown: React.FC<Props> = (props) => {
     },
     {
       onClick: () => {
-        onClick(ConditionType.omen, oracleRealitio.address)
+        onClick(ConditionType.omen, oracleReality.address)
       },
       text: 'Omen Condition',
       value: ConditionType.omen,
     },
     {
       onClick: () => {
-        onClick(ConditionType.custom, oracleRealitio.address)
+        onClick(ConditionType.custom, oracleReality.address)
       },
       text: 'Custom Reporter',
       value: ConditionType.custom,

@@ -32,7 +32,7 @@ export const useConditionsList = (advancedFilter: AdvancedFilterConditions) => {
   if (
     ReporterOracle.type === OracleFilterOptions.Current ||
     ReporterOracle.type === OracleFilterOptions.Kleros ||
-    ReporterOracle.type === OracleFilterOptions.Realitio
+    ReporterOracle.type === OracleFilterOptions.Reality
   )
     variables['oracleIn'] = ReporterOracle.value
   if (Status === StatusOptions.Open) variables['resolved'] = false

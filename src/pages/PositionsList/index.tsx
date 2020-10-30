@@ -5,6 +5,7 @@ import DataTable from 'react-data-table-component'
 import { NavLink, useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
+import { ButtonCopy } from 'components/buttons/ButtonCopy'
 import { ButtonDots } from 'components/buttons/ButtonDots'
 import { ButtonExpand } from 'components/buttons/ButtonExpand'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
@@ -25,6 +26,7 @@ import { DisplayHashesTableModal } from 'components/modals/DisplayHashesTableMod
 import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
 import { UnwrapModal } from 'components/modals/UnwrapModal'
 import { WrapModal } from 'components/modals/WrapModal'
+import { ExternalLink } from 'components/navigation/ExternalLink'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import { PageTitle } from 'components/pureStyledComponents/PageTitle'
 import { Sidebar } from 'components/pureStyledComponents/Sidebar'
@@ -37,15 +39,14 @@ import { IconTypes } from 'components/statusInfo/common'
 import { TableControls } from 'components/table/TableControls'
 import { Hash } from 'components/text/Hash'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { PositionWithUserBalanceWithDecimals } from 'hooks'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
-import { usePositionsList } from 'hooks/usePositionsList'
+import { PositionWithUserBalanceWithDecimals, usePositionsList } from 'hooks/usePositionsList'
 import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
 import { ConditionInformation } from 'hooks/utils'
 import { customStyles } from 'theme/tableCustomStyles'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
-import { formatTSSimple } from 'util/tools'
+import { formatTSSimple, getRealityQuestionUrl, isOracleRealitio } from 'util/tools'
 import {
   AdvancedFilterPosition,
   CollateralFilterOptions,
@@ -68,7 +69,14 @@ const ButtonExpandStyled = styled(ButtonExpand)`
 const logger = getLogger('PositionsList')
 
 export const PositionsList = () => {
-  const { _type: status, CTService, WrapperService, connect, signer } = useWeb3ConnectedOrInfura()
+  const {
+    _type: status,
+    CTService,
+    WrapperService,
+    connect,
+    networkConfig,
+    signer,
+  } = useWeb3ConnectedOrInfura()
   const history = useHistory()
   const { setValue } = useLocalStorage(LocalStorageManagement.PositionId)
 
@@ -349,12 +357,12 @@ export const PositionsList = () => {
       {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimals) => {
-          const { collateralTokenERC1155 } = row
+          const { collateralToken, collateralTokenERC1155 } = row
           // Please don't delete this because the tests will explode
           return collateralTokenERC1155 ? (
             <TokenIcon onClick={() => handleRowClick(row)} token={collateralTokenERC1155} />
           ) : (
-            row.collateralToken
+            collateralToken
           )
         },
         name: 'Collateral',
@@ -409,17 +417,31 @@ export const PositionsList = () => {
         cell: (row: PositionWithUserBalanceWithDecimals) => {
           const { conditions } = row
           const oracle = conditions[0]?.oracle ?? ''
+          const questionId = conditions[0]?.questionId ?? ''
 
           const allOraclesAreEqual = conditions.every(
             (condition: ConditionInformation) =>
               condition.oracle.toLowerCase() === oracle.toLowerCase()
           )
+
+          const isConditionFromOmen = isOracleRealitio(oracle, networkConfig)
+
+          const oracleName = isConditionFromOmen ? (
+            <>
+              {networkConfig.getOracleFromAddress(oracle).description}
+              <ButtonCopy value={oracle} />
+              <ExternalLink href={getRealityQuestionUrl(questionId, networkConfig)} />
+            </>
+          ) : (
+            <Hash value={oracle} />
+          )
+
           if (conditions.length === 1 || allOraclesAreEqual) {
-            return <Hash value={oracle} />
+            return oracleName
           } else {
             return (
               <>
-                <Hash value={oracle} />
+                {oracleName}
                 <ButtonExpandStyled
                   onClick={() => {
                     const hashes: HashArray[] = conditions.map(
@@ -488,7 +510,7 @@ export const PositionsList = () => {
     ]
 
     return [...defaultColumns, ...connectedItems, ...menu]
-  }, [connectedItems, menu, handleRowClick])
+  }, [connectedItems, menu, handleRowClick, networkConfig])
 
   const onWrap = useCallback(
     async (transferValue: TransferOptions) => {

@@ -53,8 +53,8 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
     variables['textToSearch'] = TextToSearch.value.toLowerCase()
   }
   if (TextToSearch.type === PositionSearchOptions.CollateralSymbol && TextToSearch.value) {
-    const token = networkConfig.getTokenFromName(TextToSearch.value)
-    variables['textToSearch'] = token?.address.toLowerCase() ?? ethers.constants.HashZero
+    const tokens = networkConfig.getMultipleTokenAddressesFromSymbol(TextToSearch.value)
+    variables['textToSearch'] = tokens.length > 0 ? tokens : [ethers.constants.HashZero]
   }
   if (CollateralValue.value) {
     variables['collateralSearch'] = CollateralValue?.value

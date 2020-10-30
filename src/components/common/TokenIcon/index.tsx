@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import Blockies from 'react-blockies'
 import styled from 'styled-components'
 
@@ -16,8 +16,7 @@ import { UsdcIcon } from 'components/common/TokenIcon/img/UsdcIcon'
 import { UsdtIcon } from 'components/common/TokenIcon/img/UsdtIcon'
 import { WEthIcon } from 'components/common/TokenIcon/img/WEthIcon'
 import { ZrxIcon } from 'components/common/TokenIcon/img/ZrxIcon'
-import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { Remote } from 'util/remoteData'
+import { Spinner } from 'components/statusInfo/Spinner'
 import { Token } from 'util/types'
 
 const ICON_DIMENSIONS = '20px'
@@ -120,13 +119,91 @@ interface Props {
   onClick?: () => void
 }
 
+interface Resource<Payload> {
+  read: () => Payload
+}
+
+type status = 'pending' | 'success' | 'error'
+
+// A Resource is an object with a read method returning the payload
+function createResource<Payload>(asyncFn: () => Promise<Payload>): Resource<Payload> {
+  let status: status = 'pending'
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let result: any
+  const promise = asyncFn().then(
+    (r: Payload) => {
+      status = 'success'
+      result = r
+    },
+    (e: Error) => {
+      status = 'error'
+      result = e
+    }
+  )
+
+  return {
+    read(): Payload {
+      switch (status) {
+        case 'pending':
+          // This should throw a promise, so the fallback of the suspense component works
+          throw promise
+        case 'error':
+          throw result
+        case 'success':
+          return result
+      }
+    },
+  }
+}
+
+// First we need a type of cache to avoid creating resources for images we have already fetched in the past
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const cache = new Map<string, any>()
+
+// this function receives the source of the image and returns a resource
+const loadImage = (source: string): Resource<string> => {
+  let resource = cache.get(source)
+
+  if (resource) return resource
+
+  resource = createResource<string>(
+    () =>
+      new Promise((resolve) => {
+        const img = new window.Image()
+        img.src = source
+        img.addEventListener('load', () => resolve(source))
+        img.addEventListener('error', () => resolve(undefined))
+      })
+  )
+  cache.set(source, resource)
+  return resource
+}
+
+interface SuspenseProps {
+  src: string
+  currencyData: CurrencyData | null
+  symbol: string
+}
+
+const SuspenseImage = (props: SuspenseProps): JSX.Element => {
+  const { currencyData, src, symbol } = props
+  const resource = loadImage(src).read()
+  return (
+    <>
+      {currencyData && <Icon>{currencyData?.icon}</Icon>}
+      {!currencyData && resource && <CustomIcon src={src} />}
+      {!currencyData && !resource && (
+        <CustomIconWrapper>
+          <Blockies scale={2} seed={symbol} size={10} />
+        </CustomIconWrapper>
+      )}
+    </>
+  )
+}
+
 export const TokenIcon: React.FC<Props> = (props) => {
   const { onClick, token, ...restProps } = props
   const { address, symbol } = token
-
-  const { networkConfig } = useWeb3ConnectedOrInfura()
-
-  const [data, setData] = React.useState<Remote<boolean>>(Remote.loading<boolean>())
 
   const currencyData = React.useMemo(() => {
     const currenciesDataFiltered = currenciesData.filter(
@@ -142,39 +219,12 @@ export const TokenIcon: React.FC<Props> = (props) => {
     [address]
   )
 
-  React.useEffect(() => {
-    const CheckTokenAvailability = async () => {
-      try {
-        const result = await fetch(customImageUrl, { method: 'HEAD' })
-        if (result.ok) {
-          setData(Remote.success(result.ok))
-        } else {
-          throw new Error('Error fetching image')
-        }
-      } catch (err) {
-        setData(Remote.failure(err))
-      }
-    }
-
-    if (!currencyData && networkConfig.networkId === 1) {
-      CheckTokenAvailability()
-    } else {
-      setData(Remote.notAsked())
-    }
-  }, [currencyData, customImageUrl, networkConfig.networkId])
-
   return (
     <Wrapper onClick={onClick} {...restProps}>
-      {currencyData && <Icon>{currencyData.icon}</Icon>}
-      {!currencyData && networkConfig.networkId === 1 && data.isSuccess() && (
-        <CustomIcon src={customImageUrl} />
-      )}
-      {!currencyData && (data.isNotAsked() || data.isFailure()) && (
-        <CustomIconWrapper>
-          <Blockies scale={2} seed={symbol} size={10} />
-        </CustomIconWrapper>
-      )}
-      <Symbol>{symbol}</Symbol>
+      <Suspense fallback={<Spinner size="20px" />}>
+        <SuspenseImage currencyData={currencyData} src={customImageUrl} symbol={symbol} />
+        <Symbol>{symbol}</Symbol>
+      </Suspense>
     </Wrapper>
   )
 }
