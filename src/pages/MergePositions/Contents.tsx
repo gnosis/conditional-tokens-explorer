@@ -231,6 +231,8 @@ export const Contents = () => {
   const onRowClicked = useCallback((row: PositionWithUserBalanceWithDecimals) => {
     setSelectedPositionId(row.id)
 
+    setMergeablePositionsList([])
+    setConditionIds([])
     setIsLoadingConditionIds(true)
     setIsLoadingMergeablePositions(true)
 
@@ -260,7 +262,7 @@ export const Contents = () => {
         '0x87602f63bb274009a02cbbe4f7567a9727e4be8c0a1127a98ecc7a17d83e0a13',
         '0xd3a743bbc6816895593ce25f77e7b59fe6afeeff40933db8a0ef180d4e6e49c5',
       ])
-    }, 3000)
+    }, 1500)
   }, [])
 
   const fullLoadingTitle = status === Status.Error ? 'Error' : 'Merge Positions'
