@@ -204,7 +204,11 @@ export const Contents = () => {
         </Button>
       </ButtonContainer>
       <Prompt
-        message="Are you sure you want to leave this page? The changes you made will be lost?"
+        message={(params) =>
+          params.pathname === '/redeem'
+            ? true
+            : 'Are you sure you want to leave this page? The changes you made will be lost?'
+        }
         when={!!condition || positions.length > 0}
       />
     </CenteredCard>

@@ -774,7 +774,11 @@ export const PrepareCondition = () => {
           </Button>
         </ButtonContainer>
         <Prompt
-          message="Are you sure you want to leave this page? The changes you made will be lost?"
+          message={(params) =>
+            params.pathname === '/prepare'
+              ? true
+              : 'Are you sure you want to leave this page? The changes you made will be lost?'
+          }
           when={
             conditionType === ConditionType.custom
               ? isDirtyCustomCondition
