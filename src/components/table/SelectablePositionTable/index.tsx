@@ -33,7 +33,7 @@ const TableControlsStyled = styled(TableControls)`
 `
 
 interface Props {
-  onRowClicked?: (row: PositionWithUserBalanceWithDecimals) => void
+  onRowClicked: (row: PositionWithUserBalanceWithDecimals) => void
   selectedPositionId?: string
   title?: string
 }
@@ -87,16 +87,19 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     () => [
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: PositionWithUserBalanceWithDecimals) => {
-          return <RadioButton checked={selectedPositionId === row.id} />
-        },
+        cell: (row: PositionWithUserBalanceWithDecimals) => (
+          <RadioButton checked={selectedPositionId === row.id} onClick={() => onRowClicked(row)} />
+        ),
         maxWidth: '12px',
         minWidth: '12px',
       },
       {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimals) => (
-          <FormatHash hash={truncateStringInTheMiddle(row.id, 8, 6)} />
+          <FormatHash
+            hash={truncateStringInTheMiddle(row.id, 8, 6)}
+            onClick={() => onRowClicked(row)}
+          />
         ),
         maxWidth: '170px',
         name: 'Position Id',
@@ -106,7 +109,11 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
       {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimals) => {
-          return row.token ? <TokenIcon token={row.token} /> : row.collateralToken
+          return row.token ? (
+            <TokenIcon onClick={() => onRowClicked(row)} token={row.token} />
+          ) : (
+            row.collateralToken
+          )
         },
         maxWidth: '140px',
         minWidth: '140px',
@@ -117,13 +124,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
       {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimals) => (
-          <span
-            {...(row.userBalanceERC1155WithDecimals
-              ? { title: row.userBalanceERC1155.toString() }
-              : {})}
-          >
-            {row.userBalanceERC1155WithDecimals}
-          </span>
+          <span onClick={() => onRowClicked(row)}>{row.userBalanceERC1155WithDecimals}</span>
         ),
         name: 'ERC1155',
         right: true,
@@ -131,7 +132,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
         sortable: true,
       },
     ],
-    [selectedPositionId]
+    [onRowClicked, selectedPositionId]
   )
 
   const [showFilters, setShowFilters] = useState(false)

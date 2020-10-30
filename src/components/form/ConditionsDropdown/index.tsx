@@ -45,7 +45,9 @@ export const ConditionsDropdown: React.FC<Props> = (props) => {
       : undefined
 
   const currentIndex =
-    value && dropdownItems?.length ? dropdownItems.findIndex((item) => item.value === value) : 0
+    value && dropdownItems && dropdownItems.length
+      ? dropdownItems.findIndex((item) => item.value === value)
+      : 0
 
   return (
     <TitleValue
