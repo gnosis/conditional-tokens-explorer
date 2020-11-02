@@ -1,12 +1,22 @@
-import { ZERO_BN } from 'config/constants'
 import { BigNumber } from 'ethers/utils'
 
-import { Positions_positions, UserWithPositions_user } from 'types/generatedGQL'
+import { ZERO_BN } from 'config/constants'
+import { Positions_positions, UserWithPositions_user } from 'types/generatedGQLForCTE'
+
+export interface ConditionInformation {
+  oracle: string
+  questionId: string
+  conditionId: string
+}
 
 export interface Position {
   id: string
+  createTimestamp: number
   collateralToken: string
-  userBalance: BigNumber
+  wrappedToken: Maybe<string>
+  userBalanceERC1155: BigNumber
+  userBalanceERC20: BigNumber
+  conditions: ConditionInformation[]
 }
 
 export const marshalPositionListData = (
@@ -20,7 +30,18 @@ export const marshalPositionListData = (
     return {
       id: position.id,
       collateralToken: position.collateralToken.id,
-      userBalance: userPosition ? new BigNumber(userPosition.balance) : ZERO_BN,
+      wrappedToken: position?.wrappedToken?.id,
+      createTimestamp: position.createTimestamp,
+      userBalanceERC1155: userPosition ? new BigNumber(userPosition.balance) : ZERO_BN,
+      userBalanceERC20: userPosition ? new BigNumber(userPosition.wrappedBalance) : ZERO_BN,
+      conditions:
+        position?.conditions.map((condition) => {
+          return {
+            oracle: condition.oracle,
+            questionId: condition.questionId,
+            conditionId: condition.id,
+          }
+        }) ?? [],
     } as Position
   })
 }
