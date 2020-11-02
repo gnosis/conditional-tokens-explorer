@@ -3,17 +3,16 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import styled from 'styled-components'
 
-import { ButtonControl, ButtonControlType } from 'components/buttons/ButtonControl'
+import { ConditionTypeFilterDropdown } from 'components/filters/ConditionTypeFilterDropdown'
+import { DateFilter } from 'components/filters/DateFilter'
+import { MinMaxFilter } from 'components/filters/MinMaxFilter'
+import { OraclesFilterDropdown } from 'components/filters/OraclesFilterDropdown'
+import { StatusFilterDropdown } from 'components/filters/StatusFilterDropdown'
 import { SearchField } from 'components/form/SearchField'
 import { Switch } from 'components/form/Switch'
 import { CompactFiltersLayout } from 'components/pureStyledComponents/CompactFiltersLayout'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import { RadioButton } from 'components/pureStyledComponents/RadioButton'
-import {
-  StripedList,
-  StripedListEmpty,
-  StripedListItem,
-} from 'components/pureStyledComponents/StripedList'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { SpinnerSize } from 'components/statusInfo/common'
 import { TableControls } from 'components/table/TableControls'
@@ -25,6 +24,7 @@ import { customStyles } from 'theme/tableCustomStyles'
 import { Conditions_conditions } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
 import { truncateStringInTheMiddle } from 'util/tools'
+import { ConditionType, ConditionTypeAll, OracleFilterOptions, StatusOptions } from 'util/types'
 
 const Search = styled(SearchField)`
   min-width: 0;
@@ -39,7 +39,7 @@ const logger = getLogger('SelectableConditionTable')
 
 interface Props {
   onRowClicked: (row: Conditions_conditions) => void
-  selectedConditionId?: string
+  selectedConditionId?: string | undefined
   title?: string
 }
 
@@ -47,6 +47,22 @@ export const SelectableConditionTable: React.FC<Props> = (props) => {
   const { onRowClicked, selectedConditionId, title = 'Conditions', ...restProps } = props
   const [conditionIdToSearch, setConditionIdToSearch] = useState<string>('')
   const [conditionIdToShow, setConditionIdToShow] = useState<string>('')
+  const [selectedOracleFilter, setSelectedOracleFilter] = useState<string[]>([])
+  const [selectedOracleValue, setSelectedOracleValue] = useState<OracleFilterOptions>(
+    OracleFilterOptions.All
+  )
+  const [resetPagination, setResetPagination] = useState<boolean>(false)
+  const [selectedStatus, setSelectedStatus] = useState<StatusOptions>(StatusOptions.All)
+  const [selectedMinOutcomes, setSelectedMinOutcomes] = useState<Maybe<number>>(null)
+  const [selectedMaxOutcomes, setSelectedMaxOutcomes] = useState<Maybe<number>>(null)
+  const [selectedFromCreationDate, setSelectedFromCreationDate] = useState<Maybe<number>>(null)
+  const [selectedToCreationDate, setSelectedToCreationDate] = useState<Maybe<number>>(null)
+  const [selectedConditionTypeFilter, setSelectedConditionTypeFilter] = useState<Maybe<string>>(
+    null
+  )
+  const [selectedConditionTypeValue, setSelectedConditionTypeValue] = useState<
+    ConditionType | ConditionTypeAll
+  >(ConditionTypeAll.all)
 
   const debouncedHandler = useDebounceCallback((conditionIdToSearch) => {
     setConditionIdToSearch(conditionIdToSearch)
@@ -166,7 +182,45 @@ export const SelectableConditionTable: React.FC<Props> = (props) => {
             }
             start={<Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />}
           />
-          {showFilters && <CompactFiltersLayout>asdf</CompactFiltersLayout>}
+          {showFilters && (
+            <CompactFiltersLayout>
+              <OraclesFilterDropdown
+                onClick={(value: OracleFilterOptions, filter: string[]) => {
+                  setSelectedOracleFilter(filter)
+                  setSelectedOracleValue(value)
+                  setResetPagination(!resetPagination)
+                }}
+                value={selectedOracleValue}
+              />
+              <StatusFilterDropdown
+                onClick={(value: StatusOptions) => {
+                  setSelectedStatus(value)
+                }}
+                value={selectedStatus}
+              />
+              <ConditionTypeFilterDropdown
+                onClick={(value: ConditionType | ConditionTypeAll, filter: Maybe<string>) => {
+                  setSelectedConditionTypeFilter(filter)
+                  setSelectedConditionTypeValue(value)
+                }}
+                value={selectedConditionTypeValue}
+              />
+              <MinMaxFilter
+                onSubmit={(min, max) => {
+                  setSelectedMinOutcomes(min)
+                  setSelectedMaxOutcomes(max)
+                }}
+                title="Number Of Outcomes"
+              />
+              <DateFilter
+                onSubmit={(from, to) => {
+                  setSelectedFromCreationDate(from)
+                  setSelectedToCreationDate(to)
+                }}
+                title="Creation Date"
+              />
+            </CompactFiltersLayout>
+          )}
           <DataTable
             className="outerTableWrapper condensedTable"
             columns={columns}

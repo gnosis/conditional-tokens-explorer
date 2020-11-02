@@ -1,4 +1,5 @@
 import React from 'react'
+import styled from 'styled-components'
 
 import { ButtonSelectLight } from 'components/buttons/ButtonSelectLight'
 import { DropdownItem, DropdownPosition } from 'components/common/Dropdown'
@@ -7,6 +8,8 @@ import { FilterTitle } from 'components/pureStyledComponents/FilterTitle'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { ConditionType, ConditionTypeAll } from 'util/types'
 
+const Wrapper = styled.div``
+
 interface Props {
   onClick: (value: ConditionType | ConditionTypeAll, filter: Maybe<string>) => void
   value: Maybe<string>
@@ -14,7 +17,7 @@ interface Props {
 
 export const ConditionTypeFilterDropdown: React.FC<Props> = (props) => {
   const { networkConfig } = useWeb3ConnectedOrInfura()
-  const { onClick, value } = props
+  const { onClick, value, ...restProps } = props
 
   const oracleReality = React.useMemo(
     () => networkConfig.getOracleFromName('reality' as KnownOracle),
@@ -46,7 +49,7 @@ export const ConditionTypeFilterDropdown: React.FC<Props> = (props) => {
   ]
 
   return (
-    <>
+    <Wrapper {...restProps}>
       <FilterTitle>Condition Type</FilterTitle>
       <FilterDropdown
         currentItem={dropdownItems.findIndex((item) => item.value === value)}
@@ -62,6 +65,6 @@ export const ConditionTypeFilterDropdown: React.FC<Props> = (props) => {
           </DropdownItem>
         ))}
       />
-    </>
+    </Wrapper>
   )
 }

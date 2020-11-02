@@ -4,20 +4,25 @@ import { Controller, FormContextValues } from 'react-hook-form'
 import styled from 'styled-components'
 
 import { BigNumberInputWrapper } from 'components/form/BigNumberInputWrapper'
-import { TableWrapper } from 'components/pureStyledComponents/TableWrapper'
 import { ZERO_BN } from 'config/constants'
 import { useQuestion } from 'hooks/useQuestion'
 import { FormInputs } from 'pages/ReportPayouts/Contents'
 import { GetCondition_condition } from 'types/generatedGQLForCTE'
 import { divBN } from 'util/tools'
 
-const Wrapper = styled.form``
+const Wrapper = styled.form`
+  border-radius: 4px;
+  border: solid 1px ${(props) => props.theme.border.colorDark};
+  display: block;
+  height: 220px;
+  overflow: auto;
+  width: 100%;
+`
 
 const Table = styled.table`
   border-collapse: initial;
-  border-radius: 4px;
   border-spacing: 0;
-  border: solid 1px ${(props) => props.theme.border.colorDark};
+  border: none;
   min-width: 100%;
 `
 
@@ -41,7 +46,11 @@ TH.defaultProps = {
   textAlign: 'left',
 }
 
-const TR = styled.tr``
+const TR = styled.tr`
+  &:last-child td {
+    border-bottom: solid 1px ${(props) => props.theme.border.colorDark};
+  }
+`
 
 const TBody = styled.tbody``
 
@@ -147,42 +156,40 @@ export const OutcomesTable = ({ condition, decimals, formMethods }: Props) => {
 
   return (
     <Wrapper>
-      <TableWrapper>
-        <Table>
-          <THead>
-            <TR>
-              <TH>Outcome</TH>
-              <TH textAlign="right">Probabilities</TH>
-              <TH textAlign="right">Payout</TH>
-            </TR>
-          </THead>
-          <TBody>
-            {outcomes.map((outcome, index) => {
-              const { name, probability } = outcome
-              return (
-                <TR key={index}>
-                  <TD>{name}</TD>
-                  <TD textAlign="right">{probability.toFixed(2)}%</TD>
-                  <TD textAlign="right">
-                    <Controller
-                      as={Textfield}
-                      control={control}
-                      decimals={decimals}
-                      defaultValue={new BigNumber(0)}
-                      name={`payouts[${index}]`}
-                      onChange={(value) => {
-                        onChange(value[0], index)
-                        return value[0]
-                      }}
-                      rules={{ required: true, validate: (amount) => amount.gte(ZERO_BN) }}
-                    />
-                  </TD>
-                </TR>
-              )
-            })}
-          </TBody>
-        </Table>
-      </TableWrapper>
+      <Table>
+        <THead>
+          <TR>
+            <TH>Outcome</TH>
+            <TH textAlign="right">Probabilities</TH>
+            <TH textAlign="right">Payout</TH>
+          </TR>
+        </THead>
+        <TBody>
+          {outcomes.map((outcome, index) => {
+            const { name, probability } = outcome
+            return (
+              <TR key={index}>
+                <TD>{name}</TD>
+                <TD textAlign="right">{probability.toFixed(2)}%</TD>
+                <TD textAlign="right">
+                  <Controller
+                    as={Textfield}
+                    control={control}
+                    decimals={decimals}
+                    defaultValue={new BigNumber(0)}
+                    name={`payouts[${index}]`}
+                    onChange={(value) => {
+                      onChange(value[0], index)
+                      return value[0]
+                    }}
+                    rules={{ required: true, validate: (amount) => amount.gte(ZERO_BN) }}
+                  />
+                </TD>
+              </TR>
+            )
+          })}
+        </TBody>
+      </Table>
     </Wrapper>
   )
 }

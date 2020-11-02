@@ -10,7 +10,8 @@ import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer
 import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
 import { StripedList, StripedListEmpty } from 'components/pureStyledComponents/StripedList'
 import { FullLoading } from 'components/statusInfo/FullLoading'
-import { IconTypes } from 'components/statusInfo/common'
+import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { IconTypes, SpinnerSize } from 'components/statusInfo/common'
 import { SelectableConditionTable } from 'components/table/SelectableConditionTable'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
@@ -28,7 +29,7 @@ const DECIMALS = 2
 const logger = getLogger('ReportPayouts')
 
 export const Contents: React.FC = () => {
-  const { clearCondition, condition } = useConditionContext()
+  const { clearCondition, condition, loading, setConditionId } = useConditionContext()
   const { _type: status, CTService, address, connect } = useWeb3ConnectedOrInfura()
 
   const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<string>>>(
@@ -103,10 +104,12 @@ export const Contents: React.FC = () => {
       }
     : undefined
 
-  const [selectedConditionId, setSelectedConditionId] = useState<string | undefined>()
-  const onRowClicked = useCallback((row: Conditions_conditions) => {
-    setSelectedConditionId(row.id)
-  }, [])
+  const onRowClicked = useCallback(
+    (row: Conditions_conditions) => {
+      setConditionId(row.id)
+    },
+    [setConditionId]
+  )
 
   const fullLoadingMessage = transactionStatus.isFailure()
     ? transactionStatus.getFailure()
@@ -127,17 +130,19 @@ export const Contents: React.FC = () => {
 
   return (
     <CenteredCard>
-      <SelectableConditionTable
-        onRowClicked={onRowClicked}
-        selectedConditionId={selectedConditionId}
-      />
+      <SelectableConditionTable onRowClicked={onRowClicked} selectedConditionId={condition?.id} />
       {condition && !isConditionResolved ? (
         <OutcomesTable condition={condition} decimals={DECIMALS} formMethods={formMethods} />
       ) : (
-        <StripedList minHeight="120px">
+        <StripedList minHeight="220px">
           <StripedListEmpty>
-            {!condition && 'Please select a condition.'}
-            {isConditionResolved && 'The condition is already resolved.'}
+            {loading ? (
+              <InlineLoading size={SpinnerSize.small} />
+            ) : !condition ? (
+              'Please select a condition.'
+            ) : (
+              isConditionResolved && 'The condition is already resolved.'
+            )}
           </StripedListEmpty>
         </StripedList>
       )}
