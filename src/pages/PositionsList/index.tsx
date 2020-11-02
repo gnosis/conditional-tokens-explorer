@@ -128,17 +128,26 @@ export const PositionsList = () => {
     [debouncedHandlerPositionIdToSearch]
   )
 
+  // Clear the filters on network change
+  useEffect(() => {
+    setShowFilters(false)
+  }, [networkConfig])
+
+  const resetFilters = useCallback(() => {
+    setResetPagination(!resetPagination)
+    setSelectedToCreationDate(null)
+    setSelectedFromCreationDate(null)
+    setSearchBy(PositionSearchOptions.PositionId)
+    setTextToSearch('')
+    setSelectedCollateralFilter(null)
+    setSelectedCollateralValue(CollateralFilterOptions.All)
+    setWrappedCollateral(WrappedCollateralOptions.All)
+  }, [resetPagination])
+
   // Clear the filters
   useEffect(() => {
     if (!showFilters) {
-      setResetPagination(!resetPagination)
-      setSelectedToCreationDate(null)
-      setSelectedFromCreationDate(null)
-      setSearchBy(PositionSearchOptions.PositionId)
-      setTextToSearch('')
-      setSelectedCollateralFilter(null)
-      setSelectedCollateralValue(CollateralFilterOptions.All)
-      setWrappedCollateral(WrappedCollateralOptions.All)
+      resetFilters()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showFilters])

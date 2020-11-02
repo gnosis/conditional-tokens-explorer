@@ -337,7 +337,11 @@ export const Contents = () => {
         </Button>
       </ButtonContainer>
       <Prompt
-        message="Are you sure you want to leave this page? The changes you made will be lost?"
+        message={(params) =>
+          params.pathname === '/merge'
+            ? true
+            : 'Are you sure you want to leave this page? The changes you made will be lost?'
+        }
         when={positions.length > 0 || !!condition || !amount.isZero()}
       />
     </CenteredCard>

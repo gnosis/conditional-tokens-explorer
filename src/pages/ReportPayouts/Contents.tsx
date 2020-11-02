@@ -162,7 +162,11 @@ export const Contents: React.FC = () => {
         </Button>
       </ButtonContainer>
       <Prompt
-        message="Are you sure you want to leave this page? The changes you made will be lost?"
+        message={(params) =>
+          params.pathname === '/report'
+            ? true
+            : 'Are you sure you want to leave this page? The changes you made will be lost?'
+        }
         when={dirty || !!condition}
       />
     </CenteredCard>

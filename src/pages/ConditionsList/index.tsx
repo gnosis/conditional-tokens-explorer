@@ -106,21 +106,31 @@ export const ConditionsList: React.FC = () => {
     debouncedHandlerTextToSearch('')
   }, [debouncedHandlerTextToSearch])
 
+  // Clear the filters on network change
+  useEffect(() => {
+    setShowFilters(false)
+  }, [networkConfig])
+
+  const resetFilters = useCallback(() => {
+    setResetPagination(!resetPagination)
+    setSelectedOracleValue(OracleFilterOptions.All)
+    setSelectedOracleFilter([])
+    setSelectedConditionTypeValue(ConditionTypeAll.all)
+    setSelectedConditionTypeFilter(null)
+    setSelectedStatus(StatusOptions.All)
+    setSelectedMinOutcomes(null)
+    setSelectedMaxOutcomes(null)
+    setSelectedToCreationDate(null)
+    setSelectedFromCreationDate(null)
+    setSearchBy(ConditionSearchOptions.ConditionId)
+    setTextToSearch('')
+  }, [resetPagination])
+
+
   // Clear the filters
   useEffect(() => {
     if (!showFilters) {
-      setResetPagination(!resetPagination)
-      setSelectedOracleValue(OracleFilterOptions.All)
-      setSelectedOracleFilter([])
-      setSelectedConditionTypeValue(ConditionTypeAll.all)
-      setSelectedConditionTypeFilter(null)
-      setSelectedStatus(StatusOptions.All)
-      setSelectedMinOutcomes(null)
-      setSelectedMaxOutcomes(null)
-      setSelectedToCreationDate(null)
-      setSelectedFromCreationDate(null)
-      setSearchBy(ConditionSearchOptions.ConditionId)
-      setTextToSearch('')
+      resetFilters()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showFilters])
@@ -261,8 +271,7 @@ export const ConditionsList: React.FC = () => {
           return oracleName
         },
         name: 'Reporter / Oracle',
-        selector: 'oracle',
-        sortable: true,
+        sortable: false,
       },
       {
         // eslint-disable-next-line react/display-name

@@ -399,7 +399,11 @@ export const Form = ({
         />
       )}
       <Prompt
-        message="Are you sure you want to leave this page? The changes you made will be lost?"
+        message={(params) =>
+          params.pathname === '/split'
+            ? true
+            : 'Are you sure you want to leave this page? The changes you made will be lost?'
+        }
         when={dirty}
       />
     </CenteredCard>
