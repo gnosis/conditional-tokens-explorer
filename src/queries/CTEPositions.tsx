@@ -201,3 +201,12 @@ export const GetMultiPositionsQuery = gql`
   }
   ${positionFragment}
 `
+
+export const GetPositionsQuery = gql`
+  query GetPositions {
+    positions(first: 1000 , orderBy: createTimestamp, orderDirection: desc) {
+      ...PositionData
+    }
+  }
+  ${positionFragment}
+`
