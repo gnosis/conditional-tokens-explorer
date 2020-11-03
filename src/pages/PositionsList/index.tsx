@@ -115,17 +115,17 @@ export const PositionsList = () => {
   const [urlTableModal, setUrlTableModal] = useState('')
   const [titleModal, setTitleModal] = useState('')
 
-  const debouncedHandlerPositionIdToSearch = useDebounceCallback((positionIdToSearch) => {
-    setTextToSearch(positionIdToSearch)
+  const debouncedHandlerTextToSearch = useDebounceCallback((textToSearch) => {
+    setTextToSearch(textToSearch)
   }, 500)
 
   const onChangeSearch = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.currentTarget
       setTextToShow(value)
-      debouncedHandlerPositionIdToSearch(value)
+      debouncedHandlerTextToSearch(value)
     },
-    [debouncedHandlerPositionIdToSearch]
+    [debouncedHandlerTextToSearch]
   )
 
   // Clear the filters on network change
@@ -178,8 +178,8 @@ export const PositionsList = () => {
 
   const onClearSearch = useCallback(() => {
     setTextToShow('')
-    debouncedHandlerPositionIdToSearch('')
-  }, [debouncedHandlerPositionIdToSearch])
+    debouncedHandlerTextToSearch('')
+  }, [debouncedHandlerTextToSearch])
 
   const { data, error, loading, refetchPositions, refetchUserPositions } = usePositionsList(
     advancedFilters
