@@ -24,6 +24,7 @@ const Table = styled.table`
   border-spacing: 0;
   border: none;
   min-width: 100%;
+  position: relative;
 `
 
 const THead = styled.thead``
@@ -37,9 +38,12 @@ const TH = styled.th<{ textAlign?: string }>`
   height: 37px;
   line-height: 1.2;
   padding: 0 23px;
+  position: sticky;
   text-align: ${(props) => props.textAlign};
   text-transform: uppercase;
+  top: 0;
   white-space: nowrap;
+  z-index: 5;
 `
 
 TH.defaultProps = {
