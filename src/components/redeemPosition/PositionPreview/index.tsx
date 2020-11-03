@@ -54,7 +54,7 @@ export const PositionPreview = ({ condition, position }: Props) => {
               <strong>{redeemedPreview}</strong>
             </StripedListItem>
           ) : (
-            <StripedListEmpty>No redeemed preview yet.</StripedListEmpty>
+            <StripedListEmpty>No redeemed position.</StripedListEmpty>
           )}
         </StripedList>
       }

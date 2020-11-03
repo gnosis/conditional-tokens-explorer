@@ -1,11 +1,12 @@
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Prompt } from 'react-router'
 
 import { Button } from 'components/buttons'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CenteredCard } from 'components/common/CenteredCard'
+import { ConditionsDropdown } from 'components/form/ConditionsDropdown'
 import { SelectCondition } from 'components/form/SelectCondition'
 import { SelectPositions } from 'components/form/SelectPositions'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
@@ -14,10 +15,12 @@ import { Row } from 'components/pureStyledComponents/Row'
 import { PositionPreview } from 'components/redeemPosition/PositionPreview'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
+import { SelectablePositionTable } from 'components/table/SelectablePositionTable'
 import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { PositionWithUserBalanceWithDecimals } from 'hooks'
 import { useIsPositionRelatedToCondition } from 'hooks/useIsPositionRelatedToCondition'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 import { getLogger } from 'util/logger'
@@ -170,13 +173,45 @@ export const Contents = () => {
     transactionStatus === Status.Error ||
     transactionStatus === Status.Ready
 
+  const [conditionIds, setConditionIds] = useState<Array<string> | undefined>()
+  const [isLoadingConditionIds, setIsLoadingConditionIds] = useState<boolean>(false)
+  const [selectedConditionId, setSelectedConditionId] = useState<string | undefined>()
+  const onConditionIdSelect = useCallback((conditionId: string) => {
+    setSelectedConditionId(conditionId)
+  }, [])
+
+  const [selectedPositionId, setSelectedPositionId] = useState<string | undefined>()
+  const onRowClicked = useCallback((row: PositionWithUserBalanceWithDecimals) => {
+    setSelectedPositionId(row.id)
+    setConditionIds([])
+    setIsLoadingConditionIds(true)
+
+    setTimeout(() => {
+      setIsLoadingConditionIds(false)
+      setConditionIds([
+        '0xc857ba826f1503552ed33578cd90c66029cc81b7d56bb06dcc8fbac21757f8ce',
+        '0x463623d0b1399ce72cfb02f5d616b7664c0aaf8e488a6bdd980c19c0542f3c53',
+        '0xac302a138fa8668be8038e4b1556a2cf1040a42353145fdd0ffb4fa19bea23f7',
+        '0x7e73fa4e7c1e2b443084c242c0c49207e36985a27a58a3d934209cc9665ad5c0',
+        '0x87602f63bb274009a02cbbe4f7567a9727e4be8c0a1127a98ecc7a17d83e0a13',
+        '0xd3a743bbc6816895593ce25f77e7b59fe6afeeff40933db8a0ef180d4e6e49c5',
+      ])
+    }, 1500)
+  }, [])
+
   return (
     <CenteredCard>
+      <SelectablePositionTable
+        onRowClicked={onRowClicked}
+        selectedPositionId={selectedPositionId}
+      />
       <Row cols="1fr">
-        <SelectPositions showOnlyPositionsWithBalance singlePosition title="Position" />
-      </Row>
-      <Row cols="1fr">
-        <SelectCondition title="Resolved Condition Id" />
+        <ConditionsDropdown
+          conditions={conditionIds}
+          isLoading={isLoadingConditionIds}
+          onClick={onConditionIdSelect}
+          value={selectedConditionId}
+        />
       </Row>
       <Row cols="1fr">
         <PositionPreview
