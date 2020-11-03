@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { InputPosition, InputPositionProps } from 'components/form/InputPosition'
+import { InputPositionProps } from 'components/form/InputPosition'
 import { SelectCollateral, SelectCollateralProps } from 'components/form/SelectCollateral'
 import { CustomCollateralModal } from 'components/modals/CustomCollateralModal'
-import { SelectPositionModal } from 'components/modals/SelectPositionsModal'
 import { TitleControl } from 'components/pureStyledComponents/TitleControl'
+import { SelectablePositionTable } from 'components/table/SelectablePositionTable'
 import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
 import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
-import { Position } from 'hooks'
+import { PositionWithUserBalanceWithDecimals } from 'hooks'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { LocalStorageManagement, SplitFromType, Token } from 'util/types'
 
@@ -67,7 +67,7 @@ const ToggleableSelectCollateral = styled(SelectCollateral)<{ visible?: boolean 
   display: ${(props) => (props.visible ? 'block' : 'none')};
 `
 
-const ToggleableInputPosition = styled(InputPosition)<{ visible?: boolean }>`
+const ToggleableSelectablePositionTable = styled(SelectablePositionTable)<{ visible?: boolean }>`
   display: ${(props) => (props.visible ? 'block' : 'none')};
 `
 
@@ -78,7 +78,6 @@ export const SplitFrom: React.FC<Props> = (props) => {
     cleanAllowanceError,
     formMethods,
     formMethods: { register, setValue },
-    onPositionChange,
     splitFromCollateral,
     splitFromPosition,
     tokens,
@@ -87,25 +86,9 @@ export const SplitFrom: React.FC<Props> = (props) => {
   const { updatePositionIds } = useMultiPositionsContext()
   const { updateBalances } = useBatchBalanceContext()
   const { getValue } = useLocalStorage(LocalStorageManagement.PositionId)
-
   const [showCustomCollateralModal, setShowCustomCollateralModal] = useState(false)
-  const [showSelectPositionModal, setShowSelectPositionModal] = useState(false)
-
   const openCustomCollateralModal = useCallback(() => setShowCustomCollateralModal(true), [])
   const closeCustomCollateralModal = useCallback(() => setShowCustomCollateralModal(false), [])
-
-  const openSelectPositionModal = useCallback(() => setShowSelectPositionModal(true), [])
-  const closeSelectPositionModal = useCallback(() => setShowSelectPositionModal(false), [])
-
-  const onSelectPositionModalConfirm = React.useCallback(
-    (positions: Array<Position>) => {
-      const ids = positions.map((position) => position.id)
-      updatePositionIds(ids)
-      updateBalances(ids)
-      closeSelectPositionModal()
-    },
-    [closeSelectPositionModal, updateBalances, updatePositionIds]
-  )
   const [customToken, setCustomToken] = useState<Maybe<Token>>(null)
 
   useEffect(() => {
@@ -122,6 +105,11 @@ export const SplitFrom: React.FC<Props> = (props) => {
       updateBalances([localStoragePosition])
     }
   }, [getValue, updatePositionIds, updateBalances, setValue])
+
+  const [selectedPositionId, setSelectedPositionId] = useState<string | undefined>()
+  const onRowClicked = useCallback((row: PositionWithUserBalanceWithDecimals) => {
+    setSelectedPositionId(row.id)
+  }, [])
 
   return (
     <>
@@ -140,9 +128,6 @@ export const SplitFrom: React.FC<Props> = (props) => {
         <ToggleableTitleControl onClick={openCustomCollateralModal} visible={splitFromCollateral}>
           Add Custom Collateral
         </ToggleableTitleControl>
-        <ToggleableTitleControl onClick={openSelectPositionModal} visible={splitFromPosition}>
-          Select Position
-        </ToggleableTitleControl>
       </Controls>
       <ToggleableSelectCollateral
         cleanAllowanceError={cleanAllowanceError}
@@ -151,11 +136,9 @@ export const SplitFrom: React.FC<Props> = (props) => {
         tokens={customToken ? [...tokens, customToken] : [...tokens]}
         visible={splitFromCollateral}
       />
-      <ToggleableInputPosition
-        clickHandler={openSelectPositionModal}
-        formMethods={formMethods}
-        onPositionChange={onPositionChange}
-        splitFromPosition={splitFromPosition}
+      <ToggleableSelectablePositionTable
+        onRowClicked={onRowClicked}
+        selectedPositionId={selectedPositionId}
         visible={splitFromPosition}
       />
       {showCustomCollateralModal && (
@@ -163,16 +146,6 @@ export const SplitFrom: React.FC<Props> = (props) => {
           isOpen={showCustomCollateralModal}
           onAdd={setCustomToken}
           onRequestClose={closeCustomCollateralModal}
-        />
-      )}
-      {showSelectPositionModal && (
-        <SelectPositionModal
-          isOpen={showSelectPositionModal}
-          onConfirm={onSelectPositionModalConfirm}
-          onRequestClose={closeSelectPositionModal}
-          preSelectedPositions={[]}
-          showOnlyPositionsWithBalance
-          singlePosition
         />
       )}
     </>

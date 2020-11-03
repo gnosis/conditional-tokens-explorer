@@ -28,13 +28,18 @@ import { PositionPreview } from 'components/splitPosition/PositionPreview'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { StatusInfoInline, StatusInfoType } from 'components/statusInfo/StatusInfoInline'
 import { IconTypes } from 'components/statusInfo/common'
+import { SelectableConditionTable } from 'components/table/SelectableConditionTable'
 import { TitleValue } from 'components/text/TitleValue'
 import { NULL_PARENT_ID, ZERO_BN } from 'config/constants'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { AllowanceMethods, useAllowanceState } from 'hooks/useAllowanceState'
 import { SplitFrom } from 'pages/SplitPosition/SplitFrom'
-import { GetCondition_condition, GetPosition_position } from 'types/generatedGQLForCTE'
+import {
+  Conditions_conditions,
+  GetCondition_condition,
+  GetPosition_position,
+} from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import { indexSetFromOutcomes, trivialPartition, truncateStringInTheMiddle } from 'util/tools'
@@ -263,11 +268,19 @@ export const Form = ({
       />
     ) : null
 
+  // just mocked code
+  const [conditionId, setConditionId] = useState<string | undefined>()
+  const onRowClicked = useCallback(
+    (row: Conditions_conditions) => {
+      setConditionId(row.id)
+      console.log(conditionId)
+    },
+    [conditionId]
+  )
+
   return (
     <CenteredCard>
-      <Row cols="1fr">
-        <InputCondition formMethods={formMethods} onConditionChange={handleConditionChange} />
-      </Row>
+      <SelectableConditionTable onRowClicked={onRowClicked} selectedConditionId={conditionId} />
       {condition && condition.resolved && (
         <Row cols="1fr">
           <StatusInfoInline status={StatusInfoType.warning}>
