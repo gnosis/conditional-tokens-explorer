@@ -681,7 +681,7 @@ export const Contents = (props: Props) => {
           onRequestClose={() => setOpenDisplayConditionsTableModal(false)}
           title="Conditions"
           titleTable="Condition Id"
-          url="condition"
+          url="conditions"
         />
       )}
       {openDisplayOraclesIdsTableModal && areOracleIdsMoreThanOne && (
