@@ -17,11 +17,13 @@ import { SpinnerSize } from 'components/statusInfo/common'
 import { TableControls } from 'components/table/TableControls'
 import { FormatHash } from 'components/text/FormatHash'
 import { TitleValue } from 'components/text/TitleValue'
-import { PositionWithUserBalanceWithDecimals, usePositions } from 'hooks'
+import { PositionWithUserBalanceWithDecimals, usePositionsList } from 'hooks/usePositionsList'
 import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
 import { truncateStringInTheMiddle } from 'util/tools'
 import { CollateralFilterOptions, WrappedCollateralOptions } from 'util/types'
+import { AdvancedFilterPosition, PositionSearchOptions } from '../../../util/types'
+import { useWeb3ConnectedOrInfura } from '../../../contexts/Web3Context'
 
 const Search = styled(SearchField)`
   min-width: 0;
@@ -33,47 +35,85 @@ const TableControlsStyled = styled(TableControls)`
 `
 
 interface Props {
-  onRowClicked: (row: PositionWithUserBalanceWithDecimals) => void
-  selectedPositionId?: string
+  onRowClicked: (position: PositionWithUserBalanceWithDecimals) => void
+  selectedPosition: Maybe<PositionWithUserBalanceWithDecimals>
   title?: string
 }
 
 export const SelectablePositionTable: React.FC<Props> = (props) => {
-  const { onRowClicked, selectedPositionId, title = 'Positions', ...restProps } = props
-  const [positionIdToSearch, setPositionIdToSearch] = useState<string>('')
-  const [positionIdToShow, setPositionIdToShow] = useState<string>('')
+  const { onRowClicked, selectedPosition, title = 'Positions', ...restProps } = props
+
+  const {
+    networkConfig,
+  } = useWeb3ConnectedOrInfura()
+
   const [positionList, setPositionList] = useState<PositionWithUserBalanceWithDecimals[]>([])
+
+  const [searchBy, setSearchBy] = useState<PositionSearchOptions>(PositionSearchOptions.PositionId)
+  const [textToShow, setTextToShow] = useState<string>('')
+  const [textToSearch, setTextToSearch] = useState<string>('')
+  const [resetPagination, setResetPagination] = useState<boolean>(false)
+  const [showFilters, setShowFilters] = useState(false)
+
   const [selectedCollateralFilter, setSelectedCollateralFilter] = useState<Maybe<string[]>>(null)
   const [selectedCollateralValue, setSelectedCollateralValue] = useState<string>(
     CollateralFilterOptions.All
   )
+
+  const [selectedFromCreationDate, setSelectedFromCreationDate] = useState<Maybe<number>>(null)
+  const [selectedToCreationDate, setSelectedToCreationDate] = useState<Maybe<number>>(null)
   const [wrappedCollateral, setWrappedCollateral] = useState<WrappedCollateralOptions>(
     WrappedCollateralOptions.All
   )
-  const [selectedFromCreationDate, setSelectedFromCreationDate] = useState<Maybe<number>>(null)
-  const [selectedToCreationDate, setSelectedToCreationDate] = useState<Maybe<number>>(null)
 
-  const debouncedHandlerPositionIdToSearch = useDebounceCallback((positionIdToSearch) => {
-    setPositionIdToSearch(positionIdToSearch)
+  const debouncedHandlerTextToSearch = useDebounceCallback((textToSearch) => {
+    setTextToSearch(textToSearch)
   }, 500)
 
-  const onChangePositionId = React.useCallback(
+  const onChangeSearch = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.currentTarget
-      setPositionIdToShow(value)
-      debouncedHandlerPositionIdToSearch(value)
+      setTextToShow(value)
+      debouncedHandlerTextToSearch(value)
     },
-    [debouncedHandlerPositionIdToSearch]
+    [debouncedHandlerTextToSearch]
   )
 
   const onClearSearch = React.useCallback(() => {
-    setPositionIdToShow('')
-    debouncedHandlerPositionIdToSearch('')
-  }, [debouncedHandlerPositionIdToSearch])
+    setTextToShow('')
+    debouncedHandlerTextToSearch('')
+  }, [debouncedHandlerTextToSearch])
 
-  const { data, error, loading } = usePositions({
-    positionId: positionIdToSearch,
-  })
+  const advancedFilters: AdvancedFilterPosition = useMemo(() => {
+    return {
+      CollateralValue: {
+        type: selectedCollateralValue,
+        value: selectedCollateralFilter,
+      },
+      ToCreationDate: selectedToCreationDate,
+      FromCreationDate: selectedFromCreationDate,
+      TextToSearch: {
+        type: searchBy,
+        value: textToSearch,
+      },
+      WrappedCollateral: wrappedCollateral,
+    }
+  }, [
+    wrappedCollateral,
+    selectedCollateralValue,
+    selectedCollateralFilter,
+    selectedToCreationDate,
+    selectedFromCreationDate,
+    searchBy,
+    textToSearch,
+  ])
+
+  const { data, error, loading } = usePositionsList(advancedFilters)
+
+  // Clear the filters on network change
+  useEffect(() => {
+    setShowFilters(false)
+  }, [networkConfig])
 
   // Filter selected positions from original list. And positions without balance as indicated by props.
   useEffect(() => {
@@ -87,8 +127,8 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     () => [
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: PositionWithUserBalanceWithDecimals) => (
-          <RadioButton checked={selectedPositionId === row.id} onClick={() => onRowClicked(row)} />
+        cell: (position: PositionWithUserBalanceWithDecimals) => (
+          <RadioButton checked={!!(selectedPosition && selectedPosition?.id === position.id)} onClick={() => onRowClicked(position)} />
         ),
         maxWidth: '12px',
         minWidth: '12px',
@@ -132,20 +172,66 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
         sortable: true,
       },
     ],
-    [onRowClicked, selectedPositionId]
+    [onRowClicked, selectedPosition]
   )
 
-  const [showFilters, setShowFilters] = useState(false)
   const toggleShowFilters = useCallback(() => {
     setShowFilters(!showFilters)
   }, [showFilters])
 
-  const isLoading = !positionIdToSearch && loading
-  const isSearching = positionIdToSearch && loading
-  const showSpinner = (isLoading || isSearching) && !error
+  const resetFilters = useCallback(() => {
+    setResetPagination(!resetPagination)
+    setSelectedToCreationDate(null)
+    setSelectedFromCreationDate(null)
+    setSearchBy(PositionSearchOptions.PositionId)
+    setTextToSearch('')
+    setSelectedCollateralFilter(null)
+    setSelectedCollateralValue(CollateralFilterOptions.All)
+    setWrappedCollateral(WrappedCollateralOptions.All)
+  }, [resetPagination])
 
-  const [searchBy, setSearchBy] = useState('all')
+  // Clear the filters
+  useEffect(() => {
+    if (!showFilters) {
+      resetFilters()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showFilters])
+
+  const isLoading = useMemo(() => !textToSearch && loading, [
+    textToSearch,
+    loading,
+  ])
+  const isSearching = useMemo(() => textToSearch && loading, [textToSearch, loading])
+
+  const showSpinner = useMemo(() => (isLoading || isSearching) && !error, [
+    isLoading,
+    isSearching,
+    error,
+  ])
+
   const dropdownItems = usePositionsSearchOptions(setSearchBy)
+
+  useEffect(() => {
+    if (
+      textToSearch !== '' ||
+      wrappedCollateral !== WrappedCollateralOptions.All ||
+      selectedCollateralValue !== CollateralFilterOptions.All ||
+      selectedCollateralFilter ||
+      selectedToCreationDate ||
+      selectedFromCreationDate
+    ) {
+      setResetPagination(!resetPagination)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    textToSearch,
+    wrappedCollateral,
+    selectedCollateralValue,
+    selectedCollateralFilter,
+    selectedToCreationDate,
+    selectedFromCreationDate,
+  ])
 
   return (
     <TitleValue
@@ -156,9 +242,9 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
             end={
               <Search
                 dropdownItems={dropdownItems}
-                onChange={onChangePositionId}
+                onChange={onChangeSearch}
                 onClear={onClearSearch}
-                value={positionIdToShow}
+                value={textToShow}
               />
             }
             start={<Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />}
