@@ -137,6 +137,7 @@ export const SplitFrom: React.FC<Props> = (props) => {
         visible={splitFromCollateral}
       />
       <ToggleableSelectablePositionTable
+        hideTitle
         onRowClicked={onRowClicked}
         selectedPositionId={selectedPositionId}
         visible={splitFromPosition}
