@@ -32,14 +32,19 @@ const TableControlsStyled = styled(TableControls)`
   padding-top: 13px;
 `
 
+const TitleValueExtended = styled(TitleValue)<{ hideTitle?: boolean }>`
+  ${(props) => props.hideTitle && 'h2 { display: none;}'}
+`
+
 interface Props {
+  hideTitle?: boolean
   onRowClicked: (row: PositionWithUserBalanceWithDecimals) => void
   selectedPositionId?: string
   title?: string
 }
 
 export const SelectablePositionTable: React.FC<Props> = (props) => {
-  const { onRowClicked, selectedPositionId, title = 'Positions', ...restProps } = props
+  const { hideTitle, onRowClicked, selectedPositionId, title = 'Positions', ...restProps } = props
   const [positionIdToSearch, setPositionIdToSearch] = useState<string>('')
   const [positionIdToShow, setPositionIdToShow] = useState<string>('')
   const [positionList, setPositionList] = useState<PositionWithUserBalanceWithDecimals[]>([])
@@ -148,7 +153,8 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
   const dropdownItems = usePositionsSearchOptions(setSearchBy)
 
   return (
-    <TitleValue
+    <TitleValueExtended
+      hideTitle={hideTitle}
       title={title}
       value={
         <>
