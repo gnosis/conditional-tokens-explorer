@@ -47,7 +47,7 @@ const MergeableItem: React.FC<{
   return (
     <MergeableStripedListItem onClick={itemOnClick} {...restProps}>
       <Checkbox checked={selected} />
-      <MergeableStripedListItemText>{item.position}</MergeableStripedListItemText>
+      <MergeableStripedListItemText>{item.positionPreview}</MergeableStripedListItemText>
     </MergeableStripedListItem>
   )
 }
