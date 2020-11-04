@@ -11,6 +11,7 @@ export const customStyles: IDataTableStyles = {
       borderBottomStyle: 'solid',
       borderBottomWidth: '1px',
       flexGrow: 1,
+      marginBottom: '-1px',
     },
   },
   tableWrapper: {
