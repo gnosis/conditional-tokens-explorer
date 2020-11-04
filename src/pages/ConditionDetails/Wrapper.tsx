@@ -57,9 +57,6 @@ export const Wrapper = (props: WrapperProps) => {
     }
   }, [condition, errors, history, loading])
 
-  console.log('ERRORS')
-  console.log(errors)
-
   return (
     <>
       <PageTitle>Condition Details</PageTitle>
