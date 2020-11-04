@@ -126,7 +126,6 @@ export const ConditionsList: React.FC = () => {
     setTextToSearch('')
   }, [resetPagination])
 
-
   // Clear the filters
   useEffect(() => {
     if (!showFilters) {
