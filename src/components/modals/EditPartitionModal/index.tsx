@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import lodashClonedeep from 'lodash.clonedeep'
 import React, { useCallback, useEffect, useState } from 'react'
-import styled, { withTheme } from 'styled-components'
+import styled, { css, withTheme } from 'styled-components'
 
 import { Button } from 'components/buttons/Button'
 import { ButtonAdd } from 'components/buttons/ButtonAdd'
@@ -25,7 +25,19 @@ import { TitleControlButton } from 'components/pureStyledComponents/TitleControl
 import { TitleValue } from 'components/text/TitleValue'
 import { OutcomeProps } from 'util/types'
 
+const CommonCSS = css`
+  max-height: 300px;
+  min-height: 200px;
+`
+
 const Collections = styled(StripedList)`
+  ${CommonCSS}
+  height: 100%;
+  position: relative;
+`
+
+const CollectionsOuter = styled.div`
+  ${CommonCSS}
   position: relative;
 `
 
@@ -108,6 +120,14 @@ const ButtonAddNewCollectionContainer = styled.div`
 
 const ButtonReset = styled(Button)`
   margin-right: auto;
+`
+
+const ConfirmOverlayFull = styled(ConfirmOverlay)`
+  border-radius: 4px;
+  bottom: 1px;
+  left: 1px;
+  right: 1px;
+  top: 1px;
 `
 
 interface DraggedOutcomeProps extends OutcomeProps {
@@ -432,8 +452,8 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
             <CardText>
               You can drag outcomes across collections. Click on an outcome to remove it.
             </CardText>
-            <Collections minHeight="200px">
-              <>
+            <CollectionsOuter>
+              <Collections>
                 {allCollections.length > 0 ? (
                   allCollections.map(
                     (outcomesList: Array<OutcomeProps>, collectionIndex: number) => {
@@ -457,20 +477,20 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
                     <strong>No collections.</strong>
                   </StripedListEmpty>
                 )}
-                {confirmDeleteAllCollections && (
-                  <ConfirmOverlay
-                    confirm={() => {
-                      removeAllCollections()
-                      setConfirmDeleteAllCollections(false)
-                    }}
-                    deny={() => {
-                      setConfirmDeleteAllCollections(false)
-                    }}
-                    text="Remove all collections?"
-                  />
-                )}
-              </>
-            </Collections>
+              </Collections>
+              {confirmDeleteAllCollections && (
+                <ConfirmOverlayFull
+                  confirm={() => {
+                    removeAllCollections()
+                    setConfirmDeleteAllCollections(false)
+                  }}
+                  deny={() => {
+                    setConfirmDeleteAllCollections(false)
+                  }}
+                  text="Remove all collections?"
+                />
+              )}
+            </CollectionsOuter>
             <SmallNote>
               A valid partition needs at least two collections. No outcomes can be orphaned.
             </SmallNote>
