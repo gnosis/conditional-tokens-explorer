@@ -174,7 +174,7 @@ export const buildQueryPositions = (options: PositionsListType = DEFAULT_OPTIONS
   const variablesClause = variablesClauseInternal ? `(${variablesClauseInternal})` : ''
 
   const query = gql`
-  query Positions ${variablesClause} {
+  query PositionsList ${variablesClause} {
     positions(first: 1000 ${whereClause} , orderBy: createTimestamp, orderDirection: desc) {
       ...PositionData
     }
@@ -196,15 +196,6 @@ export const GetPositionQuery = gql`
 export const GetMultiPositionsQuery = gql`
   query GetMultiPositions($ids: [ID!]!) {
     positions(where: { id_in: $ids }, orderBy: createTimestamp, orderDirection: desc) {
-      ...PositionData
-    }
-  }
-  ${positionFragment}
-`
-
-export const GetPositionsQuery = gql`
-  query GetPositions {
-    positions(first: 1000 , orderBy: createTimestamp, orderDirection: desc) {
       ...PositionData
     }
   }
