@@ -21,9 +21,8 @@ import { PositionWithUserBalanceWithDecimals, usePositionsList } from 'hooks/use
 import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
 import { truncateStringInTheMiddle } from 'util/tools'
-import { CollateralFilterOptions, WrappedCollateralOptions } from 'util/types'
-import { AdvancedFilterPosition, PositionSearchOptions } from '../../../util/types'
-import { useWeb3ConnectedOrInfura } from '../../../contexts/Web3Context'
+import { CollateralFilterOptions, WrappedCollateralOptions,  AdvancedFilterPosition, PositionSearchOptions } from 'util/types'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 
 const Search = styled(SearchField)`
   min-width: 0;
@@ -36,16 +35,21 @@ const TableControlsStyled = styled(TableControls)`
 
 interface Props {
   onRowClicked: (position: PositionWithUserBalanceWithDecimals) => void
+  onClearCallback: () => void
   selectedPosition: Maybe<PositionWithUserBalanceWithDecimals>
   title?: string
 }
 
 export const SelectablePositionTable: React.FC<Props> = (props) => {
-  const { onRowClicked, selectedPosition, title = 'Positions', ...restProps } = props
-
   const {
-    networkConfig,
-  } = useWeb3ConnectedOrInfura()
+    onClearCallback,
+    onRowClicked,
+    selectedPosition,
+    title = 'Positions',
+    ...restProps
+  } = props
+
+  const { networkConfig } = useWeb3ConnectedOrInfura()
 
   const [positionList, setPositionList] = useState<PositionWithUserBalanceWithDecimals[]>([])
 
@@ -70,7 +74,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     setTextToSearch(textToSearch)
   }, 500)
 
-  const onChangeSearch = React.useCallback(
+  const onChangeSearch = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.currentTarget
       setTextToShow(value)
@@ -79,7 +83,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     [debouncedHandlerTextToSearch]
   )
 
-  const onClearSearch = React.useCallback(() => {
+  const onClearSearch = useCallback(() => {
     setTextToShow('')
     debouncedHandlerTextToSearch('')
   }, [debouncedHandlerTextToSearch])
@@ -110,6 +114,17 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
 
   const { data, error, loading } = usePositionsList(advancedFilters)
 
+  // #1 Filter, only positions with balance
+  const positionsWithBalance = useMemo(
+    () =>
+      data &&
+      data.length &&
+      data.filter(
+        (position: PositionWithUserBalanceWithDecimals) => !position.userBalanceERC1155.isZero()
+      ),
+    [data]
+  )
+
   // Clear the filters on network change
   useEffect(() => {
     setShowFilters(false)
@@ -117,10 +132,10 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
 
   // Filter selected positions from original list. And positions without balance as indicated by props.
   useEffect(() => {
-    if (data) {
-      setPositionList(data)
+    if (positionsWithBalance) {
+      setPositionList(positionsWithBalance)
     }
-  }, [setPositionList, data])
+  }, [setPositionList, positionsWithBalance])
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const defaultColumns: Array<any> = useMemo(
@@ -128,7 +143,10 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
       {
         // eslint-disable-next-line react/display-name
         cell: (position: PositionWithUserBalanceWithDecimals) => (
-          <RadioButton checked={!!(selectedPosition && selectedPosition?.id === position.id)} onClick={() => onRowClicked(position)} />
+          <RadioButton
+            checked={!!(selectedPosition && selectedPosition?.id === position.id)}
+            onClick={() => onRowClicked(position)}
+          />
         ),
         maxWidth: '12px',
         minWidth: '12px',
@@ -194,14 +212,12 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
   useEffect(() => {
     if (!showFilters) {
       resetFilters()
+      onClearCallback()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showFilters])
 
-  const isLoading = useMemo(() => !textToSearch && loading, [
-    textToSearch,
-    loading,
-  ])
+  const isLoading = useMemo(() => !textToSearch && loading, [textToSearch, loading])
   const isSearching = useMemo(() => textToSearch && loading, [textToSearch, loading])
 
   const showSpinner = useMemo(() => (isLoading || isSearching) && !error, [
