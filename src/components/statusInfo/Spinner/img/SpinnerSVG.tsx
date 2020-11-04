@@ -1,7 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
 
-const Wrapper = styled.svg``
+const Wrapper = styled.svg`
+  display: block;
+`
 
 export const SpinnerSVG: React.FC = (props) => {
   return (
