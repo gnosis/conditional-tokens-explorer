@@ -38,7 +38,12 @@ const TableControlsStyled = styled(TableControls)`
   padding-top: 13px;
 `
 
+const TitleValueExtended = styled(TitleValue)<{ hideTitle?: boolean }>`
+  ${(props) => props.hideTitle && 'h2 { display: none;}'}
+`
+
 interface Props {
+  hideTitle?: boolean
   onRowClicked: (position: PositionWithUserBalanceWithDecimals) => void
   onClearCallback: () => void
   selectedPosition: Maybe<PositionWithUserBalanceWithDecimals>
@@ -48,6 +53,7 @@ interface Props {
 
 export const SelectablePositionTable: React.FC<Props> = (props) => {
   const {
+    hideTitle,
     clearFilters,
     onClearCallback,
     onRowClicked,
@@ -261,7 +267,8 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
   ])
 
   return (
-    <TitleValue
+    <TitleValueExtended
+      hideTitle={hideTitle}
       title={title}
       value={
         <>
