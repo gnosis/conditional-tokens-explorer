@@ -44,7 +44,7 @@ export const PositionPreview = ({ condition, position }: Props) => {
       return ''
     }
     return ''
-  }, [position, condition, redeemedBalance, token])
+  }, [position, condition, token])
 
   return (
     <TitleValue

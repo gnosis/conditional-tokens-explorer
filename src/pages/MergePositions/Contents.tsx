@@ -100,7 +100,7 @@ export const Contents = () => {
     setAmount(ZERO_BN)
     setMergeResult('')
     // TODO check this collateral
-   // setCollateralToken(null)
+    // setCollateralToken(null)
     setTransactionStatus(Remote.notAsked<Maybe<string>>())
   }, [])
 
@@ -146,7 +146,7 @@ export const Contents = () => {
     }
   }, [])
 
-  const { data: positions, error, loading } = usePositionsList(advancedFilters)
+  const { data: positions, error: errorPositions } = usePositionsList(advancedFilters)
 
   const onRowClicked = useCallback(
     async (position: PositionWithUserBalanceWithDecimals) => {
@@ -248,7 +248,7 @@ export const Contents = () => {
     }
 
     const selectedPositionsIds = selectedPositions.map(
-      (selectedPosition: any) => selectedPosition.id
+      (selectedPosition: PositionWithUserBalanceWithDecimals) => selectedPosition.id
     )
     if (position) {
       // We add the first selected position that we search
@@ -308,6 +308,16 @@ export const Contents = () => {
     [transactionStatus]
   )
 
+  const disabled = useMemo(
+    () =>
+      transactionStatus.isLoading() ||
+      !selectedPositions.length ||
+      !conditionId ||
+      !position ||
+      amount.isZero(),
+    [transactionStatus, amount, selectedPositions, conditionId, position]
+  )
+
   return (
     <CenteredCard>
       <SelectablePositionTable
@@ -317,6 +327,7 @@ export const Contents = () => {
       />
       <Row cols="1fr" marginBottomXL>
         <MergeWith
+          errorFetching={errorPositions}
           isLoading={isLoadingMergeablePositions}
           mergeablePositions={mergeablePositions}
           onClick={onMergeableItemClick}
@@ -349,12 +360,12 @@ export const Contents = () => {
         />
       </Row>
       <Row cols="1fr">
-          <MergePreview
-            amount={amount}
-            conditionId={conditionId}
-            positions={selectedPositions}
-            token={collateralToken}
-          />
+        <MergePreview
+          amount={amount}
+          conditionId={conditionId}
+          positions={selectedPositions}
+          token={collateralToken}
+        />
       </Row>
       {isWorking && (
         <FullLoading
@@ -374,7 +385,7 @@ export const Contents = () => {
         ></MergeResultModal>
       )}
       <ButtonContainer>
-        <Button onClick={onMerge}>Merge</Button>
+        <Button  disabled={disabled} onClick={onMerge}>Merge</Button>
       </ButtonContainer>
       <Prompt
         message={(params) =>

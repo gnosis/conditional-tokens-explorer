@@ -12,8 +12,8 @@ export interface ConditionInformation {
 
 export interface Position {
   id: string
-  indexSets: any[]
-  conditionIds: any[]
+  indexSets: string[]
+  conditionIds: string[]
   createTimestamp: number
   collateralToken: string
   wrappedToken: Maybe<string>

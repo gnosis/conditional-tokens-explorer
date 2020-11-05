@@ -11,7 +11,9 @@ export const useIsConditionResolved = (conditionId: Maybe<string>) => {
     fetchPolicy: 'no-cache',
   })
 
-  return useMemo(() => data && conditionId ? !!data.condition.resolved : false
+  return useMemo(
+    () => (data && conditionId ? !!data.condition.resolved : false),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  , [data, conditionId])
+    [data, conditionId]
+  )
 }

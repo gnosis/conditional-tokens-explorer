@@ -8,7 +8,6 @@ import {
   getRedeemedBalance,
   getRedeemedPreview,
   indexSetFromOutcomes,
-  indexSetsByCondition,
   isConditionFullIndexSet,
   isDisjointPartition,
   isFullIndexSetPartition,

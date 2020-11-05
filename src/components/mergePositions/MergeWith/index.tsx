@@ -58,10 +58,12 @@ interface Props {
   mergeablePositions: Array<any> | undefined
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onClick: (item: any, index: number) => void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  errorFetching: any
 }
 
 export const MergeWith: React.FC<Props> = (props) => {
-  const { isLoading, mergeablePositions, onClick, ...restProps } = props
+  const { errorFetching, isLoading, mergeablePositions, onClick, ...restProps } = props
 
   return (
     <Wrapper {...restProps}>
@@ -69,13 +71,15 @@ export const MergeWith: React.FC<Props> = (props) => {
         title="Merge With"
         value={
           <StripedList minHeight="158px">
-            {mergeablePositions && mergeablePositions.length ? (
+            {mergeablePositions && mergeablePositions.length && !errorFetching? (
               mergeablePositions.map((item, index) => (
                 <MergeableItem index={index} item={item} key={index} onClick={onClick} />
               ))
             ) : (
               <StripedListEmpty>
-                {isLoading ? <InlineLoading size={SpinnerSize.small} /> : 'No mergeable positions.'}
+                {isLoading && !errorFetching && <InlineLoading size={SpinnerSize.small} />}
+                {!isLoading && errorFetching && 'There was an error fetching the positions. Try again.'}
+                {!isLoading && !errorFetching && 'No mergeable positions.'}
               </StripedListEmpty>
             )}
           </StripedList>

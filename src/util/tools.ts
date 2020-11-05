@@ -5,16 +5,12 @@ import moment from 'moment-timezone'
 import BN from 'bn.js'
 import { BYTES_REGEX } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
+import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
+import { ConditionInformation } from 'hooks/utils'
 import zipObject from 'lodash.zipobject'
 import { ERC20Service } from 'services/erc20'
-import {
-  GetCondition_condition,
-  GetPosition_position,
-} from 'types/generatedGQLForCTE'
+import { GetCondition_condition, GetPosition_position } from 'types/generatedGQLForCTE'
 import { CollateralErrors, ConditionErrors, NetworkIds, PositionErrors, Token } from 'util/types'
-
-import { ConditionInformation } from '../hooks'
-import { PositionWithUserBalanceWithDecimals } from '../hooks/usePositionsList'
 
 const ZERO_BN = new BN(0)
 const ONE_BN = new BN(1)
@@ -132,7 +128,6 @@ export const mulBN = (a: BigNumber, b: number, scale = 10000): BigNumber => {
 
 export const positionString = (
   conditionIds: string[],
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   indexSets: string[],
   balance: BigNumber,
   token: Token
@@ -206,9 +201,7 @@ export const positionsSameConditionsSet = (positions: PositionWithUserBalanceWit
 export const arePositionMergeables = (positions: PositionWithUserBalanceWithDecimals[]) => {
   return (
     positions.length > 1 &&
-    positions.every(
-      (position) => position.collateralToken === positions[0].collateralToken
-    ) &&
+    positions.every((position) => position.collateralToken === positions[0].collateralToken) &&
     positionsSameConditionsSet(positions)
   )
 }
@@ -219,7 +212,10 @@ export const arePositionMergeablesByCondition = (
   conditionId: string,
   outcomeSlotCount: number
 ) => {
-  return arePositionMergeables(positions) && isConditionDisjoint(positions, conditionId, outcomeSlotCount)
+  return (
+    arePositionMergeables(positions) &&
+    isConditionDisjoint(positions, conditionId, outcomeSlotCount)
+  )
 }
 
 // TODO This is used with the assumption that our desired condition is common to that position.
