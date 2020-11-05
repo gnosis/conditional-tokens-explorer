@@ -13,6 +13,14 @@ import { GetPosition_position } from 'types/generatedGQLForCTE'
 import { positionString } from 'util/tools'
 import { SplitFromType, Token } from 'util/types'
 
+const StripedListStyled = styled(StripedList)`
+  margin-top: 6px;
+`
+
+const StripedListItemBreakable = styled(StripedListItem)`
+  word-break: break-all;
+`
+
 interface Props {
   amount: BigNumber
   conditionId: string
@@ -21,10 +29,6 @@ interface Props {
   selectedCollateral: Token
   splitFrom: SplitFromType
 }
-
-const StripedListStyled = styled(StripedList)`
-  margin-top: 6px;
-`
 
 export const PositionPreview = ({
   amount,
@@ -80,7 +84,7 @@ export const PositionPreview = ({
         <StripedListStyled>
           {splitPositionPreview.length > 0 ? (
             splitPositionPreview.map((preview, i) => (
-              <StripedListItem key={`preview-${i}`}>{preview}</StripedListItem>
+              <StripedListItemBreakable key={`preview-${i}`}>{preview}</StripedListItemBreakable>
             ))
           ) : (
             <StripedListEmpty>No Split Positions.</StripedListEmpty>

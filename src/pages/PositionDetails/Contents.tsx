@@ -115,6 +115,10 @@ const Link = styled.a`
   ${LinkCSS}
 `
 
+const StripedListItemBreakable = styled(StripedListItem)`
+  word-break: break-all;
+`
+
 const TooltipStyled = styled(Tooltip)`
   cursor: pointer;
   margin: 0 0 0 8px;
@@ -640,7 +644,7 @@ export const Contents = (props: Props) => {
       <Row cols="1fr" marginBottomXL>
         <TitleValue
           title="Position Preview"
-          value={<StripedListItem>{positionPreview || ''} </StripedListItem>}
+          value={<StripedListItemBreakable>{positionPreview || ''} </StripedListItemBreakable>}
         />
       </Row>
       {isWrapModalOpen && (
