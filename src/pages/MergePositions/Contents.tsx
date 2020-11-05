@@ -1,3 +1,4 @@
+import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Prompt } from 'react-router'
@@ -16,15 +17,26 @@ import { FullLoading } from 'components/statusInfo/FullLoading'
 import { StatusInfoInline, StatusInfoType } from 'components/statusInfo/StatusInfoInline'
 import { IconTypes } from 'components/statusInfo/common'
 import { SelectablePositionTable } from 'components/table/SelectablePositionTable'
-import { ZERO_BN } from 'config/constants'
-import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { NULL_PARENT_ID, ZERO_BN } from 'config/constants'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useCondition } from 'hooks/useCondition'
 import { useIsConditionResolved } from 'hooks/useIsConditionResolved'
 import { PositionWithUserBalanceWithDecimals, usePositionsList } from 'hooks/usePositionsList'
 import { ConditionInformation } from 'hooks/utils'
+import { ConditionalTokensService } from 'services/conditionalTokens'
 import { ERC20Service } from 'services/erc20'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
-import { getTokenSummary, isDisjointPartition, minBigNumber, positionString } from 'util/tools'
+import {
+  getFreeIndexSet,
+  getFullIndexSet,
+  getTokenSummary,
+  isDisjointPartition,
+  isPartitionFullIndexSet,
+  minBigNumber,
+  positionString,
+  xorIndexSets,
+} from 'util/tools'
 import {
   AdvancedFilterPosition,
   PositionSearchOptions,
@@ -40,10 +52,10 @@ interface MergeablePosition {
 }
 
 export const Contents = () => {
-  const { CTService, networkConfig, provider } = useWeb3ConnectedOrInfura()
+  const { _type: status, CTService, connect, networkConfig, provider } = useWeb3ConnectedOrInfura()
 
-  const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<string>>>(
-    Remote.notAsked<Maybe<string>>()
+  const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<boolean>>>(
+    Remote.notAsked<Maybe<boolean>>()
   )
 
   const [conditionId, setConditionId] = useState<Maybe<string>>(null)
@@ -64,6 +76,7 @@ export const Contents = () => {
 
   const [amount, setAmount] = useState<BigNumber>(ZERO_BN)
   const [collateralToken, setCollateralToken] = useState<Maybe<Token>>(null)
+  const [clearFilters, setClearFilters] = useState(false)
 
   const isConditionResolved = useIsConditionResolved(conditionId)
 
@@ -99,9 +112,7 @@ export const Contents = () => {
     setMergeResult('')
     setAmount(ZERO_BN)
     setMergeResult('')
-    // TODO check this collateral
-    // setCollateralToken(null)
-    setTransactionStatus(Remote.notAsked<Maybe<string>>())
+    setTransactionStatus(Remote.notAsked<Maybe<boolean>>())
   }, [])
 
   const onConditionSelect = useCallback((conditionId: string) => {
@@ -128,7 +139,84 @@ export const Contents = () => {
     setAmount(value)
   }, [])
 
-  const onMerge = useCallback(() => null, [])
+  const condition = useCondition(conditionId)
+
+  const onMerge = useCallback(async () => {
+    try {
+      if (
+        position &&
+        conditionId &&
+        selectedPositions.length > 0 &&
+        condition &&
+        status === Web3ContextStatus.Connected
+      ) {
+        setTransactionStatus(Remote.loading())
+
+        const { collateralToken, conditionIds, indexSets } = selectedPositions[0]
+        const newCollectionsSet = conditionIds.reduce(
+          (acc, id, i) =>
+            id !== conditionId
+              ? [...acc, { conditionId: id, indexSet: new BigNumber(indexSets[i]) }]
+              : acc,
+          new Array<{ conditionId: string; indexSet: BigNumber }>()
+        )
+        const parentCollectionId = newCollectionsSet.length
+          ? ConditionalTokensService.getCombinedCollectionId(newCollectionsSet)
+          : ethers.constants.HashZero
+
+        // It shouldn't be able to call onMerge if positions were not mergeables, so no -1 for findIndex.
+        const partition = selectedPositions.map(
+          ({ conditionIds, indexSets }) =>
+            indexSets[conditionIds.findIndex((id) => conditionId === id)]
+        )
+
+        await CTService.mergePositions(
+          collateralToken,
+          parentCollectionId,
+          conditionId,
+          partition,
+          amount
+        )
+
+        // if freeindexset == 0, everything was merged to...
+        if (isPartitionFullIndexSet(condition.outcomeSlotCount, partition)) {
+          if (parentCollectionId === NULL_PARENT_ID) {
+            // original collateral,
+            setMergeResult(collateralToken)
+          } else {
+            // or a position
+            setMergeResult(
+              ConditionalTokensService.getPositionId(collateralToken, parentCollectionId)
+            )
+          }
+        } else {
+          const indexSetOfMergedPosition = new BigNumber(
+            xorIndexSets(
+              getFreeIndexSet(condition.outcomeSlotCount, partition),
+              getFullIndexSet(condition.outcomeSlotCount)
+            )
+          )
+          setMergeResult(
+            ConditionalTokensService.getPositionId(
+              collateralToken,
+              ConditionalTokensService.getCollectionId(
+                parentCollectionId,
+                conditionId,
+                indexSetOfMergedPosition
+              )
+            )
+          )
+        }
+
+        setTransactionStatus(Remote.success(true))
+      } else {
+        connect()
+      }
+    } catch (err) {
+      setTransactionStatus(Remote.failure(err))
+      logger.error(err)
+    }
+  }, [selectedPositions, position, conditionId, condition, status, CTService, amount, connect])
 
   const advancedFilters: AdvancedFilterPosition = useMemo(() => {
     return {
@@ -262,13 +350,13 @@ export const Contents = () => {
       transactionStatus.isFailure()
         ? {
             buttonType: ButtonType.danger,
-            onClick: () => setTransactionStatus(Remote.notAsked<Maybe<string>>()),
+            onClick: () => setTransactionStatus(Remote.notAsked<Maybe<boolean>>()),
             text: 'Close',
           }
         : transactionStatus.isSuccess()
         ? {
             buttonType: ButtonType.primary,
-            onClick: () => setTransactionStatus(Remote.notAsked<Maybe<string>>()),
+            onClick: () => setTransactionStatus(Remote.notAsked<Maybe<boolean>>()),
             text: 'OK',
           }
         : undefined,
@@ -321,6 +409,7 @@ export const Contents = () => {
   return (
     <CenteredCard>
       <SelectablePositionTable
+        clearFilters={clearFilters}
         onClearCallback={clearComponent}
         onRowClicked={onRowClicked}
         selectedPosition={position}
@@ -378,14 +467,19 @@ export const Contents = () => {
       {transactionStatus.isSuccess() && collateralToken && (
         <MergeResultModal
           amount={amount}
-          closeAction={clearComponent}
+          closeAction={() => {
+            clearComponent()
+            setClearFilters(!clearFilters)
+          }}
           collateralToken={collateralToken}
           isOpen={transactionStatus.isSuccess()}
           mergeResult={mergeResult}
         ></MergeResultModal>
       )}
       <ButtonContainer>
-        <Button  disabled={disabled} onClick={onMerge}>Merge</Button>
+        <Button disabled={disabled} onClick={onMerge}>
+          Merge
+        </Button>
       </ButtonContainer>
       <Prompt
         message={(params) =>

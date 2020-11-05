@@ -43,10 +43,12 @@ interface Props {
   onClearCallback: () => void
   selectedPosition: Maybe<PositionWithUserBalanceWithDecimals>
   title?: string
+  clearFilters: boolean
 }
 
 export const SelectablePositionTable: React.FC<Props> = (props) => {
   const {
+    clearFilters,
     onClearCallback,
     onRowClicked,
     selectedPosition,
@@ -133,7 +135,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
   // Clear the filters on network change
   useEffect(() => {
     setShowFilters(false)
-  }, [networkConfig])
+  }, [networkConfig, clearFilters])
 
   // Filter selected positions from original list. And positions without balance as indicated by props.
   useEffect(() => {
@@ -319,6 +321,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
             paginationPerPage={5}
             paginationRowsPerPageOptions={[5, 10, 15]}
             pointerOnHover
+            paginationResetDefaultPage={resetPagination}
             responsive
           />
         </>
