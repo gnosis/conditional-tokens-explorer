@@ -47,6 +47,12 @@ export const dataTableCSS = css`
       div {
         white-space: nowrap;
       }
+
+      .rdt_TableCol_Sortable {
+        > span {
+          padding: 0 8px;
+        }
+      }
     }
 
     .rdt_TableRow {
