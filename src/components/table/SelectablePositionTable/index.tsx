@@ -53,8 +53,8 @@ interface Props {
 
 export const SelectablePositionTable: React.FC<Props> = (props) => {
   const {
-    hideTitle,
     clearFilters,
+    hideTitle,
     onClearCallback,
     onRowClicked,
     selectedPosition,
@@ -138,9 +138,23 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     [data]
   )
 
+  const resetFilters = useCallback(() => {
+    setResetPagination(!resetPagination)
+    setSelectedToCreationDate(null)
+    setSelectedFromCreationDate(null)
+    setSearchBy(PositionSearchOptions.PositionId)
+    setTextToSearch('')
+    setSelectedCollateralFilter(null)
+    setSelectedCollateralValue(CollateralFilterOptions.All)
+    setWrappedCollateral(WrappedCollateralOptions.All)
+  }, [resetPagination])
+
   // Clear the filters on network change
   useEffect(() => {
     setShowFilters(false)
+    resetFilters()
+    onClearCallback()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networkConfig, clearFilters])
 
   // Filter selected positions from original list. And positions without balance as indicated by props.
@@ -211,17 +225,6 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
   const toggleShowFilters = useCallback(() => {
     setShowFilters(!showFilters)
   }, [showFilters])
-
-  const resetFilters = useCallback(() => {
-    setResetPagination(!resetPagination)
-    setSelectedToCreationDate(null)
-    setSelectedFromCreationDate(null)
-    setSearchBy(PositionSearchOptions.PositionId)
-    setTextToSearch('')
-    setSelectedCollateralFilter(null)
-    setSelectedCollateralValue(CollateralFilterOptions.All)
-    setWrappedCollateral(WrappedCollateralOptions.All)
-  }, [resetPagination])
 
   // Clear the filters
   useEffect(() => {

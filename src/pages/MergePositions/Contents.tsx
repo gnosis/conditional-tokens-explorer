@@ -247,8 +247,6 @@ export const Contents = () => {
         setIsLoadingConditions(true)
         setIsLoadingMergeablePositions(true)
 
-        const possibleMergeablePositions = []
-
         const positionsFiltered = positions.filter(
           (positionWithBalance: PositionWithUserBalanceWithDecimals) =>
             //#1 Filter, only positions with balance
@@ -267,14 +265,13 @@ export const Contents = () => {
             ).length > 0
         )
 
-        // TODO promise all
-        for (const positionFiltered of positionsFiltered) {
+        const positionsPromises = positionsFiltered.map(async (positionFiltered) => {
           const { collateralToken, conditionIds, indexSets } = positionFiltered
           const balanceOfPositionId = await CTService.balanceOf(positionFiltered.id)
           const erc20Service = new ERC20Service(provider, collateralToken)
           const tokenPosition = await erc20Service.getProfileSummary()
 
-          const positionObject = {
+          return {
             position: positionFiltered,
             positionPreview: positionString(
               conditionIds,
@@ -283,15 +280,13 @@ export const Contents = () => {
               tokenPosition
             ),
           }
-          possibleMergeablePositions.push(positionObject)
-        }
+        })
+
+        const possibleMergeablePositions: MergeablePosition[] = await Promise.all(positionsPromises)
 
         // Calculate condition Ids to fulfill the dropdown
         const conditionIds: string[] = possibleMergeablePositions.reduce(
-          (
-            acc: string[],
-            cur: { position: PositionWithUserBalanceWithDecimals; positionPreview: string }
-          ) => acc.concat([...cur.position.conditionIds]),
+          (acc: string[], cur: MergeablePosition) => acc.concat([...cur.position.conditionIds]),
           []
         )
 

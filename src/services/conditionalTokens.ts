@@ -204,8 +204,8 @@ export class ConditionalTokensService {
     conditionId: string,
     partition: string[],
     amount: BigNumber
-  ): Promise<TransactionReceipt> {
-    const tx = await this.contract.mergePositions(
+  ): Promise<TransactionReceipt | void> {
+    const tx: TransactionResponse = await this.contract.mergePositions(
       collateralToken,
       parentCollectionId,
       conditionId,
@@ -216,7 +216,19 @@ export class ConditionalTokensService {
         gasLimit: 2750000, // TODO - should we try to precalculate this?
       }
     )
-    return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
+
+    logger.log(`Transaction hash: ${tx.hash}`)
+
+    return tx
+      .wait(CONFIRMATIONS_TO_WAIT)
+      .then((receipt: TransactionReceipt) => {
+        logger.log(`Transaction was mined in block ${receipt}`)
+        return receipt
+      })
+      .catch((error) => {
+        logger.error(error)
+        throw improveErrorMessage(error)
+      })
   }
 
   async getOutcomeSlotCount(conditionId: string): Promise<BigNumber> {
