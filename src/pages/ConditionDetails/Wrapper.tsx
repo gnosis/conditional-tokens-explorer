@@ -30,7 +30,7 @@ export const Wrapper = (props: WrapperProps) => {
     setConditionId(conditionId)
   }, [conditionId, setConditionId])
 
-  const DisplayErrors = (): JSX.Element => {
+  const DisplayErrors = React.useCallback(() => {
     const isNotLoadingAndThereIsNoCondition: boolean = !loading && !condition
     if (isNotLoadingAndThereIsNoCondition && isConditionErrorNotIndexed(errors)) {
       return (
@@ -53,9 +53,9 @@ export const Wrapper = (props: WrapperProps) => {
     } else if (isNotLoadingAndThereIsNoCondition && isConditionErrorNotFound(errors)) {
       return <InfoCard message="We couldn't find this condition..." title="Not Found" />
     } else {
-      return <></>
+      return null
     }
-  }
+  }, [condition, errors, history, loading])
 
   return (
     <>

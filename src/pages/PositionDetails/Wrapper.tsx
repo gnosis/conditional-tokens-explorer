@@ -41,18 +41,18 @@ export const Wrapper = (props: WrapperProps) => {
     }
   })
 
-  const DisplayErrors = (): JSX.Element => {
+  const DisplayErrors = React.useCallback(() => {
     const isNotLoadingAndThereIsNoPosition: boolean = !loading && !position
-    if (isNotLoadingAndThereIsNoPosition && isPositionErrorNotFound(errors)) {
-      return <InfoCard message="We couldn't find this position..." title="Not Found" />
-    } else if (isNotLoadingAndThereIsNoPosition && isPositionErrorInvalid(errors)) {
+    if (isNotLoadingAndThereIsNoPosition && isPositionErrorInvalid(errors)) {
       return <InfoCard message="Position not valid..." title="Error" />
     } else if (isNotLoadingAndThereIsNoPosition && isPositionErrorFetching(errors)) {
       return <InfoCard message="We couldn't fetch the data for this position..." title="Error" />
+    } else if (isNotLoadingAndThereIsNoPosition && isPositionErrorNotFound(errors)) {
+      return <InfoCard message="We couldn't find this position..." title="Not Found" />
     } else {
-      return <></>
+      return null
     }
-  }
+  }, [errors, loading, position])
 
   return (
     <>
