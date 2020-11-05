@@ -5,7 +5,7 @@ import styled from 'styled-components'
 import {
   StripedList,
   StripedListEmpty,
-  StripedListItem,
+  StripedListItemPreview,
 } from 'components/pureStyledComponents/StripedList'
 import { TitleValue } from 'components/text/TitleValue'
 import { useCollateral } from 'hooks/useCollateral'
@@ -15,10 +15,6 @@ import { SplitFromType, Token } from 'util/types'
 
 const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
-`
-
-const StripedListItemBreakable = styled(StripedListItem)`
-  word-break: break-all;
 `
 
 interface Props {
@@ -84,7 +80,7 @@ export const PositionPreview = ({
         <StripedListStyled>
           {splitPositionPreview.length > 0 ? (
             splitPositionPreview.map((preview, i) => (
-              <StripedListItemBreakable key={`preview-${i}`}>{preview}</StripedListItemBreakable>
+              <StripedListItemPreview key={`preview-${i}`}>{preview}</StripedListItemPreview>
             ))
           ) : (
             <StripedListEmpty>No Split Positions.</StripedListEmpty>

@@ -34,6 +34,7 @@ import {
   StripedListEmpty,
   StripedListItem,
   StripedListItemLessPadding,
+  StripedListItemPreview,
 } from 'components/pureStyledComponents/StripedList'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
@@ -113,10 +114,6 @@ const InternalLink = styled(NavLink)`
 
 const Link = styled.a`
   ${LinkCSS}
-`
-
-const StripedListItemBreakable = styled(StripedListItem)`
-  word-break: break-all;
 `
 
 const TooltipStyled = styled(Tooltip)`
@@ -641,12 +638,14 @@ export const Contents = (props: Props) => {
           }
         />
       </Row>
-      <Row cols="1fr" marginBottomXL>
-        <TitleValue
-          title="Position Preview"
-          value={<StripedListItemBreakable>{positionPreview || ''} </StripedListItemBreakable>}
-        />
-      </Row>
+      {positionPreview && (
+        <Row cols="1fr" marginBottomXL>
+          <TitleValue
+            title="Position Preview"
+            value={<StripedListItemPreview>{positionPreview}</StripedListItemPreview>}
+          />
+        </Row>
+      )}
       {isWrapModalOpen && (
         <WrapModal
           balance={balanceERC1155}

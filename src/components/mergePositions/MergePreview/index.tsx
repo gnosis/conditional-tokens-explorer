@@ -1,11 +1,10 @@
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
-import styled from 'styled-components'
 
 import {
   StripedList,
   StripedListEmpty,
-  StripedListItem,
+  StripedListItemPreview,
 } from 'components/pureStyledComponents/StripedList'
 import { TitleValue } from 'components/text/TitleValue'
 import { useConditionContext } from 'contexts/ConditionContext'
@@ -13,10 +12,6 @@ import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { getLogger } from 'util/logger'
 import { arePositionMergeablesByCondition, getMergePreview, getTokenSummary } from 'util/tools'
-
-const StripedListItemBreakable = styled(StripedListItem)`
-  word-break: break-all;
-`
 
 interface Props {
   amount: BigNumber
@@ -61,9 +56,7 @@ export const MergePreview = ({ amount }: Props) => {
       value={
         <StripedList maxHeight="none" minHeight="41px">
           {mergedPosition ? (
-            <StripedListItemBreakable>
-              <strong>{mergedPosition}</strong>
-            </StripedListItemBreakable>
+            <StripedListItemPreview>{mergedPosition}</StripedListItemPreview>
           ) : (
             <StripedListEmpty>No merged positions yet.</StripedListEmpty>
           )}
