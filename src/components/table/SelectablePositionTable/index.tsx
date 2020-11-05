@@ -319,9 +319,9 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
             onRowClicked={onRowClicked}
             pagination
             paginationPerPage={5}
+            paginationResetDefaultPage={resetPagination}
             paginationRowsPerPageOptions={[5, 10, 15]}
             pointerOnHover
-            paginationResetDefaultPage={resetPagination}
             responsive
           />
         </>
