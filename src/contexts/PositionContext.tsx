@@ -73,13 +73,8 @@ export const PositionProvider = (props: Props) => {
     }
   )
 
-  if (positionId && fetchedPosition?.position) {
-    const { position: positionFromTheGraph } = fetchedPosition ?? { position: null }
-    if (positionFromTheGraph) {
-      position = positionFromTheGraph
-    } else {
-      errors.push(PositionErrors.NOT_FOUND_ERROR)
-    }
+  if (positionId && fetchedPosition) {
+    position = fetchedPosition?.position
   }
 
   if (positionId && !position && !loading) {
@@ -93,6 +88,7 @@ export const PositionProvider = (props: Props) => {
   if (position && balanceERC1155 && balanceERC1155.isZero() && checkForEmptyBalanceERC1155) {
     errors.push(PositionErrors.EMPTY_BALANCE_ERC1155_ERROR)
   }
+
   if (position && balanceERC20 && balanceERC20.isZero() && checkForEmptyBalanceERC20) {
     errors.push(PositionErrors.EMPTY_BALANCE_ERC20_ERROR)
   }
