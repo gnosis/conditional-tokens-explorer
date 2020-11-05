@@ -1,10 +1,7 @@
 import React from 'react'
 
 import { PageTitle } from 'components/pureStyledComponents/PageTitle'
-import { BatchBalanceProvider } from 'contexts/BatchBalanceContext'
-import { ConditionProvider } from 'contexts/ConditionContext'
-import { MultiPositionsProvider } from 'contexts/MultiPositionsContext'
-import { Contents } from 'pages/MergePositions/ContentsNew'
+import { Contents } from 'pages/MergePositions/Contents'
 
 export const MergePositions = () => {
   return (

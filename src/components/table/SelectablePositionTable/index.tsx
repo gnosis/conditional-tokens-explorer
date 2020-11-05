@@ -17,12 +17,17 @@ import { SpinnerSize } from 'components/statusInfo/common'
 import { TableControls } from 'components/table/TableControls'
 import { FormatHash } from 'components/text/FormatHash'
 import { TitleValue } from 'components/text/TitleValue'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { PositionWithUserBalanceWithDecimals, usePositionsList } from 'hooks/usePositionsList'
 import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
 import { truncateStringInTheMiddle } from 'util/tools'
-import { CollateralFilterOptions, WrappedCollateralOptions,  AdvancedFilterPosition, PositionSearchOptions } from 'util/types'
-import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import {
+  AdvancedFilterPosition,
+  CollateralFilterOptions,
+  PositionSearchOptions,
+  WrappedCollateralOptions,
+} from 'util/types'
 
 const Search = styled(SearchField)`
   min-width: 0;
@@ -134,6 +139,8 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
   useEffect(() => {
     if (positionsWithBalance) {
       setPositionList(positionsWithBalance)
+    } else {
+      setPositionList([])
     }
   }, [setPositionList, positionsWithBalance])
 
@@ -239,6 +246,8 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     ) {
       setResetPagination(!resetPagination)
     }
+    onClearCallback()
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     textToSearch,

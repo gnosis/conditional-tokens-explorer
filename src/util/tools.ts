@@ -9,10 +9,12 @@ import zipObject from 'lodash.zipobject'
 import { ERC20Service } from 'services/erc20'
 import {
   GetCondition_condition,
-  GetMultiPositions_positions,
   GetPosition_position,
 } from 'types/generatedGQLForCTE'
 import { CollateralErrors, ConditionErrors, NetworkIds, PositionErrors, Token } from 'util/types'
+
+import { ConditionInformation } from '../hooks'
+import { PositionWithUserBalanceWithDecimals } from '../hooks/usePositionsList'
 
 const ZERO_BN = new BN(0)
 const ONE_BN = new BN(1)
@@ -174,13 +176,15 @@ export const getRedeemedBalance = (
 }
 
 export const getRedeemedPreview = (
-  position: GetPosition_position,
-  resolvedCondition: GetCondition_condition,
+  position: PositionWithUserBalanceWithDecimals,
+  conditionId: string,
   redeemedBalance: BigNumber,
   token: Token
 ) => {
   if (position.conditions.length > 1) {
-    const conditionIndex = position.conditions.findIndex(({ id }) => id === resolvedCondition.id)
+    const conditionIndex = position.conditions.findIndex(
+      (condition: ConditionInformation) => condition.conditionId === conditionId
+    )
     const filteredConditionIds = position.conditionIds.filter((_, i) => i !== conditionIndex)
     const filteredIndexSets = position.indexSets.filter((_, i) => i !== conditionIndex)
 
@@ -190,7 +194,7 @@ export const getRedeemedPreview = (
   return `${formatBigNumber(redeemedBalance, token.decimals)} ${token.symbol}`
 }
 
-export const positionsSameConditionsSet = (positions: GetMultiPositions_positions[]) => {
+export const positionsSameConditionsSet = (positions: PositionWithUserBalanceWithDecimals[]) => {
   // all postions include same conditions set and collateral token
   const conditionIdsSet = positions.map((position) => [...position.conditionIds].sort().join(''))
   return conditionIdsSet.every((set) => set === conditionIdsSet[0])
@@ -199,11 +203,11 @@ export const positionsSameConditionsSet = (positions: GetMultiPositions_position
 // more than 1 position
 // same collateral
 // same conditions set
-export const arePositionMergeables = (positions: GetMultiPositions_positions[]) => {
+export const arePositionMergeables = (positions: PositionWithUserBalanceWithDecimals[]) => {
   return (
     positions.length > 1 &&
     positions.every(
-      (position) => position.collateralToken.id === positions[0].collateralToken.id
+      (position) => position.collateralToken === positions[0].collateralToken
     ) &&
     positionsSameConditionsSet(positions)
   )
@@ -211,35 +215,38 @@ export const arePositionMergeables = (positions: GetMultiPositions_positions[]) 
 
 // disjoint partition
 export const arePositionMergeablesByCondition = (
-  positions: GetMultiPositions_positions[],
-  condition: GetCondition_condition
+  positions: PositionWithUserBalanceWithDecimals[],
+  conditionId: string,
+  outcomeSlotCount: number
 ) => {
-  return arePositionMergeables(positions) && isConditionDisjoint(positions, condition)
+  return arePositionMergeables(positions) && isConditionDisjoint(positions, conditionId, outcomeSlotCount)
 }
 
 // TODO This is used with the assumption that our desired condition is common to that position.
 // But we only check that every position has a condition in common
 // An option is to check if this dictionary is undefined for some conditionId.
-export const indexSetsByCondition = (position: GetMultiPositions_positions) => {
+export const indexSetsByCondition = (position: PositionWithUserBalanceWithDecimals) => {
   return zipObject(position.conditionIds, position.indexSets as string[])
 }
 
 export const isConditionFullIndexSet = (
-  positions: GetMultiPositions_positions[],
-  condition: GetCondition_condition
+  positions: PositionWithUserBalanceWithDecimals[],
+  conditionId: string,
+  outcomeSlotCount: number
 ) => {
-  const partition = positions.map((position) => indexSetsByCondition(position)[condition.id])
+  const partition = positions.map((position) => indexSetsByCondition(position)[conditionId])
 
-  return isFullIndexSetPartition(partition, condition.outcomeSlotCount)
+  return isFullIndexSetPartition(partition, outcomeSlotCount)
 }
 
 export const isConditionDisjoint = (
-  positions: GetMultiPositions_positions[],
-  condition: GetCondition_condition
+  positions: PositionWithUserBalanceWithDecimals[],
+  conditionId: string,
+  outcomeSlotCount: number
 ) => {
-  const partition = positions.map((position) => indexSetsByCondition(position)[condition.id])
+  const partition = positions.map((position) => indexSetsByCondition(position)[conditionId])
 
-  return isDisjointPartition(partition, condition.outcomeSlotCount)
+  return isDisjointPartition(partition, outcomeSlotCount)
 }
 
 export const isDisjointPartition = (partition: string[], outcomeSlotCount: number) => {
@@ -327,20 +334,21 @@ const validIndexSet = (fullIndexSet: string, indexSetA: string) => {
 }
 
 export const getMergePreview = (
-  positions: GetPosition_position[],
-  condition: GetCondition_condition,
+  positions: PositionWithUserBalanceWithDecimals[],
+  conditionId: string,
   amount: BigNumber,
-  token: Token
+  token: Token,
+  outcomeSlotCount: number
 ) => {
-  if (isConditionFullIndexSet(positions, condition)) {
-    return getRedeemedPreview(positions[0], condition, amount, token)
+  if (isConditionFullIndexSet(positions, conditionId, outcomeSlotCount)) {
+    return getRedeemedPreview(positions[0], conditionId, amount, token)
   } else {
     // this assumes all positions have same conditions set order
-    const conditionIndex = positions[0].conditionIds.findIndex((id) => id === condition.id)
+    const conditionIndex = positions[0].conditionIds.findIndex((id) => id === conditionId)
 
     // For all positions sum values on their indexSets corresponding to the given condition
     const newIndexSet = positions
-      .map((position) => indexSetsByCondition(position)[condition.id])
+      .map((position) => indexSetsByCondition(position)[conditionId])
       .reduce((acc, val) => orIndexSets(acc, val))
 
     // Maintain all indexSet the same except for the ones changed

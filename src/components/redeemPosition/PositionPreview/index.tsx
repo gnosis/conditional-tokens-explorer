@@ -39,7 +39,9 @@ export const PositionPreview = ({ condition, position }: Props) => {
 
   const redeemedPreview = useMemo(() => {
     if (position && condition && token) {
-      return getRedeemedPreview(position, condition, redeemedBalance, token)
+      // TODO: until we refactor this section
+      // return getRedeemedPreview(position, condition, redeemedBalance, token)
+      return ''
     }
     return ''
   }, [position, condition, redeemedBalance, token])

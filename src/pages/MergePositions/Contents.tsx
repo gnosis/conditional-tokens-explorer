@@ -1,4 +1,3 @@
-import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Prompt } from 'react-router'
@@ -17,283 +16,321 @@ import { FullLoading } from 'components/statusInfo/FullLoading'
 import { StatusInfoInline, StatusInfoType } from 'components/statusInfo/StatusInfoInline'
 import { IconTypes } from 'components/statusInfo/common'
 import { SelectablePositionTable } from 'components/table/SelectablePositionTable'
-import { NULL_PARENT_ID, ZERO_BN } from 'config/constants'
-import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
-import { useConditionContext } from 'contexts/ConditionContext'
-import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
-import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { PositionWithUserBalanceWithDecimals } from 'hooks'
-import { ConditionalTokensService } from 'services/conditionalTokens'
+import { ZERO_BN } from 'config/constants'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useIsConditionResolved } from 'hooks/useIsConditionResolved'
+import { PositionWithUserBalanceWithDecimals, usePositionsList } from 'hooks/usePositionsList'
+import { ConditionInformation } from 'hooks/utils'
+import { ERC20Service } from 'services/erc20'
 import { getLogger } from 'util/logger'
+import { Remote } from 'util/remoteData'
+import { getTokenSummary, isDisjointPartition, minBigNumber, positionString } from 'util/tools'
 import {
-  arePositionMergeables,
-  arePositionMergeablesByCondition,
-  getFreeIndexSet,
-  getFullIndexSet,
-  getTokenSummary,
-  isPartitionFullIndexSet,
-  minBigNumber,
-  xorIndexSets,
-} from 'util/tools'
-import { Status, Token } from 'util/types'
+  AdvancedFilterPosition,
+  PositionSearchOptions,
+  Token,
+  WrappedCollateralOptions,
+} from 'util/types'
 
 const logger = getLogger('MergePosition')
 
+interface MergeablePosition {
+  position: PositionWithUserBalanceWithDecimals
+  positionPreview: string
+}
+
 export const Contents = () => {
-  const {
-    _type: statusContext,
-    CTService,
-    connect,
-    networkConfig,
-    provider,
-  } = useWeb3ConnectedOrInfura()
+  const { CTService, networkConfig, provider } = useWeb3ConnectedOrInfura()
 
-  const { clearPositions, errors: positionsErrors, positions } = useMultiPositionsContext()
-  const { balances, errors: balancesErrors, updateBalances } = useBatchBalanceContext()
-  const { clearCondition, condition, errors: conditionErrors } = useConditionContext()
-  const [status, setStatus] = useState<Maybe<Status>>(null)
-  const [error, setError] = useState<Maybe<Error>>(null)
-  const [collateralToken, setCollateralToken] = useState<Maybe<Token>>(null)
-  const [mergeResult, setMergeResult] = useState<string>('')
-
-  const canMergePositions = useMemo(() => {
-    return condition && arePositionMergeablesByCondition(positions, condition)
-  }, [positions, condition])
-
-  const mergeablePositions = useMemo(() => {
-    return arePositionMergeables(positions)
-  }, [positions])
-
-  useEffect(() => {
-    let cancelled = false
-    if (positions.length && mergeablePositions) {
-      getTokenSummary(networkConfig, provider, positions[0].collateralToken.id)
-        .then((token) => {
-          if (!cancelled) {
-            setCollateralToken(token)
-          }
-        })
-        .catch((err) => {
-          logger.error(err)
-        })
-    }
-    return () => {
-      cancelled = true
-    }
-  }, [positions, networkConfig, provider, mergeablePositions])
-
-  const maxBalance = useMemo(
-    () => (mergeablePositions && balances.length ? minBigNumber(balances) : ZERO_BN),
-    [balances, mergeablePositions]
+  const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<string>>>(
+    Remote.notAsked<Maybe<string>>()
   )
 
-  const [amount, setAmount] = useState<BigNumber>(ZERO_BN)
-  const amountChangeHandler = useCallback((value: BigNumber) => {
-    setAmount(value)
-  }, [])
+  const [conditionId, setConditionId] = useState<Maybe<string>>(null)
+  const [position, setPosition] = useState<Maybe<PositionWithUserBalanceWithDecimals>>(null)
 
-  const useWalletHandler = useCallback(() => {
-    if (mergeablePositions && maxBalance.gt(ZERO_BN)) {
-      setAmount(maxBalance)
+  const [conditionIds, setConditionIds] = useState<Array<string>>([])
+  const [isLoadingConditions, setIsLoadingConditions] = useState<boolean>(false)
+
+  const [mergeablePositions, setMergeablePositions] = useState<Array<MergeablePosition>>([])
+  const [isLoadingMergeablePositions, setIsLoadingMergeablePositions] = useState<boolean>(false)
+
+  const [selectedPositions, setSelectedPositions] = useState<
+    Array<PositionWithUserBalanceWithDecimals>
+  >([])
+  const [selectedBalancePositions, setSelectedBalancePositions] = useState<Array<BigNumber>>([])
+
+  const [mergeResult, setMergeResult] = useState<string>('')
+
+  const [amount, setAmount] = useState<BigNumber>(ZERO_BN)
+  const [collateralToken, setCollateralToken] = useState<Maybe<Token>>(null)
+
+  const isConditionResolved = useIsConditionResolved(conditionId)
+
+  useEffect(() => {
+    const getCollateral = async () => {
+      try {
+        if (position) {
+          const token = await getTokenSummary(networkConfig, provider, position.collateralToken)
+          setCollateralToken(token)
+        }
+      } catch (err) {
+        logger.error(err)
+      }
+      return null
     }
-  }, [maxBalance, mergeablePositions])
+
+    getCollateral()
+  }, [networkConfig, provider, position])
 
   const decimals = useMemo(() => (collateralToken ? collateralToken.decimals : 0), [
     collateralToken,
   ])
 
-  const disabled = useMemo(
-    () =>
-      status === Status.Loading ||
-      positionsErrors.length > 0 ||
-      conditionErrors.length > 0 ||
-      balancesErrors.length > 0 ||
-      !canMergePositions ||
-      amount.isZero(),
-    [canMergePositions, amount, status, positionsErrors, conditionErrors, balancesErrors]
-  )
-
-  const onMerge = useCallback(async () => {
-    try {
-      if (positions && condition && statusContext === Web3ContextStatus.Connected) {
-        setStatus(Status.Loading)
-
-        const { collateralToken, conditionIds, indexSets } = positions[0]
-        const newCollectionsSet = conditionIds.reduce(
-          (acc, conditionId, i) =>
-            conditionId !== condition.id
-              ? [...acc, { conditionId, indexSet: new BigNumber(indexSets[i]) }]
-              : acc,
-          new Array<{ conditionId: string; indexSet: BigNumber }>()
-        )
-        const parentCollectionId = newCollectionsSet.length
-          ? ConditionalTokensService.getCombinedCollectionId(newCollectionsSet)
-          : ethers.constants.HashZero
-
-        // It shouldn't be able to call onMerge if positions were not mergeables, so no -1 for findIndex.
-        const partition = positions.map(
-          ({ conditionIds, indexSets }) =>
-            indexSets[conditionIds.findIndex((conditionId) => conditionId === condition.id)]
-        )
-
-        await CTService.mergePositions(
-          collateralToken.id,
-          parentCollectionId,
-          condition.id,
-          partition,
-          amount
-        )
-
-        // if freeindexset == 0, everything was merged to...
-        if (isPartitionFullIndexSet(condition.outcomeSlotCount, partition)) {
-          if (parentCollectionId === NULL_PARENT_ID) {
-            // original collateral,
-            setMergeResult(collateralToken.id)
-          } else {
-            // or a position
-            setMergeResult(
-              ConditionalTokensService.getPositionId(collateralToken.id, parentCollectionId)
-            )
-          }
-        } else {
-          const indexSetOfMergedPosition = new BigNumber(
-            xorIndexSets(
-              getFreeIndexSet(condition.outcomeSlotCount, partition),
-              getFullIndexSet(condition.outcomeSlotCount)
-            )
-          )
-          setMergeResult(
-            ConditionalTokensService.getPositionId(
-              collateralToken.id,
-              ConditionalTokensService.getCollectionId(
-                parentCollectionId,
-                condition.id,
-                indexSetOfMergedPosition
-              )
-            )
-          )
-        }
-
-        setStatus(Status.Ready)
-      } else {
-        connect()
-      }
-    } catch (err) {
-      setStatus(Status.Error)
-      setError(err)
-      logger.error(err)
-    }
-  }, [positions, condition, statusContext, CTService, amount, connect])
-
   const clearComponent = useCallback(() => {
-    setAmount(ZERO_BN)
-    clearPositions()
-    clearCondition()
-    updateBalances([])
+    setConditionId(null)
+    setPosition(null)
+    setConditionIds([])
+    setIsLoadingConditions(false)
+    setMergeablePositions([])
+    setIsLoadingMergeablePositions(false)
+    setSelectedPositions([])
+    setSelectedBalancePositions([])
     setMergeResult('')
-    setStatus(null)
-  }, [clearPositions, clearCondition, updateBalances])
+    setAmount(ZERO_BN)
+    setMergeResult('')
+    // TODO check this collateral
+   // setCollateralToken(null)
+    setTransactionStatus(Remote.notAsked<Maybe<string>>())
+  }, [])
 
-  const fullLoadingActionButton =
-    status === Status.Error
-      ? {
-          buttonType: ButtonType.danger,
-          onClick: () => setStatus(null),
-          text: 'Close',
-        }
-      : undefined
-
-  const fullLoadingIcon =
-    status === Status.Error
-      ? IconTypes.error
-      : status === Status.Loading
-      ? IconTypes.spinner
-      : undefined
-
-  const fullLoadingMessage =
-    status === Status.Error ? error?.message : status === Status.Loading ? 'Working...' : undefined
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [mergeablePositionsList, setMergeablePositionsList] = useState<Array<any> | undefined>()
-
-  const [selectedConditionId, setSelectedConditionId] = useState<string | undefined>()
-  const [conditionIds, setConditionIds] = useState<Array<string> | undefined>()
-  const [isLoadingConditionIds, setIsLoadingConditionIds] = useState<boolean>(false)
-  const [isLoadingMergeablePositions, setIsLoadingMergeablePositions] = useState<boolean>(false)
-  const onConditionIdSelect = useCallback((conditionId: string) => {
-    setSelectedConditionId(conditionId)
+  const onConditionSelect = useCallback((conditionId: string) => {
+    setConditionId(conditionId)
     logger.log(conditionId)
   }, [])
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onMergeableItemClick = useCallback((item: any, index: number) => {
-    logger.log(item.position, index)
+  const onMergeableItemClick = useCallback(
+    (item: MergeablePosition, index: number) => {
+      logger.log(item, index)
+      const { position } = item
+      const existPosition = selectedPositions.find(
+        (selectedPosition) => selectedPosition.id === position.id
+      )
+      if (!existPosition) {
+        setSelectedPositions([...selectedPositions, position])
+        setConditionId(position.conditions[0].conditionId)
+      }
+    },
+    [selectedPositions]
+  )
+
+  const onAmountChange = useCallback((value: BigNumber) => {
+    setAmount(value)
   }, [])
 
-  const [selectedPositionId, setSelectedPositionId] = useState<string | undefined>()
-  const onRowClicked = useCallback((row: PositionWithUserBalanceWithDecimals) => {
-    setSelectedPositionId(row.id)
+  const onMerge = useCallback(() => null, [])
 
-    setMergeablePositionsList([])
-    setConditionIds([])
-    setIsLoadingConditionIds(true)
-    setIsLoadingMergeablePositions(true)
-
-    setTimeout(() => {
-      setIsLoadingConditionIds(false)
-      setIsLoadingMergeablePositions(false)
-
-      setMergeablePositionsList([
-        {
-          position: '[DAI C: 0xb67f….ffa7 O: 0|1] x 10',
-        },
-        {
-          position: '[DAI C: 0xb67f….ffa7 O: 6|7|10] x 10',
-        },
-        {
-          position: '[DAI C: 0xb67f….ffa7 O: 2|4] x 10',
-        },
-        {
-          position: '[DAI C: 0xb67f….ffa7 O: 3|5|9|8] x 10',
-        },
-      ])
-      setConditionIds([
-        '0xc857ba826f1503552ed33578cd90c66029cc81b7d56bb06dcc8fbac21757f8ce',
-        '0x463623d0b1399ce72cfb02f5d616b7664c0aaf8e488a6bdd980c19c0542f3c53',
-        '0xac302a138fa8668be8038e4b1556a2cf1040a42353145fdd0ffb4fa19bea23f7',
-        '0x7e73fa4e7c1e2b443084c242c0c49207e36985a27a58a3d934209cc9665ad5c0',
-        '0x87602f63bb274009a02cbbe4f7567a9727e4be8c0a1127a98ecc7a17d83e0a13',
-        '0xd3a743bbc6816895593ce25f77e7b59fe6afeeff40933db8a0ef180d4e6e49c5',
-      ])
-    }, 1500)
+  const advancedFilters: AdvancedFilterPosition = useMemo(() => {
+    return {
+      CollateralValue: {
+        type: null,
+        value: null,
+      },
+      ToCreationDate: null,
+      FromCreationDate: null,
+      TextToSearch: {
+        type: PositionSearchOptions.All,
+        value: null,
+      },
+      WrappedCollateral: WrappedCollateralOptions.All,
+    }
   }, [])
 
-  const fullLoadingTitle = status === Status.Error ? 'Error' : 'Merge Positions'
-  const isWorking = status === Status.Loading || status === Status.Error
-  const isFinished = status === Status.Ready
+  const { data: positions, error, loading } = usePositionsList(advancedFilters)
+
+  const onRowClicked = useCallback(
+    async (position: PositionWithUserBalanceWithDecimals) => {
+      setPosition(position)
+
+      setMergeablePositions([])
+      setConditionIds([])
+
+      if (positions && positions.length > 0 && !!position) {
+        setIsLoadingConditions(true)
+        setIsLoadingMergeablePositions(true)
+
+        const possibleMergeablePositions = []
+
+        const positionsFiltered = positions.filter(
+          (positionWithBalance: PositionWithUserBalanceWithDecimals) =>
+            //#1 Filter, only positions with balance
+            !positionWithBalance.userBalanceERC1155.isZero() &&
+            //#2 Filter, remove original selected position
+            positionWithBalance.id.toLowerCase() !== position.id.toLowerCase() &&
+            //#3 Filter, positions with the same condition set
+            positionWithBalance.conditionIds.sort().join('') ===
+              position.conditionIds.sort().join('') &&
+            //#4 Filter, positions with the same collateral
+            positionWithBalance.collateralToken.toLowerCase() ===
+              position.collateralToken.toLowerCase() &&
+            //#5 Filter, allow only disjoint positions
+            positionWithBalance.conditions.filter((condition: ConditionInformation) =>
+              isDisjointPartition(positionWithBalance.indexSets, condition.outcomeSlotCount)
+            ).length > 0
+        )
+
+        // TODO promise all
+        for (const positionFiltered of positionsFiltered) {
+          const { collateralToken, conditionIds, indexSets } = positionFiltered
+          const balanceOfPositionId = await CTService.balanceOf(positionFiltered.id)
+          const erc20Service = new ERC20Service(provider, collateralToken)
+          const tokenPosition = await erc20Service.getProfileSummary()
+
+          const positionObject = {
+            position: positionFiltered,
+            positionPreview: positionString(
+              conditionIds,
+              indexSets,
+              balanceOfPositionId,
+              tokenPosition
+            ),
+          }
+          possibleMergeablePositions.push(positionObject)
+        }
+
+        // Calculate condition Ids to fulfill the dropdown
+        const conditionIds: string[] = possibleMergeablePositions.reduce(
+          (
+            acc: string[],
+            cur: { position: PositionWithUserBalanceWithDecimals; positionPreview: string }
+          ) => acc.concat([...cur.position.conditionIds]),
+          []
+        )
+
+        // Remove duplicates
+        const possibleConditions = conditionIds.filter(
+          (item, pos) => conditionIds.indexOf(item) === pos
+        )
+
+        setConditionIds(possibleConditions)
+        setMergeablePositions(possibleMergeablePositions)
+        setIsLoadingConditions(false)
+        setIsLoadingMergeablePositions(false)
+      }
+    },
+    [positions, CTService, provider]
+  )
+
+  const maxBalance = useMemo(
+    () => (selectedBalancePositions.length > 0 ? minBigNumber(selectedBalancePositions) : ZERO_BN),
+    [selectedBalancePositions]
+  )
+
+  const onUsePositionBalance = useCallback(() => {
+    if (selectedPositions && maxBalance.gt(ZERO_BN)) {
+      setAmount(maxBalance)
+    }
+  }, [maxBalance, selectedPositions])
+
+  useEffect(() => {
+    const getBalance = async (positionIds: Array<string>) => {
+      try {
+        if (positionIds.length > 0 && position) {
+          const balancePositions = await CTService.balanceOfBatch(positionIds)
+          setSelectedBalancePositions(balancePositions)
+        } else {
+          setSelectedBalancePositions([])
+        }
+      } catch (err) {
+        logger.error(err)
+        setSelectedBalancePositions([])
+      }
+    }
+
+    const selectedPositionsIds = selectedPositions.map(
+      (selectedPosition: any) => selectedPosition.id
+    )
+    if (position) {
+      // We add the first selected position that we search
+      selectedPositionsIds.push(position.id)
+    }
+    getBalance(selectedPositionsIds)
+  }, [CTService, selectedPositions, position])
+
+  const fullLoadingActionButton = useMemo(
+    () =>
+      transactionStatus.isFailure()
+        ? {
+            buttonType: ButtonType.danger,
+            onClick: () => setTransactionStatus(Remote.notAsked<Maybe<string>>()),
+            text: 'Close',
+          }
+        : transactionStatus.isSuccess()
+        ? {
+            buttonType: ButtonType.primary,
+            onClick: () => setTransactionStatus(Remote.notAsked<Maybe<string>>()),
+            text: 'OK',
+          }
+        : undefined,
+    [transactionStatus]
+  )
+
+  const fullLoadingMessage = useMemo(
+    () =>
+      transactionStatus.isFailure()
+        ? transactionStatus.getFailure()
+        : transactionStatus.isLoading()
+        ? 'Working...'
+        : 'Merge positions finished!',
+    [transactionStatus]
+  )
+
+  const fullLoadingTitle = useMemo(
+    () => (transactionStatus.isFailure() ? 'Error' : 'Merge Positions'),
+    [transactionStatus]
+  )
+
+  const fullLoadingIcon = useMemo(
+    () =>
+      transactionStatus.isFailure()
+        ? IconTypes.error
+        : transactionStatus.isLoading()
+        ? IconTypes.spinner
+        : IconTypes.ok,
+    [transactionStatus]
+  )
+
+  const isWorking = useMemo(
+    () =>
+      transactionStatus.isLoading() ||
+      transactionStatus.isFailure() ||
+      transactionStatus.isSuccess(),
+    [transactionStatus]
+  )
 
   return (
     <CenteredCard>
       <SelectablePositionTable
+        onClearCallback={clearComponent}
         onRowClicked={onRowClicked}
-        selectedPositionId={selectedPositionId}
+        selectedPosition={position}
       />
       <Row cols="1fr" marginBottomXL>
         <MergeWith
           isLoading={isLoadingMergeablePositions}
-          mergeablePositions={mergeablePositionsList}
+          mergeablePositions={mergeablePositions}
           onClick={onMergeableItemClick}
         />
       </Row>
       <Row cols="1fr">
         <ConditionsDropdown
           conditions={conditionIds}
-          isLoading={isLoadingConditionIds}
-          onClick={onConditionIdSelect}
-          value={selectedConditionId}
+          isLoading={isLoadingConditions}
+          onClick={onConditionSelect}
+          value={conditionId}
         />
       </Row>
-      {condition && condition.resolved && (
+      {isConditionResolved && (
         <Row cols="1fr">
           <StatusInfoInline status={StatusInfoType.warning}>
             This condition is already resolved.
@@ -305,14 +342,19 @@ export const Contents = () => {
           amount={amount}
           balance={maxBalance}
           decimals={decimals}
-          disabled={!mergeablePositions}
+          isFromAPosition={true}
           max={maxBalance.toString()}
-          onAmountChange={amountChangeHandler}
-          onUseWalletBalance={useWalletHandler}
+          onAmountChange={onAmountChange}
+          onUseWalletBalance={onUsePositionBalance}
         />
       </Row>
       <Row cols="1fr">
-        <MergePreview amount={amount} />
+          <MergePreview
+            amount={amount}
+            conditionId={conditionId}
+            positions={selectedPositions}
+            token={collateralToken}
+          />
       </Row>
       {isWorking && (
         <FullLoading
@@ -322,19 +364,17 @@ export const Contents = () => {
           title={fullLoadingTitle}
         />
       )}
-      {isFinished && collateralToken && (
+      {transactionStatus.isSuccess() && collateralToken && (
         <MergeResultModal
           amount={amount}
           closeAction={clearComponent}
           collateralToken={collateralToken}
-          isOpen={status === Status.Ready}
+          isOpen={transactionStatus.isSuccess()}
           mergeResult={mergeResult}
         ></MergeResultModal>
       )}
       <ButtonContainer>
-        <Button disabled={disabled} onClick={onMerge}>
-          Merge
-        </Button>
+        <Button onClick={onMerge}>Merge</Button>
       </ButtonContainer>
       <Prompt
         message={(params) =>
@@ -342,7 +382,7 @@ export const Contents = () => {
             ? true
             : 'Are you sure you want to leave this page? The changes you made will be lost?'
         }
-        when={positions.length > 0 || !!condition || !amount.isZero()}
+        when={true}
       />
     </CenteredCard>
   )
