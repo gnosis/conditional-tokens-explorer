@@ -5,13 +5,17 @@ import styled from 'styled-components'
 import {
   StripedList,
   StripedListEmpty,
-  StripedListItem,
+  StripedListItemPreview,
 } from 'components/pureStyledComponents/StripedList'
 import { TitleValue } from 'components/text/TitleValue'
 import { useCollateral } from 'hooks/useCollateral'
 import { GetPosition_position } from 'types/generatedGQLForCTE'
 import { positionString } from 'util/tools'
 import { SplitFromType, Token } from 'util/types'
+
+const StripedListStyled = styled(StripedList)`
+  margin-top: 6px;
+`
 
 interface Props {
   amount: BigNumber
@@ -21,10 +25,6 @@ interface Props {
   selectedCollateral: Token
   splitFrom: SplitFromType
 }
-
-const StripedListStyled = styled(StripedList)`
-  margin-top: 6px;
-`
 
 export const PositionPreview = ({
   amount,
@@ -80,7 +80,7 @@ export const PositionPreview = ({
         <StripedListStyled>
           {splitPositionPreview.length > 0 ? (
             splitPositionPreview.map((preview, i) => (
-              <StripedListItem key={`preview-${i}`}>{preview}</StripedListItem>
+              <StripedListItemPreview key={`preview-${i}`}>{preview}</StripedListItemPreview>
             ))
           ) : (
             <StripedListEmpty>No Split Positions.</StripedListEmpty>
