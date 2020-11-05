@@ -14,7 +14,7 @@ import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { getLogger } from 'util/logger'
 import { arePositionMergeablesByCondition, getMergePreview, getTokenSummary } from 'util/tools'
 
-const StripedListItemBreakable = styled.div`
+const StripedListItemBreakable = styled(StripedListItem)`
   word-break: break-all;
 `
 
