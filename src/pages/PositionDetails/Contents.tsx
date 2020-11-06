@@ -34,6 +34,7 @@ import {
   StripedListEmpty,
   StripedListItem,
   StripedListItemLessPadding,
+  StripedListItemPreview,
 } from 'components/pureStyledComponents/StripedList'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
@@ -637,12 +638,14 @@ export const Contents = (props: Props) => {
           }
         />
       </Row>
-      <Row cols="1fr" marginBottomXL>
-        <TitleValue
-          title="Position Preview"
-          value={<StripedListItem>{positionPreview || ''} </StripedListItem>}
-        />
-      </Row>
+      {positionPreview && (
+        <Row cols="1fr" marginBottomXL>
+          <TitleValue
+            title="Position Preview"
+            value={<StripedListItemPreview>{positionPreview}</StripedListItemPreview>}
+          />
+        </Row>
+      )}
       {isWrapModalOpen && (
         <WrapModal
           balance={balanceERC1155}

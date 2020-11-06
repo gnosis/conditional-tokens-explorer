@@ -73,14 +73,12 @@ export const PositionProvider = (props: Props) => {
     }
   )
 
-  if (positionId && fetchedPosition?.position) {
-    const { position: positionFromTheGraph } = fetchedPosition ?? { position: null }
+  if (positionId && fetchedPosition) {
+    position = fetchedPosition?.position
+  }
 
-    if (positionFromTheGraph) {
-      position = positionFromTheGraph
-    } else {
-      errors.push(PositionErrors.NOT_FOUND_ERROR)
-    }
+  if (positionId && !position && !loading) {
+    errors.push(PositionErrors.NOT_FOUND_ERROR)
   }
 
   const { balanceERC20, balanceERC1155, refetch: refetchBalances } = useBalanceForPosition(
@@ -90,6 +88,7 @@ export const PositionProvider = (props: Props) => {
   if (position && balanceERC1155 && balanceERC1155.isZero() && checkForEmptyBalanceERC1155) {
     errors.push(PositionErrors.EMPTY_BALANCE_ERC1155_ERROR)
   }
+
   if (position && balanceERC20 && balanceERC20.isZero() && checkForEmptyBalanceERC20) {
     errors.push(PositionErrors.EMPTY_BALANCE_ERC20_ERROR)
   }

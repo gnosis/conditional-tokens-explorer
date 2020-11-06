@@ -4,7 +4,7 @@ import React, { useMemo } from 'react'
 import {
   StripedList,
   StripedListEmpty,
-  StripedListItem,
+  StripedListItemPreview,
 } from 'components/pureStyledComponents/StripedList'
 import { TitleValue } from 'components/text/TitleValue'
 import { useCondition } from 'hooks/useCondition'
@@ -33,13 +33,11 @@ export const MergePreview = ({ amount, conditionId, positions, token }: Props) =
     <TitleValue
       title="Merged Positions Preview"
       value={
-        <StripedList maxHeight="41px">
+        <StripedList maxHeight="none" minHeight="41px">
           {preview ? (
-            <StripedListItem>
-              <strong>{preview}</strong>
-            </StripedListItem>
+            <StripedListItemPreview>{preview}</StripedListItemPreview>
           ) : (
-            <StripedListEmpty>No merged positions.</StripedListEmpty>
+            <StripedListEmpty>No merged positions yet.</StripedListEmpty>
           )}
         </StripedList>
       }
