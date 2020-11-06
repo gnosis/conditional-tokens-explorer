@@ -8,9 +8,9 @@ import {
 } from 'components/pureStyledComponents/StripedList'
 import { TitleValue } from 'components/text/TitleValue'
 import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
+import { GetCondition_condition } from 'types/generatedGQLForCTE'
 import { getMergePreview } from 'util/tools'
 import { Token } from 'util/types'
-import { GetCondition_condition } from 'types/generatedGQLForCTE'
 
 interface Props {
   amount: BigNumber
