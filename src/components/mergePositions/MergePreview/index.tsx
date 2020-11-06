@@ -7,27 +7,25 @@ import {
   StripedListItemPreview,
 } from 'components/pureStyledComponents/StripedList'
 import { TitleValue } from 'components/text/TitleValue'
-import { useCondition } from 'hooks/useCondition'
 import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
 import { getMergePreview } from 'util/tools'
 import { Token } from 'util/types'
+import { GetCondition_condition } from 'types/generatedGQLForCTE'
 
 interface Props {
   amount: BigNumber
   token: Maybe<Token>
   positions: Array<PositionWithUserBalanceWithDecimals>
-  conditionId: Maybe<string>
+  condition: Maybe<GetCondition_condition>
 }
 
-export const MergePreview = ({ amount, conditionId, positions, token }: Props) => {
-  const condition = useCondition(conditionId)
-
+export const MergePreview = ({ amount, condition, positions, token }: Props) => {
   const preview = useMemo(() => {
-    if (condition && conditionId && token) {
-      return getMergePreview(positions, conditionId, amount, token, condition.outcomeSlotCount)
+    if (condition && token) {
+      return getMergePreview(positions, condition.id, amount, token, condition.outcomeSlotCount)
     }
     return null
-  }, [positions, condition, conditionId, amount, token])
+  }, [positions, condition, amount, token])
 
   return (
     <TitleValue

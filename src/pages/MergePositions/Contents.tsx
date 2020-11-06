@@ -446,7 +446,7 @@ export const Contents = () => {
       <Row cols="1fr">
         <MergePreview
           amount={amount}
-          conditionId={conditionId}
+          condition={condition}
           positions={selectedPositions}
           token={collateralToken}
         />
