@@ -130,5 +130,5 @@ export const MIN_OUTCOMES_ALLOWED = Number(process.env.REACT_APP_MIN_OUTCOMES_AL
 
 export const MAX_OUTCOMES_ALLOWED = Number(process.env.REACT_APP_MAX_OUTCOMES_ALLOWED || 256)
 
-export const MAX_DATE = '2030-01-01'
 export const MIN_DATE = '2015-07-30'
+export const MAX_DATE = '2030-01-01'

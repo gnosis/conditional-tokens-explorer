@@ -627,6 +627,8 @@ export const PrepareCondition = () => {
                   <>
                     <Textfield
                       error={errorsOmenCondition.resolutionDate && true}
+                      max={MAX_DATE}
+                      min={today}
                       name="resolutionDate"
                       onChange={(e) => {
                         if (e.target.checkValidity()) {
@@ -635,7 +637,6 @@ export const PrepareCondition = () => {
                           setErrorOmenCondition('resolutionDate', 'validity')
                         }
                       }}
-                      placeholder="MM/DD/YYYY"
                       ref={registerOmenCondition({
                         required: true,
                         min: today,
@@ -651,7 +652,9 @@ export const PrepareCondition = () => {
                         {['min', 'max', 'validity'].includes(
                           errorsOmenCondition.resolutionDate.type
                         ) && (
-                          <ErrorMessage>{`Invalid date or out of range. Valid dates are from today (${today}) to ${MAX_DATE}`}</ErrorMessage>
+                          <ErrorMessage>{`Date must between ${moment(today).format(
+                            'L'
+                          )} and ${moment(MAX_DATE).format('L')}`}</ErrorMessage>
                         )}
                       </ErrorContainer>
                     )}
