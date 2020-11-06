@@ -39,10 +39,10 @@ import {
 } from 'util/tools'
 import {
   AdvancedFilterPosition,
+  MergeablePosition,
   PositionSearchOptions,
   Token,
   WrappedCollateralOptions,
-  MergeablePosition,
 } from 'util/types'
 
 const logger = getLogger('MergePosition')

@@ -62,7 +62,6 @@ interface Props {
 export const MergeWith: React.FC<Props> = (props) => {
   const { errorFetching, isLoading, mergeablePositions, onClick, ...restProps } = props
 
-  console.log(mergeablePositions)
   return (
     <Wrapper {...restProps}>
       <TitleValue
