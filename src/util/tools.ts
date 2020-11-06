@@ -9,7 +9,7 @@ import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
 import { ConditionInformation } from 'hooks/utils'
 import zipObject from 'lodash.zipobject'
 import { ERC20Service } from 'services/erc20'
-import { GetCondition_condition, GetPosition_position } from 'types/generatedGQLForCTE'
+import { GetCondition_condition } from 'types/generatedGQLForCTE'
 import { CollateralErrors, ConditionErrors, NetworkIds, PositionErrors, Token } from 'util/types'
 
 const ZERO_BN = new BN(0)
@@ -150,11 +150,13 @@ export const indexSetToBase2 = (indexSet: string) => {
   return new BN(indexSet).toString(2)
 }
 export const getRedeemedBalance = (
-  position: GetPosition_position,
+  position: PositionWithUserBalanceWithDecimals,
   resolvedCondition: GetCondition_condition,
   balance: BigNumber
 ) => {
-  const conditionIndex = position.conditions.findIndex(({ id }) => id === resolvedCondition.id)
+  const conditionIndex = position.conditions.findIndex(
+    ({ conditionId }) => conditionId === resolvedCondition.id
+  )
   const indexSet = position.indexSets[conditionIndex]
 
   const { payouts } = resolvedCondition
