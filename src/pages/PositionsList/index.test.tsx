@@ -1,7 +1,7 @@
 import { MockedProvider } from '@apollo/react-testing'
 import { waitFor, within } from '@testing-library/dom'
 import { render } from '@testing-library/react'
-import React from 'react'
+import React, { useMemo } from 'react'
 import { act } from 'react-dom/test-utils'
 import { HashRouter } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
@@ -12,6 +12,8 @@ import { PositionsList } from 'pages/PositionsList/index'
 import { PositionsListType, buildQueryPositions } from 'queries/CTEPositions'
 import { UserWithPositionsQuery } from 'queries/CTEUsers'
 import theme from 'theme'
+import { buildQueryPositionsList } from '../../queries/CTEPositions'
+import { AdvancedFilterPosition, PositionSearchOptions, WrappedCollateralOptions } from '../../util/types'
 
 const connect = jest.fn()
 const disconnect = jest.fn()
@@ -29,11 +31,22 @@ const infuraStatus = {
   networkConfig,
 } as Infura
 
-const buildQueryOptions: PositionsListType = {
-  positionId: '',
+const advancedFilters: AdvancedFilterPosition =  {
+  CollateralValue: {
+    type: null,
+    value: null,
+  },
+  ToCreationDate: null,
+  FromCreationDate: null,
+  TextToSearch: {
+    type: PositionSearchOptions.All,
+    value: null,
+  },
+  WrappedCollateral: WrappedCollateralOptions.All,
 }
 
-const query = buildQueryPositions(buildQueryOptions)
+
+const query = buildQueryPositionsList(advancedFilters)
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const renderWithConnectedProvider = (component: any, query: any) => {
