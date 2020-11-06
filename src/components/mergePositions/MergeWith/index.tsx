@@ -10,6 +10,7 @@ import {
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { SpinnerSize } from 'components/statusInfo/common'
 import { TitleValue } from 'components/text/TitleValue'
+import { MergeablePosition } from 'util/types'
 
 const Wrapper = styled.div``
 
@@ -31,10 +32,8 @@ const MergeableStripedListItemText = styled.span`
 
 const MergeableItem: React.FC<{
   index: number
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  item: any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onClick: (item: any, index: number) => void
+  item: MergeablePosition
+  onClick: (item: MergeablePosition, index: number) => void
 }> = (props) => {
   const { index, item, onClick, ...restProps } = props
   const [selected, setSelected] = useState(false)
@@ -54,10 +53,8 @@ const MergeableItem: React.FC<{
 
 interface Props {
   isLoading?: boolean
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  mergeablePositions: Array<any> | undefined
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onClick: (item: any, index: number) => void
+  mergeablePositions: Array<MergeablePosition> | undefined
+  onClick: (item: MergeablePosition, index: number) => void
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   errorFetching: any
 }
@@ -65,6 +62,7 @@ interface Props {
 export const MergeWith: React.FC<Props> = (props) => {
   const { errorFetching, isLoading, mergeablePositions, onClick, ...restProps } = props
 
+  console.log(mergeablePositions)
   return (
     <Wrapper {...restProps}>
       <TitleValue

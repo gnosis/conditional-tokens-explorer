@@ -42,14 +42,10 @@ import {
   PositionSearchOptions,
   Token,
   WrappedCollateralOptions,
+  MergeablePosition,
 } from 'util/types'
 
 const logger = getLogger('MergePosition')
-
-interface MergeablePosition {
-  position: PositionWithUserBalanceWithDecimals
-  positionPreview: string
-}
 
 export const Contents = () => {
   const { _type: status, CTService, connect, networkConfig, provider } = useWeb3ConnectedOrInfura()

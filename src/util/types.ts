@@ -2,6 +2,7 @@ import { BigNumber } from 'ethers/utils'
 import { Moment } from 'moment'
 
 import { NetworkConfig } from 'config/networkConfig'
+import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
 
 export interface Question {
   arbitratorAddress: string
@@ -246,4 +247,9 @@ export interface AdvancedFilterPosition {
     value: Maybe<string>
   }
   WrappedCollateral: WrappedCollateralOptions
+}
+
+export interface MergeablePosition {
+  position: PositionWithUserBalanceWithDecimals
+  positionPreview: string
 }
