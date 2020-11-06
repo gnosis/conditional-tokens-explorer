@@ -25,9 +25,10 @@ export const StripedListItem = styled.div<{ justifyContent?: string }>`
   font-size: 15px;
   font-weight: 400;
   justify-content: ${(props) => props.justifyContent};
-  line-height: 1;
+  line-height: 1.3;
   padding: 12px 20px;
   text-align: left;
+  word-break: break-all;
 
   &:nth-child(even) {
     background-color: ${(props) => props.theme.colors.whitesmoke2};
@@ -46,6 +47,10 @@ export const StripedListItem = styled.div<{ justifyContent?: string }>`
 
 export const StripedListItemLessPadding = styled(StripedListItem)`
   padding: 8px 12px;
+`
+
+export const StripedListItemPreview = styled(StripedListItem)`
+  font-weight: 600;
 `
 
 StripedListItem.defaultProps = {

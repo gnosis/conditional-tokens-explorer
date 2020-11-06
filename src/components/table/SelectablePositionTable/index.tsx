@@ -17,11 +17,17 @@ import { SpinnerSize } from 'components/statusInfo/common'
 import { TableControls } from 'components/table/TableControls'
 import { FormatHash } from 'components/text/FormatHash'
 import { TitleValue } from 'components/text/TitleValue'
-import { PositionWithUserBalanceWithDecimals, usePositions } from 'hooks'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { PositionWithUserBalanceWithDecimals, usePositionsList } from 'hooks/usePositionsList'
 import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
 import { truncateStringInTheMiddle } from 'util/tools'
-import { CollateralFilterOptions, WrappedCollateralOptions } from 'util/types'
+import {
+  AdvancedFilterPosition,
+  CollateralFilterOptions,
+  PositionSearchOptions,
+  WrappedCollateralOptions,
+} from 'util/types'
 
 const Search = styled(SearchField)`
   min-width: 0;
@@ -38,62 +44,138 @@ const TitleValueExtended = styled(TitleValue)<{ hideTitle?: boolean }>`
 
 interface Props {
   hideTitle?: boolean
-  onRowClicked: (row: PositionWithUserBalanceWithDecimals) => void
-  selectedPositionId?: string
+  onRowClicked: (position: PositionWithUserBalanceWithDecimals) => void
+  onClearCallback: () => void
+  selectedPosition: Maybe<PositionWithUserBalanceWithDecimals>
   title?: string
+  clearFilters: boolean
 }
 
 export const SelectablePositionTable: React.FC<Props> = (props) => {
-  const { hideTitle, onRowClicked, selectedPositionId, title = 'Positions', ...restProps } = props
-  const [positionIdToSearch, setPositionIdToSearch] = useState<string>('')
-  const [positionIdToShow, setPositionIdToShow] = useState<string>('')
+  const {
+    clearFilters,
+    hideTitle,
+    onClearCallback,
+    onRowClicked,
+    selectedPosition,
+    title = 'Positions',
+    ...restProps
+  } = props
+
+  const { networkConfig } = useWeb3ConnectedOrInfura()
+
   const [positionList, setPositionList] = useState<PositionWithUserBalanceWithDecimals[]>([])
+
+  const [searchBy, setSearchBy] = useState<PositionSearchOptions>(PositionSearchOptions.PositionId)
+  const [textToShow, setTextToShow] = useState<string>('')
+  const [textToSearch, setTextToSearch] = useState<string>('')
+  const [resetPagination, setResetPagination] = useState<boolean>(false)
+  const [showFilters, setShowFilters] = useState(false)
+
   const [selectedCollateralFilter, setSelectedCollateralFilter] = useState<Maybe<string[]>>(null)
   const [selectedCollateralValue, setSelectedCollateralValue] = useState<string>(
     CollateralFilterOptions.All
   )
+
+  const [selectedFromCreationDate, setSelectedFromCreationDate] = useState<Maybe<number>>(null)
+  const [selectedToCreationDate, setSelectedToCreationDate] = useState<Maybe<number>>(null)
   const [wrappedCollateral, setWrappedCollateral] = useState<WrappedCollateralOptions>(
     WrappedCollateralOptions.All
   )
-  const [selectedFromCreationDate, setSelectedFromCreationDate] = useState<Maybe<number>>(null)
-  const [selectedToCreationDate, setSelectedToCreationDate] = useState<Maybe<number>>(null)
 
-  const debouncedHandlerPositionIdToSearch = useDebounceCallback((positionIdToSearch) => {
-    setPositionIdToSearch(positionIdToSearch)
+  const debouncedHandlerTextToSearch = useDebounceCallback((textToSearch) => {
+    setTextToSearch(textToSearch)
   }, 500)
 
-  const onChangePositionId = React.useCallback(
+  const onChangeSearch = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.currentTarget
-      setPositionIdToShow(value)
-      debouncedHandlerPositionIdToSearch(value)
+      setTextToShow(value)
+      debouncedHandlerTextToSearch(value)
     },
-    [debouncedHandlerPositionIdToSearch]
+    [debouncedHandlerTextToSearch]
   )
 
-  const onClearSearch = React.useCallback(() => {
-    setPositionIdToShow('')
-    debouncedHandlerPositionIdToSearch('')
-  }, [debouncedHandlerPositionIdToSearch])
+  const onClearSearch = useCallback(() => {
+    setTextToShow('')
+    debouncedHandlerTextToSearch('')
+  }, [debouncedHandlerTextToSearch])
 
-  const { data, error, loading } = usePositions({
-    positionId: positionIdToSearch,
-  })
+  const advancedFilters: AdvancedFilterPosition = useMemo(() => {
+    return {
+      CollateralValue: {
+        type: selectedCollateralValue,
+        value: selectedCollateralFilter,
+      },
+      ToCreationDate: selectedToCreationDate,
+      FromCreationDate: selectedFromCreationDate,
+      TextToSearch: {
+        type: searchBy,
+        value: textToSearch,
+      },
+      WrappedCollateral: wrappedCollateral,
+    }
+  }, [
+    wrappedCollateral,
+    selectedCollateralValue,
+    selectedCollateralFilter,
+    selectedToCreationDate,
+    selectedFromCreationDate,
+    searchBy,
+    textToSearch,
+  ])
+
+  const { data, error, loading } = usePositionsList(advancedFilters)
+
+  // #1 Filter, only positions with balance
+  const positionsWithBalance = useMemo(
+    () =>
+      data &&
+      data.length &&
+      data.filter(
+        (position: PositionWithUserBalanceWithDecimals) => !position.userBalanceERC1155.isZero()
+      ),
+    [data]
+  )
+
+  const resetFilters = useCallback(() => {
+    setResetPagination(!resetPagination)
+    setSelectedToCreationDate(null)
+    setSelectedFromCreationDate(null)
+    setSearchBy(PositionSearchOptions.PositionId)
+    setTextToSearch('')
+    setSelectedCollateralFilter(null)
+    setSelectedCollateralValue(CollateralFilterOptions.All)
+    setWrappedCollateral(WrappedCollateralOptions.All)
+  }, [resetPagination])
+
+  // Clear the filters on network change
+  useEffect(() => {
+    setShowFilters(false)
+    resetFilters()
+    onClearCallback()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [networkConfig, clearFilters])
 
   // Filter selected positions from original list. And positions without balance as indicated by props.
   useEffect(() => {
-    if (data) {
-      setPositionList(data)
+    if (positionsWithBalance) {
+      setPositionList(positionsWithBalance)
+    } else {
+      setPositionList([])
     }
-  }, [setPositionList, data])
+  }, [setPositionList, positionsWithBalance])
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const defaultColumns: Array<any> = useMemo(
     () => [
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: PositionWithUserBalanceWithDecimals) => (
-          <RadioButton checked={selectedPositionId === row.id} onClick={() => onRowClicked(row)} />
+        cell: (position: PositionWithUserBalanceWithDecimals) => (
+          <RadioButton
+            checked={!!(selectedPosition && selectedPosition?.id === position.id)}
+            onClick={() => onRowClicked(position)}
+          />
         ),
         maxWidth: '12px',
         minWidth: '12px',
@@ -137,20 +219,55 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
         sortable: true,
       },
     ],
-    [onRowClicked, selectedPositionId]
+    [onRowClicked, selectedPosition]
   )
 
-  const [showFilters, setShowFilters] = useState(false)
   const toggleShowFilters = useCallback(() => {
     setShowFilters(!showFilters)
   }, [showFilters])
 
-  const isLoading = !positionIdToSearch && loading
-  const isSearching = positionIdToSearch && loading
-  const showSpinner = (isLoading || isSearching) && !error
+  // Clear the filters
+  useEffect(() => {
+    if (!showFilters) {
+      resetFilters()
+      onClearCallback()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showFilters])
 
-  const [searchBy, setSearchBy] = useState('all')
+  const isLoading = useMemo(() => !textToSearch && loading, [textToSearch, loading])
+  const isSearching = useMemo(() => textToSearch && loading, [textToSearch, loading])
+
+  const showSpinner = useMemo(() => (isLoading || isSearching) && !error, [
+    isLoading,
+    isSearching,
+    error,
+  ])
+
   const dropdownItems = usePositionsSearchOptions(setSearchBy)
+
+  useEffect(() => {
+    if (
+      textToSearch !== '' ||
+      wrappedCollateral !== WrappedCollateralOptions.All ||
+      selectedCollateralValue !== CollateralFilterOptions.All ||
+      selectedCollateralFilter ||
+      selectedToCreationDate ||
+      selectedFromCreationDate
+    ) {
+      setResetPagination(!resetPagination)
+    }
+    onClearCallback()
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    textToSearch,
+    wrappedCollateral,
+    selectedCollateralValue,
+    selectedCollateralFilter,
+    selectedToCreationDate,
+    selectedFromCreationDate,
+  ])
 
   return (
     <TitleValueExtended
@@ -162,9 +279,9 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
             end={
               <Search
                 dropdownItems={dropdownItems}
-                onChange={onChangePositionId}
+                onChange={onChangeSearch}
                 onClear={onClearSearch}
-                value={positionIdToShow}
+                value={textToShow}
               />
             }
             start={<Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />}
@@ -212,6 +329,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
             onRowClicked={onRowClicked}
             pagination
             paginationPerPage={5}
+            paginationResetDefaultPage={resetPagination}
             paginationRowsPerPageOptions={[5, 10, 15]}
             pointerOnHover
             responsive

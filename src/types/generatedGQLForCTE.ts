@@ -202,6 +202,77 @@ export interface Positions {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL query operation: PositionsList
+// ====================================================
+
+export interface PositionsList_positions_collateralToken {
+  __typename: "CollateralToken";
+  id: string;
+}
+
+export interface PositionsList_positions_wrappedToken {
+  __typename: "WrappedToken";
+  id: string;
+}
+
+export interface PositionsList_positions_collection_conditions {
+  __typename: "Condition";
+  id: string;
+  oracle: string;
+  questionId: string;
+  outcomeSlotCount: number;
+  resolved: boolean;
+  creator: string;
+  payouts: any[] | null;
+  payoutNumerators: any[] | null;
+  payoutDenominator: any | null;
+}
+
+export interface PositionsList_positions_collection_positions {
+  __typename: "Position";
+  id: string;
+}
+
+export interface PositionsList_positions_collection {
+  __typename: "Collection";
+  id: string;
+  conditions: PositionsList_positions_collection_conditions[];
+  conditionIds: string[];
+  indexSets: any[];
+  positions: PositionsList_positions_collection_positions[] | null;
+}
+
+export interface PositionsList_positions_conditions {
+  __typename: "Condition";
+  id: string;
+  oracle: string;
+  questionId: string;
+  outcomeSlotCount: number;
+}
+
+export interface PositionsList_positions {
+  __typename: "Position";
+  id: string;
+  indexSets: any[];
+  activeValue: any;
+  createTimestamp: any;
+  collateralToken: PositionsList_positions_collateralToken;
+  wrappedToken: PositionsList_positions_wrappedToken | null;
+  collection: PositionsList_positions_collection;
+  conditionIds: string[];
+  conditions: PositionsList_positions_conditions[];
+}
+
+export interface PositionsList {
+  positions: PositionsList_positions[];
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL query operation: GetPosition
 // ====================================================
 
