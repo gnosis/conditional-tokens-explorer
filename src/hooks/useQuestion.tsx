@@ -1,7 +1,10 @@
 import React from 'react'
 
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { getLogger } from 'util/logger'
 import { Question } from 'util/types'
+
+const logger = getLogger('UseQuestion')
 
 export const useQuestion = (questionId: string, outcomeSlotCount: number) => {
   const { RtyService, networkConfig } = useWeb3ConnectedOrInfura()
@@ -12,43 +15,29 @@ export const useQuestion = (questionId: string, outcomeSlotCount: number) => {
   const [loading, setLoading] = React.useState<boolean>(true)
 
   React.useEffect(() => {
-    let cancelled = false
-    if (!cancelled) setLoading(true)
+    setLoading(true)
 
-    const getQuestion = async (questionId: string) => {
+    const getQuestion = async () => {
+      let question = null
       try {
         const earliestBlockToCheck = networkConfig.getEarliestBlockToCheck()
-        const question = await RtyService.getQuestion(questionId, earliestBlockToCheck)
-        if (!cancelled) setQuestion(question)
+        question = await RtyService.getQuestion(questionId, earliestBlockToCheck)
       } catch (err) {
+        logger.error(err.message)
         setError(err)
       }
+      const outcomesSlots = question
+        ? question?.outcomes
+        : Array.from(Array(outcomeSlotCount), (_, i) => i + '')
+
+      setQuestion(question)
+      setOutcomesPrettier(outcomesSlots)
     }
 
-    getQuestion(questionId)
+    getQuestion()
 
-    if (!cancelled) setLoading(false)
-
-    return () => {
-      cancelled = true
-    }
-  }, [RtyService, networkConfig, questionId])
-
-  React.useEffect(() => {
-    let cancelled = false
-    if (!cancelled) setLoading(true)
-
-    const outcomesSlots = question
-      ? question.outcomes
-      : Array.from(Array(outcomeSlotCount), (_, i) => i + '')
-
-    if (!cancelled) setOutcomesPrettier(outcomesSlots)
-    if (!cancelled) setLoading(false)
-
-    return () => {
-      cancelled = true
-    }
-  }, [question, outcomeSlotCount])
+    setLoading(false)
+  }, [RtyService, networkConfig, questionId, outcomeSlotCount])
 
   return {
     question,
