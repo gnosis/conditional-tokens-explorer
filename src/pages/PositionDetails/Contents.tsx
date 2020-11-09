@@ -19,6 +19,7 @@ import {
 } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
 import { Tooltip } from 'components/common/Tooltip'
+import { OmenMarketsItem } from 'components/form/OmenMarketsItem'
 import { DisplayHashesTableModal } from 'components/modals/DisplayHashesTableModal'
 import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
 import { UnwrapModal } from 'components/modals/UnwrapModal'
@@ -532,6 +533,7 @@ export const Contents = (props: Props) => {
           />
         )}
       </Row>
+      <OmenMarketsItem conditionsIds={conditions.map((condition) => condition.hash)} />
       <Row cols="1fr" marginBottomXL>
         <TitleValue
           title="Wrapped Collateral"
