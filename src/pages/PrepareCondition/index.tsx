@@ -1,6 +1,6 @@
 import lodashClonedeep from 'lodash.clonedeep'
 import moment from 'moment'
-import React, { KeyboardEvent, useState, useCallback, useEffect, useMemo, ChangeEvent } from 'react'
+import React, { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Prompt } from 'react-router'
 import { useHistory } from 'react-router-dom'
@@ -292,7 +292,6 @@ export const PrepareCondition = () => {
   )
 
   const prepareCondition = useCallback(async () => {
-
     try {
       if (status === Web3ContextStatus.Connected && address) {
         setPrepareConditionStatus(Remote.loading())
@@ -628,6 +627,8 @@ export const PrepareCondition = () => {
                   <>
                     <Textfield
                       error={errorsOmenCondition.resolutionDate && true}
+                      max={MAX_DATE}
+                      min={today}
                       name="resolutionDate"
                       onChange={(e) => {
                         if (e.target.checkValidity()) {
@@ -636,7 +637,6 @@ export const PrepareCondition = () => {
                           setErrorOmenCondition('resolutionDate', 'validity')
                         }
                       }}
-                      placeholder="MM/DD/YYYY"
                       ref={registerOmenCondition({
                         required: true,
                         min: today,
@@ -652,7 +652,9 @@ export const PrepareCondition = () => {
                         {['min', 'max', 'validity'].includes(
                           errorsOmenCondition.resolutionDate.type
                         ) && (
-                          <ErrorMessage>{`Invalid date or out of range. Valid dates are from today (${today}) to ${MAX_DATE}`}</ErrorMessage>
+                          <ErrorMessage>{`Date must between ${moment(today).format(
+                            'L'
+                          )} and ${moment(MAX_DATE).format('L')}`}</ErrorMessage>
                         )}
                       </ErrorContainer>
                     )}

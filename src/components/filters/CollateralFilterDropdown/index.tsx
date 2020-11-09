@@ -1,4 +1,5 @@
 import React from 'react'
+import styled from 'styled-components'
 
 import { ButtonSelectLight } from 'components/buttons/ButtonSelectLight'
 import { DropdownItem, DropdownPosition } from 'components/common/Dropdown'
@@ -8,12 +9,14 @@ import { FilterTitle } from 'components/pureStyledComponents/FilterTitle'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { CollateralFilterOptions, Token } from 'util/types'
 
+const Wrapper = styled.div``
+
 interface Props {
   onClick: (symbol: string, address: Maybe<string[]>) => void
   value: string
 }
 
-export const CollateralFilterDropdown = ({ onClick, value }: Props) => {
+export const CollateralFilterDropdown = ({ onClick, value, ...restProps }: Props) => {
   const { networkConfig } = useWeb3ConnectedOrInfura()
   const tokensList = networkConfig
     ? [
@@ -51,7 +54,7 @@ export const CollateralFilterDropdown = ({ onClick, value }: Props) => {
   ]
 
   return (
-    <>
+    <Wrapper {...restProps}>
       <FilterTitle>Collateral</FilterTitle>
       <FilterDropdown
         currentItem={tokenItems.findIndex((tokenItem) => tokenItem.value === value)}
@@ -67,6 +70,6 @@ export const CollateralFilterDropdown = ({ onClick, value }: Props) => {
           </DropdownItem>
         ))}
       />
-    </>
+    </Wrapper>
   )
 }

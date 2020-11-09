@@ -9,9 +9,10 @@ import { ThemeProvider } from 'styled-components'
 import { NetworkConfig } from 'config/networkConfig'
 import { Connected, Infura, Web3Context, Web3ContextStatus } from 'contexts/Web3Context'
 import { PositionsList } from 'pages/PositionsList/index'
-import { PositionsListType, buildQueryPositions } from 'queries/CTEPositions'
+import { buildQueryPositionsList } from 'queries/CTEPositions'
 import { UserWithPositionsQuery } from 'queries/CTEUsers'
 import theme from 'theme'
+import { AdvancedFilterPosition, PositionSearchOptions, WrappedCollateralOptions } from 'util/types'
 
 const connect = jest.fn()
 const disconnect = jest.fn()
@@ -29,11 +30,21 @@ const infuraStatus = {
   networkConfig,
 } as Infura
 
-const buildQueryOptions: PositionsListType = {
-  positionId: '',
+const advancedFilters: AdvancedFilterPosition = {
+  CollateralValue: {
+    type: null,
+    value: null,
+  },
+  ToCreationDate: null,
+  FromCreationDate: null,
+  TextToSearch: {
+    type: PositionSearchOptions.All,
+    value: null,
+  },
+  WrappedCollateral: WrappedCollateralOptions.All,
 }
 
-const query = buildQueryPositions(buildQueryOptions)
+const query = buildQueryPositionsList(advancedFilters)
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const renderWithConnectedProvider = (component: any, query: any) => {

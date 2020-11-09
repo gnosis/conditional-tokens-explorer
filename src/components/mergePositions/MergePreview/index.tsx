@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 
 import {
   StripedList,
@@ -7,56 +7,33 @@ import {
   StripedListItemPreview,
 } from 'components/pureStyledComponents/StripedList'
 import { TitleValue } from 'components/text/TitleValue'
-import { useConditionContext } from 'contexts/ConditionContext'
-import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
-import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { getLogger } from 'util/logger'
-import { arePositionMergeablesByCondition, getMergePreview, getTokenSummary } from 'util/tools'
+import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
+import { GetCondition_condition } from 'types/generatedGQLForCTE'
+import { getMergePreview } from 'util/tools'
+import { Token } from 'util/types'
 
 interface Props {
   amount: BigNumber
+  token: Maybe<Token>
+  positions: Array<PositionWithUserBalanceWithDecimals>
+  condition: Maybe<GetCondition_condition>
 }
 
-const logger = getLogger('MergePreview')
-
-export const MergePreview = ({ amount }: Props) => {
-  const { networkConfig, provider } = useWeb3ConnectedOrInfura()
-
-  const { positions } = useMultiPositionsContext()
-  const { condition } = useConditionContext()
-  const [mergedPosition, setMergedPosition] = useState('')
-
-  const canMergePositions = useMemo(() => {
-    return condition && arePositionMergeablesByCondition(positions, condition)
-  }, [positions, condition])
-
-  useEffect(() => {
-    let cancelled = false
-    if (canMergePositions && condition && positions.length > 0) {
-      getTokenSummary(networkConfig, provider, positions[0].collateralToken.id)
-        .then((token) => {
-          if (!cancelled) {
-            setMergedPosition(getMergePreview(positions, condition, amount, token))
-          }
-        })
-        .catch((err) => {
-          logger.error(err)
-        })
-    } else {
-      setMergedPosition('')
+export const MergePreview = ({ amount, condition, positions, token }: Props) => {
+  const preview = useMemo(() => {
+    if (condition && token) {
+      return getMergePreview(positions, condition.id, amount, token, condition.outcomeSlotCount)
     }
-    return () => {
-      cancelled = true
-    }
-  }, [canMergePositions, condition, positions, amount, provider, networkConfig])
+    return null
+  }, [positions, condition, amount, token])
 
   return (
     <TitleValue
       title="Merged Positions Preview"
       value={
         <StripedList maxHeight="none" minHeight="41px">
-          {mergedPosition ? (
-            <StripedListItemPreview>{mergedPosition}</StripedListItemPreview>
+          {preview ? (
+            <StripedListItemPreview>{preview}</StripedListItemPreview>
           ) : (
             <StripedListEmpty>No merged positions yet.</StripedListEmpty>
           )}

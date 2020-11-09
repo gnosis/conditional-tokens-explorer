@@ -88,6 +88,8 @@ test('marshalPositionListData should return the Positions without balances', asy
       conditions: [],
       wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
       createTimestamp: '1571930105',
+      conditionIds: [],
+      indexSets: [],
     },
     {
       id: 'Position2',
@@ -97,6 +99,8 @@ test('marshalPositionListData should return the Positions without balances', asy
       conditions: [],
       wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
       createTimestamp: '1571930105',
+      conditionIds: [],
+      indexSets: [],
     },
   ]
 
@@ -113,6 +117,8 @@ test('marshalPositionListData should return the Positions with some balances', a
       conditions: [],
       wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
       createTimestamp: '1571930105',
+      conditionIds: [],
+      indexSets: [],
     },
     {
       id: 'Position2',
@@ -122,6 +128,8 @@ test('marshalPositionListData should return the Positions with some balances', a
       conditions: [],
       wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
       createTimestamp: '1571930105',
+      conditionIds: [],
+      indexSets: [],
     },
   ]
 

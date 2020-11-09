@@ -1,6 +1,7 @@
 import { BigNumber } from 'ethers/utils'
 
-import { GetCondition_condition, GetPosition_position } from 'types/generatedGQLForCTE'
+import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
+import { GetCondition_condition } from 'types/generatedGQLForCTE'
 import {
   arePositionMergeables,
   arePositionMergeablesByCondition,
@@ -8,7 +9,6 @@ import {
   getRedeemedBalance,
   getRedeemedPreview,
   indexSetFromOutcomes,
-  indexSetsByCondition,
   isConditionFullIndexSet,
   isDisjointPartition,
   isFullIndexSetPartition,
@@ -27,533 +27,387 @@ test('positionString should return the rigth Positions string', async () => {
   ).toStrictEqual('[DAI C:0x123 O:0 & C:0x345 O:0|2] x10.00')
 })
 
-const positions: GetPosition_position[] = [
+const positions: PositionWithUserBalanceWithDecimals[] = [
   {
-    activeValue: '1000000000000000000',
-    collateralToken: {
-      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-      __typename: 'CollateralToken',
-    },
-    wrappedToken: {
-      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-      __typename: 'WrappedToken',
-    },
-    collection: {
-      conditionIds: ['0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f'],
-      conditions: [
-        {
-          creator: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          id: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
-          oracle: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          outcomeSlotCount: 3,
-          payoutDenominator: '100',
-          payoutNumerators: ['25', '50', '25'],
-          payouts: ['0.25', '0.50', '0.25'],
-          questionId: '0xf9ff13c514572a600f9ea2795eeded39002e0ae5d2d055664d0e7def481e62c3',
-          resolved: true,
-          __typename: 'Condition',
-        },
-      ],
-      id: '0x0a62065a29201b69b9ad309abe4e2a39ecfea5bc6aeb37df6fe01f8d0afea5fd',
-      indexSets: ['2'],
-      positions: [
-        {
-          id: '0x0b12077261024ae2cfa078cc329234dabae53e38bb68d14005027e66105b4332',
-          __typename: 'Position',
-        },
-      ],
-      __typename: 'Collection',
-    },
-    conditionIds: ['0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f'],
-    conditions: [
-      {
-        id: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
-        outcomeSlotCount: 3,
-        __typename: 'Condition',
-      },
-    ],
     id: '0x0b12077261024ae2cfa078cc329234dabae53e38bb68d14005027e66105b4332',
     indexSets: ['2'],
-    __typename: 'Position',
-  },
-  {
-    activeValue: '1000000000000000000',
-    collateralToken: {
-      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-      __typename: 'CollateralToken',
-    },
-    wrappedToken: {
-      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-      __typename: 'WrappedToken',
-    },
-    collection: {
-      conditionIds: ['0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f'],
-      conditions: [
-        {
-          creator: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          id: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
-          oracle: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          outcomeSlotCount: 3,
-          payoutDenominator: '100',
-          payoutNumerators: ['25', '50', '25'],
-          payouts: ['0.25', '0.50', '0.25'],
-          questionId: '0xf9ff13c514572a600f9ea2795eeded39002e0ae5d2d055664d0e7def481e62c3',
-          resolved: true,
-          __typename: 'Condition',
-        },
-      ],
-      id: '0x1339c2c62050329af1f9c07fff3069387006d853dbfdb302a9c0adbf4dbe391c',
-      indexSets: ['5'],
-      positions: [
-        {
-          id: '0x1673bab498c5019f2a9eae23b5506eb9a5043b4b910c04c0cd529f27797a34dc',
-          __typename: 'Position',
-        },
-      ],
-      __typename: 'Collection',
-    },
     conditionIds: ['0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f'],
+    createTimestamp: 2,
+    collateralToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+    wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+    userBalanceERC1155: new BigNumber(1),
+    userBalanceERC20: new BigNumber(1),
     conditions: [
       {
-        id: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
+        conditionId: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
         outcomeSlotCount: 3,
-        __typename: 'Condition',
+        oracle: '',
+        questionId: '',
       },
     ],
+    userBalanceERC1155WithDecimals: '',
+    userBalanceERC20WithDecimals: '',
+    userBalanceERC1155Numbered: 0,
+    userBalanceERC20Numbered: 0,
+    collateralTokenERC1155: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
+    collateralTokenSymbol: 'USDC',
+    collateralTokenERC20: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
+    token: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
+  },
+  {
     id: '0x1673bab498c5019f2a9eae23b5506eb9a5043b4b910c04c0cd529f27797a34dc',
     indexSets: ['5'],
-    __typename: 'Position',
-  },
-  {
-    activeValue: '0',
-    collateralToken: {
-      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-      __typename: 'CollateralToken',
-    },
-    wrappedToken: {
-      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-      __typename: 'WrappedToken',
-    },
-    collection: {
-      conditionIds: [
-        '0xc1157d244e86a352e3a56c8f17c96bf58e6150a0c700d67e0906ec392bd812e3',
-        '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
-      ],
-      conditions: [
-        {
-          creator: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          id: '0xc1157d244e86a352e3a56c8f17c96bf58e6150a0c700d67e0906ec392bd812e3',
-          oracle: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          outcomeSlotCount: 2,
-          payoutDenominator: '100',
-          payoutNumerators: ['75', '25'],
-          payouts: ['0.75', '0.25'],
-          questionId: '0xf9ff13c514572a600f9ea2795eeded39002e0ae5d2d055664d0e7def481e62c7',
-          resolved: true,
-          __typename: 'Condition',
-        },
-        {
-          creator: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          id: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
-          oracle: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          outcomeSlotCount: 3,
-          payoutDenominator: '100',
-          payoutNumerators: ['25', '50', '25'],
-          payouts: ['0.25', '0.50', '0.25'],
-          questionId: '0xf9ff13c514572a600f9ea2795eeded39002e0ae5d2d055664d0e7def481e62c3',
-          resolved: true,
-          __typename: 'Condition',
-        },
-      ],
-      id: '0x04e783afdabafaad65a05f1b9c8ef4ea5b8226a116a65289c4cb79fb8331ade6',
-      indexSets: ['1', '5'],
-      positions: [
-        {
-          id: '0xae08dcc0c88f95ac5938445a2c3589229be7e928aa4cc7709c61535c45c4cdeb',
-          __typename: 'Position',
-        },
-      ],
-      __typename: 'Collection',
-    },
-    conditionIds: [
-      '0xc1157d244e86a352e3a56c8f17c96bf58e6150a0c700d67e0906ec392bd812e3',
-      '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
-    ],
+    conditionIds: ['0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f'],
+    createTimestamp: 2,
+    collateralToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+    wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+    userBalanceERC1155: new BigNumber(1),
+    userBalanceERC20: new BigNumber(1),
     conditions: [
       {
-        id: '0xc1157d244e86a352e3a56c8f17c96bf58e6150a0c700d67e0906ec392bd812e3',
-        outcomeSlotCount: 2,
-        __typename: 'Condition',
-      },
-      {
-        id: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
+        conditionId: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
         outcomeSlotCount: 3,
-        __typename: 'Condition',
+        oracle: '',
+        questionId: '',
       },
     ],
+    userBalanceERC1155WithDecimals: '',
+    userBalanceERC20WithDecimals: '',
+    userBalanceERC1155Numbered: 0,
+    userBalanceERC20Numbered: 0,
+    collateralTokenERC1155: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
+    collateralTokenSymbol: 'USDC',
+    collateralTokenERC20: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
+    token: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
+  },
+  {
     id: '0xae08dcc0c88f95ac5938445a2c3589229be7e928aa4cc7709c61535c45c4cdeb',
     indexSets: ['1', '5'],
-    __typename: 'Position',
-  },
-  {
-    activeValue: '0',
-    collateralToken: {
-      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-      __typename: 'CollateralToken',
-    },
-    wrappedToken: {
-      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-      __typename: 'WrappedToken',
-    },
-    collection: {
-      conditionIds: [
-        '0xc1157d244e86a352e3a56c8f17c96bf58e6150a0c700d67e0906ec392bd812e3',
-        '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
-      ],
-      conditions: [
-        {
-          creator: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          id: '0xc1157d244e86a352e3a56c8f17c96bf58e6150a0c700d67e0906ec392bd812e3',
-          oracle: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          outcomeSlotCount: 2,
-          payoutDenominator: '100',
-          payoutNumerators: ['75', '25'],
-          payouts: ['0.75', '0.25'],
-          questionId: '0xf9ff13c514572a600f9ea2795eeded39002e0ae5d2d055664d0e7def481e62c7',
-          resolved: true,
-          __typename: 'Condition',
-        },
-        {
-          creator: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          id: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
-          oracle: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          outcomeSlotCount: 3,
-          payoutDenominator: '100',
-          payoutNumerators: ['25', '50', '25'],
-          payouts: ['0.25', '0.50', '0.25'],
-          questionId: '0xf9ff13c514572a600f9ea2795eeded39002e0ae5d2d055664d0e7def481e62c3',
-          resolved: true,
-          __typename: 'Condition',
-        },
-      ],
-      id: '0x512cbec0414bb6acd477f4469167c2e5a29287e9ccc5ff2a1b491a8436cc7e47',
-      indexSets: ['2', '5'],
-      positions: [
-        {
-          id: '0xfb66d52cfff63f2a23b4456c3636383888cc2ec313513cf736c8acae67c53e29',
-          __typename: 'Position',
-        },
-      ],
-      __typename: 'Collection',
-    },
     conditionIds: [
       '0xc1157d244e86a352e3a56c8f17c96bf58e6150a0c700d67e0906ec392bd812e3',
       '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
     ],
+    createTimestamp: 2,
+    collateralToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+    wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+    userBalanceERC1155: new BigNumber(1),
+    userBalanceERC20: new BigNumber(1),
     conditions: [
       {
-        id: '0xc1157d244e86a352e3a56c8f17c96bf58e6150a0c700d67e0906ec392bd812e3',
+        conditionId: '0xc1157d244e86a352e3a56c8f17c96bf58e6150a0c700d67e0906ec392bd812e3',
         outcomeSlotCount: 2,
-        __typename: 'Condition',
+        oracle: '',
+        questionId: '',
       },
       {
-        id: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
+        conditionId: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
         outcomeSlotCount: 3,
-        __typename: 'Condition',
+        oracle: '',
+        questionId: '',
       },
     ],
+    userBalanceERC1155WithDecimals: '',
+    userBalanceERC20WithDecimals: '',
+    userBalanceERC1155Numbered: 0,
+    userBalanceERC20Numbered: 0,
+    collateralTokenERC1155: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
+    collateralTokenSymbol: 'USDC',
+    collateralTokenERC20: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
+    token: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
+  },
+  {
     id: '0xfb66d52cfff63f2a23b4456c3636383888cc2ec313513cf736c8acae67c53e29',
     indexSets: ['2', '5'],
-    __typename: 'Position',
+    conditionIds: [
+      '0xc1157d244e86a352e3a56c8f17c96bf58e6150a0c700d67e0906ec392bd812e3',
+      '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
+    ],
+    createTimestamp: 2,
+    collateralToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+    wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+    userBalanceERC1155: new BigNumber(1),
+    userBalanceERC20: new BigNumber(1),
+    conditions: [
+      {
+        conditionId: '0xc1157d244e86a352e3a56c8f17c96bf58e6150a0c700d67e0906ec392bd812e3',
+        outcomeSlotCount: 2,
+        oracle: '',
+        questionId: '',
+      },
+      {
+        conditionId: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
+        outcomeSlotCount: 3,
+        oracle: '',
+        questionId: '',
+      },
+    ],
+    userBalanceERC1155WithDecimals: '',
+    userBalanceERC20WithDecimals: '',
+    userBalanceERC1155Numbered: 0,
+    userBalanceERC20Numbered: 0,
+    collateralTokenERC1155: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
+    collateralTokenSymbol: 'USDC',
+    collateralTokenERC20: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
+    token: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
   },
 ]
 
-const positionsUSDC: GetPosition_position[] = [
+const positionsUSDC: PositionWithUserBalanceWithDecimals[] = [
   {
-    activeValue: '1000000000000000000',
-    collateralToken: {
-      id: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
-      __typename: 'CollateralToken',
-    },
-    wrappedToken: {
-      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-      __typename: 'WrappedToken',
-    },
-    collection: {
-      conditionIds: ['0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f'],
-      conditions: [
-        {
-          creator: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          id: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
-          oracle: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          outcomeSlotCount: 3,
-          payoutDenominator: '100',
-          payoutNumerators: ['25', '50', '25'],
-          payouts: ['0.25', '0.50', '0.25'],
-          questionId: '0xf9ff13c514572a600f9ea2795eeded39002e0ae5d2d055664d0e7def481e62c3',
-          resolved: true,
-          __typename: 'Condition',
-        },
-      ],
-      id: '0x0a62065a29201b69b9ad309abe4e2a39ecfea5bc6aeb37df6fe01f8d0afea5fd',
-      indexSets: ['2'],
-      positions: [
-        {
-          id: '0x0b12077261024ae2cfa078cc329234dabae53e38bb68d14005027e66105b4332',
-          __typename: 'Position',
-        },
-      ],
-      __typename: 'Collection',
-    },
-    conditionIds: ['0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f'],
-    conditions: [
-      {
-        id: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
-        outcomeSlotCount: 3,
-        __typename: 'Condition',
-      },
-    ],
     id: '0x0b12077261024ae2cfa078cc329234dabae53e38bb68d14005027e66105b4332',
     indexSets: ['2'],
-    __typename: 'Position',
-  },
-  {
-    activeValue: '1000000000000000000',
-    collateralToken: {
-      id: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
-      __typename: 'CollateralToken',
-    },
-    wrappedToken: {
-      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-      __typename: 'WrappedToken',
-    },
-    collection: {
-      conditionIds: ['0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f'],
-      conditions: [
-        {
-          creator: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          id: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
-          oracle: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          outcomeSlotCount: 3,
-          payoutDenominator: '100',
-          payoutNumerators: ['25', '50', '25'],
-          payouts: ['0.25', '0.50', '0.25'],
-          questionId: '0xf9ff13c514572a600f9ea2795eeded39002e0ae5d2d055664d0e7def481e62c3',
-          resolved: true,
-          __typename: 'Condition',
-        },
-      ],
-      id: '0x1339c2c62050329af1f9c07fff3069387006d853dbfdb302a9c0adbf4dbe391c',
-      indexSets: ['4'],
-      positions: [
-        {
-          id: '0x1673bab498c5019f2a9eae23b5506eb9a5043b4b910c04c0cd529f27797a34dc',
-          __typename: 'Position',
-        },
-      ],
-      __typename: 'Collection',
-    },
     conditionIds: ['0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f'],
+    createTimestamp: 2,
+    collateralToken: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+    wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+    userBalanceERC1155: new BigNumber(1),
+    userBalanceERC20: new BigNumber(1),
     conditions: [
       {
-        id: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
+        conditionId: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
         outcomeSlotCount: 3,
-        __typename: 'Condition',
+        oracle: '',
+        questionId: '',
       },
     ],
+    userBalanceERC1155WithDecimals: '',
+    userBalanceERC20WithDecimals: '',
+    userBalanceERC1155Numbered: 0,
+    userBalanceERC20Numbered: 0,
+    collateralTokenERC1155: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
+    collateralTokenSymbol: 'USDC',
+    collateralTokenERC20: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
+    token: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
+  },
+  {
     id: '0x1673bab498c5019f2a9eae23b5506eb9a5043b4b910c04c0cd529f27797a34dc',
     indexSets: ['4'],
-    __typename: 'Position',
-  },
-  {
-    activeValue: '1000000000000000000',
-    collateralToken: {
-      id: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
-      __typename: 'CollateralToken',
-    },
-    wrappedToken: {
-      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-      __typename: 'WrappedToken',
-    },
-    collection: {
-      conditionIds: ['0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f'],
-      conditions: [
-        {
-          creator: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          id: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
-          oracle: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          outcomeSlotCount: 3,
-          payoutDenominator: '100',
-          payoutNumerators: ['25', '50', '25'],
-          payouts: ['0.25', '0.50', '0.25'],
-          questionId: '0xf9ff13c514572a600f9ea2795eeded39002e0ae5d2d055664d0e7def481e62c3',
-          resolved: true,
-          __typename: 'Condition',
-        },
-      ],
-      id: '0x1339c2c62050329af1f9c07fff3069387006d853dbfdb302a9c0adbf4dbe391c',
-      indexSets: ['1'],
-      positions: [
-        {
-          id: '0xed780c42f5d8d7d7cb9a4d81f63af01cf0c1a9c81e5c05dc12f846b077e75001',
-          __typename: 'Position',
-        },
-      ],
-      __typename: 'Collection',
-    },
     conditionIds: ['0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f'],
+    createTimestamp: 2,
+    collateralToken: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+    wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+    userBalanceERC1155: new BigNumber(1),
+    userBalanceERC20: new BigNumber(1),
     conditions: [
       {
-        id: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
+        conditionId: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
         outcomeSlotCount: 3,
-        __typename: 'Condition',
+        oracle: '',
+        questionId: '',
       },
     ],
+    userBalanceERC1155WithDecimals: '',
+    userBalanceERC20WithDecimals: '',
+    userBalanceERC1155Numbered: 0,
+    userBalanceERC20Numbered: 0,
+    collateralTokenERC1155: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
+    collateralTokenSymbol: 'USDC',
+    collateralTokenERC20: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
+    token: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
+  },
+  {
     id: '0xed780c42f5d8d7d7cb9a4d81f63af01cf0c1a9c81e5c05dc12f846b077e75001',
     indexSets: ['1'],
-    __typename: 'Position',
-  },
-  {
-    activeValue: '0',
-    collateralToken: {
-      id: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
-      __typename: 'CollateralToken',
-    },
-    wrappedToken: {
-      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-      __typename: 'WrappedToken',
-    },
-    collection: {
-      conditionIds: [
-        '0xc1157d244e86a352e3a56c8f17c96bf58e6150a0c700d67e0906ec392bd812e3',
-        '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
-      ],
-      conditions: [
-        {
-          creator: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          id: '0xc1157d244e86a352e3a56c8f17c96bf58e6150a0c700d67e0906ec392bd812e3',
-          oracle: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          outcomeSlotCount: 2,
-          payoutDenominator: '100',
-          payoutNumerators: ['75', '25'],
-          payouts: ['0.75', '0.25'],
-          questionId: '0xf9ff13c514572a600f9ea2795eeded39002e0ae5d2d055664d0e7def481e62c7',
-          resolved: true,
-          __typename: 'Condition',
-        },
-        {
-          creator: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          id: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
-          oracle: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          outcomeSlotCount: 3,
-          payoutDenominator: '100',
-          payoutNumerators: ['25', '50', '25'],
-          payouts: ['0.25', '0.50', '0.25'],
-          questionId: '0xf9ff13c514572a600f9ea2795eeded39002e0ae5d2d055664d0e7def481e62c3',
-          resolved: true,
-          __typename: 'Condition',
-        },
-      ],
-      id: '0x04e783afdabafaad65a05f1b9c8ef4ea5b8226a116a65289c4cb79fb8331ade6',
-      indexSets: ['1', '5'],
-      positions: [
-        {
-          id: '0xae08dcc0c88f95ac5938445a2c3589229be7e928aa4cc7709c61535c45c4cdeb',
-          __typename: 'Position',
-        },
-      ],
-      __typename: 'Collection',
-    },
-    conditionIds: [
-      '0xc1157d244e86a352e3a56c8f17c96bf58e6150a0c700d67e0906ec392bd812e3',
-      '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
-    ],
+    conditionIds: ['0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f'],
+    createTimestamp: 2,
+    collateralToken: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+    wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+    userBalanceERC1155: new BigNumber(1),
+    userBalanceERC20: new BigNumber(1),
     conditions: [
       {
-        id: '0xc1157d244e86a352e3a56c8f17c96bf58e6150a0c700d67e0906ec392bd812e3',
-        outcomeSlotCount: 2,
-        __typename: 'Condition',
-      },
-      {
-        id: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
+        conditionId: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
         outcomeSlotCount: 3,
-        __typename: 'Condition',
+        oracle: '',
+        questionId: '',
       },
     ],
+    userBalanceERC1155WithDecimals: '',
+    userBalanceERC20WithDecimals: '',
+    userBalanceERC1155Numbered: 0,
+    userBalanceERC20Numbered: 0,
+    collateralTokenERC1155: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
+    collateralTokenSymbol: 'USDC',
+    collateralTokenERC20: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
+    token: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
+  },
+  {
     id: '0xae08dcc0c88f95ac5938445a2c3589229be7e928aa4cc7709c61535c45c4cdeb',
     indexSets: ['1', '5'],
-    __typename: 'Position',
-  },
-  {
-    activeValue: '0',
-    collateralToken: {
-      id: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
-      __typename: 'CollateralToken',
-    },
-    wrappedToken: {
-      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-      __typename: 'WrappedToken',
-    },
-    collection: {
-      conditionIds: [
-        '0xc1157d244e86a352e3a56c8f17c96bf58e6150a0c700d67e0906ec392bd812e3',
-        '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
-      ],
-      conditions: [
-        {
-          creator: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          id: '0xc1157d244e86a352e3a56c8f17c96bf58e6150a0c700d67e0906ec392bd812e3',
-          oracle: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          outcomeSlotCount: 2,
-          payoutDenominator: '100',
-          payoutNumerators: ['75', '25'],
-          payouts: ['0.75', '0.25'],
-          questionId: '0xf9ff13c514572a600f9ea2795eeded39002e0ae5d2d055664d0e7def481e62c7',
-          resolved: true,
-          __typename: 'Condition',
-        },
-        {
-          creator: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          id: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
-          oracle: '0xc759678ef908eab0e9d94599da7b8848c0af35c2',
-          outcomeSlotCount: 3,
-          payoutDenominator: '100',
-          payoutNumerators: ['25', '50', '25'],
-          payouts: ['0.25', '0.50', '0.25'],
-          questionId: '0xf9ff13c514572a600f9ea2795eeded39002e0ae5d2d055664d0e7def481e62c3',
-          resolved: true,
-          __typename: 'Condition',
-        },
-      ],
-      id: '0x512cbec0414bb6acd477f4469167c2e5a29287e9ccc5ff2a1b491a8436cc7e47',
-      indexSets: ['2', '5'],
-      positions: [
-        {
-          id: '0xfb66d52cfff63f2a23b4456c3636383888cc2ec313513cf736c8acae67c53e29',
-          __typename: 'Position',
-        },
-      ],
-      __typename: 'Collection',
-    },
     conditionIds: [
       '0xc1157d244e86a352e3a56c8f17c96bf58e6150a0c700d67e0906ec392bd812e3',
       '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
     ],
+    createTimestamp: 2,
+    collateralToken: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+    wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+    userBalanceERC1155: new BigNumber(1),
+    userBalanceERC20: new BigNumber(1),
     conditions: [
       {
-        id: '0xc1157d244e86a352e3a56c8f17c96bf58e6150a0c700d67e0906ec392bd812e3',
+        conditionId: '0xc1157d244e86a352e3a56c8f17c96bf58e6150a0c700d67e0906ec392bd812e3',
         outcomeSlotCount: 2,
-        __typename: 'Condition',
+        oracle: '',
+        questionId: '',
       },
       {
-        id: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
+        conditionId: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
         outcomeSlotCount: 3,
-        __typename: 'Condition',
+        oracle: '',
+        questionId: '',
       },
     ],
+    userBalanceERC1155WithDecimals: '',
+    userBalanceERC20WithDecimals: '',
+    userBalanceERC1155Numbered: 0,
+    userBalanceERC20Numbered: 0,
+    collateralTokenERC1155: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
+    collateralTokenSymbol: 'USDC',
+    collateralTokenERC20: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
+    token: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
+  },
+  {
     id: '0xfb66d52cfff63f2a23b4456c3636383888cc2ec313513cf736c8acae67c53e29',
     indexSets: ['2', '5'],
-    __typename: 'Position',
+    conditionIds: [
+      '0xc1157d244e86a352e3a56c8f17c96bf58e6150a0c700d67e0906ec392bd812e3',
+      '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
+    ],
+    createTimestamp: 2,
+    collateralToken: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+    wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+    userBalanceERC1155: new BigNumber(1),
+    userBalanceERC20: new BigNumber(1),
+    conditions: [
+      {
+        conditionId: '0xc1157d244e86a352e3a56c8f17c96bf58e6150a0c700d67e0906ec392bd812e3',
+        outcomeSlotCount: 2,
+        oracle: '',
+        questionId: '',
+      },
+      {
+        conditionId: '0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f',
+        outcomeSlotCount: 3,
+        oracle: '',
+        questionId: '',
+      },
+    ],
+    userBalanceERC1155WithDecimals: '',
+    userBalanceERC20WithDecimals: '',
+    userBalanceERC1155Numbered: 0,
+    userBalanceERC20Numbered: 0,
+    collateralTokenERC1155: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
+    collateralTokenSymbol: 'USDC',
+    collateralTokenERC20: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
+    token: {
+      symbol: '',
+      address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+      decimals: 18,
+    },
   },
 ]
 
@@ -664,7 +518,7 @@ test('getRedeemedBalance should return the balance for multi outcome position', 
 
 test('getRedeemedPreview should return new position to redeem', async () => {
   expect(
-    getRedeemedPreview(positions[2], resolvedConditions[0], new BigNumber(`${1e19}`), {
+    getRedeemedPreview(positions[2], resolvedConditions[0].id, new BigNumber(`${1e19}`), {
       symbol: 'DAI',
       address: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
       decimals: 18,
@@ -674,7 +528,7 @@ test('getRedeemedPreview should return new position to redeem', async () => {
 
 test('getRedeemedPreview should return new collateral to redeem', async () => {
   expect(
-    getRedeemedPreview(positions[1], resolvedConditions[1], new BigNumber(`${1e19}`), {
+    getRedeemedPreview(positions[1], resolvedConditions[1].id, new BigNumber(`${1e19}`), {
       symbol: 'DAI',
       address: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
       decimals: 18,
@@ -709,36 +563,72 @@ test('#arePositionMergeables - positions should be mergeable', async () => {
 
 test('#arePositionMergeablesByCondition - positions should be mergeable by condition when fillIndexSet partition', async () => {
   expect(
-    arePositionMergeablesByCondition([positions[0], positions[1]], resolvedConditions[1])
+    arePositionMergeablesByCondition(
+      [positions[0], positions[1]],
+      resolvedConditions[1].id,
+      resolvedConditions[1].outcomeSlotCount
+    )
   ).toEqual(true)
   expect(
-    arePositionMergeablesByCondition([positions[2], positions[3]], resolvedConditions[0])
+    arePositionMergeablesByCondition(
+      [positions[2], positions[3]],
+      resolvedConditions[0].id,
+      resolvedConditions[0].outcomeSlotCount
+    )
   ).toEqual(true)
 })
 
 test('#arePositionMergeablesByCondition - positions should be mergeable by condition when disjoint not fillIndexSet partition', async () => {
   expect(
-    arePositionMergeablesByCondition([positionsUSDC[0], positionsUSDC[1]], resolvedConditions[1])
+    arePositionMergeablesByCondition(
+      [positionsUSDC[0], positionsUSDC[1]],
+      resolvedConditions[1].id,
+      resolvedConditions[1].outcomeSlotCount
+    )
   ).toEqual(true)
 })
 
 test('#isConditionFullIndexSet - should be false when positions are not mergeable', async () => {
-  expect(isConditionFullIndexSet([positions[0], positionsUSDC[1]], resolvedConditions[0])).toEqual(
-    false
-  )
-  expect(isConditionFullIndexSet(positions, resolvedConditions[0])).toEqual(false)
+  expect(
+    isConditionFullIndexSet(
+      [positions[0], positionsUSDC[1]],
+      resolvedConditions[0].id,
+      resolvedConditions[0].outcomeSlotCount
+    )
+  ).toEqual(false)
+  expect(
+    isConditionFullIndexSet(
+      positions,
+      resolvedConditions[0].id,
+      resolvedConditions[0].outcomeSlotCount
+    )
+  ).toEqual(false)
 })
 
 test('#isConditionFullIndexSet - should be false when positions are not mergeable', async () => {
-  expect(isConditionFullIndexSet([positions[0], positionsUSDC[1]], resolvedConditions[0])).toEqual(
-    false
-  )
-  expect(isConditionFullIndexSet(positions, resolvedConditions[0])).toEqual(false)
+  expect(
+    isConditionFullIndexSet(
+      [positions[0], positionsUSDC[1]],
+      resolvedConditions[0].id,
+      resolvedConditions[0].outcomeSlotCount
+    )
+  ).toEqual(false)
+  expect(
+    isConditionFullIndexSet(
+      positions,
+      resolvedConditions[0].id,
+      resolvedConditions[0].outcomeSlotCount
+    )
+  ).toEqual(false)
 })
 
 test('#isConditionFullIndexSet - should be false when positions are mergeable but not fullIndexSet', async () => {
   expect(
-    isConditionFullIndexSet([positionsUSDC[0], positionsUSDC[1]], resolvedConditions[1])
+    isConditionFullIndexSet(
+      [positionsUSDC[0], positionsUSDC[1]],
+      resolvedConditions[1].id,
+      resolvedConditions[1].outcomeSlotCount
+    )
   ).toEqual(false)
 })
 
@@ -746,7 +636,8 @@ test('#isConditionFullIndexSet - should be true', async () => {
   expect(
     isConditionFullIndexSet(
       [positionsUSDC[0], positionsUSDC[1], positionsUSDC[2]],
-      resolvedConditions[1]
+      resolvedConditions[1].id,
+      resolvedConditions[1].outcomeSlotCount
     )
   ).toEqual(true)
 })
@@ -785,21 +676,33 @@ test('isFullIndexSetPartition should work', async () => {
 
 test('getMergePreview should return new position when merging fullIndexSet partition', async () => {
   expect(
-    getMergePreview([positions[2], positions[3]], resolvedConditions[0], new BigNumber(`${1e19}`), {
-      symbol: 'DAI',
-      address: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-      decimals: 18,
-    } as Token)
+    getMergePreview(
+      [positions[2], positions[3]],
+      resolvedConditions[0].id,
+      new BigNumber(`${1e19}`),
+      {
+        symbol: 'DAI',
+        address: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+        decimals: 18,
+      } as Token,
+      resolvedConditions[0].outcomeSlotCount
+    )
   ).toStrictEqual('[DAI C:0xf583ac...20856f O:0|2] x10.00')
 })
 
 test('getMergePreview should return collateral when merging fullIndexSet partition', async () => {
   expect(
-    getMergePreview([positions[0], positions[2]], resolvedConditions[1], new BigNumber(`${1e19}`), {
-      symbol: 'DAI',
-      address: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-      decimals: 18,
-    } as Token)
+    getMergePreview(
+      [positions[0], positions[2]],
+      resolvedConditions[1].id,
+      new BigNumber(`${1e19}`),
+      {
+        symbol: 'DAI',
+        address: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+        decimals: 18,
+      } as Token,
+      resolvedConditions[1].outcomeSlotCount
+    )
   ).toStrictEqual('10.00 DAI')
 })
 
@@ -807,13 +710,14 @@ test('getMergePreview should return new position when merging non fullIndexSet p
   expect(
     getMergePreview(
       [positionsUSDC[0], positionsUSDC[1]],
-      resolvedConditions[1],
+      resolvedConditions[1].id,
       new BigNumber(`${1e7}`),
       {
         symbol: 'USDC',
         address: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
         decimals: 6,
-      } as Token
+      } as Token,
+      resolvedConditions[1].outcomeSlotCount
     )
   ).toStrictEqual('[USDC C:0xf583ac...20856f O:1|2] x10.00')
 })
