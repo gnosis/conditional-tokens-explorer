@@ -266,6 +266,19 @@ export const Contents: React.FC<Props> = ({ condition }) => {
               </FlexRow>
             }
           />
+
+          {openOmenMarkets && omenMarkets.length > 0 && (
+            <DisplayHashesTableModal
+              hashes={omenMarkets.map(({ id, question }) => {
+                return { hash: id, title: question?.title || undefined }
+              })}
+              isOpen={openOmenMarkets}
+              onRequestClose={() => setOpenOmenMarkets(false)}
+              title="Omen Markets"
+              titleTable="Market Name"
+              url={OMEN_URL_DAPP}
+            />
+          )}
         </Row>
       )}
       <Row cols="1fr">
@@ -274,19 +287,6 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           value={<DisplayTablePositions isLoading={loadingPositions} positions={positions || []} />}
         />
       </Row>
-
-      {openOmenMarkets && omenMarkets.length > 0 && (
-        <DisplayHashesTableModal
-          hashes={omenMarkets.map(({ id }) => {
-            return { hash: id }
-          })}
-          isOpen={openOmenMarkets}
-          onRequestClose={() => setOpenOmenMarkets(false)}
-          title="Omen Markets"
-          titleTable="Market Name"
-          url={OMEN_URL_DAPP}
-        />
-      )}
     </CenteredCard>
   )
 }

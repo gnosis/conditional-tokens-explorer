@@ -1,9 +1,12 @@
 import React, { useCallback } from 'react'
 import DataTable from 'react-data-table-component'
 
+import { ExternalLink } from 'components/navigation/ExternalLink'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
+import { FlexRow } from 'components/pureStyledComponents/FlexRow'
 import { Hash } from 'components/text/Hash'
 import { customStyles } from 'theme/tableCustomStyles'
+import { getOmenMarketURL } from 'util/tools'
 import { HashArray } from 'util/types'
 
 interface Props {
@@ -20,17 +23,26 @@ export const DisplayTableHashes = (props: Props) => {
     return [
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: HashArray) => {
-          return (
-            <Hash
-              externalLink
-              {...(url && { href: `/${url}/${row.hash}` })}
-              onClick={() => {
-                if (typeof callbackOnHistoryPush === 'function') callbackOnHistoryPush()
-              }}
-              value={row.hash}
-            />
-          )
+        cell: ({ hash, title }: HashArray) => {
+          if (title) {
+            return (
+              <FlexRow>
+                {title}
+                <ExternalLink href={getOmenMarketURL(hash)} />
+              </FlexRow>
+            )
+          } else {
+            return (
+              <Hash
+                externalLink
+                {...(url && { href: `/${url}/${hash}` })}
+                onClick={() => {
+                  if (typeof callbackOnHistoryPush === 'function') callbackOnHistoryPush()
+                }}
+                value={hash}
+              />
+            )
+          }
         },
         name: titleTable,
       },
