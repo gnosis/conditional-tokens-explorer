@@ -23,6 +23,7 @@ import { TitleValue } from 'components/text/TitleValue'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useConditionsList } from 'hooks/useConditionsList'
 import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
+import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { customStyles } from 'theme/tableCustomStyles'
 import { Conditions_conditions } from 'types/generatedGQLForCTE'
 import { getRealityQuestionUrl, isOracleRealitio, truncateStringInTheMiddle } from 'util/tools'
@@ -31,6 +32,7 @@ import {
   ConditionSearchOptions,
   ConditionType,
   ConditionTypeAll,
+  LocalStorageManagement,
   OracleFilterOptions,
   StatusOptions,
 } from 'util/types'
@@ -55,6 +57,8 @@ interface Props {
 
 export const SelectableConditionTable: React.FC<Props> = (props) => {
   const { _type: status, CPKService, address, networkConfig } = useWeb3ConnectedOrInfura()
+
+  const { getValue } = useLocalStorage(LocalStorageManagement.ConditionId)
 
   const {
     allowToDisplayOnlyConditionsToReport = false,
@@ -101,6 +105,14 @@ export const SelectableConditionTable: React.FC<Props> = (props) => {
   const debouncedHandlerTextToSearch = useDebounceCallback((conditionIdToSearch) => {
     setTextToSearch(conditionIdToSearch)
   }, 500)
+
+  useEffect(() => {
+    const localStorageCondition = getValue()
+    if (localStorageCondition) {
+      setTextToShow(localStorageCondition)
+      debouncedHandlerTextToSearch(localStorageCondition)
+    }
+  }, [getValue, debouncedHandlerTextToSearch])
 
   const onChangeSearch = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
