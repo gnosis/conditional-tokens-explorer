@@ -1,9 +1,8 @@
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
+import lodashUniqBy from 'lodash.uniqby'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Prompt } from 'react-router'
-import lodashUniqBy from 'lodash.uniqby'
-import lodashUniq from 'lodash.uniq'
 
 import { Button } from 'components/buttons/Button'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
@@ -24,6 +23,7 @@ import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Contex
 import { useCondition } from 'hooks/useCondition'
 import { useIsConditionResolved } from 'hooks/useIsConditionResolved'
 import { PositionWithUserBalanceWithDecimals, usePositionsList } from 'hooks/usePositionsList'
+import lodashUniq from 'lodash.uniq'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 import { ERC20Service } from 'services/erc20'
 import { getLogger } from 'util/logger'
