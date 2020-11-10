@@ -17,11 +17,12 @@ export const dataTableCSS = css`
       margin-bottom: 0 !important;
     }
 
-    &.inlineTable {
+    &.condensedTable {
       border: 1px solid ${(props) => props.theme.colors.lightGrey};
+      border-radius: 4px;
       box-shadow: none;
-      margin-bottom: 32px;
-      min-height: 170px;
+      margin-bottom: 24px;
+      min-height: 280px;
 
       .rdt_TableHeadRow {
         min-height: 38px;
@@ -32,10 +33,14 @@ export const dataTableCSS = css`
         min-height: 39px;
       }
 
+      .rdt_TableRow {
+        min-height: 40px;
+      }
+
       .rdt_TableCol,
       .rdt_TableCell {
-        padding-left: 15px;
-        padding-right: 15px;
+        padding-left: 12px;
+        padding-right: 12px;
       }
     }
 

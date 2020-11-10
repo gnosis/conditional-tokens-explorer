@@ -1,6 +1,6 @@
 import lodashClonedeep from 'lodash.clonedeep'
 import moment from 'moment'
-import React, { KeyboardEvent, useState, useCallback, useEffect, useMemo, ChangeEvent } from 'react'
+import React, { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Prompt } from 'react-router'
 import { useHistory } from 'react-router-dom'
@@ -292,7 +292,6 @@ export const PrepareCondition = () => {
   )
 
   const prepareCondition = useCallback(async () => {
-
     try {
       if (status === Web3ContextStatus.Connected && address) {
         setPrepareConditionStatus(Remote.loading())
