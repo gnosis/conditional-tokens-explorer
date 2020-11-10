@@ -492,7 +492,7 @@ export const Contents = () => {
             ? true
             : 'Are you sure you want to leave this page? The changes you made will be lost?'
         }
-        when={true}
+        when={selectedPositions.length > 0 || !amount.isZero() || !!conditionId}
       />
     </CenteredCard>
   )
