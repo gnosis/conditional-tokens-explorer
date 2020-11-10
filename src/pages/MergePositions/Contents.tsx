@@ -22,16 +22,16 @@ import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Contex
 import { useCondition } from 'hooks/useCondition'
 import { useIsConditionResolved } from 'hooks/useIsConditionResolved'
 import { PositionWithUserBalanceWithDecimals, usePositionsList } from 'hooks/usePositionsList'
-import { ConditionInformation } from 'hooks/utils'
+import lodashUniq from 'lodash.uniq'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 import { ERC20Service } from 'services/erc20'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import {
+  arePositionMergeablesByCondition,
   getFreeIndexSet,
   getFullIndexSet,
   getTokenSummary,
-  isDisjointPartition,
   isPartitionFullIndexSet,
   minBigNumber,
   positionString,
@@ -243,7 +243,26 @@ export const Contents = () => {
         setIsLoadingConditions(true)
         setIsLoadingMergeablePositions(true)
 
-        const positionsFiltered = positions.filter(
+        const positionsWithBalance = positions.filter(
+          (positionWithBalance: PositionWithUserBalanceWithDecimals) =>
+            //#1 Filter, only positions with balance
+            !positionWithBalance.userBalanceERC1155.isZero()
+        )
+
+        const conditionsOfSelectedPosition = position.conditions
+
+        //#2 Filter, allow only mergeable positions
+        const positionsMergeables = positionsWithBalance.filter((p) =>
+          conditionsOfSelectedPosition.some((condition) =>
+            arePositionMergeablesByCondition(
+              [position, p],
+              condition.conditionId,
+              condition.outcomeSlotCount
+            )
+          )
+        )
+
+        const positionsFiltered = positionsMergeables.filter(
           (positionWithBalance: PositionWithUserBalanceWithDecimals) =>
             //#1 Filter, only positions with balance
             !positionWithBalance.userBalanceERC1155.isZero() &&
@@ -254,11 +273,7 @@ export const Contents = () => {
               position.conditionIds.sort().join('') &&
             //#4 Filter, positions with the same collateral
             positionWithBalance.collateralToken.toLowerCase() ===
-              position.collateralToken.toLowerCase() &&
-            //#5 Filter, allow only disjoint positions
-            positionWithBalance.conditions.filter((condition: ConditionInformation) =>
-              isDisjointPartition(positionWithBalance.indexSets, condition.outcomeSlotCount)
-            ).length > 0
+              position.collateralToken.toLowerCase()
         )
 
         const positionsPromises = positionsFiltered.map(async (positionFiltered) => {
@@ -287,9 +302,7 @@ export const Contents = () => {
         )
 
         // Remove duplicates
-        const possibleConditions = conditionIds.filter(
-          (item, pos) => conditionIds.indexOf(item) === pos
-        )
+        const possibleConditions = lodashUniq(conditionIds)
 
         setConditionIds(possibleConditions)
         setMergeablePositions(possibleMergeablePositions)
