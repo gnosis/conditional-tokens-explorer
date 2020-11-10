@@ -194,7 +194,7 @@ export const ConditionsList: React.FC = () => {
 
   const buildMenuForRow = useCallback(
     (row: Conditions_conditions) => {
-      const { id, resolved, oracle } = row
+      const { id, oracle, resolved } = row
 
       const isAllowedToReport = address && address.toLowerCase() === oracle.toLowerCase()
 
