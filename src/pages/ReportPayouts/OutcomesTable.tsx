@@ -24,7 +24,10 @@ const THead = styled.thead``
 
 const TH = styled.th<{ textAlign?: string }>`
   background-color: ${(props) => props.theme.colors.whitesmoke3};
-  border: none;
+  border-bottom: solid 1px ${(props) => props.theme.border.colorDark};
+  border-left: none;
+  border-right: none;
+  border-top: none;
   color: ${(props) => props.theme.colors.textColor};
   font-size: 14px;
   font-weight: 600;
@@ -43,19 +46,15 @@ TH.defaultProps = {
   textAlign: 'left',
 }
 
-const TR = styled.tr`
-  &:last-child td {
-    border-bottom: solid 1px ${(props) => props.theme.border.colorDark};
-  }
-`
+const TR = styled.tr``
 
 const TBody = styled.tbody``
 
 const TD = styled.td<{ textAlign?: string }>`
-  border-bottom: none;
+  border-bottom: solid 1px ${(props) => props.theme.border.colorDark};
   border-left: none;
   border-right: none;
-  border-top: solid 1px ${(props) => props.theme.border.colorDark};
+  border-top: none;
   color: ${(props) => props.theme.colors.textColor};
   font-size: 15px;
   font-weight: 400;
@@ -66,8 +65,6 @@ const TD = styled.td<{ textAlign?: string }>`
 `
 
 const TextfieldProbability = styled(Textfield)`
-  margin-left: auto;
-
   border-bottom: solid 1px ${(props) => props.theme.colors.textColor};
   border-left: none;
   border-radius: 0;
@@ -77,6 +74,7 @@ const TextfieldProbability = styled(Textfield)`
   font-size: 15px;
   font-weight: 400;
   height: auto;
+  margin-left: auto;
   padding: 0 0 2px 0;
   text-align: right;
   width: 70px;
