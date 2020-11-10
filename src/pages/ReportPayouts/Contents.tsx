@@ -153,16 +153,8 @@ export const Contents: React.FC = () => {
       <SelectableConditionTable
         allowToDisplayOnlyConditionsToReport={true}
         onClearSelection={() => {
-          if (payouts.length > 0 || conditionId) {
-            if (
-              window.confirm(
-                `Are you sure you want to clear the filters? The changes you made will be lost?`
-              )
-            ) {
-              setPayouts([])
-              setConditionId('')
-            }
-          }
+          setPayouts([])
+          setConditionId('')
         }}
         onRowClicked={onRowClicked}
         refetch={transactionStatus.isSuccess()}
