@@ -17,6 +17,7 @@ import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentTe
 import { RadioButton } from 'components/pureStyledComponents/RadioButton'
 import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { SpinnerSize } from 'components/statusInfo/common'
 import { TableControls } from 'components/table/TableControls'
 import { FormatHash } from 'components/text/FormatHash'
 import { TitleValue } from 'components/text/TitleValue'
@@ -410,7 +411,7 @@ export const SelectableConditionTable: React.FC<Props> = (props) => {
             highlightOnHover
             noDataComponent={
               showSpinner ? (
-                <InlineLoading />
+                <InlineLoading size={SpinnerSize.small} />
               ) : status === Web3ContextStatus.Infura &&
                 selectedOracleValue === OracleFilterOptions.Current ? (
                 <EmptyContentText>User is not connected to wallet.</EmptyContentText>
