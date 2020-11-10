@@ -47,7 +47,7 @@ interface Props {
 }
 
 export const Contents: React.FC<Props> = ({ condition }) => {
-  const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
+  const { _type: status, address, networkConfig } = useWeb3ConnectedOrInfura()
 
   const { setValue } = useLocalStorage(LocalStorageManagement.ConditionId)
 
@@ -64,6 +64,10 @@ export const Contents: React.FC<Props> = ({ condition }) => {
   } = condition
 
   const isConnected = useMemo(() => status === Web3ContextStatus.Connected, [status])
+  const isAllowedToReport = useMemo(
+    () => address && address.toLowerCase() === oracle.toLowerCase(),
+    [address, oracle]
+  )
 
   const dropdownItems = useMemo(() => {
     return [
@@ -89,10 +93,10 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           setValue(conditionId)
         },
         text: 'Report Payouts',
-        disabled: resolved || !isConnected,
+        disabled: resolved || !isConnected || !isAllowedToReport,
       },
     ]
-  }, [setValue, conditionId, resolved, isConnected])
+  }, [setValue, conditionId, resolved, isConnected, isAllowedToReport])
 
   const { outcomesPrettier, question } = useQuestion(questionId, outcomeSlotCount)
   const isConditionFromOmen = useIsConditionFromOmen(oracle)

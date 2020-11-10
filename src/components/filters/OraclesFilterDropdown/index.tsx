@@ -1,4 +1,5 @@
 import React from 'react'
+import styled from 'styled-components'
 
 import { ButtonSelectLight } from 'components/buttons/ButtonSelectLight'
 import { DropdownItem, DropdownPosition } from 'components/common/Dropdown'
@@ -8,6 +9,8 @@ import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { getLogger } from 'util/logger'
 import { Oracle, OracleFilterOptions } from 'util/types'
 
+const Wrapper = styled.div``
+
 interface Props {
   onClick: (value: OracleFilterOptions, filter: string[]) => void
   value: string
@@ -16,7 +19,7 @@ interface Props {
 const logger = getLogger('Oracle Filter')
 
 export const OraclesFilterDropdown = ({ onClick, value }: Props) => {
-  const { CPKService, address, networkConfig } = useWeb3ConnectedOrInfura()
+  const { CPKService, address, networkConfig, ...restProps } = useWeb3ConnectedOrInfura()
   const oracles: Oracle[] = networkConfig.getOracles()
 
   const oraclesAdresses: string[] = oracles.map((oracle: Oracle) => oracle.address.toLowerCase())
@@ -60,7 +63,7 @@ export const OraclesFilterDropdown = ({ onClick, value }: Props) => {
   ]
 
   return (
-    <>
+    <Wrapper {...restProps}>
       <FilterTitle>Reporter / Oracle</FilterTitle>
       <FilterDropdown
         currentItem={oraclesItems.findIndex((oracleItem) => oracleItem.value === value)}
@@ -76,6 +79,6 @@ export const OraclesFilterDropdown = ({ onClick, value }: Props) => {
           </DropdownItem>
         ))}
       />
-    </>
+    </Wrapper>
   )
 }

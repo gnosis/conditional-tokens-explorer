@@ -258,9 +258,23 @@ export class ConditionalTokensService {
     }
   }
 
-  async reportPayouts(questionId: string, payouts: number[]): Promise<TransactionReceipt> {
-    const tx = await this.contract.reportPayouts(questionId, payouts)
-    return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
+  async reportPayouts(questionId: string, payouts: number[]): Promise<TransactionReceipt | void> {
+    const tx: TransactionResponse = await this.contract.reportPayouts(questionId, payouts, {
+      value: '0x0',
+      gasLimit: 2750000, // TODO - should we try to precalculate this?
+    })
+    logger.log(`Transaction hash: ${tx.hash}`)
+
+    return tx
+      .wait(CONFIRMATIONS_TO_WAIT)
+      .then((receipt: TransactionReceipt) => {
+        logger.log(`Transaction was mined in block ${receipt}`)
+        return receipt
+      })
+      .catch((error) => {
+        logger.error(error)
+        throw improveErrorMessage(error)
+      })
   }
 
   // Method  used to wrapp multiple erc1155

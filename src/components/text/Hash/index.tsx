@@ -16,7 +16,6 @@ const Wrapper = styled.span`
 
 const TextCSS = css`
   color: ${(props) => props.theme.colors.textColor};
-  font-family: 'Roboto Mono', monospace;
 `
 
 const Text = styled.span`
