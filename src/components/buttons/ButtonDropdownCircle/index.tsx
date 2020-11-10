@@ -23,6 +23,12 @@ const Wrapper = styled.button`
   user-select: none;
   width: 28px;
 
+  svg {
+    .fill {
+      fill: ${(props) => props.theme.colors.mediumGrey};
+    }
+  }
+
   &:hover {
     border-color: ${(props) => props.theme.colors.primary};
 
