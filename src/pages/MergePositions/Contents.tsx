@@ -2,6 +2,8 @@ import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Prompt } from 'react-router'
+import lodashUniqBy from 'lodash.uniqby'
+import lodashUniq from 'lodash.uniq'
 
 import { Button } from 'components/buttons/Button'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
@@ -22,7 +24,6 @@ import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Contex
 import { useCondition } from 'hooks/useCondition'
 import { useIsConditionResolved } from 'hooks/useIsConditionResolved'
 import { PositionWithUserBalanceWithDecimals, usePositionsList } from 'hooks/usePositionsList'
-import lodashUniq from 'lodash.uniq'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 import { ERC20Service } from 'services/erc20'
 import { getLogger } from 'util/logger'
@@ -120,13 +121,11 @@ export const Contents = () => {
     (item: MergeablePosition, index: number) => {
       logger.log(item, index)
       const { position } = item
-      const existPosition = selectedPositions.find(
-        (selectedPosition) => selectedPosition.id === position.id
-      )
-      if (!existPosition) {
-        setSelectedPositions([...selectedPositions, position])
-        setConditionId(position.conditions[0].conditionId)
-      }
+      const positions = [...selectedPositions, position]
+      const positionsUnique = lodashUniqBy(positions, 'id')
+
+      setSelectedPositions(positionsUnique)
+      setConditionId(position.conditions[0].conditionId)
     },
     [selectedPositions]
   )
@@ -238,6 +237,7 @@ export const Contents = () => {
 
       setMergeablePositions([])
       setConditionIds([])
+      setSelectedPositions([])
 
       if (positions && positions.length > 0 && !!position) {
         setIsLoadingConditions(true)
@@ -308,6 +308,7 @@ export const Contents = () => {
         setMergeablePositions(possibleMergeablePositions)
         setIsLoadingConditions(false)
         setIsLoadingMergeablePositions(false)
+        setSelectedPositions([position])
       }
     },
     [positions, CTService, provider]
