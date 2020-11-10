@@ -68,32 +68,30 @@ const TD = styled.td<{ textAlign?: string }>`
 const TextfieldProbability = styled(Textfield)`
   margin-left: auto;
 
-  input {
-    border-bottom: solid 1px ${(props) => props.theme.colors.textColor};
-    border-left: none;
-    border-radius: 0;
-    border-right: none;
-    border-top: none;
-    color: ${(props) => props.theme.colors.textColor};
-    font-size: 15px;
-    font-weight: 400;
-    height: auto;
-    padding: 0 0 2px 0;
-    text-align: right;
-    width: 70px;
+  border-bottom: solid 1px ${(props) => props.theme.colors.textColor};
+  border-left: none;
+  border-radius: 0;
+  border-right: none;
+  border-top: none;
+  color: ${(props) => props.theme.colors.textColor};
+  font-size: 15px;
+  font-weight: 400;
+  height: auto;
+  padding: 0 0 2px 0;
+  text-align: right;
+  width: 70px;
 
-    ::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-    ::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
+  ::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  ::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 
-    &:focus {
-      border-bottom-color: ${(props) => props.theme.colors.primary};
-    }
+  &:focus {
+    border-bottom-color: ${(props) => props.theme.colors.primary};
   }
 `
 
