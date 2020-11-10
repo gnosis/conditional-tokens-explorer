@@ -194,7 +194,9 @@ export const ConditionsList: React.FC = () => {
 
   const buildMenuForRow = useCallback(
     (row: Conditions_conditions) => {
-      const { id, resolved } = row
+      const { id, resolved, oracle } = row
+
+      const isAllowedToReport = address && address.toLowerCase() === oracle.toLowerCase()
 
       const menu = [
         {
@@ -224,13 +226,13 @@ export const ConditionsList: React.FC = () => {
           onClick: () => {
             setValue(id)
           },
-          disabled: resolved || !isConnected,
+          disabled: resolved || !isConnected || !isAllowedToReport,
         },
       ]
 
       return menu
     },
-    [setValue, isConnected]
+    [setValue, isConnected, address]
   )
 
   const handleRowClick = useCallback(
