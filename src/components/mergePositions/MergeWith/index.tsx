@@ -33,14 +33,14 @@ const MergeableStripedListItemText = styled.span`
 const MergeableItem: React.FC<{
   index: number
   item: MergeablePosition
-  onClick: (item: MergeablePosition, index: number) => void
+  onClick: (item: MergeablePosition, index: number, selected: boolean) => void
 }> = (props) => {
   const { index, item, onClick, ...restProps } = props
   const [selected, setSelected] = useState(false)
 
   const itemOnClick = () => {
     setSelected(!selected)
-    onClick(item, index)
+    onClick(item, index, !selected)
   }
 
   return (
@@ -54,7 +54,7 @@ const MergeableItem: React.FC<{
 interface Props {
   isLoading?: boolean
   mergeablePositions: Array<MergeablePosition> | undefined
-  onClick: (item: MergeablePosition, index: number) => void
+  onClick: (item: MergeablePosition, index: number, selected: boolean) => void
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   errorFetching: any
 }

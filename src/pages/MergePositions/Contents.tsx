@@ -118,14 +118,24 @@ export const Contents = () => {
   }, [])
 
   const onMergeableItemClick = useCallback(
-    (item: MergeablePosition, index: number) => {
-      logger.log(item, index)
+    (item: MergeablePosition, index: number, selected: boolean) => {
+      logger.log(item, index, selected)
       const { position } = item
-      const positions = [...selectedPositions, position]
-      const positionsUnique = lodashUniqBy(positions, 'id')
-
-      setSelectedPositions(positionsUnique)
-      setConditionId(position.conditions[0].conditionId)
+      if (selected) {
+        // Add element
+        const positions = [...selectedPositions, position]
+        const positionsUnique = lodashUniqBy(positions, 'id')
+        setSelectedPositions(positionsUnique)
+      } else {
+        // Remove element
+        const positions = [...selectedPositions]
+        const newIndex = selectedPositions.indexOf(item.position)
+        if (newIndex > -1) {
+          positions.splice(newIndex, 1)
+          setSelectedPositions(positions)
+        }
+      }
+      setConditionId(position?.conditions[0]?.conditionId)
     },
     [selectedPositions]
   )
