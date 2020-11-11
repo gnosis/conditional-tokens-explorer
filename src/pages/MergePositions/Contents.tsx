@@ -427,8 +427,8 @@ export const Contents = () => {
         clearFilters={clearFilters}
         onClearCallback={clearComponent}
         onRowClicked={onRowClicked}
-        selectedPosition={position}
         refetch={transactionStatus.isSuccess()}
+        selectedPosition={position}
       />
       <Row cols="1fr" marginBottomXL>
         <MergeWith

@@ -176,7 +176,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
       refetchPositions()
       refetchUserPositions()
     }
-  }, [refetch, refetchPositions, refetchUserPositions])
+  }, [refetch, refetchPositions, refetchUserPositions, onClearSearch])
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const defaultColumns: Array<any> = useMemo(

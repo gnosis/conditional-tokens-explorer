@@ -223,7 +223,7 @@ export const SelectableConditionTable: React.FC<Props> = (props) => {
       onClearSearch()
       refetchConditionList()
     }
-  }, [refetch, refetchConditionList])
+  }, [refetch, refetchConditionList, onClearSearch])
 
   const [conditionList, setConditionList] = useState<Conditions_conditions[]>([])
 

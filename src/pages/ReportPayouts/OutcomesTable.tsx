@@ -164,8 +164,8 @@ export const OutcomesTable = (props: Props) => {
                         event.preventDefault()
                       }
                     }}
-                    type="number"
                     placeholder="0.00"
+                    type="number"
                   />
                 </TD>
               </TR>
