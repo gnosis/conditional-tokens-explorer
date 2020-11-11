@@ -10,11 +10,14 @@ import {
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { SpinnerSize } from 'components/statusInfo/common'
 import { TitleValue } from 'components/text/TitleValue'
+import { MergeablePosition } from 'util/types'
 
 const Wrapper = styled.div``
 
 const MergeableStripedListItem = styled(StripedListItem)`
+  align-items: flex-start;
   cursor: pointer;
+  flex-wrap: nowrap;
   justify-content: flex-start;
   padding-left: 15px;
   padding-right: 15px;
@@ -25,43 +28,45 @@ const MergeableStripedListItem = styled(StripedListItem)`
   }
 `
 
+const CheckboxStyled = styled(Checkbox)`
+  margin-top: 3px;
+`
+
 const MergeableStripedListItemText = styled.span`
   margin-left: 8px;
 `
 
 const MergeableItem: React.FC<{
   index: number
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  item: any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onClick: (item: any, index: number) => void
+  item: MergeablePosition
+  onClick: (item: MergeablePosition, index: number, selected: boolean) => void
 }> = (props) => {
   const { index, item, onClick, ...restProps } = props
   const [selected, setSelected] = useState(false)
 
   const itemOnClick = () => {
     setSelected(!selected)
-    onClick(item, index)
+    onClick(item, index, !selected)
   }
 
   return (
     <MergeableStripedListItem onClick={itemOnClick} {...restProps}>
-      <Checkbox checked={selected} />
-      <MergeableStripedListItemText>{item.position}</MergeableStripedListItemText>
+      <CheckboxStyled checked={selected} />
+      <MergeableStripedListItemText>{item.positionPreview}</MergeableStripedListItemText>
     </MergeableStripedListItem>
   )
 }
 
 interface Props {
   isLoading?: boolean
+  mergeablePositions: Array<MergeablePosition> | undefined
+  onClick: (item: MergeablePosition, index: number, selected: boolean) => void
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  mergeablePositions: Array<any> | undefined
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onClick: (item: any, index: number) => void
+  errorFetching: any
 }
 
 export const MergeWith: React.FC<Props> = (props) => {
-  const { isLoading, mergeablePositions, onClick, ...restProps } = props
+  const { errorFetching, isLoading, mergeablePositions, onClick, ...restProps } = props
 
   return (
     <Wrapper {...restProps}>
@@ -69,13 +74,17 @@ export const MergeWith: React.FC<Props> = (props) => {
         title="Merge With"
         value={
           <StripedList minHeight="158px">
-            {mergeablePositions && mergeablePositions.length ? (
+            {mergeablePositions && mergeablePositions.length && !errorFetching ? (
               mergeablePositions.map((item, index) => (
                 <MergeableItem index={index} item={item} key={index} onClick={onClick} />
               ))
             ) : (
               <StripedListEmpty>
-                {isLoading ? <InlineLoading size={SpinnerSize.small} /> : 'No mergeable positions.'}
+                {isLoading && !errorFetching && <InlineLoading size={SpinnerSize.small} />}
+                {!isLoading &&
+                  errorFetching &&
+                  'There was an error fetching the positions. Try again.'}
+                {!isLoading && !errorFetching && 'No mergeable positions.'}
               </StripedListEmpty>
             )}
           </StripedList>

@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo } from 'react'
 
 import {
@@ -11,7 +10,6 @@ import { NetworkConfig } from 'config/networkConfig'
 import { useBalanceForPosition } from 'hooks/useBalanceForPosition'
 import { useCollateral } from 'hooks/useCollateral'
 import { GetCondition_condition, GetPosition_position } from 'types/generatedGQLForCTE'
-import { getRedeemedBalance, getRedeemedPreview } from 'util/tools'
 
 interface Props {
   position: Maybe<GetPosition_position>
@@ -20,7 +18,7 @@ interface Props {
 }
 
 export const PositionPreview = ({ condition, position }: Props) => {
-  const { balanceERC1155, refetch } = useBalanceForPosition(position?.id || '')
+  const { refetch } = useBalanceForPosition(position?.id || '')
   const { collateral: token } = useCollateral(position ? position.collateralToken.id : '')
 
   useEffect(() => {
@@ -29,20 +27,23 @@ export const PositionPreview = ({ condition, position }: Props) => {
     }
   }, [position, refetch])
 
-  const redeemedBalance = useMemo(
-    () =>
-      position && condition
-        ? getRedeemedBalance(position, condition, balanceERC1155)
-        : new BigNumber(0),
-    [position, condition, balanceERC1155]
-  )
+  // TODO: until we refactor this section with the new designs
+  // const redeemedBalance = useMemo(
+  //   () => new BigNumber(0),
+  //   position && condition
+  //     ? getRedeemedBalance(position, condition, balanceERC1155)
+  //     : new BigNumber(0),
+  //   []
+  // )
 
   const redeemedPreview = useMemo(() => {
     if (position && condition && token) {
-      return getRedeemedPreview(position, condition, redeemedBalance, token)
+      // TODO: until we refactor this section with the new designs
+      // return getRedeemedPreview(position, condition, redeemedBalance, token)
+      return ''
     }
     return ''
-  }, [position, condition, redeemedBalance, token])
+  }, [position, condition, token])
 
   return (
     <TitleValue

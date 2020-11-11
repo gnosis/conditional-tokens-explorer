@@ -174,7 +174,7 @@ export const buildQueryPositions = (options: PositionsListType = DEFAULT_OPTIONS
   const variablesClause = variablesClauseInternal ? `(${variablesClauseInternal})` : ''
 
   const query = gql`
-  query Positions ${variablesClause} {
+  query PositionsList ${variablesClause} {
     positions(first: 1000 ${whereClause} , orderBy: createTimestamp, orderDirection: desc) {
       ...PositionData
     }

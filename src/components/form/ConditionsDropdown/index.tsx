@@ -21,12 +21,11 @@ const IdsDropdown = styled(Dropdown)`
 `
 
 interface Props {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  conditions: Array<any> | undefined
+  conditions: Maybe<Array<string>>
   isLoading?: boolean
   onClick: (conditionId: string) => void
   title?: string
-  value: string | undefined
+  value: Maybe<string>
 }
 
 export const ConditionsDropdown: React.FC<Props> = (props) => {

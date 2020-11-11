@@ -7,10 +7,13 @@ export interface ConditionInformation {
   oracle: string
   questionId: string
   conditionId: string
+  outcomeSlotCount: number
 }
 
 export interface Position {
   id: string
+  indexSets: string[]
+  conditionIds: string[]
   createTimestamp: number
   collateralToken: string
   wrappedToken: Maybe<string>
@@ -29,6 +32,8 @@ export const marshalPositionListData = (
       : 0
     return {
       id: position.id,
+      indexSets: position.indexSets,
+      conditionIds: position.conditionIds,
       collateralToken: position.collateralToken.id,
       wrappedToken: position?.wrappedToken?.id,
       createTimestamp: position.createTimestamp,
@@ -40,6 +45,7 @@ export const marshalPositionListData = (
             oracle: condition.oracle,
             questionId: condition.questionId,
             conditionId: condition.id,
+            outcomeSlotCount: condition.outcomeSlotCount,
           }
         }) ?? [],
     } as Position
