@@ -165,6 +165,7 @@ export const OutcomesTable = (props: Props) => {
                       }
                     }}
                     type="number"
+                    placeholder="0.00"
                   />
                 </TD>
               </TR>
