@@ -5,6 +5,7 @@ const Wrapper = styled.div<{ flexDirection?: string }>`
   display: flex;
   flex-direction: ${(props) => props.flexDirection};
   margin: 0;
+  min-width: 0;
 `
 
 const Title = styled.h2<{ flexDirection?: string }>`

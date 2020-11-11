@@ -255,7 +255,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
       {error && !isLoading && <InfoCard message={error.message} title="Error" />}
       {!error && (
         <DataTable
-          className="outerTableWrapper inlineTable"
+          className="outerTableWrapper condensedTable"
           columns={getPositionsColumns()}
           customStyles={customStyles}
           data={showSpinner ? [] : positionList.length ? positionList : []}
@@ -279,7 +279,7 @@ export const SelectPositionModal: React.FC<Props> = (props) => {
         title={singlePosition ? 'Selected Position' : 'Selected Positions'}
         value={
           <DataTable
-            className="outerTableWrapper inlineTable"
+            className="outerTableWrapper condensedTable"
             columns={getSelectedColumns()}
             customStyles={customStyles}
             data={selectedPositions}

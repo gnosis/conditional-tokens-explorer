@@ -11,6 +11,8 @@ import { getLogger } from 'util/logger'
 
 const Wrapper = styled.div``
 
+const Rows = styled.div``
+
 const Row = styled.div`
   align-items: flex-end;
   column-gap: 8px;
@@ -41,6 +43,7 @@ const Date = styled(Textfield)`
   height: 32px;
   padding-left: 6px;
   padding-right: 6px;
+  position: relative;
 `
 
 interface Props {
@@ -53,7 +56,7 @@ interface Props {
 const logger = getLogger('DateFilter')
 
 export const DateFilter: React.FC<Props> = (props) => {
-  const { onChangeFrom, onChangeTo, onSubmit, title } = props
+  const { onChangeFrom, onChangeTo, onSubmit, title, ...restProps } = props
   const toDate = useRef<HTMLInputElement>(null)
   const fromDate = useRef<HTMLInputElement>(null)
 
@@ -107,13 +110,20 @@ export const DateFilter: React.FC<Props> = (props) => {
 
   const fromGreaterThanToError = React.useMemo(
     () =>
-      to && from && to < from ? <ErrorMessage>To should be greater than From</ErrorMessage> : null,
+      to && from && to < from ? (
+        <ErrorMessage>
+          <i>To</i> must be greater than <i>From</i>
+        </ErrorMessage>
+      ) : null,
     [from, to]
   )
+
   const datesValidityError = React.useMemo(
     () =>
       !validToDate || !validFromDate ? (
-        <ErrorMessage>{`Invalid date or out of range. Valid dates are from ${MIN_DATE} to ${MAX_DATE}`}</ErrorMessage>
+        <ErrorMessage>{`Date must be between ${moment(MIN_DATE).format('L')} and ${moment(
+          MAX_DATE
+        ).format('L')}`}</ErrorMessage>
       ) : null,
     [validToDate, validFromDate]
   )
@@ -141,37 +151,39 @@ export const DateFilter: React.FC<Props> = (props) => {
   }, [from, to, onSubmit])
 
   return (
-    <Wrapper>
+    <Wrapper {...restProps}>
       <FilterTitle>{title}</FilterTitle>
-      <Row>
-        <FieldWrapper>
-          <Label>From:</Label>
-          <Date
-            max={MAX_DATE}
-            min={MIN_DATE}
-            name="dateFrom"
-            onChange={onChangeFromInternal}
-            onKeyUp={onPressEnter}
-            ref={fromDate}
-            type="date"
-          />
-        </FieldWrapper>
-      </Row>
-      <Row>
-        <FieldWrapper>
-          <Label>To:</Label>
-          <Date
-            max={MAX_DATE}
-            min={MIN_DATE}
-            name="dateTo"
-            onChange={onChangeToInternal}
-            onKeyUp={onPressEnter}
-            ref={toDate}
-            type="date"
-          />
-        </FieldWrapper>
-        <ButtonFilterSubmit disabled={submitDisabled} onClick={onSubmitInternal} />
-      </Row>
+      <Rows className="dateFilterRows">
+        <Row className="dateFilterRow">
+          <FieldWrapper>
+            <Label>From:</Label>
+            <Date
+              max={MAX_DATE}
+              min={MIN_DATE}
+              name="dateFrom"
+              onChange={onChangeFromInternal}
+              onKeyUp={onPressEnter}
+              ref={fromDate}
+              type="date"
+            />
+          </FieldWrapper>
+        </Row>
+        <Row className="dateFilterRow">
+          <FieldWrapper>
+            <Label>To:</Label>
+            <Date
+              max={MAX_DATE}
+              min={MIN_DATE}
+              name="dateTo"
+              onChange={onChangeToInternal}
+              onKeyUp={onPressEnter}
+              ref={toDate}
+              type="date"
+            />
+          </FieldWrapper>
+          <ButtonFilterSubmit disabled={submitDisabled} onClick={onSubmitInternal} />
+        </Row>
+      </Rows>
       {(!!datesValidityError || !!fromGreaterThanToError) && (
         <ErrorContainer>
           {datesValidityError}
