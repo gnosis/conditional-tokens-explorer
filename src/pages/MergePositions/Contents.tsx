@@ -428,6 +428,7 @@ export const Contents = () => {
         onClearCallback={clearComponent}
         onRowClicked={onRowClicked}
         selectedPosition={position}
+        refetch={transactionStatus.isSuccess()}
       />
       <Row cols="1fr" marginBottomXL>
         <MergeWith
