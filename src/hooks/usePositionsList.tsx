@@ -60,6 +60,10 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
     variables['collateralSearch'] = CollateralValue?.value
   }
 
+  React.useEffect(() => {
+    if (TextToSearch.value) setData(Remote.loading())
+  }, [TextToSearch])
+
   const {
     data: positionsData,
     error: positionsError,
