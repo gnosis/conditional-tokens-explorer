@@ -105,7 +105,7 @@ export const SelectableConditionTable: React.FC<Props> = (props) => {
 
   const debouncedHandlerTextToSearch = useDebounceCallback((conditionIdToSearch) => {
     setTextToSearch(conditionIdToSearch)
-  }, 500)
+  }, 100)
 
   useEffect(() => {
     const localStorageCondition = getValue()
