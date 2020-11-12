@@ -480,6 +480,8 @@ export const PrepareCondition = () => {
     }
   }, [checkForExistingCondition, conditionIdPreview, isConditionAlreadyExist])
 
+  const customConditionFormHasErrors = Object.keys(errorsCustomCondition).length > 0
+
   return (
     <>
       <PageTitle>Prepare Condition</PageTitle>
@@ -579,12 +581,14 @@ export const PrepareCondition = () => {
                 <>
                   <Textfield
                     error={errorsCustomCondition.outcomesSlotCount && true}
+                    max={MAX_OUTCOMES}
+                    min={MIN_OUTCOMES}
                     name="outcomesSlotCount"
                     onChange={(e) =>
                       setValueCustomCondition('outcomesSlotCount', Number(e.target.value), true)
                     }
                     onKeyPress={(event: KeyboardEvent) => {
-                      if (event.key === '.') {
+                      if (event.key === '.' || event.key === '-') {
                         event.preventDefault()
                       }
                     }}
@@ -599,11 +603,11 @@ export const PrepareCondition = () => {
                   />
                   {errorsCustomCondition.outcomesSlotCount && (
                     <ErrorContainer>
-                      {errorsCustomCondition.outcomesSlotCount.type === 'max' && (
-                        <ErrorMessage>Too many outcome slots</ErrorMessage>
-                      )}
-                      {errorsCustomCondition.outcomesSlotCount.type === 'min' && (
-                        <ErrorMessage>There should be more than one outcome slot</ErrorMessage>
+                      {(errorsCustomCondition.outcomesSlotCount.type === 'max' ||
+                        errorsCustomCondition.outcomesSlotCount.type === 'min') && (
+                        <ErrorMessage>
+                          Conditions require between {MIN_OUTCOMES} and {MAX_OUTCOMES} outcomes
+                        </ErrorMessage>
                       )}
                       {errorsCustomCondition.outcomesSlotCount.type === 'required' && (
                         <ErrorMessage>Required field</ErrorMessage>
@@ -790,7 +794,7 @@ export const PrepareCondition = () => {
             <ErrorMessage>{error.message}</ErrorMessage>
           </ErrorContainer>
         )}
-        {newCustomConditionStatusInfo && (
+        {newCustomConditionStatusInfo && !customConditionFormHasErrors && (
           <StatusInfoInline
             status={newCustomConditionStatusInfo.status}
             title={newCustomConditionStatusInfo.title}
