@@ -87,7 +87,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
 
   const debouncedHandlerTextToSearch = useDebounceCallback((textToSearch) => {
     setTextToSearch(textToSearch)
-  }, 500)
+  }, 100)
 
   const onChangeSearch = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
