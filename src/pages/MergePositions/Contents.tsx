@@ -129,7 +129,7 @@ export const Contents = () => {
       } else {
         // Remove element
         const positions = [...selectedPositions]
-        const newIndex = selectedPositions.indexOf(item.position)
+        const newIndex = selectedPositions.indexOf(position)
         if (newIndex > -1) {
           positions.splice(newIndex, 1)
           setSelectedPositions(positions)
@@ -247,7 +247,9 @@ export const Contents = () => {
 
       setMergeablePositions([])
       setConditionIds([])
-      setSelectedPositions([])
+      setAmount(ZERO_BN)
+      setMergeResult('')
+      setSelectedPositions([position])
 
       if (positions && positions.length > 0 && !!position) {
         setIsLoadingConditions(true)
@@ -319,6 +321,7 @@ export const Contents = () => {
         setIsLoadingConditions(false)
         setIsLoadingMergeablePositions(false)
         setSelectedPositions([position])
+        setConditionId(possibleConditions[0])
       }
     },
     [positions, CTService, provider]
@@ -414,11 +417,12 @@ export const Contents = () => {
   const disabled = useMemo(
     () =>
       transactionStatus.isLoading() ||
-      !selectedPositions.length ||
+      selectedPositions.length < 2 ||
       !conditionId ||
       !position ||
-      amount.isZero(),
-    [transactionStatus, amount, selectedPositions, conditionId, position]
+      amount.isZero() ||
+      amount.gt(maxBalance),
+    [transactionStatus, amount, selectedPositions, conditionId, position, maxBalance]
   )
 
   return (
