@@ -105,7 +105,7 @@ export const SelectableConditionTable: React.FC<Props> = (props) => {
 
   const debouncedHandlerTextToSearch = useDebounceCallback((conditionIdToSearch) => {
     setTextToSearch(conditionIdToSearch)
-  }, 500)
+  }, 100)
 
   useEffect(() => {
     const localStorageCondition = getValue()
@@ -219,8 +219,11 @@ export const SelectableConditionTable: React.FC<Props> = (props) => {
   const { data, error, loading, refetch: refetchConditionList } = useConditionsList(advancedFilters)
 
   useEffect(() => {
-    if (refetch) refetchConditionList()
-  }, [refetch, refetchConditionList])
+    if (refetch) {
+      onClearSearch()
+      refetchConditionList()
+    }
+  }, [refetch, refetchConditionList, onClearSearch])
 
   const [conditionList, setConditionList] = useState<Conditions_conditions[]>([])
 

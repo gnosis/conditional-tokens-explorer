@@ -153,11 +153,18 @@ export const OutcomesTable = (props: Props) => {
                       const { value } = event.currentTarget
                       setPayout(+value, index)
                     }}
-                    onKeyPress={(event: KeyboardEvent) =>
-                      event.charCode === 8 || event.charCode === 0
-                        ? null
-                        : event.charCode >= 48 && event.charCode <= 57
-                    }
+                    onKeyPress={(event: KeyboardEvent) => {
+                      const characterCode = event.key
+                      if (characterCode === 'Backspace') return
+                      const characterNumber = Number(characterCode)
+
+                      if (
+                        !((characterNumber >= 0 && characterNumber <= 9) || characterCode === '.')
+                      ) {
+                        event.preventDefault()
+                      }
+                    }}
+                    placeholder="0.00"
                     type="number"
                   />
                 </TD>

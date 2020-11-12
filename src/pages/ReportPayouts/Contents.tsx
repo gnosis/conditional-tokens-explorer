@@ -180,6 +180,10 @@ export const Contents: React.FC = () => {
         {condition && status === Web3ContextStatus.Connected && !isOracleValidToReportPayout && (
           <Error>The connected user is a not allowed to report payouts</Error>
         )}
+        {condition &&
+          status === Web3ContextStatus.Connected &&
+          payouts.length > 0 &&
+          isPayoutsEmpty && <Error>At least one payout must be positive</Error>}
       </ErrorContainer>
       {isWorking && (
         <FullLoading

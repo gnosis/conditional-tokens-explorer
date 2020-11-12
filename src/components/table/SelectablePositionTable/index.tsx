@@ -49,6 +49,7 @@ interface Props {
   selectedPosition: Maybe<PositionWithUserBalanceWithDecimals>
   title?: string
   clearFilters: boolean
+  refetch?: boolean
 }
 
 export const SelectablePositionTable: React.FC<Props> = (props) => {
@@ -57,6 +58,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     hideTitle,
     onClearCallback,
     onRowClicked,
+    refetch,
     selectedPosition,
     title = 'Positions',
     ...restProps
@@ -85,7 +87,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
 
   const debouncedHandlerTextToSearch = useDebounceCallback((textToSearch) => {
     setTextToSearch(textToSearch)
-  }, 500)
+  }, 100)
 
   const onChangeSearch = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,7 +127,9 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     textToSearch,
   ])
 
-  const { data, error, loading } = usePositionsList(advancedFilters)
+  const { data, error, loading, refetchPositions, refetchUserPositions } = usePositionsList(
+    advancedFilters
+  )
 
   // #1 Filter, only positions with balance
   const positionsWithBalance = useMemo(
@@ -165,6 +169,14 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
       setPositionList([])
     }
   }, [setPositionList, positionsWithBalance])
+
+  useEffect(() => {
+    if (refetch) {
+      onClearSearch()
+      refetchPositions()
+      refetchUserPositions()
+    }
+  }, [refetch, refetchPositions, refetchUserPositions, onClearSearch])
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const defaultColumns: Array<any> = useMemo(
