@@ -461,7 +461,7 @@ export const Contents = (props: Props) => {
         />
       }
     >
-      <Row marginBottomXL>
+      <Row cols="1fr 1fr" marginBottomXL>
         <TitleValue
           title="Position Id"
           value={
