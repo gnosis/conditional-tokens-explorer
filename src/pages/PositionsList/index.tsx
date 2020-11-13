@@ -670,6 +670,7 @@ export const PositionsList = () => {
     isSearching,
     error,
   ])
+
   const isWorking = useMemo(
     () => transfer.isLoading() || transfer.isFailure() || transfer.isSuccess(),
     [transfer]

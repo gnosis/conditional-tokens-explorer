@@ -11,6 +11,11 @@ import { SearchField } from 'components/form/SearchField'
 import { Switch } from 'components/form/Switch'
 import { CompactFiltersLayout } from 'components/pureStyledComponents/CompactFiltersLayout'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
+import {
+  FilterResultsControl,
+  FilterResultsText,
+} from 'components/pureStyledComponents/FilterResultsText'
+import { FiltersSwitchWrapper } from 'components/pureStyledComponents/FiltersSwitchWrapper'
 import { RadioButton } from 'components/pureStyledComponents/RadioButton'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { SpinnerSize } from 'components/statusInfo/common'
@@ -73,6 +78,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
   const [textToSearch, setTextToSearch] = useState<string>('')
   const [resetPagination, setResetPagination] = useState<boolean>(false)
   const [showFilters, setShowFilters] = useState(false)
+  const [isFiltering, setIsFiltering] = useState(false)
 
   const [selectedCollateralFilter, setSelectedCollateralFilter] = useState<Maybe<string[]>>(null)
   const [selectedCollateralValue, setSelectedCollateralValue] = useState<string>(
@@ -146,12 +152,28 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     setResetPagination(!resetPagination)
     setSelectedToCreationDate(null)
     setSelectedFromCreationDate(null)
-    setSearchBy(PositionSearchOptions.PositionId)
-    setTextToSearch('')
     setSelectedCollateralFilter(null)
     setSelectedCollateralValue(CollateralFilterOptions.All)
     setWrappedCollateral(WrappedCollateralOptions.All)
   }, [resetPagination])
+
+  useEffect(() => {
+    setIsFiltering(
+      selectedToCreationDate !== null ||
+        selectedFromCreationDate !== null ||
+        wrappedCollateral !== WrappedCollateralOptions.All ||
+        selectedCollateralValue !== CollateralFilterOptions.All ||
+        wrappedCollateral !== WrappedCollateralOptions.All ||
+        selectedCollateralFilter !== null
+    )
+  }, [
+    isFiltering,
+    selectedCollateralFilter,
+    selectedCollateralValue,
+    selectedFromCreationDate,
+    selectedToCreationDate,
+    wrappedCollateral,
+  ])
 
   // Clear the filters on network change
   useEffect(() => {
@@ -238,15 +260,6 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     setShowFilters(!showFilters)
   }, [showFilters])
 
-  // Clear the filters
-  // useEffect(() => {
-  //   if (!showFilters) {
-  //     resetFilters()
-  //     onClearCallback()
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [showFilters])
-
   const isLoading = useMemo(() => !textToSearch && loading, [textToSearch, loading])
   const isSearching = useMemo(() => textToSearch && loading, [textToSearch, loading])
 
@@ -296,7 +309,19 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
                 value={textToShow}
               />
             }
-            start={<Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />}
+            start={
+              <FiltersSwitchWrapper>
+                <Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />
+                {(isFiltering || showFilters) && (
+                  <FilterResultsText>
+                    Showing filtered results -{' '}
+                    <FilterResultsControl disabled={!isFiltering} onClick={resetFilters}>
+                      Clear Filters
+                    </FilterResultsControl>
+                  </FilterResultsText>
+                )}
+              </FiltersSwitchWrapper>
+            }
           />
           <CompactFiltersLayout isVisible={showFilters}>
             <CollateralFilterDropdown
