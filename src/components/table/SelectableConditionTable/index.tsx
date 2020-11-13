@@ -391,13 +391,15 @@ export const SelectableConditionTable: React.FC<Props> = (props) => {
                 value={selectedConditionTypeValue}
               />
               <MinMaxFilter
+                onClear={() => console.log('Clear date min / max')}
                 onSubmit={(min, max) => {
                   setSelectedMinOutcomes(min)
                   setSelectedMaxOutcomes(max)
                 }}
-                title="Number Of Outcomes"
+                title="Outcomes"
               />
               <DateFilter
+                onClear={() => console.log('Clear date from / to')}
                 onSubmit={(from, to) => {
                   setSelectedFromCreationDate(from)
                   setSelectedToCreationDate(to)

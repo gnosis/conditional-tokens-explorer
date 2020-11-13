@@ -3,7 +3,11 @@ import styled from 'styled-components'
 
 import { ButtonFilterSubmit } from 'components/buttons/ButtonFilterSubmit'
 import { ErrorContainer, Error as ErrorMessage } from 'components/pureStyledComponents/Error'
-import { FilterTitle } from 'components/pureStyledComponents/FilterTitle'
+import {
+  FilterTitle,
+  FilterTitleButton,
+  FilterWrapper,
+} from 'components/pureStyledComponents/FilterTitle'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { MAX_OUTCOMES_ALLOWED, MIN_OUTCOMES_ALLOWED } from 'config/constants'
 
@@ -48,12 +52,13 @@ const TextFieldStyled = styled(Textfield)`
 interface Props {
   onChangeMin?: (event: React.ChangeEvent<HTMLInputElement>) => void
   onChangeMax?: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onClear?: () => void
   onSubmit: (min: Maybe<number>, max: Maybe<number>) => void
   title: string
 }
 
 export const MinMaxFilter: React.FC<Props> = (props) => {
-  const { onChangeMax, onChangeMin, onSubmit, title } = props
+  const { onChangeMax, onChangeMin, onClear, onSubmit, title } = props
 
   const [min, setMin] = React.useState<Maybe<number>>(null)
   const [max, setMax] = React.useState<Maybe<number>>(null)
@@ -121,7 +126,14 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
 
   return (
     <Wrapper>
-      <FilterTitle>{title}</FilterTitle>
+      <FilterWrapper>
+        <FilterTitle>{title}</FilterTitle>
+        {onClear && (
+          <FilterTitleButton disabled={emptyValues} onClick={onClear}>
+            Clear
+          </FilterTitleButton>
+        )}
+      </FilterWrapper>
       <Row>
         <FieldsWrapper>
           <TextFieldStyled

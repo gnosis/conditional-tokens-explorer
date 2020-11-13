@@ -441,15 +441,17 @@ export const ConditionsList: React.FC = () => {
               </SidebarRow>
               <SidebarRow>
                 <MinMaxFilter
+                  onClear={() => logger.log('Clear min / max')}
                   onSubmit={(min, max) => {
                     setSelectedMinOutcomes(min)
                     setSelectedMaxOutcomes(max)
                   }}
-                  title="Number Of Outcomes"
+                  title="Outcomes"
                 />
               </SidebarRow>
               <SidebarRow>
                 <DateFilter
+                  onClear={() => logger.log('Clear date from / to')}
                   onSubmit={(from, to) => {
                     setSelectedFromCreationDate(from)
                     setSelectedToCreationDate(to)

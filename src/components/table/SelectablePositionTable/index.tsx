@@ -314,6 +314,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
                 value={wrappedCollateral}
               />
               <DateFilter
+                onClear={() => console.log('Clear date from / to')}
                 onSubmit={(from, to) => {
                   setSelectedFromCreationDate(from)
                   setSelectedToCreationDate(to)

@@ -4,7 +4,11 @@ import styled from 'styled-components'
 
 import { ButtonFilterSubmit } from 'components/buttons/ButtonFilterSubmit'
 import { ErrorContainer, Error as ErrorMessage } from 'components/pureStyledComponents/Error'
-import { FilterTitle } from 'components/pureStyledComponents/FilterTitle'
+import {
+  FilterTitle,
+  FilterTitleButton,
+  FilterWrapper,
+} from 'components/pureStyledComponents/FilterTitle'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { MAX_DATE, MIN_DATE } from 'config/constants'
 import { getLogger } from 'util/logger'
@@ -49,6 +53,7 @@ const Date = styled(Textfield)`
 interface Props {
   onChangeFrom?: (event: React.ChangeEvent<HTMLInputElement>) => void
   onChangeTo?: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onClear?: () => void
   onSubmit: (from: Maybe<number>, to: Maybe<number>) => void
   title: string
 }
@@ -56,7 +61,7 @@ interface Props {
 const logger = getLogger('DateFilter')
 
 export const DateFilter: React.FC<Props> = (props) => {
-  const { onChangeFrom, onChangeTo, onSubmit, title, ...restProps } = props
+  const { onChangeFrom, onChangeTo, onClear, onSubmit, title, ...restProps } = props
   const toDate = useRef<HTMLInputElement>(null)
   const fromDate = useRef<HTMLInputElement>(null)
 
@@ -90,6 +95,7 @@ export const DateFilter: React.FC<Props> = (props) => {
   )
 
   const emptyValues = React.useMemo(() => !from && !to, [from, to])
+
   const validFromDate = React.useMemo(() => {
     if (fromDate && fromDate.current && fromDate.current.value) {
       return fromDate.current.checkValidity()
@@ -145,7 +151,14 @@ export const DateFilter: React.FC<Props> = (props) => {
 
   return (
     <Wrapper {...restProps}>
-      <FilterTitle>{title}</FilterTitle>
+      <FilterWrapper>
+        <FilterTitle>{title}</FilterTitle>
+        {onClear && (
+          <FilterTitleButton disabled={emptyValues} onClick={onClear}>
+            Clear
+          </FilterTitleButton>
+        )}
+      </FilterWrapper>
       <Rows className="dateFilterRows">
         <Row className="dateFilterRow">
           <FieldWrapper>
