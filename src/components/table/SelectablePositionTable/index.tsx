@@ -239,13 +239,13 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
   }, [showFilters])
 
   // Clear the filters
-  useEffect(() => {
-    if (!showFilters) {
-      resetFilters()
-      onClearCallback()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showFilters])
+  // useEffect(() => {
+  //   if (!showFilters) {
+  //     resetFilters()
+  //     onClearCallback()
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [showFilters])
 
   const isLoading = useMemo(() => !textToSearch && loading, [textToSearch, loading])
   const isSearching = useMemo(() => textToSearch && loading, [textToSearch, loading])

@@ -28,6 +28,11 @@ import { UnwrapModal } from 'components/modals/UnwrapModal'
 import { WrapModal } from 'components/modals/WrapModal'
 import { ExternalLink } from 'components/navigation/ExternalLink'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
+import {
+  FilterResultsControl,
+  FilterResultsText,
+} from 'components/pureStyledComponents/FilterResultsText'
+import { FiltersSwitchWrapper } from 'components/pureStyledComponents/FiltersSwitchWrapper'
 import { PageTitle } from 'components/pureStyledComponents/PageTitle'
 import { Sidebar } from 'components/pureStyledComponents/Sidebar'
 import { SidebarRow } from 'components/pureStyledComponents/SidebarRow'
@@ -108,6 +113,7 @@ export const PositionsList = () => {
 
   const [searchBy, setSearchBy] = useState<PositionSearchOptions>(PositionSearchOptions.PositionId)
   const [showFilters, setShowFilters] = useState(false)
+  const [isFiltering, setIsFiltering] = useState(false)
 
   const [openDisplayHashesTableModal, setOpenDisplayHashesTableModal] = useState(false)
   const [hashesTableModal, setHashesTableModal] = useState<Array<HashArray>>([])
@@ -137,12 +143,31 @@ export const PositionsList = () => {
     setResetPagination(!resetPagination)
     setSelectedToCreationDate(null)
     setSelectedFromCreationDate(null)
-    setSearchBy(PositionSearchOptions.PositionId)
-    setTextToSearch('')
+    // setSearchBy(PositionSearchOptions.PositionId)
+    // setTextToSearch('')
     setSelectedCollateralFilter(null)
     setSelectedCollateralValue(CollateralFilterOptions.All)
     setWrappedCollateral(WrappedCollateralOptions.All)
   }, [resetPagination])
+
+  useEffect(() => {
+    setIsFiltering(
+      selectedToCreationDate !== null ||
+        selectedFromCreationDate !== null ||
+        wrappedCollateral !== WrappedCollateralOptions.All ||
+        selectedCollateralValue !== CollateralFilterOptions.All ||
+        wrappedCollateral !== WrappedCollateralOptions.All ||
+        selectedCollateralFilter !== null
+    )
+    console.log({ isFiltering })
+  }, [
+    isFiltering,
+    selectedCollateralFilter,
+    selectedCollateralValue,
+    selectedFromCreationDate,
+    selectedToCreationDate,
+    wrappedCollateral,
+  ])
 
   // Clear the filters
   // useEffect(() => {
@@ -190,6 +215,7 @@ export const PositionsList = () => {
     loading,
     transfer,
   ])
+
   const isSearching = useMemo(() => textToSearch && loading, [textToSearch, loading])
 
   const isConnected = useMemo(() => status === Web3ContextStatus.Connected, [status])
@@ -693,7 +719,19 @@ export const PositionsList = () => {
             value={textToShow}
           />
         }
-        start={<Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />}
+        start={
+          <FiltersSwitchWrapper>
+            <Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />
+            {(isFiltering || showFilters) && (
+              <FilterResultsText>
+                Showing filtered results -{' '}
+                <FilterResultsControl disabled={!isFiltering} onClick={resetFilters}>
+                  Clear Filters
+                </FilterResultsControl>
+              </FilterResultsText>
+            )}
+          </FiltersSwitchWrapper>
+        }
       />
       {error && !isLoading && <InfoCard message={error.message} title="Error" />}
       {!error && (
@@ -718,6 +756,7 @@ export const PositionsList = () => {
             </SidebarRow>
             <SidebarRow>
               <DateFilter
+                onClear={() => logger.log('Clear date from / to')}
                 onSubmit={(from, to) => {
                   setSelectedFromCreationDate(from)
                   setSelectedToCreationDate(to)
