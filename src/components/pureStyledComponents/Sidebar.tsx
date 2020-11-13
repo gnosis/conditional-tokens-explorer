@@ -7,5 +7,5 @@ export const Sidebar = styled(BaseCard)<{ isVisible?: boolean }>`
 `
 
 Sidebar.defaultProps = {
-  isVisible: false,
+  isVisible: true,
 }

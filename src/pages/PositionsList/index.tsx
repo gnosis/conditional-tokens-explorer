@@ -145,12 +145,12 @@ export const PositionsList = () => {
   }, [resetPagination])
 
   // Clear the filters
-  useEffect(() => {
-    if (!showFilters) {
-      resetFilters()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showFilters])
+  // useEffect(() => {
+  //   if (!showFilters) {
+  //     resetFilters()
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [showFilters])
 
   const advancedFilters: AdvancedFilterPosition = useMemo(() => {
     return {
@@ -698,36 +698,34 @@ export const PositionsList = () => {
       {error && !isLoading && <InfoCard message={error.message} title="Error" />}
       {!error && (
         <TwoColumnsCollapsibleLayout isCollapsed={!showFilters}>
-          {showFilters && (
-            <Sidebar>
-              <SidebarRow>
-                <CollateralFilterDropdown
-                  onClick={(symbol: string, address: Maybe<string[]>) => {
-                    setSelectedCollateralFilter(address)
-                    setSelectedCollateralValue(symbol)
-                  }}
-                  value={selectedCollateralValue}
-                />
-              </SidebarRow>
-              <SidebarRow>
-                <WrappedCollateralFilterDropdown
-                  onClick={(value: WrappedCollateralOptions) => {
-                    setWrappedCollateral(value)
-                  }}
-                  value={wrappedCollateral}
-                />
-              </SidebarRow>
-              <SidebarRow>
-                <DateFilter
-                  onSubmit={(from, to) => {
-                    setSelectedFromCreationDate(from)
-                    setSelectedToCreationDate(to)
-                  }}
-                  title="Creation Date"
-                />
-              </SidebarRow>
-            </Sidebar>
-          )}
+          <Sidebar isVisible={showFilters}>
+            <SidebarRow>
+              <CollateralFilterDropdown
+                onClick={(symbol: string, address: Maybe<string[]>) => {
+                  setSelectedCollateralFilter(address)
+                  setSelectedCollateralValue(symbol)
+                }}
+                value={selectedCollateralValue}
+              />
+            </SidebarRow>
+            <SidebarRow>
+              <WrappedCollateralFilterDropdown
+                onClick={(value: WrappedCollateralOptions) => {
+                  setWrappedCollateral(value)
+                }}
+                value={wrappedCollateral}
+              />
+            </SidebarRow>
+            <SidebarRow>
+              <DateFilter
+                onSubmit={(from, to) => {
+                  setSelectedFromCreationDate(from)
+                  setSelectedToCreationDate(to)
+                }}
+                title="Creation Date"
+              />
+            </SidebarRow>
+          </Sidebar>
           <DataTable
             className="outerTableWrapper"
             columns={getColumns()}

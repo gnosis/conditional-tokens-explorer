@@ -127,12 +127,12 @@ export const ConditionsList: React.FC = () => {
   }, [resetPagination])
 
   // Clear the filters
-  useEffect(() => {
-    if (!showFilters) {
-      resetFilters()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showFilters])
+  // useEffect(() => {
+  //   if (!showFilters) {
+  //     resetFilters()
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [showFilters])
 
   const advancedFilters: AdvancedFilterConditions = useMemo(() => {
     return {
