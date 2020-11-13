@@ -143,8 +143,6 @@ export const PositionsList = () => {
     setResetPagination(!resetPagination)
     setSelectedToCreationDate(null)
     setSelectedFromCreationDate(null)
-    // setSearchBy(PositionSearchOptions.PositionId)
-    // setTextToSearch('')
     setSelectedCollateralFilter(null)
     setSelectedCollateralValue(CollateralFilterOptions.All)
     setWrappedCollateral(WrappedCollateralOptions.All)
@@ -159,7 +157,6 @@ export const PositionsList = () => {
         wrappedCollateral !== WrappedCollateralOptions.All ||
         selectedCollateralFilter !== null
     )
-    console.log({ isFiltering })
   }, [
     isFiltering,
     selectedCollateralFilter,
@@ -168,14 +165,6 @@ export const PositionsList = () => {
     selectedToCreationDate,
     wrappedCollateral,
   ])
-
-  // Clear the filters
-  // useEffect(() => {
-  //   if (!showFilters) {
-  //     resetFilters()
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [showFilters])
 
   const advancedFilters: AdvancedFilterPosition = useMemo(() => {
     return {

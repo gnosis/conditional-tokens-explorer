@@ -21,6 +21,11 @@ import { SearchField } from 'components/form/SearchField'
 import { Switch } from 'components/form/Switch'
 import { ExternalLink } from 'components/navigation/ExternalLink'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
+import {
+  FilterResultsControl,
+  FilterResultsText,
+} from 'components/pureStyledComponents/FilterResultsText'
+import { FiltersSwitchWrapper } from 'components/pureStyledComponents/FiltersSwitchWrapper'
 import { PageTitle } from 'components/pureStyledComponents/PageTitle'
 import { Pill, PillTypes } from 'components/pureStyledComponents/Pill'
 import { Sidebar } from 'components/pureStyledComponents/Sidebar'
@@ -83,6 +88,7 @@ export const ConditionsList: React.FC = () => {
     ConditionSearchOptions.ConditionId
   )
   const [showFilters, setShowFilters] = useState(false)
+  const [isFiltering, setIsFiltering] = useState(false)
 
   const dropdownItems = useConditionsSearchOptions(setSearchBy)
 
@@ -122,17 +128,32 @@ export const ConditionsList: React.FC = () => {
     setSelectedMaxOutcomes(null)
     setSelectedToCreationDate(null)
     setSelectedFromCreationDate(null)
-    setSearchBy(ConditionSearchOptions.ConditionId)
-    setTextToSearch('')
   }, [resetPagination])
 
-  // Clear the filters
-  // useEffect(() => {
-  //   if (!showFilters) {
-  //     resetFilters()
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [showFilters])
+  useEffect(() => {
+    setIsFiltering(
+      selectedOracleValue !== OracleFilterOptions.All ||
+        selectedOracleFilter.length > 0 ||
+        selectedConditionTypeValue !== ConditionTypeAll.all ||
+        selectedConditionTypeFilter !== null ||
+        selectedStatus !== StatusOptions.All ||
+        selectedMinOutcomes !== null ||
+        selectedMaxOutcomes !== null ||
+        selectedToCreationDate !== null ||
+        selectedFromCreationDate !== null
+    )
+  }, [
+    isFiltering,
+    selectedConditionTypeFilter,
+    selectedConditionTypeValue,
+    selectedFromCreationDate,
+    selectedMaxOutcomes,
+    selectedMinOutcomes,
+    selectedOracleFilter.length,
+    selectedOracleValue,
+    selectedStatus,
+    selectedToCreationDate,
+  ])
 
   const advancedFilters: AdvancedFilterConditions = useMemo(() => {
     return {
@@ -405,7 +426,19 @@ export const ConditionsList: React.FC = () => {
             value={textToShow}
           />
         }
-        start={<Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />}
+        start={
+          <FiltersSwitchWrapper>
+            <Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />
+            {(isFiltering || showFilters) && (
+              <FilterResultsText>
+                Showing filtered results -{' '}
+                <FilterResultsControl disabled={!isFiltering} onClick={resetFilters}>
+                  Clear Filters
+                </FilterResultsControl>
+              </FilterResultsText>
+            )}
+          </FiltersSwitchWrapper>
+        }
       />
       {error && !isBytes32Error && !isLoading && <InfoCard message={error.message} title="Error" />}
       {(!error || isBytes32Error) && (
