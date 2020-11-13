@@ -367,47 +367,45 @@ export const SelectableConditionTable: React.FC<Props> = (props) => {
           {error && !isBytes32Error && !isLoading && (
             <InfoCard message={error.message} title="Error" />
           )}
-          {(!error || isBytes32Error) && showFilters && (
-            <CompactFiltersLayout>
-              <OraclesFilterDropdown
-                onClick={(value: OracleFilterOptions, filter: string[]) => {
-                  setSelectedOracleFilter(filter)
-                  setSelectedOracleValue(value)
-                  setResetPagination(!resetPagination)
-                }}
-                value={selectedOracleValue}
-              />
-              <StatusFilterDropdown
-                onClick={(value: StatusOptions) => {
-                  setSelectedStatus(value)
-                }}
-                value={selectedStatus}
-              />
-              <ConditionTypeFilterDropdown
-                onClick={(value: ConditionType | ConditionTypeAll, filter: Maybe<string>) => {
-                  setSelectedConditionTypeFilter(filter)
-                  setSelectedConditionTypeValue(value)
-                }}
-                value={selectedConditionTypeValue}
-              />
-              <MinMaxFilter
-                onClear={() => console.log('Clear date min / max')}
-                onSubmit={(min, max) => {
-                  setSelectedMinOutcomes(min)
-                  setSelectedMaxOutcomes(max)
-                }}
-                title="Outcomes"
-              />
-              <DateFilter
-                onClear={() => console.log('Clear date from / to')}
-                onSubmit={(from, to) => {
-                  setSelectedFromCreationDate(from)
-                  setSelectedToCreationDate(to)
-                }}
-                title="Creation Date"
-              />
-            </CompactFiltersLayout>
-          )}
+          <CompactFiltersLayout isVisible={(!error || isBytes32Error) && showFilters}>
+            <OraclesFilterDropdown
+              onClick={(value: OracleFilterOptions, filter: string[]) => {
+                setSelectedOracleFilter(filter)
+                setSelectedOracleValue(value)
+                setResetPagination(!resetPagination)
+              }}
+              value={selectedOracleValue}
+            />
+            <StatusFilterDropdown
+              onClick={(value: StatusOptions) => {
+                setSelectedStatus(value)
+              }}
+              value={selectedStatus}
+            />
+            <ConditionTypeFilterDropdown
+              onClick={(value: ConditionType | ConditionTypeAll, filter: Maybe<string>) => {
+                setSelectedConditionTypeFilter(filter)
+                setSelectedConditionTypeValue(value)
+              }}
+              value={selectedConditionTypeValue}
+            />
+            <MinMaxFilter
+              onClear={() => console.log('Clear date min / max')}
+              onSubmit={(min, max) => {
+                setSelectedMinOutcomes(min)
+                setSelectedMaxOutcomes(max)
+              }}
+              title="Outcomes"
+            />
+            <DateFilter
+              onClear={() => console.log('Clear date from / to')}
+              onSubmit={(from, to) => {
+                setSelectedFromCreationDate(from)
+                setSelectedToCreationDate(to)
+              }}
+              title="Creation Date"
+            />
+          </CompactFiltersLayout>
           <DataTable
             className="outerTableWrapper condensedTable"
             columns={columns}

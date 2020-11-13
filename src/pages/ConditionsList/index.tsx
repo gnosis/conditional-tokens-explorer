@@ -410,57 +410,55 @@ export const ConditionsList: React.FC = () => {
       {error && !isBytes32Error && !isLoading && <InfoCard message={error.message} title="Error" />}
       {(!error || isBytes32Error) && (
         <TwoColumnsCollapsibleLayout isCollapsed={!showFilters}>
-          {showFilters && (
-            <Sidebar>
-              <SidebarRow>
-                <OraclesFilterDropdown
-                  onClick={(value: OracleFilterOptions, filter: string[]) => {
-                    setSelectedOracleFilter(filter)
-                    setSelectedOracleValue(value)
-                    setResetPagination(!resetPagination)
-                  }}
-                  value={selectedOracleValue}
-                />
-              </SidebarRow>
-              <SidebarRow>
-                <StatusFilterDropdown
-                  onClick={(value: StatusOptions) => {
-                    setSelectedStatus(value)
-                  }}
-                  value={selectedStatus}
-                />
-              </SidebarRow>
-              <SidebarRow>
-                <ConditionTypeFilterDropdown
-                  onClick={(value: ConditionType | ConditionTypeAll, filter: Maybe<string>) => {
-                    setSelectedConditionTypeFilter(filter)
-                    setSelectedConditionTypeValue(value)
-                  }}
-                  value={selectedConditionTypeValue}
-                />
-              </SidebarRow>
-              <SidebarRow>
-                <MinMaxFilter
-                  onClear={() => logger.log('Clear min / max')}
-                  onSubmit={(min, max) => {
-                    setSelectedMinOutcomes(min)
-                    setSelectedMaxOutcomes(max)
-                  }}
-                  title="Outcomes"
-                />
-              </SidebarRow>
-              <SidebarRow>
-                <DateFilter
-                  onClear={() => logger.log('Clear date from / to')}
-                  onSubmit={(from, to) => {
-                    setSelectedFromCreationDate(from)
-                    setSelectedToCreationDate(to)
-                  }}
-                  title="Creation Date"
-                />
-              </SidebarRow>
-            </Sidebar>
-          )}
+          <Sidebar isVisible={showFilters}>
+            <SidebarRow>
+              <OraclesFilterDropdown
+                onClick={(value: OracleFilterOptions, filter: string[]) => {
+                  setSelectedOracleFilter(filter)
+                  setSelectedOracleValue(value)
+                  setResetPagination(!resetPagination)
+                }}
+                value={selectedOracleValue}
+              />
+            </SidebarRow>
+            <SidebarRow>
+              <StatusFilterDropdown
+                onClick={(value: StatusOptions) => {
+                  setSelectedStatus(value)
+                }}
+                value={selectedStatus}
+              />
+            </SidebarRow>
+            <SidebarRow>
+              <ConditionTypeFilterDropdown
+                onClick={(value: ConditionType | ConditionTypeAll, filter: Maybe<string>) => {
+                  setSelectedConditionTypeFilter(filter)
+                  setSelectedConditionTypeValue(value)
+                }}
+                value={selectedConditionTypeValue}
+              />
+            </SidebarRow>
+            <SidebarRow>
+              <MinMaxFilter
+                onClear={() => logger.log('Clear min / max')}
+                onSubmit={(min, max) => {
+                  setSelectedMinOutcomes(min)
+                  setSelectedMaxOutcomes(max)
+                }}
+                title="Outcomes"
+              />
+            </SidebarRow>
+            <SidebarRow>
+              <DateFilter
+                onClear={() => logger.log('Clear date from / to')}
+                onSubmit={(from, to) => {
+                  setSelectedFromCreationDate(from)
+                  setSelectedToCreationDate(to)
+                }}
+                title="Creation Date"
+              />
+            </SidebarRow>
+          </Sidebar>
           <DataTable
             className="outerTableWrapper"
             columns={columns}

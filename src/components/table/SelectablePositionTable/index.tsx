@@ -298,31 +298,29 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
             }
             start={<Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />}
           />
-          {showFilters && (
-            <CompactFiltersLayout>
-              <CollateralFilterDropdown
-                onClick={(symbol: string, address: Maybe<string[]>) => {
-                  setSelectedCollateralFilter(address)
-                  setSelectedCollateralValue(symbol)
-                }}
-                value={selectedCollateralValue}
-              />
-              <WrappedCollateralFilterDropdown
-                onClick={(value: WrappedCollateralOptions) => {
-                  setWrappedCollateral(value)
-                }}
-                value={wrappedCollateral}
-              />
-              <DateFilter
-                onClear={() => console.log('Clear date from / to')}
-                onSubmit={(from, to) => {
-                  setSelectedFromCreationDate(from)
-                  setSelectedToCreationDate(to)
-                }}
-                title="Creation Date"
-              />
-            </CompactFiltersLayout>
-          )}
+          <CompactFiltersLayout isVisible={showFilters}>
+            <CollateralFilterDropdown
+              onClick={(symbol: string, address: Maybe<string[]>) => {
+                setSelectedCollateralFilter(address)
+                setSelectedCollateralValue(symbol)
+              }}
+              value={selectedCollateralValue}
+            />
+            <WrappedCollateralFilterDropdown
+              onClick={(value: WrappedCollateralOptions) => {
+                setWrappedCollateral(value)
+              }}
+              value={wrappedCollateral}
+            />
+            <DateFilter
+              onClear={() => console.log('Clear date from / to')}
+              onSubmit={(from, to) => {
+                setSelectedFromCreationDate(from)
+                setSelectedToCreationDate(to)
+              }}
+              title="Creation Date"
+            />
+          </CompactFiltersLayout>
           <DataTable
             className="outerTableWrapper condensedTable"
             columns={defaultColumns}

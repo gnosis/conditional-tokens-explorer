@@ -1,8 +1,8 @@
 import styled from 'styled-components'
 
-export const CompactFiltersLayout = styled.div`
+export const CompactFiltersLayout = styled.div<{ isVisible?: boolean }>`
+  ${(props) => (props.isVisible ? 'display: grid;' : 'display: none;')}
   column-gap: 20px;
-  display: grid;
   grid-template-columns: 1fr 1fr;
   margin-bottom: 36px;
   row-gap: 20px;
@@ -37,3 +37,7 @@ export const CompactFiltersLayout = styled.div`
     }
   }
 `
+
+CompactFiltersLayout.defaultProps = {
+  isVisible: false,
+}
