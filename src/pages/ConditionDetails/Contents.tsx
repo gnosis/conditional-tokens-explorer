@@ -145,7 +145,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
         />
       }
     >
-      <Row marginBottomXL>
+      <Row cols="1fr 1fr">
         <TitleValue
           title="Condition Id"
           value={
@@ -211,7 +211,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           </Row>
         </>
       )}
-      <Row>
+      <Row cols="1fr 1fr" marginBottomXL>
         {isConditionFromOmen && resolved && (
           <TitleValue title="Resolution Date" value={formatTS(resolveTimestamp)} />
         )}

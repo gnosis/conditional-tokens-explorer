@@ -13,7 +13,6 @@ const Row = styled.div`
   column-gap: 8px;
   display: grid;
   grid-template-columns: 1fr 32px;
-  margin-bottom: 8px;
 
   &:last-child {
     margin-bottom: 0;
@@ -34,6 +33,7 @@ const Dash = styled.div`
 `
 
 const TextFieldStyled = styled(Textfield)`
+  -moz-appearance: textfield;
   font-size: 14px;
   height: 32px;
   min-width: 0;
@@ -126,6 +126,7 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
         <FieldsWrapper>
           <TextFieldStyled
             autoComplete="off"
+            max={MAX_OUTCOMES_ALLOWED}
             min={MIN_OUTCOMES_ALLOWED}
             name="min"
             onChange={onChangeMinInternal}
@@ -138,6 +139,7 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
           <TextFieldStyled
             autoComplete="off"
             max={MAX_OUTCOMES_ALLOWED}
+            min={MIN_OUTCOMES_ALLOWED}
             name="max"
             onChange={onChangeMaxInternal}
             onKeyPress={onKeyPress}

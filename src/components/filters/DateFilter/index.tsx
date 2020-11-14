@@ -110,13 +110,20 @@ export const DateFilter: React.FC<Props> = (props) => {
 
   const fromGreaterThanToError = React.useMemo(
     () =>
-      to && from && to < from ? <ErrorMessage>To should be greater than From</ErrorMessage> : null,
+      to && from && to < from ? (
+        <ErrorMessage>
+          <i>To</i> must be greater than <i>From</i>
+        </ErrorMessage>
+      ) : null,
     [from, to]
   )
+
   const datesValidityError = React.useMemo(
     () =>
       !validToDate || !validFromDate ? (
-        <ErrorMessage>{`Invalid date or out of range. Valid dates are from ${MIN_DATE} to ${MAX_DATE}`}</ErrorMessage>
+        <ErrorMessage>{`Date must be between ${moment(MIN_DATE).format('L')} and ${moment(
+          MAX_DATE
+        ).format('L')}`}</ErrorMessage>
       ) : null,
     [validToDate, validFromDate]
   )

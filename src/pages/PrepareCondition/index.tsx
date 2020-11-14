@@ -480,11 +480,17 @@ export const PrepareCondition = () => {
     }
   }, [checkForExistingCondition, conditionIdPreview, isConditionAlreadyExist])
 
+  const customConditionFormHasErrors = Object.keys(errorsCustomCondition).length > 0
+  const omenConditionFormHasHerros =
+    isQuestionAlreadyExist ||
+    Object.keys(errorsOmenCondition).length > 0 ||
+    outcomes.length < MIN_OUTCOMES_ALLOWED
+
   return (
     <>
       <PageTitle>Prepare Condition</PageTitle>
       <CenteredCard>
-        <Row cols="1fr">
+        <Row>
           <TitleValue
             title="Condition Type"
             value={
@@ -496,36 +502,127 @@ export const PrepareCondition = () => {
               />
             }
           />
-          {conditionType === ConditionType.custom && (
-            <TitleValue
-              title="Question Id"
-              value={
-                <>
-                  <Textfield
-                    autoComplete="off"
-                    error={errorsCustomCondition.questionId && true}
-                    name="questionId"
-                    onChange={(e) => setValueCustomCondition('questionId', e.target.value, true)}
-                    placeholder="Type in a question Id..."
-                    ref={registerCustomCondition({ required: true, pattern: BYTES_REGEX })}
-                    type="text"
-                  />
-                  {errorsCustomCondition.questionId && (
-                    <ErrorContainer>
-                      {errorsCustomCondition.questionId.type === 'required' && (
-                        <ErrorMessage>Required field</ErrorMessage>
-                      )}
-                      {errorsCustomCondition.questionId.type === 'pattern' && (
-                        <ErrorMessage>Invalid Question Id</ErrorMessage>
-                      )}
-                    </ErrorContainer>
-                  )}
-                </>
-              }
-            />
-          )}
-          {conditionType === ConditionType.omen && (
-            <>
+        </Row>
+        {conditionType === ConditionType.custom && (
+          <>
+            <Row>
+              <TitleValue
+                title="Question Id"
+                value={
+                  <>
+                    <Textfield
+                      autoComplete="off"
+                      error={errorsCustomCondition.questionId && true}
+                      name="questionId"
+                      onChange={(e) => setValueCustomCondition('questionId', e.target.value, true)}
+                      placeholder="Type in a question Id..."
+                      ref={registerCustomCondition({ required: true, pattern: BYTES_REGEX })}
+                      type="text"
+                    />
+                    {errorsCustomCondition.questionId && (
+                      <ErrorContainer>
+                        {errorsCustomCondition.questionId.type === 'required' && (
+                          <ErrorMessage>Required field</ErrorMessage>
+                        )}
+                        {errorsCustomCondition.questionId.type === 'pattern' && (
+                          <ErrorMessage>Invalid Question Id</ErrorMessage>
+                        )}
+                      </ErrorContainer>
+                    )}
+                  </>
+                }
+              />
+            </Row>
+            <Row>
+              <TitleValue
+                title="Outcomes"
+                value={
+                  <>
+                    <Textfield
+                      error={errorsCustomCondition.outcomesSlotCount && true}
+                      max={MAX_OUTCOMES}
+                      min={MIN_OUTCOMES}
+                      name="outcomesSlotCount"
+                      onChange={(e) =>
+                        setValueCustomCondition('outcomesSlotCount', Number(e.target.value), true)
+                      }
+                      onKeyPress={(event: KeyboardEvent) => {
+                        if (event.key === '.' || event.key === '-') {
+                          event.preventDefault()
+                        }
+                      }}
+                      placeholder={`You can add between ${MIN_OUTCOMES_ALLOWED} and ${MAX_OUTCOMES_ALLOWED} outcomes...`}
+                      ref={registerCustomCondition({
+                        required: true,
+                        min: MIN_OUTCOMES,
+                        max: MAX_OUTCOMES,
+                        pattern: INTEGER_NUMBER,
+                      })}
+                      type="number"
+                    />
+                    {errorsCustomCondition.outcomesSlotCount && (
+                      <ErrorContainer>
+                        {(errorsCustomCondition.outcomesSlotCount.type === 'max' ||
+                          errorsCustomCondition.outcomesSlotCount.type === 'min') && (
+                          <ErrorMessage>
+                            Conditions require between {MIN_OUTCOMES} and {MAX_OUTCOMES} outcomes
+                          </ErrorMessage>
+                        )}
+                        {errorsCustomCondition.outcomesSlotCount.type === 'required' && (
+                          <ErrorMessage>Required field</ErrorMessage>
+                        )}
+                        {errorsCustomCondition.outcomesSlotCount.type === 'pattern' && (
+                          <ErrorMessage>Decimal numbers are not allowed</ErrorMessage>
+                        )}
+                      </ErrorContainer>
+                    )}
+                  </>
+                }
+              />
+            </Row>
+            <Row>
+              <TitleValue
+                title="Reporting Address"
+                titleControl={
+                  <TitleControl onClick={onClickUseMyWallet}>Use My Wallet</TitleControl>
+                }
+                value={
+                  <>
+                    <Textfield
+                      autoComplete="off"
+                      error={errorsCustomCondition.oracle && true}
+                      name="oracle"
+                      onChange={(e) => setValueCustomCondition('oracle', e.target.value, true)}
+                      placeholder="Type in a valid reporting address..."
+                      ref={registerCustomCondition({
+                        required: true,
+                        pattern: ADDRESS_REGEX,
+                        validate: (value: string) => isAddress(value),
+                      })}
+                      type="text"
+                    />
+                    {errorsCustomCondition.oracle && (
+                      <ErrorContainer>
+                        {errorsCustomCondition.oracle.type === 'required' && (
+                          <ErrorMessage>Required field</ErrorMessage>
+                        )}
+                        {errorsCustomCondition.oracle.type === 'pattern' && (
+                          <ErrorMessage>Please use a valid reporting address</ErrorMessage>
+                        )}
+                        {errorsCustomCondition.oracle.type === 'validate' && (
+                          <ErrorMessage>Address checksum failed</ErrorMessage>
+                        )}
+                      </ErrorContainer>
+                    )}
+                  </>
+                }
+              />
+            </Row>
+          </>
+        )}
+        {conditionType === ConditionType.omen && (
+          <>
+            <Row>
               <TitleValue
                 title="Question"
                 value={
@@ -549,7 +646,9 @@ export const PrepareCondition = () => {
                   </>
                 }
               />
-              {isQuestionAlreadyExist && (
+            </Row>
+            {isQuestionAlreadyExist && (
+              <Row>
                 <StatusInfoInline status={StatusInfoType.warning}>
                   The question for this condition already exists on{' '}
                   <Link href={oracle.url} target="_blank">
@@ -557,76 +656,25 @@ export const PrepareCondition = () => {
                   </Link>
                   . Please change it to a different one.
                 </StatusInfoInline>
-              )}
-            </>
-          )}
-          {conditionType === ConditionType.omen && (
-            <>
-              <AddOutcome
-                addOutcome={addOutcome}
-                onChange={onChangeOutcome}
-                outcome={outcome}
-                outcomes={outcomes}
-                removeOutcome={removeOutcome}
-                updateOutcome={updateOutcome}
-              />
-            </>
-          )}
-          {conditionType === ConditionType.custom && (
-            <TitleValue
-              title="Outcomes"
-              value={
-                <>
-                  <Textfield
-                    error={errorsCustomCondition.outcomesSlotCount && true}
-                    name="outcomesSlotCount"
-                    onChange={(e) =>
-                      setValueCustomCondition('outcomesSlotCount', Number(e.target.value), true)
-                    }
-                    onKeyPress={(event: KeyboardEvent) => {
-                      if (event.key === '.') {
-                        event.preventDefault()
-                      }
-                    }}
-                    placeholder={`You can add between ${MIN_OUTCOMES_ALLOWED} and ${MAX_OUTCOMES_ALLOWED} outcomes...`}
-                    ref={registerCustomCondition({
-                      required: true,
-                      min: MIN_OUTCOMES,
-                      max: MAX_OUTCOMES,
-                      pattern: INTEGER_NUMBER,
-                    })}
-                    type="number"
-                  />
-                  {errorsCustomCondition.outcomesSlotCount && (
-                    <ErrorContainer>
-                      {errorsCustomCondition.outcomesSlotCount.type === 'max' && (
-                        <ErrorMessage>Too many outcome slots</ErrorMessage>
-                      )}
-                      {errorsCustomCondition.outcomesSlotCount.type === 'min' && (
-                        <ErrorMessage>There should be more than one outcome slot</ErrorMessage>
-                      )}
-                      {errorsCustomCondition.outcomesSlotCount.type === 'required' && (
-                        <ErrorMessage>Required field</ErrorMessage>
-                      )}
-                      {errorsCustomCondition.outcomesSlotCount.type === 'pattern' && (
-                        <ErrorMessage>Decimal numbers are not allowed</ErrorMessage>
-                      )}
-                    </ErrorContainer>
-                  )}
-                </>
-              }
+              </Row>
+            )}
+            <AddOutcome
+              addOutcome={addOutcome}
+              onChange={onChangeOutcome}
+              outcome={outcome}
+              outcomes={outcomes}
+              removeOutcome={removeOutcome}
+              updateOutcome={updateOutcome}
             />
-          )}
-        </Row>
-        <Row cols="1fr">
-          {conditionType === ConditionType.omen && (
-            <>
+            <Row>
               <TitleValue
                 title="Resolution Date"
                 value={
                   <>
                     <Textfield
                       error={errorsOmenCondition.resolutionDate && true}
+                      max={MAX_DATE}
+                      min={today}
                       name="resolutionDate"
                       onChange={(e) => {
                         if (e.target.checkValidity()) {
@@ -635,7 +683,6 @@ export const PrepareCondition = () => {
                           setErrorOmenCondition('resolutionDate', 'validity')
                         }
                       }}
-                      placeholder="MM/DD/YYYY"
                       ref={registerOmenCondition({
                         required: true,
                         min: today,
@@ -651,13 +698,17 @@ export const PrepareCondition = () => {
                         {['min', 'max', 'validity'].includes(
                           errorsOmenCondition.resolutionDate.type
                         ) && (
-                          <ErrorMessage>{`Invalid date or out of range. Valid dates are from today (${today}) to ${MAX_DATE}`}</ErrorMessage>
+                          <ErrorMessage>{`Date must between ${moment(today).format(
+                            'L'
+                          )} and ${moment(MAX_DATE).format('L')}`}</ErrorMessage>
                         )}
                       </ErrorContainer>
                     )}
                   </>
                 }
               />
+            </Row>
+            <Row>
               <StatusInfoInline status={StatusInfoType.warning}>
                 Set the market resolution date at least 6 days after the correct outcome will be
                 known and make sure that this market won&apos;t be{' '}
@@ -666,6 +717,8 @@ export const PrepareCondition = () => {
                 </Link>
                 .
               </StatusInfoInline>
+            </Row>
+            <Row>
               <TitleValue
                 title="Category"
                 value={
@@ -679,6 +732,8 @@ export const PrepareCondition = () => {
                   />
                 }
               />
+            </Row>
+            <Row>
               <TitleValue
                 title="Arbitrator"
                 value={
@@ -696,6 +751,8 @@ export const PrepareCondition = () => {
                   </>
                 }
               />
+            </Row>
+            <Row>
               <TitleValue
                 title="Oracle"
                 value={
@@ -733,45 +790,9 @@ export const PrepareCondition = () => {
                   </>
                 }
               />
-            </>
-          )}
-          {conditionType === ConditionType.custom && (
-            <TitleValue
-              title="Reporting Address"
-              titleControl={<TitleControl onClick={onClickUseMyWallet}>Use My Wallet</TitleControl>}
-              value={
-                <>
-                  <Textfield
-                    autoComplete="off"
-                    error={errorsCustomCondition.oracle && true}
-                    name="oracle"
-                    onChange={(e) => setValueCustomCondition('oracle', e.target.value, true)}
-                    placeholder="Type in a valid reporting address..."
-                    ref={registerCustomCondition({
-                      required: true,
-                      pattern: ADDRESS_REGEX,
-                      validate: (value: string) => isAddress(value),
-                    })}
-                    type="text"
-                  />
-                  {errorsCustomCondition.oracle && (
-                    <ErrorContainer>
-                      {errorsCustomCondition.oracle.type === 'required' && (
-                        <ErrorMessage>Required field</ErrorMessage>
-                      )}
-                      {errorsCustomCondition.oracle.type === 'pattern' && (
-                        <ErrorMessage>Please use a valid reporting address</ErrorMessage>
-                      )}
-                      {errorsCustomCondition.oracle.type === 'validate' && (
-                        <ErrorMessage>Address checksum failed</ErrorMessage>
-                      )}
-                    </ErrorContainer>
-                  )}
-                </>
-              }
-            />
-          )}
-        </Row>
+            </Row>
+          </>
+        )}
         {(prepareConditionStatus.isLoading() ||
           prepareConditionStatus.isFailure() ||
           prepareConditionStatus.isSuccess()) && (
@@ -787,14 +808,16 @@ export const PrepareCondition = () => {
             <ErrorMessage>{error.message}</ErrorMessage>
           </ErrorContainer>
         )}
-        {newCustomConditionStatusInfo && (
-          <StatusInfoInline
-            status={newCustomConditionStatusInfo.status}
-            title={newCustomConditionStatusInfo.title}
-          >
-            {newCustomConditionStatusInfo.contents}
-          </StatusInfoInline>
-        )}
+        {newCustomConditionStatusInfo &&
+          !customConditionFormHasErrors &&
+          !omenConditionFormHasHerros && (
+            <StatusInfoInline
+              status={newCustomConditionStatusInfo.status}
+              title={newCustomConditionStatusInfo.title}
+            >
+              {newCustomConditionStatusInfo.contents}
+            </StatusInfoInline>
+          )}
         <ButtonContainer>
           <Button disabled={submitDisabled} onClick={prepareCondition}>
             Prepare
