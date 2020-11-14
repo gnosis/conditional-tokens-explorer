@@ -5,7 +5,7 @@ export const FiltersSwitchWrapper = styled.div`
   position: relative;
 
   .filterResultsText {
-    bottom: -24px;
+    bottom: -23px;
     left: 2px;
     position: absolute;
   }
