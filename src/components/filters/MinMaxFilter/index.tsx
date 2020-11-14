@@ -7,9 +7,7 @@ import { FilterTitle } from 'components/pureStyledComponents/FilterTitle'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { MAX_OUTCOMES_ALLOWED, MIN_OUTCOMES_ALLOWED } from 'config/constants'
 
-const Wrapper = styled.div`
-  /* margin-bottom: 8px; */
-`
+const Wrapper = styled.div``
 
 const Row = styled.div`
   column-gap: 8px;

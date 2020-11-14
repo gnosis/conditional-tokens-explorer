@@ -17,6 +17,6 @@ export const Row = styled.div<{ cols?: string; marginBottomXL?: boolean }>`
 `
 
 Row.defaultProps = {
-  cols: '1fr 1fr',
+  cols: '1fr',
   marginBottomXL: false,
 }
