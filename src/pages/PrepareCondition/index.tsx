@@ -809,8 +809,8 @@ export const PrepareCondition = () => {
           </ErrorContainer>
         )}
         {newCustomConditionStatusInfo &&
-          !customConditionFormHasErrors &&
-          !omenConditionFormHasHerros && (
+          ((conditionType === ConditionType.custom && !customConditionFormHasErrors) ||
+            (conditionType === ConditionType.omen && !omenConditionFormHasHerros)) && (
             <StatusInfoInline
               status={newCustomConditionStatusInfo.status}
               title={newCustomConditionStatusInfo.title}
