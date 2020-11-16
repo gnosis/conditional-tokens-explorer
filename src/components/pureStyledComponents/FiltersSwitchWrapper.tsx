@@ -11,7 +11,7 @@ export const FiltersSwitchWrapper = styled.div`
   }
 
   .filterResultsTextAlternativeLayout {
-    bottom: -26px;
+    bottom: -28px;
     left: 2px;
     position: absolute;
   }

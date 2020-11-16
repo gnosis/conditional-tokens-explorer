@@ -392,7 +392,7 @@ export const SelectableConditionTable: React.FC<Props> = (props) => {
                 <Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />
                 {(isFiltering || showFilters) && (
                   <FilterResultsTextAlternativeLayout>
-                    Showing filtered results -{' '}
+                    Showing {isFiltering ? 'filtered' : 'all'} results -{' '}
                     <FilterResultsControl disabled={!isFiltering} onClick={resetFilters}>
                       Clear Filters
                     </FilterResultsControl>

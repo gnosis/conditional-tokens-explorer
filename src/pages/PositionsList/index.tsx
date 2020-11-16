@@ -714,7 +714,7 @@ export const PositionsList = () => {
             <Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />
             {(isFiltering || showFilters) && (
               <FilterResultsText>
-                Showing filtered results -{' '}
+                Showing {isFiltering ? 'filtered' : 'all'} results -{' '}
                 <FilterResultsControl disabled={!isFiltering} onClick={resetFilters}>
                   Clear Filters
                 </FilterResultsControl>
