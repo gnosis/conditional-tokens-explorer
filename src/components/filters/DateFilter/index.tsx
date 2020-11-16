@@ -11,7 +11,6 @@ import {
 } from 'components/pureStyledComponents/FilterTitle'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { MAX_DATE, MIN_DATE } from 'config/constants'
-import { getLogger } from 'util/logger'
 
 const Wrapper = styled.div``
 
@@ -58,8 +57,6 @@ interface Props {
   title: string
 }
 
-const logger = getLogger('DateFilter')
-
 export const DateFilter: React.FC<Props> = (props) => {
   const { onChangeFrom, onChangeTo, onClear, onSubmit, title, ...restProps } = props
   const toDate = useRef<HTMLInputElement>(null)
@@ -74,7 +71,10 @@ export const DateFilter: React.FC<Props> = (props) => {
         onChangeFrom(event)
       }
 
-      const fromTimestamp = moment(event.currentTarget.value).utc().startOf('day').unix()
+      const currentMinDate = moment(event.currentTarget.value).utc().startOf('day').unix()
+      const minDate = moment(MIN_DATE).utc().startOf('day').unix()
+
+      const fromTimestamp = currentMinDate < minDate ? minDate : currentMinDate
 
       setFrom(fromTimestamp)
     },
@@ -87,58 +87,22 @@ export const DateFilter: React.FC<Props> = (props) => {
         onChangeTo(event)
       }
 
-      const toTimestamp = moment(event.currentTarget.value).utc().endOf('day').unix()
+      const currentMaxDate = moment(event.currentTarget.value).utc().endOf('day').unix()
+      const maxDate = moment(MAX_DATE).utc().endOf('day').unix()
+
+      const toTimestamp = currentMaxDate > maxDate ? maxDate : currentMaxDate
 
       setTo(toTimestamp)
     },
     [onChangeTo]
   )
 
-  const emptyValues = React.useMemo(() => !from && !to, [from, to])
-
-  const validFromDate = React.useMemo(() => {
-    if (fromDate && fromDate.current && fromDate.current.value) {
-      return fromDate.current.checkValidity()
-    } else {
-      return true
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [from])
-
-  const validToDate = React.useMemo(() => {
-    if (toDate && toDate.current && toDate.current.value) {
-      return toDate.current.checkValidity()
-    } else {
-      return true
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [to])
-
-  const fromGreaterThanToError = React.useMemo(
-    () =>
-      to && from && to < from ? (
-        <ErrorMessage>
-          <i>To</i> must be greater than <i>From</i>
-        </ErrorMessage>
-      ) : null,
-    [from, to]
-  )
-
-  const datesValidityError = React.useMemo(
-    () =>
-      !validToDate || !validFromDate ? (
-        <ErrorMessage>{`Date must be between ${moment(MIN_DATE).format('L')} and ${moment(
-          MAX_DATE
-        ).format('L')}`}</ErrorMessage>
-      ) : null,
-    [validToDate, validFromDate]
-  )
-
-  const submitDisabled = !!fromGreaterThanToError || emptyValues || !!datesValidityError
+  const emptyValues = !from && !to
+  const fromGreaterThanToError = (to && from && to < from) || false
+  const submitDisabled = !!fromGreaterThanToError || emptyValues
 
   const onSubmitInternal = React.useCallback(() => {
     if ((from || to) && !submitDisabled) {
-      logger.log(from, to)
       onSubmit(from, to)
     }
   }, [from, to, onSubmit, submitDisabled])
@@ -197,10 +161,13 @@ export const DateFilter: React.FC<Props> = (props) => {
           <ButtonFilterSubmit disabled={submitDisabled} onClick={onSubmitInternal} />
         </Row>
       </Rows>
-      {(!!datesValidityError || !!fromGreaterThanToError) && (
+      {fromGreaterThanToError && (
         <ErrorContainer>
-          {datesValidityError}
-          {fromGreaterThanToError}
+          {fromGreaterThanToError && (
+            <ErrorMessage>
+              <i>To</i> must be greater than <i>From</i>
+            </ErrorMessage>
+          )}
         </ErrorContainer>
       )}
     </Wrapper>
