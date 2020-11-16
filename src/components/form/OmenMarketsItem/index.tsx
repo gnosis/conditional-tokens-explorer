@@ -6,8 +6,6 @@ import { DisplayHashesTableModal } from 'components/modals/DisplayHashesTableMod
 import { ExternalLink } from 'components/navigation/ExternalLink'
 import { FlexRow } from 'components/pureStyledComponents/FlexRow'
 import { Row } from 'components/pureStyledComponents/Row'
-import { InlineLoading } from 'components/statusInfo/InlineLoading'
-import { SpinnerSize } from 'components/statusInfo/common'
 import { TitleValue } from 'components/text/TitleValue'
 import { OMEN_URL_DAPP } from 'config/constants'
 import { useOmenMarkets } from 'hooks/useOmenMarkets'
@@ -40,7 +38,7 @@ export const OmenMarketsItem: React.FC<Props> = ({ conditionsIds, isConditionFro
   if (loadingOmenMarkets) {
     return (
       <Row>
-        <TitleValue title={'Omen Market'} value={<InlineLoading size={SpinnerSize.small} />} />
+        <TitleValue title={'Loading...'} value={'-'} />
       </Row>
     )
   }
@@ -78,7 +76,7 @@ export const OmenMarketsItem: React.FC<Props> = ({ conditionsIds, isConditionFro
       </Row>
     )
   } else {
-    return isConditionFromOmen ? (
+    return isConditionFromOmen && title ? (
       <Row cols="1fr" marginBottomXL>
         <TitleValue title="Question" value={title} />
       </Row>
