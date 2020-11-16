@@ -97,7 +97,11 @@ export const Contents: React.FC<Props> = ({ condition }) => {
 
   const { outcomesPrettier, question } = useQuestion(questionId, outcomeSlotCount)
   const isConditionFromOmen = useIsConditionFromOmen(oracle)
-  const { templateId = null, category = INFORMATION_NOT_AVAILABLE } = question ?? {}
+  const {
+    templateId = null,
+    title = INFORMATION_NOT_AVAILABLE,
+    category = INFORMATION_NOT_AVAILABLE,
+  } = question ?? {}
 
   const oracleName = useMemo(
     () =>
@@ -183,7 +187,11 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           }
         />
       </Row>
-      <OmenMarketsItem conditionsIds={[conditionId]} />
+      <OmenMarketsItem
+        conditionsIds={[conditionId]}
+        isConditionFromOmen={isConditionFromOmen}
+        title={title}
+      />
 
       {isConditionFromOmen && (
         <Row cols="1fr" marginBottomXL>

@@ -6,15 +6,19 @@ import { DisplayHashesTableModal } from 'components/modals/DisplayHashesTableMod
 import { ExternalLink } from 'components/navigation/ExternalLink'
 import { FlexRow } from 'components/pureStyledComponents/FlexRow'
 import { Row } from 'components/pureStyledComponents/Row'
+import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { SpinnerSize } from 'components/statusInfo/common'
 import { TitleValue } from 'components/text/TitleValue'
 import { OMEN_URL_DAPP } from 'config/constants'
 import { useOmenMarkets } from 'hooks/useOmenMarkets'
 
 interface Props {
   conditionsIds: string[]
+  title?: string
+  isConditionFromOmen?: boolean
 }
 
-export const OmenMarketsItem: React.FC<Props> = ({ conditionsIds }) => {
+export const OmenMarketsItem: React.FC<Props> = ({ conditionsIds, isConditionFromOmen, title }) => {
   const {
     data: dataOmenMarkets,
     error: errorOmenMarkets,
@@ -32,6 +36,14 @@ export const OmenMarketsItem: React.FC<Props> = ({ conditionsIds }) => {
 
   const areOmenMarketsMoreThanOne = useMemo(() => omenMarkets.length > 1, [omenMarkets])
   const firstMarket = useMemo(() => omenMarkets[0], [omenMarkets])
+
+  if (loadingOmenMarkets) {
+    return (
+      <Row>
+        <TitleValue title={'Omen Market'} value={<InlineLoading size={SpinnerSize.small} />} />
+      </Row>
+    )
+  }
 
   if (firstMarket) {
     return (
@@ -66,6 +78,10 @@ export const OmenMarketsItem: React.FC<Props> = ({ conditionsIds }) => {
       </Row>
     )
   } else {
-    return null
+    return isConditionFromOmen ? (
+      <Row cols="1fr" marginBottomXL>
+        <TitleValue title="Question" value={title} />
+      </Row>
+    ) : null
   }
 }
