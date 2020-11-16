@@ -33,6 +33,7 @@ import {
   getFreeIndexSet,
   getFullIndexSet,
   getTokenSummary,
+  indexSetsByCondition,
   isPartitionFullIndexSet,
   minBigNumber,
   positionString,
@@ -264,31 +265,33 @@ export const Contents = () => {
         const conditionsOfSelectedPosition = position.conditions
 
         //#2 Filter, allow only mergeable positions
-        const positionsMergeables = positionsWithBalance.filter((p) =>
-          conditionsOfSelectedPosition.some((condition) =>
-            arePositionMergeablesByCondition(
-              [position, p],
-              condition.conditionId,
-              condition.outcomeSlotCount
+        const positionsMergeables = positionsWithBalance
+          .filter((p) =>
+            conditionsOfSelectedPosition.some((condition) =>
+              arePositionMergeablesByCondition(
+                [position, p],
+                condition.conditionId,
+                condition.outcomeSlotCount
+              )
             )
           )
-        )
+          .filter((p) => position.indexSets.length === p.indexSets.length)
 
-        const positionsFiltered = positionsMergeables.filter(
-          (positionWithBalance: PositionWithUserBalanceWithDecimals) =>
-            //#1 Filter, only positions with balance
-            !positionWithBalance.userBalanceERC1155.isZero() &&
-            //#2 Filter, remove original selected position
-            positionWithBalance.id.toLowerCase() !== position.id.toLowerCase() &&
-            //#3 Filter, positions with the same condition set
-            positionWithBalance.conditionIds.sort().join('') ===
-              position.conditionIds.sort().join('') &&
-            //#4 Filter, positions with the same collateral
-            positionWithBalance.collateralToken.toLowerCase() ===
-              position.collateralToken.toLowerCase()
-        )
+        // Calculate condition Ids to fulfill the dropdown
+        // by removing conditions if they are shared in shallower positions.
+        const indexSetsOfConditions = indexSetsByCondition(position)
 
-        const positionsPromises = positionsFiltered.map(async (positionFiltered) => {
+        const conditionIds: string[] = conditionsOfSelectedPosition
+          .map((c) => c.conditionId)
+          .filter((conditionId) => {
+            return positionsMergeables.some((p) => {
+              return indexSetsByCondition(p)[conditionId] !== indexSetsOfConditions[conditionId]
+            })
+          })
+        // Remove duplicates
+        const possibleConditions = lodashUniq(conditionIds)
+
+        const positionsPromises = positionsMergeables.map(async (positionFiltered) => {
           const { collateralToken, conditionIds, indexSets } = positionFiltered
           const balanceOfPositionId = await CTService.balanceOf(positionFiltered.id)
           const erc20Service = new ERC20Service(provider, collateralToken)
@@ -306,15 +309,6 @@ export const Contents = () => {
         })
 
         const possibleMergeablePositions: MergeablePosition[] = await Promise.all(positionsPromises)
-
-        // Calculate condition Ids to fulfill the dropdown
-        const conditionIds: string[] = possibleMergeablePositions.reduce(
-          (acc: string[], cur: MergeablePosition) => acc.concat([...cur.position.conditionIds]),
-          []
-        )
-
-        // Remove duplicates
-        const possibleConditions = lodashUniq(conditionIds)
 
         setConditionIds(possibleConditions)
         setMergeablePositions(possibleMergeablePositions)
