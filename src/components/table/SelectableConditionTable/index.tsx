@@ -14,6 +14,11 @@ import { Switch } from 'components/form/Switch'
 import { ExternalLink } from 'components/navigation/ExternalLink'
 import { CompactFiltersLayout } from 'components/pureStyledComponents/CompactFiltersLayout'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
+import {
+  FilterResultsControl,
+  FilterResultsTextAlternativeLayout,
+} from 'components/pureStyledComponents/FilterResultsText'
+import { FiltersSwitchWrapper } from 'components/pureStyledComponents/FiltersSwitchWrapper'
 import { RadioButton } from 'components/pureStyledComponents/RadioButton'
 import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
@@ -100,6 +105,7 @@ export const SelectableConditionTable: React.FC<Props> = (props) => {
     ConditionSearchOptions.ConditionId
   )
   const [showFilters, setShowFilters] = useState(false)
+  const [isFiltering, setIsFiltering] = useState(false)
 
   const dropdownItems = useConditionsSearchOptions(setSearchBy)
 
@@ -151,18 +157,37 @@ export const SelectableConditionTable: React.FC<Props> = (props) => {
     setSelectedMaxOutcomes(null)
     setSelectedToCreationDate(null)
     setSelectedFromCreationDate(null)
-    setSearchBy(ConditionSearchOptions.ConditionId)
-    setTextToSearch('')
     onClearSelection()
   }, [resetPagination, CPKService, address, allowToDisplayOnlyConditionsToReport, onClearSelection])
 
-  // Clear the filters
   useEffect(() => {
-    if (!showFilters) {
-      resetFilters()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showFilters])
+    setIsFiltering(
+      (allowToDisplayOnlyConditionsToReport &&
+        selectedOracleValue !== OracleFilterOptions.Current) ||
+        (!allowToDisplayOnlyConditionsToReport &&
+          selectedOracleValue !== OracleFilterOptions.All) ||
+        selectedConditionTypeValue !== ConditionTypeAll.all ||
+        selectedConditionTypeFilter !== null ||
+        (allowToDisplayOnlyConditionsToReport && selectedStatus !== StatusOptions.Open) ||
+        (!allowToDisplayOnlyConditionsToReport && selectedStatus !== StatusOptions.All) ||
+        selectedMinOutcomes !== null ||
+        selectedMaxOutcomes !== null ||
+        selectedToCreationDate !== null ||
+        selectedFromCreationDate !== null
+    )
+  }, [
+    allowToDisplayOnlyConditionsToReport,
+    isFiltering,
+    selectedConditionTypeFilter,
+    selectedConditionTypeValue,
+    selectedFromCreationDate,
+    selectedMaxOutcomes,
+    selectedMinOutcomes,
+    selectedOracleFilter.length,
+    selectedOracleValue,
+    selectedStatus,
+    selectedToCreationDate,
+  ])
 
   const advancedFilters: AdvancedFilterConditions = useMemo(() => {
     return {
@@ -362,7 +387,19 @@ export const SelectableConditionTable: React.FC<Props> = (props) => {
                 value={textToShow}
               />
             }
-            start={<Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />}
+            start={
+              <FiltersSwitchWrapper>
+                <Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />
+                {(isFiltering || showFilters) && (
+                  <FilterResultsTextAlternativeLayout>
+                    Showing filtered results -{' '}
+                    <FilterResultsControl disabled={!isFiltering} onClick={resetFilters}>
+                      Clear Filters
+                    </FilterResultsControl>
+                  </FilterResultsTextAlternativeLayout>
+                )}
+              </FiltersSwitchWrapper>
+            }
           />
           {error && !isBytes32Error && !isLoading && (
             <InfoCard message={error.message} title="Error" />

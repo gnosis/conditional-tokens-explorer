@@ -5,7 +5,13 @@ export const FiltersSwitchWrapper = styled.div`
   position: relative;
 
   .filterResultsText {
-    bottom: -23px;
+    bottom: -22px;
+    left: 2px;
+    position: absolute;
+  }
+
+  .filterResultsTextAlternativeLayout {
+    bottom: -26px;
     left: 2px;
     position: absolute;
   }

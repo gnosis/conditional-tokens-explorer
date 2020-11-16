@@ -13,8 +13,14 @@ export const FilterResultsText = styled.div`
   white-space: nowrap;
 `
 
+export const FilterResultsTextAlternativeLayout = styled(FilterResultsText)``
+
 FilterResultsText.defaultProps = {
   className: 'filterResultsText',
+}
+
+FilterResultsTextAlternativeLayout.defaultProps = {
+  className: 'filterResultsTextAlternativeLayout',
 }
 
 export const FilterResultsControl = styled.button`

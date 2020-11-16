@@ -5,7 +5,7 @@ export const CompactFiltersLayout = styled.div<{ isVisible?: boolean }>`
   column-gap: 20px;
   grid-template-columns: 1fr 1fr;
   margin-bottom: 36px;
-  padding-top: 5px;
+  padding-top: 10px;
   row-gap: 20px;
 
   .dateFilterRows {

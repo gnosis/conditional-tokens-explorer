@@ -13,7 +13,7 @@ import { CompactFiltersLayout } from 'components/pureStyledComponents/CompactFil
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import {
   FilterResultsControl,
-  FilterResultsText,
+  FilterResultsTextAlternativeLayout,
 } from 'components/pureStyledComponents/FilterResultsText'
 import { FiltersSwitchWrapper } from 'components/pureStyledComponents/FiltersSwitchWrapper'
 import { RadioButton } from 'components/pureStyledComponents/RadioButton'
@@ -313,12 +313,12 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
               <FiltersSwitchWrapper>
                 <Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />
                 {(isFiltering || showFilters) && (
-                  <FilterResultsText>
+                  <FilterResultsTextAlternativeLayout>
                     Showing filtered results -{' '}
                     <FilterResultsControl disabled={!isFiltering} onClick={resetFilters}>
                       Clear Filters
                     </FilterResultsControl>
-                  </FilterResultsText>
+                  </FilterResultsTextAlternativeLayout>
                 )}
               </FiltersSwitchWrapper>
             }
