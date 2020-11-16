@@ -8,6 +8,7 @@ export interface ConditionInformation {
   questionId: string
   conditionId: string
   outcomeSlotCount: number
+  resolved: boolean
 }
 
 export interface Position {
@@ -46,6 +47,7 @@ export const marshalPositionListData = (
             questionId: condition.questionId,
             conditionId: condition.id,
             outcomeSlotCount: condition.outcomeSlotCount,
+            resolved: condition.resolved,
           }
         }) ?? [],
     } as Position

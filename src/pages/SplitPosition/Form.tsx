@@ -280,7 +280,12 @@ export const Form = ({
 
   return (
     <CenteredCard>
-      <SelectableConditionTable onRowClicked={onRowClicked} selectedConditionId={conditionId} />
+      {/*// TODO: do something on clear selection*/}
+      <SelectableConditionTable
+        onClearSelection={() => {}}
+        onRowClicked={onRowClicked}
+        selectedConditionId={conditionId}
+      />
       {condition && condition.resolved && (
         <Row cols="1fr">
           <StatusInfoInline status={StatusInfoType.warning}>

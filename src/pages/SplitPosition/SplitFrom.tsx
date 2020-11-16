@@ -106,9 +106,11 @@ export const SplitFrom: React.FC<Props> = (props) => {
     }
   }, [getValue, updatePositionIds, updateBalances, setValue])
 
-  const [selectedPositionId, setSelectedPositionId] = useState<string | undefined>()
+  const [selectedPosition, setSelectedPosition] = useState<
+    Maybe<PositionWithUserBalanceWithDecimals>
+  >(null)
   const onRowClicked = useCallback((row: PositionWithUserBalanceWithDecimals) => {
-    setSelectedPositionId(row.id)
+    setSelectedPosition(row)
   }, [])
 
   return (
@@ -136,10 +138,13 @@ export const SplitFrom: React.FC<Props> = (props) => {
         tokens={customToken ? [...tokens, customToken] : [...tokens]}
         visible={splitFromCollateral}
       />
+      {/*// TODO check this props*/}
       <ToggleableSelectablePositionTable
+        clearFilters={true}
         hideTitle
+        onClearCallback={() => {}}
         onRowClicked={onRowClicked}
-        selectedPositionId={selectedPositionId}
+        selectedPosition={selectedPosition}
         visible={splitFromPosition}
       />
       {showCustomCollateralModal && (

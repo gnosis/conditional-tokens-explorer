@@ -46,9 +46,12 @@ interface Props {
   hideTitle?: boolean
   onRowClicked: (position: PositionWithUserBalanceWithDecimals) => void
   onClearCallback: () => void
+  onFilterCallback?: (
+    positions: PositionWithUserBalanceWithDecimals[]
+  ) => PositionWithUserBalanceWithDecimals[]
   selectedPosition: Maybe<PositionWithUserBalanceWithDecimals>
   title?: string
-  clearFilters: boolean
+  clearFilters?: boolean
   refetch?: boolean
 }
 
@@ -57,6 +60,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     clearFilters,
     hideTitle,
     onClearCallback,
+    onFilterCallback,
     onRowClicked,
     refetch,
     selectedPosition,
@@ -164,11 +168,15 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
   // Filter selected positions from original list. And positions without balance as indicated by props.
   useEffect(() => {
     if (positionsWithBalance) {
-      setPositionList(positionsWithBalance)
+      if (onFilterCallback) {
+        setPositionList(onFilterCallback(positionsWithBalance))
+      } else {
+        setPositionList(positionsWithBalance)
+      }
     } else {
       setPositionList([])
     }
-  }, [setPositionList, positionsWithBalance])
+  }, [setPositionList, positionsWithBalance, onFilterCallback])
 
   useEffect(() => {
     if (refetch) {

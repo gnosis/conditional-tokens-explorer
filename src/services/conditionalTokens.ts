@@ -166,7 +166,7 @@ export class ConditionalTokensService {
     return tx
       .wait(CONFIRMATIONS_TO_WAIT)
       .then((receipt: TransactionReceipt) => {
-        logger.log(`Transaction was mined in block ${receipt}`)
+        logger.log(`Transaction was mined in block`, receipt)
         return receipt
       })
       .catch((error) => {
@@ -180,14 +180,30 @@ export class ConditionalTokensService {
     parentCollectionId: string, // If doesn't exist, must be zero, ethers.constants.HashZero
     conditionId: string,
     indexSets: string[]
-  ): Promise<TransactionReceipt> {
-    const tx = await this.contract.redeemPositions(
+  ): Promise<TransactionReceipt | void> {
+    const tx: TransactionResponse = await this.contract.redeemPositions(
       collateralToken,
       parentCollectionId,
       conditionId,
-      indexSets
+      indexSets,
+      {
+        value: '0x0',
+        gasLimit: 2750000, // TODO - should we try to precalculate this?
+      }
     )
-    return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
+
+    logger.log(`Transaction hash: ${tx.hash}`)
+
+    return tx
+      .wait(CONFIRMATIONS_TO_WAIT)
+      .then((receipt: TransactionReceipt) => {
+        logger.log(`Transaction was mined in block`, receipt)
+        return receipt
+      })
+      .catch((error) => {
+        logger.error(error)
+        throw improveErrorMessage(error)
+      })
   }
 
   async getCollectionId(
@@ -222,7 +238,7 @@ export class ConditionalTokensService {
     return tx
       .wait(CONFIRMATIONS_TO_WAIT)
       .then((receipt: TransactionReceipt) => {
-        logger.log(`Transaction was mined in block ${receipt}`)
+        logger.log(`Transaction was mined in block`, receipt)
         return receipt
       })
       .catch((error) => {
@@ -268,7 +284,7 @@ export class ConditionalTokensService {
     return tx
       .wait(CONFIRMATIONS_TO_WAIT)
       .then((receipt: TransactionReceipt) => {
-        logger.log(`Transaction was mined in block ${receipt}`)
+        logger.log(`Transaction was mined in block`, receipt)
         return receipt
       })
       .catch((error) => {
