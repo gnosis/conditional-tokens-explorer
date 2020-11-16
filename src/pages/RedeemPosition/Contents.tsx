@@ -161,10 +161,13 @@ export const Contents = () => {
   }, [])
 
   const onFilterCallback = (positions: PositionWithUserBalanceWithDecimals[]) => {
-    return positions.filter((position: PositionWithUserBalanceWithDecimals) =>
-      position.conditions.every((condition) => condition.resolved)
+    return positions.filter(
+      (position: PositionWithUserBalanceWithDecimals) =>
+        position.conditions.every((condition) => condition.resolved) &&
+        !position.userBalanceERC1155.isZero()
     )
   }
+
   return (
     <CenteredCard>
       <SelectablePositionTable

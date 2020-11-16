@@ -135,17 +135,6 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     advancedFilters
   )
 
-  // #1 Filter, only positions with balance
-  const positionsWithBalance = useMemo(
-    () =>
-      data &&
-      data.length &&
-      data.filter(
-        (position: PositionWithUserBalanceWithDecimals) => !position.userBalanceERC1155.isZero()
-      ),
-    [data]
-  )
-
   const resetFilters = useCallback(() => {
     setResetPagination(!resetPagination)
     setSelectedToCreationDate(null)
@@ -167,16 +156,16 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
 
   // Filter selected positions from original list. And positions without balance as indicated by props.
   useEffect(() => {
-    if (positionsWithBalance) {
+    if (data && data.length > 0) {
       if (onFilterCallback) {
-        setPositionList(onFilterCallback(positionsWithBalance))
+        setPositionList(onFilterCallback(data))
       } else {
-        setPositionList(positionsWithBalance)
+        setPositionList(data)
       }
     } else {
       setPositionList([])
     }
-  }, [setPositionList, positionsWithBalance, onFilterCallback])
+  }, [setPositionList, data, onFilterCallback])
 
   useEffect(() => {
     if (refetch) {
