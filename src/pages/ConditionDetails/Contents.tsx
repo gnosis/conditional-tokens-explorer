@@ -12,7 +12,7 @@ import {
   DropdownPosition,
 } from 'components/common/Dropdown'
 import { DisplayTablePositions } from 'components/form/DisplayTablePositions'
-import { OmenMarketsItem } from 'components/form/OmenMarketsItem'
+import { OmenMarketsOrQuestion } from 'components/form/OmenMarketsOrQuestion'
 import { ExternalLink } from 'components/navigation/ExternalLink'
 import { FlexRow } from 'components/pureStyledComponents/FlexRow'
 import { Pill, PillTypes } from 'components/pureStyledComponents/Pill'
@@ -187,7 +187,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           }
         />
       </Row>
-      <OmenMarketsItem
+      <OmenMarketsOrQuestion
         conditionsIds={[conditionId]}
         isConditionFromOmen={isConditionFromOmen}
         title={title}

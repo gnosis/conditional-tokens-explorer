@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react'
 import DataTable from 'react-data-table-component'
 
+import { ButtonCopy } from 'components/buttons/ButtonCopy'
 import { ExternalLink } from 'components/navigation/ExternalLink'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import { FlexRow } from 'components/pureStyledComponents/FlexRow'
@@ -28,6 +29,7 @@ export const DisplayTableHashes = (props: Props) => {
             return (
               <FlexRow>
                 {title}
+                <ButtonCopy value={hash} />
                 <ExternalLink href={getOmenMarketURL(hash)} />
               </FlexRow>
             )

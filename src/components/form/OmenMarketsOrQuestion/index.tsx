@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 
 import { ButtonCopy } from 'components/buttons'
 import { ButtonExpand } from 'components/buttons/ButtonExpand'
@@ -16,24 +16,18 @@ interface Props {
   isConditionFromOmen?: boolean
 }
 
-export const OmenMarketsItem: React.FC<Props> = ({ conditionsIds, isConditionFromOmen, title }) => {
+export const OmenMarketsOrQuestion: React.FC<Props> = ({
+  conditionsIds,
+  isConditionFromOmen,
+  title,
+}) => {
   const {
+    areOmenMarketsMoreThanOne,
     data: dataOmenMarkets,
-    error: errorOmenMarkets,
+    firstMarket,
     loading: loadingOmenMarkets,
   } = useOmenMarkets(conditionsIds)
   const [openOmenMarkets, setOpenOmenMarkets] = useState(false)
-
-  const omenMarkets = useMemo(() => {
-    if (!loadingOmenMarkets && !errorOmenMarkets && dataOmenMarkets && dataOmenMarkets.length) {
-      return dataOmenMarkets
-    } else {
-      return []
-    }
-  }, [dataOmenMarkets, errorOmenMarkets, loadingOmenMarkets])
-
-  const areOmenMarketsMoreThanOne = useMemo(() => omenMarkets.length > 1, [omenMarkets])
-  const firstMarket = useMemo(() => omenMarkets[0], [omenMarkets])
 
   if (loadingOmenMarkets) {
     return (
@@ -51,11 +45,11 @@ export const OmenMarketsItem: React.FC<Props> = ({ conditionsIds, isConditionFro
           value={
             <FlexRow>
               {firstMarket.question.title}
-              {!areOmenMarketsMoreThanOne && <ButtonCopy value={firstMarket.id} /> && (
-                <ExternalLink href={firstMarket.url} />
-              )}
-              {areOmenMarketsMoreThanOne && (
+              <ButtonCopy value={firstMarket.id} />
+              {areOmenMarketsMoreThanOne ? (
                 <ButtonExpand onClick={() => setOpenOmenMarkets(true)} />
+              ) : (
+                <ExternalLink href={firstMarket.url} />
               )}
             </FlexRow>
           }
@@ -63,7 +57,7 @@ export const OmenMarketsItem: React.FC<Props> = ({ conditionsIds, isConditionFro
 
         {openOmenMarkets && areOmenMarketsMoreThanOne && (
           <DisplayHashesTableModal
-            hashes={omenMarkets.map(({ id, question }) => {
+            hashes={dataOmenMarkets.map(({ id, question }) => {
               return { hash: id, title: question.title }
             })}
             isOpen={openOmenMarkets}
@@ -75,11 +69,14 @@ export const OmenMarketsItem: React.FC<Props> = ({ conditionsIds, isConditionFro
         )}
       </Row>
     )
-  } else {
-    return isConditionFromOmen && title ? (
+  }
+
+  if (isConditionFromOmen && title) {
+    return (
       <Row cols="1fr" marginBottomXL>
         <TitleValue title="Question" value={title} />
       </Row>
-    ) : null
+    )
   }
+  return null
 }

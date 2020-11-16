@@ -83,7 +83,9 @@ export const useOmenMarkets = (conditionsIds: string[]) => {
   }, [queryAllOmenMarkets])
 
   return {
-    data: queryResult,
+    data: queryResult || [],
+    areOmenMarketsMoreThanOne: queryResult ? queryResult.length > 1 : false,
+    firstMarket: queryResult ? queryResult[0] : null,
     error,
     loading,
   }
