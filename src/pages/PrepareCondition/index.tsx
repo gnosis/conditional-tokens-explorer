@@ -481,7 +481,7 @@ export const PrepareCondition = () => {
   }, [checkForExistingCondition, conditionIdPreview, isConditionAlreadyExist])
 
   const customConditionFormHasErrors = Object.keys(errorsCustomCondition).length > 0
-  const omenConditionFormHasHerros =
+  const omenConditionFormHasErrors =
     isQuestionAlreadyExist ||
     Object.keys(errorsOmenCondition).length > 0 ||
     outcomes.length < MIN_OUTCOMES_ALLOWED
@@ -810,7 +810,7 @@ export const PrepareCondition = () => {
         )}
         {newCustomConditionStatusInfo &&
           ((conditionType === ConditionType.custom && !customConditionFormHasErrors) ||
-            (conditionType === ConditionType.omen && !omenConditionFormHasHerros)) && (
+            (conditionType === ConditionType.omen && !omenConditionFormHasErrors)) && (
             <StatusInfoInline
               status={newCustomConditionStatusInfo.status}
               title={newCustomConditionStatusInfo.title}
