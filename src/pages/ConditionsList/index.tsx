@@ -473,7 +473,12 @@ export const ConditionsList: React.FC = () => {
             </SidebarRow>
             <SidebarRow>
               <MinMaxFilter
-                onClear={() => logger.log('Clear min / max')}
+                max={selectedMaxOutcomes}
+                min={selectedMinOutcomes}
+                onClear={() => {
+                  setSelectedMinOutcomes(null)
+                  setSelectedMaxOutcomes(null)
+                }}
                 onSubmit={(min, max) => {
                   setSelectedMinOutcomes(min)
                   setSelectedMaxOutcomes(max)

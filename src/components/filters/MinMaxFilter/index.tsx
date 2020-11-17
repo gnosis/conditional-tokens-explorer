@@ -55,13 +55,26 @@ interface Props {
   onClear?: () => void
   onSubmit: (min: Maybe<number>, max: Maybe<number>) => void
   title: string
+  min: Maybe<number>
+  max: Maybe<number>
 }
 
 export const MinMaxFilter: React.FC<Props> = (props) => {
-  const { onChangeMax, onChangeMin, onClear, onSubmit, title } = props
+  const {
+    max: maxFromProps,
+    min: minFromProps,
+    onChangeMax,
+    onChangeMin,
+    onClear,
+    onSubmit,
+    title,
+  } = props
 
   const [min, setMin] = React.useState<Maybe<number>>(null)
   const [max, setMax] = React.useState<Maybe<number>>(null)
+
+  const minInput = React.useRef<HTMLInputElement>(null)
+  const maxInput = React.useRef<HTMLInputElement>(null)
 
   const onChangeMinInternal = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,6 +85,34 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
     },
     [onChangeMin]
   )
+
+  const clearMin = React.useCallback(() => {
+    if (minInput.current) minInput.current.value = ''
+  }, [minInput])
+
+  const clearMax = React.useCallback(() => {
+    if (maxInput.current) maxInput.current.value = ''
+  }, [maxInput])
+
+  React.useEffect(() => {
+    if (minFromProps === null) {
+      clearMin()
+      setMin(null)
+    }
+  }, [minFromProps, clearMin])
+
+  React.useEffect(() => {
+    if (maxFromProps === null) {
+      clearMax()
+      setMax(null)
+    }
+  }, [maxFromProps, clearMax])
+
+  const clear = React.useCallback(() => {
+    clearMin()
+    clearMax()
+    onClear && onClear()
+  }, [clearMin, clearMax, onClear])
 
   const onChangeMaxInternal = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -129,7 +170,7 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
       <FilterWrapper>
         <FilterTitle>{title}</FilterTitle>
         {onClear && (
-          <FilterTitleButton disabled={emptyValues} onClick={onClear}>
+          <FilterTitleButton disabled={emptyValues} onClick={clear}>
             Clear
           </FilterTitleButton>
         )}
@@ -145,6 +186,7 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
             onKeyPress={onKeyPress}
             onKeyUp={onKeyUp}
             placeholder="Min..."
+            ref={minInput}
             type="number"
           />
           <Dash />
@@ -157,6 +199,7 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
             onKeyPress={onKeyPress}
             onKeyUp={onKeyUp}
             placeholder="Max..."
+            ref={maxInput}
             type="number"
           />
         </FieldsWrapper>
