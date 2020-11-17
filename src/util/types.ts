@@ -180,6 +180,7 @@ export interface TransferOptions {
 
 export type HashArray = {
   hash: string
+  title?: string
 }
 
 export enum LocalStorageManagement {

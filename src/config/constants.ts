@@ -132,3 +132,5 @@ export const MAX_OUTCOMES_ALLOWED = Number(process.env.REACT_APP_MAX_OUTCOMES_AL
 
 export const MIN_DATE = '2015-07-30'
 export const MAX_DATE = '2030-01-01'
+
+export const OMEN_URL_DAPP = process.env.REACT_APP_OMEN_URL_DAPP || 'https://omen.eth.link'
