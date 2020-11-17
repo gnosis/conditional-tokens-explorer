@@ -3,7 +3,7 @@ import { BigNumber, formatUnits, getAddress } from 'ethers/utils'
 import moment from 'moment-timezone'
 
 import BN from 'bn.js'
-import { BYTES_REGEX } from 'config/constants'
+import { BYTES_REGEX, OMEN_URL_DAPP } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
 import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
 import { ConditionInformation } from 'hooks/utils'
@@ -436,6 +436,10 @@ export const getRealityQuestionUrl = (questionId: string, networkConfig: Network
   return networkConfig.networkId === NetworkIds.GANACHE
     ? '#'
     : `${oracle.url}app/#!/question/${questionId}`
+}
+
+export const getOmenMarketURL = (marketId: string) => {
+  return `${OMEN_URL_DAPP}/#/${marketId}`
 }
 
 export const isOracleRealitio = (oracleAddress: string, networkConfig: NetworkConfig) => {
