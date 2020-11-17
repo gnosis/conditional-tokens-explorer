@@ -65,6 +65,8 @@ export const DateFilter: React.FC<Props> = (props) => {
   const [from, setFrom] = React.useState<Maybe<number>>(null)
   const [to, setTo] = React.useState<Maybe<number>>(null)
   const [isDateValid, setIsDateValid] = React.useState<undefined | boolean>()
+  const maxDateUTC = moment(MAX_DATE).utc().endOf('day').unix()
+  const minDateUTC = moment(MIN_DATE).utc().startOf('day').unix()
 
   const onChangeFromInternal = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,13 +75,17 @@ export const DateFilter: React.FC<Props> = (props) => {
       }
 
       const currentMinDate = moment(event.currentTarget.value).utc().startOf('day').unix()
-      const minDate = moment(MIN_DATE).utc().startOf('day').unix()
 
-      const fromTimestamp = currentMinDate < minDate ? minDate : currentMinDate
+      const fromTimestamp =
+        currentMinDate < minDateUTC
+          ? minDateUTC
+          : currentMinDate > maxDateUTC
+          ? maxDateUTC
+          : currentMinDate
 
       setFrom(fromTimestamp)
     },
-    [onChangeFrom]
+    [maxDateUTC, minDateUTC, onChangeFrom]
   )
 
   const onChangeToInternal = React.useCallback(
@@ -89,13 +95,17 @@ export const DateFilter: React.FC<Props> = (props) => {
       }
 
       const currentMaxDate = moment(event.currentTarget.value).utc().endOf('day').unix()
-      const maxDate = moment(MAX_DATE).utc().endOf('day').unix()
 
-      const toTimestamp = currentMaxDate > maxDate ? maxDate : currentMaxDate
+      const toTimestamp =
+        currentMaxDate > maxDateUTC
+          ? maxDateUTC
+          : currentMaxDate < minDateUTC
+          ? minDateUTC
+          : currentMaxDate
 
       setTo(toTimestamp)
     },
-    [onChangeTo]
+    [maxDateUTC, minDateUTC, onChangeTo]
   )
 
   const emptyValues = !from && !to
