@@ -3,6 +3,7 @@ import { ethers } from 'ethers'
 import lodashUniqBy from 'lodash.uniqby'
 import React, { useState } from 'react'
 
+import { ApolloError } from 'apollo-client/errors/ApolloError'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { Position, marshalPositionListData } from 'hooks/utils'
 import { buildQueryPositionsList } from 'queries/CTEPositions'
@@ -168,7 +169,7 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
 
   return {
     data: data.isSuccess() && data.get(),
-    error,
+    error: error as ApolloError,
     loading: data.isLoading(),
     refetchPositions,
     refetchUserPositions,

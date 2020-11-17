@@ -1,13 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { InputPositionProps } from 'components/form/InputPosition'
-import { SelectCollateral, SelectCollateralProps } from 'components/form/SelectCollateral'
+import { SelectCollateral } from 'components/form/SelectCollateral'
 import { CustomCollateralModal } from 'components/modals/CustomCollateralModal'
 import { TitleControl } from 'components/pureStyledComponents/TitleControl'
 import { SelectablePositionTable } from 'components/table/SelectablePositionTable'
-import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
-import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { PositionWithUserBalanceWithDecimals } from 'hooks'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { LocalStorageManagement, SplitFromType, Token } from 'util/types'
@@ -71,20 +68,29 @@ const ToggleableSelectablePositionTable = styled(SelectablePositionTable)<{ visi
   display: ${(props) => (props.visible ? 'block' : 'none')};
 `
 
-interface Props extends InputPositionProps, SelectCollateralProps {}
+interface Props {
+  cleanAllowanceError: () => void
+  onPositionChange: (position: PositionWithUserBalanceWithDecimals) => void
+  position: Maybe<PositionWithUserBalanceWithDecimals>
+  onCollateralChange: (collateral: string) => void
+  collateral: Token
+  onSplitFromChange: (splitFrom: SplitFromType) => void
+  splitFrom: SplitFromType
+  tokens: Token[]
+}
 
 export const SplitFrom: React.FC<Props> = (props) => {
   const {
     cleanAllowanceError,
-    formMethods,
-    formMethods: { register, setValue },
-    splitFromCollateral,
-    splitFromPosition,
+    collateral,
+    onCollateralChange,
+    onPositionChange,
+    onSplitFromChange,
+    position,
+    splitFrom,
     tokens,
   } = props
 
-  const { updatePositionIds } = useMultiPositionsContext()
-  const { updateBalances } = useBatchBalanceContext()
   const { getValue } = useLocalStorage(LocalStorageManagement.PositionId)
   const [showCustomCollateralModal, setShowCustomCollateralModal] = useState(false)
   const openCustomCollateralModal = useCallback(() => setShowCustomCollateralModal(true), [])
@@ -93,59 +99,69 @@ export const SplitFrom: React.FC<Props> = (props) => {
 
   useEffect(() => {
     if (customToken) {
-      setValue('collateral', customToken.address, true)
+      onCollateralChange(customToken.address)
     }
-  }, [customToken, setValue])
+  }, [customToken, onCollateralChange])
 
   useEffect(() => {
     const localStoragePosition = getValue()
     if (localStoragePosition) {
-      setValue('splitFrom', SplitFromType.position, false)
-      updatePositionIds([localStoragePosition])
-      updateBalances([localStoragePosition])
+      onSplitFromChange(SplitFromType.position)
     }
-  }, [getValue, updatePositionIds, updateBalances, setValue])
+  }, [onSplitFromChange, getValue])
 
-  const [selectedPosition, setSelectedPosition] = useState<
-    Maybe<PositionWithUserBalanceWithDecimals>
-  >(null)
-  const onRowClicked = useCallback((row: PositionWithUserBalanceWithDecimals) => {
-    setSelectedPosition(row)
-  }, [])
+  const onRowClicked = useCallback(
+    (row: PositionWithUserBalanceWithDecimals) => {
+      onPositionChange(row)
+    },
+    [onPositionChange]
+  )
 
   return (
     <>
       <Controls>
         <Tabs>
           <Tab>
-            <Radio name="splitFrom" ref={register} type="radio" value={SplitFromType.collateral} />
-            <TabText active={splitFromCollateral}>Collateral</TabText>
+            <Radio
+              name="splitFrom"
+              onClick={() => onSplitFromChange(SplitFromType.collateral)}
+              type="radio"
+              value={SplitFromType.collateral}
+            />
+            <TabText active={splitFrom === SplitFromType.collateral}>Collateral</TabText>
           </Tab>
           <Break />
           <Tab>
-            <Radio name="splitFrom" ref={register} type="radio" value={SplitFromType.position} />
-            <TabText active={splitFromPosition}>Position</TabText>
+            <Radio
+              name="splitFrom"
+              onClick={() => onSplitFromChange(SplitFromType.position)}
+              type="radio"
+              value={SplitFromType.position}
+            />
+            <TabText active={splitFrom === SplitFromType.position}>Position</TabText>
           </Tab>
         </Tabs>
-        <ToggleableTitleControl onClick={openCustomCollateralModal} visible={splitFromCollateral}>
+        <ToggleableTitleControl
+          onClick={openCustomCollateralModal}
+          visible={splitFrom === SplitFromType.collateral}
+        >
           Add Custom Collateral
         </ToggleableTitleControl>
       </Controls>
       <ToggleableSelectCollateral
         cleanAllowanceError={cleanAllowanceError}
-        formMethods={formMethods}
-        splitFromCollateral={splitFromCollateral}
+        collateral={collateral}
+        onCollateralChange={onCollateralChange}
+        splitFromCollateral={splitFrom === SplitFromType.collateral}
         tokens={customToken ? [...tokens, customToken] : [...tokens]}
-        visible={splitFromCollateral}
+        visible={splitFrom === SplitFromType.collateral}
       />
-      {/*// TODO check this props*/}
       <ToggleableSelectablePositionTable
         clearFilters={true}
         hideTitle
-        onClearCallback={() => {}}
         onRowClicked={onRowClicked}
-        selectedPosition={selectedPosition}
-        visible={splitFromPosition}
+        selectedPosition={position}
+        visible={splitFrom === SplitFromType.position}
       />
       {showCustomCollateralModal && (
         <CustomCollateralModal

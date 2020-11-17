@@ -12,6 +12,7 @@ import { Switch } from 'components/form/Switch'
 import { CompactFiltersLayout } from 'components/pureStyledComponents/CompactFiltersLayout'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import { RadioButton } from 'components/pureStyledComponents/RadioButton'
+import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { SpinnerSize } from 'components/statusInfo/common'
 import { TableControls } from 'components/table/TableControls'
@@ -45,7 +46,7 @@ const TitleValueExtended = styled(TitleValue)<{ hideTitle?: boolean }>`
 interface Props {
   hideTitle?: boolean
   onRowClicked: (position: PositionWithUserBalanceWithDecimals) => void
-  onClearCallback: () => void
+  onClearCallback?: () => void
   onFilterCallback?: (
     positions: PositionWithUserBalanceWithDecimals[]
   ) => PositionWithUserBalanceWithDecimals[]
@@ -150,7 +151,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
   useEffect(() => {
     setShowFilters(false)
     resetFilters()
-    onClearCallback()
+    if (onClearCallback) onClearCallback()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networkConfig, clearFilters])
 
@@ -239,7 +240,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
   useEffect(() => {
     if (!showFilters) {
       resetFilters()
-      onClearCallback()
+      if (onClearCallback) onClearCallback()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showFilters])
@@ -266,7 +267,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     ) {
       setResetPagination(!resetPagination)
     }
-    onClearCallback()
+    if (onClearCallback) onClearCallback()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -295,7 +296,8 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
             }
             start={<Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />}
           />
-          {showFilters && (
+          {error && !isLoading && <InfoCard message={error.message} title="Error" />}
+          {!error && showFilters && (
             <CompactFiltersLayout>
               <CollateralFilterDropdown
                 onClick={(symbol: string, address: Maybe<string[]>) => {
@@ -319,30 +321,30 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
               />
             </CompactFiltersLayout>
           )}
-          <DataTable
-            className="outerTableWrapper condensedTable"
-            columns={defaultColumns}
-            customStyles={customStyles}
-            data={showSpinner ? [] : positionList.length ? positionList : []}
-            highlightOnHover
-            noDataComponent={
-              showSpinner ? (
-                <InlineLoading size={SpinnerSize.small} />
-              ) : error ? (
-                <EmptyContentText>Error: {error.message}</EmptyContentText>
-              ) : (
-                <EmptyContentText>No positions found.</EmptyContentText>
-              )
-            }
-            noHeader
-            onRowClicked={onRowClicked}
-            pagination
-            paginationPerPage={5}
-            paginationResetDefaultPage={resetPagination}
-            paginationRowsPerPageOptions={[5, 10, 15]}
-            pointerOnHover
-            responsive
-          />
+          {!error && (
+            <DataTable
+              className="outerTableWrapper condensedTable"
+              columns={defaultColumns}
+              customStyles={customStyles}
+              data={showSpinner ? [] : positionList.length ? positionList : []}
+              highlightOnHover
+              noDataComponent={
+                showSpinner ? (
+                  <InlineLoading size={SpinnerSize.small} />
+                ) : (
+                  <EmptyContentText>No positions found.</EmptyContentText>
+                )
+              }
+              noHeader
+              onRowClicked={onRowClicked}
+              pagination
+              paginationPerPage={5}
+              paginationResetDefaultPage={resetPagination}
+              paginationRowsPerPageOptions={[5, 10, 15]}
+              pointerOnHover
+              responsive
+            />
+          )}
         </>
       }
       {...restProps}

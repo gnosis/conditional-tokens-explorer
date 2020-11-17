@@ -9,7 +9,7 @@ import {
 } from 'components/pureStyledComponents/StripedList'
 import { TitleValue } from 'components/text/TitleValue'
 import { useCollateral } from 'hooks/useCollateral'
-import { GetPosition_position } from 'types/generatedGQLForCTE'
+import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
 import { positionString } from 'util/tools'
 import { SplitFromType, Token } from 'util/types'
 
@@ -21,7 +21,7 @@ interface Props {
   amount: BigNumber
   conditionId: string
   partition: Maybe<BigNumber[]>
-  position: Maybe<GetPosition_position>
+  position: Maybe<PositionWithUserBalanceWithDecimals>
   selectedCollateral: Token
   splitFrom: SplitFromType
 }
@@ -34,9 +34,7 @@ export const PositionPreview = ({
   selectedCollateral,
   splitFrom,
 }: Props) => {
-  const { collateral: positionCollateral } = useCollateral(
-    position ? position.collateralToken.id : ''
-  )
+  const { collateral: positionCollateral } = useCollateral(position ? position.collateralToken : '')
   const splitFromCollateral = useMemo(() => splitFrom === SplitFromType.collateral, [splitFrom])
   const splitFromPosition = useMemo(() => splitFrom === SplitFromType.position, [splitFrom])
 

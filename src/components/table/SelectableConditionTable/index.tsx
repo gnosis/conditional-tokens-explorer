@@ -406,31 +406,33 @@ export const SelectableConditionTable: React.FC<Props> = (props) => {
               />
             </CompactFiltersLayout>
           )}
-          <DataTable
-            className="outerTableWrapper condensedTable"
-            columns={columns}
-            customStyles={customStyles}
-            data={showSpinner ? [] : conditionList.length ? conditionList : []}
-            highlightOnHover
-            noDataComponent={
-              showSpinner ? (
-                <InlineLoading size={SpinnerSize.small} />
-              ) : status === Web3ContextStatus.Infura &&
-                selectedOracleValue === OracleFilterOptions.Current ? (
-                <EmptyContentText>User is not connected to wallet.</EmptyContentText>
-              ) : (
-                <EmptyContentText>No conditions found.</EmptyContentText>
-              )
-            }
-            noHeader
-            onRowClicked={onRowClicked}
-            pagination
-            paginationPerPage={5}
-            paginationResetDefaultPage={resetPagination}
-            paginationRowsPerPageOptions={[5, 10, 15]}
-            pointerOnHover
-            responsive
-          />
+          {!error && (
+            <DataTable
+              className="outerTableWrapper condensedTable"
+              columns={columns}
+              customStyles={customStyles}
+              data={showSpinner ? [] : conditionList.length ? conditionList : []}
+              highlightOnHover
+              noDataComponent={
+                showSpinner ? (
+                  <InlineLoading size={SpinnerSize.small} />
+                ) : status === Web3ContextStatus.Infura &&
+                  selectedOracleValue === OracleFilterOptions.Current ? (
+                  <EmptyContentText>User is not connected to wallet.</EmptyContentText>
+                ) : (
+                  <EmptyContentText>No conditions found.</EmptyContentText>
+                )
+              }
+              noHeader
+              onRowClicked={onRowClicked}
+              pagination
+              paginationPerPage={5}
+              paginationResetDefaultPage={resetPagination}
+              paginationRowsPerPageOptions={[5, 10, 15]}
+              pointerOnHover
+              responsive
+            />
+          )}
         </>
       }
       {...restProps}
