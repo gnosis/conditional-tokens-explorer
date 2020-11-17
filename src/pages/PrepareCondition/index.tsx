@@ -482,15 +482,22 @@ export const PrepareCondition = () => {
 
   const onDateChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (!moment(event.target.value).isValid()) {
-        setErrorOmenCondition('resolutionDate', 'invalidDate')
-      } else if (event.target.checkValidity()) {
+      if (event.target.checkValidity()) {
         setValueOmenCondition('resolutionDate', event.target.value, true)
       } else {
         setErrorOmenCondition('resolutionDate', 'validity')
       }
     },
     [setErrorOmenCondition, setValueOmenCondition]
+  )
+
+  const onDateKeyUp = React.useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (!moment(event.currentTarget.value).isValid()) {
+        setErrorOmenCondition('resolutionDate', 'invalidDate')
+      }
+    },
+    [setErrorOmenCondition]
   )
 
   const customConditionFormHasErrors = Object.keys(errorsCustomCondition).length > 0
@@ -693,6 +700,7 @@ export const PrepareCondition = () => {
                       min={today}
                       name="resolutionDate"
                       onChange={onDateChange}
+                      onKeyUp={onDateKeyUp}
                       ref={registerOmenCondition({
                         required: true,
                         min: today,
@@ -706,7 +714,7 @@ export const PrepareCondition = () => {
                           <ErrorMessage>Required field</ErrorMessage>
                         )}
                         {errorsOmenCondition.resolutionDate.type === 'invalidDate' && (
-                          <ErrorMessage>{`Date is invalid`}</ErrorMessage>
+                          <ErrorMessage>Date is invalid</ErrorMessage>
                         )}
                         {['min', 'max', 'validity'].includes(
                           errorsOmenCondition.resolutionDate.type

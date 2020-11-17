@@ -64,6 +64,7 @@ export const DateFilter: React.FC<Props> = (props) => {
 
   const [from, setFrom] = React.useState<Maybe<number>>(null)
   const [to, setTo] = React.useState<Maybe<number>>(null)
+  const [isDateValid, setIsDateValid] = React.useState<undefined | boolean>()
 
   const onChangeFromInternal = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,7 +100,8 @@ export const DateFilter: React.FC<Props> = (props) => {
 
   const emptyValues = !from && !to
   const fromGreaterThanToError = (to && from && to < from) || false
-  const submitDisabled = fromGreaterThanToError || emptyValues
+  const showErrors = (isDateValid !== undefined && !isDateValid) || fromGreaterThanToError
+  const submitDisabled = showErrors || emptyValues
 
   const onSubmitInternal = React.useCallback(() => {
     if ((from || to) && !submitDisabled) {
@@ -107,13 +109,25 @@ export const DateFilter: React.FC<Props> = (props) => {
     }
   }, [from, to, onSubmit, submitDisabled])
 
-  const onKeyUp = React.useCallback(
+  const onKeyUpActions = React.useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (event.key === 'Enter') {
         onSubmitInternal()
       }
     },
     [onSubmitInternal]
+  )
+
+  const checkDateValidity = React.useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
+    setIsDateValid(moment(event.currentTarget.value).isValid())
+  }, [])
+
+  const onKeyUp = React.useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      checkDateValidity(event)
+      onKeyUpActions(event)
+    },
+    [onKeyUpActions, checkDateValidity]
   )
 
   React.useEffect(() => {
@@ -161,13 +175,14 @@ export const DateFilter: React.FC<Props> = (props) => {
           <ButtonFilterSubmit disabled={submitDisabled} onClick={onSubmitInternal} />
         </Row>
       </Rows>
-      {fromGreaterThanToError && (
+      {showErrors && (
         <ErrorContainer>
           {fromGreaterThanToError && (
             <ErrorMessage>
               <i>To</i> must be greater than <i>From</i>
             </ErrorMessage>
           )}
+          {!isDateValid && <ErrorMessage>Date is invalid</ErrorMessage>}
         </ErrorContainer>
       )}
     </Wrapper>
