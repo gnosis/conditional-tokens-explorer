@@ -1,14 +1,29 @@
 import React, { useState } from 'react'
+import styled from 'styled-components'
 
 import { ButtonCopy } from 'components/buttons'
 import { ButtonExpand } from 'components/buttons/ButtonExpand'
 import { DisplayHashesTableModal } from 'components/modals/DisplayHashesTableModal'
 import { ExternalLink } from 'components/navigation/ExternalLink'
-import { FlexRow } from 'components/pureStyledComponents/FlexRow'
-import { Row } from 'components/pureStyledComponents/Row'
 import { TitleValue } from 'components/text/TitleValue'
 import { OMEN_URL_DAPP } from 'config/constants'
 import { useOmenMarkets } from 'hooks/useOmenMarkets'
+
+const ButtonCopyInlineFlex = styled(ButtonCopy)`
+  display: inline-flex;
+`
+
+const ButtonExpandInlineFlex = styled(ButtonExpand)`
+  display: inline-flex;
+`
+
+const ExternalLinkInlineFlex = styled(ExternalLink)`
+  display: inline-flex;
+`
+
+const DisplayBlock = styled.div`
+  display: block;
+`
 
 interface Props {
   conditionsIds: string[]
@@ -30,31 +45,26 @@ export const OmenMarketsOrQuestion: React.FC<Props> = ({
   const [openOmenMarkets, setOpenOmenMarkets] = useState(false)
 
   if (loadingOmenMarkets) {
-    return (
-      <Row>
-        <TitleValue title={'Loading...'} value={'-'} />
-      </Row>
-    )
+    return <TitleValue title={'Loading...'} value={'-'} />
   }
 
   if (firstMarket) {
     return (
-      <Row>
+      <>
         <TitleValue
           title={areOmenMarketsMoreThanOne ? 'Omen Markets' : 'Omen Market'}
           value={
-            <FlexRow>
+            <DisplayBlock>
               {firstMarket.question.title}
-              <ButtonCopy value={firstMarket.id} />
+              <ButtonCopyInlineFlex value={firstMarket.id} />
               {areOmenMarketsMoreThanOne ? (
-                <ButtonExpand onClick={() => setOpenOmenMarkets(true)} />
+                <ButtonExpandInlineFlex onClick={() => setOpenOmenMarkets(true)} />
               ) : (
-                <ExternalLink href={firstMarket.url} />
+                <ExternalLinkInlineFlex href={firstMarket.url} />
               )}
-            </FlexRow>
+            </DisplayBlock>
           }
         />
-
         {openOmenMarkets && areOmenMarketsMoreThanOne && (
           <DisplayHashesTableModal
             hashes={dataOmenMarkets.map(({ id, question }) => {
@@ -67,16 +77,12 @@ export const OmenMarketsOrQuestion: React.FC<Props> = ({
             url={OMEN_URL_DAPP}
           />
         )}
-      </Row>
+      </>
     )
   }
 
   if (isConditionFromOmen && title) {
-    return (
-      <Row cols="1fr" marginBottomXL>
-        <TitleValue title="Question" value={title} />
-      </Row>
-    )
+    return <TitleValue title="Question" value={title} />
   }
   return null
 }
