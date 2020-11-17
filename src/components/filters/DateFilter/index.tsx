@@ -99,7 +99,7 @@ export const DateFilter: React.FC<Props> = (props) => {
 
   const emptyValues = !from && !to
   const fromGreaterThanToError = (to && from && to < from) || false
-  const submitDisabled = !!fromGreaterThanToError || emptyValues
+  const submitDisabled = fromGreaterThanToError || emptyValues
 
   const onSubmitInternal = React.useCallback(() => {
     if ((from || to) && !submitDisabled) {
@@ -107,9 +107,9 @@ export const DateFilter: React.FC<Props> = (props) => {
     }
   }, [from, to, onSubmit, submitDisabled])
 
-  const onPressEnter = React.useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Enter') {
+  const onKeyUp = React.useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === 'Enter') {
         onSubmitInternal()
       }
     },
@@ -139,7 +139,7 @@ export const DateFilter: React.FC<Props> = (props) => {
               min={MIN_DATE}
               name="dateFrom"
               onChange={onChangeFromInternal}
-              onKeyUp={onPressEnter}
+              onKeyUp={onKeyUp}
               ref={fromDate}
               type="date"
             />
@@ -153,7 +153,7 @@ export const DateFilter: React.FC<Props> = (props) => {
               min={MIN_DATE}
               name="dateTo"
               onChange={onChangeToInternal}
-              onKeyUp={onPressEnter}
+              onKeyUp={onKeyUp}
               ref={toDate}
               type="date"
             />

@@ -482,7 +482,9 @@ export const PrepareCondition = () => {
 
   const onDateChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (event.target.checkValidity()) {
+      if (!moment(event.target.value).isValid()) {
+        setErrorOmenCondition('resolutionDate', 'invalidDate')
+      } else if (event.target.checkValidity()) {
         setValueOmenCondition('resolutionDate', event.target.value, true)
       } else {
         setErrorOmenCondition('resolutionDate', 'validity')
@@ -703,10 +705,13 @@ export const PrepareCondition = () => {
                         {errorsOmenCondition.resolutionDate.type === 'required' && (
                           <ErrorMessage>Required field</ErrorMessage>
                         )}
+                        {errorsOmenCondition.resolutionDate.type === 'invalidDate' && (
+                          <ErrorMessage>{`Date is invalid`}</ErrorMessage>
+                        )}
                         {['min', 'max', 'validity'].includes(
                           errorsOmenCondition.resolutionDate.type
                         ) && (
-                          <ErrorMessage>{`Date must between ${todayLocalized} and ${maxDateLocalized}`}</ErrorMessage>
+                          <ErrorMessage>{`Date must be between ${todayLocalized} and ${maxDateLocalized}`}</ErrorMessage>
                         )}
                       </ErrorContainer>
                     )}
