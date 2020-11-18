@@ -1,6 +1,7 @@
-import React, { Suspense } from 'react'
+import React, { Suspense, useMemo } from 'react'
 import Blockies from 'react-blockies'
 import styled from 'styled-components'
+import { toChecksumAddress } from 'web3-utils'
 
 import { BatIcon } from 'components/common/TokenIcon/img/BatIcon'
 import { CDaiIcon } from 'components/common/TokenIcon/img/CDaiIcon'
@@ -17,7 +18,8 @@ import { UsdtIcon } from 'components/common/TokenIcon/img/UsdtIcon'
 import { WEthIcon } from 'components/common/TokenIcon/img/WEthIcon'
 import { ZrxIcon } from 'components/common/TokenIcon/img/ZrxIcon'
 import { Spinner } from 'components/statusInfo/Spinner'
-import { Token } from 'util/types'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { NetworkIds, Token } from 'util/types'
 
 const ICON_DIMENSIONS = '20px'
 
@@ -187,7 +189,13 @@ interface SuspenseProps {
 
 const SuspenseImage = (props: SuspenseProps): JSX.Element => {
   const { currencyData, src, symbol } = props
-  const resource = loadImage(src).read()
+  const { networkConfig } = useWeb3ConnectedOrInfura()
+
+  const resource = useMemo(
+    () => (networkConfig.networkId === NetworkIds.MAINNET ? loadImage(src).read() : null),
+    [networkConfig, src]
+  )
+
   return (
     <>
       {currencyData && <Icon>{currencyData?.icon}</Icon>}
@@ -213,11 +221,10 @@ export const TokenIcon: React.FC<Props> = (props) => {
   }, [symbol])
 
   // Only exist for the mainnet, not for rinkeby
-  const customImageUrl = React.useMemo(
-    () =>
-      `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${address}/logo.png`,
-    [address]
-  )
+  const customImageUrl = React.useMemo(() => {
+    const addressWithChecksum = toChecksumAddress(address)
+    return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${addressWithChecksum}/logo.png`
+  }, [address])
 
   return (
     <Wrapper onClick={onClick} {...restProps}>
