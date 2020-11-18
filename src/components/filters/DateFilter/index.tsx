@@ -190,6 +190,8 @@ export const DateFilter: React.FC<Props> = (props) => {
     clearFrom()
     clearTo()
     onClear && onClear()
+    setIsFromValid(undefined)
+    setIsToValid(undefined)
   }, [clearFrom, clearTo, onClear])
 
   return (
