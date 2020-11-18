@@ -1,22 +1,30 @@
 import React from 'react'
+import styled from 'styled-components'
 
 import { ButtonSelectLight } from 'components/buttons/ButtonSelectLight'
 import { DropdownItem, DropdownPosition } from 'components/common/Dropdown'
 import { FilterDropdown } from 'components/pureStyledComponents/FilterDropdown'
-import { FilterTitle } from 'components/pureStyledComponents/FilterTitle'
+import {
+  FilterTitle,
+  FilterTitleButton,
+  FilterWrapper,
+} from 'components/pureStyledComponents/FilterTitle'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { getLogger } from 'util/logger'
 import { Oracle, OracleFilterOptions } from 'util/types'
 
+const Wrapper = styled.div``
+
 interface Props {
+  onClear?: () => void
   onClick: (value: OracleFilterOptions, filter: string[]) => void
   value: string
 }
 
 const logger = getLogger('Oracle Filter')
 
-export const OraclesFilterDropdown = ({ onClick, value }: Props) => {
-  const { CPKService, address, networkConfig } = useWeb3ConnectedOrInfura()
+export const OraclesFilterDropdown = ({ onClear, onClick, value }: Props) => {
+  const { CPKService, address, networkConfig, ...restProps } = useWeb3ConnectedOrInfura()
   const oracles: Oracle[] = networkConfig.getOracles()
 
   const oraclesAdresses: string[] = oracles.map((oracle: Oracle) => oracle.address.toLowerCase())
@@ -60,8 +68,11 @@ export const OraclesFilterDropdown = ({ onClick, value }: Props) => {
   ]
 
   return (
-    <>
-      <FilterTitle>Reporter / Oracle</FilterTitle>
+    <Wrapper {...restProps}>
+      <FilterWrapper>
+        <FilterTitle>Reporter / Oracle</FilterTitle>
+        {onClear && <FilterTitleButton onClick={onClear}>Clear</FilterTitleButton>}
+      </FilterWrapper>
       <FilterDropdown
         currentItem={oraclesItems.findIndex((oracleItem) => oracleItem.value === value)}
         dropdownButtonContent={
@@ -76,6 +87,6 @@ export const OraclesFilterDropdown = ({ onClick, value }: Props) => {
           </DropdownItem>
         ))}
       />
-    </>
+    </Wrapper>
   )
 }

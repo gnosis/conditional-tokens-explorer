@@ -177,6 +177,7 @@ export interface Positions_positions_conditions {
   oracle: string;
   questionId: string;
   outcomeSlotCount: number;
+  resolved: boolean;
 }
 
 export interface Positions_positions {
@@ -248,6 +249,7 @@ export interface PositionsList_positions_conditions {
   oracle: string;
   questionId: string;
   outcomeSlotCount: number;
+  resolved: boolean;
 }
 
 export interface PositionsList_positions {
@@ -319,6 +321,7 @@ export interface GetPosition_position_conditions {
   oracle: string;
   questionId: string;
   outcomeSlotCount: number;
+  resolved: boolean;
 }
 
 export interface GetPosition_position {
@@ -394,6 +397,7 @@ export interface GetMultiPositions_positions_conditions {
   oracle: string;
   questionId: string;
   outcomeSlotCount: number;
+  resolved: boolean;
 }
 
 export interface GetMultiPositions_positions {
@@ -598,6 +602,7 @@ export interface PositionData_conditions {
   oracle: string;
   questionId: string;
   outcomeSlotCount: number;
+  resolved: boolean;
 }
 
 export interface PositionData {

@@ -1,20 +1,28 @@
 import React from 'react'
+import styled from 'styled-components'
 
 import { ButtonSelectLight } from 'components/buttons/ButtonSelectLight'
 import { DropdownItem, DropdownPosition } from 'components/common/Dropdown'
 import { FilterDropdown } from 'components/pureStyledComponents/FilterDropdown'
-import { FilterTitle } from 'components/pureStyledComponents/FilterTitle'
+import {
+  FilterTitle,
+  FilterTitleButton,
+  FilterWrapper,
+} from 'components/pureStyledComponents/FilterTitle'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { ConditionType, ConditionTypeAll } from 'util/types'
 
+const Wrapper = styled.div``
+
 interface Props {
+  onClear?: () => void
   onClick: (value: ConditionType | ConditionTypeAll, filter: Maybe<string>) => void
   value: Maybe<string>
 }
 
 export const ConditionTypeFilterDropdown: React.FC<Props> = (props) => {
   const { networkConfig } = useWeb3ConnectedOrInfura()
-  const { onClick, value } = props
+  const { onClear, onClick, value, ...restProps } = props
 
   const oracleReality = React.useMemo(
     () => networkConfig.getOracleFromName('reality' as KnownOracle),
@@ -46,8 +54,11 @@ export const ConditionTypeFilterDropdown: React.FC<Props> = (props) => {
   ]
 
   return (
-    <>
-      <FilterTitle>Condition Type</FilterTitle>
+    <Wrapper {...restProps}>
+      <FilterWrapper>
+        <FilterTitle>Condition Type</FilterTitle>
+        {onClear && <FilterTitleButton onClick={onClear}>Clear</FilterTitleButton>}
+      </FilterWrapper>
       <FilterDropdown
         currentItem={dropdownItems.findIndex((item) => item.value === value)}
         dropdownButtonContent={
@@ -62,6 +73,6 @@ export const ConditionTypeFilterDropdown: React.FC<Props> = (props) => {
           </DropdownItem>
         ))}
       />
-    </>
+    </Wrapper>
   )
 }

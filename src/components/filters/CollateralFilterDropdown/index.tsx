@@ -5,18 +5,23 @@ import { ButtonSelectLight } from 'components/buttons/ButtonSelectLight'
 import { DropdownItem, DropdownPosition } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
 import { FilterDropdown } from 'components/pureStyledComponents/FilterDropdown'
-import { FilterTitle } from 'components/pureStyledComponents/FilterTitle'
+import {
+  FilterTitle,
+  FilterTitleButton,
+  FilterWrapper,
+} from 'components/pureStyledComponents/FilterTitle'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { CollateralFilterOptions, Token } from 'util/types'
 
 const Wrapper = styled.div``
 
 interface Props {
+  onClear?: () => void
   onClick: (symbol: string, address: Maybe<string[]>) => void
   value: string
 }
 
-export const CollateralFilterDropdown = ({ onClick, value, ...restProps }: Props) => {
+export const CollateralFilterDropdown = ({ onClear, onClick, value, ...restProps }: Props) => {
   const { networkConfig } = useWeb3ConnectedOrInfura()
   const tokensList = networkConfig
     ? [
@@ -55,7 +60,10 @@ export const CollateralFilterDropdown = ({ onClick, value, ...restProps }: Props
 
   return (
     <Wrapper {...restProps}>
-      <FilterTitle>Collateral</FilterTitle>
+      <FilterWrapper>
+        <FilterTitle>Collateral</FilterTitle>
+        {onClear && <FilterTitleButton onClick={onClear}>Clear</FilterTitleButton>}
+      </FilterWrapper>
       <FilterDropdown
         currentItem={tokenItems.findIndex((tokenItem) => tokenItem.value === value)}
         dropdownButtonContent={

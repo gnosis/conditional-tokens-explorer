@@ -21,7 +21,7 @@ interface Props {
 
 export const MergePreview = ({ amount, condition, positions, token }: Props) => {
   const preview = useMemo(() => {
-    if (condition && token) {
+    if (condition && token && positions.length > 0) {
       return getMergePreview(positions, condition.id, amount, token, condition.outcomeSlotCount)
     }
     return null

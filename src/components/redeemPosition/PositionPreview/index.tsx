@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo } from 'react'
 
 import {
@@ -9,17 +10,19 @@ import { TitleValue } from 'components/text/TitleValue'
 import { NetworkConfig } from 'config/networkConfig'
 import { useBalanceForPosition } from 'hooks/useBalanceForPosition'
 import { useCollateral } from 'hooks/useCollateral'
-import { GetCondition_condition, GetPosition_position } from 'types/generatedGQLForCTE'
+import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
+import { GetCondition_condition } from 'types/generatedGQLForCTE'
+import { getRedeemedBalance, getRedeemedPreview } from 'util/tools'
 
 interface Props {
-  position: Maybe<GetPosition_position>
+  position: Maybe<PositionWithUserBalanceWithDecimals>
   condition: Maybe<GetCondition_condition>
   networkConfig: NetworkConfig
 }
 
 export const PositionPreview = ({ condition, position }: Props) => {
-  const { refetch } = useBalanceForPosition(position?.id || '')
-  const { collateral: token } = useCollateral(position ? position.collateralToken.id : '')
+  const { balanceERC1155, refetch } = useBalanceForPosition(position?.id || '')
+  const { collateral: token } = useCollateral(position ? position.collateralToken : '')
 
   useEffect(() => {
     if (position) {
@@ -27,23 +30,20 @@ export const PositionPreview = ({ condition, position }: Props) => {
     }
   }, [position, refetch])
 
-  // TODO: until we refactor this section with the new designs
-  // const redeemedBalance = useMemo(
-  //   () => new BigNumber(0),
-  //   position && condition
-  //     ? getRedeemedBalance(position, condition, balanceERC1155)
-  //     : new BigNumber(0),
-  //   []
-  // )
+  const redeemedBalance = useMemo(
+    () =>
+      position && condition
+        ? getRedeemedBalance(position, condition, balanceERC1155)
+        : new BigNumber(0),
+    [balanceERC1155, condition, position]
+  )
 
   const redeemedPreview = useMemo(() => {
     if (position && condition && token) {
-      // TODO: until we refactor this section with the new designs
-      // return getRedeemedPreview(position, condition, redeemedBalance, token)
-      return ''
+      return getRedeemedPreview(position, condition.id, redeemedBalance, token)
     }
     return ''
-  }, [position, condition, token])
+  }, [position, condition, token, redeemedBalance])
 
   return (
     <TitleValue
@@ -55,7 +55,7 @@ export const PositionPreview = ({ condition, position }: Props) => {
               <strong>{redeemedPreview}</strong>
             </StripedListItem>
           ) : (
-            <StripedListEmpty>No redeemed preview yet.</StripedListEmpty>
+            <StripedListEmpty>No redeemed position.</StripedListEmpty>
           )}
         </StripedList>
       }

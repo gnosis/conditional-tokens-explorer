@@ -11,6 +11,11 @@ import { SearchField } from 'components/form/SearchField'
 import { Switch } from 'components/form/Switch'
 import { CompactFiltersLayout } from 'components/pureStyledComponents/CompactFiltersLayout'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
+import {
+  FilterResultsControl,
+  FilterResultsTextAlternativeLayout,
+} from 'components/pureStyledComponents/FilterResultsText'
+import { FiltersSwitchWrapper } from 'components/pureStyledComponents/FiltersSwitchWrapper'
 import { RadioButton } from 'components/pureStyledComponents/RadioButton'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { SpinnerSize } from 'components/statusInfo/common'
@@ -18,6 +23,7 @@ import { TableControls } from 'components/table/TableControls'
 import { FormatHash } from 'components/text/FormatHash'
 import { TitleValue } from 'components/text/TitleValue'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { PositionWithUserBalanceWithDecimals, usePositionsList } from 'hooks/usePositionsList'
 import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
@@ -25,6 +31,7 @@ import { truncateStringInTheMiddle } from 'util/tools'
 import {
   AdvancedFilterPosition,
   CollateralFilterOptions,
+  LocalStorageManagement,
   PositionSearchOptions,
   WrappedCollateralOptions,
 } from 'util/types'
@@ -45,10 +52,14 @@ const TitleValueExtended = styled(TitleValue)<{ hideTitle?: boolean }>`
 interface Props {
   hideTitle?: boolean
   onRowClicked: (position: PositionWithUserBalanceWithDecimals) => void
-  onClearCallback: () => void
+  onClearCallback?: () => void
+  onFilterCallback?: (
+    positions: PositionWithUserBalanceWithDecimals[]
+  ) => PositionWithUserBalanceWithDecimals[]
   selectedPosition: Maybe<PositionWithUserBalanceWithDecimals>
   title?: string
-  clearFilters: boolean
+  clearFilters?: boolean
+  refetch?: boolean
 }
 
 export const SelectablePositionTable: React.FC<Props> = (props) => {
@@ -56,13 +67,17 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     clearFilters,
     hideTitle,
     onClearCallback,
+    onFilterCallback,
     onRowClicked,
+    refetch,
     selectedPosition,
     title = 'Positions',
     ...restProps
   } = props
 
   const { networkConfig } = useWeb3ConnectedOrInfura()
+
+  const { getValue } = useLocalStorage(LocalStorageManagement.PositionId)
 
   const [positionList, setPositionList] = useState<PositionWithUserBalanceWithDecimals[]>([])
 
@@ -71,6 +86,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
   const [textToSearch, setTextToSearch] = useState<string>('')
   const [resetPagination, setResetPagination] = useState<boolean>(false)
   const [showFilters, setShowFilters] = useState(false)
+  const [isFiltering, setIsFiltering] = useState(false)
 
   const [selectedCollateralFilter, setSelectedCollateralFilter] = useState<Maybe<string[]>>(null)
   const [selectedCollateralValue, setSelectedCollateralValue] = useState<string>(
@@ -85,7 +101,15 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
 
   const debouncedHandlerTextToSearch = useDebounceCallback((textToSearch) => {
     setTextToSearch(textToSearch)
-  }, 500)
+  }, 100)
+
+  useEffect(() => {
+    const localStorageCondition = getValue()
+    if (localStorageCondition) {
+      setTextToShow(localStorageCondition)
+      debouncedHandlerTextToSearch(localStorageCondition)
+    }
+  }, [getValue, debouncedHandlerTextToSearch])
 
   const onChangeSearch = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,46 +149,65 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     textToSearch,
   ])
 
-  const { data, error, loading } = usePositionsList(advancedFilters)
-
-  // #1 Filter, only positions with balance
-  const positionsWithBalance = useMemo(
-    () =>
-      data &&
-      data.length &&
-      data.filter(
-        (position: PositionWithUserBalanceWithDecimals) => !position.userBalanceERC1155.isZero()
-      ),
-    [data]
+  const { data, error, loading, refetchPositions, refetchUserPositions } = usePositionsList(
+    advancedFilters
   )
 
   const resetFilters = useCallback(() => {
     setResetPagination(!resetPagination)
     setSelectedToCreationDate(null)
     setSelectedFromCreationDate(null)
-    setSearchBy(PositionSearchOptions.PositionId)
-    setTextToSearch('')
     setSelectedCollateralFilter(null)
     setSelectedCollateralValue(CollateralFilterOptions.All)
     setWrappedCollateral(WrappedCollateralOptions.All)
   }, [resetPagination])
 
+  useEffect(() => {
+    setIsFiltering(
+      selectedToCreationDate !== null ||
+        selectedFromCreationDate !== null ||
+        wrappedCollateral !== WrappedCollateralOptions.All ||
+        selectedCollateralValue !== CollateralFilterOptions.All ||
+        wrappedCollateral !== WrappedCollateralOptions.All ||
+        selectedCollateralFilter !== null
+    )
+  }, [
+    isFiltering,
+    selectedCollateralFilter,
+    selectedCollateralValue,
+    selectedFromCreationDate,
+    selectedToCreationDate,
+    wrappedCollateral,
+  ])
+
   // Clear the filters on network change
   useEffect(() => {
     setShowFilters(false)
     resetFilters()
-    onClearCallback()
+    if (onClearCallback) onClearCallback()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networkConfig, clearFilters])
 
   // Filter selected positions from original list. And positions without balance as indicated by props.
   useEffect(() => {
-    if (positionsWithBalance) {
-      setPositionList(positionsWithBalance)
+    if (data && data.length > 0) {
+      if (onFilterCallback) {
+        setPositionList(onFilterCallback(data))
+      } else {
+        setPositionList(data)
+      }
     } else {
       setPositionList([])
     }
-  }, [setPositionList, positionsWithBalance])
+  }, [setPositionList, data, onFilterCallback])
+
+  useEffect(() => {
+    if (refetch) {
+      onClearSearch()
+      refetchPositions()
+      refetchUserPositions()
+    }
+  }, [refetch, refetchPositions, refetchUserPositions, onClearSearch])
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const defaultColumns: Array<any> = useMemo(
@@ -226,15 +269,6 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     setShowFilters(!showFilters)
   }, [showFilters])
 
-  // Clear the filters
-  useEffect(() => {
-    if (!showFilters) {
-      resetFilters()
-      onClearCallback()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showFilters])
-
   const isLoading = useMemo(() => !textToSearch && loading, [textToSearch, loading])
   const isSearching = useMemo(() => textToSearch && loading, [textToSearch, loading])
 
@@ -257,7 +291,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     ) {
       setResetPagination(!resetPagination)
     }
-    onClearCallback()
+    if (onClearCallback) onClearCallback()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -284,32 +318,48 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
                 value={textToShow}
               />
             }
-            start={<Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />}
+            start={
+              <FiltersSwitchWrapper>
+                <Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />
+                {(isFiltering || showFilters) && (
+                  <FilterResultsTextAlternativeLayout>
+                    Showing {isFiltering ? 'filtered' : 'all'} results -{' '}
+                    <FilterResultsControl disabled={!isFiltering} onClick={resetFilters}>
+                      Clear Filters
+                    </FilterResultsControl>
+                  </FilterResultsTextAlternativeLayout>
+                )}
+              </FiltersSwitchWrapper>
+            }
           />
-          {showFilters && (
-            <CompactFiltersLayout>
-              <CollateralFilterDropdown
-                onClick={(symbol: string, address: Maybe<string[]>) => {
-                  setSelectedCollateralFilter(address)
-                  setSelectedCollateralValue(symbol)
-                }}
-                value={selectedCollateralValue}
-              />
-              <WrappedCollateralFilterDropdown
-                onClick={(value: WrappedCollateralOptions) => {
-                  setWrappedCollateral(value)
-                }}
-                value={wrappedCollateral}
-              />
-              <DateFilter
-                onSubmit={(from, to) => {
-                  setSelectedFromCreationDate(from)
-                  setSelectedToCreationDate(to)
-                }}
-                title="Creation Date"
-              />
-            </CompactFiltersLayout>
-          )}
+          <CompactFiltersLayout isVisible={showFilters}>
+            <CollateralFilterDropdown
+              onClick={(symbol: string, address: Maybe<string[]>) => {
+                setSelectedCollateralFilter(address)
+                setSelectedCollateralValue(symbol)
+              }}
+              value={selectedCollateralValue}
+            />
+            <WrappedCollateralFilterDropdown
+              onClick={(value: WrappedCollateralOptions) => {
+                setWrappedCollateral(value)
+              }}
+              value={wrappedCollateral}
+            />
+            <DateFilter
+              fromValue={selectedFromCreationDate}
+              onClear={() => {
+                setSelectedToCreationDate(null)
+                setSelectedFromCreationDate(null)
+              }}
+              onSubmit={(from, to) => {
+                setSelectedFromCreationDate(from)
+                setSelectedToCreationDate(to)
+              }}
+              title="Creation Date"
+              toValue={selectedToCreationDate}
+            />
+          </CompactFiltersLayout>
           <DataTable
             className="outerTableWrapper condensedTable"
             columns={defaultColumns}

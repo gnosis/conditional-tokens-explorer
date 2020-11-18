@@ -1,17 +1,9 @@
 import { useDebounceCallback } from '@react-hook/debounce'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { NavLink, useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { ButtonCopy } from 'components/buttons/ButtonCopy'
-import { ButtonDots } from 'components/buttons/ButtonDots'
-import {
-  Dropdown,
-  DropdownItemCSS,
-  DropdownItemProps,
-  DropdownPosition,
-} from 'components/common/Dropdown'
 import { ConditionTypeFilterDropdown } from 'components/filters/ConditionTypeFilterDropdown'
 import { DateFilter } from 'components/filters/DateFilter'
 import { MinMaxFilter } from 'components/filters/MinMaxFilter'
@@ -20,29 +12,27 @@ import { StatusFilterDropdown } from 'components/filters/StatusFilterDropdown'
 import { SearchField } from 'components/form/SearchField'
 import { Switch } from 'components/form/Switch'
 import { ExternalLink } from 'components/navigation/ExternalLink'
+import { CompactFiltersLayout } from 'components/pureStyledComponents/CompactFiltersLayout'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import {
   FilterResultsControl,
-  FilterResultsText,
+  FilterResultsTextAlternativeLayout,
 } from 'components/pureStyledComponents/FilterResultsText'
 import { FiltersSwitchWrapper } from 'components/pureStyledComponents/FiltersSwitchWrapper'
-import { PageTitle } from 'components/pureStyledComponents/PageTitle'
-import { Pill, PillTypes } from 'components/pureStyledComponents/Pill'
-import { Sidebar } from 'components/pureStyledComponents/Sidebar'
-import { SidebarRow } from 'components/pureStyledComponents/SidebarRow'
-import { TwoColumnsCollapsibleLayout } from 'components/pureStyledComponents/TwoColumnsCollapsibleLayout'
+import { RadioButton } from 'components/pureStyledComponents/RadioButton'
 import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { SpinnerSize } from 'components/statusInfo/common'
 import { TableControls } from 'components/table/TableControls'
-import { Hash } from 'components/text/Hash'
+import { FormatHash } from 'components/text/FormatHash'
+import { TitleValue } from 'components/text/TitleValue'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useConditionsList } from 'hooks/useConditionsList'
 import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { customStyles } from 'theme/tableCustomStyles'
 import { Conditions_conditions } from 'types/generatedGQLForCTE'
-import { getLogger } from 'util/logger'
-import { formatTSSimple, getRealityQuestionUrl, isOracleRealitio } from 'util/tools'
+import { getRealityQuestionUrl, isOracleRealitio, truncateStringInTheMiddle } from 'util/tools'
 import {
   AdvancedFilterConditions,
   ConditionSearchOptions,
@@ -53,27 +43,54 @@ import {
   StatusOptions,
 } from 'util/types'
 
-const DropdownItemLink = styled(NavLink)<DropdownItemProps>`
-  ${DropdownItemCSS}
+const Search = styled(SearchField)`
+  min-width: 0;
+  width: 400px;
 `
 
-const logger = getLogger('ConditionsList')
+const TableControlsStyled = styled(TableControls)`
+  padding-top: 13px;
+`
 
-export const ConditionsList: React.FC = () => {
+interface Props {
+  onRowClicked: (row: Conditions_conditions) => void
+  selectedConditionId?: string | undefined
+  onClearSelection: () => void
+  title?: string
+  allowToDisplayOnlyConditionsToReport?: boolean
+  refetch?: boolean
+}
+
+export const SelectableConditionTable: React.FC<Props> = (props) => {
   const { _type: status, CPKService, address, networkConfig } = useWeb3ConnectedOrInfura()
 
-  const history = useHistory()
-  const { setValue } = useLocalStorage(LocalStorageManagement.ConditionId)
+  const { getValue } = useLocalStorage(LocalStorageManagement.ConditionId)
+
+  const {
+    allowToDisplayOnlyConditionsToReport = false,
+    onClearSelection,
+    onRowClicked,
+    refetch,
+    selectedConditionId,
+    title = 'Conditions',
+    ...restProps
+  } = props
 
   const [textToSearch, setTextToSearch] = useState<string>('')
   const [textToShow, setTextToShow] = useState<string>('')
   const [resetPagination, setResetPagination] = useState<boolean>(false)
 
-  const [selectedOracleFilter, setSelectedOracleFilter] = useState<string[]>([])
-  const [selectedOracleValue, setSelectedOracleValue] = useState<OracleFilterOptions>(
-    OracleFilterOptions.All
+  const [selectedOracleFilter, setSelectedOracleFilter] = useState<string[]>(() =>
+    allowToDisplayOnlyConditionsToReport && address && CPKService
+      ? [address.toLowerCase(), CPKService.address.toLowerCase()]
+      : []
   )
-  const [selectedStatus, setSelectedStatus] = useState<StatusOptions>(StatusOptions.All)
+  const [selectedOracleValue, setSelectedOracleValue] = useState<OracleFilterOptions>(() =>
+    allowToDisplayOnlyConditionsToReport ? OracleFilterOptions.Current : OracleFilterOptions.All
+  )
+  const [selectedStatus, setSelectedStatus] = useState<StatusOptions>(() =>
+    allowToDisplayOnlyConditionsToReport ? StatusOptions.Open : StatusOptions.All
+  )
   const [selectedMinOutcomes, setSelectedMinOutcomes] = useState<Maybe<number>>(null)
   const [selectedMaxOutcomes, setSelectedMaxOutcomes] = useState<Maybe<number>>(null)
   const [selectedFromCreationDate, setSelectedFromCreationDate] = useState<Maybe<number>>(null)
@@ -92,11 +109,17 @@ export const ConditionsList: React.FC = () => {
 
   const dropdownItems = useConditionsSearchOptions(setSearchBy)
 
-  logger.log(`Search by ${searchBy}`)
-
   const debouncedHandlerTextToSearch = useDebounceCallback((conditionIdToSearch) => {
     setTextToSearch(conditionIdToSearch)
-  }, 500)
+  }, 100)
+
+  useEffect(() => {
+    const localStorageCondition = getValue()
+    if (localStorageCondition) {
+      setTextToShow(localStorageCondition)
+      debouncedHandlerTextToSearch(localStorageCondition)
+    }
+  }, [getValue, debouncedHandlerTextToSearch])
 
   const onChangeSearch = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,30 +142,41 @@ export const ConditionsList: React.FC = () => {
 
   const resetFilters = useCallback(() => {
     setResetPagination(!resetPagination)
-    setSelectedOracleValue(OracleFilterOptions.All)
-    setSelectedOracleFilter([])
+    setSelectedOracleValue(
+      allowToDisplayOnlyConditionsToReport ? OracleFilterOptions.Current : OracleFilterOptions.All
+    )
+    setSelectedOracleFilter(
+      allowToDisplayOnlyConditionsToReport && address && CPKService
+        ? [address.toLowerCase(), CPKService.address.toLowerCase()]
+        : []
+    )
     setSelectedConditionTypeValue(ConditionTypeAll.all)
     setSelectedConditionTypeFilter(null)
-    setSelectedStatus(StatusOptions.All)
+    setSelectedStatus(allowToDisplayOnlyConditionsToReport ? StatusOptions.Open : StatusOptions.All)
     setSelectedMinOutcomes(null)
     setSelectedMaxOutcomes(null)
     setSelectedToCreationDate(null)
     setSelectedFromCreationDate(null)
-  }, [resetPagination])
+    onClearSelection()
+  }, [resetPagination, CPKService, address, allowToDisplayOnlyConditionsToReport, onClearSelection])
 
   useEffect(() => {
     setIsFiltering(
-      selectedOracleValue !== OracleFilterOptions.All ||
-        selectedOracleFilter.length > 0 ||
+      (allowToDisplayOnlyConditionsToReport &&
+        selectedOracleValue !== OracleFilterOptions.Current) ||
+        (!allowToDisplayOnlyConditionsToReport &&
+          selectedOracleValue !== OracleFilterOptions.All) ||
         selectedConditionTypeValue !== ConditionTypeAll.all ||
         selectedConditionTypeFilter !== null ||
-        selectedStatus !== StatusOptions.All ||
+        (allowToDisplayOnlyConditionsToReport && selectedStatus !== StatusOptions.Open) ||
+        (!allowToDisplayOnlyConditionsToReport && selectedStatus !== StatusOptions.All) ||
         selectedMinOutcomes !== null ||
         selectedMaxOutcomes !== null ||
         selectedToCreationDate !== null ||
         selectedFromCreationDate !== null
     )
   }, [
+    allowToDisplayOnlyConditionsToReport,
     isFiltering,
     selectedConditionTypeFilter,
     selectedConditionTypeValue,
@@ -207,68 +241,43 @@ export const ConditionsList: React.FC = () => {
     }
   }, [status, CPKService, address, selectedOracleValue])
 
-  const { data, error, loading } = useConditionsList(advancedFilters)
+  const { data, error, loading, refetch: refetchConditionList } = useConditionsList(advancedFilters)
 
-  const isLoading = useMemo(() => !textToSearch && loading, [textToSearch, loading])
-  const isSearching = useMemo(() => textToSearch && loading, [textToSearch, loading])
-  const isConnected = useMemo(() => status === Web3ContextStatus.Connected, [status])
+  useEffect(() => {
+    if (refetch) {
+      onClearSearch()
+      refetchConditionList()
+    }
+  }, [refetch, refetchConditionList, onClearSearch])
 
-  const buildMenuForRow = useCallback(
-    (row: Conditions_conditions) => {
-      const { id, oracle, resolved } = row
+  const [conditionList, setConditionList] = useState<Conditions_conditions[]>([])
 
-      const isAllowedToReport = address && address.toLowerCase() === oracle.toLowerCase()
-
-      const menu = [
-        {
-          href: `/conditions/${id}`,
-          text: 'Details',
-          onClick: undefined,
-        },
-        {
-          href: `/split/`,
-          text: 'Split Position',
-          onClick: () => {
-            setValue(id)
-          },
-          disabled: !isConnected,
-        },
-        {
-          href: `/merge/`,
-          text: 'Merge Positions',
-          onClick: () => {
-            setValue(id)
-          },
-          disabled: !isConnected,
-        },
-        {
-          href: `/report/`,
-          text: 'Report Payouts',
-          onClick: () => {
-            setValue(id)
-          },
-          disabled: resolved || !isConnected || !isAllowedToReport,
-        },
-      ]
-
-      return menu
-    },
-    [setValue, isConnected, address]
-  )
-
-  const handleRowClick = useCallback(
-    (row: Conditions_conditions) => {
-      history.push(`/conditions/${row.id}`)
-    },
-    [history]
-  )
+  useEffect(() => {
+    if (!data || !data.conditions) {
+      setConditionList([])
+    } else {
+      setConditionList(data.conditions)
+    }
+  }, [data])
 
   const columns = useMemo(
     () => [
       {
         // eslint-disable-next-line react/display-name
         cell: (row: Conditions_conditions) => (
-          <Hash href={`/conditions/${row.id}`} value={row.id} />
+          <RadioButton checked={selectedConditionId === row.id} onClick={() => onRowClicked(row)} />
+        ),
+        maxWidth: '12px',
+        minWidth: '12px',
+        name: '',
+      },
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: Conditions_conditions) => (
+          <FormatHash
+            hash={truncateStringInTheMiddle(row.id, 8, 6)}
+            onClick={() => onRowClicked(row)}
+          />
         ),
         name: 'Condition Id',
         sortable: false,
@@ -287,87 +296,36 @@ export const ConditionsList: React.FC = () => {
               <ExternalLink href={getRealityQuestionUrl(questionId, networkConfig)} />
             </>
           ) : (
-            <Hash onClick={() => handleRowClick(row)} value={oracle} />
+            <FormatHash
+              hash={truncateStringInTheMiddle(oracle, 8, 6)}
+              onClick={() => onRowClicked(row)}
+            />
           )
 
           return oracleName
         },
         name: 'Reporter / Oracle',
-        sortable: false,
+        selector: 'oracle',
+        sortable: true,
       },
       {
         // eslint-disable-next-line react/display-name
         cell: (row: Conditions_conditions) => (
-          <Hash onClick={() => handleRowClick(row)} value={row.questionId} />
+          <FormatHash
+            hash={truncateStringInTheMiddle(row.questionId, 8, 6)}
+            onClick={() => onRowClicked(row)}
+          />
         ),
         name: 'Question Id',
         selector: 'questionId',
         sortable: true,
       },
-      {
-        maxWidth: '100px',
-        name: 'Outcomes',
-        right: true,
-        selector: 'outcomeSlotCount',
-        sortable: true,
-      },
-      {
-        cell: (row: Conditions_conditions) => formatTSSimple(row.createTimestamp),
-        maxWidth: '150px',
-        name: 'Creation Date',
-        right: true,
-        selector: 'createTimestamp',
-        sortable: true,
-      },
-      {
-        center: true,
-        name: 'Status',
-        selector: 'resolved',
-        sortable: true,
-        width: '150px',
-        // eslint-disable-next-line react/display-name
-        cell: (row: Conditions_conditions) =>
-          row.resolved ? (
-            <Pill onClick={() => handleRowClick(row)} type={PillTypes.primary}>
-              Resolved
-            </Pill>
-          ) : (
-            <Pill onClick={() => handleRowClick(row)} type={PillTypes.open}>
-              Open
-            </Pill>
-          ),
-        sortFunction: (a: Conditions_conditions, b: Conditions_conditions) => {
-          const valA = a.resolved ? 2 : 1
-          const valB = b.resolved ? 2 : 1
-          return valA - valB
-        },
-      },
-      {
-        // eslint-disable-next-line react/display-name
-        cell: (row: Conditions_conditions) => (
-          <Dropdown
-            activeItemHighlight={false}
-            dropdownButtonContent={<ButtonDots />}
-            dropdownPosition={DropdownPosition.right}
-            items={buildMenuForRow(row).map((item, index) => (
-              <DropdownItemLink
-                disabled={item.disabled}
-                key={index}
-                onMouseDown={item.onClick}
-                to={item.href}
-              >
-                {item.text}
-              </DropdownItemLink>
-            ))}
-          />
-        ),
-        name: '',
-        width: '60px',
-        right: true,
-      },
     ],
-    [buildMenuForRow, handleRowClick, networkConfig]
+    [onRowClicked, selectedConditionId, networkConfig]
   )
+
+  const isLoading = useMemo(() => !textToSearch && loading, [textToSearch, loading])
+  const isSearching = useMemo(() => textToSearch && loading, [textToSearch, loading])
 
   const toggleShowFilters = useCallback(() => {
     setShowFilters(!showFilters)
@@ -399,6 +357,7 @@ export const ConditionsList: React.FC = () => {
       selectedFromCreationDate
     ) {
       setResetPagination(!resetPagination)
+      onClearSelection()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -415,102 +374,94 @@ export const ConditionsList: React.FC = () => {
   ])
 
   return (
-    <>
-      <PageTitle>Conditions</PageTitle>
-      <TableControls
-        end={
-          <SearchField
-            dropdownItems={dropdownItems}
-            onChange={onChangeSearch}
-            onClear={onClearSearch}
-            value={textToShow}
+    <TitleValue
+      title={title}
+      value={
+        <>
+          <TableControlsStyled
+            end={
+              <Search
+                dropdownItems={dropdownItems}
+                onChange={onChangeSearch}
+                onClear={onClearSearch}
+                value={textToShow}
+              />
+            }
+            start={
+              <FiltersSwitchWrapper>
+                <Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />
+                {(isFiltering || showFilters) && (
+                  <FilterResultsTextAlternativeLayout>
+                    Showing {isFiltering ? 'filtered' : 'all'} results -{' '}
+                    <FilterResultsControl disabled={!isFiltering} onClick={resetFilters}>
+                      Clear Filters
+                    </FilterResultsControl>
+                  </FilterResultsTextAlternativeLayout>
+                )}
+              </FiltersSwitchWrapper>
+            }
           />
-        }
-        start={
-          <FiltersSwitchWrapper>
-            <Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />
-            {(isFiltering || showFilters) && (
-              <FilterResultsText>
-                Showing {isFiltering ? 'filtered' : 'all'} results -{' '}
-                <FilterResultsControl disabled={!isFiltering} onClick={resetFilters}>
-                  Clear Filters
-                </FilterResultsControl>
-              </FilterResultsText>
-            )}
-          </FiltersSwitchWrapper>
-        }
-      />
-      {error && !isBytes32Error && !isLoading && <InfoCard message={error.message} title="Error" />}
-      {(!error || isBytes32Error) && (
-        <TwoColumnsCollapsibleLayout isCollapsed={!showFilters}>
-          <Sidebar isVisible={showFilters}>
-            <SidebarRow>
-              <OraclesFilterDropdown
-                onClick={(value: OracleFilterOptions, filter: string[]) => {
-                  setSelectedOracleFilter(filter)
-                  setSelectedOracleValue(value)
-                  setResetPagination(!resetPagination)
-                }}
-                value={selectedOracleValue}
-              />
-            </SidebarRow>
-            <SidebarRow>
-              <StatusFilterDropdown
-                onClick={(value: StatusOptions) => {
-                  setSelectedStatus(value)
-                }}
-                value={selectedStatus}
-              />
-            </SidebarRow>
-            <SidebarRow>
-              <ConditionTypeFilterDropdown
-                onClick={(value: ConditionType | ConditionTypeAll, filter: Maybe<string>) => {
-                  setSelectedConditionTypeFilter(filter)
-                  setSelectedConditionTypeValue(value)
-                }}
-                value={selectedConditionTypeValue}
-              />
-            </SidebarRow>
-            <SidebarRow>
-              <MinMaxFilter
-                maxValue={selectedMaxOutcomes}
-                minValue={selectedMinOutcomes}
-                onClear={() => {
-                  setSelectedMinOutcomes(null)
-                  setSelectedMaxOutcomes(null)
-                }}
-                onSubmit={(min, max) => {
-                  setSelectedMinOutcomes(min)
-                  setSelectedMaxOutcomes(max)
-                }}
-                title="Outcomes"
-              />
-            </SidebarRow>
-            <SidebarRow>
-              <DateFilter
-                fromValue={selectedFromCreationDate}
-                onClear={() => {
-                  setSelectedToCreationDate(null)
-                  setSelectedFromCreationDate(null)
-                }}
-                onSubmit={(from, to) => {
-                  setSelectedFromCreationDate(from)
-                  setSelectedToCreationDate(to)
-                }}
-                title="Creation Date"
-                toValue={selectedToCreationDate}
-              />
-            </SidebarRow>
-          </Sidebar>
+          {error && !isBytes32Error && !isLoading && (
+            <InfoCard message={error.message} title="Error" />
+          )}
+          <CompactFiltersLayout isVisible={(!error || isBytes32Error) && showFilters}>
+            <OraclesFilterDropdown
+              onClick={(value: OracleFilterOptions, filter: string[]) => {
+                setSelectedOracleFilter(filter)
+                setSelectedOracleValue(value)
+                setResetPagination(!resetPagination)
+              }}
+              value={selectedOracleValue}
+            />
+            <StatusFilterDropdown
+              onClick={(value: StatusOptions) => {
+                setSelectedStatus(value)
+              }}
+              value={selectedStatus}
+            />
+            <ConditionTypeFilterDropdown
+              onClick={(value: ConditionType | ConditionTypeAll, filter: Maybe<string>) => {
+                setSelectedConditionTypeFilter(filter)
+                setSelectedConditionTypeValue(value)
+              }}
+              value={selectedConditionTypeValue}
+            />
+            <MinMaxFilter
+              maxValue={selectedMaxOutcomes}
+              minValue={selectedMinOutcomes}
+              onClear={() => {
+                setSelectedMinOutcomes(null)
+                setSelectedMaxOutcomes(null)
+              }}
+              onSubmit={(min, max) => {
+                setSelectedMinOutcomes(min)
+                setSelectedMaxOutcomes(max)
+              }}
+              title="Outcomes"
+            />
+            <DateFilter
+              fromValue={selectedFromCreationDate}
+              onClear={() => {
+                setSelectedToCreationDate(null)
+                setSelectedFromCreationDate(null)
+              }}
+              onSubmit={(from, to) => {
+                setSelectedFromCreationDate(from)
+                setSelectedToCreationDate(to)
+              }}
+              title="Creation Date"
+              toValue={selectedToCreationDate}
+            />
+          </CompactFiltersLayout>
           <DataTable
-            className="outerTableWrapper"
+            className="outerTableWrapper condensedTable"
             columns={columns}
             customStyles={customStyles}
-            data={showSpinner ? [] : data?.conditions || []}
+            data={showSpinner ? [] : conditionList.length ? conditionList : []}
             highlightOnHover
             noDataComponent={
               showSpinner ? (
-                <InlineLoading />
+                <InlineLoading size={SpinnerSize.small} />
               ) : status === Web3ContextStatus.Infura &&
                 selectedOracleValue === OracleFilterOptions.Current ? (
                 <EmptyContentText>User is not connected to wallet.</EmptyContentText>
@@ -519,13 +470,17 @@ export const ConditionsList: React.FC = () => {
               )
             }
             noHeader
-            onRowClicked={handleRowClick}
+            onRowClicked={onRowClicked}
             pagination
+            paginationPerPage={5}
             paginationResetDefaultPage={resetPagination}
+            paginationRowsPerPageOptions={[5, 10, 15]}
+            pointerOnHover
             responsive
           />
-        </TwoColumnsCollapsibleLayout>
-      )}
-    </>
+        </>
+      }
+      {...restProps}
+    />
   )
 }

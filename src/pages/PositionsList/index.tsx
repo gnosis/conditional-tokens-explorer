@@ -28,6 +28,11 @@ import { UnwrapModal } from 'components/modals/UnwrapModal'
 import { WrapModal } from 'components/modals/WrapModal'
 import { ExternalLink } from 'components/navigation/ExternalLink'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
+import {
+  FilterResultsControl,
+  FilterResultsText,
+} from 'components/pureStyledComponents/FilterResultsText'
+import { FiltersSwitchWrapper } from 'components/pureStyledComponents/FiltersSwitchWrapper'
 import { PageTitle } from 'components/pureStyledComponents/PageTitle'
 import { Sidebar } from 'components/pureStyledComponents/Sidebar'
 import { SidebarRow } from 'components/pureStyledComponents/SidebarRow'
@@ -108,6 +113,7 @@ export const PositionsList = () => {
 
   const [searchBy, setSearchBy] = useState<PositionSearchOptions>(PositionSearchOptions.PositionId)
   const [showFilters, setShowFilters] = useState(false)
+  const [isFiltering, setIsFiltering] = useState(false)
 
   const [openDisplayHashesTableModal, setOpenDisplayHashesTableModal] = useState(false)
   const [hashesTableModal, setHashesTableModal] = useState<Array<HashArray>>([])
@@ -137,20 +143,28 @@ export const PositionsList = () => {
     setResetPagination(!resetPagination)
     setSelectedToCreationDate(null)
     setSelectedFromCreationDate(null)
-    setSearchBy(PositionSearchOptions.PositionId)
-    setTextToSearch('')
     setSelectedCollateralFilter(null)
     setSelectedCollateralValue(CollateralFilterOptions.All)
     setWrappedCollateral(WrappedCollateralOptions.All)
   }, [resetPagination])
 
-  // Clear the filters
   useEffect(() => {
-    if (!showFilters) {
-      resetFilters()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showFilters])
+    setIsFiltering(
+      selectedToCreationDate !== null ||
+        selectedFromCreationDate !== null ||
+        wrappedCollateral !== WrappedCollateralOptions.All ||
+        selectedCollateralValue !== CollateralFilterOptions.All ||
+        wrappedCollateral !== WrappedCollateralOptions.All ||
+        selectedCollateralFilter !== null
+    )
+  }, [
+    isFiltering,
+    selectedCollateralFilter,
+    selectedCollateralValue,
+    selectedFromCreationDate,
+    selectedToCreationDate,
+    wrappedCollateral,
+  ])
 
   const advancedFilters: AdvancedFilterPosition = useMemo(() => {
     return {
@@ -190,6 +204,7 @@ export const PositionsList = () => {
     loading,
     transfer,
   ])
+
   const isSearching = useMemo(() => textToSearch && loading, [textToSearch, loading])
 
   const isConnected = useMemo(() => status === Web3ContextStatus.Connected, [status])
@@ -655,6 +670,7 @@ export const PositionsList = () => {
     isSearching,
     error,
   ])
+
   const isWorking = useMemo(
     () => transfer.isLoading() || transfer.isFailure() || transfer.isSuccess(),
     [transfer]
@@ -693,41 +709,57 @@ export const PositionsList = () => {
             value={textToShow}
           />
         }
-        start={<Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />}
+        start={
+          <FiltersSwitchWrapper>
+            <Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />
+            {(isFiltering || showFilters) && (
+              <FilterResultsText>
+                Showing {isFiltering ? 'filtered' : 'all'} results -{' '}
+                <FilterResultsControl disabled={!isFiltering} onClick={resetFilters}>
+                  Clear Filters
+                </FilterResultsControl>
+              </FilterResultsText>
+            )}
+          </FiltersSwitchWrapper>
+        }
       />
       {error && !isLoading && <InfoCard message={error.message} title="Error" />}
       {!error && (
         <TwoColumnsCollapsibleLayout isCollapsed={!showFilters}>
-          {showFilters && (
-            <Sidebar>
-              <SidebarRow>
-                <CollateralFilterDropdown
-                  onClick={(symbol: string, address: Maybe<string[]>) => {
-                    setSelectedCollateralFilter(address)
-                    setSelectedCollateralValue(symbol)
-                  }}
-                  value={selectedCollateralValue}
-                />
-              </SidebarRow>
-              <SidebarRow>
-                <WrappedCollateralFilterDropdown
-                  onClick={(value: WrappedCollateralOptions) => {
-                    setWrappedCollateral(value)
-                  }}
-                  value={wrappedCollateral}
-                />
-              </SidebarRow>
-              <SidebarRow>
-                <DateFilter
-                  onSubmit={(from, to) => {
-                    setSelectedFromCreationDate(from)
-                    setSelectedToCreationDate(to)
-                  }}
-                  title="Creation Date"
-                />
-              </SidebarRow>
-            </Sidebar>
-          )}
+          <Sidebar isVisible={showFilters}>
+            <SidebarRow>
+              <CollateralFilterDropdown
+                onClick={(symbol: string, address: Maybe<string[]>) => {
+                  setSelectedCollateralFilter(address)
+                  setSelectedCollateralValue(symbol)
+                }}
+                value={selectedCollateralValue}
+              />
+            </SidebarRow>
+            <SidebarRow>
+              <WrappedCollateralFilterDropdown
+                onClick={(value: WrappedCollateralOptions) => {
+                  setWrappedCollateral(value)
+                }}
+                value={wrappedCollateral}
+              />
+            </SidebarRow>
+            <SidebarRow>
+              <DateFilter
+                fromValue={selectedFromCreationDate}
+                onClear={() => {
+                  setSelectedToCreationDate(null)
+                  setSelectedFromCreationDate(null)
+                }}
+                onSubmit={(from, to) => {
+                  setSelectedFromCreationDate(from)
+                  setSelectedToCreationDate(to)
+                }}
+                title="Creation Date"
+                toValue={selectedToCreationDate}
+              />
+            </SidebarRow>
+          </Sidebar>
           <DataTable
             className="outerTableWrapper"
             columns={getColumns()}

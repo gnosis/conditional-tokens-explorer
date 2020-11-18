@@ -4,7 +4,7 @@ import styled from 'styled-components'
 const Wrapper = styled.div`
   align-items: center;
   display: block;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 
   @media (min-width: ${(props) => props.theme.themeBreakPoints.md}) {
     display: flex;
