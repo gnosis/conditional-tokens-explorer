@@ -159,6 +159,11 @@ export const SplitFrom: React.FC<Props> = (props) => {
       <ToggleableSelectablePositionTable
         clearFilters={true}
         hideTitle
+        onFilterCallback={(positions: PositionWithUserBalanceWithDecimals[]) =>
+          positions.filter(
+            (position: PositionWithUserBalanceWithDecimals) => !position.userBalanceERC1155.isZero()
+          )
+        }
         onRowClicked={onRowClicked}
         selectedPosition={position}
         visible={splitFrom === SplitFromType.position}
