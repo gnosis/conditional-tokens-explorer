@@ -55,10 +55,21 @@ interface Props {
   onClear?: () => void
   onSubmit: (from: Maybe<number>, to: Maybe<number>) => void
   title: string
+  toValue: Maybe<number>
+  fromValue: Maybe<number>
 }
 
 export const DateFilter: React.FC<Props> = (props) => {
-  const { onChangeFrom, onChangeTo, onClear, onSubmit, title, ...restProps } = props
+  const {
+    fromValue: fromValueFromProps,
+    onChangeFrom,
+    onChangeTo,
+    onClear,
+    onSubmit,
+    title,
+    toValue: toValueFromProps,
+    ...restProps
+  } = props
   const toDate = useRef<HTMLInputElement>(null)
   const fromDate = useRef<HTMLInputElement>(null)
 
@@ -144,12 +155,40 @@ export const DateFilter: React.FC<Props> = (props) => {
     if (!from && !to) onSubmit(from, to)
   }, [from, to, onSubmit])
 
+  const clearFrom = React.useCallback(() => {
+    if (fromDate.current) fromDate.current.value = ''
+    setFrom(null)
+  }, [fromDate])
+
+  const clearTo = React.useCallback(() => {
+    if (toDate.current) toDate.current.value = ''
+    setTo(null)
+  }, [toDate])
+
+  React.useEffect(() => {
+    if (fromValueFromProps === null) {
+      clearFrom()
+    }
+  }, [fromValueFromProps, clearFrom])
+
+  React.useEffect(() => {
+    if (toValueFromProps === null) {
+      clearTo()
+    }
+  }, [toValueFromProps, clearTo])
+
+  const clear = React.useCallback(() => {
+    clearFrom()
+    clearTo()
+    onClear && onClear()
+  }, [clearFrom, clearTo, onClear])
+
   return (
     <Wrapper {...restProps}>
       <FilterWrapper>
         <FilterTitle>{title}</FilterTitle>
         {onClear && (
-          <FilterTitleButton disabled={emptyValues} onClick={onClear}>
+          <FilterTitleButton disabled={emptyValues} onClick={clear}>
             Clear
           </FilterTitleButton>
         )}
