@@ -3,7 +3,11 @@ import styled from 'styled-components'
 
 import { ButtonFilterSubmit } from 'components/buttons/ButtonFilterSubmit'
 import { ErrorContainer, Error as ErrorMessage } from 'components/pureStyledComponents/Error'
-import { FilterTitle } from 'components/pureStyledComponents/FilterTitle'
+import {
+  FilterTitle,
+  FilterTitleButton,
+  FilterWrapper,
+} from 'components/pureStyledComponents/FilterTitle'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { MAX_OUTCOMES_ALLOWED, MIN_OUTCOMES_ALLOWED } from 'config/constants'
 
@@ -13,7 +17,6 @@ const Row = styled.div`
   column-gap: 8px;
   display: grid;
   grid-template-columns: 1fr 32px;
-  margin-bottom: 8px;
 
   &:last-child {
     margin-bottom: 0;
@@ -34,6 +37,7 @@ const Dash = styled.div`
 `
 
 const TextFieldStyled = styled(Textfield)`
+  -moz-appearance: textfield;
   font-size: 14px;
   height: 32px;
   min-width: 0;
@@ -48,15 +52,29 @@ const TextFieldStyled = styled(Textfield)`
 interface Props {
   onChangeMin?: (event: React.ChangeEvent<HTMLInputElement>) => void
   onChangeMax?: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onClear?: () => void
   onSubmit: (min: Maybe<number>, max: Maybe<number>) => void
   title: string
+  minValue: Maybe<number>
+  maxValue: Maybe<number>
 }
 
 export const MinMaxFilter: React.FC<Props> = (props) => {
-  const { onChangeMax, onChangeMin, onSubmit, title } = props
+  const {
+    maxValue: maxFromProps,
+    minValue: minFromProps,
+    onChangeMax,
+    onChangeMin,
+    onClear,
+    onSubmit,
+    title,
+  } = props
 
   const [min, setMin] = React.useState<Maybe<number>>(null)
   const [max, setMax] = React.useState<Maybe<number>>(null)
+
+  const minInput = React.useRef<HTMLInputElement>(null)
+  const maxInput = React.useRef<HTMLInputElement>(null)
 
   const onChangeMinInternal = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,6 +85,34 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
     },
     [onChangeMin]
   )
+
+  const clearMin = React.useCallback(() => {
+    if (minInput.current) minInput.current.value = ''
+    setMin(null)
+  }, [minInput])
+
+  const clearMax = React.useCallback(() => {
+    if (maxInput.current) maxInput.current.value = ''
+    setMax(null)
+  }, [maxInput])
+
+  React.useEffect(() => {
+    if (minFromProps === null) {
+      clearMin()
+    }
+  }, [minFromProps, clearMin])
+
+  React.useEffect(() => {
+    if (maxFromProps === null) {
+      clearMax()
+    }
+  }, [maxFromProps, clearMax])
+
+  const clear = React.useCallback(() => {
+    clearMin()
+    clearMax()
+    onClear && onClear()
+  }, [clearMin, clearMax, onClear])
 
   const onChangeMaxInternal = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -121,28 +167,39 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
 
   return (
     <Wrapper>
-      <FilterTitle>{title}</FilterTitle>
+      <FilterWrapper>
+        <FilterTitle>{title}</FilterTitle>
+        {onClear && (
+          <FilterTitleButton disabled={emptyValues} onClick={clear}>
+            Clear
+          </FilterTitleButton>
+        )}
+      </FilterWrapper>
       <Row>
         <FieldsWrapper>
           <TextFieldStyled
             autoComplete="off"
+            max={MAX_OUTCOMES_ALLOWED}
             min={MIN_OUTCOMES_ALLOWED}
             name="min"
             onChange={onChangeMinInternal}
             onKeyPress={onKeyPress}
             onKeyUp={onKeyUp}
             placeholder="Min..."
+            ref={minInput}
             type="number"
           />
           <Dash />
           <TextFieldStyled
             autoComplete="off"
             max={MAX_OUTCOMES_ALLOWED}
+            min={MIN_OUTCOMES_ALLOWED}
             name="max"
             onChange={onChangeMaxInternal}
             onKeyPress={onKeyPress}
             onKeyUp={onKeyUp}
             placeholder="Max..."
+            ref={maxInput}
             type="number"
           />
         </FieldsWrapper>

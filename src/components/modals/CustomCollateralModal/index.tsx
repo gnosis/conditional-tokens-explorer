@@ -76,7 +76,7 @@ export const CustomCollateralModal: React.FC<Props> = (props) => {
       </FirstRow>
       {!collateralData && <SpinnerWrapper>{loading && !error && <InlineLoading />}</SpinnerWrapper>}
       {!loading && collateralData && (
-        <Row>
+        <Row cols="1fr 1fr">
           <TitleValue title={'Token Symbol'} value={collateralData && collateralData.symbol} />
           <TitleValue
             title={'Decimals of Precision'}

@@ -11,30 +11,18 @@ export const DEFAULT_NETWORK_ID: NetworkId = Number(
 export const CTE_GRAPH_HTTP_MAINNET =
   process.env.REACT_APP_CTE_GRAPH_HTTP_MAINNET ||
   'https://api.thegraph.com/subgraphs/name/gnosis/hg'
-export const CTE_GRAPH_WS_MAINNET =
-  process.env.REACT_APP_CTE_GRAPH_WS_MAINNET || 'wss://api.thegraph.com/subgraphs/name/gnosis/hg'
 export const CTE_GRAPH_HTTP_RINKEBY =
   process.env.REACT_APP_CTE_GRAPH_HTTP_RINKEBY ||
   'https://api.thegraph.com/subgraphs/name/gnosis/hg-rinkeby'
-export const CTE_GRAPH_WS_RINKEBY =
-  process.env.REACT_APP_CTE_GRAPH_WS_RINKEBY ||
-  'wss://api.thegraph.com/subgraphs/name/gnosis/hg-rinkeby'
 export const CTE_GRAPH_HTTP_GANACHE =
   process.env.REACT_APP_CTE_GRAPH_HTTP_GANACHE || 'http://localhost:8000/subgraphs/name/gnosis/hg'
-export const CTE_GRAPH_WS_GANACHE =
-  process.env.REACT_APP_CTE_GRAPH_WS_GANACHE || 'ws://localhost:8001/subgraphs/name/gnosis/hg'
 
 export const OMEN_GRAPH_HTTP_MAINNET =
   process.env.REACT_APP_OMEN_GRAPH_HTTP_MAINNET ||
   'https://api.thegraph.com/subgraphs/name/gnosis/omen'
-export const OMEN_GRAPH_WS_MAINNET =
-  process.env.REACT_APP_OMEN_GRAPH_WS_MAINNET || 'wss://api.thegraph.com/subgraphs/name/gnosis/omen'
 export const OMEN_GRAPH_HTTP_RINKEBY =
   process.env.REACT_APP_OMEN_GRAPH_HTTP_RINKEBY ||
   'https://api.thegraph.com/subgraphs/name/gnosis/omen-rinkeby'
-export const OMEN_GRAPH_WS_RINKEBY =
-  process.env.REACT_APP_OMEN_GRAPH_WS_RINKEBY ||
-  'wss://api.thegraph.com/subgraphs/name/gnosis/omen-rinkeby'
 
 export const BYTES_REGEX = /^0x[a-fA-F0-9]{64}$/
 export const NULL_PARENT_ID = '0x0000000000000000000000000000000000000000000000000000000000000000'
@@ -130,5 +118,7 @@ export const MIN_OUTCOMES_ALLOWED = Number(process.env.REACT_APP_MIN_OUTCOMES_AL
 
 export const MAX_OUTCOMES_ALLOWED = Number(process.env.REACT_APP_MAX_OUTCOMES_ALLOWED || 256)
 
-export const MAX_DATE = '2030-01-01'
 export const MIN_DATE = '2015-07-30'
+export const MAX_DATE = '2030-01-01'
+
+export const OMEN_URL_DAPP = process.env.REACT_APP_OMEN_URL_DAPP || 'https://omen.eth.link'

@@ -6,7 +6,7 @@ export const ErrorContainer = styled.div`
 
 export const Error = styled.p`
   color: ${(props) => props.theme.colors.error};
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   line-height: 1.4;
   margin: 0 0 5px 0;

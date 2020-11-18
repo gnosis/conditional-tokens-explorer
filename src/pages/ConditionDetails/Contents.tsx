@@ -12,6 +12,7 @@ import {
   DropdownPosition,
 } from 'components/common/Dropdown'
 import { DisplayTablePositions } from 'components/form/DisplayTablePositions'
+import { OmenMarketsOrQuestion } from 'components/form/OmenMarketsOrQuestion'
 import { ExternalLink } from 'components/navigation/ExternalLink'
 import { FlexRow } from 'components/pureStyledComponents/FlexRow'
 import { Pill, PillTypes } from 'components/pureStyledComponents/Pill'
@@ -145,7 +146,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
         />
       }
     >
-      <Row marginBottomXL>
+      <Row cols="1fr 1fr">
         <TitleValue
           title="Condition Id"
           value={
@@ -190,28 +191,30 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           }
         />
       </Row>
+      <Row cols="1fr">
+        <OmenMarketsOrQuestion
+          conditionsIds={[conditionId]}
+          isConditionFromOmen={isConditionFromOmen}
+          title={title}
+        />
+      </Row>
       {isConditionFromOmen && (
-        <>
-          <Row cols="1fr" marginBottomXL>
-            <TitleValue title="Question" value={title} />
-          </Row>
-          <Row cols="1fr" marginBottomXL>
-            <TitleValue
-              title="Outcomes"
-              value={
-                <StripedListStyled>
-                  {outcomesPrettier.map((outcome: string, index: number) => (
-                    <StripedListItem key={index}>
-                      {resolved && payouts ? `${outcome} - ${payouts[index]}%` : outcome}
-                    </StripedListItem>
-                  ))}
-                </StripedListStyled>
-              }
-            />
-          </Row>
-        </>
+        <Row cols="1fr" marginBottomXL>
+          <TitleValue
+            title="Outcomes"
+            value={
+              <StripedListStyled>
+                {outcomesPrettier.map((outcome: string, index: number) => (
+                  <StripedListItem key={index}>
+                    {resolved && payouts ? `${outcome} - ${payouts[index]}%` : outcome}
+                  </StripedListItem>
+                ))}
+              </StripedListStyled>
+            }
+          />
+        </Row>
       )}
-      <Row>
+      <Row cols="1fr 1fr" marginBottomXL>
         {isConditionFromOmen && resolved && (
           <TitleValue title="Resolution Date" value={formatTS(resolveTimestamp)} />
         )}

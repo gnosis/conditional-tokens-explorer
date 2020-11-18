@@ -11,8 +11,12 @@ import { SearchField } from 'components/form/SearchField'
 import { Switch } from 'components/form/Switch'
 import { CompactFiltersLayout } from 'components/pureStyledComponents/CompactFiltersLayout'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
+import {
+  FilterResultsControl,
+  FilterResultsTextAlternativeLayout,
+} from 'components/pureStyledComponents/FilterResultsText'
+import { FiltersSwitchWrapper } from 'components/pureStyledComponents/FiltersSwitchWrapper'
 import { RadioButton } from 'components/pureStyledComponents/RadioButton'
-import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { SpinnerSize } from 'components/statusInfo/common'
 import { TableControls } from 'components/table/TableControls'
@@ -82,6 +86,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
   const [textToSearch, setTextToSearch] = useState<string>('')
   const [resetPagination, setResetPagination] = useState<boolean>(false)
   const [showFilters, setShowFilters] = useState(false)
+  const [isFiltering, setIsFiltering] = useState(false)
 
   const [selectedCollateralFilter, setSelectedCollateralFilter] = useState<Maybe<string[]>>(null)
   const [selectedCollateralValue, setSelectedCollateralValue] = useState<string>(
@@ -152,12 +157,28 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     setResetPagination(!resetPagination)
     setSelectedToCreationDate(null)
     setSelectedFromCreationDate(null)
-    setSearchBy(PositionSearchOptions.PositionId)
-    setTextToSearch('')
     setSelectedCollateralFilter(null)
     setSelectedCollateralValue(CollateralFilterOptions.All)
     setWrappedCollateral(WrappedCollateralOptions.All)
   }, [resetPagination])
+
+  useEffect(() => {
+    setIsFiltering(
+      selectedToCreationDate !== null ||
+        selectedFromCreationDate !== null ||
+        wrappedCollateral !== WrappedCollateralOptions.All ||
+        selectedCollateralValue !== CollateralFilterOptions.All ||
+        wrappedCollateral !== WrappedCollateralOptions.All ||
+        selectedCollateralFilter !== null
+    )
+  }, [
+    isFiltering,
+    selectedCollateralFilter,
+    selectedCollateralValue,
+    selectedFromCreationDate,
+    selectedToCreationDate,
+    wrappedCollateral,
+  ])
 
   // Clear the filters on network change
   useEffect(() => {
@@ -248,15 +269,6 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     setShowFilters(!showFilters)
   }, [showFilters])
 
-  // Clear the filters
-  useEffect(() => {
-    if (!showFilters) {
-      resetFilters()
-      if (onClearCallback) onClearCallback()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showFilters])
-
   const isLoading = useMemo(() => !textToSearch && loading, [textToSearch, loading])
   const isSearching = useMemo(() => textToSearch && loading, [textToSearch, loading])
 
@@ -306,57 +318,72 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
                 value={textToShow}
               />
             }
-            start={<Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />}
+            start={
+              <FiltersSwitchWrapper>
+                <Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />
+                {(isFiltering || showFilters) && (
+                  <FilterResultsTextAlternativeLayout>
+                    Showing {isFiltering ? 'filtered' : 'all'} results -{' '}
+                    <FilterResultsControl disabled={!isFiltering} onClick={resetFilters}>
+                      Clear Filters
+                    </FilterResultsControl>
+                  </FilterResultsTextAlternativeLayout>
+                )}
+              </FiltersSwitchWrapper>
+            }
           />
-          {error && !isLoading && <InfoCard message={error.message} title="Error" />}
-          {!error && showFilters && (
-            <CompactFiltersLayout>
-              <CollateralFilterDropdown
-                onClick={(symbol: string, address: Maybe<string[]>) => {
-                  setSelectedCollateralFilter(address)
-                  setSelectedCollateralValue(symbol)
-                }}
-                value={selectedCollateralValue}
-              />
-              <WrappedCollateralFilterDropdown
-                onClick={(value: WrappedCollateralOptions) => {
-                  setWrappedCollateral(value)
-                }}
-                value={wrappedCollateral}
-              />
-              <DateFilter
-                onSubmit={(from, to) => {
-                  setSelectedFromCreationDate(from)
-                  setSelectedToCreationDate(to)
-                }}
-                title="Creation Date"
-              />
-            </CompactFiltersLayout>
-          )}
-          {!error && (
-            <DataTable
-              className="outerTableWrapper condensedTable"
-              columns={defaultColumns}
-              customStyles={customStyles}
-              data={showSpinner ? [] : positionList.length ? positionList : []}
-              highlightOnHover
-              noDataComponent={
-                showSpinner ? (
-                  <InlineLoading size={SpinnerSize.small} />
-                ) : (
-                  <EmptyContentText>No positions found.</EmptyContentText>
-                )
-              }
-              noHeader
-              onRowClicked={onRowClicked}
-              pagination
-              paginationPerPage={5}
-              paginationResetDefaultPage={resetPagination}
-              paginationRowsPerPageOptions={[5, 10, 15]}
-              pointerOnHover
-              responsive
+          <CompactFiltersLayout isVisible={showFilters}>
+            <CollateralFilterDropdown
+              onClick={(symbol: string, address: Maybe<string[]>) => {
+                setSelectedCollateralFilter(address)
+                setSelectedCollateralValue(symbol)
+              }}
+              value={selectedCollateralValue}
             />
-          )}
+            <WrappedCollateralFilterDropdown
+              onClick={(value: WrappedCollateralOptions) => {
+                setWrappedCollateral(value)
+              }}
+              value={wrappedCollateral}
+            />
+            <DateFilter
+              fromValue={selectedFromCreationDate}
+              onClear={() => {
+                setSelectedToCreationDate(null)
+                setSelectedFromCreationDate(null)
+              }}
+              onSubmit={(from, to) => {
+                setSelectedFromCreationDate(from)
+                setSelectedToCreationDate(to)
+              }}
+              title="Creation Date"
+              toValue={selectedToCreationDate}
+            />
+          </CompactFiltersLayout>
+          <DataTable
+            className="outerTableWrapper condensedTable"
+            columns={defaultColumns}
+            customStyles={customStyles}
+            data={showSpinner ? [] : positionList.length ? positionList : []}
+            highlightOnHover
+            noDataComponent={
+              showSpinner ? (
+                <InlineLoading size={SpinnerSize.small} />
+              ) : error ? (
+                <EmptyContentText>Error: {error.message}</EmptyContentText>
+              ) : (
+                <EmptyContentText>No positions found.</EmptyContentText>
+              )
+            }
+            noHeader
+            onRowClicked={onRowClicked}
+            pagination
+            paginationPerPage={5}
+            paginationResetDefaultPage={resetPagination}
+            paginationRowsPerPageOptions={[5, 10, 15]}
+            pointerOnHover
+            responsive
+          />
         </>
       }
       {...restProps}
