@@ -4,18 +4,23 @@ import styled from 'styled-components'
 import { ButtonSelectLight } from 'components/buttons/ButtonSelectLight'
 import { DropdownItem, DropdownPosition } from 'components/common/Dropdown'
 import { FilterDropdown } from 'components/pureStyledComponents/FilterDropdown'
-import { FilterTitle } from 'components/pureStyledComponents/FilterTitle'
+import {
+  FilterTitle,
+  FilterTitleButton,
+  FilterWrapper,
+} from 'components/pureStyledComponents/FilterTitle'
 import { WrappedCollateralOptions } from 'util/types'
 
 const Wrapper = styled.div``
 
 interface Props {
+  onClear?: () => void
   onClick: (value: WrappedCollateralOptions) => void
   value: string
 }
 
 export const WrappedCollateralFilterDropdown: React.FC<Props> = (props) => {
-  const { onClick, value, ...restProps } = props
+  const { onClear, onClick, value, ...restProps } = props
 
   const dropdownItems = [
     {
@@ -43,7 +48,10 @@ export const WrappedCollateralFilterDropdown: React.FC<Props> = (props) => {
 
   return (
     <Wrapper {...restProps}>
-      <FilterTitle>Wrapped Collateral</FilterTitle>
+      <FilterWrapper>
+        <FilterTitle>Wrapped Collateral</FilterTitle>
+        {onClear && <FilterTitleButton onClick={onClear}>Clear</FilterTitleButton>}
+      </FilterWrapper>
       <FilterDropdown
         currentItem={dropdownItems.findIndex((item) => item.value === value)}
         dropdownButtonContent={

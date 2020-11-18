@@ -3,16 +3,21 @@ import React from 'react'
 import { ButtonSelectLight } from 'components/buttons/ButtonSelectLight'
 import { DropdownItem, DropdownPosition } from 'components/common/Dropdown'
 import { FilterDropdown } from 'components/pureStyledComponents/FilterDropdown'
-import { FilterTitle } from 'components/pureStyledComponents/FilterTitle'
+import {
+  FilterTitle,
+  FilterTitleButton,
+  FilterWrapper,
+} from 'components/pureStyledComponents/FilterTitle'
 import { ValidityOptions } from 'util/types'
 
 interface Props {
+  onClear?: () => void
   onClick: (value: ValidityOptions) => void
   value: string
 }
 
 export const ValidityFilterDropdown: React.FC<Props> = (props) => {
-  const { onClick, value } = props
+  const { onClear, onClick, value } = props
 
   const dropdownItems = [
     {
@@ -40,7 +45,10 @@ export const ValidityFilterDropdown: React.FC<Props> = (props) => {
 
   return (
     <>
-      <FilterTitle>Validity</FilterTitle>
+      <FilterWrapper>
+        <FilterTitle>Validity</FilterTitle>
+        {onClear && <FilterTitleButton onClick={onClear}>Clear</FilterTitleButton>}
+      </FilterWrapper>
       <FilterDropdown
         currentItem={dropdownItems.findIndex((item) => item.value === value)}
         dropdownButtonContent={
