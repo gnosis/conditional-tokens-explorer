@@ -6,8 +6,7 @@ import { CustomCollateralModal } from 'components/modals/CustomCollateralModal'
 import { TitleControl } from 'components/pureStyledComponents/TitleControl'
 import { SelectablePositionTable } from 'components/table/SelectablePositionTable'
 import { PositionWithUserBalanceWithDecimals } from 'hooks'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
-import { LocalStorageManagement, SplitFromType, Token } from 'util/types'
+import { SplitFromType, Token } from 'util/types'
 
 const Controls = styled.div`
   margin-bottom: 8px;
@@ -91,7 +90,6 @@ export const SplitFrom: React.FC<Props> = (props) => {
     tokens,
   } = props
 
-  const { getValue } = useLocalStorage(LocalStorageManagement.PositionId)
   const [showCustomCollateralModal, setShowCustomCollateralModal] = useState(false)
   const openCustomCollateralModal = useCallback(() => setShowCustomCollateralModal(true), [])
   const closeCustomCollateralModal = useCallback(() => setShowCustomCollateralModal(false), [])
@@ -102,13 +100,6 @@ export const SplitFrom: React.FC<Props> = (props) => {
       onCollateralChange(customToken.address)
     }
   }, [customToken, onCollateralChange])
-
-  useEffect(() => {
-    const localStoragePosition = getValue()
-    if (localStoragePosition) {
-      onSplitFromChange(SplitFromType.position)
-    }
-  }, [onSplitFromChange, getValue])
 
   const onRowClicked = useCallback(
     (row: PositionWithUserBalanceWithDecimals) => {

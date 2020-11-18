@@ -19,6 +19,7 @@ import { TableControls } from 'components/table/TableControls'
 import { FormatHash } from 'components/text/FormatHash'
 import { TitleValue } from 'components/text/TitleValue'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { PositionWithUserBalanceWithDecimals, usePositionsList } from 'hooks/usePositionsList'
 import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
@@ -26,6 +27,7 @@ import { truncateStringInTheMiddle } from 'util/tools'
 import {
   AdvancedFilterPosition,
   CollateralFilterOptions,
+  LocalStorageManagement,
   PositionSearchOptions,
   WrappedCollateralOptions,
 } from 'util/types'
@@ -71,6 +73,8 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
 
   const { networkConfig } = useWeb3ConnectedOrInfura()
 
+  const { getValue } = useLocalStorage(LocalStorageManagement.PositionId)
+
   const [positionList, setPositionList] = useState<PositionWithUserBalanceWithDecimals[]>([])
 
   const [searchBy, setSearchBy] = useState<PositionSearchOptions>(PositionSearchOptions.PositionId)
@@ -93,6 +97,14 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
   const debouncedHandlerTextToSearch = useDebounceCallback((textToSearch) => {
     setTextToSearch(textToSearch)
   }, 100)
+
+  useEffect(() => {
+    const localStorageCondition = getValue()
+    if (localStorageCondition) {
+      setTextToShow(localStorageCondition)
+      debouncedHandlerTextToSearch(localStorageCondition)
+    }
+  }, [getValue, debouncedHandlerTextToSearch])
 
   const onChangeSearch = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {

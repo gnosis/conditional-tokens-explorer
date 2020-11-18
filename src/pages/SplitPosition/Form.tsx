@@ -34,13 +34,21 @@ import { useAllowance } from 'hooks/useAllowance'
 import { useAllowanceState } from 'hooks/useAllowanceState'
 import { useCollateral } from 'hooks/useCollateral'
 import { useCondition } from 'hooks/useCondition'
+import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
 import { SplitFrom } from 'pages/SplitPosition/SplitFrom'
 import { Conditions_conditions } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import { indexSetFromOutcomes, trivialPartition, truncateStringInTheMiddle } from 'util/tools'
-import { OutcomeProps, PositionIdsArray, SplitFromType, SplitStatus, Token } from 'util/types'
+import {
+  LocalStorageManagement,
+  OutcomeProps,
+  PositionIdsArray,
+  SplitFromType,
+  SplitStatus,
+  Token,
+} from 'util/types'
 
 const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
@@ -66,11 +74,14 @@ export const Form = (props: Props) => {
   const { CTService } = useWeb3ConnectedOrInfura()
   const { tokens } = props
 
+  const { getValue } = useLocalStorage(LocalStorageManagement.PositionId)
+  const defaultSplitFrom = getValue(false) ? SplitFromType.position : SplitFromType.collateral
+
   const [conditionId, setConditionId] = useState('')
   const [position, setPosition] = useState<Maybe<PositionWithUserBalanceWithDecimals>>(null)
   const [collateralAddress, setCollateralAddress] = useState(tokens[0].address)
   const [amount, setAmount] = useState(ZERO_BN)
-  const [splitFrom, setSplitFrom] = useState(SplitFromType.collateral)
+  const [splitFrom, setSplitFrom] = useState(defaultSplitFrom)
   const [originalPartition, setOriginalPartition] = useState<BigNumber[]>([])
   const [numberedOutcomes, setNumberedOutcomes] = useState<Array<Array<OutcomeProps>>>([])
 
@@ -104,7 +115,6 @@ export const Form = (props: Props) => {
     setConditionId('')
     setCollateralAddress(tokens[0].address)
     setAmount(ZERO_BN)
-    setSplitFrom(SplitFromType.collateral)
     setPosition(null)
   }, [tokens])
 
