@@ -55,14 +55,14 @@ interface Props {
   onClear?: () => void
   onSubmit: (min: Maybe<number>, max: Maybe<number>) => void
   title: string
-  min: Maybe<number>
-  max: Maybe<number>
+  minValue: Maybe<number>
+  maxValue: Maybe<number>
 }
 
 export const MinMaxFilter: React.FC<Props> = (props) => {
   const {
-    max: maxFromProps,
-    min: minFromProps,
+    maxValue: maxFromProps,
+    minValue: minFromProps,
     onChangeMax,
     onChangeMin,
     onClear,
@@ -88,23 +88,23 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
 
   const clearMin = React.useCallback(() => {
     if (minInput.current) minInput.current.value = ''
+    setMin(null)
   }, [minInput])
 
   const clearMax = React.useCallback(() => {
     if (maxInput.current) maxInput.current.value = ''
+    setMax(null)
   }, [maxInput])
 
   React.useEffect(() => {
     if (minFromProps === null) {
       clearMin()
-      setMin(null)
     }
   }, [minFromProps, clearMin])
 
   React.useEffect(() => {
     if (maxFromProps === null) {
       clearMax()
-      setMax(null)
     }
   }, [maxFromProps, clearMax])
 
