@@ -71,6 +71,8 @@ export const Form = (props: Props) => {
   const [collateralAddress, setCollateralAddress] = useState(tokens[0].address)
   const [amount, setAmount] = useState(ZERO_BN)
   const [splitFrom, setSplitFrom] = useState(SplitFromType.collateral)
+  const [originalPartition, setOriginalPartition] = useState<BigNumber[]>([])
+  const [numberedOutcomes, setNumberedOutcomes] = useState<Array<Array<OutcomeProps>>>([])
 
   const [isEditPartitionModalOpen, setIsEditPartitionModalOpen] = useState(false)
   const [status, setStatus] = useState<Remote<SplitStatus>>(Remote.notAsked<SplitStatus>())
@@ -82,18 +84,17 @@ export const Form = (props: Props) => {
   const outcomeSlot = useMemo(() => (condition ? condition.outcomeSlotCount : 0), [condition])
   const conditionIdToPreviewShow = useMemo(() => (condition ? condition.id : ''), [condition])
 
-  const originalPartition = useMemo(() => (outcomeSlot ? trivialPartition(outcomeSlot) : []), [
-    outcomeSlot,
-  ])
-  const numberedOutcomes = useMemo(
-    () =>
-      originalPartition
-        ? originalPartition.map((outcome: BigNumber, key: number) => [
-            { value: key, id: outcome.toString() },
-          ])
-        : [],
-    [originalPartition]
-  )
+  useEffect(() => {
+    setOriginalPartition(trivialPartition(outcomeSlot))
+  }, [outcomeSlot])
+
+  useEffect(() => {
+    const numberedOutcomesToSet = originalPartition.map((outcome: BigNumber, key: number) => {
+      return [{ value: key, id: outcome.toString() }]
+    })
+    setNumberedOutcomes(numberedOutcomesToSet)
+  }, [originalPartition, setNumberedOutcomes])
+
   const partition = useMemo(() => {
     const outcomes = numberedOutcomes.map((collection) => collection.map((c) => c.id))
     return outcomes.map(indexSetFromOutcomes).map((o) => new BigNumber(o))
@@ -112,8 +113,9 @@ export const Form = (props: Props) => {
   ])
   const isSplittingFromPosition = useMemo(() => splitFrom === SplitFromType.position, [splitFrom])
 
-  const onEditPartitionSave = useCallback(() => {
+  const onEditPartitionSave = useCallback((numberedOutcomes: Array<Array<OutcomeProps>>) => {
     setIsEditPartitionModalOpen(false)
+    setNumberedOutcomes(numberedOutcomes)
   }, [])
 
   const onSubmit = useCallback(async () => {
