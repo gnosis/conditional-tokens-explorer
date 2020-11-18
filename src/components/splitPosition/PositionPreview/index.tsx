@@ -8,7 +8,6 @@ import {
   StripedListItemPreview,
 } from 'components/pureStyledComponents/StripedList'
 import { TitleValue } from 'components/text/TitleValue'
-import { useCollateral } from 'hooks/useCollateral'
 import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
 import { positionString } from 'util/tools'
 import { SplitFromType, Token } from 'util/types'
@@ -34,12 +33,11 @@ export const PositionPreview = ({
   selectedCollateral,
   splitFrom,
 }: Props) => {
-  const { collateral: positionCollateral } = useCollateral(position ? position.collateralToken : '')
   const splitFromCollateral = useMemo(() => splitFrom === SplitFromType.collateral, [splitFrom])
   const splitFromPosition = useMemo(() => splitFrom === SplitFromType.position, [splitFrom])
 
   const splitPositionPreview = useMemo(() => {
-    if (!conditionId || (splitFromPosition && (!position || !positionCollateral))) {
+    if (!conditionId || (splitFromPosition && (!position || !position.token))) {
       return []
     }
 
@@ -49,13 +47,13 @@ export const PositionPreview = ({
       })
     }
 
-    if (position && positionCollateral && partition && partition.length > 0) {
+    if (position && position.token && partition && partition.length > 0) {
       return partition.map((indexSet) => {
         return positionString(
           [...position.conditionIds, conditionId],
-          [...[position.indexSets].map((i) => i.toString()), indexSet.toString()],
+          [...position.indexSets.map((i) => i.toString()), indexSet.toString()],
           amount,
-          positionCollateral
+          position.token
         )
       })
     }
@@ -65,7 +63,6 @@ export const PositionPreview = ({
     conditionId,
     partition,
     position,
-    positionCollateral,
     selectedCollateral,
     splitFromCollateral,
     splitFromPosition,

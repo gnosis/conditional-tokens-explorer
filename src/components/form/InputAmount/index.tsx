@@ -21,7 +21,7 @@ interface Props {
   amount: BigNumber
 }
 
-const fetchBalance = (
+const fetchBalanceERC20 = (
   provider: Web3Provider | InfuraProvider,
   signer: JsonRpcSigner,
   tokenAddress: string,
@@ -34,7 +34,7 @@ const fetchBalance = (
 export const InputAmount = (props: Props) => {
   const { amount, collateral, onAmountChange, position, splitFrom } = props
 
-  const { _type: status, address, provider, signer } = useWeb3ConnectedOrInfura()
+  const { _type: status, CTService, address, provider, signer } = useWeb3ConnectedOrInfura()
   const [balance, setBalance] = useState<Maybe<BigNumber>>(null)
   const [decimals, setDecimals] = useState(0)
 
@@ -47,16 +47,16 @@ export const InputAmount = (props: Props) => {
     let cancelled = false
 
     if (splitFrom === SplitFromType.collateral && signer && address) {
-      fetchBalance(provider, signer, collateral.address, address).then((result) => {
+      fetchBalanceERC20(provider, signer, collateral.address, address).then((result) => {
         if (!cancelled) {
           setDecimals(collateral.decimals)
           setBalance(result)
         }
       })
     } else if (splitFrom === SplitFromType.position && signer && address && position) {
-      fetchBalance(provider, signer, position.collateralToken, address).then((result) => {
+      CTService.balanceOf(position.id).then((result) => {
         if (!cancelled) {
-          setDecimals(collateral.decimals)
+          setDecimals(+position.token.decimals)
           setBalance(result)
         }
       })
@@ -65,7 +65,7 @@ export const InputAmount = (props: Props) => {
     return () => {
       cancelled = true
     }
-  }, [splitFrom, provider, signer, position, collateral, address])
+  }, [splitFrom, provider, signer, position, collateral, address, CTService])
 
   const tokenSymbol = useMemo(
     () => (splitFrom === SplitFromType.collateral ? collateral.symbol : ''),
