@@ -440,12 +440,17 @@ export const SelectableConditionTable: React.FC<Props> = (props) => {
               title="Outcomes"
             />
             <DateFilter
-              onClear={() => console.log('Clear date from / to')}
+              fromValue={selectedFromCreationDate}
+              onClear={() => {
+                setSelectedToCreationDate(null)
+                setSelectedFromCreationDate(null)
+              }}
               onSubmit={(from, to) => {
                 setSelectedFromCreationDate(from)
                 setSelectedToCreationDate(to)
               }}
               title="Creation Date"
+              toValue={selectedToCreationDate}
             />
           </CompactFiltersLayout>
           <DataTable
