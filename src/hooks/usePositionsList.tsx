@@ -3,7 +3,8 @@ import { ethers } from 'ethers'
 import lodashUniqBy from 'lodash.uniqby'
 import React, { useState } from 'react'
 
-import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { ApolloError } from 'apollo-client/errors/ApolloError'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { Position, marshalPositionListData } from 'hooks/utils'
 import { buildQueryPositionsList } from 'queries/CTEPositions'
 import { UserWithPositionsQuery } from 'queries/CTEUsers'
@@ -29,17 +30,11 @@ export type PositionWithUserBalanceWithDecimals = Position &
  * Return a array of positions, and the user balance if it's connected.
  */
 export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
-  const {
-    _type: status,
-    address: addressFromWallet,
-    networkConfig,
-    provider,
-  } = useWeb3ConnectedOrInfura()
+  const { address, networkConfig, provider } = useWeb3ConnectedOrInfura()
 
   const [data, setData] = useState<Remote<Maybe<PositionWithUserBalanceWithDecimals[]>>>(
     Remote.loading()
   )
-  const [address, setAddress] = React.useState<Maybe<string>>(null)
 
   const { CollateralValue, FromCreationDate, TextToSearch, ToCreationDate } = advancedFilter
 
@@ -77,15 +72,9 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
     skip: !address,
     fetchPolicy: 'no-cache',
     variables: {
-      account: address,
+      account: address?.toLowerCase(),
     },
   })
-
-  React.useEffect(() => {
-    if (status === Web3ContextStatus.Connected && addressFromWallet) {
-      setAddress(addressFromWallet.toLowerCase())
-    }
-  }, [status, addressFromWallet])
 
   React.useEffect(() => {
     // The use of loadingPositions act as a blocker when the useQuery is executing again
@@ -180,7 +169,7 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
 
   return {
     data: data.isSuccess() && data.get(),
-    error,
+    error: error as ApolloError,
     loading: data.isLoading(),
     refetchPositions,
     refetchUserPositions,

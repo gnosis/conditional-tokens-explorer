@@ -1,48 +1,27 @@
 import { InfuraProvider, JsonRpcSigner, Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
-import { Controller, FormContextValues } from 'react-hook-form'
 
 import { BigNumberInputWrapper } from 'components/form/BigNumberInputWrapper'
 import { TitleControlButton } from 'components/pureStyledComponents/TitleControl'
 import { TitleValue } from 'components/text/TitleValue'
 import { ZERO_BN } from 'config/constants'
-import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
-import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { useWithToken } from 'hooks/useWithToken'
-import { SplitFrom, SplitPositionFormMethods } from 'pages/SplitPosition/Form'
+import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
+import { SplitFrom } from 'pages/SplitPosition/Form'
 import { ERC20Service } from 'services/erc20'
-import { GetMultiPositions_positions } from 'types/generatedGQLForCTE'
 import { formatBigNumber } from 'util/tools'
 import { SplitFromType, Token } from 'util/types'
 
 interface Props {
   collateral: Token
-  formMethods: FormContextValues<SplitPositionFormMethods>
-  positionId: string
+  position: Maybe<PositionWithUserBalanceWithDecimals>
   splitFrom: SplitFrom
+  onAmountChange: (value: BigNumber) => void
+  amount: BigNumber
 }
 
-const canSetPositionBalance = (
-  positionsLoading: boolean,
-  balancesLoading: boolean,
-  positions: GetMultiPositions_positions[],
-  balances: BigNumber[],
-  positionIds: string[]
-) => {
-  return (
-    !positionsLoading &&
-    !balancesLoading &&
-    positions.length &&
-    balances.length &&
-    balances.length === positionIds.length &&
-    positions.length === positionIds.length &&
-    JSON.stringify(positions.map(({ id }) => id).sort()) === JSON.stringify([...positionIds].sort())
-  )
-}
-
-const fetchBalance = (
+const fetchBalanceERC20 = (
   provider: Web3Provider | InfuraProvider,
   signer: JsonRpcSigner,
   tokenAddress: string,
@@ -52,60 +31,32 @@ const fetchBalance = (
   return erc20Service.balanceOf(walletAddress)
 }
 
-export const InputAmount = ({
-  collateral,
-  formMethods: { control, setValue },
-  positionId,
-  splitFrom,
-}: Props) => {
-  const { _type: status, address, networkConfig, provider, signer } = useWeb3ConnectedOrInfura()
-  const { loading: positionsLoading, positionIds, positions } = useMultiPositionsContext()
-  const { data: positionsWithToken } = useWithToken(positions)
+export const InputAmount = (props: Props) => {
+  const { amount, collateral, onAmountChange, position, splitFrom } = props
 
-  const { balances, loading: balancesLoading } = useBatchBalanceContext()
-
+  const { _type: status, CTService, address, provider, signer } = useWeb3ConnectedOrInfura()
   const [balance, setBalance] = useState<Maybe<BigNumber>>(null)
   const [decimals, setDecimals] = useState(0)
 
   useEffect(() => {
-    setValue('amount', ZERO_BN, true)
-  }, [collateral, positionId, setValue, splitFrom])
-
-  useEffect(() => {
-    if (splitFrom === SplitFromType.position) {
-      if (
-        canSetPositionBalance(
-          positionsLoading,
-          balancesLoading,
-          positionsWithToken,
-          balances,
-          positionIds
-        )
-      ) {
-        setDecimals(positionsWithToken[0].token.decimals)
-        setBalance(balances[0])
-      } else {
-        setBalance(ZERO_BN)
-      }
-    }
-  }, [
-    splitFrom,
-    balances,
-    positionIds,
-    positionsLoading,
-    balancesLoading,
-    positions,
-    networkConfig,
-    positionsWithToken,
-  ])
+    onAmountChange(ZERO_BN)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [collateral, position, splitFrom])
 
   useEffect(() => {
     let cancelled = false
 
     if (splitFrom === SplitFromType.collateral && signer && address) {
-      fetchBalance(provider, signer, collateral.address, address).then((result) => {
+      fetchBalanceERC20(provider, signer, collateral.address, address).then((result) => {
         if (!cancelled) {
           setDecimals(collateral.decimals)
+          setBalance(result)
+        }
+      })
+    } else if (splitFrom === SplitFromType.position && signer && address && position) {
+      CTService.balanceOf(position.id).then((result) => {
+        if (!cancelled) {
+          setDecimals(+position.token.decimals)
           setBalance(result)
         }
       })
@@ -114,19 +65,24 @@ export const InputAmount = ({
     return () => {
       cancelled = true
     }
-  }, [splitFrom, provider, signer, collateral, address])
+  }, [splitFrom, provider, signer, position, collateral, address, CTService])
 
   const tokenSymbol = useMemo(
     () => (splitFrom === SplitFromType.collateral ? collateral.symbol : ''),
     [splitFrom, collateral]
   )
 
-  const isDisconnected = status !== Web3ContextStatus.Connected
-  const placeholder = isDisconnected
-    ? 'Please connect to your wallet...'
-    : balance && balance.isZero()
-    ? 'Please add funds to your wallet...'
-    : '0.00'
+  const isDisconnected = useMemo(() => status !== Web3ContextStatus.Connected, [status])
+
+  const placeholder = useMemo(
+    () =>
+      isDisconnected
+        ? 'Please connect to your wallet...'
+        : balance && balance.isZero()
+        ? 'Please add funds to your wallet...'
+        : '0.00',
+    [balance, isDisconnected]
+  )
 
   return (
     <TitleValue
@@ -136,26 +92,21 @@ export const InputAmount = ({
           <TitleControlButton disabled>Not Connected To Wallet</TitleControlButton>
         ) : (
           balance && (
-            <TitleControlButton
-              disabled={balance.isZero()}
-              onClick={() => setValue('amount', balance, true)}
-            >
+            <TitleControlButton disabled={balance.isZero()} onClick={() => onAmountChange(balance)}>
               Use Wallet Balance ({formatBigNumber(balance, decimals)})
             </TitleControlButton>
           )
         )
       }
       value={
-        <Controller
-          as={BigNumberInputWrapper}
-          control={control}
+        <BigNumberInputWrapper
           decimals={decimals}
           disabled={isDisconnected || (balance && balance.isZero()) || false}
           max={(balance && balance.toString()) || undefined}
-          name="amount"
+          onChange={onAmountChange}
           placeholder={placeholder}
-          rules={{ required: true, validate: (amount) => amount.gt(ZERO_BN) }}
           tokenSymbol={tokenSymbol}
+          value={amount}
         />
       }
     />

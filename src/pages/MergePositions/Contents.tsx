@@ -419,11 +419,18 @@ export const Contents = () => {
     [transactionStatus, amount, selectedPositions, conditionId, position, maxBalance]
   )
 
+  const onFilterCallback = (positions: PositionWithUserBalanceWithDecimals[]) => {
+    return positions.filter(
+      (position: PositionWithUserBalanceWithDecimals) => !position.userBalanceERC1155.isZero()
+    )
+  }
+
   return (
     <CenteredCard>
       <SelectablePositionTable
         clearFilters={clearFilters}
         onClearCallback={clearComponent}
+        onFilterCallback={onFilterCallback}
         onRowClicked={onRowClicked}
         refetch={transactionStatus.isSuccess()}
         selectedPosition={position}

@@ -23,6 +23,7 @@ import { TableControls } from 'components/table/TableControls'
 import { FormatHash } from 'components/text/FormatHash'
 import { TitleValue } from 'components/text/TitleValue'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { PositionWithUserBalanceWithDecimals, usePositionsList } from 'hooks/usePositionsList'
 import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
@@ -30,6 +31,7 @@ import { truncateStringInTheMiddle } from 'util/tools'
 import {
   AdvancedFilterPosition,
   CollateralFilterOptions,
+  LocalStorageManagement,
   PositionSearchOptions,
   WrappedCollateralOptions,
 } from 'util/types'
@@ -50,10 +52,13 @@ const TitleValueExtended = styled(TitleValue)<{ hideTitle?: boolean }>`
 interface Props {
   hideTitle?: boolean
   onRowClicked: (position: PositionWithUserBalanceWithDecimals) => void
-  onClearCallback: () => void
+  onClearCallback?: () => void
+  onFilterCallback?: (
+    positions: PositionWithUserBalanceWithDecimals[]
+  ) => PositionWithUserBalanceWithDecimals[]
   selectedPosition: Maybe<PositionWithUserBalanceWithDecimals>
   title?: string
-  clearFilters: boolean
+  clearFilters?: boolean
   refetch?: boolean
 }
 
@@ -62,6 +67,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     clearFilters,
     hideTitle,
     onClearCallback,
+    onFilterCallback,
     onRowClicked,
     refetch,
     selectedPosition,
@@ -70,6 +76,8 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
   } = props
 
   const { networkConfig } = useWeb3ConnectedOrInfura()
+
+  const { getValue } = useLocalStorage(LocalStorageManagement.PositionId)
 
   const [positionList, setPositionList] = useState<PositionWithUserBalanceWithDecimals[]>([])
 
@@ -94,6 +102,14 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
   const debouncedHandlerTextToSearch = useDebounceCallback((textToSearch) => {
     setTextToSearch(textToSearch)
   }, 100)
+
+  useEffect(() => {
+    const localStorageCondition = getValue()
+    if (localStorageCondition) {
+      setTextToShow(localStorageCondition)
+      debouncedHandlerTextToSearch(localStorageCondition)
+    }
+  }, [getValue, debouncedHandlerTextToSearch])
 
   const onChangeSearch = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -137,17 +153,6 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     advancedFilters
   )
 
-  // #1 Filter, only positions with balance
-  const positionsWithBalance = useMemo(
-    () =>
-      data &&
-      data.length &&
-      data.filter(
-        (position: PositionWithUserBalanceWithDecimals) => !position.userBalanceERC1155.isZero()
-      ),
-    [data]
-  )
-
   const resetFilters = useCallback(() => {
     setResetPagination(!resetPagination)
     setSelectedToCreationDate(null)
@@ -179,18 +184,22 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
   useEffect(() => {
     setShowFilters(false)
     resetFilters()
-    onClearCallback()
+    if (onClearCallback) onClearCallback()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networkConfig, clearFilters])
 
   // Filter selected positions from original list. And positions without balance as indicated by props.
   useEffect(() => {
-    if (positionsWithBalance) {
-      setPositionList(positionsWithBalance)
+    if (data && data.length > 0) {
+      if (onFilterCallback) {
+        setPositionList(onFilterCallback(data))
+      } else {
+        setPositionList(data)
+      }
     } else {
       setPositionList([])
     }
-  }, [setPositionList, positionsWithBalance])
+  }, [setPositionList, data, onFilterCallback])
 
   useEffect(() => {
     if (refetch) {
@@ -282,7 +291,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     ) {
       setResetPagination(!resetPagination)
     }
-    onClearCallback()
+    if (onClearCallback) onClearCallback()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [

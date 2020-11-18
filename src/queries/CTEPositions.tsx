@@ -70,6 +70,7 @@ const positionFragment = gql`
       oracle
       questionId
       outcomeSlotCount
+      resolved
     }
   }
 `
