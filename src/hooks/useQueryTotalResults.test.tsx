@@ -119,4 +119,24 @@ describe('useQueryTotalResults', () => {
     expect(result.current.loading).toBe(false)
     expect(result.current.data).toEqual([{ id: '0x1' }, { id: '0x2' }, { id: '0x3' }])
   })
+
+  it('gives error for request', async () => {
+    const { result, waitForNextUpdate } = renderHook(
+      () =>
+        useQueryTotalResults<Conditions, PaginateVariables>({
+          query,
+          step: 2,
+          entityName: 'conditions',
+        }),
+      {
+        wrapper: wrapper(mockedQuery),
+      }
+    )
+
+    await waitForNextUpdate({ timeout: 100 })
+
+    expect(result.current.loading).toBe(false)
+    expect(result.current.data).toEqual([])
+    expect(result.current.error).not.toBeNull()
+  })
 })
