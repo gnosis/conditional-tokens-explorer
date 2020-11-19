@@ -17,14 +17,21 @@ import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Contex
 import { useCondition } from 'hooks/useCondition'
 import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
 import { ConditionalTokensService } from 'services/conditionalTokens'
+import { CPKService } from 'services/cpk'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
-import { CPKService } from 'services/cpk'
 
 const logger = getLogger('RedeemPosition')
 
 export const Contents = () => {
-  const { _type: status, CTService, connect, networkConfig, provider, signer } = useWeb3ConnectedOrInfura()
+  const {
+    _type: status,
+    CTService,
+    connect,
+    networkConfig,
+    provider,
+    signer,
+  } = useWeb3ConnectedOrInfura()
 
   const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<boolean>>>(
     Remote.notAsked<Maybe<boolean>>()
@@ -83,7 +90,7 @@ export const Contents = () => {
           collateralToken,
           parentCollectionId,
           conditionId,
-          indexSets: redeemedIndexSet
+          indexSets: redeemedIndexSet,
         })
 
         setPosition(null)

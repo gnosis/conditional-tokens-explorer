@@ -41,9 +41,9 @@ interface CPKReportPayoutParams {
 
 interface CPKRedeemPositionParams {
   CTService: ConditionalTokensService
-  collateralToken: string,
-  parentCollectionId: string, // If doesn't exist, must be zero, ethers.constants.HashZero
-  conditionId: string,
+  collateralToken: string
+  parentCollectionId: string // If doesn't exist, must be zero, ethers.constants.HashZero
+  conditionId: string
   indexSets: string[]
 }
 
@@ -197,11 +197,22 @@ class CPKService {
   redeemPosition = async (
     redeemPositionParams: CPKRedeemPositionParams
   ): Promise<TransactionReceipt | void> => {
-    const {   CTService,  collateralToken, parentCollectionId, conditionId, indexSets } = redeemPositionParams
+    const {
+      CTService,
+      collateralToken,
+      conditionId,
+      indexSets,
+      parentCollectionId,
+    } = redeemPositionParams
 
     const redeemPositionTx = {
       to: CTService.address,
-      data: ConditionalTokensService.encodeRedeemPositions(collateralToken, parentCollectionId, conditionId, indexSets),
+      data: ConditionalTokensService.encodeRedeemPositions(
+        collateralToken,
+        parentCollectionId,
+        conditionId,
+        indexSets
+      ),
     }
 
     const transactions = [redeemPositionTx]

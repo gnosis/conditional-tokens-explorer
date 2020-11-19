@@ -20,12 +20,7 @@ import { Remote } from 'util/remoteData'
 const logger = getLogger('ReportPayouts')
 
 export const Contents: React.FC = () => {
-  const {
-    _type: status,
-    CTService,
-    address,
-    connect,
-  } = useWeb3ConnectedOrInfura()
+  const { _type: status, CTService, address, connect } = useWeb3ConnectedOrInfura()
 
   const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<string>>>(
     Remote.notAsked<Maybe<string>>()
