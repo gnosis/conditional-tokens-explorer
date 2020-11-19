@@ -3,7 +3,7 @@ import gql from 'graphql-tag'
 import React, { ReactElement } from 'react'
 
 import { renderHook } from '@testing-library/react-hooks'
-import { useQueryTotalResults } from 'hooks/useQueryTotalResults'
+import { PaginateVariables, useQueryTotalResults } from 'hooks/useQueryTotalResults'
 import { Conditions } from 'types/generatedGQLForCTE'
 
 const query = gql`
@@ -73,11 +73,6 @@ const mockedQuery = [
   },
 ]
 
-interface Paginate {
-  first: number
-  skip: number
-}
-
 interface Props {
   children: ReactElement
 }
@@ -94,7 +89,11 @@ describe('useQueryTotalResults', () => {
   it('verifies that it renders with no initial value', async () => {
     const { result } = renderHook(
       () =>
-        useQueryTotalResults<Conditions, Paginate>({ query, step: 1, entityName: 'conditions' }),
+        useQueryTotalResults<Conditions, PaginateVariables>({
+          query,
+          step: 1,
+          entityName: 'conditions',
+        }),
       {
         wrapper: wrapper(mockedQuery),
       }
@@ -105,7 +104,11 @@ describe('useQueryTotalResults', () => {
   it('verifies that next update has all values', async () => {
     const { result, waitForNextUpdate } = renderHook(
       () =>
-        useQueryTotalResults<Conditions, Paginate>({ query, step: 1, entityName: 'conditions' }),
+        useQueryTotalResults<Conditions, PaginateVariables>({
+          query,
+          step: 1,
+          entityName: 'conditions',
+        }),
       {
         wrapper: wrapper(mockedQuery),
       }

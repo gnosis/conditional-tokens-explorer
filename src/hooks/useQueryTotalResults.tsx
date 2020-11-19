@@ -2,7 +2,7 @@ import { useApolloClient } from '@apollo/react-hooks'
 import { QueryBaseOptions } from 'apollo-client'
 import { useCallback, useEffect, useState } from 'react'
 
-interface PaginateVariables {
+export interface PaginateVariables {
   first: number
   skip: number
 }
@@ -33,6 +33,7 @@ export function useQueryTotalResults<Result, K extends PaginateVariables>(
     const entityName = options.entityName
 
     setLoading(true)
+    setData(null)
     // eslint-disable-next-line no-constant-condition
     while (true) {
       const { data: lastFetched } = await client.query<Entity<Result>>({
