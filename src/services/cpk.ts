@@ -28,6 +28,7 @@ interface CPKPrepareOmenConditionParams {
   category: string
   outcomes: string[]
   question: string
+  questionId: string
   openingDateMoment: Moment
   networkConfig: NetworkConfig
 }
@@ -77,8 +78,9 @@ class CPKService {
       ),
     }
 
-    const  { hash, transactionResponse } = await this.cpk.execTransactions([prepareConditionTx])
+    const { hash, transactionResponse } = await this.cpk.execTransactions([prepareConditionTx])
     logger.log(`Transaction hash: ${hash}`)
+    logger.log(`CPK address: ${this.cpk.address}`)
 
     return transactionResponse
       .wait(CONFIRMATIONS_TO_WAIT)
@@ -105,6 +107,7 @@ class CPKService {
       oracleAddress,
       outcomes,
       question,
+      questionId,
     } = prepareOmenConditionParams
 
     const realitioAddress = RtyService.address
@@ -122,16 +125,6 @@ class CPKService {
       ),
     }
 
-    const questionId = await RtyService.askQuestionConstant({
-      arbitratorAddress: arbitrator,
-      category,
-      openingDateMoment,
-      outcomes,
-      question,
-      networkConfig,
-      signerAddress: this.cpk.address,
-    })
-
     // Step 2: Prepare condition
     const prepareConditionTx = {
       to: CTService.address,
@@ -146,6 +139,7 @@ class CPKService {
 
     const { hash, transactionResponse } = await this.cpk.execTransactions(transactions)
     logger.log(`Transaction hash: ${hash}`)
+    logger.log(`CPK address: ${this.cpk.address}`)
 
     return transactionResponse
       .wait(CONFIRMATIONS_TO_WAIT)

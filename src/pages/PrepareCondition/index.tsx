@@ -218,7 +218,7 @@ export const PrepareCondition = () => {
           ) {
             const openingDateMoment = moment(resolutionDate + '')
             const questionOptions: QuestionOptions = {
-              arbitratorAddress: (arbitrator as Arbitrator).address,
+              arbitrator: (arbitrator as Arbitrator).address,
               category,
               openingDateMoment,
               outcomes,
@@ -328,6 +328,16 @@ export const PrepareCondition = () => {
             const openingDateMoment = moment(resolutionDate + '')
             logger.log(`outcomes`, outcomes)
 
+            const questionId = await RtyService.askQuestionConstant({
+              arbitrator: (arbitrator as Arbitrator).address,
+              category,
+              openingDateMoment,
+              outcomes,
+              question: questionTitle + '',
+              networkConfig,
+              signerAddress: cpk.address,
+            })
+
             await cpk.prepareOmenCondition({
               CTService,
               RtyService,
@@ -337,20 +347,9 @@ export const PrepareCondition = () => {
               oracleAddress: oracleOmen + '',
               outcomes,
               question: questionTitle + '',
+              questionId,
               openingDateMoment,
             })
-
-            const questionOptions: QuestionOptions = {
-              arbitratorAddress: (arbitrator as Arbitrator).address,
-              category,
-              openingDateMoment,
-              networkConfig,
-              signerAddress: cpk.address,
-              outcomes,
-              question: questionTitle + '',
-            }
-
-            const questionId = await RtyService.askQuestionConstant(questionOptions)
 
             conditionIdToUpdate = ConditionalTokensService.getConditionId(
               questionId,

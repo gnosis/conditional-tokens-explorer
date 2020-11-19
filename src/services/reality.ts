@@ -51,7 +51,7 @@ export class RealityService {
 
   askQuestion = async (questionOptions: QuestionOptions): Promise<string> => {
     const {
-      arbitratorAddress,
+      arbitrator,
       category,
       networkConfig,
       openingDateMoment,
@@ -73,7 +73,7 @@ export class RealityService {
     const args = [
       SINGLE_SELECT_TEMPLATE_ID,
       questionText,
-      arbitratorAddress,
+      arbitrator,
       timeoutResolution,
       openingTimestamp,
       0,
@@ -95,7 +95,7 @@ export class RealityService {
 
   askQuestionConstant = async (questionOptions: QuestionOptions): Promise<string> => {
     const {
-      arbitratorAddress,
+      arbitrator,
       category,
       networkConfig,
       openingDateMoment,
@@ -117,7 +117,7 @@ export class RealityService {
     const args = [
       SINGLE_SELECT_TEMPLATE_ID,
       questionText,
-      arbitratorAddress,
+      arbitrator,
       timeoutResolution,
       openingTimestamp,
       0,
