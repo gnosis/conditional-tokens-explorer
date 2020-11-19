@@ -39,6 +39,14 @@ interface CPKReportPayoutParams {
   payouts: number[]
 }
 
+interface CPKRedeemPositionParams {
+  CTService: ConditionalTokensService
+  collateralToken: string,
+  parentCollectionId: string, // If doesn't exist, must be zero, ethers.constants.HashZero
+  conditionId: string,
+  indexSets: string[]
+}
+
 class CPKService {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   cpk: any
@@ -169,6 +177,34 @@ class CPKService {
     }
 
     const transactions = [reportPayoutTx]
+
+    const { hash, transactionResponse } = await this.cpk.execTransactions(transactions)
+    logger.log(`Transaction hash: ${hash}`)
+    logger.log(`CPK address: ${this.cpk.address}`)
+
+    return transactionResponse
+      .wait(CONFIRMATIONS_TO_WAIT)
+      .then((receipt: TransactionReceipt) => {
+        logger.log(`Transaction was mined in block`, receipt)
+        return receipt
+      })
+      .catch((error: Error) => {
+        logger.error(error)
+        throw improveErrorMessage(error)
+      })
+  }
+
+  redeemPosition = async (
+    redeemPositionParams: CPKRedeemPositionParams
+  ): Promise<TransactionReceipt | void> => {
+    const {   CTService,  collateralToken, parentCollectionId, conditionId, indexSets } = redeemPositionParams
+
+    const redeemPositionTx = {
+      to: CTService.address,
+      data: ConditionalTokensService.encodeRedeemPositions(collateralToken, parentCollectionId, conditionId, indexSets),
+    }
+
+    const transactions = [redeemPositionTx]
 
     const { hash, transactionResponse } = await this.cpk.execTransactions(transactions)
     logger.log(`Transaction hash: ${hash}`)
