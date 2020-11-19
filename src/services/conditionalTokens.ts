@@ -1,7 +1,7 @@
 import CTHelpersConstructor from '@gnosis.pm/conditional-tokens-contracts/utils/id-helpers'
 import { Contract, ethers } from 'ethers'
 import { TransactionReceipt, TransactionResponse } from 'ethers/providers'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, Interface } from 'ethers/utils'
 import Web3Utils from 'web3-utils'
 
 import { CONFIRMATIONS_TO_WAIT } from 'config/constants'
@@ -377,5 +377,19 @@ export class ConditionalTokensService {
     } catch {
       return false
     }
+  }
+
+  static encodePrepareCondition = (
+    questionId: string,
+    oracleAddress: string,
+    outcomeSlotCount: number
+  ): string => {
+    const prepareConditionInterface = new Interface(conditionalTokensAbi)
+
+    return prepareConditionInterface.functions.prepareCondition.encode([
+      oracleAddress,
+      questionId,
+      new BigNumber(outcomeSlotCount),
+    ])
   }
 }

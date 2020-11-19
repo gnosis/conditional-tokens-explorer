@@ -1,7 +1,8 @@
 import RealitioQuestionLib from '@realitio/realitio-lib/formatters/question'
 import RealitioTemplateLib from '@realitio/realitio-lib/formatters/template'
 import { Contract, ethers } from 'ethers'
-import { bigNumberify } from 'ethers/utils'
+import { Interface, bigNumberify } from 'ethers/utils'
+import { Moment } from 'moment'
 
 import { REALITY_TIMEOUT, SINGLE_SELECT_TEMPLATE_ID } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
@@ -218,5 +219,38 @@ export class RealityService {
       )
       throw err
     }
+  }
+
+  static encodeAskQuestion = (
+    question: string,
+    outcomes: string[],
+    category: string,
+    arbitratorAddress: string,
+    openingDateMoment: Moment,
+    networkConfig: NetworkConfig
+  ): string => {
+    const openingTimestamp = openingDateMoment.unix()
+    const outcomeNames = outcomes.map((outcome: string) => outcome)
+    const questionText = RealitioQuestionLib.encodeText(
+      'single-select',
+      question,
+      outcomeNames,
+      category
+    )
+
+    const timeoutResolution = REALITY_TIMEOUT || networkConfig.getRealityTimeout()
+
+    const args = [
+      SINGLE_SELECT_TEMPLATE_ID,
+      questionText,
+      arbitratorAddress,
+      timeoutResolution,
+      openingTimestamp,
+      0,
+    ]
+
+    const askQuestionInterface = new Interface(realityAbi)
+
+    return askQuestionInterface.functions.askQuestion.encode(args)
   }
 }
