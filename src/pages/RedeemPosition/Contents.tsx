@@ -105,7 +105,7 @@ export const Contents = () => {
       setTransactionStatus(Remote.failure(err))
       logger.error(err)
     }
-  }, [status, CTService, connect, conditionId, position, provider, signer])
+  }, [status, CTService, connect, conditionId, position, provider, networkConfig, signer])
 
   const disabled =
     transactionStatus.isLoading() || !conditionIds.length || !position || !conditionId
