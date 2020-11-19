@@ -33,6 +33,12 @@ interface CPKPrepareOmenConditionParams {
   networkConfig: NetworkConfig
 }
 
+interface CPKReportPayoutParams {
+  CTService: ConditionalTokensService
+  questionId: string
+  payouts: number[]
+}
+
 class CPKService {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   cpk: any
@@ -136,6 +142,33 @@ class CPKService {
     }
 
     const transactions = [createQuestionTx, prepareConditionTx]
+
+    const { hash, transactionResponse } = await this.cpk.execTransactions(transactions)
+    logger.log(`Transaction hash: ${hash}`)
+    logger.log(`CPK address: ${this.cpk.address}`)
+
+    return transactionResponse
+      .wait(CONFIRMATIONS_TO_WAIT)
+      .then((receipt: TransactionReceipt) => {
+        logger.log(`Transaction was mined in block`, receipt)
+        return receipt
+      })
+      .catch((error: Error) => {
+        logger.error(error)
+        throw improveErrorMessage(error)
+      })
+  }
+
+  reportPayout = async (
+    reportPayoutParams: CPKReportPayoutParams
+  ): Promise<TransactionReceipt | void> => {
+    const { CTService, payouts, questionId } = reportPayoutParams
+    const reportPayoutTx = {
+      to: CTService.address,
+      data: ConditionalTokensService.encodeReportPayout(questionId, payouts),
+    }
+
+    const transactions = [reportPayoutTx]
 
     const { hash, transactionResponse } = await this.cpk.execTransactions(transactions)
     logger.log(`Transaction hash: ${hash}`)

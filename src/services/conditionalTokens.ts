@@ -2,7 +2,7 @@ import CTHelpersConstructor from '@gnosis.pm/conditional-tokens-contracts/utils/
 import { Contract, ethers } from 'ethers'
 import { TransactionReceipt, TransactionResponse } from 'ethers/providers'
 import { BigNumber, Interface } from 'ethers/utils'
-import Web3Utils from 'web3-utils'
+import Web3Utils, { toChecksumAddress } from 'web3-utils'
 
 import { CONFIRMATIONS_TO_WAIT } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
@@ -129,17 +129,22 @@ export class ConditionalTokensService {
     questionId: string,
     oracleAddress: string,
     outcomeSlotCount: number
-  ): Promise<TransactionReceipt> {
-    const transactionObject = await this.contract.prepareCondition(
+  ): Promise<TransactionReceipt | void> {
+    const tx: TransactionResponse = await this.contract.prepareCondition(
       oracleAddress,
       questionId,
-      outcomeSlotCount,
-      {
-        value: '0x0',
-        gasLimit: 750000,
-      }
+      outcomeSlotCount
     )
-    return this.provider.waitForTransaction(transactionObject.hash, CONFIRMATIONS_TO_WAIT)
+    return tx
+      .wait(CONFIRMATIONS_TO_WAIT)
+      .then((receipt: TransactionReceipt) => {
+        logger.log(`Transaction was mined in block`, receipt)
+        return receipt
+      })
+      .catch((error) => {
+        logger.error(error)
+        throw improveErrorMessage(error)
+      })
   }
 
   async splitPosition(
@@ -154,11 +159,7 @@ export class ConditionalTokensService {
       parentCollectionId,
       conditionId,
       partition,
-      amount,
-      {
-        value: '0x0',
-        gasLimit: 2750000, // TODO - should we try to precalculate this?
-      }
+      amount
     )
 
     logger.log(`Transaction hash: ${tx.hash}`)
@@ -185,11 +186,7 @@ export class ConditionalTokensService {
       collateralToken,
       parentCollectionId,
       conditionId,
-      indexSets,
-      {
-        value: '0x0',
-        gasLimit: 2750000, // TODO - should we try to precalculate this?
-      }
+      indexSets
     )
 
     logger.log(`Transaction hash: ${tx.hash}`)
@@ -226,11 +223,7 @@ export class ConditionalTokensService {
       parentCollectionId,
       conditionId,
       partition,
-      amount,
-      {
-        value: '0x0',
-        gasLimit: 2750000, // TODO - should we try to precalculate this?
-      }
+      amount
     )
 
     logger.log(`Transaction hash: ${tx.hash}`)
@@ -275,10 +268,7 @@ export class ConditionalTokensService {
   }
 
   async reportPayouts(questionId: string, payouts: number[]): Promise<TransactionReceipt | void> {
-    const tx: TransactionResponse = await this.contract.reportPayouts(questionId, payouts, {
-      value: '0x0',
-      gasLimit: 2750000, // TODO - should we try to precalculate this?
-    })
+    const tx: TransactionResponse = await this.contract.reportPayouts(questionId, payouts)
     logger.log(`Transaction hash: ${tx.hash}`)
 
     return tx
@@ -387,9 +377,30 @@ export class ConditionalTokensService {
     const prepareConditionInterface = new Interface(conditionalTokensAbi)
 
     return prepareConditionInterface.functions.prepareCondition.encode([
-      oracleAddress,
+      toChecksumAddress(oracleAddress),
       questionId,
       new BigNumber(outcomeSlotCount),
+    ])
+  }
+
+  static encodeReportPayout = (questionId: string, payouts: number[]): string => {
+    const reportPayoutInterface = new Interface(conditionalTokensAbi)
+    return reportPayoutInterface.functions.reportPayouts.encode([questionId, payouts])
+  }
+
+  static encodeRedeemPositions = (
+    collateralToken: string,
+    parentCollectionId: string, // If doesn't exist, must be zero, ethers.constants.HashZero
+    conditionId: string,
+    indexSets: string[]
+  ): string => {
+    const redeemPositionsInterface = new Interface(conditionalTokensAbi)
+
+    return redeemPositionsInterface.functions.redeemPositions.encode([
+      collateralToken,
+      parentCollectionId,
+      conditionId,
+      indexSets,
     ])
   }
 }
