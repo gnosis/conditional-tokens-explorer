@@ -2,90 +2,60 @@ import { useApolloClient } from '@apollo/react-hooks'
 import { QueryBaseOptions } from 'apollo-client'
 import { useCallback, useEffect, useState } from 'react'
 
-import { Conditions } from 'types/generatedGQLForCTE'
-
 interface PaginateVariables {
   first: number
   skip: number
 }
 
-// TODO
-// [ ] Compose with async-fetch hook / use if !cancelled
-// [ ] throttle
-// [ ] Found the way of make firstArg/secondArg general.
+interface TotalQueryExtraOptions {
+  step?: number
+  entityName: EntitiesNames
+}
 
-const LIMIT = 10
-export function useQueryTotalResults<T extends Conditions, K extends PaginateVariables>(
-  options: QueryBaseOptions<K>
-  // firstArg: string,
-  // secondArg?: string
+type EntitiesNames = 'conditions' | 'positions'
+type Entity<Result> = {
+  [I in EntitiesNames]: Result[]
+}
+
+const LIMIT = 1000
+export function useQueryTotalResults<Result, K extends PaginateVariables>(
+  options: TotalQueryExtraOptions & QueryBaseOptions<K>
 ) {
   const client = useApolloClient()
 
-  const [data, setData] = useState<Maybe<T['conditions']>>(null)
-  const [loading, setLoading] = useState(true)
+  const [data, setData] = useState<Maybe<Result[]>>(null)
+  const [loading, setLoading] = useState(false)
 
   const fetchAll = useCallback(async () => {
-    const limit = options.variables ? options.variables.first : LIMIT
-    let skip = options.variables ? options.variables.skip : 0
-    let partialData: T['conditions'] = []
+    const step = options.step || LIMIT
+    let skip = 0
+    let partialData: Result[] = []
+    const entityName = options.entityName
 
+    setLoading(true)
     // eslint-disable-next-line no-constant-condition
     while (true) {
-      const { data: lastFetched } = await client.query<T>({
+      const { data: lastFetched } = await client.query<Entity<Result>>({
         ...options,
+        variables: { first: step, skip },
       })
 
-      skip = skip + limit
+      skip = skip + step
 
-      if (lastFetched && lastFetched.conditions.length === 0) {
+      if ((lastFetched && lastFetched[entityName].length === 0) || !lastFetched) {
         break
       } else {
-        partialData = [...partialData, ...lastFetched.conditions]
+        partialData = [...partialData, ...lastFetched[entityName]]
       }
     }
     setLoading(false)
     setData(partialData)
-    // let hasNextPage = true
-    // let allResults: any[] = []
-    // variables.first = 1000
-    // while (hasNextPage) {
-    //   const { data }: { data: any } = await client.query<T>({
-    //     query,
-    //     context,
-    //     variables,
-    //   })
-    //   let registers: any[] = []
-    //   if (firstArg && secondArg) {
-    //     registers = data[firstArg] ? data[firstArg][secondArg] : []
-    //   } else {
-    //     registers = data[firstArg]
-    //   }
-    //   allResults = [...allResults, ...registers]
-    //   if (registers.length === 1000) {
-    //     variables.skip = (variables.skip || 0) + 1000
-    //   } else {
-    //     hasNextPage = false
-    //   }
-    //   await new Promise((r) => setTimeout(r, 2000))
-    // }
-    // setLoading(false)
-    // if (firstArg && secondArg) {
-    //   const obj1: any = {}
-    //   const obj2: any = {}
-    //   obj2[secondArg] = allResults
-    //   obj1[firstArg] = obj2
-    //   setData(obj1)
-    // } else {
-    //   const obj: any = {}
-    //   obj[firstArg] = allResults
-    //   setData(obj)
-    // }
   }, [client, options])
 
   useEffect(() => {
     fetchAll()
-  }, [fetchAll])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return {
     loading,
