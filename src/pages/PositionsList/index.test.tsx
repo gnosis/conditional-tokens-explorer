@@ -77,6 +77,7 @@ test('position list should show right columns when the user is connected', async
     {
       request: {
         query: query,
+        variables: { first: 1000, skip: 0 },
       },
       result: {
         data: {
@@ -126,6 +127,17 @@ test('position list should show right columns when the user is connected', async
               conditions: [],
             },
           ],
+        },
+      },
+    },
+    {
+      request: {
+        query: query,
+        variables: { first: 1000, skip: 1000 },
+      },
+      result: {
+        data: {
+          positions: [],
         },
       },
     },
@@ -186,6 +198,7 @@ test('position list should show right columns when the user is not connected', a
     {
       request: {
         query: query,
+        variables: { first: 1000, skip: 0 },
       },
       result: {
         data: {
@@ -235,6 +248,17 @@ test('position list should show right columns when the user is not connected', a
               conditions: [],
             },
           ],
+        },
+      },
+    },
+    {
+      request: {
+        query: query,
+        variables: { first: 1000, skip: 1000 },
+      },
+      result: {
+        data: {
+          positions: [],
         },
       },
     },

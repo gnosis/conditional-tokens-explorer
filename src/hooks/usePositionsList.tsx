@@ -5,10 +5,11 @@ import React, { useState } from 'react'
 
 import { ApolloError } from 'apollo-client/errors/ApolloError'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { PaginateVariables, useQueryTotalResults } from 'hooks/useQueryTotalResults'
 import { Position, marshalPositionListData } from 'hooks/utils'
 import { buildQueryPositionsList } from 'queries/CTEPositions'
 import { UserWithPositionsQuery } from 'queries/CTEUsers'
-import { Positions, UserWithPositions } from 'types/generatedGQLForCTE'
+import { Positions_positions, UserWithPositions } from 'types/generatedGQLForCTE'
 import { Remote } from 'util/remoteData'
 import { formatBigNumber, getTokenSummary } from 'util/tools'
 import { AdvancedFilterPosition, PositionSearchOptions, Token } from 'util/types'
@@ -26,6 +27,9 @@ export type UserBalanceWithDecimals = {
 export type PositionWithUserBalanceWithDecimals = Position &
   UserBalanceWithDecimals & { token: Token }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Variables = { [k: string]: any }
+
 /**
  * Return a array of positions, and the user balance if it's connected.
  */
@@ -40,8 +44,7 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
 
   const query = buildQueryPositionsList(advancedFilter)
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const variables: { [k: string]: any } = {}
+  const variables: Variables = {}
   if (FromCreationDate) variables['fromCreationDate'] = FromCreationDate
   if (ToCreationDate) variables['toCreationDate'] = ToCreationDate
   if (TextToSearch.type !== PositionSearchOptions.CollateralSymbol && TextToSearch.value) {
@@ -64,7 +67,12 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
     error: positionsError,
     loading: loadingPositions,
     refetch: refetchPositions,
-  } = useQuery<Positions>(query, { fetchPolicy: 'no-cache', variables })
+  } = useQueryTotalResults<Positions_positions, Variables & PaginateVariables>({
+    query,
+    //fetchPolicy: 'no-cache',
+    variables,
+    entityName: 'positions',
+  })
 
   const { data: userData, error: userError, refetch: refetchUserPositions } = useQuery<
     UserWithPositions
@@ -80,7 +88,7 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
     // The use of loadingPositions act as a blocker when the useQuery is executing again
     if (positionsData && !loadingPositions) {
       setData(Remote.loading())
-      const positionListData = marshalPositionListData(positionsData.positions, userData?.user)
+      const positionListData = marshalPositionListData(positionsData, userData?.user)
 
       const fetchUserBalanceWithDecimals = async () => {
         const uniqueCollateralTokens = lodashUniqBy(positionListData, 'collateralToken')

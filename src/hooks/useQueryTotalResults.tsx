@@ -3,13 +3,14 @@ import { ApolloError, QueryBaseOptions } from 'apollo-client'
 import { useCallback, useEffect, useState } from 'react'
 
 export interface PaginateVariables {
-  first: number
-  skip: number
+  first?: number
+  skip?: number
 }
 
 interface TotalQueryExtraOptions {
   step?: number
   entityName: EntitiesNames
+  skipQuery?: boolean
 }
 
 type EntitiesNames = 'conditions' | 'positions'
@@ -63,9 +64,9 @@ export function useQueryTotalResults<Result, K extends PaginateVariables>(
   }, [client, options])
 
   useEffect(() => {
-    fetchAll()
+    if (!options.skipQuery) fetchAll()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [options.query, options.skipQuery])
 
   return {
     loading,
