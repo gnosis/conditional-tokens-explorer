@@ -5,6 +5,7 @@ import { BaseCard } from 'components/pureStyledComponents/BaseCard'
 import { Li, OrderedList } from 'components/pureStyledComponents/Lists'
 import { PageTitle } from 'components/pureStyledComponents/PageTitle'
 import { Paragraph } from 'components/pureStyledComponents/Paragraph'
+import { TableWrapper } from 'components/pureStyledComponents/TableWrapper'
 import { Title } from 'components/pureStyledComponents/Title'
 
 const BaseCardGrow = styled(BaseCard)`
@@ -33,36 +34,62 @@ const LiTitleNoMarginTop = styled(LiTitle)`
 `
 
 const StripedTable = styled.table`
-  border-collapse: collapse;
-  border: 1px solid ${(props) => props.theme.colors.lightGrey};
+  border-collapse: separate;
   border-radius: 4px;
-  width: 100%;
+  border-spacing: 0;
+  border: 1px solid ${(props) => props.theme.colors.lightGrey};
+  min-width: 100%;
 `
 const THead = styled.thead``
 
 const TBody = styled.tbody``
 
-const TR = styled.tr``
+const TR = styled.tr`
+  &:nth-child(odd) {
+    td {
+      background-color: ${(props) => props.theme.colors.whitesmoke3};
+    }
+  }
 
-const TH = styled.tr`
+  &:last-child {
+    td {
+      border-bottom: none;
+    }
+  }
+`
+
+const TH = styled.th`
   border-bottom: 1px solid ${(props) => props.theme.colors.lightGrey};
+  border-right: 1px solid ${(props) => props.theme.colors.lightGrey};
   color: ${(props) => props.theme.colors.textColor};
   font-size: 14px;
   font-weight: 600;
   line-height: 1.2;
-  padding-left: ${(props) => props.theme.layout.horizontalPadding};
-  padding-right: ${(props) => props.theme.layout.horizontalPadding};
+  padding: 15px;
+  text-align: left;
   text-transform: uppercase;
+  vertical-align: middle;
+  white-space: nowrap;
+
+  &:last-child {
+    border-right: none;
+  }
 `
 
 const TD = styled.td`
   border-bottom: 1px solid ${(props) => props.theme.colors.lightGrey};
+  border-right: 1px solid ${(props) => props.theme.colors.lightGrey};
   color: ${(props) => props.theme.colors.textColor};
   font-size: 15px;
   font-weight: 400;
   line-height: 1.2;
-  padding-left: ${(props) => props.theme.layout.horizontalPadding};
-  padding-right: ${(props) => props.theme.layout.horizontalPadding};
+  padding: 15px;
+  text-align: left;
+  vertical-align: top;
+
+  &:last-child {
+    border-right: none;
+  }
 `
 
 export const CookiePolicy: React.FC = () => {
@@ -452,6 +479,78 @@ export const CookiePolicy: React.FC = () => {
             Table: Overview of cookies placed and the consequences if the cookies are not placed.
           </i>
         </Paragraph>
+        <TableWrapper>
+          <StripedTable>
+            <THead>
+              <TR>
+                <TH>
+                  Name of
+                  <br />
+                  cookie
+                </TH>
+                <TH>Purpose(s) of cookie</TH>
+                <TH>
+                  Storage period
+                  <br />
+                  of cookie
+                </TH>
+                <TH>
+                  Consequences if cookie
+                  <br />
+                  is not accepted
+                </TH>
+              </TR>
+            </THead>
+            <TBody>
+              <TR>
+                <TD>__utma</TD>
+                <TD>
+                  Used to distinguish users and sessions. The cookie is created when the javascript
+                  library executes and no existing __utma cookies exists. The cookie is updated
+                  every time data is sent to Google Analytics.
+                </TD>
+                <TD>2 years from set/update</TD>
+                <TD>User activity won&apos;t be tracked</TD>
+              </TR>
+              <TR>
+                <TD>__utmt</TD>
+                <TD>Used to throttle request rate.</TD>
+                <TD>10 minutes</TD>
+                <TD>User activity won&apos;t be tracked</TD>
+              </TR>
+              <TR>
+                <TD>__utmb</TD>
+                <TD>
+                  Used to determine new sessions/visits. The cookie is created when the javascript
+                  library executes and no existing __utmb cookies exists. The cookie is updated
+                  every time data is sent to Google Analytics.
+                </TD>
+                <TD>30 mins from set/update</TD>
+                <TD>User activity won&apos;t be tracked</TD>
+              </TR>
+              <TR>
+                <TD>__utmv</TD>
+                <TD>
+                  Used to store visitor-level custom variable data. This cookie is created when a
+                  developer uses the _setCustomVar method with a visitor level custom variable. This
+                  cookie was also used for the deprecated _setVar method. The cookie is updated
+                  every time data is sent to Google Analytics.
+                </TD>
+                <TD>2 years from set/update</TD>
+                <TD>User activity won&apos;t be tracked</TD>
+              </TR>
+              <TR>
+                <TD>__utmc</TD>
+                <TD>
+                  Historically, this cookie operated in conjunction with the __utmb cookie to
+                  determine whether the user was in a new session/visit.
+                </TD>
+                <TD>End of browser session</TD>
+                <TD>User activity won&apos;t be tracked</TD>
+              </TR>
+            </TBody>
+          </StripedTable>
+        </TableWrapper>
       </BaseCardGrow>
     </>
   )
