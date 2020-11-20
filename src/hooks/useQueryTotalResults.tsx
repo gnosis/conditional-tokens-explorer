@@ -42,7 +42,7 @@ export function useQueryTotalResults<Result, K extends PaginateVariables>(
       try {
         const { data: lastFetched } = await client.query<Entity<Result>>({
           ...options,
-          variables: { first: step, skip },
+          variables: { first: step, skip, ...options.variables },
         })
 
         skip = skip + step

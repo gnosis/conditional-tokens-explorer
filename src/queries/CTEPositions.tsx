@@ -140,17 +140,18 @@ export const buildQueryPositionsList = (
     .join(',')
 
   const variablesClause = variablesClauseInternal
-    ? `($first: Int, $skip: Int, ${variablesClauseInternal})`
-    : '($first: Int, $skip: Int)'
+    ? `($first: Int!, $skip: Int!, ${variablesClauseInternal})`
+    : '($first: Int!, $skip: Int!)'
 
   const query = gql`
   query Positions ${variablesClause} {
-    positions(first: $first, skip: $skip ${whereClause} , orderBy: createTimestamp, orderDirection: desc) {
+    positions(first: $first, skip: $skip${whereClause}, orderBy: createTimestamp, orderDirection: desc) {
       ...PositionData
     }
   }
   ${positionFragment}
   `
+
   return query
 }
 
