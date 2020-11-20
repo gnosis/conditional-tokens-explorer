@@ -21,6 +21,10 @@ const Wrapper = styled.div`
     flex-shrink: 0;
     height: 100%;
   }
+
+  .dropdown.isOpen {
+    background-color: ${(props) => props.theme.colors.primary};
+  }
 `
 
 const SearchIconWrapper = styled.label`

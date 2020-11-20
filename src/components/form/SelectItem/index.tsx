@@ -40,6 +40,7 @@ interface Props {
     | undefined
   value: string
   onClick?: ((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void) | undefined
+  activeItemHighlight?: boolean
 }
 
 export const SelectItem: React.FC<Props> = (props) => {

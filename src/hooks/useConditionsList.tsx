@@ -51,7 +51,7 @@ export const useConditionsList = (advancedFilter: AdvancedFilterConditions) => {
     variables['textToSearch'] = TextToSearch.value.toLowerCase()
   }
 
-  const { data, error, loading } = useQuery<Conditions>(query, {
+  const { data, error, loading, refetch } = useQuery<Conditions>(query, {
     variables,
     fetchPolicy: 'no-cache',
   })
@@ -60,5 +60,6 @@ export const useConditionsList = (advancedFilter: AdvancedFilterConditions) => {
     data,
     error,
     loading,
+    refetch,
   }
 }

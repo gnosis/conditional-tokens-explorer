@@ -39,8 +39,8 @@ export const dataTableCSS = css`
 
       .rdt_TableCol,
       .rdt_TableCell {
-        padding-left: 15px;
-        padding-right: 15px;
+        padding-left: 12px;
+        padding-right: 12px;
       }
     }
 

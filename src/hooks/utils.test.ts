@@ -90,6 +90,14 @@ test('marshalPositionListData should return the Positions without balances', asy
       createTimestamp: '1571930105',
       conditionIds: [],
       indexSets: [],
+      collection: {
+        __typename: 'Collection',
+        conditionIds: [],
+        conditions: [],
+        id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+        indexSets: [],
+        positions: null,
+      },
     },
     {
       id: 'Position2',
@@ -101,6 +109,14 @@ test('marshalPositionListData should return the Positions without balances', asy
       createTimestamp: '1571930105',
       conditionIds: [],
       indexSets: [],
+      collection: {
+        __typename: 'Collection',
+        conditionIds: [],
+        conditions: [],
+        id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+        indexSets: [],
+        positions: null,
+      },
     },
   ]
 
@@ -119,6 +135,14 @@ test('marshalPositionListData should return the Positions with some balances', a
       createTimestamp: '1571930105',
       conditionIds: [],
       indexSets: [],
+      collection: {
+        __typename: 'Collection',
+        conditionIds: [],
+        conditions: [],
+        id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+        indexSets: [],
+        positions: null,
+      },
     },
     {
       id: 'Position2',
@@ -130,6 +154,14 @@ test('marshalPositionListData should return the Positions with some balances', a
       createTimestamp: '1571930105',
       conditionIds: [],
       indexSets: [],
+      collection: {
+        __typename: 'Collection',
+        conditionIds: [],
+        conditions: [],
+        id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+        indexSets: [],
+        positions: null,
+      },
     },
   ]
 

@@ -480,11 +480,34 @@ export const PrepareCondition = () => {
     }
   }, [checkForExistingCondition, conditionIdPreview, isConditionAlreadyExist])
 
+  const onDateChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (event.target.checkValidity()) {
+        setValueOmenCondition('resolutionDate', event.target.value, true)
+      } else {
+        setErrorOmenCondition('resolutionDate', 'validity')
+      }
+    },
+    [setErrorOmenCondition, setValueOmenCondition]
+  )
+
+  const onDateKeyUp = React.useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (!moment(event.currentTarget.value).isValid()) {
+        setErrorOmenCondition('resolutionDate', 'invalidDate')
+      }
+    },
+    [setErrorOmenCondition]
+  )
+
   const customConditionFormHasErrors = Object.keys(errorsCustomCondition).length > 0
   const omenConditionFormHasErrors =
     isQuestionAlreadyExist ||
     Object.keys(errorsOmenCondition).length > 0 ||
     outcomes.length < MIN_OUTCOMES_ALLOWED
+
+  const todayLocalized = moment(today).format('LL')
+  const maxDateLocalized = moment(MAX_DATE).format('LL')
 
   return (
     <>
@@ -676,13 +699,8 @@ export const PrepareCondition = () => {
                       max={MAX_DATE}
                       min={today}
                       name="resolutionDate"
-                      onChange={(e) => {
-                        if (e.target.checkValidity()) {
-                          setValueOmenCondition('resolutionDate', e.target.value, true)
-                        } else {
-                          setErrorOmenCondition('resolutionDate', 'validity')
-                        }
-                      }}
+                      onChange={onDateChange}
+                      onKeyUp={onDateKeyUp}
                       ref={registerOmenCondition({
                         required: true,
                         min: today,
@@ -695,12 +713,13 @@ export const PrepareCondition = () => {
                         {errorsOmenCondition.resolutionDate.type === 'required' && (
                           <ErrorMessage>Required field</ErrorMessage>
                         )}
+                        {errorsOmenCondition.resolutionDate.type === 'invalidDate' && (
+                          <ErrorMessage>Date is invalid</ErrorMessage>
+                        )}
                         {['min', 'max', 'validity'].includes(
                           errorsOmenCondition.resolutionDate.type
                         ) && (
-                          <ErrorMessage>{`Date must between ${moment(today).format(
-                            'L'
-                          )} and ${moment(MAX_DATE).format('L')}`}</ErrorMessage>
+                          <ErrorMessage>{`Date must be between ${todayLocalized} and ${maxDateLocalized}`}</ErrorMessage>
                         )}
                       </ErrorContainer>
                     )}
