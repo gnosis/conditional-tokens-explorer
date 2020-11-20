@@ -1,5 +1,6 @@
 import { ethers } from 'ethers'
 import { TransactionReceipt } from 'ethers/providers'
+import { BigNumber } from 'ethers/utils'
 import { Moment } from 'moment'
 
 import { CONFIRMATIONS_TO_WAIT } from 'config/constants'
@@ -45,6 +46,15 @@ interface CPKRedeemPositionParams {
   parentCollectionId: string // If doesn't exist, must be zero, ethers.constants.HashZero
   conditionId: string
   indexSets: string[]
+}
+
+interface CPKSplitPositionParams {
+  CTService: ConditionalTokensService
+  collateralToken: string
+  parentCollectionId: string
+  conditionId: string
+  partition: BigNumber[]
+  amount: BigNumber
 }
 
 class CPKService {
@@ -216,6 +226,47 @@ class CPKService {
     }
 
     const transactions = [redeemPositionTx]
+
+    const { hash, transactionResponse } = await this.cpk.execTransactions(transactions)
+    logger.log(`Transaction hash: ${hash}`)
+    logger.log(`CPK address: ${this.cpk.address}`)
+
+    return transactionResponse
+      .wait(CONFIRMATIONS_TO_WAIT)
+      .then((receipt: TransactionReceipt) => {
+        logger.log(`Transaction was mined in block`, receipt)
+        return receipt
+      })
+      .catch((error: Error) => {
+        logger.error(error)
+        throw improveErrorMessage(error)
+      })
+  }
+
+  splitPosition = async (
+    splitPositionParams: CPKSplitPositionParams
+  ): Promise<TransactionReceipt | void> => {
+    const {
+      CTService,
+      amount,
+      collateralToken,
+      conditionId,
+      parentCollectionId,
+      partition,
+    } = splitPositionParams
+
+    const splitPositionTx = {
+      to: CTService.address,
+      data: ConditionalTokensService.encodeSplitPositions(
+        collateralToken,
+        parentCollectionId,
+        conditionId,
+        partition,
+        amount
+      ),
+    }
+
+    const transactions = [splitPositionTx]
 
     const { hash, transactionResponse } = await this.cpk.execTransactions(transactions)
     logger.log(`Transaction hash: ${hash}`)

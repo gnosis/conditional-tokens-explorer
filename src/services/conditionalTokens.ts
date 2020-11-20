@@ -403,4 +403,22 @@ export class ConditionalTokensService {
       indexSets,
     ])
   }
+
+  static encodeSplitPositions = (
+    collateralToken: string,
+    parentCollectionId: string,
+    conditionId: string,
+    partition: BigNumber[],
+    amount: BigNumber
+  ): string => {
+    const splitPositionsInterface = new Interface(conditionalTokensAbi)
+
+    return splitPositionsInterface.functions.splitPosition.encode([
+      collateralToken,
+      parentCollectionId,
+      conditionId,
+      partition,
+      amount,
+    ])
+  }
 }
