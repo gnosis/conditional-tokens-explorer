@@ -8,6 +8,10 @@ export const Paragraph = styled.p`
   margin: 0 0 30px;
   text-align: left;
 
+  &:last-child {
+    margin-bottom: 0;
+  }
+
   a {
     color: ${(props) => props.theme.colors.primary};
     text-decoration: underline;

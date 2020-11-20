@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { BaseCard } from 'components/pureStyledComponents/BaseCard'
 import { Li, OrderedList } from 'components/pureStyledComponents/Lists'
 import { PageTitle } from 'components/pureStyledComponents/PageTitle'
+import { PageTitleNote } from 'components/pureStyledComponents/PageTitleNote'
 import { Paragraph } from 'components/pureStyledComponents/Paragraph'
 import { TableWrapper } from 'components/pureStyledComponents/TableWrapper'
 import { Title } from 'components/pureStyledComponents/Title'
@@ -14,15 +15,6 @@ const BaseCardGrow = styled(BaseCard)`
 
 const PageTitleStyled = styled(PageTitle)`
   margin: 0;
-`
-
-const PageTitleNote = styled.p`
-  color: ${(props) => props.theme.colors.darkGrey};
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 1.2;
-  margin: 0 0 20px;
-  text-align: left;
 `
 
 const LiTitle = styled(Title)`
