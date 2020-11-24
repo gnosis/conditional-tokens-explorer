@@ -350,7 +350,7 @@ export const Form = (props: Props) => {
           value={
             <>
               <CardTextSm>Outcomes Collections</CardTextSm>
-              <StripedListStyled minHeight="200px">
+              <StripedListStyled>
                 {numberedOutcomes && numberedOutcomes.length ? (
                   numberedOutcomes.map(
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
