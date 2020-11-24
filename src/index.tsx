@@ -12,10 +12,9 @@ import { MainWrapper } from 'components/pureStyledComponents/MainWrapper'
 import { ApolloProviderWrapper } from 'contexts/Apollo'
 import { Web3ContextProvider } from 'contexts/Web3Context'
 import { Routes } from 'pages/Routes'
-// eslint-disable-next-line import/order
-import 'sanitize.css'
 import theme from 'theme'
 import { GlobalStyle } from 'theme/globalStyle'
+import 'sanitize.css'
 
 ReactDOM.render(
   <React.StrictMode>
