@@ -31,13 +31,11 @@ const CommonCSS = css`
 `
 
 const Collections = styled(StripedList)`
-  ${CommonCSS}
   height: 100%;
   position: relative;
 `
 
 const CollectionsOuter = styled.div`
-  ${CommonCSS}
   position: relative;
 `
 
@@ -473,9 +471,7 @@ const PartitionModal: React.FC<EditPartitionModalProps> = (props) => {
                     }
                   )
                 ) : (
-                  <StripedListEmpty>
-                    <strong>No collections.</strong>
-                  </StripedListEmpty>
+                  <StripedListEmpty>No collections.</StripedListEmpty>
                 )}
               </Collections>
               {confirmDeleteAllCollections && (
