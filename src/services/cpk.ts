@@ -59,6 +59,15 @@ interface CPKSplitPositionParams {
   account: string
 }
 
+interface CPKMergePositionParams {
+  CTService: ConditionalTokensService
+  collateralToken: string
+  parentCollectionId: string // If doesn't exist, must be zero, ethers.constants.HashZero
+  conditionId: string
+  partition: string[]
+  amount: BigNumber
+}
+
 class CPKService {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   cpk: any
@@ -275,6 +284,47 @@ class CPKService {
     }
 
     const transactions = [transferFromTx, splitPositionTx]
+
+    const { hash, transactionResponse } = await this.cpk.execTransactions(transactions)
+    logger.log(`Transaction hash: ${hash}`)
+    logger.log(`CPK address: ${this.cpk.address}`)
+
+    return transactionResponse
+      .wait(CONFIRMATIONS_TO_WAIT)
+      .then((receipt: TransactionReceipt) => {
+        logger.log(`Transaction was mined in block`, receipt)
+        return receipt
+      })
+      .catch((error: Error) => {
+        logger.error(error)
+        throw improveErrorMessage(error)
+      })
+  }
+
+  mergePositions = async (
+    mergePositionParams: CPKMergePositionParams
+  ): Promise<TransactionReceipt | void> => {
+    const {
+      CTService,
+      amount,
+      collateralToken,
+      conditionId,
+      parentCollectionId,
+      partition,
+    } = mergePositionParams
+
+    const mergePositionsTx = {
+      to: CTService.address,
+      data: ConditionalTokensService.encodeMergePositions(
+        collateralToken,
+        parentCollectionId,
+        conditionId,
+        partition,
+        amount
+      ),
+    }
+
+    const transactions = [mergePositionsTx]
 
     const { hash, transactionResponse } = await this.cpk.execTransactions(transactions)
     logger.log(`Transaction hash: ${hash}`)

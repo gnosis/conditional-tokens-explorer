@@ -421,4 +421,22 @@ export class ConditionalTokensService {
       amount,
     ])
   }
+
+  static encodeMergePositions = (
+    collateralToken: string,
+    parentCollectionId: string,
+    conditionId: string,
+    partition: string[],
+    amount: BigNumber
+  ): string => {
+    const mergePositionsInterface = new Interface(conditionalTokensAbi)
+
+    return mergePositionsInterface.functions.mergePositions.encode([
+      collateralToken,
+      parentCollectionId,
+      conditionId,
+      partition,
+      amount,
+    ])
+  }
 }
