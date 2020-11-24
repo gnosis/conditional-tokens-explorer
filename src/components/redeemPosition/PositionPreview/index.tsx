@@ -49,7 +49,7 @@ export const PositionPreview = ({ condition, position }: Props) => {
     <TitleValue
       title="Redeemed Position Preview"
       value={
-        <StripedList maxHeight={redeemedPreview ? 'auto' : '44px'}>
+        <StripedList>
           {redeemedPreview ? (
             <StripedListItem>
               <strong>{redeemedPreview}</strong>

@@ -31,11 +31,11 @@ export const MergePreview = ({ amount, condition, positions, token }: Props) => 
     <TitleValue
       title="Merged Positions Preview"
       value={
-        <StripedList maxHeight="none" minHeight="41px">
+        <StripedList>
           {preview ? (
             <StripedListItemPreview>{preview}</StripedListItemPreview>
           ) : (
-            <StripedListEmpty>No merged positions yet.</StripedListEmpty>
+            <StripedListEmpty>No merged positions.</StripedListEmpty>
           )}
         </StripedList>
       }
