@@ -5,7 +5,7 @@ import React, { useMemo, useState } from 'react'
 
 import { ApolloError } from 'apollo-client/errors/ApolloError'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { PaginateVariables, useQueryTotalResults } from 'hooks/useQueryTotalResults'
+import { useQueryTotalResults } from 'hooks/useQueryTotalResults'
 import { Position, marshalPositionListData } from 'hooks/utils'
 import { buildQueryPositionsList } from 'queries/CTEPositions'
 import { UserWithPositionsQuery } from 'queries/CTEUsers'
@@ -77,9 +77,9 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
     error: positionsError,
     loading: loadingPositions,
     refetch: refetchPositions,
-  } = useQueryTotalResults<Positions_positions, Variables & PaginateVariables>({
+  } = useQueryTotalResults<Positions_positions, Variables>({
     query,
-    //fetchPolicy: 'no-cache',
+    fetchPolicy: 'no-cache',
     variables,
     entityName: 'positions',
   })

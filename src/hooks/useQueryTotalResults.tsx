@@ -1,6 +1,6 @@
 import { useApolloClient } from '@apollo/react-hooks'
-import { ApolloError, QueryBaseOptions } from 'apollo-client'
-import { useCallback, useEffect, useState } from 'react'
+import { ApolloError, QueryOptions } from 'apollo-client'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 export interface PaginateVariables {
   first?: number
@@ -10,7 +10,6 @@ export interface PaginateVariables {
 interface TotalQueryExtraOptions {
   step?: number
   entityName: EntitiesNames
-  skipQuery?: boolean
 }
 
 type EntitiesNames = 'conditions' | 'positions'
@@ -19,8 +18,9 @@ type Entity<Result> = {
 }
 
 const LIMIT = 1000
-export function useQueryTotalResults<Result, K extends PaginateVariables>(
-  options: TotalQueryExtraOptions & QueryBaseOptions<K>
+export function useQueryTotalResults<Result, Variables>(
+  options: TotalQueryExtraOptions & PaginateVariables & QueryOptions<Variables>,
+  skipQuery?: boolean
 ) {
   const client = useApolloClient()
 
@@ -28,11 +28,38 @@ export function useQueryTotalResults<Result, K extends PaginateVariables>(
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<Maybe<ApolloError>>(null)
 
+  const optionsMemo = useMemo(() => {
+    return {
+      step: options.step,
+      entityName: options.entityName,
+      first: options.first,
+      skip: options.skip,
+      fetchPolicy: options.fetchPolicy,
+      query: options.query,
+      variables: options.variables,
+      errorPolicy: options.errorPolicy,
+      fetchResults: options.fetchResults,
+      metadata: options.metadata,
+      context: options.context,
+    }
+  }, [
+    options.context,
+    options.entityName,
+    options.errorPolicy,
+    options.fetchPolicy,
+    options.fetchResults,
+    options.first,
+    options.metadata,
+    options.query,
+    options.skip,
+    options.step,
+    options.variables,
+  ])
   const fetchAll = useCallback(async () => {
-    const step = options.step || LIMIT
+    const step = optionsMemo.step || LIMIT
     let skip = 0
     let partialData: Result[] = []
-    const entityName = options.entityName
+    const entityName = optionsMemo.entityName
 
     setLoading(true)
     setData(null)
@@ -41,8 +68,8 @@ export function useQueryTotalResults<Result, K extends PaginateVariables>(
     while (true) {
       try {
         const { data: lastFetched } = await client.query<Entity<Result>>({
-          ...options,
-          variables: { first: step, skip, ...options.variables },
+          ...optionsMemo,
+          variables: { first: step, skip, ...optionsMemo.variables },
         })
 
         skip = skip + step
@@ -61,12 +88,11 @@ export function useQueryTotalResults<Result, K extends PaginateVariables>(
     }
     setLoading(false)
     setData(partialData)
-  }, [client, options])
+  }, [client, optionsMemo])
 
   useEffect(() => {
-    if (!options.skipQuery) fetchAll()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [options.query, options.variables, options.skipQuery])
+    if (!skipQuery) fetchAll()
+  }, [skipQuery, fetchAll])
 
   return {
     loading,
