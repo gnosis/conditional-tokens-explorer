@@ -37,7 +37,6 @@ import { useCondition } from 'hooks/useCondition'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
 import { SplitFrom } from 'pages/SplitPosition/SplitFrom'
-import { CPKService } from 'services/cpk'
 import { Conditions_conditions } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
@@ -72,14 +71,7 @@ interface Props {
 const logger = getLogger('Form')
 
 export const Form = (props: Props) => {
-  const {
-    _type: status,
-    CTService,
-    connect,
-    networkConfig,
-    provider,
-    signer,
-  } = useWeb3ConnectedOrInfura()
+  const { _type: status, CTService, connect } = useWeb3ConnectedOrInfura()
   const { tokens } = props
 
   const { getValue } = useLocalStorage(LocalStorageManagement.PositionId)
@@ -140,30 +132,20 @@ export const Form = (props: Props) => {
 
   const onSubmit = useCallback(async () => {
     try {
-      if (status === Web3ContextStatus.Connected && signer) {
+      if (status === Web3ContextStatus.Connected) {
         setTransactionStatus(Remote.loading())
 
         let positionIds: PositionIdsArray[]
         let collateralFromSplit: string = collateralAddress
 
-        const cpk = await CPKService.create(networkConfig, provider, signer)
         if (isSplittingFromCollateral) {
-          await cpk.splitPosition({
-            CTService,
-            collateralToken: collateralFromSplit,
-            parentCollectionId: NULL_PARENT_ID,
+          await CTService.splitPosition(
+            collateralFromSplit,
+            NULL_PARENT_ID,
             conditionId,
             partition,
-            amount,
-          })
-
-          // await CTService.splitPosition(
-          //   collateralFromSplit,
-          //   NULL_PARENT_ID,
-          //   conditionId,
-          //   partition,
-          //   amount,
-          // )
+            amount
+          )
 
           positionIds = await CTService.getPositionsFromPartition(
             partition,
@@ -180,22 +162,13 @@ export const Form = (props: Props) => {
           collateralFromSplit = position.collateralToken
           const collectionId = position.collection.id
 
-          await cpk.splitPosition({
-            CTService,
-            collateralToken: collateralFromSplit,
-            parentCollectionId: collectionId,
+          await CTService.splitPosition(
+            collateralFromSplit,
+            collectionId,
             conditionId,
             partition,
-            amount,
-          })
-
-          // await CTService.splitPosition(
-          //   collateralFromSplit,
-          //   collectionId,
-          //   conditionId,
-          //   partition,
-          //   amount,
-          // )
+            amount
+          )
 
           positionIds = await CTService.getPositionsFromPartition(
             partition,
@@ -218,9 +191,6 @@ export const Form = (props: Props) => {
   }, [
     CTService,
     connect,
-    networkConfig,
-    provider,
-    signer,
     status,
     partition,
     isSplittingFromCollateral,

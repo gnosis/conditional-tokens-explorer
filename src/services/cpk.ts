@@ -8,6 +8,7 @@ import { NetworkConfig } from 'config/networkConfig'
 import CPK from 'contract-proxy-kit/lib/esm'
 import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapter'
 import { ConditionalTokensService } from 'services/conditionalTokens'
+import { ERC20Service } from 'services/erc20'
 import { RealityService } from 'services/reality'
 import { getLogger } from 'util/logger'
 import { improveErrorMessage } from 'util/tools'
@@ -55,6 +56,7 @@ interface CPKSplitPositionParams {
   conditionId: string
   partition: BigNumber[]
   amount: BigNumber
+  account: string
 }
 
 class CPKService {
@@ -248,12 +250,18 @@ class CPKService {
   ): Promise<TransactionReceipt | void> => {
     const {
       CTService,
+      account,
       amount,
       collateralToken,
       conditionId,
       parentCollectionId,
       partition,
     } = splitPositionParams
+
+    const transferFromTx = {
+      to: collateralToken,
+      data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
+    }
 
     const splitPositionTx = {
       to: CTService.address,
@@ -266,7 +274,7 @@ class CPKService {
       ),
     }
 
-    const transactions = [splitPositionTx]
+    const transactions = [transferFromTx, splitPositionTx]
 
     const { hash, transactionResponse } = await this.cpk.execTransactions(transactions)
     logger.log(`Transaction hash: ${hash}`)
