@@ -66,7 +66,7 @@ export function useQueryTotalResults<Result, K extends PaginateVariables>(
   useEffect(() => {
     if (!options.skipQuery) fetchAll()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [options.query, options.skipQuery])
+  }, [options.query, options.variables, options.skipQuery])
 
   return {
     loading,

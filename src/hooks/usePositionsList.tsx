@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/react-hooks'
 import { ethers } from 'ethers'
 import lodashUniqBy from 'lodash.uniqby'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 
 import { ApolloError } from 'apollo-client/errors/ApolloError'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
@@ -44,19 +44,29 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
 
   const query = buildQueryPositionsList(advancedFilter)
 
-  const variables: Variables = {}
-  if (FromCreationDate) variables['fromCreationDate'] = FromCreationDate
-  if (ToCreationDate) variables['toCreationDate'] = ToCreationDate
-  if (TextToSearch.type !== PositionSearchOptions.CollateralSymbol && TextToSearch.value) {
-    variables['textToSearch'] = TextToSearch.value.toLowerCase()
-  }
-  if (TextToSearch.type === PositionSearchOptions.CollateralSymbol && TextToSearch.value) {
-    const tokens = networkConfig.getMultipleTokenAddressesFromSymbol(TextToSearch.value)
-    variables['textToSearch'] = tokens.length > 0 ? tokens : [ethers.constants.HashZero]
-  }
-  if (CollateralValue.value) {
-    variables['collateralSearch'] = CollateralValue?.value
-  }
+  const variables = useMemo(() => {
+    const variables: Variables = {}
+    if (FromCreationDate) variables['fromCreationDate'] = FromCreationDate
+    if (ToCreationDate) variables['toCreationDate'] = ToCreationDate
+    if (TextToSearch.type !== PositionSearchOptions.CollateralSymbol && TextToSearch.value) {
+      variables['textToSearch'] = TextToSearch.value.toLowerCase()
+    }
+    if (TextToSearch.type === PositionSearchOptions.CollateralSymbol && TextToSearch.value) {
+      const tokens = networkConfig.getMultipleTokenAddressesFromSymbol(TextToSearch.value)
+      variables['textToSearch'] = tokens.length > 0 ? tokens : [ethers.constants.HashZero]
+    }
+    if (CollateralValue.value) {
+      variables['collateralSearch'] = CollateralValue?.value
+    }
+    return variables
+  }, [
+    CollateralValue,
+    FromCreationDate,
+    TextToSearch.type,
+    TextToSearch.value,
+    ToCreationDate,
+    networkConfig,
+  ])
 
   React.useEffect(() => {
     if (TextToSearch.value) setData(Remote.loading())
