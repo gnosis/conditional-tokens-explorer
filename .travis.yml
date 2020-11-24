@@ -15,7 +15,7 @@ before_install:
 before_script:
   - if [[ -n "$TRAVIS_TAG" ]]; then export REACT_APP_GOOGLE_ANALYTICS_ID=${REACT_APP_GOOGLE_ANALYTICS_ID_PROD}; fi;
 script:
-  - yarn test
+  - yarn test --coverage
   - yarn build
 after_success:
   # Pull Request - Deploy it to a review environment
