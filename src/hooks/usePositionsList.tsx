@@ -96,8 +96,8 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
 
   React.useEffect(() => {
     // The use of loadingPositions act as a blocker when the useQuery is executing again
-    if (positionsData && !loadingPositions) {
-      setData(Remote.loading())
+    if (loadingPositions) setData(Remote.loading)
+    else if (positionsData) {
       const positionListData = marshalPositionListData(positionsData, userData?.user)
 
       const fetchUserBalanceWithDecimals = async () => {

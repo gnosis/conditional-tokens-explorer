@@ -7,7 +7,7 @@ export interface PaginateVariables {
   skip?: number
 }
 
-interface TotalQueryExtraOptions {
+interface ExtraOptions {
   step?: number
   entityName: EntitiesNames
 }
@@ -19,7 +19,7 @@ type Entity<Result> = {
 
 const LIMIT = 1000
 export function useQueryTotalResults<Result, Variables>(
-  options: TotalQueryExtraOptions & PaginateVariables & QueryOptions<Variables>,
+  options: ExtraOptions & PaginateVariables & QueryOptions<Variables>,
   skipQuery?: boolean
 ) {
   const client = useApolloClient()
@@ -28,6 +28,7 @@ export function useQueryTotalResults<Result, Variables>(
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<Maybe<ApolloError>>(null)
 
+  // options.variables should be memoized in the consumer.
   const optionsMemo = useMemo(() => {
     return {
       step: options.step,
