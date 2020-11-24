@@ -73,7 +73,7 @@ export const MergeWith: React.FC<Props> = (props) => {
       <TitleValue
         title="Merge With"
         value={
-          <StripedList minHeight="158px">
+          <StripedList>
             {mergeablePositions && mergeablePositions.length && !errorFetching ? (
               mergeablePositions.map((item, index) => (
                 <MergeableItem index={index} item={item} key={index} onClick={onClick} />
