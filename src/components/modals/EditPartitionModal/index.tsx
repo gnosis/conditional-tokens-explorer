@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import lodashClonedeep from 'lodash.clonedeep'
 import React, { useCallback, useEffect, useState } from 'react'
-import styled, { css, withTheme } from 'styled-components'
+import styled, { withTheme } from 'styled-components'
 
 import { Button } from 'components/buttons/Button'
 import { ButtonAdd } from 'components/buttons/ButtonAdd'
@@ -24,11 +24,6 @@ import { StripedList, StripedListEmpty } from 'components/pureStyledComponents/S
 import { TitleControlButton } from 'components/pureStyledComponents/TitleControl'
 import { TitleValue } from 'components/text/TitleValue'
 import { OutcomeProps } from 'util/types'
-
-const CommonCSS = css`
-  max-height: 300px;
-  min-height: 200px;
-`
 
 const Collections = styled(StripedList)`
   height: 100%;
