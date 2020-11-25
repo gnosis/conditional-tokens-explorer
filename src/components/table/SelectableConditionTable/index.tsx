@@ -305,8 +305,7 @@ export const SelectableConditionTable: React.FC<Props> = (props) => {
           return oracleName
         },
         name: 'Reporter / Oracle',
-        selector: 'oracle',
-        sortable: true,
+        sortable: false,
       },
       {
         // eslint-disable-next-line react/display-name
@@ -317,8 +316,7 @@ export const SelectableConditionTable: React.FC<Props> = (props) => {
           />
         ),
         name: 'Question Id',
-        selector: 'questionId',
-        sortable: true,
+        sortable: false,
       },
     ],
     [onRowClicked, selectedConditionId, networkConfig]
