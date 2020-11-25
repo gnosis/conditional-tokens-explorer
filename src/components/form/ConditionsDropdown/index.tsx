@@ -58,7 +58,7 @@ export const ConditionsDropdown: React.FC<Props> = (props) => {
           dropdownButtonContent={
             <Button
               content={
-                dropdownItems && dropdownItems.length ? (
+                dropdownItems && dropdownItems.length && dropdownItems[currentIndex] ? (
                   <ButtonText>{dropdownItems[currentIndex].value}</ButtonText>
                 ) : isLoading ? (
                   'Loading...'
