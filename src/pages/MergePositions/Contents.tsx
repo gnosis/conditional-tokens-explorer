@@ -463,8 +463,8 @@ export const Contents = () => {
           amount={amount}
           balance={maxBalance}
           decimals={decimals}
-          isFromAPosition={true}
           disabled={!condition}
+          isFromAPosition={true}
           max={maxBalance.toString()}
           onAmountChange={onAmountChange}
           onUseWalletBalance={onUsePositionBalance}
