@@ -122,3 +122,6 @@ export const MIN_DATE = '2015-07-30'
 export const MAX_DATE = '2030-01-01'
 
 export const OMEN_URL_DAPP = process.env.REACT_APP_OMEN_URL_DAPP || 'https://omen.eth.link'
+
+export const ICON_ENDPOINT =
+  process.env.REACT_APP_ICON_ENDPOINT || 'https://gnosis-safe-token-logos.s3.amazonaws.com/{}.png'
