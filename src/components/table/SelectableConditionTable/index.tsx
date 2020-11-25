@@ -1,7 +1,7 @@
 import { useDebounceCallback } from '@react-hook/debounce'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import styled from 'styled-components'
+import styled, { withTheme } from 'styled-components'
 
 import { ButtonCopy } from 'components/buttons/ButtonCopy'
 import { ConditionTypeFilterDropdown } from 'components/filters/ConditionTypeFilterDropdown'
@@ -53,15 +53,17 @@ const TableControlsStyled = styled(TableControls)`
 `
 
 interface Props {
-  onRowClicked: (row: Conditions_conditions) => void
-  selectedConditionId?: string | undefined
-  onClearSelection: () => void
-  title?: string
   allowToDisplayOnlyConditionsToReport?: boolean
+  onClearSelection: () => void
+  onRowClicked: (row: Conditions_conditions) => void
   refetch?: boolean
+  selectedConditionId?: string | undefined
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  theme?: any
+  title?: string
 }
 
-export const SelectableConditionTable: React.FC<Props> = (props) => {
+const SelectConditionTable: React.FC<Props> = (props) => {
   const { _type: status, CPKService, address, networkConfig } = useWeb3ConnectedOrInfura()
 
   const { getValue } = useLocalStorage(LocalStorageManagement.ConditionId)
@@ -72,6 +74,7 @@ export const SelectableConditionTable: React.FC<Props> = (props) => {
     onRowClicked,
     refetch,
     selectedConditionId,
+    theme,
     title = 'Conditions',
     ...restProps
   } = props
@@ -371,6 +374,20 @@ export const SelectableConditionTable: React.FC<Props> = (props) => {
     selectedFromCreationDate,
   ])
 
+  const conditionalRowStyles = [
+    {
+      when: (condition: Conditions_conditions) => selectedConditionId === condition.id,
+      style: {
+        backgroundColor: theme.colors.whitesmoke3,
+        color: theme.colors.darkerGrey,
+        '&:hover': {
+          cursor: 'default',
+        },
+        pointerEvents: 'none' as const,
+      },
+    },
+  ]
+
   return (
     <TitleValue
       title={title}
@@ -454,6 +471,7 @@ export const SelectableConditionTable: React.FC<Props> = (props) => {
           <DataTable
             className="outerTableWrapper condensedTable"
             columns={columns}
+            conditionalRowStyles={conditionalRowStyles}
             customStyles={customStyles}
             data={showSpinner ? [] : conditionList.length ? conditionList : []}
             highlightOnHover
@@ -482,3 +500,5 @@ export const SelectableConditionTable: React.FC<Props> = (props) => {
     />
   )
 }
+
+export const SelectableConditionTable = withTheme(SelectConditionTable)

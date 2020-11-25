@@ -1,7 +1,7 @@
 import { useDebounceCallback } from '@react-hook/debounce'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import styled from 'styled-components'
+import styled, { withTheme } from 'styled-components'
 
 import { TokenIcon } from 'components/common/TokenIcon'
 import { CollateralFilterDropdown } from 'components/filters/CollateralFilterDropdown'
@@ -50,19 +50,21 @@ const TitleValueExtended = styled(TitleValue)<{ hideTitle?: boolean }>`
 `
 
 interface Props {
+  clearFilters?: boolean
   hideTitle?: boolean
-  onRowClicked: (position: PositionWithUserBalanceWithDecimals) => void
   onClearCallback?: () => void
   onFilterCallback?: (
     positions: PositionWithUserBalanceWithDecimals[]
   ) => PositionWithUserBalanceWithDecimals[]
-  selectedPosition: Maybe<PositionWithUserBalanceWithDecimals>
-  title?: string
-  clearFilters?: boolean
+  onRowClicked: (position: PositionWithUserBalanceWithDecimals) => void
   refetch?: boolean
+  selectedPosition: Maybe<PositionWithUserBalanceWithDecimals>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  theme?: any
+  title?: string
 }
 
-export const SelectablePositionTable: React.FC<Props> = (props) => {
+const SelectPositionTable: React.FC<Props> = (props) => {
   const {
     clearFilters,
     hideTitle,
@@ -71,6 +73,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     onRowClicked,
     refetch,
     selectedPosition,
+    theme,
     title = 'Positions',
     ...restProps
   } = props
@@ -303,6 +306,21 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     selectedFromCreationDate,
   ])
 
+  const conditionalRowStyles = [
+    {
+      when: (position: PositionWithUserBalanceWithDecimals) =>
+        !!(selectedPosition && selectedPosition?.id === position.id),
+      style: {
+        backgroundColor: theme.colors.whitesmoke3,
+        color: theme.colors.darkerGrey,
+        '&:hover': {
+          cursor: 'default',
+        },
+        pointerEvents: 'none' as const,
+      },
+    },
+  ]
+
   return (
     <TitleValueExtended
       hideTitle={hideTitle}
@@ -363,6 +381,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
           <DataTable
             className="outerTableWrapper condensedTable"
             columns={defaultColumns}
+            conditionalRowStyles={conditionalRowStyles}
             customStyles={customStyles}
             data={showSpinner ? [] : positionList.length ? positionList : []}
             highlightOnHover
@@ -390,3 +409,5 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     />
   )
 }
+
+export const SelectablePositionTable = withTheme(SelectPositionTable)
