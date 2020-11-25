@@ -168,7 +168,7 @@ export const Contents: React.FC = () => {
           setPayout={setPayout}
         />
       ) : (
-        <StripedList minHeight="220px">
+        <StripedList>
           <StripedListEmpty>
             {!condition
               ? 'Please select a condition.'
