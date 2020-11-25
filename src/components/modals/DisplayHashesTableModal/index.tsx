@@ -15,11 +15,10 @@ interface Props extends ModalProps {
   hashes: Array<HashArray>
   title: string
   titleTable: string
-  url: string
 }
 
 export const DisplayHashesTableModal = (props: Props) => {
-  const { hashes, onRequestClose, title, titleTable, url, ...restProps } = props
+  const { hashes, onRequestClose, title, titleTable, ...restProps } = props
 
   return (
     <Modal
@@ -28,7 +27,7 @@ export const DisplayHashesTableModal = (props: Props) => {
       title={title}
       {...restProps}
     >
-      <DisplayTableHashes hashes={hashes} titleTable={titleTable} url={url} />
+      <DisplayTableHashes hashes={hashes} titleTable={titleTable} />
       <ButtonContainerStyled>
         <Button onClick={onRequestClose}>Close</Button>
       </ButtonContainerStyled>
