@@ -1,14 +1,15 @@
 import { useQuery } from '@apollo/react-hooks'
 import { ethers } from 'ethers'
 import lodashUniqBy from 'lodash.uniqby'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 
 import { ApolloError } from 'apollo-client/errors/ApolloError'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useQueryTotalResults } from 'hooks/useQueryTotalResults'
 import { Position, marshalPositionListData } from 'hooks/utils'
 import { buildQueryPositionsList } from 'queries/CTEPositions'
 import { UserWithPositionsQuery } from 'queries/CTEUsers'
-import { Positions, UserWithPositions } from 'types/generatedGQLForCTE'
+import { Positions_positions, UserWithPositions } from 'types/generatedGQLForCTE'
 import { Remote } from 'util/remoteData'
 import { formatBigNumber, getTokenSummary } from 'util/tools'
 import { AdvancedFilterPosition, PositionSearchOptions, Token } from 'util/types'
@@ -26,6 +27,9 @@ export type UserBalanceWithDecimals = {
 export type PositionWithUserBalanceWithDecimals = Position &
   UserBalanceWithDecimals & { token: Token }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Variables = { [k: string]: any }
+
 /**
  * Return a array of positions, and the user balance if it's connected.
  */
@@ -40,20 +44,29 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
 
   const query = buildQueryPositionsList(advancedFilter)
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const variables: { [k: string]: any } = {}
-  if (FromCreationDate) variables['fromCreationDate'] = FromCreationDate
-  if (ToCreationDate) variables['toCreationDate'] = ToCreationDate
-  if (TextToSearch.type !== PositionSearchOptions.CollateralSymbol && TextToSearch.value) {
-    variables['textToSearch'] = TextToSearch.value.toLowerCase()
-  }
-  if (TextToSearch.type === PositionSearchOptions.CollateralSymbol && TextToSearch.value) {
-    const tokens = networkConfig.getMultipleTokenAddressesFromSymbol(TextToSearch.value)
-    variables['textToSearch'] = tokens.length > 0 ? tokens : [ethers.constants.HashZero]
-  }
-  if (CollateralValue.value) {
-    variables['collateralSearch'] = CollateralValue?.value
-  }
+  const variables = useMemo(() => {
+    const variables: Variables = {}
+    if (FromCreationDate) variables['fromCreationDate'] = FromCreationDate
+    if (ToCreationDate) variables['toCreationDate'] = ToCreationDate
+    if (TextToSearch.type !== PositionSearchOptions.CollateralSymbol && TextToSearch.value) {
+      variables['textToSearch'] = TextToSearch.value.toLowerCase()
+    }
+    if (TextToSearch.type === PositionSearchOptions.CollateralSymbol && TextToSearch.value) {
+      const tokens = networkConfig.getMultipleTokenAddressesFromSymbol(TextToSearch.value)
+      variables['textToSearch'] = tokens.length > 0 ? tokens : [ethers.constants.HashZero]
+    }
+    if (CollateralValue.value) {
+      variables['collateralSearch'] = CollateralValue?.value
+    }
+    return variables
+  }, [
+    CollateralValue,
+    FromCreationDate,
+    TextToSearch.type,
+    TextToSearch.value,
+    ToCreationDate,
+    networkConfig,
+  ])
 
   React.useEffect(() => {
     if (TextToSearch.value) setData(Remote.loading())
@@ -64,7 +77,12 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
     error: positionsError,
     loading: loadingPositions,
     refetch: refetchPositions,
-  } = useQuery<Positions>(query, { fetchPolicy: 'no-cache', variables })
+  } = useQueryTotalResults<Positions_positions, Variables>({
+    query,
+    fetchPolicy: 'no-cache',
+    variables,
+    entityName: 'positions',
+  })
 
   const { data: userData, error: userError, refetch: refetchUserPositions } = useQuery<
     UserWithPositions
@@ -78,9 +96,9 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
 
   React.useEffect(() => {
     // The use of loadingPositions act as a blocker when the useQuery is executing again
-    if (positionsData && !loadingPositions) {
-      setData(Remote.loading())
-      const positionListData = marshalPositionListData(positionsData.positions, userData?.user)
+    if (loadingPositions) setData(Remote.loading)
+    else if (positionsData) {
+      const positionListData = marshalPositionListData(positionsData, userData?.user)
 
       const fetchUserBalanceWithDecimals = async () => {
         const uniqueCollateralTokens = lodashUniqBy(positionListData, 'collateralToken')
