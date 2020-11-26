@@ -64,6 +64,7 @@ export const dataTableCSS = css`
       border-bottom-color: ${(props) => props.theme.colors.lightGrey}!important;
 
       &:hover {
+        background-color: ${(props) => props.theme.colors.whitesmoke3}!important;
         color: ${(props) => props.theme.colors.darkerGrey}!important;
       }
 
