@@ -439,15 +439,22 @@ export const PositionsList = () => {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimals) => {
           const { conditions } = row
-          const oracle = conditions[0]?.oracle ?? ''
-          const questionId = conditions[0]?.questionId ?? ''
+          const isConditionFromOmen = conditions.some((condition: ConditionInformation) =>
+            isOracleRealitio(condition.oracle, networkConfig)
+          )
+
+          const conditionsFiltered = isConditionFromOmen
+            ? conditions.filter((condition: ConditionInformation) =>
+                isOracleRealitio(condition.oracle, networkConfig)
+              )
+            : conditions
+          const oracle = conditionsFiltered[0]?.oracle ?? ''
+          const questionId = conditionsFiltered[0]?.questionId ?? ''
 
           const allOraclesAreEqual = conditions.every(
             (condition: ConditionInformation) =>
               condition.oracle.toLowerCase() === oracle.toLowerCase()
           )
-
-          const isConditionFromOmen = isOracleRealitio(oracle, networkConfig)
 
           const oracleName = isConditionFromOmen ? (
             <>
