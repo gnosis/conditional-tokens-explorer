@@ -469,13 +469,13 @@ export const PositionsList = () => {
                   onClick={() => {
                     const hashes: HashArray[] = conditions.map(
                       (condition: ConditionInformation) => {
-                        const oracleAddress = condition.oracle
+                        const { oracle, questionId } = condition
 
-                        const hash: HashArray = { hash: oracleAddress }
-                        const isConditionFromOmen = isOracleRealitio(oracleAddress, networkConfig)
+                        const hash: HashArray = { hash: oracle }
+                        const isConditionFromOmen = isOracleRealitio(oracle, networkConfig)
                         if (isConditionFromOmen) {
-                          hash.title = networkConfig.getOracleFromAddress(oracleAddress).description
-                          hash.url = networkConfig.getOracleFromAddress(oracleAddress).url
+                          hash.title = networkConfig.getOracleFromAddress(oracle).description
+                          hash.url = getRealityQuestionUrl(questionId, networkConfig)
                         }
 
                         return hash

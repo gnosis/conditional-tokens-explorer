@@ -207,7 +207,7 @@ export const Contents = (props: Props) => {
     })
   }, [indexSets])
 
-  const isConditionFromOmen = useIsConditionFromOmen(oracleIds[0])
+  const isConditionFromOmen = useIsConditionFromOmen(oracleIds)
 
   const ERC1155Symbol = useMemo(
     () => (collateralERC1155 && collateralERC1155.symbol ? collateralERC1155.symbol : ''),

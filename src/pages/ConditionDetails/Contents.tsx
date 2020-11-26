@@ -100,7 +100,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
   }, [setValue, conditionId, resolved, isConnected, isAllowedToReport])
 
   const { outcomesPrettier, question } = useQuestion(questionId, outcomeSlotCount)
-  const isConditionFromOmen = useIsConditionFromOmen(oracle)
+  const isConditionFromOmen = useIsConditionFromOmen([oracle])
   const {
     templateId = null,
     title = INFORMATION_NOT_AVAILABLE,
