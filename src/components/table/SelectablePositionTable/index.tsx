@@ -110,10 +110,10 @@ const SelectPositionTable: React.FC<Props> = (props) => {
   }, 100)
 
   useEffect(() => {
-    const localStorageCondition = getValue()
-    if (localStorageCondition) {
-      setTextToShow(localStorageCondition)
-      debouncedHandlerTextToSearch(localStorageCondition)
+    const localStoragePosition = getValue()
+    if (localStoragePosition) {
+      setTextToShow(localStoragePosition)
+      debouncedHandlerTextToSearch(localStoragePosition)
     }
   }, [getValue, debouncedHandlerTextToSearch])
 
