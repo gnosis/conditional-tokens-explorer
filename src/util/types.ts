@@ -190,7 +190,7 @@ export enum LocalStorageManagement {
 }
 
 export interface QuestionOptions {
-  arbitratorAddress: string
+  arbitrator: string
   category: string
   openingDateMoment: Moment
   outcomes: string[]

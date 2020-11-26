@@ -17,13 +17,21 @@ import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Contex
 import { useCondition } from 'hooks/useCondition'
 import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
 import { ConditionalTokensService } from 'services/conditionalTokens'
+import { CPKService } from 'services/cpk'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 
 const logger = getLogger('RedeemPosition')
 
 export const Contents = () => {
-  const { _type: status, CTService, connect, networkConfig } = useWeb3ConnectedOrInfura()
+  const {
+    _type: status,
+    CTService,
+    connect,
+    networkConfig,
+    provider,
+    signer,
+  } = useWeb3ConnectedOrInfura()
 
   const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<boolean>>>(
     Remote.notAsked<Maybe<boolean>>()
@@ -48,7 +56,7 @@ export const Contents = () => {
 
   const onRedeem = useCallback(async () => {
     try {
-      if (position && conditionId && status === Web3ContextStatus.Connected) {
+      if (position && conditionId && status === Web3ContextStatus.Connected && signer) {
         setTransactionStatus(Remote.loading())
 
         const { collateralToken, conditionIds, indexSets } = position
@@ -75,12 +83,15 @@ export const Contents = () => {
           indexSets[conditionIds.findIndex((condId) => condId === conditionId)],
         ]
 
-        await CTService.redeemPositions(
+        const cpk = await CPKService.create(networkConfig, provider, signer)
+
+        await cpk.redeemPosition({
+          CTService,
           collateralToken,
           parentCollectionId,
           conditionId,
-          redeemedIndexSet
-        )
+          indexSets: redeemedIndexSet,
+        })
 
         setPosition(null)
         setConditionIds([])
@@ -94,7 +105,7 @@ export const Contents = () => {
       setTransactionStatus(Remote.failure(err))
       logger.error(err)
     }
-  }, [status, CTService, connect, conditionId, position])
+  }, [status, CTService, connect, conditionId, position, provider, networkConfig, signer])
 
   const disabled =
     transactionStatus.isLoading() || !conditionIds.length || !position || !conditionId

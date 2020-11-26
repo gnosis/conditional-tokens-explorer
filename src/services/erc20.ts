@@ -1,6 +1,6 @@
 import { Contract, Signer, ethers } from 'ethers'
 import { Provider, TransactionResponse } from 'ethers/providers'
-import { BigNumber, toUtf8String } from 'ethers/utils'
+import { BigNumber, Interface, toUtf8String } from 'ethers/utils'
 
 import { Token } from 'util/types'
 
@@ -29,7 +29,11 @@ const erc20Bytes32Abi = [
 class ERC20Service {
   private contract: Contract
   private contractBytes32: Contract
-  constructor(private provider: Provider, private address: string, private signer?: Signer) {
+  constructor(
+    private provider: Provider,
+    private address: string,
+    private signer?: Signer | string
+  ) {
     if (signer) {
       this.contract = new ethers.Contract(address, erc20Abi, provider).connect(signer)
       this.contractBytes32 = new ethers.Contract(address, erc20Bytes32Abi, provider).connect(signer)
@@ -87,6 +91,30 @@ class ERC20Service {
 
   balanceOf = async (owner: string): Promise<BigNumber> => {
     return await this.contract.balanceOf(owner)
+  }
+
+  static encodeApprove = (spenderAccount: string, amount: BigNumber): string => {
+    const approveInterface = new Interface(erc20Abi)
+
+    return approveInterface.functions.approve.encode([spenderAccount, amount])
+  }
+
+  static encodeApproveUnlimited = (spenderAccount: string): string => {
+    const approveInterface = new Interface(erc20Abi)
+
+    return approveInterface.functions.approve.encode([spenderAccount, ethers.constants.MaxUint256])
+  }
+
+  static encodeTransferFrom = (from: string, to: string, amount: BigNumber): string => {
+    const transferFromInterface = new Interface(erc20Abi)
+
+    return transferFromInterface.functions.transferFrom.encode([from, to, amount])
+  }
+
+  static encodeTransfer = (to: string, amount: BigNumber): string => {
+    const transferInterface = new Interface(erc20Abi)
+
+    return transferInterface.functions.transfer.encode([to, amount])
   }
 }
 

@@ -29,7 +29,7 @@ import { IconTypes } from 'components/statusInfo/common'
 import { SelectableConditionTable } from 'components/table/SelectableConditionTable'
 import { TitleValue } from 'components/text/TitleValue'
 import { NULL_PARENT_ID, ZERO_BN } from 'config/constants'
-import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useAllowance } from 'hooks/useAllowance'
 import { useAllowanceState } from 'hooks/useAllowanceState'
 import { useCollateral } from 'hooks/useCollateral'
@@ -71,7 +71,7 @@ interface Props {
 const logger = getLogger('Form')
 
 export const Form = (props: Props) => {
-  const { CTService } = useWeb3ConnectedOrInfura()
+  const { _type: status, CTService, connect } = useWeb3ConnectedOrInfura()
   const { tokens } = props
 
   const { getValue } = useLocalStorage(LocalStorageManagement.PositionId)
@@ -86,7 +86,9 @@ export const Form = (props: Props) => {
   const [numberedOutcomes, setNumberedOutcomes] = useState<Array<Array<OutcomeProps>>>([])
 
   const [isEditPartitionModalOpen, setIsEditPartitionModalOpen] = useState(false)
-  const [status, setStatus] = useState<Remote<SplitStatus>>(Remote.notAsked<SplitStatus>())
+  const [transactionStatus, setTransactionStatus] = useState<Remote<SplitStatus>>(
+    Remote.notAsked<SplitStatus>()
+  )
 
   const allowanceMethods = useAllowance(collateralAddress)
   const { collateral } = useCollateral(collateralAddress)
@@ -130,59 +132,66 @@ export const Form = (props: Props) => {
 
   const onSubmit = useCallback(async () => {
     try {
-      setStatus(Remote.loading())
+      if (status === Web3ContextStatus.Connected) {
+        setTransactionStatus(Remote.loading())
 
-      let positionIds: PositionIdsArray[]
-      let collateralFromSplit: string = collateralAddress
+        let positionIds: PositionIdsArray[]
+        let collateralFromSplit: string = collateralAddress
 
-      if (isSplittingFromCollateral) {
-        await CTService.splitPosition(
-          collateralFromSplit,
-          NULL_PARENT_ID,
-          conditionId,
-          partition,
-          amount
-        )
+        if (isSplittingFromCollateral) {
+          await CTService.splitPosition(
+            collateralFromSplit,
+            NULL_PARENT_ID,
+            conditionId,
+            partition,
+            amount
+          )
 
-        positionIds = await CTService.getPositionsFromPartition(
-          partition,
-          NULL_PARENT_ID,
-          conditionId,
-          collateralFromSplit
-        )
-      } else if (
-        isSplittingFromPosition &&
-        position &&
-        position.collateralToken &&
-        position.collection
-      ) {
-        collateralFromSplit = position.collateralToken
-        const collectionId = position.collection.id
-        await CTService.splitPosition(
-          collateralFromSplit,
-          collectionId,
-          conditionId,
-          partition,
-          amount
-        )
+          positionIds = await CTService.getPositionsFromPartition(
+            partition,
+            NULL_PARENT_ID,
+            conditionId,
+            collateralFromSplit
+          )
+        } else if (
+          isSplittingFromPosition &&
+          position &&
+          position.collateralToken &&
+          position.collection
+        ) {
+          collateralFromSplit = position.collateralToken
+          const collectionId = position.collection.id
 
-        positionIds = await CTService.getPositionsFromPartition(
-          partition,
-          collectionId,
-          conditionId,
-          collateralFromSplit
-        )
-      } else {
-        throw Error('Invalid split origin')
+          await CTService.splitPosition(
+            collateralFromSplit,
+            collectionId,
+            conditionId,
+            partition,
+            amount
+          )
+
+          positionIds = await CTService.getPositionsFromPartition(
+            partition,
+            collectionId,
+            conditionId,
+            collateralFromSplit
+          )
+        } else {
+          throw Error('Invalid split origin')
+        }
+
+        setTransactionStatus(Remote.success({ positionIds, collateral: collateralFromSplit }))
+      } else if (status === Web3ContextStatus.Infura) {
+        connect()
       }
-
-      setStatus(Remote.success({ positionIds, collateral: collateralFromSplit }))
     } catch (err) {
       logger.error(err)
-      setStatus(Remote.failure(err))
+      setTransactionStatus(Remote.failure(err))
     }
   }, [
     CTService,
+    connect,
+    status,
     partition,
     isSplittingFromCollateral,
     isSplittingFromPosition,
@@ -195,8 +204,8 @@ export const Form = (props: Props) => {
   const clearComponent = useCallback(() => {
     resetState()
     // Clear status to notAsked, so we can close the modal
-    setStatus(Remote.notAsked<SplitStatus>())
-  }, [resetState, setStatus])
+    setTransactionStatus(Remote.notAsked<SplitStatus>())
+  }, [resetState, setTransactionStatus])
 
   const {
     allowanceError,
@@ -238,44 +247,52 @@ export const Form = (props: Props) => {
 
   const fullLoadingActionButton = useMemo(
     () =>
-      status.isSuccess()
+      transactionStatus.isSuccess()
         ? {
             buttonType: ButtonType.primary,
-            onClick: () => setStatus(Remote.notAsked<SplitStatus>()),
+            onClick: () => setTransactionStatus(Remote.notAsked<SplitStatus>()),
             text: 'OK',
           }
-        : status.isFailure()
+        : transactionStatus.isFailure()
         ? {
             buttonType: ButtonType.danger,
             text: 'Close',
-            onClick: () => setStatus(Remote.notAsked<SplitStatus>()),
+            onClick: () => setTransactionStatus(Remote.notAsked<SplitStatus>()),
           }
         : undefined,
-    [status]
+    [transactionStatus]
   )
 
   const fullLoadingIcon = useMemo(
     () =>
-      status.isFailure() ? IconTypes.error : status.isSuccess() ? IconTypes.ok : IconTypes.spinner,
-    [status]
+      transactionStatus.isFailure()
+        ? IconTypes.error
+        : transactionStatus.isSuccess()
+        ? IconTypes.ok
+        : IconTypes.spinner,
+    [transactionStatus]
   )
 
   const fullLoadingMessage = useMemo(
     () =>
-      status.isFailure() ? status.getFailure() : status.isLoading() ? 'Working...' : undefined,
-    [status]
+      transactionStatus.isFailure()
+        ? transactionStatus.getFailure()
+        : transactionStatus.isLoading()
+        ? 'Working...'
+        : undefined,
+    [transactionStatus]
   )
 
   const splitPositionsTable = useMemo(
     () =>
-      status.isSuccess() && status.hasData() ? (
+      transactionStatus.isSuccess() && transactionStatus.hasData() ? (
         <DisplayTablePositionsWrapper
           callbackOnHistoryPush={clearComponent}
-          collateral={status.get().collateral}
-          positionIds={status.get().positionIds}
+          collateral={transactionStatus.get().collateral}
+          positionIds={transactionStatus.get().positionIds}
         />
       ) : null,
-    [status, clearComponent]
+    [transactionStatus, clearComponent]
   )
 
   const onRowClicked = useCallback((row: Conditions_conditions) => {
@@ -287,7 +304,7 @@ export const Form = (props: Props) => {
       <SelectableConditionTable
         onClearSelection={() => clearComponent()}
         onRowClicked={onRowClicked}
-        refetch={status.isSuccess()}
+        refetch={transactionStatus.isSuccess()}
         selectedConditionId={conditionId}
       />
       {condition && condition.resolved && (
@@ -390,17 +407,17 @@ export const Form = (props: Props) => {
           />
         )}
       </Row>
-      {(status.isLoading() || status.isFailure()) && (
+      {(transactionStatus.isLoading() || transactionStatus.isFailure()) && (
         <FullLoading
           actionButton={fullLoadingActionButton}
           icon={fullLoadingIcon}
           message={fullLoadingMessage}
-          title={status.isFailure() ? 'Error' : 'Split positions'}
+          title={transactionStatus.isFailure() ? 'Error' : 'Split positions'}
         />
       )}
-      {status.isSuccess() && (
+      {transactionStatus.isSuccess() && (
         <Modal
-          isOpen={status.isSuccess()}
+          isOpen={transactionStatus.isSuccess()}
           onRequestClose={clearComponent}
           subTitle={
             <>

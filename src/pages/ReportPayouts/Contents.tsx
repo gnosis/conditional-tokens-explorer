@@ -30,6 +30,8 @@ export const Contents: React.FC = () => {
   const [payouts, setPayouts] = useState<number[]>([])
 
   const condition = useCondition(conditionId)
+  logger.log(conditionId)
+
   const questionId = useMemo(() => condition && condition.questionId, [condition])
   const outcomeSlotCount = useMemo(() => condition && condition.outcomeSlotCount, [condition])
   const [isDirty, setIsDirty] = useState(false)
@@ -50,11 +52,13 @@ export const Contents: React.FC = () => {
     if (outcomeSlotCount) setPayouts(new Array(outcomeSlotCount).fill(0))
   }, [outcomeSlotCount])
 
-  const onReportPayout = async () => {
+  const onReportPayout = useCallback(async () => {
     try {
       if (status === Web3ContextStatus.Connected && questionId) {
         setTransactionStatus(Remote.loading())
 
+        // We can't use the CPK here, if you put in as the reporter the original account, you'd have to use the original account, so use a plain transaction
+        // or else it will derive a different condition ID
         await CTService.reportPayouts(questionId, payouts)
 
         setTransactionStatus(Remote.success(questionId))
@@ -65,7 +69,7 @@ export const Contents: React.FC = () => {
       setTransactionStatus(Remote.failure(err))
       logger.error(err)
     }
-  }
+  }, [status, payouts, connect, questionId, CTService])
 
   const onRowClicked = useCallback(
     (row: Conditions_conditions) => {

@@ -38,6 +38,7 @@ import {
 } from 'config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { ConditionalTokensService } from 'services/conditionalTokens'
+import { CPKService } from 'services/cpk'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import { isAddress } from 'util/tools'
@@ -81,6 +82,8 @@ export const PrepareCondition = () => {
     address,
     connect,
     networkConfig,
+    provider,
+    signer,
   } = useWeb3ConnectedOrInfura()
 
   const history = useHistory()
@@ -215,7 +218,7 @@ export const PrepareCondition = () => {
           ) {
             const openingDateMoment = moment(resolutionDate + '')
             const questionOptions: QuestionOptions = {
-              arbitratorAddress: (arbitrator as Arbitrator).address,
+              arbitrator: (arbitrator as Arbitrator).address,
               category,
               openingDateMoment,
               outcomes,
@@ -293,13 +296,20 @@ export const PrepareCondition = () => {
 
   const prepareCondition = useCallback(async () => {
     try {
-      if (status === Web3ContextStatus.Connected && address) {
+      if (status === Web3ContextStatus.Connected && address && signer) {
         setPrepareConditionStatus(Remote.loading())
         let conditionIdToUpdate: Maybe<string> = null
+        const cpk = await CPKService.create(networkConfig, provider, signer)
         if (conditionType === ConditionType.custom) {
           const { oracle: oracleCustom, outcomesSlotCount, questionId } = getValuesCustomCondition()
           if (outcomesSlotCount) {
-            await CTService.prepareCondition(questionId, oracleCustom, outcomesSlotCount)
+            await cpk.prepareCustomCondition({
+              CTService,
+              questionId,
+              oracleAddress: oracleCustom,
+              outcomesSlotCount,
+            })
+
             conditionIdToUpdate = ConditionalTokensService.getConditionId(
               questionId,
               oracleCustom,
@@ -317,19 +327,30 @@ export const PrepareCondition = () => {
           if (resolutionDate && questionTitle && oracleOmen && category) {
             const openingDateMoment = moment(resolutionDate + '')
             logger.log(`outcomes`, outcomes)
-            const questionOptions: QuestionOptions = {
-              arbitratorAddress: (arbitrator as Arbitrator).address,
+
+            const questionId = await RtyService.askQuestionConstant({
+              arbitrator: (arbitrator as Arbitrator).address,
               category,
               openingDateMoment,
               outcomes,
               question: questionTitle + '',
               networkConfig,
-              signerAddress: address,
-            }
+              signerAddress: cpk.address,
+            })
 
-            const questionId = await RtyService.askQuestion(questionOptions)
+            await cpk.prepareOmenCondition({
+              CTService,
+              RtyService,
+              arbitrator: (arbitrator as Arbitrator).address,
+              category,
+              networkConfig,
+              oracleAddress: oracleOmen + '',
+              outcomes,
+              question: questionTitle + '',
+              questionId,
+              openingDateMoment,
+            })
 
-            await CTService.prepareCondition(questionId, oracleOmen + '', outcomes.length)
             conditionIdToUpdate = ConditionalTokensService.getConditionId(
               questionId,
               oracleOmen + '',
@@ -358,6 +379,8 @@ export const PrepareCondition = () => {
     networkConfig,
     outcomes,
     status,
+    provider,
+    signer,
   ])
 
   const onClickUseMyWallet = useCallback(() => {
