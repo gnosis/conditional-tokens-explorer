@@ -32,6 +32,7 @@ export const Contents: React.FC = () => {
   const condition = useCondition(conditionId)
   const questionId = useMemo(() => condition && condition.questionId, [condition])
   const outcomeSlotCount = useMemo(() => condition && condition.outcomeSlotCount, [condition])
+  const [isDirty, setIsDirty] = useState(false)
 
   const isConditionResolved = useMemo(() => condition && condition.resolved, [condition])
   const oracle = useMemo(() => condition && condition.oracle, [condition])
@@ -70,6 +71,7 @@ export const Contents: React.FC = () => {
     (row: Conditions_conditions) => {
       setConditionId(row.id)
       setPayouts([])
+      setIsDirty(false)
     },
     [setConditionId, setPayouts]
   )
@@ -144,8 +146,22 @@ export const Contents: React.FC = () => {
       const newArrPayout = [...payouts]
       newArrPayout[index] = payout
       setPayouts(newArrPayout)
+      setIsDirty(true)
     },
     [payouts]
+  )
+
+  const isNotAllowedToReportPayout = useMemo(
+    () => condition && status === Web3ContextStatus.Connected && !isOracleValidToReportPayout,
+    [condition, status, isOracleValidToReportPayout]
+  )
+  const isNotConnected = useMemo(() => condition && status !== Web3ContextStatus.Connected, [
+    condition,
+    status,
+  ])
+  const isPayoutPositive = useMemo(
+    () => condition && status === Web3ContextStatus.Connected && isDirty && isPayoutsEmpty,
+    [condition, status, isDirty, isPayoutsEmpty]
   )
 
   return (
@@ -177,16 +193,11 @@ export const Contents: React.FC = () => {
         </StripedList>
       )}
       <ErrorContainer>
-        {condition && status === Web3ContextStatus.Connected && !isOracleValidToReportPayout && (
+        {isNotAllowedToReportPayout && (
           <Error>The connected user is a not allowed to report payouts</Error>
         )}
-        {condition && status !== Web3ContextStatus.Connected && !isOracleValidToReportPayout && (
-          <Error>Please connect to your wallet to report payouts</Error>
-        )}
-        {condition &&
-          status === Web3ContextStatus.Connected &&
-          payouts.length > 0 &&
-          isPayoutsEmpty && <Error>At least one payout must be positive</Error>}
+        {isNotConnected && <Error>Please connect to your wallet to report payouts</Error>}
+        {isPayoutPositive && <Error>At least one payout must be positive</Error>}
       </ErrorContainer>
       {isWorking && (
         <FullLoading
