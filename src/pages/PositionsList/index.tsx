@@ -118,7 +118,6 @@ export const PositionsList = () => {
   const [openDisplayHashesTableModal, setOpenDisplayHashesTableModal] = useState(false)
   const [hashesTableModal, setHashesTableModal] = useState<Array<HashArray>>([])
   const [titleTableModal, setTitleTableModal] = useState('')
-  const [urlTableModal, setUrlTableModal] = useState('')
   const [titleModal, setTitleModal] = useState('')
 
   const debouncedHandlerTextToSearch = useDebounceCallback((textToSearch) => {
@@ -418,6 +417,7 @@ export const PositionsList = () => {
                       (condition: ConditionInformation) => {
                         return {
                           hash: condition.conditionId,
+                          url: `/conditions/${condition.conditionId}`,
                         }
                       }
                     )
@@ -425,7 +425,6 @@ export const PositionsList = () => {
                     setHashesTableModal(hashes)
                     setTitleTableModal('Condition Id')
                     setTitleModal('Conditions')
-                    setUrlTableModal('conditions')
                   }}
                 />
               </>
@@ -470,16 +469,22 @@ export const PositionsList = () => {
                   onClick={() => {
                     const hashes: HashArray[] = conditions.map(
                       (condition: ConditionInformation) => {
-                        return {
-                          hash: condition.oracle,
+                        const oracleAddress = condition.oracle
+
+                        const hash: HashArray = { hash: oracleAddress }
+                        const isConditionFromOmen = isOracleRealitio(oracleAddress, networkConfig)
+                        if (isConditionFromOmen) {
+                          hash.title = networkConfig.getOracleFromAddress(oracleAddress).description
+                          hash.url = networkConfig.getOracleFromAddress(oracleAddress).url
                         }
+
+                        return hash
                       }
                     )
                     setOpenDisplayHashesTableModal(true)
                     setHashesTableModal(hashes)
                     setTitleTableModal('Oracle Id')
                     setTitleModal('Oracles')
-                    setUrlTableModal('')
                   }}
                 />
               </>
@@ -520,7 +525,6 @@ export const PositionsList = () => {
                     setHashesTableModal(hashes)
                     setTitleTableModal('Question Id')
                     setTitleModal('Questions')
-                    setUrlTableModal('')
                   }}
                 />
               </>
@@ -823,7 +827,6 @@ export const PositionsList = () => {
           }}
           title={titleModal}
           titleTable={titleTableModal}
-          url={urlTableModal}
         />
       )}
       {isWorking && (

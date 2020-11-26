@@ -38,6 +38,7 @@ export const Wrapper = (props: WrapperProps) => {
   const conditions = position?.conditions.map((condition: PositionData_conditions) => {
     return {
       hash: condition.id,
+      url: `/conditions/${condition.id}`,
     }
   })
 

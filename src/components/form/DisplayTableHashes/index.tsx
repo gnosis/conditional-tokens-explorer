@@ -7,37 +7,35 @@ import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentTe
 import { FlexRow } from 'components/pureStyledComponents/FlexRow'
 import { Hash } from 'components/text/Hash'
 import { customStyles } from 'theme/tableCustomStyles'
-import { getOmenMarketURL } from 'util/tools'
 import { HashArray } from 'util/types'
 
 interface Props {
   hashes: Array<HashArray>
   callbackOnHistoryPush?: () => void
   titleTable: string
-  url: string
 }
 
 export const DisplayTableHashes = (props: Props) => {
-  const { callbackOnHistoryPush, hashes, titleTable, url } = props
+  const { callbackOnHistoryPush, hashes, titleTable } = props
 
   const getColumns = useCallback(() => {
     return [
       {
         // eslint-disable-next-line react/display-name
-        cell: ({ hash, title }: HashArray) => {
+        cell: ({ hash, title, url }: HashArray) => {
           if (title) {
             return (
               <FlexRow>
                 {title}
                 <ButtonCopy value={hash} />
-                <ExternalLink href={getOmenMarketURL(hash)} />
+                {url && <ExternalLink href={url} />}
               </FlexRow>
             )
           } else {
             return (
               <Hash
                 externalLink
-                {...(url && { href: `/${url}/${hash}` })}
+                {...(url && { href: `${url}` })}
                 onClick={() => {
                   if (typeof callbackOnHistoryPush === 'function') callbackOnHistoryPush()
                 }}
@@ -49,7 +47,7 @@ export const DisplayTableHashes = (props: Props) => {
         name: titleTable,
       },
     ]
-  }, [callbackOnHistoryPush, titleTable, url])
+  }, [callbackOnHistoryPush, titleTable])
 
   return (
     <DataTable

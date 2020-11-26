@@ -6,8 +6,8 @@ import { ButtonExpand } from 'components/buttons/ButtonExpand'
 import { DisplayHashesTableModal } from 'components/modals/DisplayHashesTableModal'
 import { ExternalLink } from 'components/navigation/ExternalLink'
 import { TitleValue } from 'components/text/TitleValue'
-import { OMEN_URL_DAPP } from 'config/constants'
 import { useOmenMarkets } from 'hooks/useOmenMarkets'
+import { getOmenMarketURL } from 'util/tools'
 
 const ButtonCopyInlineFlex = styled(ButtonCopy)`
   display: inline-flex;
@@ -68,13 +68,12 @@ export const OmenMarketsOrQuestion: React.FC<Props> = ({
         {openOmenMarkets && areOmenMarketsMoreThanOne && (
           <DisplayHashesTableModal
             hashes={dataOmenMarkets.map(({ id, question }) => {
-              return { hash: id, title: question.title }
+              return { hash: id, title: question.title, url: getOmenMarketURL(id) }
             })}
             isOpen={openOmenMarkets}
             onRequestClose={() => setOpenOmenMarkets(false)}
             title="Omen Markets"
             titleTable="Market Name"
-            url={OMEN_URL_DAPP}
           />
         )}
       </>

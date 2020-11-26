@@ -181,6 +181,7 @@ export interface TransferOptions {
 export type HashArray = {
   hash: string
   title?: string
+  url?: string
 }
 
 export enum LocalStorageManagement {

@@ -686,19 +686,22 @@ export const Contents = (props: Props) => {
           onRequestClose={() => setOpenDisplayConditionsTableModal(false)}
           title="Conditions"
           titleTable="Condition Id"
-          url="conditions"
         />
       )}
       {openDisplayOraclesIdsTableModal && areOracleIdsMoreThanOne && (
         <DisplayHashesTableModal
-          hashes={oracleIds.map((id) => {
-            return { hash: id }
+          hashes={oracleIds.map((address) => {
+            const hash: HashArray = { hash: address }
+            if (isConditionFromOmen) {
+              hash.title = networkConfig.getOracleFromAddress(address).description
+              hash.url = networkConfig.getOracleFromAddress(address).url
+            }
+            return hash
           })}
           isOpen={openDisplayOraclesIdsTableModal}
           onRequestClose={() => setOpenDisplayOraclesIdsTableModal(false)}
           title="Oracles"
           titleTable="Oracle Id"
-          url=""
         />
       )}
       {openDisplayQuestionIdsTableModal && areQuestionIdsMoreThanOne && (
@@ -710,7 +713,6 @@ export const Contents = (props: Props) => {
           onRequestClose={() => setOpenDisplayQuestionIdsTableModal(false)}
           title="Question Ids"
           titleTable="Question Id"
-          url=""
         />
       )}
       {isWorking && (
