@@ -338,8 +338,7 @@ export const CookiePolicy: React.FC = () => {
               <Li>
                 By using this website, you consent to the processing of data about you by Google in
                 the manner and for the purposes set out above. Google Analytics, its purpose and
-                function is further explained on the // eslint-disable-next-line
-                react/jsx-no-target-blank
+                function is further explained on the
                 <a
                   href="https://www.google.com/analytics/"
                   rel="noopener noreferrer"
@@ -366,7 +365,7 @@ export const CookiePolicy: React.FC = () => {
                   target="_blank"
                 >
                   Google Analytics Help
-                </a>
+                </a>{' '}
                 pages. For further information about the use of these cookies by Google{' '}
                 <a
                   href="https://support.google.com/analytics/answer/6004245"

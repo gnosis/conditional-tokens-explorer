@@ -6,9 +6,11 @@ export const PageTitle = styled.h2<{ cardWidth?: boolean }>`
   font-weight: 400;
   line-height: 1.2;
   margin: 0 0 20px;
+  padding-top: 36px;
   text-align: left;
 `
 
 PageTitle.defaultProps = {
   cardWidth: false,
+  id: 'mainTitle',
 }

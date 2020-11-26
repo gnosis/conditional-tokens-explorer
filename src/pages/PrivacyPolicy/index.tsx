@@ -716,7 +716,7 @@ export const PrivacyPolicy: React.FC = () => {
             </Paragraph>
             <Paragraph>
               If you have any queries concerning your rights under this Privacy Policy, please
-              contact us at <a href="mailto:dataprotection@gnosis.pm">dataprotection@gnosis.pm</a>
+              contact us at <a href="mailto:dataprotection@gnosis.pm">dataprotection@gnosis.pm</a>.
             </Paragraph>
           </Li>
         </LeftPaddedOrderedList>

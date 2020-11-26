@@ -60,12 +60,17 @@ export const TermsAndConditions: React.FC = () => {
           <ColorToMakeSurePeopleNoticesTheText>
             THESE TERMS CREATE A BINDING LEGAL CONTRACT BETWEEN YOU AND GNOSIS LIMITED. BY USING OUR
             SERVICES (DEFINED BELOW), YOU AGREE TO BE BOUND BY THESE TERMS. IF YOU DO NOT ACCEPT THE
-            TERMS, YOU MUST NOT AND ARE NOT AUTHORIZED TO USE ANY OF OUR SERVICES. FOR PERSONS
-            RESIDING IN THE USA: THESE TERMS CONTAIN ADDITIONAL PROVISIONS APPLICABLE ONLY TO YOU.
-            THEY CONTAIN AN ARBITRATION PROVISION. IF WE CANNOT RESOLVE A DISPUTE AMICABLY, ALL
-            DISPUTES ARISING UNDER OR IN CONNECTION WITH THIS AGREEMENT MUST BE SETTLED IN BINDING
-            ARBITRATION PER CLAUSE 28.4. ENTERING INTO THIS AGREEMENT CONSTITUTES A WAIVER OF YOUR
-            RIGHT, IF ANY, TO PARTICIPATE IN A CLASS ACTION LAWSUIT OR A JURY TRIAL.
+            TERMS, YOU MUST NOT AND ARE NOT AUTHORIZED TO USE ANY OF OUR SERVICES.
+          </ColorToMakeSurePeopleNoticesTheText>
+        </Paragraph>
+        <Paragraph>
+          <ColorToMakeSurePeopleNoticesTheText>
+            FOR PERSONS RESIDING IN THE USA: THESE TERMS CONTAIN ADDITIONAL PROVISIONS APPLICABLE
+            ONLY TO YOU. THEY CONTAIN AN ARBITRATION PROVISION. IF WE CANNOT RESOLVE A DISPUTE
+            AMICABLY, ALL DISPUTES ARISING UNDER OR IN CONNECTION WITH THIS AGREEMENT MUST BE
+            SETTLED IN BINDING ARBITRATION PER CLAUSE 27.4. ENTERING INTO THIS AGREEMENT CONSTITUTES
+            A WAIVER OF YOUR RIGHT, IF ANY, TO PARTICIPATE IN A CLASS ACTION LAWSUIT OR A JURY
+            TRIAL.
           </ColorToMakeSurePeopleNoticesTheText>
         </Paragraph>
         <OrderedListMultiNumber>
@@ -76,21 +81,21 @@ export const TermsAndConditions: React.FC = () => {
                 These Terms of Service (the <strong>&quot;Agreement&quot;</strong>) are a legal
                 agreement between you (<strong>&quot;you&quot;</strong> or{' '}
                 <strong>&quot;yours&quot;</strong>) and Gnosis Limited (
-                <strong>&quot;Gnosis&quot;</strong>,<strong>&quot;we&quot;</strong>, &quot;our&quot;
-                or &quot;us&quot;). We are a company limited by shares registered in Gibraltar under
-                company no. 115571, with its registered office at the World Trade Center, 6 Bayside
-                Rd, GX11 1AA, Gibraltar. You can contact us by writing to{' '}
-                <a href="mailto:info@gnosis.io">info@gnosis.io</a>.
+                <strong>&quot;Gnosis&quot;</strong>, <strong>&quot;we&quot;</strong>,{' '}
+                <strong>&quot;our&quot;</strong> or <strong>&quot;us&quot;</strong>). We are a
+                company limited by shares registered in Gibraltar under company no. 115571, with its
+                registered office at the World Trade Center, 6 Bayside Rd, GX11 1AA, Gibraltar. You
+                can contact us by writing to <a href="mailto:info@gnosis.io">info@gnosis.io</a>.
               </LiMultiNumber>
               <LiMultiNumber>
                 By using any service offered by us, whether through{' '}
                 <a href="https://cte.gnosis.io/" rel="noopener noreferrer" target="_blank">
                   https://cte.gnosis.io/
                 </a>
-                , any associated website, API, or applications (collectively, the
-                &quot;Services&quot;), you agree that you have read, understood, and accept all of
-                the terms and conditions contained in this Agreement, including the{' '}
-                <NavLink to="cookie-policy">Cookie Policy</NavLink> and the{' '}
+                , any associated website, API, or applications (collectively, the{' '}
+                <strong>&quot;Services&quot;</strong>), you agree that you have read, understood,
+                and accept all of the terms and conditions contained in this Agreement, including
+                the <NavLink to="cookie-policy">Cookie Policy</NavLink> and the{' '}
                 <NavLink to="privacy-policy">Privacy Policy</NavLink> incorporated herein by
                 reference, as amended from time to time. If you do not agree with this Agreement,
                 you must not use the Services.
@@ -560,7 +565,7 @@ export const TermsAndConditions: React.FC = () => {
               <LiMultiNumber>
                 If you become aware of any exploits, bugs or vulnerabilities, please let us know at{' '}
                 <a href="mailto:info@gnosis.io">info@gnosis.io</a> and{' '}
-                <a href="bounty@gnosis.io">bounty@gnosis.io</a>.
+                <a href="mailto:bounty@gnosis.io">bounty@gnosis.io</a>.
               </LiMultiNumber>
               <LiMultiNumber>
                 You must not misuse our Services by knowingly introducing material that is malicious
@@ -808,7 +813,7 @@ export const TermsAndConditions: React.FC = () => {
                     <ColorToMakeSurePeopleNoticesTheText>
                       YOU AND WE AGREE THAT EACH MAY BRING CLAIMS AGAINST THE OTHER ONLY IN
                       INDIVIDUAL CAPACITY, AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED
-                      CLASS OR REPRESENTATIVE PROCEEDING.
+                      CLASS OR REPRESENTATIVE PROCEEDING.{' '}
                     </ColorToMakeSurePeopleNoticesTheText>
                     If any court, arbitrator or arbitral tribunal determines that the class action
                     waiver set forth in this paragraph is void or unenforceable for any reason or
