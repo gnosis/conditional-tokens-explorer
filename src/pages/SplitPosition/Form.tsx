@@ -74,7 +74,8 @@ export const Form = (props: Props) => {
   const { _type: status, CTService, connect } = useWeb3ConnectedOrInfura()
   const { tokens } = props
 
-  const { getValue } = useLocalStorage<LSKey>('splitCondition')
+  const { getValue } = useLocalStorage<LSKey>('splitPosition')
+  // This doesn't remove the value from local storage because is consumed later by Selectable{Position|Condition}
   const defaultSplitFrom = getValue(false) ? SplitFromType.position : SplitFromType.collateral
 
   const [conditionId, setConditionId] = useState('')
