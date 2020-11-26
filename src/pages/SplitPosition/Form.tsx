@@ -42,7 +42,7 @@ import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import { indexSetFromOutcomes, trivialPartition, truncateStringInTheMiddle } from 'util/tools'
 import {
-  LocalStorageManagement,
+  LSKey,
   OutcomeProps,
   PositionIdsArray,
   SplitFromType,
@@ -74,7 +74,7 @@ export const Form = (props: Props) => {
   const { _type: status, CTService, connect } = useWeb3ConnectedOrInfura()
   const { tokens } = props
 
-  const { getValue } = useLocalStorage(LocalStorageManagement.PositionId)
+  const { getValue } = useLocalStorage<LSKey>('splitCondition')
   const defaultSplitFrom = getValue(false) ? SplitFromType.position : SplitFromType.collateral
 
   const [conditionId, setConditionId] = useState('')
@@ -302,6 +302,7 @@ export const Form = (props: Props) => {
   return (
     <CenteredCard>
       <SelectableConditionTable
+        localStorageKey="splitCondition"
         onClearSelection={() => clearComponent()}
         onRowClicked={onRowClicked}
         refetch={transactionStatus.isSuccess()}

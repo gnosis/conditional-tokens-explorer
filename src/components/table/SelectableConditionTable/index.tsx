@@ -38,7 +38,8 @@ import {
   ConditionSearchOptions,
   ConditionType,
   ConditionTypeAll,
-  LocalStorageManagement,
+  LSKey,
+  LSKeyCondition,
   OracleFilterOptions,
   StatusOptions,
 } from 'util/types'
@@ -61,15 +62,15 @@ interface Props {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   theme?: any
   title?: string
+  localStorageKey?: LSKeyCondition
 }
 
 const SelectConditionTable: React.FC<Props> = (props) => {
   const { _type: status, CPKService, address, networkConfig } = useWeb3ConnectedOrInfura()
 
-  const { getValue } = useLocalStorage(LocalStorageManagement.ConditionId)
-
   const {
     allowToDisplayOnlyConditionsToReport = false,
+    localStorageKey = '',
     onClearSelection,
     onRowClicked,
     refetch,
@@ -78,6 +79,8 @@ const SelectConditionTable: React.FC<Props> = (props) => {
     title = 'Conditions',
     ...restProps
   } = props
+
+  const { getValue } = useLocalStorage<LSKey>(localStorageKey)
 
   const [textToSearch, setTextToSearch] = useState<string>('')
   const [textToShow, setTextToShow] = useState<string>('')

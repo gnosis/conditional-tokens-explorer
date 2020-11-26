@@ -150,6 +150,7 @@ export const SplitFrom: React.FC<Props> = (props) => {
       <ToggleableSelectablePositionTable
         clearFilters={true}
         hideTitle
+        localStorageKey="splitPosition"
         onFilterCallback={(positions: PositionWithUserBalanceWithDecimals[]) =>
           positions.filter(
             (position: PositionWithUserBalanceWithDecimals) => !position.userBalanceERC1155.isZero()

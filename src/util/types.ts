@@ -184,10 +184,10 @@ export type HashArray = {
   url?: string
 }
 
-export enum LocalStorageManagement {
-  ConditionId = 'conditionId',
-  PositionId = 'positionId',
-}
+// This could leverage Template Literal Types from typescript 4.1
+export type LSKeyCondition = 'reportCondition' | 'splitCondition'
+export type LSKeyPosition = 'splitPosition' | 'redeemPosition'
+export type LSKey = LSKeyPosition | LSKeyCondition | ''
 
 export interface QuestionOptions {
   arbitrator: string

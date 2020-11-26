@@ -31,7 +31,8 @@ import { truncateStringInTheMiddle } from 'util/tools'
 import {
   AdvancedFilterPosition,
   CollateralFilterOptions,
-  LocalStorageManagement,
+  LSKey,
+  LSKeyPosition,
   PositionSearchOptions,
   WrappedCollateralOptions,
 } from 'util/types'
@@ -62,12 +63,14 @@ interface Props {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   theme?: any
   title?: string
+  localStorageKey?: LSKeyPosition
 }
 
 const SelectPositionTable: React.FC<Props> = (props) => {
   const {
     clearFilters,
     hideTitle,
+    localStorageKey = '',
     onClearCallback,
     onFilterCallback,
     onRowClicked,
@@ -80,7 +83,7 @@ const SelectPositionTable: React.FC<Props> = (props) => {
 
   const { networkConfig } = useWeb3ConnectedOrInfura()
 
-  const { getValue } = useLocalStorage(LocalStorageManagement.PositionId)
+  const { getValue } = useLocalStorage<LSKey>(localStorageKey)
 
   const [positionList, setPositionList] = useState<PositionWithUserBalanceWithDecimals[]>([])
 

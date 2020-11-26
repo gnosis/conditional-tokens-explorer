@@ -172,6 +172,7 @@ export const Contents: React.FC = () => {
     <CenteredCard>
       <SelectableConditionTable
         allowToDisplayOnlyConditionsToReport={true}
+        localStorageKey="reportCondition"
         onClearSelection={() => {
           setPayouts([])
           setConditionId('')

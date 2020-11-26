@@ -56,7 +56,7 @@ import {
   AdvancedFilterPosition,
   CollateralFilterOptions,
   HashArray,
-  LocalStorageManagement,
+  LSKey,
   PositionSearchOptions,
   Token,
   TransferOptions,
@@ -83,7 +83,8 @@ export const PositionsList = () => {
     signer,
   } = useWeb3ConnectedOrInfura()
   const history = useHistory()
-  const { setValue } = useLocalStorage(LocalStorageManagement.PositionId)
+  const { setValue: setValueSplit } = useLocalStorage<LSKey>('splitPosition')
+  const { setValue: setValueRedeem } = useLocalStorage<LSKey>('redeemPosition')
 
   const [textToSearch, setTextToSearch] = useState<string>('')
   const [textToShow, setTextToShow] = useState<string>('')
@@ -226,14 +227,14 @@ export const PositionsList = () => {
           href: `/redeem`,
           text: 'Redeem',
           onClick: () => {
-            setValue(id)
+            setValueRedeem(id)
           },
         },
         {
           disabled: !userHasERC1155Balance || !isConnected,
           href: `/split`,
           onClick: () => {
-            setValue(id)
+            setValueSplit(id)
           },
           text: 'Split',
         },
@@ -274,7 +275,7 @@ export const PositionsList = () => {
 
       return menu
     },
-    [setValue, isConnected, isSigner]
+    [isConnected, isSigner, setValueRedeem, setValueSplit]
   )
 
   const handleRowClick = useCallback(

@@ -48,7 +48,7 @@ import {
   ConditionSearchOptions,
   ConditionType,
   ConditionTypeAll,
-  LocalStorageManagement,
+  LSKey,
   OracleFilterOptions,
   StatusOptions,
 } from 'util/types'
@@ -63,7 +63,8 @@ export const ConditionsList: React.FC = () => {
   const { _type: status, CPKService, address, networkConfig } = useWeb3ConnectedOrInfura()
 
   const history = useHistory()
-  const { setValue } = useLocalStorage(LocalStorageManagement.ConditionId)
+  const { setValue: setValueSplit } = useLocalStorage<LSKey>('splitCondition')
+  const { setValue: setValueReport } = useLocalStorage<LSKey>('reportCondition')
 
   const [textToSearch, setTextToSearch] = useState<string>('')
   const [textToShow, setTextToShow] = useState<string>('')
@@ -229,15 +230,7 @@ export const ConditionsList: React.FC = () => {
           href: `/split/`,
           text: 'Split Position',
           onClick: () => {
-            setValue(id)
-          },
-          disabled: !isConnected,
-        },
-        {
-          href: `/merge/`,
-          text: 'Merge Positions',
-          onClick: () => {
-            setValue(id)
+            setValueSplit(id)
           },
           disabled: !isConnected,
         },
@@ -245,7 +238,7 @@ export const ConditionsList: React.FC = () => {
           href: `/report/`,
           text: 'Report Payouts',
           onClick: () => {
-            setValue(id)
+            setValueReport(id)
           },
           disabled: resolved || !isConnected || !isAllowedToReport,
         },
@@ -253,7 +246,7 @@ export const ConditionsList: React.FC = () => {
 
       return menu
     },
-    [setValue, isConnected, address]
+    [address, isConnected, setValueSplit, setValueReport]
   )
 
   const handleRowClick = useCallback(

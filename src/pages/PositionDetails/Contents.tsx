@@ -56,13 +56,7 @@ import {
   positionString,
   truncateStringInTheMiddle,
 } from 'util/tools'
-import {
-  HashArray,
-  LocalStorageManagement,
-  NetworkIds,
-  OutcomeProps,
-  TransferOptions,
-} from 'util/types'
+import { HashArray, LSKey, NetworkIds, OutcomeProps, TransferOptions } from 'util/types'
 
 const CollateralText = styled.span`
   color: ${(props) => props.theme.colors.darkerGrey};
@@ -156,7 +150,8 @@ export const Contents = (props: Props) => {
   } = props
 
   const { createTimestamp, id: positionId, indexSets } = position
-  const { setValue } = useLocalStorage(LocalStorageManagement.PositionId)
+  const { setValue: setValueSplit } = useLocalStorage<LSKey>('splitPosition')
+  const { setValue: setValueRedeem } = useLocalStorage<LSKey>('redeemPosition')
 
   const { collateral: collateralERC1155 } = useCollateral(collateralTokenAddress)
   const { collateral: collateralERC20 } = useCollateral(wrappedTokenAddress)
@@ -342,7 +337,7 @@ export const Contents = (props: Props) => {
         disabled: !userHasBalance || !isConnected,
         href: `/redeem`,
         onClick: () => {
-          setValue(positionId)
+          setValueRedeem(positionId)
         },
         text: 'Redeem',
       },
@@ -350,7 +345,7 @@ export const Contents = (props: Props) => {
         disabled: !userHasBalance || !isConnected,
         href: `/split`,
         onClick: () => {
-          setValue(positionId)
+          setValueSplit(positionId)
         },
         text: 'Split',
       },
@@ -365,7 +360,7 @@ export const Contents = (props: Props) => {
     ]
 
     return menu
-  }, [setValue, positionId, isConnected, isSigner, userHasBalance])
+  }, [userHasBalance, isConnected, isSigner, setValueRedeem, positionId, setValueSplit])
 
   const conditionIdLink = (id: string) => {
     return (

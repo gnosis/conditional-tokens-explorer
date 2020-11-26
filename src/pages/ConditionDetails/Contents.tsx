@@ -33,7 +33,7 @@ import {
   getRealityQuestionUrl,
   truncateStringInTheMiddle,
 } from 'util/tools'
-import { ConditionStatus, ConditionType, LocalStorageManagement } from 'util/types'
+import { ConditionStatus, ConditionType, LSKey } from 'util/types'
 
 const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
@@ -50,7 +50,8 @@ interface Props {
 export const Contents: React.FC<Props> = ({ condition }) => {
   const { _type: status, address, networkConfig } = useWeb3ConnectedOrInfura()
 
-  const { setValue } = useLocalStorage(LocalStorageManagement.ConditionId)
+  const { setValue: setValueReport } = useLocalStorage<LSKey>('reportCondition')
+  const { setValue: setValueSplit } = useLocalStorage<LSKey>('splitCondition')
 
   const {
     createTimestamp,
@@ -75,29 +76,21 @@ export const Contents: React.FC<Props> = ({ condition }) => {
       {
         href: `/split/`,
         onClick: () => {
-          setValue(conditionId)
+          setValueSplit(conditionId)
         },
         text: 'Split Position',
         disabled: !isConnected,
       },
       {
-        href: `/merge/`,
-        onClick: () => {
-          setValue(conditionId)
-        },
-        text: 'Merge Positions',
-        disabled: !isConnected,
-      },
-      {
         href: `/report/`,
         onClick: () => {
-          setValue(conditionId)
+          setValueReport(conditionId)
         },
         text: 'Report Payouts',
         disabled: resolved || !isConnected || !isAllowedToReport,
       },
     ]
-  }, [setValue, conditionId, resolved, isConnected, isAllowedToReport])
+  }, [isConnected, resolved, isAllowedToReport, setValueSplit, conditionId, setValueReport])
 
   const { outcomesPrettier, question } = useQuestion(questionId, outcomeSlotCount)
   const isConditionFromOmen = useIsConditionFromOmen(oracle)
