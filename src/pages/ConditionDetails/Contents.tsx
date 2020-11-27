@@ -191,13 +191,15 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           }
         />
       </Row>
-      <Row cols="1fr">
-        <OmenMarketsOrQuestion
-          conditionsIds={[conditionId]}
-          isConditionFromOmen={isConditionFromOmen}
-          title={title}
-        />
-      </Row>
+      {(title !== INFORMATION_NOT_AVAILABLE || isConditionFromOmen) && (
+        <Row cols="1fr">
+          <OmenMarketsOrQuestion
+            conditionsIds={[conditionId]}
+            isConditionFromOmen={isConditionFromOmen}
+            title={title}
+          />
+        </Row>
+      )}
       {isConditionFromOmen && (
         <Row cols="1fr" marginBottomXL>
           <TitleValue

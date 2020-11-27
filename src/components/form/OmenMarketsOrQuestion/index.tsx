@@ -44,44 +44,37 @@ export const OmenMarketsOrQuestion: React.FC<Props> = ({
   } = useOmenMarkets(conditionsIds)
   const [openOmenMarkets, setOpenOmenMarkets] = useState(false)
 
-  if (loadingOmenMarkets) {
-    return null
-  }
-
-  if (firstMarket) {
-    return (
-      <>
-        <TitleValue
-          title={areOmenMarketsMoreThanOne ? 'Omen Markets' : 'Omen Market'}
-          value={
-            <DisplayBlock>
-              {firstMarket.question.title}
-              <ButtonCopyInlineFlex value={firstMarket.id} />
-              {areOmenMarketsMoreThanOne ? (
-                <ButtonExpandInlineFlex onClick={() => setOpenOmenMarkets(true)} />
-              ) : (
-                <ExternalLinkInlineFlex href={firstMarket.url} />
-              )}
-            </DisplayBlock>
-          }
+  return loadingOmenMarkets ? (
+    <TitleValue title="Loading" value="-" />
+  ) : firstMarket ? (
+    <>
+      <TitleValue
+        title={areOmenMarketsMoreThanOne ? 'Omen Markets' : 'Omen Market'}
+        value={
+          <DisplayBlock>
+            {firstMarket.question.title}
+            <ButtonCopyInlineFlex value={firstMarket.id} />
+            {areOmenMarketsMoreThanOne ? (
+              <ButtonExpandInlineFlex onClick={() => setOpenOmenMarkets(true)} />
+            ) : (
+              <ExternalLinkInlineFlex href={firstMarket.url} />
+            )}
+          </DisplayBlock>
+        }
+      />
+      {openOmenMarkets && areOmenMarketsMoreThanOne && (
+        <DisplayHashesTableModal
+          hashes={dataOmenMarkets.map(({ id, question }) => {
+            return { hash: id, title: question.title, url: getOmenMarketURL(id) }
+          })}
+          isOpen={openOmenMarkets}
+          onRequestClose={() => setOpenOmenMarkets(false)}
+          title="Omen Markets"
+          titleTable="Market Name"
         />
-        {openOmenMarkets && areOmenMarketsMoreThanOne && (
-          <DisplayHashesTableModal
-            hashes={dataOmenMarkets.map(({ id, question }) => {
-              return { hash: id, title: question.title, url: getOmenMarketURL(id) }
-            })}
-            isOpen={openOmenMarkets}
-            onRequestClose={() => setOpenOmenMarkets(false)}
-            title="Omen Markets"
-            titleTable="Market Name"
-          />
-        )}
-      </>
-    )
-  }
-
-  if (isConditionFromOmen && title) {
-    return <TitleValue title="Question" value={title} />
-  }
-  return null
+      )}
+    </>
+  ) : isConditionFromOmen && title ? (
+    <TitleValue title="Question" value={title} />
+  ) : null
 }
