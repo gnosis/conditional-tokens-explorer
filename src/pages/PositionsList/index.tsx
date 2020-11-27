@@ -208,9 +208,10 @@ export const PositionsList = () => {
 
   const buildMenuForRow = useCallback(
     (row: PositionWithUserBalanceWithDecimals) => {
-      const { collateralTokenERC1155, id, userBalanceERC20, userBalanceERC1155 } = row
+      const { collateralTokenERC1155, conditions, id, userBalanceERC20, userBalanceERC1155 } = row
       const userHasERC1155Balance = userBalanceERC1155 && !userBalanceERC1155.isZero()
       const userHasERC20Balance = userBalanceERC20 && !userBalanceERC20.isZero()
+      const isRedeemable = conditions.every((c) => c.resolved)
 
       const menu = [
         {
@@ -219,7 +220,7 @@ export const PositionsList = () => {
           text: 'Details',
         },
         {
-          disabled: !userHasERC1155Balance || !isConnected,
+          disabled: !userHasERC1155Balance || !isConnected || !isRedeemable,
           href: `/redeem/${id}`,
           text: 'Redeem',
         },
