@@ -6,10 +6,12 @@ import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
+import { Row } from 'components/pureStyledComponents/Row'
 import { StripedList, StripedListEmpty } from 'components/pureStyledComponents/StripedList'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
 import { SelectableConditionTable } from 'components/table/SelectableConditionTable'
+import { TitleValue } from 'components/text/TitleValue'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useCondition } from 'hooks/useCondition'
 import { OutcomesTable } from 'pages/ReportPayouts/OutcomesTable'
@@ -159,14 +161,18 @@ export const Contents: React.FC = () => {
     () => condition && status === Web3ContextStatus.Connected && !isOracleValidToReportPayout,
     [condition, status, isOracleValidToReportPayout]
   )
+
   const isNotConnected = useMemo(() => condition && status !== Web3ContextStatus.Connected, [
     condition,
     status,
   ])
+
   const isPayoutPositive = useMemo(
     () => condition && status === Web3ContextStatus.Connected && isDirty && isPayoutsEmpty,
     [condition, status, isDirty, isPayoutsEmpty]
   )
+
+  const thereAreErrors = isNotAllowedToReportPayout || isNotConnected || isPayoutPositive
 
   return (
     <CenteredCard>
@@ -180,29 +186,40 @@ export const Contents: React.FC = () => {
         refetch={transactionStatus.isSuccess()}
         selectedConditionId={condition?.id}
       />
-      {condition && !isConditionResolved ? (
-        <OutcomesTable
-          conditionId={condition.id}
-          outcomeSlotCount={outcomeSlotCount}
-          payouts={payouts}
-          setPayout={setPayout}
+      <Row>
+        <TitleValue
+          title="Payouts"
+          value={
+            <>
+              {condition && !isConditionResolved ? (
+                <OutcomesTable
+                  conditionId={condition.id}
+                  outcomeSlotCount={outcomeSlotCount}
+                  payouts={payouts}
+                  setPayout={setPayout}
+                />
+              ) : (
+                <StripedList>
+                  <StripedListEmpty>
+                    {!condition
+                      ? 'Please select a condition.'
+                      : isConditionResolved && 'The condition is already resolved.'}
+                  </StripedListEmpty>
+                </StripedList>
+              )}
+              {thereAreErrors && (
+                <ErrorContainer>
+                  {isNotAllowedToReportPayout && (
+                    <Error>The connected user is a not allowed to report payouts</Error>
+                  )}
+                  {isNotConnected && <Error>Please connect to your wallet to report payouts</Error>}
+                  {isPayoutPositive && <Error>At least one payout must be positive</Error>}
+                </ErrorContainer>
+              )}
+            </>
+          }
         />
-      ) : (
-        <StripedList>
-          <StripedListEmpty>
-            {!condition
-              ? 'Please select a condition.'
-              : isConditionResolved && 'The condition is already resolved.'}
-          </StripedListEmpty>
-        </StripedList>
-      )}
-      <ErrorContainer>
-        {isNotAllowedToReportPayout && (
-          <Error>The connected user is a not allowed to report payouts</Error>
-        )}
-        {isNotConnected && <Error>Please connect to your wallet to report payouts</Error>}
-        {isPayoutPositive && <Error>At least one payout must be positive</Error>}
-      </ErrorContainer>
+      </Row>
       {isWorking && (
         <FullLoading
           actionButton={fullLoadingActionButton}

@@ -49,11 +49,11 @@ export const OmenMarketsOrQuestion: React.FC<Props> = ({
   const loadingConditionFromOmen = loadingOmenMarkets && validConditionFromOmen
 
   return loadingConditionFromOmen || loadingFirstMarket ? (
-    <Row>
+    <Row paddingTop>
       <TitleValue title="Loading" value="-" />
     </Row>
   ) : firstMarket ? (
-    <Row>
+    <Row paddingTop>
       <TitleValue
         title={areOmenMarketsMoreThanOne ? 'Omen Markets' : 'Omen Market'}
         value={
@@ -81,7 +81,7 @@ export const OmenMarketsOrQuestion: React.FC<Props> = ({
       )}
     </Row>
   ) : validConditionFromOmen ? (
-    <Row>
+    <Row paddingTop>
       <TitleValue title="Question" value={title} />
     </Row>
   ) : null

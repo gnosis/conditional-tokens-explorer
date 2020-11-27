@@ -51,7 +51,7 @@ export const CustomCollateralModal: React.FC<Props> = (props) => {
       title={'Add Custom Token'}
       {...restProps}
     >
-      <FirstRow cols="1fr">
+      <FirstRow>
         <TitleValue
           title="Token Contract Address"
           value={

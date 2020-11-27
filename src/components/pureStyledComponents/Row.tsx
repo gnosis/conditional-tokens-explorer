@@ -1,11 +1,13 @@
 import styled from 'styled-components'
 
+const MARGIN_BOTTOM = '16px'
+
 export const Row = styled.div<{ cols?: string; paddingTop?: boolean }>`
   display: grid;
-  grid-column-gap: 25px;
-  grid-row-gap: 20px;
+  grid-column-gap: 20px;
+  grid-row-gap: ${MARGIN_BOTTOM};
   grid-template-columns: 1fr;
-  margin-bottom: 20px;
+  margin-bottom: ${MARGIN_BOTTOM};
   padding-top: ${(props) => (props.paddingTop ? '8px' : '0')};
 
   &:last-child {

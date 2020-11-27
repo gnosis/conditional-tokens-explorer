@@ -452,7 +452,7 @@ export const Contents = () => {
         />
       </Row>
       {isConditionResolved && (
-        <Row cols="1fr">
+        <Row>
           <StatusInfoInline status={StatusInfoType.warning}>
             This condition is already resolved.
           </StatusInfoInline>
@@ -470,7 +470,7 @@ export const Contents = () => {
           onUseWalletBalance={onUsePositionBalance}
         />
       </Row>
-      <Row>
+      <Row paddingTop>
         <MergePreview
           amount={amount}
           condition={condition}

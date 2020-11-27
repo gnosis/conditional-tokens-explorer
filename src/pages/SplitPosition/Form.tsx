@@ -344,7 +344,7 @@ export const Form = (props: Props) => {
           />
         </Row>
       )}
-      <Row paddingTop>
+      <Row>
         {collateral && (
           <InputAmount
             amount={amount}
@@ -355,7 +355,7 @@ export const Form = (props: Props) => {
           />
         )}
       </Row>
-      <Row>
+      <Row paddingTop>
         <TitleValue
           title="Partition"
           titleControl={
