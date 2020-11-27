@@ -439,15 +439,22 @@ export const PositionsList = () => {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimals) => {
           const { conditions } = row
-          const oracle = conditions[0]?.oracle ?? ''
-          const questionId = conditions[0]?.questionId ?? ''
+          const isConditionFromOmen = conditions.some((condition: ConditionInformation) =>
+            isOracleRealitio(condition.oracle, networkConfig)
+          )
+
+          const conditionsFiltered = isConditionFromOmen
+            ? conditions.filter((condition: ConditionInformation) =>
+                isOracleRealitio(condition.oracle, networkConfig)
+              )
+            : conditions
+          const oracle = conditionsFiltered[0]?.oracle ?? ''
+          const questionId = conditionsFiltered[0]?.questionId ?? ''
 
           const allOraclesAreEqual = conditions.every(
             (condition: ConditionInformation) =>
               condition.oracle.toLowerCase() === oracle.toLowerCase()
           )
-
-          const isConditionFromOmen = isOracleRealitio(oracle, networkConfig)
 
           const oracleName = isConditionFromOmen ? (
             <>
@@ -469,13 +476,13 @@ export const PositionsList = () => {
                   onClick={() => {
                     const hashes: HashArray[] = conditions.map(
                       (condition: ConditionInformation) => {
-                        const oracleAddress = condition.oracle
+                        const { oracle, questionId } = condition
 
-                        const hash: HashArray = { hash: oracleAddress }
-                        const isConditionFromOmen = isOracleRealitio(oracleAddress, networkConfig)
+                        const hash: HashArray = { hash: oracle }
+                        const isConditionFromOmen = isOracleRealitio(oracle, networkConfig)
                         if (isConditionFromOmen) {
-                          hash.title = networkConfig.getOracleFromAddress(oracleAddress).description
-                          hash.url = networkConfig.getOracleFromAddress(oracleAddress).url
+                          hash.title = networkConfig.getOracleFromAddress(oracle).description
+                          hash.url = getRealityQuestionUrl(questionId, networkConfig)
                         }
 
                         return hash

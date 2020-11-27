@@ -45,7 +45,7 @@ export const OmenMarketsOrQuestion: React.FC<Props> = ({
   const [openOmenMarkets, setOpenOmenMarkets] = useState(false)
 
   if (loadingOmenMarkets) {
-    return <TitleValue title={'Loading...'} value={'-'} />
+    return null
   }
 
   if (firstMarket) {
