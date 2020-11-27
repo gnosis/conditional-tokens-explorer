@@ -100,7 +100,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
   }, [setValue, conditionId, resolved, isConnected, isAllowedToReport])
 
   const { outcomesPrettier, question } = useQuestion(questionId, outcomeSlotCount)
-  const isConditionFromOmen = useIsConditionFromOmen(oracle)
+  const isConditionFromOmen = useIsConditionFromOmen([oracle])
   const {
     templateId = null,
     title = INFORMATION_NOT_AVAILABLE,
@@ -207,7 +207,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
             value={
               <StripedListStyled>
                 {outcomesPrettier.map((outcome: string, index: number) => (
-                  <StripedListItem key={index}>
+                  <StripedListItem key={index} wordBreak="normal">
                     {resolved && payouts ? `${outcome} - ${payouts[index]}%` : outcome}
                   </StripedListItem>
                 ))}

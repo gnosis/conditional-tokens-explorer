@@ -16,7 +16,7 @@ StripedList.defaultProps = {
   minHeight: '41px',
 }
 
-export const StripedListItem = styled.div<{ justifyContent?: string }>`
+export const StripedListItem = styled.div<{ justifyContent?: string; wordBreak?: string }>`
   align-items: center;
   background-color: ${(props) => props.theme.colors.whitesmoke3};
   color: ${(props) => props.theme.colors.darkerGrey};
@@ -28,7 +28,7 @@ export const StripedListItem = styled.div<{ justifyContent?: string }>`
   line-height: 1.3;
   padding: 12px 20px;
   text-align: left;
-  word-break: break-all;
+  word-break: ${(props) => props.wordBreak};
 
   &:nth-child(even) {
     background-color: ${(props) => props.theme.colors.whitesmoke2};
@@ -55,6 +55,7 @@ export const StripedListItemPreview = styled(StripedListItem)`
 
 StripedListItem.defaultProps = {
   justifyContent: 'space-between',
+  wordBreak: 'break-all',
 }
 
 export const StripedListEmpty = styled.div`

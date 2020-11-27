@@ -53,6 +53,7 @@ import {
   formatTS,
   getRealityQuestionUrl,
   indexSetToBase2,
+  isOracleRealitio,
   positionString,
   truncateStringInTheMiddle,
 } from 'util/tools'
@@ -207,7 +208,7 @@ export const Contents = (props: Props) => {
     })
   }, [indexSets])
 
-  const isConditionFromOmen = useIsConditionFromOmen(oracleIds[0])
+  const isConditionFromOmen = useIsConditionFromOmen(oracleIds)
 
   const ERC1155Symbol = useMemo(
     () => (collateralERC1155 && collateralERC1155.symbol ? collateralERC1155.symbol : ''),
@@ -417,15 +418,32 @@ export const Contents = (props: Props) => {
     }
   }, [isConditionFromOmen, areQuestionIdsMoreThanOne])
 
-  const oracleName = useMemo(
-    () =>
-      isConditionFromOmen ? (
-        networkConfig.getOracleFromAddress(oracleIds[0]).description
-      ) : (
-        <FormatHash hash={truncateStringInTheMiddle(oracleIds[0], 8, 6)} />
-      ),
-    [networkConfig, oracleIds, isConditionFromOmen]
-  )
+  const oracleName = useMemo(() => {
+    const oracleIdsFiltered = isConditionFromOmen
+      ? oracleIds.filter((oracle: string) => isOracleRealitio(oracle, networkConfig))
+      : oracleIds
+    const oracleAddress = oracleIdsFiltered[0]
+
+    return isConditionFromOmen ? (
+      networkConfig.getOracleFromAddress(oracleAddress).description
+    ) : (
+      <FormatHash hash={truncateStringInTheMiddle(oracleAddress, 8, 6)} />
+    )
+  }, [networkConfig, oracleIds, isConditionFromOmen])
+  const questionIdFromOmen = useMemo(() => {
+    const questionIdsFiltered = isConditionFromOmen
+      ? questionIds.filter((questionId: string, index: number) =>
+          isOracleRealitio(oracleIds[index], networkConfig)
+        )
+      : questionIds
+    return questionIdsFiltered[0]
+  }, [networkConfig, oracleIds, questionIds, isConditionFromOmen])
+  const oracleId = useMemo(() => {
+    const oracleIdsFiltered = isConditionFromOmen
+      ? oracleIds.filter((oracle: string) => isOracleRealitio(oracle, networkConfig))
+      : oracleIds
+    return oracleIdsFiltered[0]
+  }, [networkConfig, oracleIds, isConditionFromOmen])
 
   const getRealityQuestionUrlMemoized = useCallback(
     (questionId: string): string => getRealityQuestionUrl(questionId, networkConfig),
@@ -506,12 +524,12 @@ export const Contents = (props: Props) => {
           value={
             <FlexRow>
               {oracleName}
-              {!areOracleIdsMoreThanOne && <ButtonCopy value={oracleIds[0]} />}
+              {!areOracleIdsMoreThanOne && <ButtonCopy value={oracleId} />}
               {areOracleIdsMoreThanOne && (
                 <ButtonExpand onClick={() => setOpenDisplayOraclesIdsTableModal(true)} />
               )}
               {isConditionFromOmen && (
-                <ExternalLink href={getRealityQuestionUrlMemoized(questionIds[0])} />
+                <ExternalLink href={getRealityQuestionUrlMemoized(questionIdFromOmen)} />
               )}
             </FlexRow>
           }
@@ -533,7 +551,9 @@ export const Contents = (props: Props) => {
           />
         )}
       </Row>
-      <OmenMarketsOrQuestion conditionsIds={conditions.map((condition) => condition.hash)} />
+      <Row cols="1fr" marginBottomXL>
+        <OmenMarketsOrQuestion conditionsIds={conditions.map((condition) => condition.hash)} />
+      </Row>
       <Row cols="1fr" marginBottomXL>
         <TitleValue
           title="Wrapped Collateral"
@@ -690,11 +710,11 @@ export const Contents = (props: Props) => {
       )}
       {openDisplayOraclesIdsTableModal && areOracleIdsMoreThanOne && (
         <DisplayHashesTableModal
-          hashes={oracleIds.map((address) => {
+          hashes={oracleIds.map((address: string, index: number) => {
             const hash: HashArray = { hash: address }
-            if (isConditionFromOmen) {
+            if (isOracleRealitio(address, networkConfig)) {
               hash.title = networkConfig.getOracleFromAddress(address).description
-              hash.url = networkConfig.getOracleFromAddress(address).url
+              hash.url = getRealityQuestionUrl(questionIds[index], networkConfig)
             }
             return hash
           })}
