@@ -150,7 +150,7 @@ const networks: { [K in NetworkIds]: Network } = {
       },
       {
         symbol: 'CDAI',
-        address: '0x7a978b38d5af06ff929ca06647e025b759479318',
+        address: '0x6d7f0754ffeb405d23c51ce938289d4835be3b14',
         decimals: 18,
       },
       {
