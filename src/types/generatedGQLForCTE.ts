@@ -4,6 +4,29 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL query operation: PaginatedConditions
+// ====================================================
+
+export interface PaginatedConditions_conditions {
+  __typename: "Condition";
+  id: string;
+}
+
+export interface PaginatedConditions {
+  conditions: PaginatedConditions_conditions[];
+}
+
+export interface PaginatedConditionsVariables {
+  first?: number | null;
+  skip?: number | null;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL query operation: ConditionsList
 // ====================================================
 
