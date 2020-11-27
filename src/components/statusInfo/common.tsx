@@ -51,6 +51,6 @@ export enum IconTypes {
 
 export enum SpinnerSize {
   small = '24px',
-  regular = '48px',
+  regular = '40px',
   large = '60px',
 }
