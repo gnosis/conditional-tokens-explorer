@@ -5,6 +5,7 @@ import { ButtonCopy } from 'components/buttons'
 import { ButtonExpand } from 'components/buttons/ButtonExpand'
 import { DisplayHashesTableModal } from 'components/modals/DisplayHashesTableModal'
 import { ExternalLink } from 'components/navigation/ExternalLink'
+import { Row } from 'components/pureStyledComponents/Row'
 import { TitleValue } from 'components/text/TitleValue'
 import { useOmenMarkets } from 'hooks/useOmenMarkets'
 import { getOmenMarketURL } from 'util/tools'
@@ -43,11 +44,16 @@ export const OmenMarketsOrQuestion: React.FC<Props> = ({
     loading: loadingOmenMarkets,
   } = useOmenMarkets(conditionsIds)
   const [openOmenMarkets, setOpenOmenMarkets] = useState(false)
+  const loadingFirstMarket = loadingOmenMarkets && firstMarket
+  const validConditionFromOmen = isConditionFromOmen && title
+  const loadingConditionFromOmen = loadingOmenMarkets && validConditionFromOmen
 
-  return loadingOmenMarkets ? (
-    <TitleValue title="Loading" value="-" />
+  return loadingConditionFromOmen || loadingFirstMarket ? (
+    <Row>
+      <TitleValue title="Loading" value="-" />
+    </Row>
   ) : firstMarket ? (
-    <>
+    <Row>
       <TitleValue
         title={areOmenMarketsMoreThanOne ? 'Omen Markets' : 'Omen Market'}
         value={
@@ -73,8 +79,10 @@ export const OmenMarketsOrQuestion: React.FC<Props> = ({
           titleTable="Market Name"
         />
       )}
-    </>
-  ) : isConditionFromOmen && title ? (
-    <TitleValue title="Question" value={title} />
+    </Row>
+  ) : validConditionFromOmen ? (
+    <Row>
+      <TitleValue title="Question" value={title} />
+    </Row>
   ) : null
 }

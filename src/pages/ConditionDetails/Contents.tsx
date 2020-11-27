@@ -191,17 +191,15 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           }
         />
       </Row>
-      {(title !== INFORMATION_NOT_AVAILABLE || isConditionFromOmen) && (
-        <Row cols="1fr">
-          <OmenMarketsOrQuestion
-            conditionsIds={[conditionId]}
-            isConditionFromOmen={isConditionFromOmen}
-            title={title}
-          />
-        </Row>
+      {title !== INFORMATION_NOT_AVAILABLE && (
+        <OmenMarketsOrQuestion
+          conditionsIds={[conditionId]}
+          isConditionFromOmen={isConditionFromOmen}
+          title={title}
+        />
       )}
       {isConditionFromOmen && (
-        <Row cols="1fr" marginBottomXL>
+        <Row marginBottomXL>
           <TitleValue
             title="Outcomes"
             value={
@@ -234,7 +232,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           }
         />
       </Row>
-      <Row cols="1fr">
+      <Row>
         <TitleValue
           title={"Condition's split positions"}
           value={<DisplayTablePositions isLoading={loadingPositions} positions={positions || []} />}
