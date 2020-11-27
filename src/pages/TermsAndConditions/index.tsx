@@ -764,7 +764,7 @@ export const TermsAndConditions: React.FC = () => {
               <LiMultiNumber>
                 <ColorToMakeSurePeopleNoticesTheText>
                   IF YOU ARE RESIDING IN THE UNITED STATES OF AMERICA (&quot;USA&quot;), THIS CLAUSE
-                  28.4 REQUIRES YOU TO ARBITRATE ALL DISPUTES WITH US AND LIMITS THE MANNER IN WHICH
+                  27.4 REQUIRES YOU TO ARBITRATE ALL DISPUTES WITH US AND LIMITS THE MANNER IN WHICH
                   YOU CAN SEEK RELIEF FROM US.
                 </ColorToMakeSurePeopleNoticesTheText>
                 <OrderedListMultiNumber>
