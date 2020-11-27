@@ -199,7 +199,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
         />
       )}
       {isConditionFromOmen && (
-        <Row marginBottomXL>
+        <Row paddingTop>
           <TitleValue
             title="Outcomes"
             value={
@@ -214,7 +214,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           />
         </Row>
       )}
-      <Row cols="1fr 1fr" marginBottomXL>
+      <Row cols="1fr 1fr" paddingTop>
         {isConditionFromOmen && resolved && (
           <TitleValue title="Resolution Date" value={formatTS(resolveTimestamp)} />
         )}
@@ -232,7 +232,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           }
         />
       </Row>
-      <Row>
+      <Row paddingTop>
         <TitleValue
           title={"Condition's split positions"}
           value={<DisplayTablePositions isLoading={loadingPositions} positions={positions || []} />}

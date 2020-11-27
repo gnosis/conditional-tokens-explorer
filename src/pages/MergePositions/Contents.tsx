@@ -435,7 +435,7 @@ export const Contents = () => {
         refetch={transactionStatus.isSuccess()}
         selectedPosition={position}
       />
-      <Row cols="1fr" marginBottomXL>
+      <Row>
         <MergeWith
           errorFetching={errorPositions}
           isLoading={isLoadingMergeablePositions}
@@ -443,7 +443,7 @@ export const Contents = () => {
           onClick={onMergeableItemClick}
         />
       </Row>
-      <Row cols="1fr">
+      <Row paddingTop>
         <ConditionsDropdown
           conditions={conditionIds}
           isLoading={isLoadingConditions}
@@ -458,7 +458,7 @@ export const Contents = () => {
           </StatusInfoInline>
         </Row>
       )}
-      <Row cols="1fr">
+      <Row>
         <Amount
           amount={amount}
           balance={maxBalance}
@@ -470,7 +470,7 @@ export const Contents = () => {
           onUseWalletBalance={onUsePositionBalance}
         />
       </Row>
-      <Row cols="1fr">
+      <Row>
         <MergePreview
           amount={amount}
           condition={condition}
