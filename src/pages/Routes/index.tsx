@@ -41,9 +41,9 @@ export const Routes: React.FC = () => {
       <ProtectedRoute component={PositionsList} exact path="/positions" />
       <ProtectedRoute component={PositionDetails} exact path="/positions/:positionId" />
       <ProtectedRoute component={PrepareCondition} path="/prepare" />
-      <ProtectedRoute component={SplitPosition} path="/split" />
-      <ProtectedRoute component={ReportPayoutsContainer} path="/report" />
-      <ProtectedRoute component={RedeemPosition} path="/redeem" />
+      <ProtectedRoute component={SplitPosition} path="/split/:conditionId?" />
+      <ProtectedRoute component={ReportPayoutsContainer} path="/report/:conditionId?" />
+      <ProtectedRoute component={RedeemPosition} path="/redeem/:positionId?" />
       <ProtectedRoute component={MergePositions} path="/merge" />
       <ProtectedRoute component={TermsAndConditions} path="/terms-and-conditions" />
       <ProtectedRoute component={CookiePolicy} path="/cookie-policy" />

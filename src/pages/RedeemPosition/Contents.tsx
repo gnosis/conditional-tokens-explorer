@@ -182,7 +182,6 @@ export const Contents = () => {
   return (
     <CenteredCard>
       <SelectablePositionTable
-        localStorageKey="redeemPosition"
         onClearCallback={clearComponent}
         onFilterCallback={onFilterCallback}
         onRowClicked={onRowClicked}

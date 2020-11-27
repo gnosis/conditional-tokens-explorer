@@ -38,7 +38,6 @@ import { Hash } from 'components/text/Hash'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useConditionsList } from 'hooks/useConditionsList'
 import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { customStyles } from 'theme/tableCustomStyles'
 import { Conditions_conditions } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
@@ -48,7 +47,6 @@ import {
   ConditionSearchOptions,
   ConditionType,
   ConditionTypeAll,
-  LSKey,
   OracleFilterOptions,
   StatusOptions,
 } from 'util/types'
@@ -63,8 +61,6 @@ export const ConditionsList: React.FC = () => {
   const { _type: status, CPKService, address, networkConfig } = useWeb3ConnectedOrInfura()
 
   const history = useHistory()
-  const { setValue: setValueSplit } = useLocalStorage<LSKey>('splitCondition')
-  const { setValue: setValueReport } = useLocalStorage<LSKey>('reportCondition')
 
   const [textToSearch, setTextToSearch] = useState<string>('')
   const [textToShow, setTextToShow] = useState<string>('')
@@ -227,26 +223,20 @@ export const ConditionsList: React.FC = () => {
           onClick: undefined,
         },
         {
-          href: `/split/`,
+          href: `/split/${id}`,
           text: 'Split Position',
-          onClick: () => {
-            setValueSplit(id)
-          },
           disabled: !isConnected,
         },
         {
-          href: `/report/`,
+          href: `/report/${id}`,
           text: 'Report Payouts',
-          onClick: () => {
-            setValueReport(id)
-          },
           disabled: resolved || !isConnected || !isAllowedToReport,
         },
       ]
 
       return menu
     },
-    [address, isConnected, setValueSplit, setValueReport]
+    [address, isConnected]
   )
 
   const handleRowClick = useCallback(

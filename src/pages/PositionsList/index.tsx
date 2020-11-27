@@ -44,7 +44,6 @@ import { IconTypes } from 'components/statusInfo/common'
 import { TableControls } from 'components/table/TableControls'
 import { Hash } from 'components/text/Hash'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { PositionWithUserBalanceWithDecimals, usePositionsList } from 'hooks/usePositionsList'
 import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
 import { ConditionInformation } from 'hooks/utils'
@@ -56,7 +55,6 @@ import {
   AdvancedFilterPosition,
   CollateralFilterOptions,
   HashArray,
-  LSKey,
   PositionSearchOptions,
   Token,
   TransferOptions,
@@ -83,8 +81,6 @@ export const PositionsList = () => {
     signer,
   } = useWeb3ConnectedOrInfura()
   const history = useHistory()
-  const { setValue: setValueSplit } = useLocalStorage<LSKey>('splitPosition')
-  const { setValue: setValueRedeem } = useLocalStorage<LSKey>('redeemPosition')
 
   const [textToSearch, setTextToSearch] = useState<string>('')
   const [textToShow, setTextToShow] = useState<string>('')
@@ -224,20 +220,17 @@ export const PositionsList = () => {
         },
         {
           disabled: !userHasERC1155Balance || !isConnected,
-          href: `/redeem`,
+          href: `/redeem/${id}`,
           text: 'Redeem',
-          onClick: () => {
-            setValueRedeem(id)
-          },
         },
-        {
-          disabled: !userHasERC1155Balance || !isConnected,
-          href: `/split`,
-          onClick: () => {
-            setValueSplit(id)
-          },
-          text: 'Split',
-        },
+        // {
+        //   disabled: !userHasERC1155Balance || !isConnected,
+        //   href: `/split`,
+        //   onClick: () => {
+        //     setValueSplit(id)
+        //   },
+        //   text: 'Split',
+        // },
         {
           disabled: !userHasERC1155Balance || !isConnected || !isSigner,
           href: undefined,
@@ -275,7 +268,7 @@ export const PositionsList = () => {
 
       return menu
     },
-    [isConnected, isSigner, setValueRedeem, setValueSplit]
+    [isConnected, isSigner]
   )
 
   const handleRowClick = useCallback(

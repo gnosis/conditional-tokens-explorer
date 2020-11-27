@@ -44,7 +44,6 @@ import { TitleValue } from 'components/text/TitleValue'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useCollateral } from 'hooks/useCollateral'
 import { useIsConditionFromOmen } from 'hooks/useIsConditionFromOmen'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { GetPosition_position as Position } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
@@ -57,7 +56,7 @@ import {
   positionString,
   truncateStringInTheMiddle,
 } from 'util/tools'
-import { HashArray, LSKey, NetworkIds, OutcomeProps, TransferOptions } from 'util/types'
+import { HashArray, NetworkIds, OutcomeProps, TransferOptions } from 'util/types'
 
 const CollateralText = styled.span`
   color: ${(props) => props.theme.colors.darkerGrey};
@@ -151,8 +150,6 @@ export const Contents = (props: Props) => {
   } = props
 
   const { createTimestamp, id: positionId, indexSets } = position
-  const { setValue: setValueSplit } = useLocalStorage<LSKey>('splitPosition')
-  const { setValue: setValueRedeem } = useLocalStorage<LSKey>('redeemPosition')
 
   const { collateral: collateralERC1155 } = useCollateral(collateralTokenAddress)
   const { collateral: collateralERC20 } = useCollateral(wrappedTokenAddress)
@@ -336,20 +333,14 @@ export const Contents = (props: Props) => {
     const menu = [
       {
         disabled: !userHasBalance || !isConnected,
-        href: `/redeem`,
-        onClick: () => {
-          setValueRedeem(positionId)
-        },
+        href: `/redeem/${positionId}`,
         text: 'Redeem',
       },
-      {
-        disabled: !userHasBalance || !isConnected,
-        href: `/split`,
-        onClick: () => {
-          setValueSplit(positionId)
-        },
-        text: 'Split',
-      },
+      // {
+      //   disabled: !userHasBalance || !isConnected,
+      //   href: `/split/${positionId}`,
+      //   text: 'Split',
+      // },
       {
         disabled: !userHasBalance || !isConnected || !isSigner,
         href: '',
@@ -361,7 +352,7 @@ export const Contents = (props: Props) => {
     ]
 
     return menu
-  }, [userHasBalance, isConnected, isSigner, setValueRedeem, positionId, setValueSplit])
+  }, [userHasBalance, isConnected, isSigner, positionId])
 
   const conditionIdLink = (id: string) => {
     return (
