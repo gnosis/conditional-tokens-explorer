@@ -1,6 +1,7 @@
 import { useDebounceCallback } from '@react-hook/debounce'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
+import { useParams } from 'react-router-dom'
 import styled, { withTheme } from 'styled-components'
 
 import { ButtonCopy } from 'components/buttons/ButtonCopy'
@@ -29,7 +30,6 @@ import { TitleValue } from 'components/text/TitleValue'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useConditionsList } from 'hooks/useConditionsList'
 import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { customStyles } from 'theme/tableCustomStyles'
 import { Conditions_conditions } from 'types/generatedGQLForCTE'
 import { getRealityQuestionUrl, isOracleRealitio, truncateStringInTheMiddle } from 'util/tools'
@@ -38,7 +38,6 @@ import {
   ConditionSearchOptions,
   ConditionType,
   ConditionTypeAll,
-  LocalStorageManagement,
   OracleFilterOptions,
   StatusOptions,
 } from 'util/types'
@@ -63,10 +62,12 @@ interface Props {
   title?: string
 }
 
+interface Params {
+  conditionId?: string
+}
+
 const SelectConditionTable: React.FC<Props> = (props) => {
   const { _type: status, CPKService, address, networkConfig } = useWeb3ConnectedOrInfura()
-
-  const { getValue } = useLocalStorage(LocalStorageManagement.ConditionId)
 
   const {
     allowToDisplayOnlyConditionsToReport = false,
@@ -79,8 +80,10 @@ const SelectConditionTable: React.FC<Props> = (props) => {
     ...restProps
   } = props
 
-  const [textToSearch, setTextToSearch] = useState<string>('')
-  const [textToShow, setTextToShow] = useState<string>('')
+  const { conditionId } = useParams<Params>()
+
+  const [textToSearch, setTextToSearch] = useState<string>(conditionId || '')
+  const [textToShow, setTextToShow] = useState<string>(conditionId || '')
   const [resetPagination, setResetPagination] = useState<boolean>(false)
 
   const [selectedOracleFilter, setSelectedOracleFilter] = useState<string[]>(() =>
@@ -115,14 +118,6 @@ const SelectConditionTable: React.FC<Props> = (props) => {
   const debouncedHandlerTextToSearch = useDebounceCallback((conditionIdToSearch) => {
     setTextToSearch(conditionIdToSearch)
   }, 100)
-
-  useEffect(() => {
-    const localStorageCondition = getValue()
-    if (localStorageCondition) {
-      setTextToShow(localStorageCondition)
-      debouncedHandlerTextToSearch(localStorageCondition)
-    }
-  }, [getValue, debouncedHandlerTextToSearch])
 
   const onChangeSearch = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {

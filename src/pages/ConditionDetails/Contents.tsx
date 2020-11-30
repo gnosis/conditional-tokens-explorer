@@ -23,7 +23,6 @@ import { TitleValue } from 'components/text/TitleValue'
 import { INFORMATION_NOT_AVAILABLE } from 'config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useIsConditionFromOmen } from 'hooks/useIsConditionFromOmen'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { usePositions } from 'hooks/usePositions'
 import { useQuestion } from 'hooks/useQuestion'
 import { GetCondition_condition } from 'types/generatedGQLForCTE'
@@ -33,7 +32,7 @@ import {
   getRealityQuestionUrl,
   truncateStringInTheMiddle,
 } from 'util/tools'
-import { ConditionStatus, ConditionType, LocalStorageManagement } from 'util/types'
+import { ConditionStatus, ConditionType } from 'util/types'
 
 const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
@@ -49,8 +48,6 @@ interface Props {
 
 export const Contents: React.FC<Props> = ({ condition }) => {
   const { _type: status, address, networkConfig } = useWeb3ConnectedOrInfura()
-
-  const { setValue } = useLocalStorage(LocalStorageManagement.ConditionId)
 
   const {
     createTimestamp,
@@ -73,31 +70,17 @@ export const Contents: React.FC<Props> = ({ condition }) => {
   const dropdownItems = useMemo(() => {
     return [
       {
-        href: `/split/`,
-        onClick: () => {
-          setValue(conditionId)
-        },
+        href: `/split/${conditionId}`,
         text: 'Split Position',
         disabled: !isConnected,
       },
       {
-        href: `/merge/`,
-        onClick: () => {
-          setValue(conditionId)
-        },
-        text: 'Merge Positions',
-        disabled: !isConnected,
-      },
-      {
-        href: `/report/`,
-        onClick: () => {
-          setValue(conditionId)
-        },
+        href: `/report/${conditionId}`,
         text: 'Report Payouts',
         disabled: resolved || !isConnected || !isAllowedToReport,
       },
     ]
-  }, [setValue, conditionId, resolved, isConnected, isAllowedToReport])
+  }, [isConnected, resolved, isAllowedToReport, conditionId])
 
   const { outcomesPrettier, question } = useQuestion(questionId, outcomeSlotCount)
   const isConditionFromOmen = useIsConditionFromOmen([oracle])
@@ -134,12 +117,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           dropdownButtonContent={<ButtonDropdownCircle />}
           dropdownPosition={DropdownPosition.right}
           items={dropdownItems.map((item, index) => (
-            <DropdownItemLink
-              disabled={item.disabled}
-              key={index}
-              onMouseDown={item.onClick}
-              to={item.href}
-            >
+            <DropdownItemLink disabled={item.disabled} key={index} to={item.href}>
               {item.text}
             </DropdownItemLink>
           ))}

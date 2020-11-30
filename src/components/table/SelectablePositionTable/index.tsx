@@ -1,6 +1,7 @@
 import { useDebounceCallback } from '@react-hook/debounce'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
+import { useParams } from 'react-router-dom'
 import styled, { withTheme } from 'styled-components'
 
 import { TokenIcon } from 'components/common/TokenIcon'
@@ -23,7 +24,6 @@ import { TableControls } from 'components/table/TableControls'
 import { FormatHash } from 'components/text/FormatHash'
 import { TitleValue } from 'components/text/TitleValue'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { PositionWithUserBalanceWithDecimals, usePositionsList } from 'hooks/usePositionsList'
 import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
@@ -31,7 +31,6 @@ import { truncateStringInTheMiddle } from 'util/tools'
 import {
   AdvancedFilterPosition,
   CollateralFilterOptions,
-  LocalStorageManagement,
   PositionSearchOptions,
   WrappedCollateralOptions,
 } from 'util/types'
@@ -64,6 +63,10 @@ interface Props {
   title?: string
 }
 
+interface Params {
+  positionId?: string
+}
+
 const SelectPositionTable: React.FC<Props> = (props) => {
   const {
     clearFilters,
@@ -80,13 +83,13 @@ const SelectPositionTable: React.FC<Props> = (props) => {
 
   const { networkConfig } = useWeb3ConnectedOrInfura()
 
-  const { getValue } = useLocalStorage(LocalStorageManagement.PositionId)
+  const { positionId } = useParams<Params>()
 
   const [positionList, setPositionList] = useState<PositionWithUserBalanceWithDecimals[]>([])
 
   const [searchBy, setSearchBy] = useState<PositionSearchOptions>(PositionSearchOptions.PositionId)
-  const [textToShow, setTextToShow] = useState<string>('')
-  const [textToSearch, setTextToSearch] = useState<string>('')
+  const [textToShow, setTextToShow] = useState<string>(positionId || '')
+  const [textToSearch, setTextToSearch] = useState<string>(positionId || '')
   const [resetPagination, setResetPagination] = useState<boolean>(false)
   const [showFilters, setShowFilters] = useState(false)
   const [isFiltering, setIsFiltering] = useState(false)
@@ -105,14 +108,6 @@ const SelectPositionTable: React.FC<Props> = (props) => {
   const debouncedHandlerTextToSearch = useDebounceCallback((textToSearch) => {
     setTextToSearch(textToSearch)
   }, 100)
-
-  useEffect(() => {
-    const localStorageCondition = getValue()
-    if (localStorageCondition) {
-      setTextToShow(localStorageCondition)
-      debouncedHandlerTextToSearch(localStorageCondition)
-    }
-  }, [getValue, debouncedHandlerTextToSearch])
 
   const onChangeSearch = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {

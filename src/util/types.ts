@@ -184,11 +184,6 @@ export type HashArray = {
   url?: string
 }
 
-export enum LocalStorageManagement {
-  ConditionId = 'conditionId',
-  PositionId = 'positionId',
-}
-
 export interface QuestionOptions {
   arbitrator: string
   category: string

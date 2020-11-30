@@ -44,7 +44,6 @@ import { IconTypes } from 'components/statusInfo/common'
 import { TableControls } from 'components/table/TableControls'
 import { Hash } from 'components/text/Hash'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { PositionWithUserBalanceWithDecimals, usePositionsList } from 'hooks/usePositionsList'
 import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
 import { ConditionInformation } from 'hooks/utils'
@@ -56,7 +55,6 @@ import {
   AdvancedFilterPosition,
   CollateralFilterOptions,
   HashArray,
-  LocalStorageManagement,
   PositionSearchOptions,
   Token,
   TransferOptions,
@@ -83,7 +81,6 @@ export const PositionsList = () => {
     signer,
   } = useWeb3ConnectedOrInfura()
   const history = useHistory()
-  const { setValue } = useLocalStorage(LocalStorageManagement.PositionId)
 
   const [textToSearch, setTextToSearch] = useState<string>('')
   const [textToShow, setTextToShow] = useState<string>('')
@@ -211,9 +208,10 @@ export const PositionsList = () => {
 
   const buildMenuForRow = useCallback(
     (row: PositionWithUserBalanceWithDecimals) => {
-      const { collateralTokenERC1155, id, userBalanceERC20, userBalanceERC1155 } = row
+      const { collateralTokenERC1155, conditions, id, userBalanceERC20, userBalanceERC1155 } = row
       const userHasERC1155Balance = userBalanceERC1155 && !userBalanceERC1155.isZero()
       const userHasERC20Balance = userBalanceERC20 && !userBalanceERC20.isZero()
+      const isRedeemable = conditions.every((c) => c.resolved)
 
       const menu = [
         {
@@ -222,20 +220,9 @@ export const PositionsList = () => {
           text: 'Details',
         },
         {
-          disabled: !userHasERC1155Balance || !isConnected,
-          href: `/redeem`,
+          disabled: !userHasERC1155Balance || !isConnected || !isRedeemable,
+          href: `/redeem/${id}`,
           text: 'Redeem',
-          onClick: () => {
-            setValue(id)
-          },
-        },
-        {
-          disabled: !userHasERC1155Balance || !isConnected,
-          href: `/split`,
-          onClick: () => {
-            setValue(id)
-          },
-          text: 'Split',
         },
         {
           disabled: !userHasERC1155Balance || !isConnected || !isSigner,
@@ -274,7 +261,7 @@ export const PositionsList = () => {
 
       return menu
     },
-    [setValue, isConnected, isSigner]
+    [isConnected, isSigner]
   )
 
   const handleRowClick = useCallback(

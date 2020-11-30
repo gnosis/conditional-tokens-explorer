@@ -3,11 +3,10 @@ import { BigNumber } from 'ethers/utils'
 import React, { useContext, useState } from 'react'
 
 import { useBalanceForPosition } from 'hooks/useBalanceForPosition'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { GetPositionQuery } from 'queries/CTEPositions'
 import { GetPosition, GetPosition_position } from 'types/generatedGQLForCTE'
 import { isPositionIdValid } from 'util/tools'
-import { LocalStorageManagement, PositionErrors } from 'util/types'
+import { PositionErrors } from 'util/types'
 
 export interface PositionContext {
   position: Maybe<GetPosition_position>
@@ -51,7 +50,6 @@ interface Props {
 export const PositionProvider = (props: Props) => {
   const { checkForEmptyBalanceERC20, checkForEmptyBalanceERC1155 } = props
   const [positionId, setPositionId] = useState('')
-  const { getValue } = useLocalStorage(LocalStorageManagement.PositionId)
 
   const errors = []
   let position: Maybe<GetPosition_position> = null
@@ -103,13 +101,6 @@ export const PositionProvider = (props: Props) => {
   if (errorFetchingPosition) {
     errors.push(PositionErrors.FETCHING_ERROR)
   }
-
-  React.useEffect(() => {
-    const localStoragePosition = getValue()
-    if (localStoragePosition) {
-      setPositionIdCallback(localStoragePosition)
-    }
-  }, [getValue, setPositionIdCallback])
 
   const value = {
     position,
