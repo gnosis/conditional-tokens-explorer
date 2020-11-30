@@ -29,14 +29,9 @@ const DisplayBlock = styled.div`
 interface Props {
   conditionsIds: string[]
   title?: string
-  isConditionFromOmen?: boolean
 }
 
-export const OmenMarketsOrQuestion: React.FC<Props> = ({
-  conditionsIds,
-  isConditionFromOmen,
-  title,
-}) => {
+export const OmenMarketsOrQuestion: React.FC<Props> = ({ conditionsIds, title }) => {
   const {
     areOmenMarketsMoreThanOne,
     data: dataOmenMarkets,
@@ -44,16 +39,13 @@ export const OmenMarketsOrQuestion: React.FC<Props> = ({
     loading: loadingOmenMarkets,
   } = useOmenMarkets(conditionsIds)
   const [openOmenMarkets, setOpenOmenMarkets] = useState(false)
-  const loadingFirstMarket = loadingOmenMarkets && firstMarket
-  const validConditionFromOmen = isConditionFromOmen && title
-  const loadingConditionFromOmen = loadingOmenMarkets && validConditionFromOmen
 
-  return loadingConditionFromOmen || loadingFirstMarket ? (
-    <Row paddingTop>
+  return loadingOmenMarkets ? (
+    <Row>
       <TitleValue title="Loading" value="-" />
     </Row>
   ) : firstMarket ? (
-    <Row paddingTop>
+    <Row>
       <TitleValue
         title={areOmenMarketsMoreThanOne ? 'Omen Markets' : 'Omen Market'}
         value={
@@ -80,9 +72,13 @@ export const OmenMarketsOrQuestion: React.FC<Props> = ({
         />
       )}
     </Row>
-  ) : validConditionFromOmen ? (
-    <Row paddingTop>
+  ) : title ? (
+    <Row>
       <TitleValue title="Question" value={title} />
     </Row>
-  ) : null
+  ) : (
+    <Row>
+      <TitleValue title="Question" value={<i>None</i>} />
+    </Row>
+  )
 }

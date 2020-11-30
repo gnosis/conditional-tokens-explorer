@@ -191,13 +191,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           }
         />
       </Row>
-      {title !== INFORMATION_NOT_AVAILABLE && (
-        <OmenMarketsOrQuestion
-          conditionsIds={[conditionId]}
-          isConditionFromOmen={isConditionFromOmen}
-          title={title}
-        />
-      )}
+      <OmenMarketsOrQuestion conditionsIds={[conditionId]} title={title} />
       {isConditionFromOmen && (
         <Row paddingTop>
           <TitleValue
@@ -214,7 +208,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           />
         </Row>
       )}
-      <Row cols="1fr 1fr" paddingTop>
+      <Row cols="1fr 1fr">
         {isConditionFromOmen && resolved && (
           <TitleValue title="Resolution Date" value={formatTS(resolveTimestamp)} />
         )}
