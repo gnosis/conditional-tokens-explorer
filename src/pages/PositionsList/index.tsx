@@ -224,14 +224,6 @@ export const PositionsList = () => {
           href: `/redeem/${id}`,
           text: 'Redeem',
         },
-        // {
-        //   disabled: !userHasERC1155Balance || !isConnected,
-        //   href: `/split`,
-        //   onClick: () => {
-        //     setValueSplit(id)
-        //   },
-        //   text: 'Split',
-        // },
         {
           disabled: !userHasERC1155Balance || !isConnected || !isSigner,
           href: undefined,

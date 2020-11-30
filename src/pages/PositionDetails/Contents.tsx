@@ -336,11 +336,6 @@ export const Contents = (props: Props) => {
         href: `/redeem/${positionId}`,
         text: 'Redeem',
       },
-      // {
-      //   disabled: !userHasBalance || !isConnected,
-      //   href: `/split/${positionId}`,
-      //   text: 'Split',
-      // },
       {
         disabled: !userHasBalance || !isConnected || !isSigner,
         href: '',
