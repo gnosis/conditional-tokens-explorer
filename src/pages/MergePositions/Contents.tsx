@@ -78,6 +78,8 @@ export const Contents = () => {
 
   const isConditionResolved = useIsConditionResolved(conditionId)
 
+  const [isDirty, setIsDirty] = useState(false)
+
   useEffect(() => {
     const getCollateral = async () => {
       try {
@@ -110,6 +112,7 @@ export const Contents = () => {
     setMergeResult('')
     setAmount(ZERO_BN)
     setMergeResult('')
+    setIsDirty(false)
     setTransactionStatus(Remote.notAsked<Maybe<boolean>>())
   }, [])
 
@@ -215,6 +218,7 @@ export const Contents = () => {
         }
 
         setTransactionStatus(Remote.success(true))
+        setIsDirty(false)
       } else {
         connect()
       }
@@ -368,11 +372,11 @@ export const Contents = () => {
         : transactionStatus.isSuccess()
         ? {
             buttonType: ButtonType.primary,
-            onClick: () => setTransactionStatus(Remote.notAsked<Maybe<boolean>>()),
+            onClick: () => clearComponent(),
             text: 'OK',
           }
         : undefined,
-    [transactionStatus]
+    [transactionStatus, clearComponent]
   )
 
   const fullLoadingMessage = useMemo(
@@ -509,7 +513,7 @@ export const Contents = () => {
             ? true
             : 'Are you sure you want to leave this page? The changes you made will be lost?'
         }
-        when={selectedPositions.length > 0 || !amount.isZero() || !!conditionId}
+        when={isDirty}
       />
     </CenteredCard>
   )
