@@ -61,8 +61,8 @@ export const InputAmount = (props: Props) => {
         }
       })
     } else {
-      setDecimals(0)
-      setBalance(new BigNumber(0))
+      setDecimals(18)
+      setBalance(null)
     }
 
     return () => {
@@ -94,11 +94,12 @@ export const InputAmount = (props: Props) => {
         isDisconnected ? (
           <TitleControlButton disabled>Not Connected To Wallet</TitleControlButton>
         ) : (
-          balance && (
-            <TitleControlButton disabled={balance.isZero()} onClick={() => onAmountChange(balance)}>
-              Use Wallet Balance ({formatBigNumber(balance, decimals)})
-            </TitleControlButton>
-          )
+          <TitleControlButton
+            disabled={!balance || balance.isZero()}
+            onClick={() => balance && onAmountChange(balance)}
+          >
+            Use Wallet Balance ({formatBigNumber(balance || new BigNumber(0), decimals)})
+          </TitleControlButton>
         )
       }
       value={
