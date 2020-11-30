@@ -135,9 +135,18 @@ export const CategoriesDropdown = ({ onClick, value }: Props) => {
     }
   }, [categories, value])
 
+  const currentItem = useMemo(() => {
+    let currentItem = 0
+    if (categories.hasData()) {
+      currentItem = categories.get().findIndex((category) => category.value === value)
+    }
+    return currentItem
+  }, [value, categories])
+
   return (
     categories && (
       <DropdownStyled
+        currentItem={currentItem}
         disabled={!(categories.isSuccess() && categories.hasData())}
         dropdownButtonContent={
           <ButtonSelect

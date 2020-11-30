@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 import { ButtonSelect } from 'components/buttons/ButtonSelect'
 import { Dropdown, DropdownPosition } from 'components/common/Dropdown'
@@ -49,9 +49,16 @@ export const SelectCollateral = (props: SelectCollateralProps) => {
     }
   }, [tokens, collateral])
 
+  const currentItem = useMemo(
+    () =>
+      tokens.findIndex((token) => token.address.toLowerCase() === collateral.address.toLowerCase()),
+    [tokens, collateral]
+  )
+
   return (
     <Dropdown
       {...restProps}
+      currentItem={currentItem}
       dropdownButtonContent={button}
       dropdownPosition={DropdownPosition.center}
       fullWidth
