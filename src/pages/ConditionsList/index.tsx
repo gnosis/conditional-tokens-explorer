@@ -494,7 +494,7 @@ export const ConditionsList: React.FC = () => {
             className="outerTableWrapper"
             columns={columns}
             customStyles={customStyles}
-            data={showSpinner ? [] : data?.conditions || []}
+            data={showSpinner ? [] : data || []}
             highlightOnHover
             noDataComponent={
               showSpinner ? (

@@ -130,11 +130,13 @@ export const buildQueryConditionsList = (
     .filter((s) => s.length)
     .join(',')
 
-  const variablesClause = variablesClauseInternal ? `(${variablesClauseInternal})` : ''
+  const variablesClause = variablesClauseInternal
+    ? `($first: Int!, $skip: Int!, ${variablesClauseInternal})`
+    : '($first: Int!, $skip: Int!)'
 
   const query = gql`
       query ConditionsList ${variablesClause} {
-        conditions(first: 1000 ${whereClause} , orderBy: createTimestamp, orderDirection: desc) {
+        conditions(first: $first, skip: $skip${whereClause}, orderBy: createTimestamp, orderDirection: desc) {
           ...ConditionData
         }
       }

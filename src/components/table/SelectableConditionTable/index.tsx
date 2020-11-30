@@ -251,10 +251,10 @@ const SelectConditionTable: React.FC<Props> = (props) => {
   const [conditionList, setConditionList] = useState<Conditions_conditions[]>([])
 
   useEffect(() => {
-    if (!data || !data.conditions) {
+    if (!data) {
       setConditionList([])
     } else {
-      setConditionList(data.conditions)
+      setConditionList(data)
     }
   }, [data])
 
@@ -414,7 +414,7 @@ const SelectConditionTable: React.FC<Props> = (props) => {
           {error && !isBytes32Error && !isLoading && (
             <InfoCard message={error.message} title="Error" />
           )}
-          <CompactFiltersLayout isVisible={(!error || isBytes32Error) && showFilters}>
+          <CompactFiltersLayout isVisible={(!error || !!isBytes32Error) && showFilters}>
             <OraclesFilterDropdown
               onClick={(value: OracleFilterOptions, filter: string[]) => {
                 setSelectedOracleFilter(filter)
