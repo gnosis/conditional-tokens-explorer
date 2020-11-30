@@ -39,7 +39,7 @@ import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Contex
 import { useConditionsList } from 'hooks/useConditionsList'
 import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
-import { Conditions_conditions } from 'types/generatedGQLForCTE'
+import { GetCondition_condition } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
 import { formatTSSimple, getRealityQuestionUrl, isOracleRealitio } from 'util/tools'
 import {
@@ -211,7 +211,7 @@ export const ConditionsList: React.FC = () => {
   const isConnected = useMemo(() => status === Web3ContextStatus.Connected, [status])
 
   const buildMenuForRow = useCallback(
-    (row: Conditions_conditions) => {
+    (row: GetCondition_condition) => {
       const { id, oracle, resolved } = row
       const isAllowedToReport = address && address.toLowerCase() === oracle.toLowerCase()
 
@@ -239,7 +239,7 @@ export const ConditionsList: React.FC = () => {
   )
 
   const handleRowClick = useCallback(
-    (row: Conditions_conditions) => {
+    (row: GetCondition_condition) => {
       history.push(`/conditions/${row.id}`)
     },
     [history]
@@ -249,7 +249,7 @@ export const ConditionsList: React.FC = () => {
     () => [
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: Conditions_conditions) => (
+        cell: (row: GetCondition_condition) => (
           <Hash href={`/conditions/${row.id}`} value={row.id} />
         ),
         maxWidth: '270px',
@@ -259,7 +259,7 @@ export const ConditionsList: React.FC = () => {
       },
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: Conditions_conditions) => {
+        cell: (row: GetCondition_condition) => {
           const { oracle, questionId } = row
           const isConditionFromOmen = isOracleRealitio(oracle, networkConfig)
           const oracleName = isConditionFromOmen ? (
@@ -280,7 +280,7 @@ export const ConditionsList: React.FC = () => {
       },
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: Conditions_conditions) => (
+        cell: (row: GetCondition_condition) => (
           <Hash onClick={() => handleRowClick(row)} value={row.questionId} />
         ),
         maxWidth: '250px',
@@ -298,7 +298,7 @@ export const ConditionsList: React.FC = () => {
         sortable: true,
       },
       {
-        cell: (row: Conditions_conditions) => formatTSSimple(row.createTimestamp),
+        cell: (row: GetCondition_condition) => formatTSSimple(row.createTimestamp),
         maxWidth: '170px',
         minWidth: '170px',
         name: 'Creation Date',
@@ -308,7 +308,7 @@ export const ConditionsList: React.FC = () => {
       },
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: Conditions_conditions) =>
+        cell: (row: GetCondition_condition) =>
           row.resolved ? (
             <Pill onClick={() => handleRowClick(row)} type={PillTypes.primary}>
               Resolved
@@ -322,7 +322,7 @@ export const ConditionsList: React.FC = () => {
         name: 'Status',
         selector: 'resolved',
         sortable: true,
-        sortFunction: (a: Conditions_conditions, b: Conditions_conditions) => {
+        sortFunction: (a: GetCondition_condition, b: GetCondition_condition) => {
           const valA = a.resolved ? 2 : 1
           const valB = b.resolved ? 2 : 1
           return valA - valB
@@ -332,7 +332,7 @@ export const ConditionsList: React.FC = () => {
       },
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: Conditions_conditions) => (
+        cell: (row: GetCondition_condition) => (
           <Dropdown
             activeItemHighlight={false}
             dropdownButtonContent={<ButtonDots />}

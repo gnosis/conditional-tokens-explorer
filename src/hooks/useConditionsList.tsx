@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 
 import { useQueryTotalResults } from 'hooks/useQueryTotalResults'
 import { buildQueryConditionsList } from 'queries/CTEConditions'
-import { Conditions_conditions } from 'types/generatedGQLForCTE'
+import { GetCondition_condition } from 'types/generatedGQLForCTE'
 import {
   AdvancedFilterConditions,
   ConditionType,
@@ -71,12 +71,14 @@ export const useConditionsList = (advancedFilter: AdvancedFilterConditions) => {
     ToCreationDate,
   ])
 
-  const { data, error, loading, refetch } = useQueryTotalResults<Conditions_conditions, Variables>({
-    query,
-    fetchPolicy: 'no-cache',
-    variables,
-    entityName: 'conditions',
-  })
+  const { data, error, loading, refetch } = useQueryTotalResults<GetCondition_condition, Variables>(
+    {
+      query,
+      fetchPolicy: 'no-cache',
+      variables,
+      entityName: 'conditions',
+    }
+  )
 
   return {
     data,
