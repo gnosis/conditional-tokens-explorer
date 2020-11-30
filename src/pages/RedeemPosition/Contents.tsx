@@ -197,13 +197,7 @@ export const Contents = () => {
         />
       </Row>
       <Row cols="1fr">
-        {position && condition && (
-          <PositionPreview
-            condition={condition}
-            networkConfig={networkConfig}
-            position={position}
-          />
-        )}
+        <PositionPreview condition={condition} networkConfig={networkConfig} position={position} />
       </Row>
       {isWorking && (
         <FullLoading
