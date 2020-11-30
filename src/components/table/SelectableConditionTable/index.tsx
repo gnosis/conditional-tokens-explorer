@@ -472,7 +472,7 @@ const SelectConditionTable: React.FC<Props> = (props) => {
             highlightOnHover
             noDataComponent={
               showSpinner ? (
-                <InlineLoading size={SpinnerSize.small} />
+                <InlineLoading size={SpinnerSize.regular} />
               ) : status === Web3ContextStatus.Infura &&
                 selectedOracleValue === OracleFilterOptions.Current ? (
                 <EmptyContentText>User is not connected to wallet.</EmptyContentText>

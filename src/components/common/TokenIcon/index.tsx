@@ -1,4 +1,4 @@
-import React, { Suspense, useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import Blockies from 'react-blockies'
 import styled from 'styled-components'
 import { toChecksumAddress } from 'web3-utils'
@@ -125,39 +125,6 @@ interface Resource<Payload> {
   read: () => Payload
 }
 
-type status = 'pending' | 'success' | 'error'
-
-// A Resource is an object with a read method returning the payload
-function createResource<Payload>(asyncFn: () => Promise<Payload>): Resource<Payload> {
-  let status: status = 'pending'
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let result: any
-  const promise = asyncFn().then(
-    (r: Payload) => {
-      status = 'success'
-      result = r
-    },
-    (e: Error) => {
-      status = 'error'
-      result = e
-    }
-  )
-
-  return {
-    read(): Payload {
-      switch (status) {
-        case 'pending':
-          // This should throw a promise, so the fallback of the suspense component works
-          throw promise
-        case 'error':
-          throw result
-        case 'success':
-          return result
-      }
-    },
-  }
-}
-
 // First we need a type of cache to avoid creating resources for images we have already fetched in the past
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const cache = new Map<string, any>()
@@ -168,46 +135,27 @@ const loadImage = (source: string): Resource<string> => {
 
   if (resource) return resource
 
-  resource = createResource<string>(
-    () =>
-      new Promise((resolve) => {
-        const img = new window.Image()
-        img.src = source
-        img.addEventListener('load', () => resolve(source))
-        img.addEventListener('error', () => resolve(undefined))
-      })
-  )
+  resource = new Promise((resolve, reject) => {
+    const img = new window.Image()
+    img.src = source
+    img.addEventListener('load', () => resolve(source))
+    img.addEventListener('error', (err) => reject(err))
+  })
   cache.set(source, resource)
   return resource
-}
-
-interface SuspenseProps {
-  src: string
-  currencyData: CurrencyData | null
-  symbol: string
-}
-
-const SuspenseImage = (props: SuspenseProps): JSX.Element => {
-  const { currencyData, src, symbol } = props
-
-  const resource = useMemo(() => loadImage(src).read(), [src])
-
-  return (
-    <>
-      {currencyData && <Icon>{currencyData?.icon}</Icon>}
-      {!currencyData && resource && <CustomIcon src={src} />}
-      {!currencyData && !resource && (
-        <CustomIconWrapper>
-          <Blockies scale={2} seed={symbol} size={10} />
-        </CustomIconWrapper>
-      )}
-    </>
-  )
 }
 
 export const TokenIcon: React.FC<Props> = (props) => {
   const { onClick, token, ...restProps } = props
   const { address, symbol } = token
+
+  const [loading, setLoading] = useState(false)
+  const [tokenCustom, setTokenCustom] = useState<any>(null)
+
+  const customImageUrl = useMemo(() => {
+    const addressWithChecksum = toChecksumAddress(address)
+    return ICON_ENDPOINT.replace(`{}`, addressWithChecksum)
+  }, [address])
 
   const currencyData = React.useMemo(() => {
     const currenciesDataFiltered = currenciesData.filter(
@@ -216,17 +164,39 @@ export const TokenIcon: React.FC<Props> = (props) => {
     return currenciesDataFiltered.length > 0 ? currenciesDataFiltered[0] : null
   }, [symbol])
 
-  const customImageUrl = React.useMemo(() => {
-    const addressWithChecksum = toChecksumAddress(address)
-    return ICON_ENDPOINT.replace(`{}`, addressWithChecksum)
-  }, [address])
+  useEffect(() => {
+    const fetchImage = async () => {
+      setLoading(true)
+      try {
+        const resource = await loadImage(customImageUrl)
+        const tokenCustom = resource ? (
+          <>{resource && <CustomIcon src={customImageUrl} />}</>
+        ) : (
+          <Icon>{currencyData?.icon}</Icon>
+        )
+        setTokenCustom(tokenCustom)
+      } catch (err) {
+        setTokenCustom(
+          <CustomIconWrapper>
+            <Blockies scale={2} seed={symbol} size={10} />
+          </CustomIconWrapper>
+        )
+      }
+      setLoading(false)
+    }
+
+    fetchImage()
+  }, [currencyData, customImageUrl, symbol])
 
   return (
     <Wrapper onClick={onClick} {...restProps}>
-      <Suspense fallback={<Spinner size="20px" />}>
-        <SuspenseImage currencyData={currencyData} src={customImageUrl} symbol={symbol} />
-        <Symbol>{symbol}</Symbol>
-      </Suspense>
+      {loading && <Spinner size="20px" />}
+      {!loading && tokenCustom && (
+        <>
+          {tokenCustom}
+          <Symbol>{symbol}</Symbol>
+        </>
+      )}
     </Wrapper>
   )
 }

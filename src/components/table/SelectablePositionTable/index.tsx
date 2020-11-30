@@ -382,7 +382,7 @@ const SelectPositionTable: React.FC<Props> = (props) => {
             highlightOnHover
             noDataComponent={
               showSpinner ? (
-                <InlineLoading size={SpinnerSize.small} />
+                <InlineLoading size={SpinnerSize.regular} />
               ) : error ? (
                 <EmptyContentText>Error: {error.message}</EmptyContentText>
               ) : (

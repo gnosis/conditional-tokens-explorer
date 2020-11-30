@@ -10,13 +10,14 @@ import { customStyles } from 'theme/tableCustomStyles'
 import { HashArray } from 'util/types'
 
 interface Props {
-  hashes: Array<HashArray>
   callbackOnHistoryPush?: () => void
+  className?: string
+  hashes: Array<HashArray>
   titleTable: string
 }
 
 export const DisplayTableHashes = (props: Props) => {
-  const { callbackOnHistoryPush, hashes, titleTable } = props
+  const { callbackOnHistoryPush, className = '', hashes, titleTable } = props
 
   const getColumns = useCallback(() => {
     return [
@@ -51,7 +52,7 @@ export const DisplayTableHashes = (props: Props) => {
 
   return (
     <DataTable
-      className="outerTableWrapper condensedTable"
+      className={`outerTableWrapper condensedTable ${className}`}
       columns={getColumns()}
       customStyles={customStyles}
       data={hashes || []}

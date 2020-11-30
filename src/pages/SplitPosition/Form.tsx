@@ -109,6 +109,7 @@ export const Form = (props: Props) => {
     setCollateralAddress(tokens[0].address)
     setAmount(ZERO_BN)
     setPosition(null)
+    setIsDirty(false)
   }, [tokens])
 
   const isSplittingFromCollateral = useMemo(() => splitFrom === SplitFromType.collateral, [
@@ -172,6 +173,7 @@ export const Form = (props: Props) => {
         }
 
         setTransactionStatus(Remote.success({ positionIds, collateral: collateralFromSplit }))
+        setIsDirty(false)
       } else if (status === Web3ContextStatus.Infura) {
         connect()
       }
@@ -241,7 +243,7 @@ export const Form = (props: Props) => {
       transactionStatus.isSuccess()
         ? {
             buttonType: ButtonType.primary,
-            onClick: () => setTransactionStatus(Remote.notAsked<SplitStatus>()),
+            onClick: () => clearComponent(),
             text: 'OK',
           }
         : transactionStatus.isFailure()
@@ -251,7 +253,7 @@ export const Form = (props: Props) => {
             onClick: () => setTransactionStatus(Remote.notAsked<SplitStatus>()),
           }
         : undefined,
-    [transactionStatus]
+    [transactionStatus, clearComponent]
   )
 
   const fullLoadingIcon = useMemo(

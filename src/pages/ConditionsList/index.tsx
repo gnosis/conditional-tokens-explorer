@@ -213,7 +213,6 @@ export const ConditionsList: React.FC = () => {
   const buildMenuForRow = useCallback(
     (row: Conditions_conditions) => {
       const { id, oracle, resolved } = row
-
       const isAllowedToReport = address && address.toLowerCase() === oracle.toLowerCase()
 
       const menu = [
@@ -253,6 +252,8 @@ export const ConditionsList: React.FC = () => {
         cell: (row: Conditions_conditions) => (
           <Hash href={`/conditions/${row.id}`} value={row.id} />
         ),
+        maxWidth: '270px',
+        minWidth: '270px',
         name: 'Condition Id',
         sortable: false,
       },
@@ -260,9 +261,7 @@ export const ConditionsList: React.FC = () => {
         // eslint-disable-next-line react/display-name
         cell: (row: Conditions_conditions) => {
           const { oracle, questionId } = row
-
           const isConditionFromOmen = isOracleRealitio(oracle, networkConfig)
-
           const oracleName = isConditionFromOmen ? (
             <>
               {networkConfig.getOracleFromAddress(oracle).description}
@@ -272,9 +271,10 @@ export const ConditionsList: React.FC = () => {
           ) : (
             <Hash onClick={() => handleRowClick(row)} value={oracle} />
           )
-
           return oracleName
         },
+        maxWidth: '250px',
+        minWidth: '250px',
         name: 'Reporter / Oracle',
         sortable: false,
       },
@@ -283,12 +283,15 @@ export const ConditionsList: React.FC = () => {
         cell: (row: Conditions_conditions) => (
           <Hash onClick={() => handleRowClick(row)} value={row.questionId} />
         ),
+        maxWidth: '250px',
+        minWidth: '250px',
         name: 'Question Id',
         selector: 'questionId',
         sortable: true,
       },
       {
-        maxWidth: '100px',
+        maxWidth: '110px',
+        minWidth: '110px',
         name: 'Outcomes',
         right: true,
         selector: 'outcomeSlotCount',
@@ -296,18 +299,14 @@ export const ConditionsList: React.FC = () => {
       },
       {
         cell: (row: Conditions_conditions) => formatTSSimple(row.createTimestamp),
-        maxWidth: '150px',
+        maxWidth: '170px',
+        minWidth: '170px',
         name: 'Creation Date',
         right: true,
         selector: 'createTimestamp',
         sortable: true,
       },
       {
-        center: true,
-        name: 'Status',
-        selector: 'resolved',
-        sortable: true,
-        width: '150px',
         // eslint-disable-next-line react/display-name
         cell: (row: Conditions_conditions) =>
           row.resolved ? (
@@ -319,11 +318,17 @@ export const ConditionsList: React.FC = () => {
               Open
             </Pill>
           ),
+        center: true,
+        name: 'Status',
+        selector: 'resolved',
+        sortable: true,
         sortFunction: (a: Conditions_conditions, b: Conditions_conditions) => {
           const valA = a.resolved ? 2 : 1
           const valB = b.resolved ? 2 : 1
           return valA - valB
         },
+        minWidth: '110px',
+        maxWidth: '110px',
       },
       {
         // eslint-disable-next-line react/display-name
@@ -344,8 +349,8 @@ export const ConditionsList: React.FC = () => {
             ))}
           />
         ),
+        minWidth: '60px',
         name: '',
-        width: '60px',
         right: true,
       },
     ],
