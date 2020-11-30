@@ -1,7 +1,6 @@
 import { MockedProvider } from '@apollo/react-testing'
 import { render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { BigNumber } from 'ethers/utils'
 import React, { ReactElement } from 'react'
 import { HashRouter as Router } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'

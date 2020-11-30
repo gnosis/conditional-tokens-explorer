@@ -69,7 +69,7 @@ const ToggleableSelectablePositionTable = styled(SelectablePositionTable)<{ visi
 
 interface Props {
   cleanAllowanceError: () => void
-  onPositionChange: (position: PositionWithUserBalanceWithDecimals) => void
+  onPositionChange: (position: Maybe<PositionWithUserBalanceWithDecimals>) => void
   position: Maybe<PositionWithUserBalanceWithDecimals>
   onCollateralChange: (collateral: string) => void
   collateral: Token
@@ -115,7 +115,10 @@ export const SplitFrom: React.FC<Props> = (props) => {
           <Tab>
             <Radio
               name="splitFrom"
-              onClick={() => onSplitFromChange(SplitFromType.collateral)}
+              onClick={() => {
+                onSplitFromChange(SplitFromType.collateral)
+                onPositionChange(null)
+              }}
               type="radio"
               value={SplitFromType.collateral}
             />
