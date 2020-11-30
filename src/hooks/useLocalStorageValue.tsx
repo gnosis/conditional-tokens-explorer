@@ -4,7 +4,7 @@ import { getLogger } from 'util/logger'
 
 const logger = getLogger('useLocalStorage')
 
-export const useLocalStorage = <T,>(key: string) => {
+export const useLocalStorage = <T extends string>(key: T) => {
   const getValue = useCallback(
     (removeValue = true) => {
       const t = window.localStorage.getItem(key) || null
@@ -21,7 +21,7 @@ export const useLocalStorage = <T,>(key: string) => {
   )
 
   const setValue = useCallback(
-    (value: T) => {
+    (value: string) => {
       window.localStorage.setItem(key, JSON.stringify(value))
     },
     [key]

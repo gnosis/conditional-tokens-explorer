@@ -34,21 +34,13 @@ import { useAllowance } from 'hooks/useAllowance'
 import { useAllowanceState } from 'hooks/useAllowanceState'
 import { useCollateral } from 'hooks/useCollateral'
 import { useCondition } from 'hooks/useCondition'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
 import { SplitFrom } from 'pages/SplitPosition/SplitFrom'
 import { Conditions_conditions } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import { indexSetFromOutcomes, trivialPartition, truncateStringInTheMiddle } from 'util/tools'
-import {
-  LocalStorageManagement,
-  OutcomeProps,
-  PositionIdsArray,
-  SplitFromType,
-  SplitStatus,
-  Token,
-} from 'util/types'
+import { OutcomeProps, PositionIdsArray, SplitFromType, SplitStatus, Token } from 'util/types'
 
 const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
@@ -74,8 +66,7 @@ export const Form = (props: Props) => {
   const { _type: status, CTService, connect } = useWeb3ConnectedOrInfura()
   const { tokens } = props
 
-  const { getValue } = useLocalStorage(LocalStorageManagement.PositionId)
-  const defaultSplitFrom = getValue(false) ? SplitFromType.position : SplitFromType.collateral
+  const defaultSplitFrom = SplitFromType.collateral
 
   const [conditionId, setConditionId] = useState('')
   const [position, setPosition] = useState<Maybe<PositionWithUserBalanceWithDecimals>>(null)

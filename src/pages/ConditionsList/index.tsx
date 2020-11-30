@@ -38,7 +38,6 @@ import { Hash } from 'components/text/Hash'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useConditionsList } from 'hooks/useConditionsList'
 import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { customStyles } from 'theme/tableCustomStyles'
 import { Conditions_conditions } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
@@ -48,7 +47,6 @@ import {
   ConditionSearchOptions,
   ConditionType,
   ConditionTypeAll,
-  LocalStorageManagement,
   OracleFilterOptions,
   StatusOptions,
 } from 'util/types'
@@ -63,7 +61,6 @@ export const ConditionsList: React.FC = () => {
   const { _type: status, CPKService, address, networkConfig } = useWeb3ConnectedOrInfura()
 
   const history = useHistory()
-  const { setValue } = useLocalStorage(LocalStorageManagement.ConditionId)
 
   const [textToSearch, setTextToSearch] = useState<string>('')
   const [textToShow, setTextToShow] = useState<string>('')
@@ -225,34 +222,20 @@ export const ConditionsList: React.FC = () => {
           onClick: undefined,
         },
         {
-          href: `/split/`,
+          href: `/split/${id}`,
           text: 'Split Position',
-          onClick: () => {
-            setValue(id)
-          },
           disabled: !isConnected,
         },
         {
-          href: `/merge/`,
-          text: 'Merge Positions',
-          onClick: () => {
-            setValue(id)
-          },
-          disabled: !isConnected,
-        },
-        {
-          href: `/report/`,
+          href: `/report/${id}`,
           text: 'Report Payouts',
-          onClick: () => {
-            setValue(id)
-          },
           disabled: resolved || !isConnected || !isAllowedToReport,
         },
       ]
 
       return menu
     },
-    [setValue, isConnected, address]
+    [address, isConnected]
   )
 
   const handleRowClick = useCallback(
