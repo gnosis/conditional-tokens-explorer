@@ -150,6 +150,7 @@ export const TokenIcon: React.FC<Props> = (props) => {
   const { address, symbol } = token
 
   const [loading, setLoading] = useState(false)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [tokenCustom, setTokenCustom] = useState<any>(null)
 
   const customImageUrl = useMemo(() => {
