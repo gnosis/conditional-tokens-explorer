@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 
 import { ButtonSelect } from 'components/buttons/ButtonSelect'
 import { Dropdown, DropdownPosition } from 'components/common/Dropdown'
@@ -11,25 +11,34 @@ interface Props {
 }
 
 export const ConditionTypesDropdown = ({ onClick, value }: Props) => {
-  const conditionTypeItems = [
-    {
-      text: ConditionType.custom,
-      onClick: () => {
-        onClick(ConditionType.custom)
+  const conditionTypeItems = useMemo(
+    () => [
+      {
+        text: ConditionType.custom,
+        onClick: () => {
+          onClick(ConditionType.custom)
+        },
+        value: ConditionType.custom,
       },
-      value: ConditionType.custom,
-    },
-    {
-      text: ConditionType.omen,
-      onClick: () => {
-        onClick(ConditionType.omen)
+      {
+        text: ConditionType.omen,
+        onClick: () => {
+          onClick(ConditionType.omen)
+        },
+        value: ConditionType.omen,
       },
-      value: ConditionType.omen,
-    },
-  ]
+    ],
+    [onClick]
+  )
+
+  const currentItem = useMemo(
+    () => conditionTypeItems.findIndex((conditionType) => conditionType.value === value),
+    [value, conditionTypeItems]
+  )
 
   return (
     <Dropdown
+      currentItem={currentItem}
       dropdownButtonContent={
         <ButtonSelect content={conditionTypeItems.filter((item) => item.value === value)[0].text} />
       }
