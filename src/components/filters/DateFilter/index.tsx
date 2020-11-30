@@ -193,12 +193,16 @@ export const DateFilter: React.FC<Props> = (props) => {
   )
   const debounceOnChangeToInternal = useDebounce((value: string) => onChangeToInternal(value), 3000)
 
+  const clearDisabled = React.useMemo(
+    () => emptyValues && isFromValid === undefined && isToValid === undefined,
+    [emptyValues, isFromValid, isToValid]
+  )
   return (
     <Wrapper {...restProps}>
       <FilterWrapper>
         <FilterTitle>{title}</FilterTitle>
         {onClear && (
-          <FilterTitleButton disabled={emptyValues} onClick={clear}>
+          <FilterTitleButton disabled={clearDisabled} onClick={clear}>
             Clear
           </FilterTitleButton>
         )}
