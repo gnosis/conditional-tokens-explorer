@@ -4,10 +4,10 @@ import styled from 'styled-components'
 
 import { BaseCard } from 'components/pureStyledComponents/BaseCard'
 import { Li, OrderedList } from 'components/pureStyledComponents/Lists'
-import { PageTitle } from 'components/pureStyledComponents/PageTitle'
 import { PageTitleNote } from 'components/pureStyledComponents/PageTitleNote'
 import { Paragraph } from 'components/pureStyledComponents/Paragraph'
 import { Title } from 'components/pureStyledComponents/Title'
+import { PageTitle } from 'components/text/PageTitle'
 
 const BaseCardGrow = styled(BaseCard)`
   flex-grow: 1;
