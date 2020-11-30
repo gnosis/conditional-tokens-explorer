@@ -7,6 +7,7 @@ import { DisplayHashesTableModal } from 'components/modals/DisplayHashesTableMod
 import { ExternalLink } from 'components/navigation/ExternalLink'
 import { Row } from 'components/pureStyledComponents/Row'
 import { TitleValue } from 'components/text/TitleValue'
+import { INFORMATION_NOT_AVAILABLE } from 'config/constants'
 import { useOmenMarkets } from 'hooks/useOmenMarkets'
 import { getOmenMarketURL } from 'util/tools'
 
@@ -39,6 +40,8 @@ export const OmenMarketsOrQuestion: React.FC<Props> = ({ conditionsIds, title })
     loading: loadingOmenMarkets,
   } = useOmenMarkets(conditionsIds)
   const [openOmenMarkets, setOpenOmenMarkets] = useState(false)
+
+  console.log(dataOmenMarkets)
 
   return loadingOmenMarkets ? (
     <Row>
@@ -78,7 +81,7 @@ export const OmenMarketsOrQuestion: React.FC<Props> = ({ conditionsIds, title })
     </Row>
   ) : (
     <Row>
-      <TitleValue title="Question" value={<i>None</i>} />
+      <TitleValue title="Omen Markets" value={INFORMATION_NOT_AVAILABLE} />
     </Row>
   )
 }
