@@ -36,7 +36,7 @@ import { useCollateral } from 'hooks/useCollateral'
 import { useCondition } from 'hooks/useCondition'
 import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
 import { SplitFrom } from 'pages/SplitPosition/SplitFrom'
-import { Conditions_conditions } from 'types/generatedGQLForCTE'
+import { GetCondition_condition } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import { indexSetFromOutcomes, trivialPartition, truncateStringInTheMiddle } from 'util/tools'
@@ -288,7 +288,7 @@ export const Form = (props: Props) => {
     [transactionStatus, clearComponent]
   )
 
-  const onRowClicked = useCallback((row: Conditions_conditions) => {
+  const onRowClicked = useCallback((row: GetCondition_condition) => {
     setConditionId(row.id)
   }, [])
 

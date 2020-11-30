@@ -68,47 +68,6 @@ export interface ConditionsList {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: Conditions
-// ====================================================
-
-export interface Conditions_conditions_positions_collateralToken {
-  __typename: "CollateralToken";
-  id: string;
-}
-
-export interface Conditions_conditions_positions {
-  __typename: "Position";
-  id: string;
-  collateralToken: Conditions_conditions_positions_collateralToken;
-}
-
-export interface Conditions_conditions {
-  __typename: "Condition";
-  id: string;
-  oracle: string;
-  questionId: string;
-  outcomeSlotCount: number;
-  resolved: boolean;
-  creator: string;
-  payouts: any[] | null;
-  createTimestamp: any;
-  payoutNumerators: any[] | null;
-  payoutDenominator: any | null;
-  resolveTimestamp: any | null;
-  resolveBlockNumber: any | null;
-  positions: Conditions_conditions_positions[] | null;
-}
-
-export interface Conditions {
-  conditions: Conditions_conditions[];
-}
-
-/* tslint:disable */
-/* eslint-disable */
-// @generated
-// This file was automatically generated and should not be edited.
-
-// ====================================================
 // GraphQL query operation: GetCondition
 // ====================================================
 
