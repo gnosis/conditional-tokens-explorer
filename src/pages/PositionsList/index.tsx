@@ -314,8 +314,8 @@ export const PositionsList = () => {
             })}
           />
         ),
+        minWidth: '60px',
         name: '',
-        width: '60px',
         right: true,
       },
     ]
@@ -337,6 +337,7 @@ export const PositionsList = () => {
             {isConnected ? row.userBalanceERC1155WithDecimals : '-'}
           </span>
         ),
+        minWidth: '180px',
         name: 'ERC1155 Amount',
         right: true,
         selector: 'userBalanceERC1155Numbered',
@@ -356,6 +357,7 @@ export const PositionsList = () => {
             {isConnected ? row.userBalanceERC20WithDecimals : '-'}
           </span>
         ),
+        minWidth: '180px',
         name: 'ERC20 Amount',
         right: true,
         selector: 'userBalanceERC20Numbered',
@@ -373,9 +375,10 @@ export const PositionsList = () => {
         cell: (row: PositionWithUserBalanceWithDecimals) => (
           <Hash href={`/positions/${row.id}`} value={row.id} />
         ),
+        maxWidth: '270px',
+        minWidth: '270px',
         name: 'Position Id',
         sortable: false,
-        minWidth: '250px',
       },
       {
         // eslint-disable-next-line react/display-name
@@ -388,6 +391,8 @@ export const PositionsList = () => {
             collateralToken
           )
         },
+        maxWidth: '155px',
+        minWidth: '155px',
         name: 'Collateral',
         selector: 'collateralTokenSymbol',
         sortable: true,
@@ -395,6 +400,8 @@ export const PositionsList = () => {
       {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimals) => formatTSSimple(row.createTimestamp),
+        maxWidth: '170px',
+        minWidth: '170px',
         name: 'Creation Date',
         right: true,
         selector: 'createTimestamp',
@@ -431,9 +438,10 @@ export const PositionsList = () => {
             )
           }
         },
+        maxWidth: '290px',
+        minWidth: '270px',
         name: 'Condition Id',
         sortable: false,
-        minWidth: '350px',
       },
       {
         // eslint-disable-next-line react/display-name
@@ -498,9 +506,10 @@ export const PositionsList = () => {
             )
           }
         },
+        maxWidth: '290px',
+        minWidth: '270px',
         name: 'Oracle',
         sortable: false,
-        minWidth: '350px',
       },
       {
         // eslint-disable-next-line react/display-name
@@ -538,9 +547,10 @@ export const PositionsList = () => {
             )
           }
         },
+        maxWidth: '270px',
+        minWidth: '270px',
         name: 'Question Id',
         sortable: false,
-        minWidth: '350px',
       },
     ]
 

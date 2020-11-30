@@ -190,6 +190,7 @@ export const SearchField: React.FC<Props> = (props) => {
       {dropdownItems && (
         <Dropdown
           activeItemHighlight={true}
+          currentItem={currentItem}
           disabled={disabled}
           dropdownButtonContent={
             <ButtonDropdown>

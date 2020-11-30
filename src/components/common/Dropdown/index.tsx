@@ -172,7 +172,6 @@ export const Dropdown: React.FC<Props> = (props) => {
     items,
     ...restProps
   } = props
-  const [currentItemIndex, setCurrentItemIndex] = useState<number>(currentItem)
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const node = createRef<HTMLDivElement>()
 
@@ -223,7 +222,7 @@ export const Dropdown: React.FC<Props> = (props) => {
         {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           items.map((item: any, index: number) => {
-            const isActive = activeItemHighlight && index === currentItemIndex
+            const isActive = activeItemHighlight && index === currentItem
             const dropdownItem = React.cloneElement(item, {
               className: `dropdownItem ${isActive && 'isActive'}`,
               key: item.key ? item.key : index,
@@ -238,7 +237,6 @@ export const Dropdown: React.FC<Props> = (props) => {
                   return
                 }
 
-                setCurrentItemIndex(index)
                 item.props.onClick()
               },
             })

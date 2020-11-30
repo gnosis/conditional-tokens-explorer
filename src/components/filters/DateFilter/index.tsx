@@ -11,6 +11,7 @@ import {
 } from 'components/pureStyledComponents/FilterTitle'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { MAX_DATE, MIN_DATE } from 'config/constants'
+import { useDebounce } from 'hooks/useDebounce'
 
 const Wrapper = styled.div``
 
@@ -80,29 +81,19 @@ export const DateFilter: React.FC<Props> = (props) => {
   const maxDateUTC = moment(MAX_DATE).utc().endOf('day').unix()
   const minDateUTC = moment(MIN_DATE).utc().startOf('day').unix()
 
-  const checkFromValidity = React.useCallback(
-    (event: React.KeyboardEvent<HTMLInputElement> | React.ChangeEvent<HTMLInputElement>) => {
-      setIsFromValid(moment(event.currentTarget.value).isValid())
-    },
-    []
-  )
+  const checkFromValidity = React.useCallback((value: string) => {
+    setIsFromValid(moment(value).isValid())
+  }, [])
 
-  const checkToValidity = React.useCallback(
-    (event: React.KeyboardEvent<HTMLInputElement> | React.ChangeEvent<HTMLInputElement>) => {
-      setIsToValid(moment(event.currentTarget.value).isValid())
-    },
-    []
-  )
+  const checkToValidity = React.useCallback((value: string) => {
+    setIsToValid(moment(value).isValid())
+  }, [])
 
   const onChangeFromInternal = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (typeof onChangeFrom === 'function') {
-        onChangeFrom(event)
-      }
+    (value: string) => {
+      checkFromValidity(value)
 
-      checkFromValidity(event)
-
-      const currentMinDate = moment(event.currentTarget.value).utc().startOf('day').unix()
+      const currentMinDate = moment(value).utc().startOf('day').unix()
 
       const fromTimestamp =
         currentMinDate < minDateUTC
@@ -113,18 +104,14 @@ export const DateFilter: React.FC<Props> = (props) => {
 
       setFrom(fromTimestamp)
     },
-    [checkFromValidity, maxDateUTC, minDateUTC, onChangeFrom]
+    [checkFromValidity, maxDateUTC, minDateUTC]
   )
 
   const onChangeToInternal = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (typeof onChangeTo === 'function') {
-        onChangeTo(event)
-      }
+    (value: string) => {
+      checkToValidity(value)
 
-      checkToValidity(event)
-
-      const currentMaxDate = moment(event.currentTarget.value).utc().endOf('day').unix()
+      const currentMaxDate = moment(value).utc().endOf('day').unix()
 
       const toTimestamp =
         currentMaxDate > maxDateUTC
@@ -135,15 +122,19 @@ export const DateFilter: React.FC<Props> = (props) => {
 
       setTo(toTimestamp)
     },
-    [checkToValidity, maxDateUTC, minDateUTC, onChangeTo]
+    [checkToValidity, maxDateUTC, minDateUTC]
   )
 
-  const emptyValues = !from && !to
-  const fromGreaterThanToError = (to && from && to < from) || false
-  const invalidTo = isToValid !== undefined && !isToValid
-  const invalidFrom = isFromValid !== undefined && !isFromValid
-  const showErrors = invalidTo || invalidFrom || fromGreaterThanToError
-  const submitDisabled = showErrors || emptyValues
+  const emptyValues = React.useMemo(() => !from && !to, [from, to])
+  const fromGreaterThanToError = React.useMemo(() => (to && from && to < from) || false, [from, to])
+  const invalidTo = React.useMemo(() => isToValid !== undefined && !isToValid, [isToValid])
+  const invalidFrom = React.useMemo(() => isFromValid !== undefined && !isFromValid, [isFromValid])
+  const showErrors = React.useMemo(() => invalidTo || invalidFrom || fromGreaterThanToError, [
+    invalidTo,
+    invalidFrom,
+    fromGreaterThanToError,
+  ])
+  const submitDisabled = React.useMemo(() => showErrors || emptyValues, [showErrors, emptyValues])
 
   const onSubmitInternal = React.useCallback(() => {
     if ((from || to) && !submitDisabled) {
@@ -194,6 +185,14 @@ export const DateFilter: React.FC<Props> = (props) => {
     setIsToValid(undefined)
   }, [clearFrom, clearTo, onClear])
 
+  const debounceFromValidity = useDebounce((value: string) => checkFromValidity(value), 3000)
+  const debounceToValidity = useDebounce((value: string) => checkToValidity(value), 3000)
+  const debounceOnChangeFromInternal = useDebounce(
+    (value: string) => onChangeFromInternal(value),
+    3000
+  )
+  const debounceOnChangeToInternal = useDebounce((value: string) => onChangeToInternal(value), 3000)
+
   return (
     <Wrapper {...restProps}>
       <FilterWrapper>
@@ -212,10 +211,17 @@ export const DateFilter: React.FC<Props> = (props) => {
               max={MAX_DATE}
               min={MIN_DATE}
               name="dateFrom"
-              onChange={onChangeFromInternal}
+              onChange={(event) => {
+                if (typeof onChangeFrom === 'function') {
+                  onChangeFrom(event)
+                }
+                const value = event.currentTarget.value
+                debounceOnChangeFromInternal(value)
+              }}
               onKeyUp={(event) => {
                 onKeyUp(event)
-                checkFromValidity(event)
+                const value = event.currentTarget.value
+                debounceFromValidity(value)
               }}
               ref={fromDate}
               type="date"
@@ -229,10 +235,17 @@ export const DateFilter: React.FC<Props> = (props) => {
               max={MAX_DATE}
               min={MIN_DATE}
               name="dateTo"
-              onChange={onChangeToInternal}
+              onChange={(event) => {
+                if (typeof onChangeTo === 'function') {
+                  onChangeTo(event)
+                }
+                const value = event.currentTarget.value
+                debounceOnChangeToInternal(value)
+              }}
               onKeyUp={(event) => {
                 onKeyUp(event)
-                checkToValidity(event)
+                const value = event.currentTarget.value
+                debounceToValidity(value)
               }}
               ref={toDate}
               type="date"

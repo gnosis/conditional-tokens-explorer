@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import styled from 'styled-components'
 
 import { ButtonSelectLight } from 'components/buttons/ButtonSelectLight'
@@ -29,43 +29,51 @@ export const OraclesFilterDropdown = ({ onClear, onClick, value }: Props) => {
 
   const oraclesAdresses: string[] = oracles.map((oracle: Oracle) => oracle.address.toLowerCase())
 
-  const oraclesItems = [
-    {
-      text: 'All',
-      onClick: () => {
-        onClick(OracleFilterOptions.All, [])
+  const oraclesItems = useMemo(
+    () => [
+      {
+        text: 'All',
+        onClick: () => {
+          onClick(OracleFilterOptions.All, [])
+        },
+        value: OracleFilterOptions.All,
       },
-      value: OracleFilterOptions.All,
-    },
-    {
-      text: 'Current Wallet',
-      onClick: () => {
-        const currentWallet =
-          address && CPKService ? [address.toLowerCase(), CPKService.address.toLowerCase()] : []
-        logger.log(`Current Wallet`, currentWallet)
-        onClick(OracleFilterOptions.Current, currentWallet)
+      {
+        text: 'Current Wallet',
+        onClick: () => {
+          const currentWallet =
+            address && CPKService ? [address.toLowerCase(), CPKService.address.toLowerCase()] : []
+          logger.log(`Current Wallet`, currentWallet)
+          onClick(OracleFilterOptions.Current, currentWallet)
+        },
+        value: OracleFilterOptions.Current,
       },
-      value: OracleFilterOptions.Current,
-    },
-    {
-      text: 'Custom Reporters',
-      onClick: () => {
-        onClick(OracleFilterOptions.Custom, oraclesAdresses)
+      {
+        text: 'Custom Reporters',
+        onClick: () => {
+          onClick(OracleFilterOptions.Custom, oraclesAdresses)
+        },
+        value: OracleFilterOptions.Custom,
       },
-      value: OracleFilterOptions.Custom,
-    },
-    ...oracles
-      .filter((item) => item.name !== OracleFilterOptions.Kleros)
-      .map((item) => {
-        return {
-          text: item.description,
-          onClick: () => {
-            onClick(item.name as OracleFilterOptions, [item.address.toLowerCase()])
-          },
-          value: item.name as OracleFilterOptions,
-        }
-      }),
-  ]
+      ...oracles
+        .filter((item) => item.name !== OracleFilterOptions.Kleros)
+        .map((item) => {
+          return {
+            text: item.description,
+            onClick: () => {
+              onClick(item.name as OracleFilterOptions, [item.address.toLowerCase()])
+            },
+            value: item.name as OracleFilterOptions,
+          }
+        }),
+    ],
+    [CPKService, address, onClick, oracles, oraclesAdresses]
+  )
+
+  const currentItem = useMemo(
+    () => oraclesItems.findIndex((oracleItem) => oracleItem.value === value),
+    [value, oraclesItems]
+  )
 
   return (
     <Wrapper {...restProps}>
@@ -74,7 +82,7 @@ export const OraclesFilterDropdown = ({ onClear, onClick, value }: Props) => {
         {onClear && <FilterTitleButton onClick={onClear}>Clear</FilterTitleButton>}
       </FilterWrapper>
       <FilterDropdown
-        currentItem={oraclesItems.findIndex((oracleItem) => oracleItem.value === value)}
+        currentItem={currentItem}
         dropdownButtonContent={
           <ButtonSelectLight
             content={oraclesItems.filter((item) => item.value === value)[0].text}

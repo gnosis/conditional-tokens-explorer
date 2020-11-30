@@ -60,6 +60,9 @@ export const InputAmount = (props: Props) => {
           setBalance(result)
         }
       })
+    } else {
+      setDecimals(0)
+      setBalance(new BigNumber(0))
     }
 
     return () => {
@@ -88,7 +91,7 @@ export const InputAmount = (props: Props) => {
     <TitleValue
       title="Amount"
       titleControl={
-        isDisconnected || !balance ? (
+        isDisconnected ? (
           <TitleControlButton disabled>Not Connected To Wallet</TitleControlButton>
         ) : (
           balance && (
