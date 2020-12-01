@@ -60,8 +60,9 @@ const Items = styled.div`
   overflow: auto;
 `
 
-const Item = styled.div`
+const Item = styled.div<{ disabled?: boolean }>`
   align-items: center;
+  border-bottom: 1px solid ${(props) => props.theme.border.color};
   cursor: pointer;
   display: flex;
   padding: 10px ${COMMON_PADDING};
@@ -69,6 +70,18 @@ const Item = styled.div`
   &:hover {
     background-color: ${(props) => props.theme.dropdown.item.backgroundColorHover};
   }
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  ${(props) =>
+    props.disabled &&
+    `
+    cursor: not-allowed;
+    opacity: 0.5;
+    pointer-events: none;
+  `}
 `
 
 const ItemText = styled.span`
@@ -93,7 +106,8 @@ const ApplyButton = styled(Button)`
 
 interface CommonProps {
   onApply?: () => void // make mandatory
-  options?: () => void // make mandatory
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  options: Array<any> // make mandatory
 }
 
 interface Props extends CommonProps {
@@ -107,9 +121,13 @@ const DropdownContent: React.FC<CommonProps> = (props) => {
     <>
       <Title>Table Columns</Title>
       <Items>
-        <Item>
-          <Checkbox /> <ItemText>asf</ItemText>
-        </Item>
+        {options?.map((item, index) => {
+          return (
+            <Item disabled={item.mandatory} key={index}>
+              <Checkbox checked={item.visible || item.mandatory} /> <ItemText>{item.name}</ItemText>
+            </Item>
+          )
+        })}
       </Items>
       <ApplyButtonContainer>
         <ApplyButton buttonType={ButtonType.primary} onClick={onApply}>

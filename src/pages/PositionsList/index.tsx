@@ -302,9 +302,11 @@ export const PositionsList = () => {
             })}
           />
         ),
+        mandatory: true,
         minWidth: '60px',
-        name: '',
+        name: 'Menu',
         right: true,
+        selector: 'menu',
       },
     ]
   }, [buildMenuForRow])
@@ -325,6 +327,7 @@ export const PositionsList = () => {
             {isConnected ? row.userBalanceERC1155WithDecimals : '-'}
           </span>
         ),
+        mandatory: true,
         minWidth: '180px',
         name: 'ERC1155 Amount',
         right: true,
@@ -345,6 +348,7 @@ export const PositionsList = () => {
             {isConnected ? row.userBalanceERC20WithDecimals : '-'}
           </span>
         ),
+        mandatory: true,
         minWidth: '180px',
         name: 'ERC20 Amount',
         right: true,
@@ -363,6 +367,7 @@ export const PositionsList = () => {
         cell: (row: PositionWithUserBalanceWithDecimals) => (
           <Hash href={`/positions/${row.id}`} value={row.id} />
         ),
+        mandatory: true,
         maxWidth: '270px',
         minWidth: '270px',
         name: 'Position Id',
@@ -384,6 +389,7 @@ export const PositionsList = () => {
         name: 'Collateral',
         selector: 'collateralTokenSymbol',
         sortable: true,
+        visible: true,
       },
       {
         // eslint-disable-next-line react/display-name
@@ -394,6 +400,7 @@ export const PositionsList = () => {
         right: true,
         selector: 'createTimestamp',
         sortable: true,
+        visible: true,
       },
       {
         // eslint-disable-next-line react/display-name
@@ -430,6 +437,7 @@ export const PositionsList = () => {
         minWidth: '270px',
         name: 'Condition Id',
         sortable: false,
+        visible: true,
       },
       {
         // eslint-disable-next-line react/display-name
@@ -498,6 +506,7 @@ export const PositionsList = () => {
         minWidth: '270px',
         name: 'Oracle',
         sortable: false,
+        visible: true,
       },
       {
         // eslint-disable-next-line react/display-name
@@ -539,6 +548,7 @@ export const PositionsList = () => {
         minWidth: '270px',
         name: 'Question Id',
         sortable: false,
+        visible: true,
       },
     ]
 
@@ -708,7 +718,7 @@ export const PositionsList = () => {
 
   return (
     <>
-      <PageTitle extraControls={<PageOptions />}>Positions</PageTitle>
+      <PageTitle extraControls={<PageOptions options={getColumns()} />}>Positions</PageTitle>
       <TableControls
         end={
           <SearchField
