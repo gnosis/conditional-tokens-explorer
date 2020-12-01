@@ -15,7 +15,7 @@ import { TitleValue } from 'components/text/TitleValue'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useCondition } from 'hooks/useCondition'
 import { OutcomesTable } from 'pages/ReportPayouts/OutcomesTable'
-import { Conditions_conditions } from 'types/generatedGQLForCTE'
+import { GetCondition_condition } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 
@@ -74,7 +74,7 @@ export const Contents: React.FC = () => {
   }, [status, payouts, connect, questionId, CTService])
 
   const onRowClicked = useCallback(
-    (row: Conditions_conditions) => {
+    (row: GetCondition_condition) => {
       setConditionId(row.id)
       setPayouts([])
       setIsDirty(false)

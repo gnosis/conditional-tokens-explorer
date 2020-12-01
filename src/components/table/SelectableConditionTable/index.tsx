@@ -31,7 +31,7 @@ import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Contex
 import { useConditionsList } from 'hooks/useConditionsList'
 import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
-import { Conditions_conditions } from 'types/generatedGQLForCTE'
+import { GetCondition_condition } from 'types/generatedGQLForCTE'
 import { getRealityQuestionUrl, isOracleRealitio, truncateStringInTheMiddle } from 'util/tools'
 import {
   AdvancedFilterConditions,
@@ -54,7 +54,7 @@ const TableControlsStyled = styled(TableControls)`
 interface Props {
   allowToDisplayOnlyConditionsToReport?: boolean
   onClearSelection: () => void
-  onRowClicked: (row: Conditions_conditions) => void
+  onRowClicked: (row: GetCondition_condition) => void
   refetch?: boolean
   selectedConditionId?: string | undefined
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -248,13 +248,13 @@ const SelectConditionTable: React.FC<Props> = (props) => {
     }
   }, [refetch, refetchConditionList, onClearSearch])
 
-  const [conditionList, setConditionList] = useState<Conditions_conditions[]>([])
+  const [conditionList, setConditionList] = useState<GetCondition_condition[]>([])
 
   useEffect(() => {
-    if (!data || !data.conditions) {
+    if (!data) {
       setConditionList([])
     } else {
-      setConditionList(data.conditions)
+      setConditionList(data)
     }
   }, [data])
 
@@ -262,7 +262,7 @@ const SelectConditionTable: React.FC<Props> = (props) => {
     () => [
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: Conditions_conditions) => (
+        cell: (row: GetCondition_condition) => (
           <RadioButton checked={selectedConditionId === row.id} onClick={() => onRowClicked(row)} />
         ),
         maxWidth: '12px',
@@ -271,7 +271,7 @@ const SelectConditionTable: React.FC<Props> = (props) => {
       },
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: Conditions_conditions) => (
+        cell: (row: GetCondition_condition) => (
           <FormatHash
             hash={truncateStringInTheMiddle(row.id, 8, 6)}
             onClick={() => onRowClicked(row)}
@@ -282,7 +282,7 @@ const SelectConditionTable: React.FC<Props> = (props) => {
       },
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: Conditions_conditions) => {
+        cell: (row: GetCondition_condition) => {
           const { oracle, questionId } = row
 
           const isConditionFromOmen = isOracleRealitio(oracle, networkConfig)
@@ -307,7 +307,7 @@ const SelectConditionTable: React.FC<Props> = (props) => {
       },
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: Conditions_conditions) => (
+        cell: (row: GetCondition_condition) => (
           <FormatHash
             hash={truncateStringInTheMiddle(row.questionId, 8, 6)}
             onClick={() => onRowClicked(row)}
@@ -371,7 +371,7 @@ const SelectConditionTable: React.FC<Props> = (props) => {
 
   const conditionalRowStyles = [
     {
-      when: (condition: Conditions_conditions) => selectedConditionId === condition.id,
+      when: (condition: GetCondition_condition) => selectedConditionId === condition.id,
       style: {
         backgroundColor: theme.colors.whitesmoke3,
         color: theme.colors.darkerGrey,
@@ -414,7 +414,7 @@ const SelectConditionTable: React.FC<Props> = (props) => {
           {error && !isBytes32Error && !isLoading && (
             <InfoCard message={error.message} title="Error" />
           )}
-          <CompactFiltersLayout isVisible={(!error || isBytes32Error) && showFilters}>
+          <CompactFiltersLayout isVisible={(!error || !!isBytes32Error) && showFilters}>
             <OraclesFilterDropdown
               onClick={(value: OracleFilterOptions, filter: string[]) => {
                 setSelectedOracleFilter(filter)
