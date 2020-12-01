@@ -16,6 +16,7 @@ import {
   DropdownItemProps,
   DropdownPosition,
 } from 'components/common/Dropdown'
+import { PageOptions } from 'components/common/PageOptions'
 import { TokenIcon } from 'components/common/TokenIcon'
 import { CollateralFilterDropdown } from 'components/filters/CollateralFilterDropdown'
 import { DateFilter } from 'components/filters/DateFilter'
@@ -707,7 +708,7 @@ export const PositionsList = () => {
 
   return (
     <>
-      <PageTitle>Positions</PageTitle>
+      <PageTitle extraControls={<PageOptions />}>Positions</PageTitle>
       <TableControls
         end={
           <SearchField
