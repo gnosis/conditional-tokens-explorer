@@ -159,12 +159,13 @@ export const OutcomesTable = (props: Props) => {
                       const characterNumber = Number(characterCode)
 
                       if (
-                        !((characterNumber >= 0 && characterNumber <= 9) || characterCode === '.')
+                        !(characterNumber >= 0 && characterNumber <= 9) ||
+                        characterCode === '.'
                       ) {
                         event.preventDefault()
                       }
                     }}
-                    placeholder="0.00"
+                    placeholder="0"
                     type="number"
                   />
                 </TD>
