@@ -130,46 +130,13 @@ export const buildQueryConditionsList = (
     .filter((s) => s.length)
     .join(',')
 
-  const variablesClause = variablesClauseInternal ? `(${variablesClauseInternal})` : ''
+  const variablesClause = variablesClauseInternal
+    ? `($first: Int!, $skip: Int!, ${variablesClauseInternal})`
+    : '($first: Int!, $skip: Int!)'
 
   const query = gql`
       query ConditionsList ${variablesClause} {
-        conditions(first: 1000 ${whereClause} , orderBy: createTimestamp, orderDirection: desc) {
-          ...ConditionData
-        }
-      }
-      ${conditionFragment}
-  `
-
-  return query
-}
-
-export const buildQueryConditions = (options: ConditionsListType = DEFAULT_OPTIONS) => {
-  const { conditionId, oracleIn, oracleNotIn } = options
-
-  const whereClauseInternal = [
-    conditionId ? 'id: $conditionId' : '',
-    oracleIn && oracleIn.length > 0 ? 'oracle_in: $oracleIn' : '',
-    oracleNotIn && oracleNotIn.length > 0 ? 'oracle_not_in: $oracleNotIn' : '',
-  ]
-    .filter((s) => s.length)
-    .join(',')
-
-  const whereClause = whereClauseInternal ? `, where: { ${whereClauseInternal} }` : ''
-
-  const variablesClauseInternal = [
-    conditionId ? '$conditionId: String' : '',
-    oracleIn && oracleIn.length > 0 ? '$oracleIn: [String]' : '',
-    oracleNotIn && oracleNotIn.length > 0 ? '$oracleNotIn: [String]' : '',
-  ]
-    .filter((s) => s.length)
-    .join(',')
-
-  const variablesClause = variablesClauseInternal ? `(${variablesClauseInternal})` : ''
-
-  const query = gql`
-      query Conditions ${variablesClause} {
-        conditions(first: 1000 ${whereClause} , orderBy: createTimestamp, orderDirection: desc) {
+        conditions(first: $first, skip: $skip${whereClause}, orderBy: createTimestamp, orderDirection: desc) {
           ...ConditionData
         }
       }

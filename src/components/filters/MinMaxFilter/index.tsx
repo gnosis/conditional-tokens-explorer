@@ -81,7 +81,8 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
       if (typeof onChangeMin === 'function') {
         onChangeMin(event)
       }
-      setMin(+event.currentTarget.value)
+
+      setMin(event.currentTarget.value.length ? +event.currentTarget.value : null)
     },
     [onChangeMin]
   )
@@ -119,7 +120,8 @@ export const MinMaxFilter: React.FC<Props> = (props) => {
       if (typeof onChangeMax === 'function') {
         onChangeMax(event)
       }
-      setMax(+event.currentTarget.value)
+
+      setMax(event.currentTarget.value.length ? +event.currentTarget.value : null)
     },
     [onChangeMax]
   )
