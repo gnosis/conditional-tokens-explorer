@@ -60,6 +60,8 @@ interface Props {
   fromValue: Maybe<number>
 }
 
+const MILISECONDS_TO_DEBOUNCE = 1000
+
 export const DateFilter: React.FC<Props> = (props) => {
   const {
     fromValue: fromValueFromProps,
@@ -185,13 +187,13 @@ export const DateFilter: React.FC<Props> = (props) => {
     setIsToValid(undefined)
   }, [clearFrom, clearTo, onClear])
 
-  const debounceFromValidity = useDebounce((value: string) => checkFromValidity(value), 3000)
-  const debounceToValidity = useDebounce((value: string) => checkToValidity(value), 3000)
+  const debounceFromValidity = useDebounce((value: string) => checkFromValidity(value), MILISECONDS_TO_DEBOUNCE)
+  const debounceToValidity = useDebounce((value: string) => checkToValidity(value), MILISECONDS_TO_DEBOUNCE)
   const debounceOnChangeFromInternal = useDebounce(
     (value: string) => onChangeFromInternal(value),
-    3000
+    MILISECONDS_TO_DEBOUNCE
   )
-  const debounceOnChangeToInternal = useDebounce((value: string) => onChangeToInternal(value), 3000)
+  const debounceOnChangeToInternal = useDebounce((value: string) => onChangeToInternal(value), MILISECONDS_TO_DEBOUNCE)
 
   const clearDisabled = React.useMemo(
     () => emptyValues && isFromValid === undefined && isToValid === undefined,
