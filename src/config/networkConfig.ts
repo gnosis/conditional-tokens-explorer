@@ -182,7 +182,7 @@ const networks: { [K in NetworkIds]: Network } = {
         name: 'reality',
         description: 'Reality.eth',
         url: 'https://reality.eth.link/',
-        address: '0x576b76eebe6b5411c0ef310e65de9bff8a60130f',
+        address: '0x17174dC1b62add32a1DE477A357e75b0dcDEed6E',
       },
     ],
     arbitrators: [

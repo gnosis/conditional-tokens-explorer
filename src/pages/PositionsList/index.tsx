@@ -722,6 +722,11 @@ export const PositionsList = () => {
     return getColumns().filter((item) => item.isVisible || item.mandatory)
   }, [getColumns])
 
+  useEffect(() => {
+    resetFilters()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status])
+
   return (
     <>
       <PageTitle
