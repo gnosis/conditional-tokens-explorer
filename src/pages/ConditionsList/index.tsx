@@ -402,6 +402,10 @@ export const ConditionsList: React.FC = () => {
     selectedFromCreationDate,
   ])
 
+  useEffect(() => {
+    resetFilters()
+  }, [status, resetFilters])
+
   return (
     <>
       <PageTitle>Conditions</PageTitle>

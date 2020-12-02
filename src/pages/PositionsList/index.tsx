@@ -705,6 +705,10 @@ export const PositionsList = () => {
     selectedFromCreationDate,
   ])
 
+  useEffect(() => {
+    resetFilters()
+  }, [status, resetFilters])
+
   return (
     <>
       <PageTitle>Positions</PageTitle>
