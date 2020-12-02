@@ -161,7 +161,7 @@ export const Contents = () => {
     setAmount(value)
   }, [])
 
-  const condition = useCondition(conditionId)
+  const { condition } = useCondition(conditionId)
 
   const onMerge = useCallback(async () => {
     try {

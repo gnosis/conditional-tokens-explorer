@@ -8,7 +8,8 @@ import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer
 import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
 import { StripedList, StripedListEmpty } from 'components/pureStyledComponents/StripedList'
 import { FullLoading } from 'components/statusInfo/FullLoading'
-import { IconTypes } from 'components/statusInfo/common'
+import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { IconTypes, SpinnerSize } from 'components/statusInfo/common'
 import { SelectableConditionTable } from 'components/table/SelectableConditionTable'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useCondition } from 'hooks/useCondition'
@@ -29,7 +30,7 @@ export const Contents: React.FC = () => {
   const [conditionId, setConditionId] = useState<string>('')
   const [payouts, setPayouts] = useState<number[]>([])
 
-  const condition = useCondition(conditionId)
+  const { condition, loading: loadingCondition } = useCondition(conditionId)
   logger.log(conditionId)
 
   const questionId = useMemo(() => condition && condition.questionId, [condition])
@@ -185,9 +186,15 @@ export const Contents: React.FC = () => {
         }}
         onRowClicked={onRowClicked}
         refetch={transactionStatus.isSuccess()}
-        selectedConditionId={condition?.id}
+        selectedConditionId={conditionId}
       />
-      {condition && !isConditionResolved ? (
+      {loadingCondition ? (
+        <StripedList>
+          <StripedListEmpty>
+            <InlineLoading size={SpinnerSize.small} />
+          </StripedListEmpty>
+        </StripedList>
+      ) : condition && !isConditionResolved ? (
         <OutcomesTable
           conditionId={condition.id}
           outcomeSlotCount={outcomeSlotCount}
