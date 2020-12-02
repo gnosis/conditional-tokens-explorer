@@ -707,7 +707,8 @@ export const PositionsList = () => {
 
   useEffect(() => {
     resetFilters()
-  }, [status, resetFilters])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status])
 
   return (
     <>

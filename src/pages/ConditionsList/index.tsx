@@ -404,7 +404,8 @@ export const ConditionsList: React.FC = () => {
 
   useEffect(() => {
     resetFilters()
-  }, [status, resetFilters])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status])
 
   return (
     <>
