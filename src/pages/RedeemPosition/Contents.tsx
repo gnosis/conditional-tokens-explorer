@@ -174,10 +174,13 @@ export const Contents = () => {
   )
 
   const onRowClicked = useCallback((position: PositionWithUserBalanceWithDecimals) => {
+    const resolvedConditionsIds = position.conditions
+      .filter((c) => c.resolved)
+      .map((c) => c.conditionId)
     setIsLoadingConditionIds(true)
     setPosition(position)
-    setConditionIds(position.conditionIds)
-    setConditionId(position.conditionIds[0])
+    setConditionIds(resolvedConditionsIds)
+    setConditionId(resolvedConditionsIds[0])
     setIsLoadingConditionIds(false)
   }, [])
 
