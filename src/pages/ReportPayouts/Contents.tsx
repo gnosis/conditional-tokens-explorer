@@ -62,6 +62,7 @@ export const Contents: React.FC = () => {
         await CTService.reportPayouts(questionId, payouts)
 
         setTransactionStatus(Remote.success(questionId))
+        setIsDirty(false)
       } else if (status === Web3ContextStatus.Infura) {
         connect()
       }
@@ -76,9 +77,17 @@ export const Contents: React.FC = () => {
       setConditionId(row.id)
       setPayouts([])
       setIsDirty(false)
+      logger.log(`OnRowClicked`)
     },
     [setConditionId, setPayouts]
   )
+
+  const clearComponent = useCallback(() => {
+    setConditionId('')
+    setPayouts([])
+    setTransactionStatus(Remote.notAsked<Maybe<string>>())
+    logger.log(`ClearComponent`)
+  }, [])
 
   const fullLoadingActionButton = useMemo(
     () =>
@@ -92,14 +101,12 @@ export const Contents: React.FC = () => {
         ? {
             buttonType: ButtonType.primary,
             onClick: () => {
-              setConditionId('')
-              setPayouts([])
-              setTransactionStatus(Remote.notAsked<Maybe<string>>())
+              clearComponent()
             },
             text: 'OK',
           }
         : undefined,
-    [transactionStatus]
+    [transactionStatus, clearComponent]
   )
 
   const fullLoadingMessage = useMemo(
@@ -151,6 +158,7 @@ export const Contents: React.FC = () => {
       newArrPayout[index] = payout
       setPayouts(newArrPayout)
       setIsDirty(true)
+      logger.log(`SetPayout`)
     },
     [payouts]
   )
@@ -173,8 +181,7 @@ export const Contents: React.FC = () => {
       <SelectableConditionTable
         allowToDisplayOnlyConditionsToReport={true}
         onClearSelection={() => {
-          setPayouts([])
-          setConditionId('')
+          clearComponent()
         }}
         onRowClicked={onRowClicked}
         refetch={transactionStatus.isSuccess()}
@@ -217,7 +224,7 @@ export const Contents: React.FC = () => {
             ? true
             : 'Are you sure you want to leave this page? The changes you made will be lost.'
         }
-        when={payouts.length > 0 || !!condition}
+        when={isDirty}
       />
       <ButtonContainer>
         <Button disabled={disabled} onClick={onReportPayout}>
