@@ -340,7 +340,7 @@ export const PrepareCondition = () => {
               outcomes,
               question: questionTitle + '',
               networkConfig,
-              signerAddress: cpk.address,
+              signerAddress: USE_CPK ? cpk.address : address,
             }
 
             const questionId = await RtyService.askQuestionConstant(questionOptions)
