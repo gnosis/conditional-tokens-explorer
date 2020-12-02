@@ -203,7 +203,6 @@ export const PositionsList = () => {
   ])
 
   const isSearching = useMemo(() => textToSearch && loading, [textToSearch, loading])
-
   const isConnected = useMemo(() => status === Web3ContextStatus.Connected, [status])
   const isSigner = useMemo(() => signer !== null, [signer])
 
@@ -306,7 +305,6 @@ export const PositionsList = () => {
         minWidth: '60px',
         name: 'Menu',
         right: true,
-        selector: 'menu',
       },
     ]
   }, [buildMenuForRow])
@@ -371,6 +369,7 @@ export const PositionsList = () => {
         maxWidth: '270px',
         minWidth: '270px',
         name: 'Position Id',
+        selector: 'positionId',
         sortable: false,
       },
       {
@@ -389,7 +388,7 @@ export const PositionsList = () => {
         name: 'Collateral',
         selector: 'collateralTokenSymbol',
         sortable: true,
-        visible: true,
+        isVisible: true,
       },
       {
         // eslint-disable-next-line react/display-name
@@ -400,7 +399,7 @@ export const PositionsList = () => {
         right: true,
         selector: 'createTimestamp',
         sortable: true,
-        visible: true,
+        isVisible: true,
       },
       {
         // eslint-disable-next-line react/display-name
@@ -436,8 +435,9 @@ export const PositionsList = () => {
         maxWidth: '290px',
         minWidth: '270px',
         name: 'Condition Id',
+        selector: 'conditionId',
         sortable: false,
-        visible: true,
+        isVisible: true,
       },
       {
         // eslint-disable-next-line react/display-name
@@ -505,8 +505,9 @@ export const PositionsList = () => {
         maxWidth: '290px',
         minWidth: '270px',
         name: 'Oracle',
+        selector: 'oracle',
         sortable: false,
-        visible: true,
+        isVisible: true,
       },
       {
         // eslint-disable-next-line react/display-name
@@ -547,8 +548,9 @@ export const PositionsList = () => {
         maxWidth: '270px',
         minWidth: '270px',
         name: 'Question Id',
+        selector: 'questionId',
         sortable: false,
-        visible: true,
+        isVisible: true,
       },
     ]
 
@@ -716,9 +718,32 @@ export const PositionsList = () => {
     selectedFromCreationDate,
   ])
 
+  const getVisibleColumns = useCallback(() => {
+    return getColumns().filter((item) => item.isVisible || item.mandatory)
+  }, [getColumns])
+
   return (
     <>
-      <PageTitle extraControls={<PageOptions options={getColumns()} />}>Positions</PageTitle>
+      <PageTitle
+        extraControls={
+          <PageOptions
+            disabled={showSpinner ? true : false}
+            onApply={() => console.log('disable or enable the fucking columns')}
+            options={[
+              ...getColumns().map((item) => {
+                return {
+                  ...item,
+                  toggleStatus: () => {
+                    console.log('toggle the fucking checkbox')
+                  },
+                }
+              }),
+            ]}
+          />
+        }
+      >
+        Positions
+      </PageTitle>
       <TableControls
         end={
           <SearchField
@@ -781,7 +806,7 @@ export const PositionsList = () => {
           </Sidebar>
           <DataTable
             className="outerTableWrapper"
-            columns={getColumns()}
+            columns={getVisibleColumns()}
             customStyles={customStyles}
             data={showSpinner ? [] : data || []}
             highlightOnHover

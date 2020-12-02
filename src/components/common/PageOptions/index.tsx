@@ -105,12 +105,17 @@ const ApplyButton = styled(Button)`
 `
 
 interface CommonProps {
-  onApply?: () => void // make mandatory
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  options: Array<any> // make mandatory
+  onApply: () => void
+  options: Array<{
+    mandatory?: boolean
+    isVisible?: boolean
+    toggleStatus: () => void
+    name: string
+  }>
 }
 
 interface Props extends CommonProps {
+  disabled?: boolean
   title?: string
 }
 
@@ -121,10 +126,12 @@ const DropdownContent: React.FC<CommonProps> = (props) => {
     <>
       <Title>Table Columns</Title>
       <Items>
-        {options?.map((item, index) => {
+        {options.map((item, index) => {
+          const isChecked = item.isVisible || item.mandatory
+
           return (
-            <Item disabled={item.mandatory} key={index}>
-              <Checkbox checked={item.visible || item.mandatory} /> <ItemText>{item.name}</ItemText>
+            <Item disabled={item.mandatory} key={index} onClick={item.toggleStatus}>
+              <Checkbox checked={isChecked} /> <ItemText>{item.name}</ItemText>
             </Item>
           )
         })}
@@ -139,13 +146,14 @@ const DropdownContent: React.FC<CommonProps> = (props) => {
 }
 
 export const PageOptions: React.FC<Props> = (props) => {
-  const { onApply, options, title = 'Page Settings', ...restProps } = props
+  const { disabled, onApply, options, title = 'Page Settings', ...restProps } = props
 
   return (
     <Wrapper
       {...restProps}
       activeItemHighlight={false}
       closeOnClick={false}
+      disabled={disabled}
       dropdownButtonContent={
         <DropdownButton>
           <DropdownButtonText className="dropdownButtonText">{title}</DropdownButtonText>
