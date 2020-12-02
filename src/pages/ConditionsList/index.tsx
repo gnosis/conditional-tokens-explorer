@@ -402,6 +402,11 @@ export const ConditionsList: React.FC = () => {
     selectedFromCreationDate,
   ])
 
+  useEffect(() => {
+    resetFilters()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status])
+
   return (
     <>
       <PageTitle>Conditions</PageTitle>
