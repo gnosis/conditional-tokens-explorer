@@ -184,7 +184,7 @@ export const Contents = () => {
   const onFilterCallback = (positions: PositionWithUserBalanceWithDecimals[]) => {
     return positions.filter(
       (position: PositionWithUserBalanceWithDecimals) =>
-        position.conditions.every((condition) => condition.resolved) &&
+        position.conditions.some((condition) => condition.resolved) &&
         !position.userBalanceERC1155.isZero()
     )
   }

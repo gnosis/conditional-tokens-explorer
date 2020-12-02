@@ -211,7 +211,7 @@ export const PositionsList = () => {
       const { collateralTokenERC1155, conditions, id, userBalanceERC20, userBalanceERC1155 } = row
       const userHasERC1155Balance = userBalanceERC1155 && !userBalanceERC1155.isZero()
       const userHasERC20Balance = userBalanceERC20 && !userBalanceERC20.isZero()
-      const isRedeemable = conditions.every((c) => c.resolved)
+      const isRedeemable = conditions.some((c) => c.resolved)
 
       const menu = [
         {
