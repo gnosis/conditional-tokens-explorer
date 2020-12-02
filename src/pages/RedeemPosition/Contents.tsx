@@ -46,7 +46,7 @@ export const Contents = () => {
     setConditionId(conditionId)
   }, [])
 
-  const condition = useCondition(conditionId)
+  const { condition } = useCondition(conditionId)
 
   const clearComponent = useCallback(() => {
     setPosition(null)
