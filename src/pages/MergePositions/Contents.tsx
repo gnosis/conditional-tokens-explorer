@@ -113,7 +113,6 @@ export const Contents = () => {
     setAmount(ZERO_BN)
     setMergeResult('')
     setIsDirty(false)
-    setTransactionStatus(Remote.notAsked<Maybe<boolean>>())
   }, [])
 
   const onConditionSelect = useCallback((conditionId: string) => {
@@ -139,7 +138,21 @@ export const Contents = () => {
           setSelectedPositions(positions)
         }
       }
-      setConditionId(position?.conditions[0]?.conditionId)
+
+      const conditionsOfSelectedPosition = position.conditions
+      const indexSetsOfConditions = indexSetsByCondition(position)
+      const conditionIds: string[] = conditionsOfSelectedPosition
+        .map((c) => c.conditionId)
+        .filter(
+          (conditionId) =>
+            indexSetsByCondition(position)[conditionId] !== indexSetsOfConditions[conditionId]
+        )
+
+      // Remove duplicates
+      const possibleConditions = lodashUniq(conditionIds)
+
+      logger.log('Selected condition', possibleConditions[0])
+      if (possibleConditions.length > 0) setConditionId(possibleConditions[0])
     },
     [selectedPositions]
   )
@@ -369,14 +382,8 @@ export const Contents = () => {
             onClick: () => setTransactionStatus(Remote.notAsked<Maybe<boolean>>()),
             text: 'Close',
           }
-        : transactionStatus.isSuccess()
-        ? {
-            buttonType: ButtonType.primary,
-            onClick: () => clearComponent(),
-            text: 'OK',
-          }
         : undefined,
-    [transactionStatus, clearComponent]
+    [transactionStatus]
   )
 
   const fullLoadingMessage = useMemo(
@@ -495,6 +502,7 @@ export const Contents = () => {
           amount={amount}
           closeAction={() => {
             clearComponent()
+            setTransactionStatus(Remote.notAsked<Maybe<boolean>>())
             setClearFilters(!clearFilters)
           }}
           collateralToken={collateralToken}

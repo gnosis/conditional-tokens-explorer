@@ -187,13 +187,22 @@ export const DateFilter: React.FC<Props> = (props) => {
     setIsToValid(undefined)
   }, [clearFrom, clearTo, onClear])
 
-  const debounceFromValidity = useDebounce((value: string) => checkFromValidity(value), MILISECONDS_TO_DEBOUNCE)
-  const debounceToValidity = useDebounce((value: string) => checkToValidity(value), MILISECONDS_TO_DEBOUNCE)
+  const debounceFromValidity = useDebounce(
+    (value: string) => checkFromValidity(value),
+    MILISECONDS_TO_DEBOUNCE
+  )
+  const debounceToValidity = useDebounce(
+    (value: string) => checkToValidity(value),
+    MILISECONDS_TO_DEBOUNCE
+  )
   const debounceOnChangeFromInternal = useDebounce(
     (value: string) => onChangeFromInternal(value),
     MILISECONDS_TO_DEBOUNCE
   )
-  const debounceOnChangeToInternal = useDebounce((value: string) => onChangeToInternal(value), MILISECONDS_TO_DEBOUNCE)
+  const debounceOnChangeToInternal = useDebounce(
+    (value: string) => onChangeToInternal(value),
+    MILISECONDS_TO_DEBOUNCE
+  )
 
   const clearDisabled = React.useMemo(
     () => emptyValues && isFromValid === undefined && isToValid === undefined,
