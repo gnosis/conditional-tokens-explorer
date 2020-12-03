@@ -35,6 +35,7 @@ import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { TableControls } from 'components/table/TableControls'
 import { Hash } from 'components/text/Hash'
+import { Question } from 'components/text/Question'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useConditionsList } from 'hooks/useConditionsList'
 import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
@@ -280,9 +281,21 @@ export const ConditionsList: React.FC = () => {
       },
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: GetCondition_condition) => (
-          <Hash onClick={() => handleRowClick(row)} value={row.questionId} />
-        ),
+        cell: (row: GetCondition_condition) => {
+          const { oracle, questionId, title } = row
+          const isConditionFromOmen = isOracleRealitio(oracle, networkConfig)
+          if (isConditionFromOmen && title) {
+            return (
+              <Question
+                hash={questionId}
+                onClick={() => handleRowClick(row)}
+                questionTitle={title}
+              />
+            )
+          } else {
+            return <Hash onClick={() => handleRowClick(row)} value={row.questionId} />
+          }
+        },
         maxWidth: '250px',
         minWidth: '250px',
         name: 'Question Id',

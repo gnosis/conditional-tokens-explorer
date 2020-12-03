@@ -55,6 +55,7 @@ export interface ConditionsList_conditions {
   payoutDenominator: any | null;
   resolveTimestamp: any | null;
   resolveBlockNumber: any | null;
+  title: string | null;
   positions: ConditionsList_conditions_positions[] | null;
 }
 
@@ -96,6 +97,7 @@ export interface GetCondition_condition {
   payoutDenominator: any | null;
   resolveTimestamp: any | null;
   resolveBlockNumber: any | null;
+  title: string | null;
   positions: GetCondition_condition_positions[] | null;
 }
 
@@ -529,6 +531,7 @@ export interface ConditionData {
   payoutDenominator: any | null;
   resolveTimestamp: any | null;
   resolveBlockNumber: any | null;
+  title: string | null;
   positions: ConditionData_positions[] | null;
 }
 

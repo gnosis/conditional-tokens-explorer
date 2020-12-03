@@ -55,6 +55,7 @@ const conditionFragment = gql`
     payoutDenominator
     resolveTimestamp
     resolveBlockNumber
+    title
     positions {
       id
       collateralToken {
