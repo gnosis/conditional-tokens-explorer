@@ -455,9 +455,9 @@ export const getParentCollectionId = (
   conditionId: string
 ) => {
   const newCollectionsSet = conditionIds.reduce(
-    (acc, condId, i) =>
-      condId !== conditionId
-        ? [...acc, { conditionId, indexSet: new BigNumber(indexSets[i]) }]
+    (acc, id, i) =>
+      id !== conditionId
+        ? [...acc, { conditionId: id, indexSet: new BigNumber(indexSets[i]) }]
         : acc,
     new Array<{ conditionId: string; indexSet: BigNumber }>()
   )
