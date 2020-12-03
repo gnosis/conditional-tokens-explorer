@@ -756,7 +756,7 @@ test('getParentCollection depth > 1 and second condition', async () => {
   ).toBe('0x6a3582e97ac103071a470d04cb3036c307f0f8a8b91e5a2c5d4c5a4371e24f10')
 })
 
-test('getParentCollection depth = 2 and first of two conditions resolved', async () => {
+test('getParentCollection depth = 2 A', async () => {
   expect(
     getParentCollectionId(
       ['8', '1'],
@@ -769,7 +769,7 @@ test('getParentCollection depth = 2 and first of two conditions resolved', async
   ).toBe('0x2fb72d59493bdec15bafb1dbb6a93407bbfd2d3f1346939c5725215bb3b774ab')
 })
 
-test('getParentCollection depth = 2 and second of two conditions resolved', async () => {
+test('getParentCollection depth = 2 B', async () => {
   expect(
     getParentCollectionId(
       ['8', '1'],
@@ -790,4 +790,17 @@ test('getParentCollection depth = 1 and first condition resolved', async () => {
       '0x2c610099cde2a76bc57b3c0311c4186c7991fa4ecaeaa2a7b4dcf1e74eef46eb'
     )
   ).toBe('0x0000000000000000000000000000000000000000000000000000000000000000')
+})
+
+test('getParentCollection depth = 2 C', async () => {
+  expect(
+    getParentCollectionId(
+      ['1', '8'],
+      [
+        '0x6abc84f342efc291c72dbfd278ab3e4c045bb3de9ca9310f1503a3dca8a42ccd',
+        '0x20833caaecc79024050dc351445db3008593a9cd5596378496f5daac5fad3ae7',
+      ],
+      '0x6abc84f342efc291c72dbfd278ab3e4c045bb3de9ca9310f1503a3dca8a42ccd'
+    )
+  ).toBe('0x55d6b2977dea10366b353817d510cc4be6451bdf49f3d9a1ab50413e71ba9663')
 })
