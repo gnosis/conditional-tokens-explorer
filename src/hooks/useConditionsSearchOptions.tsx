@@ -27,14 +27,13 @@ export const useConditionsSearchOptions = (
         placeholder: 'Search by Condition Id',
         text: 'Condition Id',
       },
-      // TODO  remove this when the question is indexed
-      // {
-      //   onClick: () => {
-      //     itemAction(ConditionSearchOptions.QuestionText)
-      //   },
-      //   placeholder: 'Search by Question Text',
-      //   text: 'Question Text',
-      // },
+      {
+        onClick: () => {
+          itemAction(ConditionSearchOptions.QuestionText)
+        },
+        placeholder: 'Search by Question Text',
+        text: 'Question Text',
+      },
       {
         onClick: () => {
           itemAction(ConditionSearchOptions.QuestionId)
