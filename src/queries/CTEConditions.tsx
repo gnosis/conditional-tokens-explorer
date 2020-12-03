@@ -97,6 +97,9 @@ export const buildQueryConditionsList = (
     TextToSearch.type === ConditionSearchOptions.QuestionId && TextToSearch.value
       ? 'questionId_contains: $textToSearch'
       : '',
+    TextToSearch.type === ConditionSearchOptions.QuestionText && TextToSearch.value
+      ? 'title_contains: $textToSearch'
+      : '',
     TextToSearch.type === ConditionSearchOptions.OracleAddress && TextToSearch.value
       ? 'oracle_contains: $textToSearch'
       : '',
