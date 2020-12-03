@@ -8,8 +8,8 @@ const Wrapper = styled.div<{ flexDirection?: string }>`
   min-width: 0;
 `
 
-const Title = styled.h2<{ flexDirection?: string }>`
-  margin: ${(props) => (props.flexDirection === 'column' ? '0 0 8px 0' : '0 5px 0 0')};
+const Title = styled.div<{ flexDirection?: string }>`
+  margin: ${(props) => (props.flexDirection === 'column' ? '0 0 6px 0' : '0 5px 0 0')};
 
   @media (min-width: ${(props) => props.theme.themeBreakPoints.md}) {
     align-items: center;
@@ -18,12 +18,12 @@ const Title = styled.h2<{ flexDirection?: string }>`
   }
 `
 
-const TitleText = styled.div`
+const TitleText = styled.h2`
   color: ${(props) => props.theme.colors.darkerGrey};
   font-size: 16px;
   font-weight: 600;
   line-height: 1.2;
-  margin-right: 10px;
+  margin: 0 10px 0 0;
   text-transform: uppercase;
 `
 

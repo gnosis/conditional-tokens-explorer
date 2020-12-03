@@ -80,7 +80,7 @@ export const WrapModal: React.FC<Props> = (props) => {
       title={'Wrap ERC1155'}
       {...restProps}
     >
-      <FirstRow cols="1fr">
+      <FirstRow>
         <Amount
           amount={amount}
           autoFocus

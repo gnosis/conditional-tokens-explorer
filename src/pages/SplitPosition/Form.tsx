@@ -301,13 +301,13 @@ export const Form = (props: Props) => {
         selectedConditionId={conditionId}
       />
       {condition && condition.resolved && (
-        <Row cols="1fr">
+        <Row>
           <StatusInfoInline status={StatusInfoType.warning}>
             This condition is already resolved.
           </StatusInfoInline>
         </Row>
       )}
-      <Row cols="1fr" marginBottomXL>
+      <Row>
         {collateral && (
           <TitleValue
             title="Split From"
@@ -327,15 +327,17 @@ export const Form = (props: Props) => {
         )}
       </Row>
       {isAllowanceVisible && collateral && (
-        <SetAllowance
-          collateral={collateral}
-          error={allowanceError}
-          fetching={fetchingAllowance}
-          finished={allowanceFinished}
-          onUnlock={unlockCollateral}
-        />
+        <Row paddingTop>
+          <SetAllowance
+            collateral={collateral}
+            error={allowanceError}
+            fetching={fetchingAllowance}
+            finished={allowanceFinished}
+            onUnlock={unlockCollateral}
+          />
+        </Row>
       )}
-      <Row cols="1fr" marginBottomXL>
+      <Row>
         {collateral && (
           <InputAmount
             amount={amount}
@@ -346,7 +348,7 @@ export const Form = (props: Props) => {
           />
         )}
       </Row>
-      <Row cols="1fr" marginBottomXL>
+      <Row paddingTop>
         <TitleValue
           title="Partition"
           titleControl={
@@ -388,7 +390,7 @@ export const Form = (props: Props) => {
           }
         />
       </Row>
-      <Row cols="1fr" marginBottomXL>
+      <Row paddingTop>
         {collateral && (
           <PositionPreview
             amount={amount}

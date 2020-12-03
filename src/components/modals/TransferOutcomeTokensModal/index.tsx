@@ -117,7 +117,7 @@ export const TransferOutcomeTokensModal: React.FC<Props> = (props) => {
       )}
       {!isLoading && (
         <>
-          <FirstRow cols="1fr">
+          <FirstRow>
             <InputAddress
               address={address}
               onAddressChange={addressChangeHandler}
@@ -125,14 +125,14 @@ export const TransferOutcomeTokensModal: React.FC<Props> = (props) => {
             />
           </FirstRow>
           {isAddressToSendTheConnectedUser && (
-            <Row cols="1fr">
+            <Row>
               <StatusInfoInline status={StatusInfoType.warning}>
                 The SEND TO field is the current connected wallet
               </StatusInfoInline>
             </Row>
           )}
           {token && token.decimals && (
-            <Row cols="1fr">
+            <Row>
               <Amount
                 amount={amount}
                 balance={balance}

@@ -18,10 +18,11 @@ export const dataTableCSS = css`
     }
 
     &.condensedTable {
-      border: 1px solid ${(props) => props.theme.colors.lightGrey};
       border-radius: 4px;
+      border: 1px solid ${(props) => props.theme.colors.lightGrey};
       box-shadow: none;
       margin-bottom: 24px;
+      margin-top: 6px;
       min-height: 280px;
 
       .rdt_TableHeadRow {

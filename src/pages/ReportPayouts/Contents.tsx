@@ -6,11 +6,10 @@ import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
-import { StripedList, StripedListEmpty } from 'components/pureStyledComponents/StripedList'
 import { FullLoading } from 'components/statusInfo/FullLoading'
-import { InlineLoading } from 'components/statusInfo/InlineLoading'
-import { IconTypes, SpinnerSize } from 'components/statusInfo/common'
+import { IconTypes } from 'components/statusInfo/common'
 import { SelectableConditionTable } from 'components/table/SelectableConditionTable'
+import { TitleValue } from 'components/text/TitleValue'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useCondition } from 'hooks/useCondition'
 import { OutcomesTable } from 'pages/ReportPayouts/OutcomesTable'
@@ -31,7 +30,6 @@ export const Contents: React.FC = () => {
   const [payouts, setPayouts] = useState<number[]>([])
 
   const { condition, loading: loadingCondition } = useCondition(conditionId)
-  logger.log(conditionId)
 
   const questionId = useMemo(() => condition && condition.questionId, [condition])
   const outcomeSlotCount = useMemo(() => condition && condition.outcomeSlotCount, [condition])
@@ -177,6 +175,9 @@ export const Contents: React.FC = () => {
     [condition, status, isDirty, isPayoutsEmpty]
   )
 
+  const thereAreErrors =
+    isNotAllowedToReportPayout || isNotConnected || isPayoutPositive || isConditionResolved
+
   return (
     <CenteredCard>
       <SelectableConditionTable
@@ -188,35 +189,30 @@ export const Contents: React.FC = () => {
         refetch={transactionStatus.isSuccess()}
         selectedConditionId={conditionId}
       />
-      {loadingCondition ? (
-        <StripedList>
-          <StripedListEmpty>
-            <InlineLoading size={SpinnerSize.small} />
-          </StripedListEmpty>
-        </StripedList>
-      ) : condition && !isConditionResolved ? (
-        <OutcomesTable
-          conditionId={condition.id}
-          outcomeSlotCount={outcomeSlotCount}
-          payouts={payouts}
-          setPayout={setPayout}
-        />
-      ) : (
-        <StripedList>
-          <StripedListEmpty>
-            {!condition
-              ? 'Please select a condition.'
-              : isConditionResolved && 'The condition is already resolved.'}
-          </StripedListEmpty>
-        </StripedList>
-      )}
-      <ErrorContainer>
-        {isNotAllowedToReportPayout && (
-          <Error>The connected user is a not allowed to report payouts</Error>
-        )}
-        {isNotConnected && <Error>Please connect to your wallet to report payouts</Error>}
-        {isPayoutPositive && <Error>At least one payout must be positive</Error>}
-      </ErrorContainer>
+      <TitleValue
+        title="Payouts"
+        value={
+          <>
+            <OutcomesTable
+              conditionId={condition && condition.id}
+              isLoading={loadingCondition}
+              outcomeSlotCount={outcomeSlotCount}
+              payouts={payouts}
+              setPayout={setPayout}
+            />
+            {thereAreErrors && (
+              <ErrorContainer>
+                {isNotAllowedToReportPayout && (
+                  <Error>The connected user is a not allowed to report payouts.</Error>
+                )}
+                {isNotConnected && <Error>Please connect to your wallet to report payouts.</Error>}
+                {isPayoutPositive && <Error>At least one payout must be positive.</Error>}
+                {isConditionResolved && <Error>Condition is already resolved.</Error>}
+              </ErrorContainer>
+            )}
+          </>
+        }
+      />
       {isWorking && (
         <FullLoading
           actionButton={fullLoadingActionButton}
