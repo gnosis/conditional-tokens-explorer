@@ -88,7 +88,7 @@ export const UnwrapModal: React.FC<Props> = (props) => {
       title={'Unwrap ERC20'}
       {...restProps}
     >
-      <FirstRow cols="1fr">
+      <FirstRow>
         <Amount
           amount={amount}
           autoFocus

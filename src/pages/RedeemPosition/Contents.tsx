@@ -198,7 +198,7 @@ export const Contents = () => {
         refetch={transactionStatus.isSuccess()}
         selectedPosition={position}
       />
-      <Row cols="1fr">
+      <Row>
         <ConditionsDropdown
           conditions={conditionIds}
           isLoading={isLoadingConditionIds}
@@ -206,7 +206,7 @@ export const Contents = () => {
           value={conditionId}
         />
       </Row>
-      <Row cols="1fr">
+      <Row>
         <PositionPreview condition={condition} networkConfig={networkConfig} position={position} />
       </Row>
       {isWorking && (

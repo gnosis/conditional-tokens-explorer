@@ -29,8 +29,8 @@ export const CenteredCard: React.FC<FormCardProps> = (props) => {
   return (
     <Wrapper {...restProps}>
       <>
-        {children}
         {dropdown && <DropdownContainer>{dropdown}</DropdownContainer>}
+        {children}
       </>
     </Wrapper>
   )

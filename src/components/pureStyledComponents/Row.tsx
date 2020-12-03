@@ -1,11 +1,14 @@
 import styled from 'styled-components'
 
-export const Row = styled.div<{ cols?: string; marginBottomXL?: boolean }>`
+const MARGIN_BOTTOM = '16px'
+
+export const Row = styled.div<{ cols?: string; paddingTop?: boolean }>`
   display: grid;
-  grid-column-gap: 25px;
-  grid-row-gap: 20px;
+  grid-column-gap: 20px;
+  grid-row-gap: ${MARGIN_BOTTOM};
   grid-template-columns: 1fr;
-  margin-bottom: ${(props) => (props.marginBottomXL ? '25px' : '20px')};
+  margin-bottom: ${MARGIN_BOTTOM};
+  padding-top: ${(props) => (props.paddingTop ? '8px' : '0')};
 
   &:last-child {
     margin-bottom: 0;
@@ -18,5 +21,5 @@ export const Row = styled.div<{ cols?: string; marginBottomXL?: boolean }>`
 
 Row.defaultProps = {
   cols: '1fr',
-  marginBottomXL: false,
+  paddingTop: false,
 }
