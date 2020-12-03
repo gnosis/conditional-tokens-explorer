@@ -120,7 +120,7 @@ export const DisplayTablePositions: React.FC<Props> = (props) => {
       data={isLoading ? [] : positions.length ? positions : []}
       noDataComponent={
         isLoading ? (
-          <InlineLoading size={SpinnerSize.regular} />
+          <InlineLoading size={SpinnerSize.small} />
         ) : (
           <EmptyContentText>No positions.</EmptyContentText>
         )
