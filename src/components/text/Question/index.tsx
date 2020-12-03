@@ -36,7 +36,7 @@ export const Question: React.FC<Props> = (props) => {
   return (
     <Wrapper {...restProps}>
       <Text className="hashText" onClick={onClick} title={questionTitle}>
-        {truncateStringInTheMiddle(shownValue, 10, 8)}
+        {shownValue}
       </Text>
       <ButtonCopyStyled light value={hash} />
     </Wrapper>
