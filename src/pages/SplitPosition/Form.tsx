@@ -75,6 +75,7 @@ export const Form = (props: Props) => {
   const [splitFrom, setSplitFrom] = useState(defaultSplitFrom)
   const [originalPartition, setOriginalPartition] = useState<BigNumber[]>([])
   const [numberedOutcomes, setNumberedOutcomes] = useState<Array<Array<OutcomeProps>>>([])
+  const [resetFilterUpdate, setResetFilterUpdate] = useState(false)
 
   const [isEditPartitionModalOpen, setIsEditPartitionModalOpen] = useState(false)
   const [transactionStatus, setTransactionStatus] = useState<Remote<SplitStatus>>(
@@ -292,12 +293,18 @@ export const Form = (props: Props) => {
     setConditionId(row.id)
   }, [])
 
+  useEffect(() => {
+    setResetFilterUpdate(!resetFilterUpdate)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status])
+
   return (
     <CenteredCard>
       <SelectableConditionTable
         onClearSelection={() => clearComponent()}
         onRowClicked={onRowClicked}
         refetch={transactionStatus.isSuccess()}
+        resetFilterUpdate={resetFilterUpdate}
         selectedConditionId={conditionId}
       />
       {condition && condition.resolved && (
