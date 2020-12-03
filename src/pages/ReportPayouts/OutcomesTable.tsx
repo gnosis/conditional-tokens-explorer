@@ -1,7 +1,10 @@
 import React, { KeyboardEvent, useMemo } from 'react'
 import styled from 'styled-components'
 
+import { StripedList, StripedListEmpty } from 'components/pureStyledComponents/StripedList'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
+import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { SpinnerSize } from 'components/statusInfo/common'
 
 const Wrapper = styled.form`
   border-radius: 4px;
@@ -98,10 +101,11 @@ TH.defaultProps = {
 }
 
 interface Props {
-  conditionId: string
+  conditionId?: string
+  isLoading?: boolean
+  outcomeSlotCount: number
   payouts: number[]
   setPayout: (payout: number, index: number) => void
-  outcomeSlotCount: number
 }
 
 interface Outcome {
@@ -110,7 +114,14 @@ interface Outcome {
 }
 
 export const OutcomesTable = (props: Props) => {
-  const { conditionId, outcomeSlotCount, payouts, setPayout } = props
+  const {
+    conditionId,
+    isLoading = true,
+    outcomeSlotCount,
+    payouts,
+    setPayout,
+    ...restProps
+  } = props
 
   const outcomesWithProbabilities: Outcome[] = useMemo(() => {
     const outcomes: Outcome[] = []
@@ -127,52 +138,65 @@ export const OutcomesTable = (props: Props) => {
     return outcomes
   }, [outcomeSlotCount, payouts])
 
-  return (
-    <Wrapper>
-      <Table>
-        <THead>
-          <TR>
-            <TH>Outcome</TH>
-            <TH textAlign="right">Probabilities</TH>
-            <TH textAlign="right">Payout</TH>
-          </TR>
-        </THead>
-        <TBody>
-          {outcomesWithProbabilities.map((outcome, index) => {
-            const { name, probability } = outcome
-            return (
-              <TR key={index}>
-                <TD>{name}</TD>
-                <TD textAlign="right">{probability.toFixed(2)}%</TD>
-                <TD textAlign="right">
-                  <TextfieldProbability
-                    key={`${conditionId}_${outcome}_${index}`}
-                    min={0}
-                    name={`payouts[${index}]`}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                      const { value } = event.currentTarget
-                      setPayout(+value, index)
-                    }}
-                    onKeyPress={(event: KeyboardEvent) => {
-                      const characterCode = event.key
-                      if (characterCode === 'Backspace') return
-                      const characterNumber = Number(characterCode)
+  return !conditionId ? (
+    <StripedList>
+      {isLoading ? (
+        <InlineLoading size={SpinnerSize.small} />
+      ) : (
+        <StripedListEmpty>Please select a condition</StripedListEmpty>
+      )}
+    </StripedList>
+  ) : (
+    <Wrapper {...restProps}>
+      {isLoading ? (
+        <InlineLoading size={SpinnerSize.regular} />
+      ) : (
+        <Table>
+          <THead>
+            <TR>
+              <TH>Outcome</TH>
+              <TH textAlign="right">Probabilities</TH>
+              <TH textAlign="right">Payout</TH>
+            </TR>
+          </THead>
+          <TBody>
+            {outcomesWithProbabilities.map((outcome, index) => {
+              const { name, probability } = outcome
+              return (
+                <TR key={index}>
+                  <TD>{name}</TD>
+                  <TD textAlign="right">{probability.toFixed(2)}%</TD>
+                  <TD textAlign="right">
+                    <TextfieldProbability
+                      key={`${conditionId}_${outcome}_${index}`}
+                      min={0}
+                      name={`payouts[${index}]`}
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        const { value } = event.currentTarget
+                        setPayout(+value, index)
+                      }}
+                      onKeyPress={(event: KeyboardEvent) => {
+                        const characterCode = event.key
+                        if (characterCode === 'Backspace') return
+                        const characterNumber = Number(characterCode)
 
-                      if (
-                        !((characterNumber >= 0 && characterNumber <= 9) || characterCode === '.')
-                      ) {
-                        event.preventDefault()
-                      }
-                    }}
-                    placeholder="0.00"
-                    type="number"
-                  />
-                </TD>
-              </TR>
-            )
-          })}
-        </TBody>
-      </Table>
+                        if (
+                          !(characterNumber >= 0 && characterNumber <= 9) ||
+                          characterCode === '.'
+                        ) {
+                          event.preventDefault()
+                        }
+                      }}
+                      placeholder="0"
+                      type="number"
+                    />
+                  </TD>
+                </TR>
+              )
+            })}
+          </TBody>
+        </Table>
+      )}
     </Wrapper>
   )
 }

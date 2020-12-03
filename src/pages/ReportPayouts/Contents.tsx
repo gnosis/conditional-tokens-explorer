@@ -6,8 +6,6 @@ import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CenteredCard } from 'components/common/CenteredCard'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
-import { Row } from 'components/pureStyledComponents/Row'
-import { StripedList, StripedListEmpty } from 'components/pureStyledComponents/StripedList'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
 import { SelectableConditionTable } from 'components/table/SelectableConditionTable'
@@ -31,8 +29,7 @@ export const Contents: React.FC = () => {
   const [conditionId, setConditionId] = useState<string>('')
   const [payouts, setPayouts] = useState<number[]>([])
 
-  const condition = useCondition(conditionId)
-  logger.log(conditionId)
+  const { condition, loading: loadingCondition } = useCondition(conditionId)
 
   const questionId = useMemo(() => condition && condition.questionId, [condition])
   const outcomeSlotCount = useMemo(() => condition && condition.outcomeSlotCount, [condition])
@@ -64,6 +61,7 @@ export const Contents: React.FC = () => {
         await CTService.reportPayouts(questionId, payouts)
 
         setTransactionStatus(Remote.success(questionId))
+        setIsDirty(false)
       } else if (status === Web3ContextStatus.Infura) {
         connect()
       }
@@ -78,9 +76,17 @@ export const Contents: React.FC = () => {
       setConditionId(row.id)
       setPayouts([])
       setIsDirty(false)
+      logger.log(`OnRowClicked`)
     },
     [setConditionId, setPayouts]
   )
+
+  const clearComponent = useCallback(() => {
+    setConditionId('')
+    setPayouts([])
+    setTransactionStatus(Remote.notAsked<Maybe<string>>())
+    logger.log(`ClearComponent`)
+  }, [])
 
   const fullLoadingActionButton = useMemo(
     () =>
@@ -94,14 +100,12 @@ export const Contents: React.FC = () => {
         ? {
             buttonType: ButtonType.primary,
             onClick: () => {
-              setConditionId('')
-              setPayouts([])
-              setTransactionStatus(Remote.notAsked<Maybe<string>>())
+              clearComponent()
             },
             text: 'OK',
           }
         : undefined,
-    [transactionStatus]
+    [transactionStatus, clearComponent]
   )
 
   const fullLoadingMessage = useMemo(
@@ -153,6 +157,7 @@ export const Contents: React.FC = () => {
       newArrPayout[index] = payout
       setPayouts(newArrPayout)
       setIsDirty(true)
+      logger.log(`SetPayout`)
     },
     [payouts]
   )
@@ -161,65 +166,53 @@ export const Contents: React.FC = () => {
     () => condition && status === Web3ContextStatus.Connected && !isOracleValidToReportPayout,
     [condition, status, isOracleValidToReportPayout]
   )
-
   const isNotConnected = useMemo(() => condition && status !== Web3ContextStatus.Connected, [
     condition,
     status,
   ])
-
   const isPayoutPositive = useMemo(
     () => condition && status === Web3ContextStatus.Connected && isDirty && isPayoutsEmpty,
     [condition, status, isDirty, isPayoutsEmpty]
   )
 
-  const thereAreErrors = isNotAllowedToReportPayout || isNotConnected || isPayoutPositive
+  const thereAreErrors =
+    isNotAllowedToReportPayout || isNotConnected || isPayoutPositive || isConditionResolved
 
   return (
     <CenteredCard>
       <SelectableConditionTable
         allowToDisplayOnlyConditionsToReport={true}
         onClearSelection={() => {
-          setPayouts([])
-          setConditionId('')
+          clearComponent()
         }}
         onRowClicked={onRowClicked}
         refetch={transactionStatus.isSuccess()}
-        selectedConditionId={condition?.id}
+        selectedConditionId={conditionId}
       />
-      <Row>
-        <TitleValue
-          title="Payouts"
-          value={
-            <>
-              {condition && !isConditionResolved ? (
-                <OutcomesTable
-                  conditionId={condition.id}
-                  outcomeSlotCount={outcomeSlotCount}
-                  payouts={payouts}
-                  setPayout={setPayout}
-                />
-              ) : (
-                <StripedList>
-                  <StripedListEmpty>
-                    {!condition
-                      ? 'Please select a condition.'
-                      : isConditionResolved && 'The condition is already resolved.'}
-                  </StripedListEmpty>
-                </StripedList>
-              )}
-              {thereAreErrors && (
-                <ErrorContainer>
-                  {isNotAllowedToReportPayout && (
-                    <Error>The connected user is a not allowed to report payouts</Error>
-                  )}
-                  {isNotConnected && <Error>Please connect to your wallet to report payouts</Error>}
-                  {isPayoutPositive && <Error>At least one payout must be positive</Error>}
-                </ErrorContainer>
-              )}
-            </>
-          }
-        />
-      </Row>
+      <TitleValue
+        title="Payouts"
+        value={
+          <>
+            <OutcomesTable
+              conditionId={condition && condition.id}
+              isLoading={loadingCondition}
+              outcomeSlotCount={outcomeSlotCount}
+              payouts={payouts}
+              setPayout={setPayout}
+            />
+            {thereAreErrors && (
+              <ErrorContainer>
+                {isNotAllowedToReportPayout && (
+                  <Error>The connected user is a not allowed to report payouts.</Error>
+                )}
+                {isNotConnected && <Error>Please connect to your wallet to report payouts.</Error>}
+                {isPayoutPositive && <Error>At least one payout must be positive.</Error>}
+                {isConditionResolved && <Error>Condition is already resolved.</Error>}
+              </ErrorContainer>
+            )}
+          </>
+        }
+      />
       {isWorking && (
         <FullLoading
           actionButton={fullLoadingActionButton}
@@ -234,7 +227,7 @@ export const Contents: React.FC = () => {
             ? true
             : 'Are you sure you want to leave this page? The changes you made will be lost.'
         }
-        when={payouts.length > 0 || !!condition}
+        when={isDirty}
       />
       <ButtonContainer>
         <Button disabled={disabled} onClick={onReportPayout}>

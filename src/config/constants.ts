@@ -125,3 +125,5 @@ export const OMEN_URL_DAPP = process.env.REACT_APP_OMEN_URL_DAPP || 'https://ome
 
 export const ICON_ENDPOINT =
   process.env.REACT_APP_ICON_ENDPOINT || 'https://gnosis-safe-token-logos.s3.amazonaws.com/{}.png'
+
+export const USE_CPK = process.env.REACT_APP_USE_CPK === 'false' ? false : true

@@ -35,6 +35,7 @@ import {
   MAX_OUTCOMES_ALLOWED,
   MIN_OUTCOMES,
   MIN_OUTCOMES_ALLOWED,
+  USE_CPK,
 } from 'config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { ConditionalTokensService } from 'services/conditionalTokens'
@@ -303,12 +304,16 @@ export const PrepareCondition = () => {
         if (conditionType === ConditionType.custom) {
           const { oracle: oracleCustom, outcomesSlotCount, questionId } = getValuesCustomCondition()
           if (outcomesSlotCount) {
-            await cpk.prepareCustomCondition({
-              CTService,
-              questionId,
-              oracleAddress: oracleCustom,
-              outcomesSlotCount,
-            })
+            if (USE_CPK) {
+              await cpk.prepareCustomCondition({
+                CTService,
+                questionId,
+                oracleAddress: oracleCustom,
+                outcomesSlotCount,
+              })
+            } else {
+              await CTService.prepareCondition(questionId, oracleCustom, outcomesSlotCount)
+            }
 
             conditionIdToUpdate = ConditionalTokensService.getConditionId(
               questionId,
@@ -328,28 +333,35 @@ export const PrepareCondition = () => {
             const openingDateMoment = moment(resolutionDate + '')
             logger.log(`outcomes`, outcomes)
 
-            const questionId = await RtyService.askQuestionConstant({
+            const questionOptions: QuestionOptions = {
               arbitrator: (arbitrator as Arbitrator).address,
               category,
               openingDateMoment,
               outcomes,
               question: questionTitle + '',
               networkConfig,
-              signerAddress: cpk.address,
-            })
+              signerAddress: USE_CPK ? cpk.address : address,
+            }
 
-            await cpk.prepareOmenCondition({
-              CTService,
-              RtyService,
-              arbitrator: (arbitrator as Arbitrator).address,
-              category,
-              networkConfig,
-              oracleAddress: oracleOmen + '',
-              outcomes,
-              question: questionTitle + '',
-              questionId,
-              openingDateMoment,
-            })
+            const questionId = await RtyService.askQuestionConstant(questionOptions)
+
+            if (USE_CPK) {
+              await cpk.prepareOmenCondition({
+                CTService,
+                RtyService,
+                arbitrator: (arbitrator as Arbitrator).address,
+                category,
+                networkConfig,
+                oracleAddress: oracleOmen + '',
+                outcomes,
+                question: questionTitle + '',
+                questionId,
+                openingDateMoment,
+              })
+            } else {
+              await RtyService.askQuestion(questionOptions)
+              await CTService.prepareCondition(questionId, oracleOmen + '', outcomes.length)
+            }
 
             conditionIdToUpdate = ConditionalTokensService.getConditionId(
               questionId,

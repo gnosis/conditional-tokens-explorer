@@ -13,6 +13,7 @@ import { PositionPreview } from 'components/redeemPosition/PositionPreview'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
 import { SelectablePositionTable } from 'components/table/SelectablePositionTable'
+import { USE_CPK } from 'config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useCondition } from 'hooks/useCondition'
 import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
@@ -45,7 +46,7 @@ export const Contents = () => {
     setConditionId(conditionId)
   }, [])
 
-  const condition = useCondition(conditionId)
+  const { condition } = useCondition(conditionId)
 
   const clearComponent = useCallback(() => {
     setPosition(null)
@@ -85,13 +86,22 @@ export const Contents = () => {
 
         const cpk = await CPKService.create(networkConfig, provider, signer)
 
-        await cpk.redeemPosition({
-          CTService,
-          collateralToken,
-          parentCollectionId,
-          conditionId,
-          indexSets: redeemedIndexSet,
-        })
+        if (USE_CPK) {
+          await cpk.redeemPosition({
+            CTService,
+            collateralToken,
+            parentCollectionId,
+            conditionId,
+            indexSets: redeemedIndexSet,
+          })
+        } else {
+          await CTService.redeemPositions(
+            collateralToken,
+            parentCollectionId,
+            conditionId,
+            redeemedIndexSet
+          )
+        }
 
         setPosition(null)
         setConditionIds([])

@@ -84,7 +84,7 @@ export const Form = (props: Props) => {
   const allowanceMethods = useAllowance(collateralAddress)
   const { collateral } = useCollateral(collateralAddress)
 
-  const condition = useCondition(conditionId)
+  const { condition } = useCondition(conditionId)
   const outcomeSlot = useMemo(() => (condition ? condition.outcomeSlotCount : 0), [condition])
   const conditionIdToPreviewShow = useMemo(() => (condition ? condition.id : ''), [condition])
 

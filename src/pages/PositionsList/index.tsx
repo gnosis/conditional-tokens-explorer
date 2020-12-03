@@ -705,6 +705,11 @@ export const PositionsList = () => {
     selectedFromCreationDate,
   ])
 
+  useEffect(() => {
+    resetFilters()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status])
+
   return (
     <>
       <PageTitle>Positions</PageTitle>
