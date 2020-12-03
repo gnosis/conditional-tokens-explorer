@@ -461,7 +461,7 @@ export const Contents = (props: Props) => {
         />
       }
     >
-      <Row cols="1fr 1fr" marginBottomXL>
+      <Row cols="1fr 1fr">
         <TitleValue
           title="Position Id"
           value={
@@ -515,7 +515,6 @@ export const Contents = (props: Props) => {
             </FlexRow>
           }
         />
-
         {conditions.length > 0 && (
           <TitleValue
             title={!areConditionsMoreThanOne ? 'Condition Id' : 'Condition Ids'}
@@ -532,10 +531,8 @@ export const Contents = (props: Props) => {
           />
         )}
       </Row>
-      <Row cols="1fr" marginBottomXL>
-        <OmenMarketsOrQuestion conditionsIds={conditions.map((condition) => condition.hash)} />
-      </Row>
-      <Row cols="1fr" marginBottomXL>
+      <OmenMarketsOrQuestion conditionsIds={conditions.map((condition) => condition.hash)} />
+      <Row paddingTop>
         <TitleValue
           title="Wrapped Collateral"
           value={
@@ -586,7 +583,7 @@ export const Contents = (props: Props) => {
           }
         />
       </Row>
-      <Row cols="1fr" marginBottomXL>
+      <Row paddingTop>
         <TitleValue
           title="Wrapped Collateral Address"
           value={
@@ -604,7 +601,7 @@ export const Contents = (props: Props) => {
           }
         />
       </Row>
-      <Row cols="1fr" marginBottomXL>
+      <Row paddingTop>
         <TitleValue
           title="Partition"
           value={
@@ -642,7 +639,7 @@ export const Contents = (props: Props) => {
         />
       </Row>
       {positionPreview && (
-        <Row cols="1fr" marginBottomXL>
+        <Row paddingTop>
           <TitleValue
             title="Position Preview"
             value={<StripedListItemPreview>{positionPreview}</StripedListItemPreview>}

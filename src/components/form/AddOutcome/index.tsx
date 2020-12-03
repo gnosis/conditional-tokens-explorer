@@ -229,7 +229,7 @@ export const AddOutcome: React.FC<Props> = (props) => {
   }
 
   return (
-    <Row cols="1fr" {...restProps}>
+    <Row {...restProps}>
       <TitleValue
         title="Add Outcome"
         value={
