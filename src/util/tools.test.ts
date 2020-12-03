@@ -6,6 +6,7 @@ import {
   arePositionMergeables,
   arePositionMergeablesByCondition,
   getMergePreview,
+  getParentCollectionId,
   getRedeemedBalance,
   getRedeemedPreview,
   indexSetFromOutcomes,
@@ -727,4 +728,66 @@ test('indexSetFromOutcomes should return ORed values', async () => {
   expect(
     indexSetFromOutcomes(['1606938044258990275541962092341162602522202993782792835301376', '4'])
   ).toBe('1606938044258990275541962092341162602522202993782792835301380')
+})
+
+test('getParentCollection depth > 1 and first condition', async () => {
+  expect(
+    getParentCollectionId(
+      ['8', '1'],
+      [
+        '0x3e803fe36846d0b57d002bb00fb4a916ef94787ddd4b7613c4e8090397eda27a',
+        '0xfb8de9ceffa8431c00c2bf1a22b343a2bcbeba65f08ed41fc25c231ad44ff724',
+      ],
+      '0x3e803fe36846d0b57d002bb00fb4a916ef94787ddd4b7613c4e8090397eda27a'
+    )
+  ).toBe('0x296519534592413fb03189b1415f32f130d087ddcf09130e8ca07c5fab5264db')
+})
+
+test('getParentCollection depth > 1 and second condition', async () => {
+  expect(
+    getParentCollectionId(
+      ['1', '1'],
+      [
+        '0x3e803fe36846d0b57d002bb00fb4a916ef94787ddd4b7613c4e8090397eda27a',
+        '0xfb8de9ceffa8431c00c2bf1a22b343a2bcbeba65f08ed41fc25c231ad44ff724',
+      ],
+      '0xfb8de9ceffa8431c00c2bf1a22b343a2bcbeba65f08ed41fc25c231ad44ff724'
+    )
+  ).toBe('0x4adb0fa03dea49bf1b4a70c49ce524c48fb445810bb993fab2581c9596649749')
+})
+
+test('getParentCollection depth = 2 and first of two conditions resolved', async () => {
+  expect(
+    getParentCollectionId(
+      ['8', '1'],
+      [
+        '0x2c610099cde2a76bc57b3c0311c4186c7991fa4ecaeaa2a7b4dcf1e74eef46eb',
+        '0x80adf18b977d760304618d1911fb4b01f4b762e567b08783b98dbdacd891149f',
+      ],
+      '0x2c610099cde2a76bc57b3c0311c4186c7991fa4ecaeaa2a7b4dcf1e74eef46eb'
+    )
+  ).toBe('0x1a138aec008614dabc4d7c7068558fce7566059c54cfed43e9f9c24b0f708e66')
+})
+
+test('getParentCollection depth = 2 and second of two conditions resolved', async () => {
+  expect(
+    getParentCollectionId(
+      ['8', '1'],
+      [
+        '0x2c610099cde2a76bc57b3c0311c4186c7991fa4ecaeaa2a7b4dcf1e74eef46eb',
+        '0x80adf18b977d760304618d1911fb4b01f4b762e567b08783b98dbdacd891149f',
+      ],
+      '0x80adf18b977d760304618d1911fb4b01f4b762e567b08783b98dbdacd891149f'
+    )
+  ).toBe('0x10677f94b7bad290b26fb5af9556859c30558c22d66926f909088a2e48d88cad')
+})
+
+test('getParentCollection depth = 1 and first condition resolved', async () => {
+  expect(
+    getParentCollectionId(
+      ['8'],
+      ['0x2c610099cde2a76bc57b3c0311c4186c7991fa4ecaeaa2a7b4dcf1e74eef46eb'],
+      '0x2c610099cde2a76bc57b3c0311c4186c7991fa4ecaeaa2a7b4dcf1e74eef46eb'
+    )
+  ).toBe('0x0000000000000000000000000000000000000000000000000000000000000000')
 })

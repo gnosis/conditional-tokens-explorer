@@ -1,5 +1,3 @@
-import { ethers } from 'ethers'
-import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useMemo, useState } from 'react'
 import { Prompt } from 'react-router'
 
@@ -17,10 +15,10 @@ import { USE_CPK } from 'config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useCondition } from 'hooks/useCondition'
 import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
-import { ConditionalTokensService } from 'services/conditionalTokens'
 import { CPKService } from 'services/cpk'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
+import { getParentCollectionId } from 'util/tools'
 
 const logger = getLogger('RedeemPosition')
 
@@ -61,17 +59,8 @@ export const Contents = () => {
         setTransactionStatus(Remote.loading())
 
         const { collateralToken, conditionIds, indexSets } = position
-        const newCollectionsSet = conditionIds.reduce(
-          (acc, condId, i) =>
-            condId !== conditionId
-              ? [...acc, { conditionId, indexSet: new BigNumber(indexSets[i]) }]
-              : acc,
-          new Array<{ conditionId: string; indexSet: BigNumber }>()
-        )
-        const parentCollectionId = newCollectionsSet.length
-          ? ConditionalTokensService.getCombinedCollectionId(newCollectionsSet)
-          : ethers.constants.HashZero
 
+        const parentCollectionId = getParentCollectionId(indexSets, conditionIds, conditionId)
         // This UI only allows to redeem 1 position although it's possible to redeem multiple position when you the user owns different positions with the same set of conditions and several indexSets for the resolved condition.
         // i.e.
         // - DAI C:0x123 0:0b01 && C:0x345 O:0b01
