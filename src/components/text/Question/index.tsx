@@ -32,10 +32,10 @@ interface Props {
 
 export const Question: React.FC<Props> = (props) => {
   const { hash, onClick, questionTitle, ...restProps } = props
-  const shownValue = truncateStringInTheMiddle(questionTitle, 10, 8)
+  const shownValue = truncateStringInTheMiddle(questionTitle, 14, 14)
   return (
     <Wrapper {...restProps}>
-      <Text className="hashText" onClick={onClick}>
+      <Text className="hashText" onClick={onClick} title={questionTitle}>
         {truncateStringInTheMiddle(shownValue, 10, 8)}
       </Text>
       <ButtonCopyStyled light value={hash} />

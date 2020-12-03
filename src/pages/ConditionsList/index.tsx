@@ -298,7 +298,7 @@ export const ConditionsList: React.FC = () => {
         },
         maxWidth: '250px',
         minWidth: '250px',
-        name: 'Question Id',
+        name: 'Question Id / Title',
         selector: 'questionId',
         sortable: true,
       },
