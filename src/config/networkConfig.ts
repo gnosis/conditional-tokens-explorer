@@ -6,16 +6,11 @@ import {
   CTE_GRAPH_HTTP_GANACHE,
   CTE_GRAPH_HTTP_MAINNET,
   CTE_GRAPH_HTTP_RINKEBY,
-  CTE_GRAPH_WS_GANACHE,
-  CTE_GRAPH_WS_MAINNET,
-  CTE_GRAPH_WS_RINKEBY,
   EARLIEST_GANACHE_BLOCK_TO_CHECK,
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
   EARLIEST_RINKEBY_BLOCK_TO_CHECK,
   OMEN_GRAPH_HTTP_MAINNET,
   OMEN_GRAPH_HTTP_RINKEBY,
-  OMEN_GRAPH_WS_MAINNET,
-  OMEN_GRAPH_WS_RINKEBY,
   REALITY_CONTRACT_ADDRESS_FOR_GANACHE,
   REALITY_CONTRACT_ADDRESS_FOR_MAINNET,
   REALITY_CONTRACT_ADDRESS_FOR_RINKEBY,
@@ -42,9 +37,7 @@ interface Network {
   }
   tokens: Token[]
   CTEGraphHttpUri: string
-  CTEGraphWsUri: string
   OMENGraphHttpUri: string
-  OMENGraphWsUri: string
   oracles: Oracle[]
   arbitrators: Arbitrator[]
   realityTimeout: number
@@ -106,9 +99,7 @@ const networks: { [K in NetworkIds]: Network } = {
       },
     ],
     CTEGraphHttpUri: CTE_GRAPH_HTTP_MAINNET,
-    CTEGraphWsUri: CTE_GRAPH_WS_MAINNET,
     OMENGraphHttpUri: OMEN_GRAPH_HTTP_MAINNET,
-    OMENGraphWsUri: OMEN_GRAPH_WS_MAINNET,
     oracles: [
       {
         name: 'kleros',
@@ -159,7 +150,7 @@ const networks: { [K in NetworkIds]: Network } = {
       },
       {
         symbol: 'CDAI',
-        address: '0x7a978b38d5af06ff929ca06647e025b759479318',
+        address: '0x6d7f0754ffeb405d23c51ce938289d4835be3b14',
         decimals: 18,
       },
       {
@@ -179,9 +170,7 @@ const networks: { [K in NetworkIds]: Network } = {
       },
     ],
     CTEGraphHttpUri: CTE_GRAPH_HTTP_RINKEBY,
-    CTEGraphWsUri: CTE_GRAPH_WS_RINKEBY,
     OMENGraphHttpUri: OMEN_GRAPH_HTTP_RINKEBY,
-    OMENGraphWsUri: OMEN_GRAPH_WS_RINKEBY,
     oracles: [
       {
         name: 'kleros',
@@ -193,7 +182,7 @@ const networks: { [K in NetworkIds]: Network } = {
         name: 'reality',
         description: 'Reality.eth',
         url: 'https://reality.eth.link/',
-        address: '0x576b76eebe6b5411c0ef310e65de9bff8a60130f',
+        address: '0x17174dC1b62add32a1DE477A357e75b0dcDEed6E',
       },
     ],
     arbitrators: [
@@ -252,9 +241,7 @@ const networks: { [K in NetworkIds]: Network } = {
       },
     ],
     CTEGraphHttpUri: CTE_GRAPH_HTTP_GANACHE,
-    CTEGraphWsUri: CTE_GRAPH_WS_GANACHE,
     OMENGraphHttpUri: '',
-    OMENGraphWsUri: '',
     oracles: [
       {
         name: 'kleros',
@@ -335,12 +322,10 @@ export class NetworkConfig {
     return networks[this.networkId].arbitrators
   }
 
-  getGraphUris(): { CTEhttpUri: string; CTEwsUri: string; OMENhttpUri: string; OMENwsUri: string } {
+  getGraphUris(): { CTEhttpUri: string; OMENhttpUri: string } {
     const CTEhttpUri = networks[this.networkId].CTEGraphHttpUri
-    const CTEwsUri = networks[this.networkId].CTEGraphWsUri
     const OMENhttpUri = networks[this.networkId].OMENGraphHttpUri
-    const OMENwsUri = networks[this.networkId].OMENGraphWsUri
-    return { CTEhttpUri, CTEwsUri, OMENhttpUri, OMENwsUri }
+    return { CTEhttpUri, OMENhttpUri }
   }
 
   getEarliestBlockToCheck(): number {

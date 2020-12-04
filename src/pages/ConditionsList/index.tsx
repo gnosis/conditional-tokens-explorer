@@ -21,6 +21,11 @@ import { SearchField } from 'components/form/SearchField'
 import { Switch } from 'components/form/Switch'
 import { ExternalLink } from 'components/navigation/ExternalLink'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
+import {
+  FilterResultsControl,
+  FilterResultsText,
+} from 'components/pureStyledComponents/FilterResultsText'
+import { FiltersSwitchWrapper } from 'components/pureStyledComponents/FiltersSwitchWrapper'
 import { PageTitle } from 'components/pureStyledComponents/PageTitle'
 import { Pill, PillTypes } from 'components/pureStyledComponents/Pill'
 import { Sidebar } from 'components/pureStyledComponents/Sidebar'
@@ -33,9 +38,8 @@ import { Hash } from 'components/text/Hash'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useConditionsList } from 'hooks/useConditionsList'
 import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { customStyles } from 'theme/tableCustomStyles'
-import { Conditions_conditions } from 'types/generatedGQLForCTE'
+import { GetCondition_condition } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
 import { formatTSSimple, getRealityQuestionUrl, isOracleRealitio } from 'util/tools'
 import {
@@ -43,7 +47,6 @@ import {
   ConditionSearchOptions,
   ConditionType,
   ConditionTypeAll,
-  LocalStorageManagement,
   OracleFilterOptions,
   StatusOptions,
 } from 'util/types'
@@ -58,7 +61,6 @@ export const ConditionsList: React.FC = () => {
   const { _type: status, CPKService, address, networkConfig } = useWeb3ConnectedOrInfura()
 
   const history = useHistory()
-  const { setValue } = useLocalStorage(LocalStorageManagement.ConditionId)
 
   const [textToSearch, setTextToSearch] = useState<string>('')
   const [textToShow, setTextToShow] = useState<string>('')
@@ -83,6 +85,7 @@ export const ConditionsList: React.FC = () => {
     ConditionSearchOptions.ConditionId
   )
   const [showFilters, setShowFilters] = useState(false)
+  const [isFiltering, setIsFiltering] = useState(false)
 
   const dropdownItems = useConditionsSearchOptions(setSearchBy)
 
@@ -122,17 +125,32 @@ export const ConditionsList: React.FC = () => {
     setSelectedMaxOutcomes(null)
     setSelectedToCreationDate(null)
     setSelectedFromCreationDate(null)
-    setSearchBy(ConditionSearchOptions.ConditionId)
-    setTextToSearch('')
   }, [resetPagination])
 
-  // Clear the filters
   useEffect(() => {
-    if (!showFilters) {
-      resetFilters()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showFilters])
+    setIsFiltering(
+      selectedOracleValue !== OracleFilterOptions.All ||
+        selectedOracleFilter.length > 0 ||
+        selectedConditionTypeValue !== ConditionTypeAll.all ||
+        selectedConditionTypeFilter !== null ||
+        selectedStatus !== StatusOptions.All ||
+        selectedMinOutcomes !== null ||
+        selectedMaxOutcomes !== null ||
+        selectedToCreationDate !== null ||
+        selectedFromCreationDate !== null
+    )
+  }, [
+    isFiltering,
+    selectedConditionTypeFilter,
+    selectedConditionTypeValue,
+    selectedFromCreationDate,
+    selectedMaxOutcomes,
+    selectedMinOutcomes,
+    selectedOracleFilter.length,
+    selectedOracleValue,
+    selectedStatus,
+    selectedToCreationDate,
+  ])
 
   const advancedFilters: AdvancedFilterConditions = useMemo(() => {
     return {
@@ -193,8 +211,9 @@ export const ConditionsList: React.FC = () => {
   const isConnected = useMemo(() => status === Web3ContextStatus.Connected, [status])
 
   const buildMenuForRow = useCallback(
-    (row: Conditions_conditions) => {
-      const { id, resolved } = row
+    (row: GetCondition_condition) => {
+      const { id, oracle, resolved } = row
+      const isAllowedToReport = address && address.toLowerCase() === oracle.toLowerCase()
 
       const menu = [
         {
@@ -203,38 +222,24 @@ export const ConditionsList: React.FC = () => {
           onClick: undefined,
         },
         {
-          href: `/split/`,
+          href: `/split/${id}`,
           text: 'Split Position',
-          onClick: () => {
-            setValue(id)
-          },
           disabled: !isConnected,
         },
         {
-          href: `/merge/`,
-          text: 'Merge Positions',
-          onClick: () => {
-            setValue(id)
-          },
-          disabled: !isConnected,
-        },
-        {
-          href: `/report/`,
+          href: `/report/${id}`,
           text: 'Report Payouts',
-          onClick: () => {
-            setValue(id)
-          },
-          disabled: resolved || !isConnected,
+          disabled: resolved || !isConnected || !isAllowedToReport,
         },
       ]
 
       return menu
     },
-    [setValue, isConnected]
+    [address, isConnected]
   )
 
   const handleRowClick = useCallback(
-    (row: Conditions_conditions) => {
+    (row: GetCondition_condition) => {
       history.push(`/conditions/${row.id}`)
     },
     [history]
@@ -244,19 +249,19 @@ export const ConditionsList: React.FC = () => {
     () => [
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: Conditions_conditions) => (
+        cell: (row: GetCondition_condition) => (
           <Hash href={`/conditions/${row.id}`} value={row.id} />
         ),
+        maxWidth: '270px',
+        minWidth: '270px',
         name: 'Condition Id',
         sortable: false,
       },
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: Conditions_conditions) => {
+        cell: (row: GetCondition_condition) => {
           const { oracle, questionId } = row
-
           const isConditionFromOmen = isOracleRealitio(oracle, networkConfig)
-
           const oracleName = isConditionFromOmen ? (
             <>
               {networkConfig.getOracleFromAddress(oracle).description}
@@ -266,44 +271,44 @@ export const ConditionsList: React.FC = () => {
           ) : (
             <Hash onClick={() => handleRowClick(row)} value={oracle} />
           )
-
           return oracleName
         },
+        maxWidth: '250px',
+        minWidth: '250px',
         name: 'Reporter / Oracle',
         sortable: false,
       },
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: Conditions_conditions) => (
+        cell: (row: GetCondition_condition) => (
           <Hash onClick={() => handleRowClick(row)} value={row.questionId} />
         ),
+        maxWidth: '250px',
+        minWidth: '250px',
         name: 'Question Id',
         selector: 'questionId',
         sortable: true,
       },
       {
-        maxWidth: '100px',
+        maxWidth: '110px',
+        minWidth: '110px',
         name: 'Outcomes',
         right: true,
         selector: 'outcomeSlotCount',
         sortable: true,
       },
       {
-        cell: (row: Conditions_conditions) => formatTSSimple(row.createTimestamp),
-        maxWidth: '150px',
+        cell: (row: GetCondition_condition) => formatTSSimple(row.createTimestamp),
+        maxWidth: '170px',
+        minWidth: '170px',
         name: 'Creation Date',
         right: true,
         selector: 'createTimestamp',
         sortable: true,
       },
       {
-        center: true,
-        name: 'Status',
-        selector: 'resolved',
-        sortable: true,
-        width: '150px',
         // eslint-disable-next-line react/display-name
-        cell: (row: Conditions_conditions) =>
+        cell: (row: GetCondition_condition) =>
           row.resolved ? (
             <Pill onClick={() => handleRowClick(row)} type={PillTypes.primary}>
               Resolved
@@ -313,15 +318,21 @@ export const ConditionsList: React.FC = () => {
               Open
             </Pill>
           ),
-        sortFunction: (a: Conditions_conditions, b: Conditions_conditions) => {
+        center: true,
+        name: 'Status',
+        selector: 'resolved',
+        sortable: true,
+        sortFunction: (a: GetCondition_condition, b: GetCondition_condition) => {
           const valA = a.resolved ? 2 : 1
           const valB = b.resolved ? 2 : 1
           return valA - valB
         },
+        minWidth: '110px',
+        maxWidth: '110px',
       },
       {
         // eslint-disable-next-line react/display-name
-        cell: (row: Conditions_conditions) => (
+        cell: (row: GetCondition_condition) => (
           <Dropdown
             activeItemHighlight={false}
             dropdownButtonContent={<ButtonDots />}
@@ -338,8 +349,8 @@ export const ConditionsList: React.FC = () => {
             ))}
           />
         ),
+        minWidth: '60px',
         name: '',
-        width: '60px',
         right: true,
       },
     ],
@@ -391,6 +402,11 @@ export const ConditionsList: React.FC = () => {
     selectedFromCreationDate,
   ])
 
+  useEffect(() => {
+    resetFilters()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status])
+
   return (
     <>
       <PageTitle>Conditions</PageTitle>
@@ -403,65 +419,87 @@ export const ConditionsList: React.FC = () => {
             value={textToShow}
           />
         }
-        start={<Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />}
+        start={
+          <FiltersSwitchWrapper>
+            <Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />
+            {(isFiltering || showFilters) && (
+              <FilterResultsText>
+                Showing {isFiltering ? 'filtered' : 'all'} results -{' '}
+                <FilterResultsControl disabled={!isFiltering} onClick={resetFilters}>
+                  Clear Filters
+                </FilterResultsControl>
+              </FilterResultsText>
+            )}
+          </FiltersSwitchWrapper>
+        }
       />
       {error && !isBytes32Error && !isLoading && <InfoCard message={error.message} title="Error" />}
       {(!error || isBytes32Error) && (
         <TwoColumnsCollapsibleLayout isCollapsed={!showFilters}>
-          {showFilters && (
-            <Sidebar>
-              <SidebarRow>
-                <OraclesFilterDropdown
-                  onClick={(value: OracleFilterOptions, filter: string[]) => {
-                    setSelectedOracleFilter(filter)
-                    setSelectedOracleValue(value)
-                    setResetPagination(!resetPagination)
-                  }}
-                  value={selectedOracleValue}
-                />
-              </SidebarRow>
-              <SidebarRow>
-                <StatusFilterDropdown
-                  onClick={(value: StatusOptions) => {
-                    setSelectedStatus(value)
-                  }}
-                  value={selectedStatus}
-                />
-              </SidebarRow>
-              <SidebarRow>
-                <ConditionTypeFilterDropdown
-                  onClick={(value: ConditionType | ConditionTypeAll, filter: Maybe<string>) => {
-                    setSelectedConditionTypeFilter(filter)
-                    setSelectedConditionTypeValue(value)
-                  }}
-                  value={selectedConditionTypeValue}
-                />
-              </SidebarRow>
-              <SidebarRow>
-                <MinMaxFilter
-                  onSubmit={(min, max) => {
-                    setSelectedMinOutcomes(min)
-                    setSelectedMaxOutcomes(max)
-                  }}
-                  title="Number Of Outcomes"
-                />
-              </SidebarRow>
-              <SidebarRow>
-                <DateFilter
-                  onSubmit={(from, to) => {
-                    setSelectedFromCreationDate(from)
-                    setSelectedToCreationDate(to)
-                  }}
-                  title="Creation Date"
-                />
-              </SidebarRow>
-            </Sidebar>
-          )}
+          <Sidebar isVisible={showFilters}>
+            <SidebarRow>
+              <OraclesFilterDropdown
+                onClick={(value: OracleFilterOptions, filter: string[]) => {
+                  setSelectedOracleFilter(filter)
+                  setSelectedOracleValue(value)
+                  setResetPagination(!resetPagination)
+                }}
+                value={selectedOracleValue}
+              />
+            </SidebarRow>
+            <SidebarRow>
+              <StatusFilterDropdown
+                onClick={(value: StatusOptions) => {
+                  setSelectedStatus(value)
+                }}
+                value={selectedStatus}
+              />
+            </SidebarRow>
+            <SidebarRow>
+              <ConditionTypeFilterDropdown
+                onClick={(value: ConditionType | ConditionTypeAll, filter: Maybe<string>) => {
+                  setSelectedConditionTypeFilter(filter)
+                  setSelectedConditionTypeValue(value)
+                }}
+                value={selectedConditionTypeValue}
+              />
+            </SidebarRow>
+            <SidebarRow>
+              <MinMaxFilter
+                maxValue={selectedMaxOutcomes}
+                minValue={selectedMinOutcomes}
+                onClear={() => {
+                  setSelectedMinOutcomes(null)
+                  setSelectedMaxOutcomes(null)
+                }}
+                onSubmit={(min, max) => {
+                  setSelectedMinOutcomes(min)
+                  setSelectedMaxOutcomes(max)
+                }}
+                title="Outcomes"
+              />
+            </SidebarRow>
+            <SidebarRow>
+              <DateFilter
+                fromValue={selectedFromCreationDate}
+                onClear={() => {
+                  setSelectedToCreationDate(null)
+                  setSelectedFromCreationDate(null)
+                }}
+                onSubmit={(from, to) => {
+                  setSelectedFromCreationDate(from)
+                  setSelectedToCreationDate(to)
+                }}
+                title="Creation Date"
+                toValue={selectedToCreationDate}
+              />
+            </SidebarRow>
+          </Sidebar>
           <DataTable
             className="outerTableWrapper"
             columns={columns}
             customStyles={customStyles}
-            data={showSpinner ? [] : data?.conditions || []}
+            data={showSpinner ? [] : data || []}
             highlightOnHover
             noDataComponent={
               showSpinner ? (

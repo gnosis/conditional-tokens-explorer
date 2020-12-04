@@ -2,6 +2,8 @@ import React from 'react'
 import { NavLink } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 
+import { HashLink } from 'react-router-hash-link'
+
 // eslint-disable-next-line no-restricted-imports
 import { version as appVersion } from '../../../../package.json'
 
@@ -64,6 +66,10 @@ const FooterLink = styled(NavLink)`
   ${LinkCSS}
 `
 
+const FooterLinkHash = styled(HashLink)`
+  ${LinkCSS}
+`
+
 const Break = styled.span`
   @media (min-width: ${(props) => props.theme.themeBreakPoints.mdPre}) {
     margin: 0 6px;
@@ -88,14 +94,17 @@ export const Footer: React.FC = (props) => {
       url: 'https://gnosis.io/',
     },
     {
+      hash: 'mainTitle',
       text: 'Terms & Conditions',
       url: '/terms-and-conditions',
     },
     {
+      hash: 'mainTitle',
       text: 'Privacy Policy',
       url: '/privacy-policy',
     },
     {
+      hash: 'mainTitle',
       text: 'Cookie Policy',
       url: '/cookie-policy',
     },
@@ -122,6 +131,8 @@ export const Footer: React.FC = (props) => {
                   <ExternalLink href={item.url} rel="noopener noreferrer" target="_blank">
                     {item.text}
                   </ExternalLink>
+                ) : item.hash ? (
+                  <FooterLinkHash to={`${item.url}#${item.hash}`}>{item.text}</FooterLinkHash>
                 ) : (
                   <FooterLink to={item.url}>{item.text}</FooterLink>
                 )

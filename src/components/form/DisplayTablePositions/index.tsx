@@ -18,7 +18,7 @@ interface PropsWrapper extends SplitStatus {
   callbackOnHistoryPush?: () => void
 }
 
-export const DisplayTablePositionsWrapper = (props: PropsWrapper) => {
+export const DisplayTablePositionsWrapper: React.FC<PropsWrapper> = (props) => {
   const { callbackOnHistoryPush, collateral, positionIds } = props
   const { collateral: collateralFetched, loading } = useCollateral(collateral)
 
@@ -42,7 +42,7 @@ export const DisplayTablePositionsWrapper = (props: PropsWrapper) => {
     <DisplayTablePositions
       callbackOnHistoryPush={callbackOnHistoryPush}
       positions={positions as PositionWithUserBalanceWithDecimals[]}
-    ></DisplayTablePositions>
+    />
   ) : null
 }
 
@@ -52,7 +52,7 @@ interface Props {
   positions: PositionWithUserBalanceWithDecimals[]
 }
 
-export const DisplayTablePositions = (props: Props) => {
+export const DisplayTablePositions: React.FC<Props> = (props) => {
   const { callbackOnHistoryPush, isLoading, positions } = props
   const history = useHistory()
 
@@ -122,13 +122,14 @@ export const DisplayTablePositions = (props: Props) => {
         isLoading ? (
           <InlineLoading size={SpinnerSize.small} />
         ) : (
-          <EmptyContentText>No positions found.</EmptyContentText>
+          <EmptyContentText>No positions.</EmptyContentText>
         )
       }
       noHeader
       pagination
       paginationPerPage={5}
       paginationRowsPerPageOptions={[5, 10, 15]}
+      style={{ minHeight: isLoading || !positions.length ? '41px' : '280px' }}
     />
   )
 }

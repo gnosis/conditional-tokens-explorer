@@ -1,7 +1,6 @@
 import { MockedProvider } from '@apollo/react-testing'
 import { render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { BigNumber } from 'ethers/utils'
 import React, { ReactElement } from 'react'
 import { HashRouter as Router } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
@@ -63,35 +62,6 @@ test('show unlock button with zero allowance', async () => {
   )
   const unlockBtn = await findByTestId('unlock-btn')
   expect(unlockBtn).toBeInTheDocument()
-})
-
-test('toggle unlock button visiblity according to allowance and amount', async () => {
-  const allowanceMethods = {
-    refresh: () => Promise.resolve(new BigNumber(10)),
-    unlock: jest.fn(),
-  }
-
-  const { findByPlaceholderText, findByTestId } = render(
-    renderWithConnectedProvider(
-      <Form
-        allowanceMethods={allowanceMethods}
-        collateral={defaultToken}
-        onCollateralChange={onCollateralChange}
-        splitPosition={splitPosition}
-        tokens={tokens}
-      />
-    )
-  )
-
-  const unlockBefore = findByTestId('unlockButton')
-  expect(unlockBefore).toMatchObject({})
-
-  const amountInput = await findByPlaceholderText('0.00')
-  await userEvent.type(amountInput, '20')
-
-  const unlockAfter = await findByTestId('unlock-btn')
-
-  expect(unlockAfter).toBeInTheDocument()
 })
 
 test.skip('show unlock button after failure', async () => {

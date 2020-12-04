@@ -12,6 +12,7 @@ import {
   DropdownPosition,
 } from 'components/common/Dropdown'
 import { DisplayTablePositions } from 'components/form/DisplayTablePositions'
+import { OmenMarketsOrQuestion } from 'components/form/OmenMarketsOrQuestion'
 import { ExternalLink } from 'components/navigation/ExternalLink'
 import { FlexRow } from 'components/pureStyledComponents/FlexRow'
 import { Pill, PillTypes } from 'components/pureStyledComponents/Pill'
@@ -22,7 +23,6 @@ import { TitleValue } from 'components/text/TitleValue'
 import { INFORMATION_NOT_AVAILABLE } from 'config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useIsConditionFromOmen } from 'hooks/useIsConditionFromOmen'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { usePositions } from 'hooks/usePositions'
 import { useQuestion } from 'hooks/useQuestion'
 import { GetCondition_condition } from 'types/generatedGQLForCTE'
@@ -32,7 +32,7 @@ import {
   getRealityQuestionUrl,
   truncateStringInTheMiddle,
 } from 'util/tools'
-import { ConditionStatus, ConditionType, LocalStorageManagement } from 'util/types'
+import { ConditionStatus, ConditionType } from 'util/types'
 
 const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
@@ -47,9 +47,7 @@ interface Props {
 }
 
 export const Contents: React.FC<Props> = ({ condition }) => {
-  const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
-
-  const { setValue } = useLocalStorage(LocalStorageManagement.ConditionId)
+  const { _type: status, address, networkConfig } = useWeb3ConnectedOrInfura()
 
   const {
     createTimestamp,
@@ -64,38 +62,28 @@ export const Contents: React.FC<Props> = ({ condition }) => {
   } = condition
 
   const isConnected = useMemo(() => status === Web3ContextStatus.Connected, [status])
+  const isAllowedToReport = useMemo(
+    () => address && address.toLowerCase() === oracle.toLowerCase(),
+    [address, oracle]
+  )
 
   const dropdownItems = useMemo(() => {
     return [
       {
-        href: `/split/`,
-        onClick: () => {
-          setValue(conditionId)
-        },
+        href: `/split/${conditionId}`,
         text: 'Split Position',
         disabled: !isConnected,
       },
       {
-        href: `/merge/`,
-        onClick: () => {
-          setValue(conditionId)
-        },
-        text: 'Merge Positions',
-        disabled: !isConnected,
-      },
-      {
-        href: `/report/`,
-        onClick: () => {
-          setValue(conditionId)
-        },
+        href: `/report/${conditionId}`,
         text: 'Report Payouts',
-        disabled: resolved || !isConnected,
+        disabled: resolved || !isConnected || !isAllowedToReport,
       },
     ]
-  }, [setValue, conditionId, resolved, isConnected])
+  }, [isConnected, resolved, isAllowedToReport, conditionId])
 
   const { outcomesPrettier, question } = useQuestion(questionId, outcomeSlotCount)
-  const isConditionFromOmen = useIsConditionFromOmen(oracle)
+  const isConditionFromOmen = useIsConditionFromOmen([oracle])
   const {
     templateId = null,
     title = INFORMATION_NOT_AVAILABLE,
@@ -129,19 +117,14 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           dropdownButtonContent={<ButtonDropdownCircle />}
           dropdownPosition={DropdownPosition.right}
           items={dropdownItems.map((item, index) => (
-            <DropdownItemLink
-              disabled={item.disabled}
-              key={index}
-              onMouseDown={item.onClick}
-              to={item.href}
-            >
+            <DropdownItemLink disabled={item.disabled} key={index} to={item.href}>
               {item.text}
             </DropdownItemLink>
           ))}
         />
       }
     >
-      <Row marginBottomXL>
+      <Row cols="1fr 1fr">
         <TitleValue
           title="Condition Id"
           value={
@@ -186,28 +169,24 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           }
         />
       </Row>
+      <OmenMarketsOrQuestion conditionsIds={[conditionId]} title={title} />
       {isConditionFromOmen && (
-        <>
-          <Row cols="1fr" marginBottomXL>
-            <TitleValue title="Question" value={title} />
-          </Row>
-          <Row cols="1fr" marginBottomXL>
-            <TitleValue
-              title="Outcomes"
-              value={
-                <StripedListStyled>
-                  {outcomesPrettier.map((outcome: string, index: number) => (
-                    <StripedListItem key={index}>
-                      {resolved && payouts ? `${outcome} - ${payouts[index]}%` : outcome}
-                    </StripedListItem>
-                  ))}
-                </StripedListStyled>
-              }
-            />
-          </Row>
-        </>
+        <Row paddingTop>
+          <TitleValue
+            title="Outcomes"
+            value={
+              <StripedListStyled>
+                {outcomesPrettier.map((outcome: string, index: number) => (
+                  <StripedListItem key={index} wordBreak="normal">
+                    {resolved && payouts ? `${outcome} - ${payouts[index]}%` : outcome}
+                  </StripedListItem>
+                ))}
+              </StripedListStyled>
+            }
+          />
+        </Row>
       )}
-      <Row>
+      <Row cols="1fr 1fr">
         {isConditionFromOmen && resolved && (
           <TitleValue title="Resolution Date" value={formatTS(resolveTimestamp)} />
         )}
@@ -225,7 +204,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           }
         />
       </Row>
-      <Row cols="1fr">
+      <Row paddingTop>
         <TitleValue
           title={"Condition's split positions"}
           value={<DisplayTablePositions isLoading={loadingPositions} positions={positions || []} />}

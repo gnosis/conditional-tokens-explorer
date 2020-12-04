@@ -229,7 +229,7 @@ export const AddOutcome: React.FC<Props> = (props) => {
   }
 
   return (
-    <Row cols="1fr" {...restProps}>
+    <Row {...restProps}>
       <TitleValue
         title="Add Outcome"
         value={
@@ -254,7 +254,7 @@ export const AddOutcome: React.FC<Props> = (props) => {
         title="Outcomes"
         value={
           <>
-            <StripedList maxHeight="300px" minHeight="200px">
+            <StripedList>
               {outcomes.length ? (
                 outcomes.map((item, index) => (
                   <StripedListItem key={`${index}_${item}`}>

@@ -4,6 +4,7 @@ import styled from 'styled-components'
 const Wrapper = styled.span``
 
 const Hash = styled.span`
+  font-family: 'Roboto Mono', monospace;
   text-transform: uppercase;
 `
 

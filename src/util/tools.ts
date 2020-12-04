@@ -1,13 +1,16 @@
+import { ethers } from 'ethers'
 import { Provider } from 'ethers/providers'
 import { BigNumber, formatUnits, getAddress } from 'ethers/utils'
 import moment from 'moment-timezone'
 
 import BN from 'bn.js'
-import { BYTES_REGEX } from 'config/constants'
+import { BYTES_REGEX, OMEN_URL_DAPP } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
 import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
 import { ConditionInformation } from 'hooks/utils'
+import isEqual from 'lodash.isequal'
 import zipObject from 'lodash.zipobject'
+import { ConditionalTokensService } from 'services/conditionalTokens'
 import { ERC20Service } from 'services/erc20'
 import { GetCondition_condition } from 'types/generatedGQLForCTE'
 import { CollateralErrors, ConditionErrors, NetworkIds, PositionErrors, Token } from 'util/types'
@@ -193,8 +196,7 @@ export const getRedeemedPreview = (
 
 export const positionsSameConditionsSet = (positions: PositionWithUserBalanceWithDecimals[]) => {
   // all postions include same conditions set and collateral token
-  const conditionIdsSet = positions.map((position) => [...position.conditionIds].sort().join(''))
-  return conditionIdsSet.every((set) => set === conditionIdsSet[0])
+  return positions.every((position) => isEqual(position.conditionIds, positions[0].conditionIds))
 }
 
 // more than 1 position
@@ -438,7 +440,28 @@ export const getRealityQuestionUrl = (questionId: string, networkConfig: Network
     : `${oracle.url}app/#!/question/${questionId}`
 }
 
+export const getOmenMarketURL = (marketId: string) => {
+  return `${OMEN_URL_DAPP}/#/${marketId}`
+}
+
 export const isOracleRealitio = (oracleAddress: string, networkConfig: NetworkConfig) => {
   const oracle = networkConfig.getOracleFromAddress(oracleAddress)
   return oracle.name === ('reality' as KnownOracle)
+}
+
+export const getParentCollectionId = (
+  indexSets: string[],
+  conditionIds: string[],
+  conditionId: string
+) => {
+  const newCollectionsSet = conditionIds.reduce(
+    (acc, id, i) =>
+      id !== conditionId
+        ? [...acc, { conditionId: id, indexSet: new BigNumber(indexSets[i]) }]
+        : acc,
+    new Array<{ conditionId: string; indexSet: BigNumber }>()
+  )
+  return newCollectionsSet.length
+    ? ConditionalTokensService.getCombinedCollectionId(newCollectionsSet)
+    : ethers.constants.HashZero
 }

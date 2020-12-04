@@ -4,6 +4,29 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL query operation: PaginatedConditions
+// ====================================================
+
+export interface PaginatedConditions_conditions {
+  __typename: "Condition";
+  id: string;
+}
+
+export interface PaginatedConditions {
+  conditions: PaginatedConditions_conditions[];
+}
+
+export interface PaginatedConditionsVariables {
+  first?: number | null;
+  skip?: number | null;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL query operation: ConditionsList
 // ====================================================
 
@@ -37,47 +60,6 @@ export interface ConditionsList_conditions {
 
 export interface ConditionsList {
   conditions: ConditionsList_conditions[];
-}
-
-/* tslint:disable */
-/* eslint-disable */
-// @generated
-// This file was automatically generated and should not be edited.
-
-// ====================================================
-// GraphQL query operation: Conditions
-// ====================================================
-
-export interface Conditions_conditions_positions_collateralToken {
-  __typename: "CollateralToken";
-  id: string;
-}
-
-export interface Conditions_conditions_positions {
-  __typename: "Position";
-  id: string;
-  collateralToken: Conditions_conditions_positions_collateralToken;
-}
-
-export interface Conditions_conditions {
-  __typename: "Condition";
-  id: string;
-  oracle: string;
-  questionId: string;
-  outcomeSlotCount: number;
-  resolved: boolean;
-  creator: string;
-  payouts: any[] | null;
-  createTimestamp: any;
-  payoutNumerators: any[] | null;
-  payoutDenominator: any | null;
-  resolveTimestamp: any | null;
-  resolveBlockNumber: any | null;
-  positions: Conditions_conditions_positions[] | null;
-}
-
-export interface Conditions {
-  conditions: Conditions_conditions[];
 }
 
 /* tslint:disable */
@@ -177,6 +159,7 @@ export interface Positions_positions_conditions {
   oracle: string;
   questionId: string;
   outcomeSlotCount: number;
+  resolved: boolean;
 }
 
 export interface Positions_positions {
@@ -248,6 +231,7 @@ export interface PositionsList_positions_conditions {
   oracle: string;
   questionId: string;
   outcomeSlotCount: number;
+  resolved: boolean;
 }
 
 export interface PositionsList_positions {
@@ -319,6 +303,7 @@ export interface GetPosition_position_conditions {
   oracle: string;
   questionId: string;
   outcomeSlotCount: number;
+  resolved: boolean;
 }
 
 export interface GetPosition_position {
@@ -394,6 +379,7 @@ export interface GetMultiPositions_positions_conditions {
   oracle: string;
   questionId: string;
   outcomeSlotCount: number;
+  resolved: boolean;
 }
 
 export interface GetMultiPositions_positions {
@@ -598,6 +584,7 @@ export interface PositionData_conditions {
   oracle: string;
   questionId: string;
   outcomeSlotCount: number;
+  resolved: boolean;
 }
 
 export interface PositionData {

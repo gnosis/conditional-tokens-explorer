@@ -1,13 +1,18 @@
 import { BigNumber } from 'ethers/utils'
 
 import { ZERO_BN } from 'config/constants'
-import { Positions_positions, UserWithPositions_user } from 'types/generatedGQLForCTE'
+import {
+  Positions_positions,
+  Positions_positions_collection,
+  UserWithPositions_user,
+} from 'types/generatedGQLForCTE'
 
 export interface ConditionInformation {
   oracle: string
   questionId: string
   conditionId: string
   outcomeSlotCount: number
+  resolved: boolean
 }
 
 export interface Position {
@@ -20,6 +25,7 @@ export interface Position {
   userBalanceERC1155: BigNumber
   userBalanceERC20: BigNumber
   conditions: ConditionInformation[]
+  collection: Positions_positions_collection
 }
 
 export const marshalPositionListData = (
@@ -36,6 +42,7 @@ export const marshalPositionListData = (
       conditionIds: position.conditionIds,
       collateralToken: position.collateralToken.id,
       wrappedToken: position?.wrappedToken?.id,
+      collection: position?.collection,
       createTimestamp: position.createTimestamp,
       userBalanceERC1155: userPosition ? new BigNumber(userPosition.balance) : ZERO_BN,
       userBalanceERC20: userPosition ? new BigNumber(userPosition.wrappedBalance) : ZERO_BN,
@@ -46,6 +53,7 @@ export const marshalPositionListData = (
             questionId: condition.questionId,
             conditionId: condition.id,
             outcomeSlotCount: condition.outcomeSlotCount,
+            resolved: condition.resolved,
           }
         }) ?? [],
     } as Position

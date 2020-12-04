@@ -180,15 +180,12 @@ export interface TransferOptions {
 
 export type HashArray = {
   hash: string
-}
-
-export enum LocalStorageManagement {
-  ConditionId = 'conditionId',
-  PositionId = 'positionId',
+  title?: string
+  url?: string
 }
 
 export interface QuestionOptions {
-  arbitratorAddress: string
+  arbitrator: string
   category: string
   openingDateMoment: Moment
   outcomes: string[]

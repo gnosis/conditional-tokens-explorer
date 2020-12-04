@@ -1,7 +1,8 @@
 import { useDebounceCallback } from '@react-hook/debounce'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import styled from 'styled-components'
+import { useParams } from 'react-router-dom'
+import styled, { withTheme } from 'styled-components'
 
 import { TokenIcon } from 'components/common/TokenIcon'
 import { CollateralFilterDropdown } from 'components/filters/CollateralFilterDropdown'
@@ -11,6 +12,11 @@ import { SearchField } from 'components/form/SearchField'
 import { Switch } from 'components/form/Switch'
 import { CompactFiltersLayout } from 'components/pureStyledComponents/CompactFiltersLayout'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
+import {
+  FilterResultsControl,
+  FilterResultsTextAlternativeLayout,
+} from 'components/pureStyledComponents/FilterResultsText'
+import { FiltersSwitchWrapper } from 'components/pureStyledComponents/FiltersSwitchWrapper'
 import { RadioButton } from 'components/pureStyledComponents/RadioButton'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { SpinnerSize } from 'components/statusInfo/common'
@@ -43,34 +49,50 @@ const TitleValueExtended = styled(TitleValue)<{ hideTitle?: boolean }>`
 `
 
 interface Props {
+  clearFilters?: boolean
   hideTitle?: boolean
+  onClearCallback?: () => void
+  onFilterCallback?: (
+    positions: PositionWithUserBalanceWithDecimals[]
+  ) => PositionWithUserBalanceWithDecimals[]
   onRowClicked: (position: PositionWithUserBalanceWithDecimals) => void
-  onClearCallback: () => void
+  refetch?: boolean
   selectedPosition: Maybe<PositionWithUserBalanceWithDecimals>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  theme?: any
   title?: string
-  clearFilters: boolean
 }
 
-export const SelectablePositionTable: React.FC<Props> = (props) => {
+interface Params {
+  positionId?: string
+}
+
+const SelectPositionTable: React.FC<Props> = (props) => {
   const {
     clearFilters,
     hideTitle,
     onClearCallback,
+    onFilterCallback,
     onRowClicked,
+    refetch,
     selectedPosition,
+    theme,
     title = 'Positions',
     ...restProps
   } = props
 
   const { networkConfig } = useWeb3ConnectedOrInfura()
 
+  const { positionId } = useParams<Params>()
+
   const [positionList, setPositionList] = useState<PositionWithUserBalanceWithDecimals[]>([])
 
   const [searchBy, setSearchBy] = useState<PositionSearchOptions>(PositionSearchOptions.PositionId)
-  const [textToShow, setTextToShow] = useState<string>('')
-  const [textToSearch, setTextToSearch] = useState<string>('')
+  const [textToShow, setTextToShow] = useState<string>(positionId || '')
+  const [textToSearch, setTextToSearch] = useState<string>(positionId || '')
   const [resetPagination, setResetPagination] = useState<boolean>(false)
   const [showFilters, setShowFilters] = useState(false)
+  const [isFiltering, setIsFiltering] = useState(false)
 
   const [selectedCollateralFilter, setSelectedCollateralFilter] = useState<Maybe<string[]>>(null)
   const [selectedCollateralValue, setSelectedCollateralValue] = useState<string>(
@@ -85,7 +107,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
 
   const debouncedHandlerTextToSearch = useDebounceCallback((textToSearch) => {
     setTextToSearch(textToSearch)
-  }, 500)
+  }, 100)
 
   const onChangeSearch = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,46 +147,65 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     textToSearch,
   ])
 
-  const { data, error, loading } = usePositionsList(advancedFilters)
-
-  // #1 Filter, only positions with balance
-  const positionsWithBalance = useMemo(
-    () =>
-      data &&
-      data.length &&
-      data.filter(
-        (position: PositionWithUserBalanceWithDecimals) => !position.userBalanceERC1155.isZero()
-      ),
-    [data]
+  const { data, error, loading, refetchPositions, refetchUserPositions } = usePositionsList(
+    advancedFilters
   )
 
   const resetFilters = useCallback(() => {
     setResetPagination(!resetPagination)
     setSelectedToCreationDate(null)
     setSelectedFromCreationDate(null)
-    setSearchBy(PositionSearchOptions.PositionId)
-    setTextToSearch('')
     setSelectedCollateralFilter(null)
     setSelectedCollateralValue(CollateralFilterOptions.All)
     setWrappedCollateral(WrappedCollateralOptions.All)
   }, [resetPagination])
 
+  useEffect(() => {
+    setIsFiltering(
+      selectedToCreationDate !== null ||
+        selectedFromCreationDate !== null ||
+        wrappedCollateral !== WrappedCollateralOptions.All ||
+        selectedCollateralValue !== CollateralFilterOptions.All ||
+        wrappedCollateral !== WrappedCollateralOptions.All ||
+        selectedCollateralFilter !== null
+    )
+  }, [
+    isFiltering,
+    selectedCollateralFilter,
+    selectedCollateralValue,
+    selectedFromCreationDate,
+    selectedToCreationDate,
+    wrappedCollateral,
+  ])
+
   // Clear the filters on network change
   useEffect(() => {
     setShowFilters(false)
     resetFilters()
-    onClearCallback()
+    if (onClearCallback) onClearCallback()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networkConfig, clearFilters])
 
   // Filter selected positions from original list. And positions without balance as indicated by props.
   useEffect(() => {
-    if (positionsWithBalance) {
-      setPositionList(positionsWithBalance)
+    if (data && data.length > 0) {
+      if (onFilterCallback) {
+        setPositionList(onFilterCallback(data))
+      } else {
+        setPositionList(data)
+      }
     } else {
       setPositionList([])
     }
-  }, [setPositionList, positionsWithBalance])
+  }, [setPositionList, data, onFilterCallback])
+
+  useEffect(() => {
+    if (refetch) {
+      onClearSearch()
+      refetchPositions()
+      refetchUserPositions()
+    }
+  }, [refetch, refetchPositions, refetchUserPositions, onClearSearch])
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const defaultColumns: Array<any> = useMemo(
@@ -226,15 +267,6 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     setShowFilters(!showFilters)
   }, [showFilters])
 
-  // Clear the filters
-  useEffect(() => {
-    if (!showFilters) {
-      resetFilters()
-      onClearCallback()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showFilters])
-
   const isLoading = useMemo(() => !textToSearch && loading, [textToSearch, loading])
   const isSearching = useMemo(() => textToSearch && loading, [textToSearch, loading])
 
@@ -257,7 +289,7 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     ) {
       setResetPagination(!resetPagination)
     }
-    onClearCallback()
+    if (onClearCallback) onClearCallback()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -268,6 +300,21 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     selectedToCreationDate,
     selectedFromCreationDate,
   ])
+
+  const conditionalRowStyles = [
+    {
+      when: (position: PositionWithUserBalanceWithDecimals) =>
+        !!(selectedPosition && selectedPosition?.id === position.id),
+      style: {
+        backgroundColor: theme.colors.whitesmoke3,
+        color: theme.colors.darkerGrey,
+        '&:hover': {
+          cursor: 'default',
+        },
+        pointerEvents: 'none' as const,
+      },
+    },
+  ]
 
   return (
     <TitleValueExtended
@@ -284,41 +331,58 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
                 value={textToShow}
               />
             }
-            start={<Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />}
+            start={
+              <FiltersSwitchWrapper>
+                <Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />
+                {(isFiltering || showFilters) && (
+                  <FilterResultsTextAlternativeLayout>
+                    Showing {isFiltering ? 'filtered' : 'all'} results -{' '}
+                    <FilterResultsControl disabled={!isFiltering} onClick={resetFilters}>
+                      Clear Filters
+                    </FilterResultsControl>
+                  </FilterResultsTextAlternativeLayout>
+                )}
+              </FiltersSwitchWrapper>
+            }
           />
-          {showFilters && (
-            <CompactFiltersLayout>
-              <CollateralFilterDropdown
-                onClick={(symbol: string, address: Maybe<string[]>) => {
-                  setSelectedCollateralFilter(address)
-                  setSelectedCollateralValue(symbol)
-                }}
-                value={selectedCollateralValue}
-              />
-              <WrappedCollateralFilterDropdown
-                onClick={(value: WrappedCollateralOptions) => {
-                  setWrappedCollateral(value)
-                }}
-                value={wrappedCollateral}
-              />
-              <DateFilter
-                onSubmit={(from, to) => {
-                  setSelectedFromCreationDate(from)
-                  setSelectedToCreationDate(to)
-                }}
-                title="Creation Date"
-              />
-            </CompactFiltersLayout>
-          )}
+          <CompactFiltersLayout isVisible={showFilters}>
+            <CollateralFilterDropdown
+              onClick={(symbol: string, address: Maybe<string[]>) => {
+                setSelectedCollateralFilter(address)
+                setSelectedCollateralValue(symbol)
+              }}
+              value={selectedCollateralValue}
+            />
+            <WrappedCollateralFilterDropdown
+              onClick={(value: WrappedCollateralOptions) => {
+                setWrappedCollateral(value)
+              }}
+              value={wrappedCollateral}
+            />
+            <DateFilter
+              fromValue={selectedFromCreationDate}
+              onClear={() => {
+                setSelectedToCreationDate(null)
+                setSelectedFromCreationDate(null)
+              }}
+              onSubmit={(from, to) => {
+                setSelectedFromCreationDate(from)
+                setSelectedToCreationDate(to)
+              }}
+              title="Creation Date"
+              toValue={selectedToCreationDate}
+            />
+          </CompactFiltersLayout>
           <DataTable
             className="outerTableWrapper condensedTable"
             columns={defaultColumns}
+            conditionalRowStyles={conditionalRowStyles}
             customStyles={customStyles}
             data={showSpinner ? [] : positionList.length ? positionList : []}
             highlightOnHover
             noDataComponent={
               showSpinner ? (
-                <InlineLoading size={SpinnerSize.small} />
+                <InlineLoading size={SpinnerSize.regular} />
               ) : error ? (
                 <EmptyContentText>Error: {error.message}</EmptyContentText>
               ) : (
@@ -340,3 +404,5 @@ export const SelectablePositionTable: React.FC<Props> = (props) => {
     />
   )
 }
+
+export const SelectablePositionTable = withTheme(SelectPositionTable)

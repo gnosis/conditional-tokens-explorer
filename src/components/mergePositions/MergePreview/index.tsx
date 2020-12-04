@@ -21,7 +21,7 @@ interface Props {
 
 export const MergePreview = ({ amount, condition, positions, token }: Props) => {
   const preview = useMemo(() => {
-    if (condition && token) {
+    if (condition && token && positions.length > 0) {
       return getMergePreview(positions, condition.id, amount, token, condition.outcomeSlotCount)
     }
     return null
@@ -31,11 +31,11 @@ export const MergePreview = ({ amount, condition, positions, token }: Props) => 
     <TitleValue
       title="Merged Positions Preview"
       value={
-        <StripedList maxHeight="none" minHeight="41px">
+        <StripedList>
           {preview ? (
             <StripedListItemPreview>{preview}</StripedListItemPreview>
           ) : (
-            <StripedListEmpty>No merged positions yet.</StripedListEmpty>
+            <StripedListEmpty>No merged positions.</StripedListEmpty>
           )}
         </StripedList>
       }

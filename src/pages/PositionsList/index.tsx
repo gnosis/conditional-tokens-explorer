@@ -28,6 +28,11 @@ import { UnwrapModal } from 'components/modals/UnwrapModal'
 import { WrapModal } from 'components/modals/WrapModal'
 import { ExternalLink } from 'components/navigation/ExternalLink'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
+import {
+  FilterResultsControl,
+  FilterResultsText,
+} from 'components/pureStyledComponents/FilterResultsText'
+import { FiltersSwitchWrapper } from 'components/pureStyledComponents/FiltersSwitchWrapper'
 import { PageTitle } from 'components/pureStyledComponents/PageTitle'
 import { Sidebar } from 'components/pureStyledComponents/Sidebar'
 import { SidebarRow } from 'components/pureStyledComponents/SidebarRow'
@@ -39,7 +44,6 @@ import { IconTypes } from 'components/statusInfo/common'
 import { TableControls } from 'components/table/TableControls'
 import { Hash } from 'components/text/Hash'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { PositionWithUserBalanceWithDecimals, usePositionsList } from 'hooks/usePositionsList'
 import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
 import { ConditionInformation } from 'hooks/utils'
@@ -51,7 +55,6 @@ import {
   AdvancedFilterPosition,
   CollateralFilterOptions,
   HashArray,
-  LocalStorageManagement,
   PositionSearchOptions,
   Token,
   TransferOptions,
@@ -78,7 +81,6 @@ export const PositionsList = () => {
     signer,
   } = useWeb3ConnectedOrInfura()
   const history = useHistory()
-  const { setValue } = useLocalStorage(LocalStorageManagement.PositionId)
 
   const [textToSearch, setTextToSearch] = useState<string>('')
   const [textToShow, setTextToShow] = useState<string>('')
@@ -108,11 +110,11 @@ export const PositionsList = () => {
 
   const [searchBy, setSearchBy] = useState<PositionSearchOptions>(PositionSearchOptions.PositionId)
   const [showFilters, setShowFilters] = useState(false)
+  const [isFiltering, setIsFiltering] = useState(false)
 
   const [openDisplayHashesTableModal, setOpenDisplayHashesTableModal] = useState(false)
   const [hashesTableModal, setHashesTableModal] = useState<Array<HashArray>>([])
   const [titleTableModal, setTitleTableModal] = useState('')
-  const [urlTableModal, setUrlTableModal] = useState('')
   const [titleModal, setTitleModal] = useState('')
 
   const debouncedHandlerTextToSearch = useDebounceCallback((textToSearch) => {
@@ -137,20 +139,28 @@ export const PositionsList = () => {
     setResetPagination(!resetPagination)
     setSelectedToCreationDate(null)
     setSelectedFromCreationDate(null)
-    setSearchBy(PositionSearchOptions.PositionId)
-    setTextToSearch('')
     setSelectedCollateralFilter(null)
     setSelectedCollateralValue(CollateralFilterOptions.All)
     setWrappedCollateral(WrappedCollateralOptions.All)
   }, [resetPagination])
 
-  // Clear the filters
   useEffect(() => {
-    if (!showFilters) {
-      resetFilters()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showFilters])
+    setIsFiltering(
+      selectedToCreationDate !== null ||
+        selectedFromCreationDate !== null ||
+        wrappedCollateral !== WrappedCollateralOptions.All ||
+        selectedCollateralValue !== CollateralFilterOptions.All ||
+        wrappedCollateral !== WrappedCollateralOptions.All ||
+        selectedCollateralFilter !== null
+    )
+  }, [
+    isFiltering,
+    selectedCollateralFilter,
+    selectedCollateralValue,
+    selectedFromCreationDate,
+    selectedToCreationDate,
+    wrappedCollateral,
+  ])
 
   const advancedFilters: AdvancedFilterPosition = useMemo(() => {
     return {
@@ -190,6 +200,7 @@ export const PositionsList = () => {
     loading,
     transfer,
   ])
+
   const isSearching = useMemo(() => textToSearch && loading, [textToSearch, loading])
 
   const isConnected = useMemo(() => status === Web3ContextStatus.Connected, [status])
@@ -197,9 +208,10 @@ export const PositionsList = () => {
 
   const buildMenuForRow = useCallback(
     (row: PositionWithUserBalanceWithDecimals) => {
-      const { collateralTokenERC1155, id, userBalanceERC20, userBalanceERC1155 } = row
+      const { collateralTokenERC1155, conditions, id, userBalanceERC20, userBalanceERC1155 } = row
       const userHasERC1155Balance = userBalanceERC1155 && !userBalanceERC1155.isZero()
       const userHasERC20Balance = userBalanceERC20 && !userBalanceERC20.isZero()
+      const isRedeemable = conditions.some((c) => c.resolved)
 
       const menu = [
         {
@@ -208,20 +220,9 @@ export const PositionsList = () => {
           text: 'Details',
         },
         {
-          disabled: !userHasERC1155Balance || !isConnected,
-          href: `/redeem`,
+          disabled: !userHasERC1155Balance || !isConnected || !isRedeemable,
+          href: `/redeem/${id}`,
           text: 'Redeem',
-          onClick: () => {
-            setValue(id)
-          },
-        },
-        {
-          disabled: !userHasERC1155Balance || !isConnected,
-          href: `/split`,
-          onClick: () => {
-            setValue(id)
-          },
-          text: 'Split',
         },
         {
           disabled: !userHasERC1155Balance || !isConnected || !isSigner,
@@ -260,7 +261,7 @@ export const PositionsList = () => {
 
       return menu
     },
-    [setValue, isConnected, isSigner]
+    [isConnected, isSigner]
   )
 
   const handleRowClick = useCallback(
@@ -300,8 +301,8 @@ export const PositionsList = () => {
             })}
           />
         ),
+        minWidth: '60px',
         name: '',
-        width: '60px',
         right: true,
       },
     ]
@@ -323,6 +324,7 @@ export const PositionsList = () => {
             {isConnected ? row.userBalanceERC1155WithDecimals : '-'}
           </span>
         ),
+        minWidth: '180px',
         name: 'ERC1155 Amount',
         right: true,
         selector: 'userBalanceERC1155Numbered',
@@ -342,6 +344,7 @@ export const PositionsList = () => {
             {isConnected ? row.userBalanceERC20WithDecimals : '-'}
           </span>
         ),
+        minWidth: '180px',
         name: 'ERC20 Amount',
         right: true,
         selector: 'userBalanceERC20Numbered',
@@ -359,9 +362,10 @@ export const PositionsList = () => {
         cell: (row: PositionWithUserBalanceWithDecimals) => (
           <Hash href={`/positions/${row.id}`} value={row.id} />
         ),
+        maxWidth: '270px',
+        minWidth: '270px',
         name: 'Position Id',
         sortable: false,
-        minWidth: '250px',
       },
       {
         // eslint-disable-next-line react/display-name
@@ -374,6 +378,8 @@ export const PositionsList = () => {
             collateralToken
           )
         },
+        maxWidth: '155px',
+        minWidth: '155px',
         name: 'Collateral',
         selector: 'collateralTokenSymbol',
         sortable: true,
@@ -381,6 +387,8 @@ export const PositionsList = () => {
       {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimals) => formatTSSimple(row.createTimestamp),
+        maxWidth: '170px',
+        minWidth: '170px',
         name: 'Creation Date',
         right: true,
         selector: 'createTimestamp',
@@ -403,6 +411,7 @@ export const PositionsList = () => {
                       (condition: ConditionInformation) => {
                         return {
                           hash: condition.conditionId,
+                          url: `/conditions/${condition.conditionId}`,
                         }
                       }
                     )
@@ -410,30 +419,37 @@ export const PositionsList = () => {
                     setHashesTableModal(hashes)
                     setTitleTableModal('Condition Id')
                     setTitleModal('Conditions')
-                    setUrlTableModal('conditions')
                   }}
                 />
               </>
             )
           }
         },
+        maxWidth: '290px',
+        minWidth: '270px',
         name: 'Condition Id',
         sortable: false,
-        minWidth: '350px',
       },
       {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimals) => {
           const { conditions } = row
-          const oracle = conditions[0]?.oracle ?? ''
-          const questionId = conditions[0]?.questionId ?? ''
+          const isConditionFromOmen = conditions.some((condition: ConditionInformation) =>
+            isOracleRealitio(condition.oracle, networkConfig)
+          )
+
+          const conditionsFiltered = isConditionFromOmen
+            ? conditions.filter((condition: ConditionInformation) =>
+                isOracleRealitio(condition.oracle, networkConfig)
+              )
+            : conditions
+          const oracle = conditionsFiltered[0]?.oracle ?? ''
+          const questionId = conditionsFiltered[0]?.questionId ?? ''
 
           const allOraclesAreEqual = conditions.every(
             (condition: ConditionInformation) =>
               condition.oracle.toLowerCase() === oracle.toLowerCase()
           )
-
-          const isConditionFromOmen = isOracleRealitio(oracle, networkConfig)
 
           const oracleName = isConditionFromOmen ? (
             <>
@@ -455,25 +471,32 @@ export const PositionsList = () => {
                   onClick={() => {
                     const hashes: HashArray[] = conditions.map(
                       (condition: ConditionInformation) => {
-                        return {
-                          hash: condition.oracle,
+                        const { oracle, questionId } = condition
+
+                        const hash: HashArray = { hash: oracle }
+                        const isConditionFromOmen = isOracleRealitio(oracle, networkConfig)
+                        if (isConditionFromOmen) {
+                          hash.title = networkConfig.getOracleFromAddress(oracle).description
+                          hash.url = getRealityQuestionUrl(questionId, networkConfig)
                         }
+
+                        return hash
                       }
                     )
                     setOpenDisplayHashesTableModal(true)
                     setHashesTableModal(hashes)
                     setTitleTableModal('Oracle Id')
                     setTitleModal('Oracles')
-                    setUrlTableModal('')
                   }}
                 />
               </>
             )
           }
         },
+        maxWidth: '290px',
+        minWidth: '270px',
         name: 'Oracle',
         sortable: false,
-        minWidth: '350px',
       },
       {
         // eslint-disable-next-line react/display-name
@@ -505,16 +528,16 @@ export const PositionsList = () => {
                     setHashesTableModal(hashes)
                     setTitleTableModal('Question Id')
                     setTitleModal('Questions')
-                    setUrlTableModal('')
                   }}
                 />
               </>
             )
           }
         },
+        maxWidth: '270px',
+        minWidth: '270px',
         name: 'Question Id',
         sortable: false,
-        minWidth: '350px',
       },
     ]
 
@@ -655,6 +678,7 @@ export const PositionsList = () => {
     isSearching,
     error,
   ])
+
   const isWorking = useMemo(
     () => transfer.isLoading() || transfer.isFailure() || transfer.isSuccess(),
     [transfer]
@@ -681,6 +705,11 @@ export const PositionsList = () => {
     selectedFromCreationDate,
   ])
 
+  useEffect(() => {
+    resetFilters()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status])
+
   return (
     <>
       <PageTitle>Positions</PageTitle>
@@ -693,41 +722,57 @@ export const PositionsList = () => {
             value={textToShow}
           />
         }
-        start={<Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />}
+        start={
+          <FiltersSwitchWrapper>
+            <Switch active={showFilters} label="Filters" onClick={toggleShowFilters} />
+            {(isFiltering || showFilters) && (
+              <FilterResultsText>
+                Showing {isFiltering ? 'filtered' : 'all'} results -{' '}
+                <FilterResultsControl disabled={!isFiltering} onClick={resetFilters}>
+                  Clear Filters
+                </FilterResultsControl>
+              </FilterResultsText>
+            )}
+          </FiltersSwitchWrapper>
+        }
       />
       {error && !isLoading && <InfoCard message={error.message} title="Error" />}
       {!error && (
         <TwoColumnsCollapsibleLayout isCollapsed={!showFilters}>
-          {showFilters && (
-            <Sidebar>
-              <SidebarRow>
-                <CollateralFilterDropdown
-                  onClick={(symbol: string, address: Maybe<string[]>) => {
-                    setSelectedCollateralFilter(address)
-                    setSelectedCollateralValue(symbol)
-                  }}
-                  value={selectedCollateralValue}
-                />
-              </SidebarRow>
-              <SidebarRow>
-                <WrappedCollateralFilterDropdown
-                  onClick={(value: WrappedCollateralOptions) => {
-                    setWrappedCollateral(value)
-                  }}
-                  value={wrappedCollateral}
-                />
-              </SidebarRow>
-              <SidebarRow>
-                <DateFilter
-                  onSubmit={(from, to) => {
-                    setSelectedFromCreationDate(from)
-                    setSelectedToCreationDate(to)
-                  }}
-                  title="Creation Date"
-                />
-              </SidebarRow>
-            </Sidebar>
-          )}
+          <Sidebar isVisible={showFilters}>
+            <SidebarRow>
+              <CollateralFilterDropdown
+                onClick={(symbol: string, address: Maybe<string[]>) => {
+                  setSelectedCollateralFilter(address)
+                  setSelectedCollateralValue(symbol)
+                }}
+                value={selectedCollateralValue}
+              />
+            </SidebarRow>
+            <SidebarRow>
+              <WrappedCollateralFilterDropdown
+                onClick={(value: WrappedCollateralOptions) => {
+                  setWrappedCollateral(value)
+                }}
+                value={wrappedCollateral}
+              />
+            </SidebarRow>
+            <SidebarRow>
+              <DateFilter
+                fromValue={selectedFromCreationDate}
+                onClear={() => {
+                  setSelectedToCreationDate(null)
+                  setSelectedFromCreationDate(null)
+                }}
+                onSubmit={(from, to) => {
+                  setSelectedFromCreationDate(from)
+                  setSelectedToCreationDate(to)
+                }}
+                title="Creation Date"
+                toValue={selectedToCreationDate}
+              />
+            </SidebarRow>
+          </Sidebar>
           <DataTable
             className="outerTableWrapper"
             columns={getColumns()}
@@ -791,7 +836,6 @@ export const PositionsList = () => {
           }}
           title={titleModal}
           titleTable={titleTableModal}
-          url={urlTableModal}
         />
       )}
       {isWorking && (

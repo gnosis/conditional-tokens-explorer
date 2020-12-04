@@ -18,10 +18,11 @@ export const dataTableCSS = css`
     }
 
     &.condensedTable {
-      border: 1px solid ${(props) => props.theme.colors.lightGrey};
       border-radius: 4px;
+      border: 1px solid ${(props) => props.theme.colors.lightGrey};
       box-shadow: none;
       margin-bottom: 24px;
+      margin-top: 6px;
       min-height: 280px;
 
       .rdt_TableHeadRow {
@@ -39,8 +40,8 @@ export const dataTableCSS = css`
 
       .rdt_TableCol,
       .rdt_TableCell {
-        padding-left: 15px;
-        padding-right: 15px;
+        padding-left: 12px;
+        padding-right: 12px;
       }
     }
 
@@ -64,6 +65,7 @@ export const dataTableCSS = css`
       border-bottom-color: ${(props) => props.theme.colors.lightGrey}!important;
 
       &:hover {
+        background-color: ${(props) => props.theme.colors.whitesmoke3}!important;
         color: ${(props) => props.theme.colors.darkerGrey}!important;
       }
 

@@ -1,85 +1,66 @@
-import { ethers } from 'ethers'
-import { BigNumber } from 'ethers/utils'
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { Prompt } from 'react-router'
 
 import { Button } from 'components/buttons'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CenteredCard } from 'components/common/CenteredCard'
-import { SelectCondition } from 'components/form/SelectCondition'
-import { SelectPositions } from 'components/form/SelectPositions'
+import { ConditionsDropdown } from 'components/form/ConditionsDropdown'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
-import { Error, ErrorContainer } from 'components/pureStyledComponents/Error'
 import { Row } from 'components/pureStyledComponents/Row'
 import { PositionPreview } from 'components/redeemPosition/PositionPreview'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
-import { useBatchBalanceContext } from 'contexts/BatchBalanceContext'
-import { useConditionContext } from 'contexts/ConditionContext'
-import { useMultiPositionsContext } from 'contexts/MultiPositionsContext'
+import { SelectablePositionTable } from 'components/table/SelectablePositionTable'
+import { USE_CPK } from 'config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { useIsPositionRelatedToCondition } from 'hooks/useIsPositionRelatedToCondition'
-import { ConditionalTokensService } from 'services/conditionalTokens'
+import { useCondition } from 'hooks/useCondition'
+import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
+import { CPKService } from 'services/cpk'
 import { getLogger } from 'util/logger'
-import { Status } from 'util/types'
+import { Remote } from 'util/remoteData'
+import { getParentCollectionId } from 'util/tools'
 
 const logger = getLogger('RedeemPosition')
 
 export const Contents = () => {
-  const { _type: status, CTService, connect, networkConfig } = useWeb3ConnectedOrInfura()
   const {
-    clearPositions,
-    errors: positionsErrors,
-    loading: loadingPositions,
-    positions,
-  } = useMultiPositionsContext()
-  const {
-    errors: balancesErrors,
-    loading: loadingBalance,
-    updateBalances,
-  } = useBatchBalanceContext()
+    _type: status,
+    CTService,
+    connect,
+    networkConfig,
+    provider,
+    signer,
+  } = useWeb3ConnectedOrInfura()
 
-  const {
-    clearCondition,
-    condition,
-    errors: conditionErrors,
-    loading: loadingCondition,
-  } = useConditionContext()
-  const [transactionStatus, setTransactionStatus] = React.useState<Maybe<Status>>(null)
-  const [error, setError] = React.useState<Maybe<Error>>(null)
-
-  useEffect(() => {
-    if (positions) {
-      updateBalances(positions.map((p) => p.id))
-    }
-  }, [positions, updateBalances])
-
-  const loading = useMemo(
-    () =>
-      loadingCondition ||
-      loadingBalance ||
-      loadingPositions ||
-      transactionStatus === Status.Loading,
-    [loadingCondition, loadingBalance, loadingPositions, transactionStatus]
+  const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<boolean>>>(
+    Remote.notAsked<Maybe<boolean>>()
   )
+  const [position, setPosition] = useState<Maybe<PositionWithUserBalanceWithDecimals>>(null)
+  const [conditionIds, setConditionIds] = useState<Array<string>>([])
+  const [conditionId, setConditionId] = useState<string>('')
+
+  const [isLoadingConditionIds, setIsLoadingConditionIds] = useState<boolean>(false)
+  const onConditionIdSelect = useCallback((conditionId: string) => {
+    setConditionId(conditionId)
+  }, [])
+
+  const { condition } = useCondition(conditionId)
+
+  const clearComponent = useCallback(() => {
+    setPosition(null)
+    setConditionIds([])
+    setConditionId('')
+    setTransactionStatus(Remote.notAsked<Maybe<boolean>>())
+  }, [])
 
   const onRedeem = useCallback(async () => {
     try {
-      if (positions.length && condition && status === Web3ContextStatus.Connected) {
-        setTransactionStatus(Status.Loading)
+      if (position && conditionId && status === Web3ContextStatus.Connected && signer) {
+        setTransactionStatus(Remote.loading())
 
-        const { collateralToken, conditionIds, indexSets } = positions[0]
-        const newCollectionsSet = conditionIds.reduce(
-          (acc, conditionId, i) =>
-            conditionId !== condition.id
-              ? [...acc, { conditionId, indexSet: new BigNumber(indexSets[i]) }]
-              : acc,
-          new Array<{ conditionId: string; indexSet: BigNumber }>()
-        )
-        const parentCollectionId = newCollectionsSet.length
-          ? ConditionalTokensService.getCombinedCollectionId(newCollectionsSet)
-          : ethers.constants.HashZero
+        const { collateralToken, conditionIds, indexSets } = position
 
+        const parentCollectionId = getParentCollectionId(indexSets, conditionIds, conditionId)
         // This UI only allows to redeem 1 position although it's possible to redeem multiple position when you the user owns different positions with the same set of conditions and several indexSets for the resolved condition.
         // i.e.
         // - DAI C:0x123 0:0b01 && C:0x345 O:0b01
@@ -89,107 +70,137 @@ export const Contents = () => {
 
         // It shouldn't be able to call onRedeem if resolved condition id were not included in conditionsIds, so no -1 for findIndex.
         const redeemedIndexSet = [
-          indexSets[conditionIds.findIndex((conditionId) => conditionId === condition.id)],
+          indexSets[conditionIds.findIndex((condId) => condId === conditionId)],
         ]
 
-        await CTService.redeemPositions(
-          collateralToken.id,
-          parentCollectionId,
-          condition.id,
-          redeemedIndexSet
-        )
+        const cpk = await CPKService.create(networkConfig, provider, signer)
 
-        clearCondition()
-        clearPositions()
-        setError(null)
+        if (USE_CPK) {
+          await cpk.redeemPosition({
+            CTService,
+            collateralToken,
+            parentCollectionId,
+            conditionId,
+            indexSets: redeemedIndexSet,
+          })
+        } else {
+          await CTService.redeemPositions(
+            collateralToken,
+            parentCollectionId,
+            conditionId,
+            redeemedIndexSet
+          )
+        }
 
-        setTransactionStatus(Status.Ready)
+        setPosition(null)
+        setConditionIds([])
+        setConditionId('')
+
+        setTransactionStatus(Remote.success(true))
       } else if (status === Web3ContextStatus.Infura) {
         connect()
       }
     } catch (err) {
-      setTransactionStatus(Status.Error)
-      setError(err)
+      setTransactionStatus(Remote.failure(err))
       logger.error(err)
     }
-  }, [positions, condition, status, CTService, clearCondition, clearPositions, connect])
-
-  const {
-    isRelated,
-    loading: loadingCheckPositionRelatedToCondition,
-  } = useIsPositionRelatedToCondition(positions.length ? positions[0].id : '', condition?.id || '')
+  }, [status, CTService, connect, conditionId, position, provider, networkConfig, signer])
 
   const disabled =
-    loading ||
-    positionsErrors.length > 0 ||
-    conditionErrors.length > 0 ||
-    balancesErrors.length > 0 ||
-    !positions.length ||
-    !condition ||
-    !isRelated
+    transactionStatus.isLoading() || !conditionIds.length || !position || !conditionId
 
-  const nonRelatedPositionAndCondition = React.useMemo(() => {
-    return (
-      !isRelated && !!(positions.length > 0 && condition) && !loadingCheckPositionRelatedToCondition
+  const fullLoadingActionButton = useMemo(
+    () =>
+      transactionStatus.isFailure()
+        ? {
+            buttonType: ButtonType.danger,
+            onClick: () => setTransactionStatus(Remote.notAsked<Maybe<boolean>>()),
+            text: 'Close',
+          }
+        : transactionStatus.isSuccess()
+        ? {
+            buttonType: ButtonType.primary,
+            onClick: () => {
+              clearComponent()
+            },
+            text: 'OK',
+          }
+        : undefined,
+    [transactionStatus, clearComponent]
+  )
+
+  const fullLoadingMessage = useMemo(
+    () =>
+      transactionStatus.isFailure()
+        ? transactionStatus.getFailure()
+        : transactionStatus.isLoading()
+        ? 'Working...'
+        : 'Redeeming finished!',
+    [transactionStatus]
+  )
+
+  const fullLoadingTitle = useMemo(
+    () => (transactionStatus.isFailure() ? 'Error' : 'Redeem Positions'),
+    [transactionStatus]
+  )
+
+  const fullLoadingIcon = useMemo(
+    () =>
+      transactionStatus.isFailure()
+        ? IconTypes.error
+        : transactionStatus.isLoading()
+        ? IconTypes.spinner
+        : IconTypes.ok,
+    [transactionStatus]
+  )
+
+  const isWorking = useMemo(
+    () =>
+      transactionStatus.isLoading() ||
+      transactionStatus.isFailure() ||
+      transactionStatus.isSuccess(),
+    [transactionStatus]
+  )
+
+  const onRowClicked = useCallback((position: PositionWithUserBalanceWithDecimals) => {
+    const resolvedConditionsIds = position.conditions
+      .filter((c) => c.resolved)
+      .map((c) => c.conditionId)
+    setIsLoadingConditionIds(true)
+    setPosition(position)
+    setConditionIds(resolvedConditionsIds)
+    setConditionId(resolvedConditionsIds[0])
+    setIsLoadingConditionIds(false)
+  }, [])
+
+  const onFilterCallback = (positions: PositionWithUserBalanceWithDecimals[]) => {
+    return positions.filter(
+      (position: PositionWithUserBalanceWithDecimals) =>
+        position.conditions.some((condition) => condition.resolved) &&
+        !position.userBalanceERC1155.isZero()
     )
-  }, [isRelated, positions, condition, loadingCheckPositionRelatedToCondition])
-
-  const fullLoadingActionButton =
-    transactionStatus === Status.Error
-      ? {
-          buttonType: ButtonType.danger,
-          onClick: () => setTransactionStatus(null),
-          text: 'Close',
-        }
-      : transactionStatus === Status.Ready
-      ? {
-          buttonType: ButtonType.primary,
-          onClick: () => setTransactionStatus(null),
-          text: 'OK',
-        }
-      : undefined
-
-  const fullLoadingMessage =
-    transactionStatus === Status.Error
-      ? error?.message
-      : transactionStatus === Status.Loading
-      ? 'Working...'
-      : 'Redeeming finished!'
-
-  const fullLoadingTitle = transactionStatus === Status.Error ? 'Error' : 'Redeem Positions'
-
-  const fullLoadingIcon =
-    transactionStatus === Status.Error
-      ? IconTypes.error
-      : transactionStatus === Status.Loading
-      ? IconTypes.spinner
-      : IconTypes.ok
-
-  const isWorking =
-    transactionStatus === Status.Loading ||
-    transactionStatus === Status.Error ||
-    transactionStatus === Status.Ready
+  }
 
   return (
     <CenteredCard>
-      <Row cols="1fr">
-        <SelectPositions showOnlyPositionsWithBalance singlePosition title="Position" />
-      </Row>
-      <Row cols="1fr">
-        <SelectCondition title="Resolved Condition Id" />
-      </Row>
-      <Row cols="1fr">
-        <PositionPreview
-          condition={condition}
-          networkConfig={networkConfig}
-          position={positions.length ? positions[0] : null}
+      <SelectablePositionTable
+        onClearCallback={clearComponent}
+        onFilterCallback={onFilterCallback}
+        onRowClicked={onRowClicked}
+        refetch={transactionStatus.isSuccess()}
+        selectedPosition={position}
+      />
+      <Row>
+        <ConditionsDropdown
+          conditions={conditionIds}
+          isLoading={isLoadingConditionIds}
+          onClick={onConditionIdSelect}
+          value={conditionId}
         />
       </Row>
-      {nonRelatedPositionAndCondition && (
-        <ErrorContainer>
-          <Error>Position is not related to the condition.</Error>
-        </ErrorContainer>
-      )}
+      <Row>
+        <PositionPreview condition={condition} networkConfig={networkConfig} position={position} />
+      </Row>
       {isWorking && (
         <FullLoading
           actionButton={fullLoadingActionButton}
@@ -209,7 +220,7 @@ export const Contents = () => {
             ? true
             : 'Are you sure you want to leave this page? The changes you made will be lost?'
         }
-        when={!!condition || positions.length > 0}
+        when={!!(position || conditionId || conditionIds.length > 0)}
       />
     </CenteredCard>
   )

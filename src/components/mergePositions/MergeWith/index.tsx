@@ -15,7 +15,9 @@ import { MergeablePosition } from 'util/types'
 const Wrapper = styled.div``
 
 const MergeableStripedListItem = styled(StripedListItem)`
+  align-items: flex-start;
   cursor: pointer;
+  flex-wrap: nowrap;
   justify-content: flex-start;
   padding-left: 15px;
   padding-right: 15px;
@@ -26,6 +28,10 @@ const MergeableStripedListItem = styled(StripedListItem)`
   }
 `
 
+const CheckboxStyled = styled(Checkbox)`
+  margin-top: 3px;
+`
+
 const MergeableStripedListItemText = styled.span`
   margin-left: 8px;
 `
@@ -33,19 +39,19 @@ const MergeableStripedListItemText = styled.span`
 const MergeableItem: React.FC<{
   index: number
   item: MergeablePosition
-  onClick: (item: MergeablePosition, index: number) => void
+  onClick: (item: MergeablePosition, index: number, selected: boolean) => void
 }> = (props) => {
   const { index, item, onClick, ...restProps } = props
   const [selected, setSelected] = useState(false)
 
   const itemOnClick = () => {
     setSelected(!selected)
-    onClick(item, index)
+    onClick(item, index, !selected)
   }
 
   return (
     <MergeableStripedListItem onClick={itemOnClick} {...restProps}>
-      <Checkbox checked={selected} />
+      <CheckboxStyled checked={selected} />
       <MergeableStripedListItemText>{item.positionPreview}</MergeableStripedListItemText>
     </MergeableStripedListItem>
   )
@@ -54,7 +60,7 @@ const MergeableItem: React.FC<{
 interface Props {
   isLoading?: boolean
   mergeablePositions: Array<MergeablePosition> | undefined
-  onClick: (item: MergeablePosition, index: number) => void
+  onClick: (item: MergeablePosition, index: number, selected: boolean) => void
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   errorFetching: any
 }
@@ -67,7 +73,7 @@ export const MergeWith: React.FC<Props> = (props) => {
       <TitleValue
         title="Merge With"
         value={
-          <StripedList minHeight="158px">
+          <StripedList>
             {mergeablePositions && mergeablePositions.length && !errorFetching ? (
               mergeablePositions.map((item, index) => (
                 <MergeableItem index={index} item={item} key={index} onClick={onClick} />

@@ -6,6 +6,7 @@ import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { StatusInfoInline, StatusInfoType } from 'components/statusInfo/StatusInfoInline'
 import { SpinnerSize } from 'components/statusInfo/common'
+import { Token } from 'util/types'
 
 const Wrapper = styled.div`
   align-items: center;
@@ -48,8 +49,7 @@ const StatusInfo = styled(StatusInfoInline)`
 `
 
 interface Props {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  collateral: any
+  collateral: Token
   fetching: boolean
   finished: boolean
   error: Maybe<Error>

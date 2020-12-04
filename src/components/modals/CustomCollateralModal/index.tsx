@@ -51,7 +51,7 @@ export const CustomCollateralModal: React.FC<Props> = (props) => {
       title={'Add Custom Token'}
       {...restProps}
     >
-      <FirstRow cols="1fr">
+      <FirstRow>
         <TitleValue
           title="Token Contract Address"
           value={
@@ -76,7 +76,7 @@ export const CustomCollateralModal: React.FC<Props> = (props) => {
       </FirstRow>
       {!collateralData && <SpinnerWrapper>{loading && !error && <InlineLoading />}</SpinnerWrapper>}
       {!loading && collateralData && (
-        <Row>
+        <Row cols="1fr 1fr">
           <TitleValue title={'Token Symbol'} value={collateralData && collateralData.symbol} />
           <TitleValue
             title={'Decimals of Precision'}

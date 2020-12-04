@@ -70,6 +70,7 @@ const positionFragment = gql`
       oracle
       questionId
       outcomeSlotCount
+      resolved
     }
   }
 `
@@ -138,16 +139,19 @@ export const buildQueryPositionsList = (
     .filter((s) => s.length)
     .join(',')
 
-  const variablesClause = variablesClauseInternal ? `(${variablesClauseInternal})` : ''
+  const variablesClause = variablesClauseInternal
+    ? `($first: Int!, $skip: Int!, ${variablesClauseInternal})`
+    : '($first: Int!, $skip: Int!)'
 
   const query = gql`
   query Positions ${variablesClause} {
-    positions(first: 1000 ${whereClause} , orderBy: createTimestamp, orderDirection: desc) {
+    positions(first: $first, skip: $skip${whereClause}, orderBy: createTimestamp, orderDirection: desc) {
       ...PositionData
     }
   }
   ${positionFragment}
   `
+
   return query
 }
 

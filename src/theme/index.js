@@ -100,7 +100,7 @@ const theme = {
   layout: {
     commonContainerMaxWidth: '600px',
     horizontalPadding: '10px',
-    maxWidth: '1272px',
+    maxWidth: '100%',
   },
   outcomes: {
     dimensions: '27px',

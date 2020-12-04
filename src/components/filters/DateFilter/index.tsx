@@ -4,10 +4,14 @@ import styled from 'styled-components'
 
 import { ButtonFilterSubmit } from 'components/buttons/ButtonFilterSubmit'
 import { ErrorContainer, Error as ErrorMessage } from 'components/pureStyledComponents/Error'
-import { FilterTitle } from 'components/pureStyledComponents/FilterTitle'
+import {
+  FilterTitle,
+  FilterTitleButton,
+  FilterWrapper,
+} from 'components/pureStyledComponents/FilterTitle'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { MAX_DATE, MIN_DATE } from 'config/constants'
-import { getLogger } from 'util/logger'
+import { useDebounce } from 'hooks/useDebounce'
 
 const Wrapper = styled.div``
 
@@ -49,97 +53,100 @@ const Date = styled(Textfield)`
 interface Props {
   onChangeFrom?: (event: React.ChangeEvent<HTMLInputElement>) => void
   onChangeTo?: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onClear?: () => void
   onSubmit: (from: Maybe<number>, to: Maybe<number>) => void
   title: string
+  toValue: Maybe<number>
+  fromValue: Maybe<number>
 }
 
-const logger = getLogger('DateFilter')
+const MILISECONDS_TO_DEBOUNCE = 1000
 
 export const DateFilter: React.FC<Props> = (props) => {
-  const { onChangeFrom, onChangeTo, onSubmit, title, ...restProps } = props
-  const toDate = useRef<HTMLInputElement>(null)
+  const {
+    fromValue: fromValueFromProps,
+    onChangeFrom,
+    onChangeTo,
+    onClear,
+    onSubmit,
+    title,
+    toValue: toValueFromProps,
+    ...restProps
+  } = props
   const fromDate = useRef<HTMLInputElement>(null)
+  const toDate = useRef<HTMLInputElement>(null)
 
   const [from, setFrom] = React.useState<Maybe<number>>(null)
   const [to, setTo] = React.useState<Maybe<number>>(null)
+  const [isFromValid, setIsFromValid] = React.useState<undefined | boolean>()
+  const [isToValid, setIsToValid] = React.useState<undefined | boolean>()
+  const maxDateUTC = moment(MAX_DATE).utc().endOf('day').unix()
+  const minDateUTC = moment(MIN_DATE).utc().startOf('day').unix()
+
+  const checkFromValidity = React.useCallback((value: string) => {
+    setIsFromValid(moment(value).isValid())
+  }, [])
+
+  const checkToValidity = React.useCallback((value: string) => {
+    setIsToValid(moment(value).isValid())
+  }, [])
 
   const onChangeFromInternal = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (typeof onChangeFrom === 'function') {
-        onChangeFrom(event)
-      }
+    (value: string) => {
+      checkFromValidity(value)
 
-      const fromTimestamp = moment(event.currentTarget.value).utc().startOf('day').unix()
+      const currentMinDate = moment(value).utc().startOf('day').unix()
+
+      const fromTimestamp =
+        currentMinDate < minDateUTC
+          ? minDateUTC
+          : currentMinDate > maxDateUTC
+          ? maxDateUTC
+          : currentMinDate
 
       setFrom(fromTimestamp)
     },
-    [onChangeFrom]
+    [checkFromValidity, maxDateUTC, minDateUTC]
   )
 
   const onChangeToInternal = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (typeof onChangeTo === 'function') {
-        onChangeTo(event)
-      }
+    (value: string) => {
+      checkToValidity(value)
 
-      const toTimestamp = moment(event.currentTarget.value).utc().endOf('day').unix()
+      const currentMaxDate = moment(value).utc().endOf('day').unix()
+
+      const toTimestamp =
+        currentMaxDate > maxDateUTC
+          ? maxDateUTC
+          : currentMaxDate < minDateUTC
+          ? minDateUTC
+          : currentMaxDate
 
       setTo(toTimestamp)
     },
-    [onChangeTo]
+    [checkToValidity, maxDateUTC, minDateUTC]
   )
 
   const emptyValues = React.useMemo(() => !from && !to, [from, to])
-  const validFromDate = React.useMemo(() => {
-    if (fromDate && fromDate.current && fromDate.current.value) {
-      return fromDate.current.checkValidity()
-    } else {
-      return true
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [from])
-
-  const validToDate = React.useMemo(() => {
-    if (toDate && toDate.current && toDate.current.value) {
-      return toDate.current.checkValidity()
-    } else {
-      return true
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [to])
-
-  const fromGreaterThanToError = React.useMemo(
-    () =>
-      to && from && to < from ? (
-        <ErrorMessage>
-          <i>To</i> must be greater than <i>From</i>
-        </ErrorMessage>
-      ) : null,
-    [from, to]
-  )
-
-  const datesValidityError = React.useMemo(
-    () =>
-      !validToDate || !validFromDate ? (
-        <ErrorMessage>{`Date must be between ${moment(MIN_DATE).format('L')} and ${moment(
-          MAX_DATE
-        ).format('L')}`}</ErrorMessage>
-      ) : null,
-    [validToDate, validFromDate]
-  )
-
-  const submitDisabled = !!fromGreaterThanToError || emptyValues || !!datesValidityError
+  const fromGreaterThanToError = React.useMemo(() => (to && from && to < from) || false, [from, to])
+  const invalidTo = React.useMemo(() => isToValid !== undefined && !isToValid, [isToValid])
+  const invalidFrom = React.useMemo(() => isFromValid !== undefined && !isFromValid, [isFromValid])
+  const showErrors = React.useMemo(() => invalidTo || invalidFrom || fromGreaterThanToError, [
+    invalidTo,
+    invalidFrom,
+    fromGreaterThanToError,
+  ])
+  const submitDisabled = React.useMemo(() => showErrors || emptyValues, [showErrors, emptyValues])
 
   const onSubmitInternal = React.useCallback(() => {
     if ((from || to) && !submitDisabled) {
-      logger.log(from, to)
       onSubmit(from, to)
     }
   }, [from, to, onSubmit, submitDisabled])
 
-  const onPressEnter = React.useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Enter') {
+  const onKeyUp = React.useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === 'Enter') {
         onSubmitInternal()
       }
     },
@@ -150,9 +157,67 @@ export const DateFilter: React.FC<Props> = (props) => {
     if (!from && !to) onSubmit(from, to)
   }, [from, to, onSubmit])
 
+  const clearFrom = React.useCallback(() => {
+    if (fromDate.current) fromDate.current.value = ''
+    setFrom(null)
+  }, [fromDate])
+
+  const clearTo = React.useCallback(() => {
+    if (toDate.current) toDate.current.value = ''
+    setTo(null)
+  }, [toDate])
+
+  React.useEffect(() => {
+    if (fromValueFromProps === null) {
+      clearFrom()
+    }
+  }, [fromValueFromProps, clearFrom])
+
+  React.useEffect(() => {
+    if (toValueFromProps === null) {
+      clearTo()
+    }
+  }, [toValueFromProps, clearTo])
+
+  const clear = React.useCallback(() => {
+    clearFrom()
+    clearTo()
+    onClear && onClear()
+    setIsFromValid(undefined)
+    setIsToValid(undefined)
+  }, [clearFrom, clearTo, onClear])
+
+  const debounceFromValidity = useDebounce(
+    (value: string) => checkFromValidity(value),
+    MILISECONDS_TO_DEBOUNCE
+  )
+  const debounceToValidity = useDebounce(
+    (value: string) => checkToValidity(value),
+    MILISECONDS_TO_DEBOUNCE
+  )
+  const debounceOnChangeFromInternal = useDebounce(
+    (value: string) => onChangeFromInternal(value),
+    MILISECONDS_TO_DEBOUNCE
+  )
+  const debounceOnChangeToInternal = useDebounce(
+    (value: string) => onChangeToInternal(value),
+    MILISECONDS_TO_DEBOUNCE
+  )
+
+  const clearDisabled = React.useMemo(
+    () => emptyValues && isFromValid === undefined && isToValid === undefined,
+    [emptyValues, isFromValid, isToValid]
+  )
   return (
     <Wrapper {...restProps}>
-      <FilterTitle>{title}</FilterTitle>
+      <FilterWrapper>
+        <FilterTitle>{title}</FilterTitle>
+        {onClear && (
+          <FilterTitleButton disabled={clearDisabled} onClick={clear}>
+            Clear
+          </FilterTitleButton>
+        )}
+      </FilterWrapper>
       <Rows className="dateFilterRows">
         <Row className="dateFilterRow">
           <FieldWrapper>
@@ -161,8 +226,18 @@ export const DateFilter: React.FC<Props> = (props) => {
               max={MAX_DATE}
               min={MIN_DATE}
               name="dateFrom"
-              onChange={onChangeFromInternal}
-              onKeyUp={onPressEnter}
+              onChange={(event) => {
+                if (typeof onChangeFrom === 'function') {
+                  onChangeFrom(event)
+                }
+                const value = event.currentTarget.value
+                debounceOnChangeFromInternal(value)
+              }}
+              onKeyUp={(event) => {
+                onKeyUp(event)
+                const value = event.currentTarget.value
+                debounceFromValidity(value)
+              }}
               ref={fromDate}
               type="date"
             />
@@ -175,8 +250,18 @@ export const DateFilter: React.FC<Props> = (props) => {
               max={MAX_DATE}
               min={MIN_DATE}
               name="dateTo"
-              onChange={onChangeToInternal}
-              onKeyUp={onPressEnter}
+              onChange={(event) => {
+                if (typeof onChangeTo === 'function') {
+                  onChangeTo(event)
+                }
+                const value = event.currentTarget.value
+                debounceOnChangeToInternal(value)
+              }}
+              onKeyUp={(event) => {
+                onKeyUp(event)
+                const value = event.currentTarget.value
+                debounceToValidity(value)
+              }}
               ref={toDate}
               type="date"
             />
@@ -184,10 +269,23 @@ export const DateFilter: React.FC<Props> = (props) => {
           <ButtonFilterSubmit disabled={submitDisabled} onClick={onSubmitInternal} />
         </Row>
       </Rows>
-      {(!!datesValidityError || !!fromGreaterThanToError) && (
+      {showErrors && (
         <ErrorContainer>
-          {datesValidityError}
-          {fromGreaterThanToError}
+          {fromGreaterThanToError && (
+            <ErrorMessage>
+              <i>To</i> must be greater than <i>From</i>
+            </ErrorMessage>
+          )}
+          {invalidFrom && (
+            <ErrorMessage>
+              <i>From</i> date is invalid
+            </ErrorMessage>
+          )}
+          {invalidTo && (
+            <ErrorMessage>
+              <i>To</i> date is invalid
+            </ErrorMessage>
+          )}
         </ErrorContainer>
       )}
     </Wrapper>

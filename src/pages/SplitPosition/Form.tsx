@@ -1,6 +1,5 @@
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
 import { Prompt } from 'react-router'
 import styled from 'styled-components'
 
@@ -11,7 +10,6 @@ import { Modal } from 'components/common/Modal'
 import { SetAllowance } from 'components/common/SetAllowance'
 import { DisplayTablePositionsWrapper } from 'components/form/DisplayTablePositions'
 import { InputAmount } from 'components/form/InputAmount'
-import { InputCondition } from 'components/form/InputCondition'
 import { EditPartitionModal } from 'components/modals/EditPartitionModal'
 import { Outcome } from 'components/partitions/Outcome'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
@@ -28,13 +26,17 @@ import { PositionPreview } from 'components/splitPosition/PositionPreview'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { StatusInfoInline, StatusInfoType } from 'components/statusInfo/StatusInfoInline'
 import { IconTypes } from 'components/statusInfo/common'
+import { SelectableConditionTable } from 'components/table/SelectableConditionTable'
 import { TitleValue } from 'components/text/TitleValue'
 import { NULL_PARENT_ID, ZERO_BN } from 'config/constants'
-import { useConditionContext } from 'contexts/ConditionContext'
-import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { AllowanceMethods, useAllowanceState } from 'hooks/useAllowanceState'
+import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useAllowance } from 'hooks/useAllowance'
+import { useAllowanceState } from 'hooks/useAllowanceState'
+import { useCollateral } from 'hooks/useCollateral'
+import { useCondition } from 'hooks/useCondition'
+import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
 import { SplitFrom } from 'pages/SplitPosition/SplitFrom'
-import { GetCondition_condition, GetPosition_position } from 'types/generatedGQLForCTE'
+import { GetCondition_condition } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import { indexSetFromOutcomes, trivialPartition, truncateStringInTheMiddle } from 'util/tools'
@@ -55,80 +57,37 @@ export type SplitPositionFormMethods = {
 }
 
 interface Props {
-  allowanceMethods: AllowanceMethods
-  collateral: Token
-  onCollateralChange: (collateral: string) => void
-  splitPosition: (
-    collateral: string,
-    parentCollection: string,
-    conditionId: string,
-    partition: BigNumber[],
-    amount: BigNumber
-  ) => void
   tokens: Token[]
 }
 
 const logger = getLogger('Form')
 
-export const Form = ({
-  allowanceMethods,
-  collateral,
-  onCollateralChange,
-  splitPosition,
-  tokens,
-}: Props) => {
-  const { clearCondition } = useConditionContext()
-  const { CTService } = useWeb3ConnectedOrInfura()
+export const Form = (props: Props) => {
+  const { _type: status, CTService, connect } = useWeb3ConnectedOrInfura()
+  const { tokens } = props
 
-  const DEFAULT_VALUES = useMemo(() => {
-    return {
-      conditionId: '',
-      collateral: tokens[0].address,
-      amount: ZERO_BN,
-      splitFrom: SplitFromType.collateral,
-      positionId: '',
-    }
-  }, [tokens])
+  const defaultSplitFrom = SplitFromType.collateral
 
-  const formMethods = useForm<SplitPositionFormMethods>({
-    mode: 'onChange',
-    defaultValues: DEFAULT_VALUES,
-  })
-
-  const { formState, getValues, handleSubmit, reset, watch } = formMethods
-
-  const { dirty, isValid } = formState
-
-  const [outcomeSlot, setOutcomeSlot] = useState(0)
-  const [conditionIdToPreviewShow, setConditionIdToPreviewShow] = useState('')
-  const [condition, setCondition] = useState<Maybe<GetCondition_condition>>(null)
-  const [position, setPosition] = useState<Maybe<GetPosition_position>>(null)
+  const [conditionId, setConditionId] = useState('')
+  const [position, setPosition] = useState<Maybe<PositionWithUserBalanceWithDecimals>>(null)
+  const [collateralAddress, setCollateralAddress] = useState(tokens[0].address)
+  const [amount, setAmount] = useState(ZERO_BN)
+  const [splitFrom, setSplitFrom] = useState(defaultSplitFrom)
   const [originalPartition, setOriginalPartition] = useState<BigNumber[]>([])
   const [numberedOutcomes, setNumberedOutcomes] = useState<Array<Array<OutcomeProps>>>([])
+  const [resetFilterUpdate, setResetFilterUpdate] = useState(false)
+
   const [isEditPartitionModalOpen, setIsEditPartitionModalOpen] = useState(false)
+  const [transactionStatus, setTransactionStatus] = useState<Remote<SplitStatus>>(
+    Remote.notAsked<SplitStatus>()
+  )
 
-  const [status, setStatus] = useState<Remote<SplitStatus>>(Remote.notAsked<SplitStatus>())
+  const allowanceMethods = useAllowance(collateralAddress)
+  const { collateral } = useCollateral(collateralAddress)
 
-  const { amount, positionId, splitFrom } = getValues() as SplitPositionFormMethods
-
-  const handleConditionChange = useCallback((condition: Maybe<GetCondition_condition>) => {
-    setCondition(condition)
-    setOutcomeSlot(condition ? condition.outcomeSlotCount : 0)
-    setConditionIdToPreviewShow(condition ? condition.id : '')
-  }, [])
-
-  const watchCollateralAddress = watch('collateral')
-  watch('splitFrom')
-  watch('amount')
-
-  const splitFromCollateral = splitFrom === SplitFromType.collateral
-  const splitFromPosition = splitFrom === SplitFromType.position
-
-  useEffect(() => {
-    if (watchCollateralAddress) {
-      onCollateralChange(getValues('collateral'))
-    }
-  }, [getValues, onCollateralChange, watchCollateralAddress])
+  const { condition } = useCondition(conditionId)
+  const outcomeSlot = useMemo(() => (condition ? condition.outcomeSlotCount : 0), [condition])
+  const conditionIdToPreviewShow = useMemo(() => (condition ? condition.id : ''), [condition])
 
   useEffect(() => {
     setOriginalPartition(trivialPartition(outcomeSlot))
@@ -146,20 +105,40 @@ export const Form = ({
     return outcomes.map(indexSetFromOutcomes).map((o) => new BigNumber(o))
   }, [numberedOutcomes])
 
+  const resetState = useCallback(() => {
+    setConditionId('')
+    setCollateralAddress(tokens[0].address)
+    setAmount(ZERO_BN)
+    setPosition(null)
+    setIsDirty(false)
+  }, [tokens])
+
+  const isSplittingFromCollateral = useMemo(() => splitFrom === SplitFromType.collateral, [
+    splitFrom,
+  ])
+  const isSplittingFromPosition = useMemo(() => splitFrom === SplitFromType.position, [splitFrom])
+
   const onEditPartitionSave = useCallback((numberedOutcomes: Array<Array<OutcomeProps>>) => {
     setIsEditPartitionModalOpen(false)
     setNumberedOutcomes(numberedOutcomes)
   }, [])
 
-  const onSubmit = useCallback(
-    async ({ amount, collateral, conditionId }: SplitPositionFormMethods) => {
-      try {
-        setStatus(Remote.loading())
+  const onSubmit = useCallback(async () => {
+    try {
+      if (status === Web3ContextStatus.Connected) {
+        setTransactionStatus(Remote.loading())
 
         let positionIds: PositionIdsArray[]
-        let collateralFromSplit: string = collateral
-        if (splitFromCollateral) {
-          await splitPosition(collateral, NULL_PARENT_ID, conditionId, partition, amount)
+        let collateralFromSplit: string = collateralAddress
+
+        if (isSplittingFromCollateral) {
+          await CTService.splitPosition(
+            collateralFromSplit,
+            NULL_PARENT_ID,
+            conditionId,
+            partition,
+            amount
+          )
 
           positionIds = await CTService.getPositionsFromPartition(
             partition,
@@ -168,14 +147,21 @@ export const Form = ({
             collateralFromSplit
           )
         } else if (
-          splitFromPosition &&
+          isSplittingFromPosition &&
           position &&
           position.collateralToken &&
           position.collection
         ) {
-          collateralFromSplit = position.collateralToken.id
+          collateralFromSplit = position.collateralToken
           const collectionId = position.collection.id
-          await splitPosition(collateralFromSplit, collectionId, conditionId, partition, amount)
+
+          await CTService.splitPosition(
+            collateralFromSplit,
+            collectionId,
+            conditionId,
+            partition,
+            amount
+          )
 
           positionIds = await CTService.getPositionsFromPartition(
             partition,
@@ -187,22 +173,33 @@ export const Form = ({
           throw Error('Invalid split origin')
         }
 
-        setStatus(Remote.success({ positionIds, collateral: collateralFromSplit }))
-      } catch (err) {
-        logger.error(err)
-        setStatus(Remote.failure(err))
+        setTransactionStatus(Remote.success({ positionIds, collateral: collateralFromSplit }))
+        setIsDirty(false)
+      } else if (status === Web3ContextStatus.Infura) {
+        connect()
       }
-    },
-    [CTService, partition, splitFromCollateral, splitFromPosition, position, splitPosition]
-  )
+    } catch (err) {
+      logger.error(err)
+      setTransactionStatus(Remote.failure(err))
+    }
+  }, [
+    CTService,
+    connect,
+    status,
+    partition,
+    isSplittingFromCollateral,
+    isSplittingFromPosition,
+    position,
+    amount,
+    collateralAddress,
+    conditionId,
+  ])
 
   const clearComponent = useCallback(() => {
-    reset(DEFAULT_VALUES)
-    // Clear condition manually, the reset doesn't work, the use of the conditionContext and react hook form is not so good
-    clearCondition()
+    resetState()
     // Clear status to notAsked, so we can close the modal
-    setStatus(Remote.notAsked<SplitStatus>())
-  }, [DEFAULT_VALUES, clearCondition, reset, setStatus])
+    setTransactionStatus(Remote.notAsked<SplitStatus>())
+  }, [resetState, setTransactionStatus])
 
   const {
     allowanceError,
@@ -213,101 +210,152 @@ export const Form = ({
     unlockCollateral,
   } = useAllowanceState(allowanceMethods, amount)
 
-  const isAllowanceVisible = useMemo(() => splitFromCollateral && shouldDisplayAllowance, [
+  const isAllowanceVisible = useMemo(() => isSplittingFromCollateral && shouldDisplayAllowance, [
     shouldDisplayAllowance,
-    splitFromCollateral,
+    isSplittingFromCollateral,
   ])
 
-  const canSubmit = useMemo(() => {
-    if (splitFromCollateral) {
-      return isValid && allowanceFinished
-    } else {
-      return isValid
+  const isValid = useMemo(
+    () =>
+      conditionId &&
+      condition &&
+      (isSplittingFromCollateral ? collateralAddress : position) &&
+      !amount.isZero(),
+    [conditionId, condition, position, collateralAddress, amount, isSplittingFromCollateral]
+  )
+
+  const [isDirty, setIsDirty] = useState(false)
+
+  useEffect(() => {
+    if (conditionId || condition || position || !amount.isZero()) {
+      setIsDirty(true)
     }
-  }, [splitFromCollateral, isValid, allowanceFinished])
+  }, [conditionId, condition, position, amount])
+
+  const canSubmit = useMemo(
+    () => (isSplittingFromCollateral ? isValid && allowanceFinished : isValid),
+    [isSplittingFromCollateral, isValid, allowanceFinished]
+  )
 
   const outcomesByRow = '14'
 
-  const fullLoadingActionButton = status.isSuccess()
-    ? {
-        buttonType: ButtonType.primary,
-        onClick: () => setStatus(Remote.notAsked<SplitStatus>()),
-        text: 'OK',
-      }
-    : status.isFailure()
-    ? {
-        buttonType: ButtonType.danger,
-        text: 'Close',
-        onClick: () => setStatus(Remote.notAsked<SplitStatus>()),
-      }
-    : undefined
+  const fullLoadingActionButton = useMemo(
+    () =>
+      transactionStatus.isSuccess()
+        ? {
+            buttonType: ButtonType.primary,
+            onClick: () => clearComponent(),
+            text: 'OK',
+          }
+        : transactionStatus.isFailure()
+        ? {
+            buttonType: ButtonType.danger,
+            text: 'Close',
+            onClick: () => setTransactionStatus(Remote.notAsked<SplitStatus>()),
+          }
+        : undefined,
+    [transactionStatus, clearComponent]
+  )
 
-  const fullLoadingIcon = status.isFailure()
-    ? IconTypes.error
-    : status.isSuccess()
-    ? IconTypes.ok
-    : IconTypes.spinner
+  const fullLoadingIcon = useMemo(
+    () =>
+      transactionStatus.isFailure()
+        ? IconTypes.error
+        : transactionStatus.isSuccess()
+        ? IconTypes.ok
+        : IconTypes.spinner,
+    [transactionStatus]
+  )
 
-  const fullLoadingMessage = status.isFailure()
-    ? status.getFailure()
-    : status.isLoading()
-    ? 'Working...'
-    : undefined
+  const fullLoadingMessage = useMemo(
+    () =>
+      transactionStatus.isFailure()
+        ? transactionStatus.getFailure()
+        : transactionStatus.isLoading()
+        ? 'Working...'
+        : undefined,
+    [transactionStatus]
+  )
 
-  const splitPositionsTable =
-    status.isSuccess() && status.hasData() ? (
-      <DisplayTablePositionsWrapper
-        callbackOnHistoryPush={clearComponent}
-        collateral={status.get().collateral}
-        positionIds={status.get().positionIds}
-      />
-    ) : null
+  const splitPositionsTable = useMemo(
+    () =>
+      transactionStatus.isSuccess() && transactionStatus.hasData() ? (
+        <DisplayTablePositionsWrapper
+          callbackOnHistoryPush={clearComponent}
+          collateral={transactionStatus.get().collateral}
+          positionIds={transactionStatus.get().positionIds}
+        />
+      ) : null,
+    [transactionStatus, clearComponent]
+  )
+
+  const onRowClicked = useCallback((row: GetCondition_condition) => {
+    setConditionId(row.id)
+  }, [])
+
+  useEffect(() => {
+    setResetFilterUpdate(!resetFilterUpdate)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status])
 
   return (
     <CenteredCard>
-      <Row cols="1fr">
-        <InputCondition formMethods={formMethods} onConditionChange={handleConditionChange} />
-      </Row>
+      <SelectableConditionTable
+        onClearSelection={() => clearComponent()}
+        onRowClicked={onRowClicked}
+        refetch={transactionStatus.isSuccess()}
+        resetFilterUpdate={resetFilterUpdate}
+        selectedConditionId={conditionId}
+      />
       {condition && condition.resolved && (
-        <Row cols="1fr">
+        <Row>
           <StatusInfoInline status={StatusInfoType.warning}>
             This condition is already resolved.
           </StatusInfoInline>
         </Row>
       )}
-      <Row cols="1fr" marginBottomXL>
-        <TitleValue
-          title="Split From"
-          value={
-            <SplitFrom
-              cleanAllowanceError={cleanAllowanceError}
-              formMethods={formMethods}
-              onPositionChange={setPosition}
-              splitFromCollateral={splitFromCollateral}
-              splitFromPosition={splitFromPosition}
-              tokens={tokens}
-            />
-          }
-        />
+      <Row>
+        {collateral && (
+          <TitleValue
+            title="Split From"
+            value={
+              <SplitFrom
+                cleanAllowanceError={cleanAllowanceError}
+                collateral={collateral}
+                onCollateralChange={setCollateralAddress}
+                onPositionChange={setPosition}
+                onSplitFromChange={setSplitFrom}
+                position={position}
+                splitFrom={splitFrom}
+                tokens={tokens}
+              />
+            }
+          />
+        )}
       </Row>
-      {isAllowanceVisible && (
-        <SetAllowance
-          collateral={collateral}
-          error={allowanceError}
-          fetching={fetchingAllowance}
-          finished={allowanceFinished}
-          onUnlock={unlockCollateral}
-        />
+      {isAllowanceVisible && collateral && (
+        <Row paddingTop>
+          <SetAllowance
+            collateral={collateral}
+            error={allowanceError}
+            fetching={fetchingAllowance}
+            finished={allowanceFinished}
+            onUnlock={unlockCollateral}
+          />
+        </Row>
       )}
-      <Row cols="1fr" marginBottomXL>
-        <InputAmount
-          collateral={collateral}
-          formMethods={formMethods}
-          positionId={positionId}
-          splitFrom={splitFrom}
-        />
+      <Row>
+        {collateral && (
+          <InputAmount
+            amount={amount}
+            collateral={collateral}
+            onAmountChange={(value: BigNumber) => setAmount(value)}
+            position={position}
+            splitFrom={splitFrom}
+          />
+        )}
       </Row>
-      <Row cols="1fr" marginBottomXL>
+      <Row paddingTop>
         <TitleValue
           title="Partition"
           titleControl={
@@ -321,7 +369,7 @@ export const Form = ({
           value={
             <>
               <CardTextSm>Outcomes Collections</CardTextSm>
-              <StripedListStyled minHeight="200px">
+              <StripedListStyled>
                 {numberedOutcomes && numberedOutcomes.length ? (
                   numberedOutcomes.map(
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -349,27 +397,29 @@ export const Form = ({
           }
         />
       </Row>
-      <Row cols="1fr" marginBottomXL>
-        <PositionPreview
-          amount={amount}
-          conditionId={conditionIdToPreviewShow}
-          partition={partition}
-          position={position}
-          selectedCollateral={collateral}
-          splitFrom={splitFrom}
-        />
+      <Row paddingTop>
+        {collateral && (
+          <PositionPreview
+            amount={amount}
+            conditionId={conditionIdToPreviewShow}
+            partition={partition}
+            position={position}
+            selectedCollateral={collateral}
+            splitFrom={splitFrom}
+          />
+        )}
       </Row>
-      {(status.isLoading() || status.isFailure()) && (
+      {(transactionStatus.isLoading() || transactionStatus.isFailure()) && (
         <FullLoading
           actionButton={fullLoadingActionButton}
           icon={fullLoadingIcon}
           message={fullLoadingMessage}
-          title={status.isFailure() ? 'Error' : 'Split positions'}
+          title={transactionStatus.isFailure() ? 'Error' : 'Split positions'}
         />
       )}
-      {status.isSuccess() && (
+      {transactionStatus.isSuccess() && (
         <Modal
-          isOpen={status.isSuccess()}
+          isOpen={transactionStatus.isSuccess()}
           onRequestClose={clearComponent}
           subTitle={
             <>
@@ -386,7 +436,7 @@ export const Form = ({
         </Modal>
       )}
       <ButtonContainer>
-        <Button disabled={!canSubmit} onClick={handleSubmit(onSubmit)}>
+        <Button disabled={!canSubmit} onClick={onSubmit}>
           Split
         </Button>
       </ButtonContainer>
@@ -404,7 +454,7 @@ export const Form = ({
             ? true
             : 'Are you sure you want to leave this page? The changes you made will be lost?'
         }
-        when={dirty}
+        when={isDirty}
       />
     </CenteredCard>
   )

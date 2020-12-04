@@ -19,6 +19,7 @@ import {
 } from 'components/common/Dropdown'
 import { TokenIcon } from 'components/common/TokenIcon'
 import { Tooltip } from 'components/common/Tooltip'
+import { OmenMarketsOrQuestion } from 'components/form/OmenMarketsOrQuestion'
 import { DisplayHashesTableModal } from 'components/modals/DisplayHashesTableModal'
 import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
 import { UnwrapModal } from 'components/modals/UnwrapModal'
@@ -43,7 +44,6 @@ import { TitleValue } from 'components/text/TitleValue'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useCollateral } from 'hooks/useCollateral'
 import { useIsConditionFromOmen } from 'hooks/useIsConditionFromOmen'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { GetPosition_position as Position } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
@@ -52,16 +52,11 @@ import {
   formatTS,
   getRealityQuestionUrl,
   indexSetToBase2,
+  isOracleRealitio,
   positionString,
   truncateStringInTheMiddle,
 } from 'util/tools'
-import {
-  HashArray,
-  LocalStorageManagement,
-  NetworkIds,
-  OutcomeProps,
-  TransferOptions,
-} from 'util/types'
+import { HashArray, NetworkIds, OutcomeProps, TransferOptions } from 'util/types'
 
 const CollateralText = styled.span`
   color: ${(props) => props.theme.colors.darkerGrey};
@@ -155,7 +150,6 @@ export const Contents = (props: Props) => {
   } = props
 
   const { createTimestamp, id: positionId, indexSets } = position
-  const { setValue } = useLocalStorage(LocalStorageManagement.PositionId)
 
   const { collateral: collateralERC1155 } = useCollateral(collateralTokenAddress)
   const { collateral: collateralERC20 } = useCollateral(wrappedTokenAddress)
@@ -206,7 +200,7 @@ export const Contents = (props: Props) => {
     })
   }, [indexSets])
 
-  const isConditionFromOmen = useIsConditionFromOmen(oracleIds[0])
+  const isConditionFromOmen = useIsConditionFromOmen(oracleIds)
 
   const ERC1155Symbol = useMemo(
     () => (collateralERC1155 && collateralERC1155.symbol ? collateralERC1155.symbol : ''),
@@ -339,19 +333,8 @@ export const Contents = (props: Props) => {
     const menu = [
       {
         disabled: !userHasBalance || !isConnected,
-        href: `/redeem`,
-        onClick: () => {
-          setValue(positionId)
-        },
+        href: `/redeem/${positionId}`,
         text: 'Redeem',
-      },
-      {
-        disabled: !userHasBalance || !isConnected,
-        href: `/split`,
-        onClick: () => {
-          setValue(positionId)
-        },
-        text: 'Split',
       },
       {
         disabled: !userHasBalance || !isConnected || !isSigner,
@@ -364,7 +347,7 @@ export const Contents = (props: Props) => {
     ]
 
     return menu
-  }, [setValue, positionId, isConnected, isSigner, userHasBalance])
+  }, [userHasBalance, isConnected, isSigner, positionId])
 
   const conditionIdLink = (id: string) => {
     return (
@@ -416,15 +399,32 @@ export const Contents = (props: Props) => {
     }
   }, [isConditionFromOmen, areQuestionIdsMoreThanOne])
 
-  const oracleName = useMemo(
-    () =>
-      isConditionFromOmen ? (
-        networkConfig.getOracleFromAddress(oracleIds[0]).description
-      ) : (
-        <FormatHash hash={truncateStringInTheMiddle(oracleIds[0], 8, 6)} />
-      ),
-    [networkConfig, oracleIds, isConditionFromOmen]
-  )
+  const oracleName = useMemo(() => {
+    const oracleIdsFiltered = isConditionFromOmen
+      ? oracleIds.filter((oracle: string) => isOracleRealitio(oracle, networkConfig))
+      : oracleIds
+    const oracleAddress = oracleIdsFiltered[0]
+
+    return isConditionFromOmen ? (
+      networkConfig.getOracleFromAddress(oracleAddress).description
+    ) : (
+      <FormatHash hash={truncateStringInTheMiddle(oracleAddress, 8, 6)} />
+    )
+  }, [networkConfig, oracleIds, isConditionFromOmen])
+  const questionIdFromOmen = useMemo(() => {
+    const questionIdsFiltered = isConditionFromOmen
+      ? questionIds.filter((questionId: string, index: number) =>
+          isOracleRealitio(oracleIds[index], networkConfig)
+        )
+      : questionIds
+    return questionIdsFiltered[0]
+  }, [networkConfig, oracleIds, questionIds, isConditionFromOmen])
+  const oracleId = useMemo(() => {
+    const oracleIdsFiltered = isConditionFromOmen
+      ? oracleIds.filter((oracle: string) => isOracleRealitio(oracle, networkConfig))
+      : oracleIds
+    return oracleIdsFiltered[0]
+  }, [networkConfig, oracleIds, isConditionFromOmen])
 
   const getRealityQuestionUrlMemoized = useCallback(
     (questionId: string): string => getRealityQuestionUrl(questionId, networkConfig),
@@ -461,7 +461,7 @@ export const Contents = (props: Props) => {
         />
       }
     >
-      <Row marginBottomXL>
+      <Row cols="1fr 1fr">
         <TitleValue
           title="Position Id"
           value={
@@ -505,17 +505,16 @@ export const Contents = (props: Props) => {
           value={
             <FlexRow>
               {oracleName}
-              {!areOracleIdsMoreThanOne && <ButtonCopy value={oracleIds[0]} />}
+              {!areOracleIdsMoreThanOne && <ButtonCopy value={oracleId} />}
               {areOracleIdsMoreThanOne && (
                 <ButtonExpand onClick={() => setOpenDisplayOraclesIdsTableModal(true)} />
               )}
               {isConditionFromOmen && (
-                <ExternalLink href={getRealityQuestionUrlMemoized(questionIds[0])} />
+                <ExternalLink href={getRealityQuestionUrlMemoized(questionIdFromOmen)} />
               )}
             </FlexRow>
           }
         />
-
         {conditions.length > 0 && (
           <TitleValue
             title={!areConditionsMoreThanOne ? 'Condition Id' : 'Condition Ids'}
@@ -532,7 +531,8 @@ export const Contents = (props: Props) => {
           />
         )}
       </Row>
-      <Row cols="1fr" marginBottomXL>
+      <OmenMarketsOrQuestion conditionsIds={conditions.map((condition) => condition.hash)} />
+      <Row paddingTop>
         <TitleValue
           title="Wrapped Collateral"
           value={
@@ -583,7 +583,7 @@ export const Contents = (props: Props) => {
           }
         />
       </Row>
-      <Row cols="1fr" marginBottomXL>
+      <Row paddingTop>
         <TitleValue
           title="Wrapped Collateral Address"
           value={
@@ -601,7 +601,7 @@ export const Contents = (props: Props) => {
           }
         />
       </Row>
-      <Row cols="1fr" marginBottomXL>
+      <Row paddingTop>
         <TitleValue
           title="Partition"
           value={
@@ -639,7 +639,7 @@ export const Contents = (props: Props) => {
         />
       </Row>
       {positionPreview && (
-        <Row cols="1fr" marginBottomXL>
+        <Row paddingTop>
           <TitleValue
             title="Position Preview"
             value={<StripedListItemPreview>{positionPreview}</StripedListItemPreview>}
@@ -684,19 +684,22 @@ export const Contents = (props: Props) => {
           onRequestClose={() => setOpenDisplayConditionsTableModal(false)}
           title="Conditions"
           titleTable="Condition Id"
-          url="conditions"
         />
       )}
       {openDisplayOraclesIdsTableModal && areOracleIdsMoreThanOne && (
         <DisplayHashesTableModal
-          hashes={oracleIds.map((id) => {
-            return { hash: id }
+          hashes={oracleIds.map((address: string, index: number) => {
+            const hash: HashArray = { hash: address }
+            if (isOracleRealitio(address, networkConfig)) {
+              hash.title = networkConfig.getOracleFromAddress(address).description
+              hash.url = getRealityQuestionUrl(questionIds[index], networkConfig)
+            }
+            return hash
           })}
           isOpen={openDisplayOraclesIdsTableModal}
           onRequestClose={() => setOpenDisplayOraclesIdsTableModal(false)}
           title="Oracles"
           titleTable="Oracle Id"
-          url=""
         />
       )}
       {openDisplayQuestionIdsTableModal && areQuestionIdsMoreThanOne && (
@@ -708,7 +711,6 @@ export const Contents = (props: Props) => {
           onRequestClose={() => setOpenDisplayQuestionIdsTableModal(false)}
           title="Question Ids"
           titleTable="Question Id"
-          url=""
         />
       )}
       {isWorking && (
