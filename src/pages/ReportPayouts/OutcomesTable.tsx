@@ -82,15 +82,6 @@ const TextfieldProbability = styled(Textfield)`
   text-align: right;
   width: 70px;
 
-  ::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  ::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-
   &:focus {
     border-bottom-color: ${(props) => props.theme.colors.primary};
   }
