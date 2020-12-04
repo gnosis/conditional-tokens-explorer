@@ -60,6 +60,7 @@ interface Props {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   theme?: any
   title?: string
+  resetFilterUpdate?: boolean
 }
 
 interface Params {
@@ -74,6 +75,7 @@ const SelectConditionTable: React.FC<Props> = (props) => {
     onClearSelection,
     onRowClicked,
     refetch,
+    resetFilterUpdate = false,
     selectedConditionId,
     theme,
     title = 'Conditions',
@@ -157,6 +159,11 @@ const SelectConditionTable: React.FC<Props> = (props) => {
     setSelectedFromCreationDate(null)
     onClearSelection()
   }, [resetPagination, CPKService, address, allowToDisplayOnlyConditionsToReport, onClearSelection])
+
+  useEffect(() => {
+    resetFilters()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resetFilterUpdate])
 
   useEffect(() => {
     setIsFiltering(

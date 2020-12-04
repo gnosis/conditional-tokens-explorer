@@ -41,8 +41,6 @@ export const OmenMarketsOrQuestion: React.FC<Props> = ({ conditionsIds, title })
   } = useOmenMarkets(conditionsIds)
   const [openOmenMarkets, setOpenOmenMarkets] = useState(false)
 
-  console.log(dataOmenMarkets)
-
   return loadingOmenMarkets ? (
     <Row>
       <TitleValue title="Loading" value="-" />

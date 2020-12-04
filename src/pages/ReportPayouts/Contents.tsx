@@ -34,6 +34,7 @@ export const Contents: React.FC = () => {
   const questionId = useMemo(() => condition && condition.questionId, [condition])
   const outcomeSlotCount = useMemo(() => condition && condition.outcomeSlotCount, [condition])
   const [isDirty, setIsDirty] = useState(false)
+  const [resetFilterUpdate, setResetFilterUpdate] = useState(false)
 
   const isConditionResolved = useMemo(() => condition && condition.resolved, [condition])
   const oracle = useMemo(() => condition && condition.oracle, [condition])
@@ -175,6 +176,11 @@ export const Contents: React.FC = () => {
     [condition, status, isDirty, isPayoutsEmpty]
   )
 
+  useEffect(() => {
+    setResetFilterUpdate(!resetFilterUpdate)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status])
+
   const thereAreErrors =
     isNotAllowedToReportPayout || isNotConnected || isPayoutPositive || isConditionResolved
 
@@ -187,6 +193,7 @@ export const Contents: React.FC = () => {
         }}
         onRowClicked={onRowClicked}
         refetch={transactionStatus.isSuccess()}
+        resetFilterUpdate={resetFilterUpdate}
         selectedConditionId={conditionId}
       />
       <TitleValue
