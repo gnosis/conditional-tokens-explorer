@@ -1,6 +1,7 @@
 Version 0.3.0 (2020-12-03)
 ==========================
 
+- Fix regression in redeem #734
 - Question/Outcomes/Category is not displayed in an Omen condition details when create in it the CTE #718
 - Do not apply 3 sec of a delay when a date field is filled in with a correct value #711
 - Enable 'Clear' button as soon as a value appears in the Date filter #706
