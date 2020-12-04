@@ -37,16 +37,9 @@ const Dash = styled.div`
 `
 
 const TextFieldStyled = styled(Textfield)`
-  -moz-appearance: textfield;
   font-size: 14px;
   height: 32px;
   min-width: 0;
-
-  &::-webkit-inner-spin-button,
-  &::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
 `
 
 interface Props {
