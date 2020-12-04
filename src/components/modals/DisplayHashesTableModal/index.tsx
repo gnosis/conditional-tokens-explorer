@@ -9,6 +9,11 @@ const Table = styled(DisplayTableHashes)`
   &.noMarginBottom {
     margin-bottom: 0;
   }
+
+  &.constrainContents .rdt_Table {
+    max-width: 100%;
+    min-width: 0;
+  }
 `
 
 interface Props extends ModalProps {
@@ -27,7 +32,7 @@ export const DisplayHashesTableModal = (props: Props) => {
       title={title}
       {...restProps}
     >
-      <Table className="noMarginBottom" hashes={hashes} titleTable={titleTable} />
+      <Table className="noMarginBottom constrainContents" hashes={hashes} titleTable={titleTable} />
     </Modal>
   )
 }
