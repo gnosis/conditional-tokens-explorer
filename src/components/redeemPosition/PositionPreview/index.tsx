@@ -6,6 +6,8 @@ import {
   StripedListEmpty,
   StripedListItem,
 } from 'components/pureStyledComponents/StripedList'
+import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { SpinnerSize } from 'components/statusInfo/common'
 import { TitleValue } from 'components/text/TitleValue'
 import { NetworkConfig } from 'config/networkConfig'
 import { useBalanceForPosition } from 'hooks/useBalanceForPosition'
@@ -18,9 +20,11 @@ interface Props {
   position: Maybe<PositionWithUserBalanceWithDecimals>
   condition: Maybe<GetCondition_condition>
   networkConfig: NetworkConfig
+  isLoading: boolean
 }
 
-export const PositionPreview = ({ condition, position }: Props) => {
+export const PositionPreview = (props: Props) => {
+  const { condition, isLoading, position } = props
   const { balanceERC1155, refetch } = useBalanceForPosition(position?.id || '')
   const { collateral: token } = useCollateral(position ? position.collateralToken : '')
 
@@ -50,7 +54,9 @@ export const PositionPreview = ({ condition, position }: Props) => {
       title="Redeemed Position Preview"
       value={
         <StripedList>
-          {redeemedPreview ? (
+          {isLoading ? (
+            <InlineLoading size={SpinnerSize.small} />
+          ) : redeemedPreview ? (
             <StripedListItem>
               <strong>{redeemedPreview}</strong>
             </StripedListItem>
