@@ -111,6 +111,7 @@ export const PositionsList = () => {
   const [searchBy, setSearchBy] = useState<PositionSearchOptions>(PositionSearchOptions.PositionId)
   const [showFilters, setShowFilters] = useState(false)
   const [isFiltering, setIsFiltering] = useState(false)
+  const [positionsWithBalance, setPositionsWithBalance] = useState(false)
 
   const [openDisplayHashesTableModal, setOpenDisplayHashesTableModal] = useState(false)
   const [hashesTableModal, setHashesTableModal] = useState<Array<HashArray>>([])
@@ -142,6 +143,7 @@ export const PositionsList = () => {
     setSelectedCollateralFilter(null)
     setSelectedCollateralValue(CollateralFilterOptions.All)
     setWrappedCollateral(WrappedCollateralOptions.All)
+    setPositionsWithBalance(false)
   }, [resetPagination])
 
   useEffect(() => {
@@ -151,10 +153,12 @@ export const PositionsList = () => {
         wrappedCollateral !== WrappedCollateralOptions.All ||
         selectedCollateralValue !== CollateralFilterOptions.All ||
         wrappedCollateral !== WrappedCollateralOptions.All ||
-        selectedCollateralFilter !== null
+        selectedCollateralFilter !== null ||
+        positionsWithBalance
     )
   }, [
     isFiltering,
+    positionsWithBalance,
     selectedCollateralFilter,
     selectedCollateralValue,
     selectedFromCreationDate,
@@ -191,8 +195,20 @@ export const PositionsList = () => {
     debouncedHandlerTextToSearch('')
   }, [debouncedHandlerTextToSearch])
 
+  const filterPositions = useCallback(
+    (position: PositionWithUserBalanceWithDecimals) => {
+      if (positionsWithBalance) {
+        return position.userBalanceERC1155Numbered > 0 || position.userBalanceERC20Numbered > 0
+      } else {
+        return true
+      }
+    },
+    [positionsWithBalance]
+  )
+
   const { data, error, loading, refetchPositions, refetchUserPositions } = usePositionsList(
-    advancedFilters
+    advancedFilters,
+    filterPositions
   )
 
   const isLoading = useMemo(() => !textToSearch && loading && transfer.isNotAsked(), [
@@ -673,6 +689,10 @@ export const PositionsList = () => {
     setShowFilters(!showFilters)
   }, [showFilters])
 
+  const togglePositionsWithBalance = useCallback(() => {
+    setPositionsWithBalance(!positionsWithBalance)
+  }, [positionsWithBalance])
+
   const showSpinner = useMemo(() => (isLoading || isSearching) && !error, [
     isLoading,
     isSearching,
@@ -740,6 +760,15 @@ export const PositionsList = () => {
       {!error && (
         <TwoColumnsCollapsibleLayout isCollapsed={!showFilters}>
           <Sidebar isVisible={showFilters}>
+            {isConnected && (
+              <SidebarRow>
+                <Switch
+                  active={positionsWithBalance}
+                  label="With Balance"
+                  onClick={togglePositionsWithBalance}
+                />
+              </SidebarRow>
+            )}
             <SidebarRow>
               <CollateralFilterDropdown
                 onClick={(symbol: string, address: Maybe<string[]>) => {
