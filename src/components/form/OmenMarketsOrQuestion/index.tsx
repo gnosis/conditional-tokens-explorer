@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import { useQuery } from '@apollo/react-hooks'
+import React, { useMemo, useState } from 'react'
 import styled from 'styled-components'
 
 import { ButtonCopy } from 'components/buttons'
@@ -9,6 +10,14 @@ import { Row } from 'components/pureStyledComponents/Row'
 import { TitleValue } from 'components/text/TitleValue'
 import { INFORMATION_NOT_AVAILABLE } from 'config/constants'
 import { useOmenMarkets } from 'hooks/useOmenMarkets'
+import {
+  GetConditionWithQuestions,
+  GetConditionWithQuestionsOfPosition,
+} from 'queries/CTEConditionsWithQuestions'
+import {
+  GetConditionWithQuestions as FromConditionType,
+  GetConditionWithQuestionsOfPosition_position as FromPositionType,
+} from 'types/generatedGQLForCTE'
 import { getOmenMarketURL } from 'util/tools'
 
 const ButtonCopyInlineFlex = styled(ButtonCopy)`
@@ -27,21 +36,66 @@ const DisplayBlock = styled.div`
   display: block;
 `
 
-interface Props {
-  conditionsIds: string[]
-  title?: string
-}
+type Props =
+  | {
+      positionId: string
+      conditionId?: never
+    }
+  | {
+      positionId?: never
+      conditionId: string
+    }
 
-export const OmenMarketsOrQuestion: React.FC<Props> = ({ conditionsIds, title }) => {
+export const OmenMarketsOrQuestion: React.FC<Props> = ({ conditionId, positionId }) => {
+  // TODO Reuse as a way to ask something from position or from condition
+  const { data: conditionsFromPosition, loading: loadingConditionsFromPosition } = useQuery<
+    FromPositionType
+  >(GetConditionWithQuestionsOfPosition, {
+    skip: !!conditionId,
+    variables: { id: positionId },
+  })
+
+  const { data: conditions, loading: loadingConditions } = useQuery<FromConditionType>(
+    GetConditionWithQuestions,
+    {
+      skip: !!positionId,
+      variables: { id: conditionId },
+    }
+  )
+
+  const conditionsWithQuestions = useMemo(() => {
+    if (!loadingConditions && !loadingConditionsFromPosition) {
+      return [conditionsFromPosition?.conditions || conditions?.condition || []].flat()
+    } else {
+      return []
+    }
+  }, [conditions, conditionsFromPosition, loadingConditions, loadingConditionsFromPosition])
+
   const {
     areOmenMarketsMoreThanOne,
     data: dataOmenMarkets,
     firstMarket,
     loading: loadingOmenMarkets,
-  } = useOmenMarkets(conditionsIds)
+  } = useOmenMarkets(conditionsWithQuestions.map((c) => c.id))
+
+  const loading = useMemo(
+    () => !loadingOmenMarkets && !loadingConditions && !loadingConditionsFromPosition,
+    [loadingConditions, loadingConditionsFromPosition, loadingOmenMarkets]
+  )
+
+  // TODO Narrow filtered type
+  const titlesIDsPairs = useMemo(
+    () =>
+      conditionsWithQuestions
+        .map(({ id, question }) => {
+          return { id, title: question?.title }
+        })
+        .filter((p) => p.title),
+    [conditionsWithQuestions]
+  )
   const [openOmenMarkets, setOpenOmenMarkets] = useState(false)
 
-  return loadingOmenMarkets ? (
+  return loading ? (
     <Row>
       <TitleValue title="Loading" value="-" />
     </Row>
@@ -73,9 +127,9 @@ export const OmenMarketsOrQuestion: React.FC<Props> = ({ conditionsIds, title })
         />
       )}
     </Row>
-  ) : title ? (
+  ) : titlesIDsPairs.length > 0 ? (
     <Row>
-      <TitleValue title="Question" value={title} />
+      <TitleValue title="Question" value={titlesIDsPairs[0]} />
     </Row>
   ) : (
     <Row>
