@@ -19,6 +19,7 @@ import {
 import { TokenIcon } from 'components/common/TokenIcon'
 import { CollateralFilterDropdown } from 'components/filters/CollateralFilterDropdown'
 import { DateFilter } from 'components/filters/DateFilter'
+import { WithBalanceFilterDropdown } from 'components/filters/WithBalanceFilterDropdown'
 import { WrappedCollateralFilterDropdown } from 'components/filters/WrappedCollateralFilterDropdown'
 import { SearchField } from 'components/form/SearchField'
 import { Switch } from 'components/form/Switch'
@@ -58,6 +59,7 @@ import {
   PositionSearchOptions,
   Token,
   TransferOptions,
+  WithBalanceOptions,
   WrappedCollateralOptions,
 } from 'util/types'
 
@@ -97,6 +99,10 @@ export const PositionsList = () => {
   const [wrappedCollateral, setWrappedCollateral] = useState<WrappedCollateralOptions>(
     WrappedCollateralOptions.All
   )
+  const [positionsWithBalance, setPositionsWithBalance] = useState<WithBalanceOptions>(
+    WithBalanceOptions.All
+  )
+
   const [isTransferOutcomeModalOpen, setIsTransferOutcomeModalOpen] = useState(false)
   const [selectedPositionId, setSelectedPositionId] = useState<string>('')
   const [selectedCollateralToken, setSelectedCollateralToken] = useState<Maybe<Token>>(null)
@@ -111,7 +117,6 @@ export const PositionsList = () => {
   const [searchBy, setSearchBy] = useState<PositionSearchOptions>(PositionSearchOptions.PositionId)
   const [showFilters, setShowFilters] = useState(false)
   const [isFiltering, setIsFiltering] = useState(false)
-  const [positionsWithBalance, setPositionsWithBalance] = useState(false)
 
   const [openDisplayHashesTableModal, setOpenDisplayHashesTableModal] = useState(false)
   const [hashesTableModal, setHashesTableModal] = useState<Array<HashArray>>([])
@@ -143,7 +148,7 @@ export const PositionsList = () => {
     setSelectedCollateralFilter(null)
     setSelectedCollateralValue(CollateralFilterOptions.All)
     setWrappedCollateral(WrappedCollateralOptions.All)
-    setPositionsWithBalance(false)
+    setPositionsWithBalance(WithBalanceOptions.All)
   }, [resetPagination])
 
   useEffect(() => {
@@ -154,7 +159,7 @@ export const PositionsList = () => {
         selectedCollateralValue !== CollateralFilterOptions.All ||
         wrappedCollateral !== WrappedCollateralOptions.All ||
         selectedCollateralFilter !== null ||
-        positionsWithBalance
+        positionsWithBalance !== WithBalanceOptions.All
     )
   }, [
     isFiltering,
@@ -197,10 +202,16 @@ export const PositionsList = () => {
 
   const filterPositions = useCallback(
     (position: PositionWithUserBalanceWithDecimals) => {
-      if (positionsWithBalance) {
-        return position.userBalanceERC1155Numbered > 0 || position.userBalanceERC20Numbered > 0
-      } else {
-        return true
+      switch (positionsWithBalance) {
+        case WithBalanceOptions.Yes:
+          return position.userBalanceERC1155Numbered > 0 || position.userBalanceERC20Numbered > 0
+        case WithBalanceOptions.No:
+          return (
+            position.userBalanceERC1155Numbered === 0 && position.userBalanceERC20Numbered === 0
+          )
+        case WithBalanceOptions.All:
+        default:
+          return true
       }
     },
     [positionsWithBalance]
@@ -689,10 +700,6 @@ export const PositionsList = () => {
     setShowFilters(!showFilters)
   }, [showFilters])
 
-  const togglePositionsWithBalance = useCallback(() => {
-    setPositionsWithBalance(!positionsWithBalance)
-  }, [positionsWithBalance])
-
   const showSpinner = useMemo(() => (isLoading || isSearching) && !error, [
     isLoading,
     isSearching,
@@ -760,15 +767,6 @@ export const PositionsList = () => {
       {!error && (
         <TwoColumnsCollapsibleLayout isCollapsed={!showFilters}>
           <Sidebar isVisible={showFilters}>
-            {isConnected && (
-              <SidebarRow>
-                <Switch
-                  active={positionsWithBalance}
-                  label="With Balance"
-                  onClick={togglePositionsWithBalance}
-                />
-              </SidebarRow>
-            )}
             <SidebarRow>
               <CollateralFilterDropdown
                 onClick={(symbol: string, address: Maybe<string[]>) => {
@@ -786,6 +784,16 @@ export const PositionsList = () => {
                 value={wrappedCollateral}
               />
             </SidebarRow>
+            {isConnected && (
+              <SidebarRow>
+                <WithBalanceFilterDropdown
+                  onClick={(value: WithBalanceOptions) => {
+                    setPositionsWithBalance(value)
+                  }}
+                  value={positionsWithBalance}
+                />
+              </SidebarRow>
+            )}
             <SidebarRow>
               <DateFilter
                 fromValue={selectedFromCreationDate}
