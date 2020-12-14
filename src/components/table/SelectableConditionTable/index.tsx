@@ -418,9 +418,6 @@ const SelectConditionTable: React.FC<Props> = (props) => {
               </FiltersSwitchWrapper>
             }
           />
-          {error && !isBytes32Error && !isLoading && (
-            <InfoCard message={error.message} title="Error" />
-          )}
           <CompactFiltersLayout isVisible={(!error || !!isBytes32Error) && showFilters}>
             <OraclesFilterDropdown
               onClick={(value: OracleFilterOptions, filter: string[]) => {
@@ -480,6 +477,8 @@ const SelectConditionTable: React.FC<Props> = (props) => {
             noDataComponent={
               showSpinner ? (
                 <InlineLoading size={SpinnerSize.regular} />
+              ) : error && !isBytes32Error && !isLoading ? (
+                <InfoCard message={error.message} title="Error" />
               ) : status === Web3ContextStatus.Infura &&
                 selectedOracleValue === OracleFilterOptions.Current ? (
                 <EmptyContentText>User is not connected to wallet.</EmptyContentText>
