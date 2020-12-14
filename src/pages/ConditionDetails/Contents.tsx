@@ -47,7 +47,7 @@ interface Props {
 }
 
 export const Contents: React.FC<Props> = ({ condition }) => {
-  const { _type: status, address, networkConfig } = useWeb3ConnectedOrInfura()
+  const { _type: status, cpkAddress, networkConfig } = useWeb3ConnectedOrInfura()
 
   const {
     createTimestamp,
@@ -63,8 +63,8 @@ export const Contents: React.FC<Props> = ({ condition }) => {
 
   const isConnected = useMemo(() => status === Web3ContextStatus.Connected, [status])
   const isAllowedToReport = useMemo(
-    () => address && address.toLowerCase() === oracle.toLowerCase(),
-    [address, oracle]
+    () => cpkAddress && cpkAddress.toLowerCase() === oracle.toLowerCase(),
+    [cpkAddress, oracle]
   )
 
   const dropdownItems = useMemo(() => {
