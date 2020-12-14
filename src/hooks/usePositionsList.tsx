@@ -34,7 +34,7 @@ type Variables = { [k: string]: any }
  * Return a array of positions, and the user balance if it's connected.
  */
 export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
-  const { address, networkConfig, provider } = useWeb3ConnectedOrInfura()
+  const { cpkAddress, networkConfig, provider } = useWeb3ConnectedOrInfura()
 
   const [data, setData] = useState<Remote<Maybe<PositionWithUserBalanceWithDecimals[]>>>(
     Remote.loading()
@@ -87,10 +87,10 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
   const { data: userData, error: userError, refetch: refetchUserPositions } = useQuery<
     UserWithPositions
   >(UserWithPositionsQuery, {
-    skip: !address,
+    skip: !cpkAddress,
     fetchPolicy: 'no-cache',
     variables: {
-      account: address?.toLowerCase(),
+      account: cpkAddress?.toLowerCase(),
     },
   })
 
