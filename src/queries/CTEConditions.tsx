@@ -55,12 +55,6 @@ const conditionFragment = gql`
     payoutDenominator
     resolveTimestamp
     resolveBlockNumber
-    positions {
-      id
-      collateralToken {
-        id
-      }
-    }
   }
 `
 export const buildQueryConditionsList = (
