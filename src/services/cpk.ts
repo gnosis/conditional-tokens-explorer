@@ -3,6 +3,7 @@ import { TransactionReceipt } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 import { Moment } from 'moment'
 
+import { txs } from '@gnosis.pm/safe-apps-sdk/dist/txs'
 import { CONFIRMATIONS_TO_WAIT } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
 import CPK from 'contract-proxy-kit/lib/esm'
@@ -10,8 +11,9 @@ import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapt
 import { ConditionalTokensService } from 'services/conditionalTokens'
 import { ERC20Service } from 'services/erc20'
 import { RealityService } from 'services/reality'
+import { Wrapper1155Service } from 'services/wrapper1155'
 import { getLogger } from 'util/logger'
-import { improveErrorMessage } from 'util/tools'
+import { improveErrorMessage, sleep } from 'util/tools'
 
 const logger = getLogger('Services::CPKService')
 
@@ -56,7 +58,7 @@ interface CPKSplitPositionParams {
   conditionId: string
   partition: BigNumber[]
   amount: BigNumber
-  account: string
+  address: string
 }
 
 interface CPKMergePositionParams {
@@ -65,6 +67,33 @@ interface CPKMergePositionParams {
   parentCollectionId: string // If doesn't exist, must be zero, ethers.constants.HashZero
   conditionId: string
   partition: string[]
+  amount: BigNumber
+}
+
+interface TransactionResult {
+  hash?: string
+  safeTxHash?: string
+}
+
+interface TxOptions {
+  value?: BigNumber
+  gas?: number
+}
+
+interface CPKWrapParams {
+  CTService: ConditionalTokensService
+  addressFrom: string
+  addressTo: string
+  positionId: string
+  amount: BigNumber // outcomeTokensToTransfer
+}
+
+interface CPKUnwrapParams {
+  CTService: ConditionalTokensService
+  WrapperService: Wrapper1155Service
+  addressFrom: string
+  addressTo: string
+  positionId: string
   amount: BigNumber
 }
 
@@ -100,6 +129,27 @@ class CPKService {
     return new CPKService(cpk, provider)
   }
 
+  getTransactionHash = async (txObject: TransactionResult): Promise<string> => {
+    if (txObject.hash) {
+      return txObject.hash
+    }
+
+    if (txObject.safeTxHash) {
+      let transactionHash
+      // poll for safe tx data
+      while (!transactionHash) {
+        const safeTransaction = await txs.getBySafeTxHash(txObject.safeTxHash)
+        if (safeTransaction.transactionHash) {
+          transactionHash = safeTransaction.transactionHash
+        }
+        await sleep()
+      }
+      return transactionHash
+    }
+
+    return ''
+  }
+
   prepareCustomCondition = async (
     prepareCustomConditionParams: CPKPrepareCustomConditionParams
   ): Promise<TransactionReceipt | void> => {
@@ -113,12 +163,13 @@ class CPKService {
       ),
     }
 
-    const { hash, transactionResponse } = await this.cpk.execTransactions([prepareConditionTx])
-    logger.log(`Transaction hash: ${hash}`)
-    logger.log(`CPK address: ${this.cpk.address}`)
+    const txObject = await this.cpk.execTransactions([prepareConditionTx])
 
-    return transactionResponse
-      .wait(CONFIRMATIONS_TO_WAIT)
+    const txHash = await this.getTransactionHash(txObject)
+    logger.log(`Transaction hash: ${txHash}`)
+    logger.log(`CPK address: ${this.cpk.address}`)
+    return this.provider
+      .waitForTransaction(txHash, CONFIRMATIONS_TO_WAIT)
       .then((receipt: TransactionReceipt) => {
         logger.log(`Transaction was mined in block`, receipt)
         return receipt
@@ -172,12 +223,13 @@ class CPKService {
 
     const transactions = [createQuestionTx, prepareConditionTx]
 
-    const { hash, transactionResponse } = await this.cpk.execTransactions(transactions)
-    logger.log(`Transaction hash: ${hash}`)
-    logger.log(`CPK address: ${this.cpk.address}`)
+    const txObject = await this.cpk.execTransactions(transactions)
 
-    return transactionResponse
-      .wait(CONFIRMATIONS_TO_WAIT)
+    const txHash = await this.getTransactionHash(txObject)
+    logger.log(`Transaction hash: ${txHash}`)
+    logger.log(`CPK address: ${this.cpk.address}`)
+    return this.provider
+      .waitForTransaction(txHash, CONFIRMATIONS_TO_WAIT)
       .then((receipt: TransactionReceipt) => {
         logger.log(`Transaction was mined in block`, receipt)
         return receipt
@@ -199,12 +251,13 @@ class CPKService {
 
     const transactions = [reportPayoutTx]
 
-    const { hash, transactionResponse } = await this.cpk.execTransactions(transactions)
-    logger.log(`Transaction hash: ${hash}`)
-    logger.log(`CPK address: ${this.cpk.address}`)
+    const txObject = await this.cpk.execTransactions(transactions)
 
-    return transactionResponse
-      .wait(CONFIRMATIONS_TO_WAIT)
+    const txHash = await this.getTransactionHash(txObject)
+    logger.log(`Transaction hash: ${txHash}`)
+    logger.log(`CPK address: ${this.cpk.address}`)
+    return this.provider
+      .waitForTransaction(txHash, CONFIRMATIONS_TO_WAIT)
       .then((receipt: TransactionReceipt) => {
         logger.log(`Transaction was mined in block`, receipt)
         return receipt
@@ -238,12 +291,13 @@ class CPKService {
 
     const transactions = [redeemPositionTx]
 
-    const { hash, transactionResponse } = await this.cpk.execTransactions(transactions)
-    logger.log(`Transaction hash: ${hash}`)
-    logger.log(`CPK address: ${this.cpk.address}`)
+    const txObject = await this.cpk.execTransactions(transactions)
 
-    return transactionResponse
-      .wait(CONFIRMATIONS_TO_WAIT)
+    const txHash = await this.getTransactionHash(txObject)
+    logger.log(`Transaction hash: ${txHash}`)
+    logger.log(`CPK address: ${this.cpk.address}`)
+    return this.provider
+      .waitForTransaction(txHash, CONFIRMATIONS_TO_WAIT)
       .then((receipt: TransactionReceipt) => {
         logger.log(`Transaction was mined in block`, receipt)
         return receipt
@@ -259,7 +313,7 @@ class CPKService {
   ): Promise<TransactionReceipt | void> => {
     const {
       CTService,
-      account,
+      address,
       amount,
       collateralToken,
       conditionId,
@@ -267,12 +321,41 @@ class CPKService {
       partition,
     } = splitPositionParams
 
-    const transferFromTx = {
-      to: collateralToken,
-      data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
+    const transactions = []
+
+    const txOptions: TxOptions = {}
+
+    if (this.cpk.isSafeApp()) {
+      txOptions.gas = 500000
     }
 
-    const splitPositionTx = {
+    const collateralService = new ERC20Service(this.provider, collateralToken, this.cpk.address)
+
+    const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
+      this.cpk.address,
+      CTService.address,
+      amount
+    )
+
+    logger.log(`Has CPK enough allowance to make the transaction?`, hasCPKEnoughAlowance)
+    if (!hasCPKEnoughAlowance) {
+      // Approve unlimited amount to be transferred to the Conditional Token
+      transactions.push({
+        to: collateralToken,
+        data: ERC20Service.encodeApproveUnlimited(CTService.address),
+      })
+    }
+
+    // If we are signed in as a safe we don't need to transfer
+    if (!this.cpk.isSafeApp()) {
+      // Transfer amount from user
+      transactions.push({
+        to: collateralToken,
+        data: ERC20Service.encodeTransferFrom(address, this.cpk.address, amount),
+      })
+    }
+
+    transactions.push({
       to: CTService.address,
       data: ConditionalTokensService.encodeSplitPositions(
         collateralToken,
@@ -281,16 +364,15 @@ class CPKService {
         partition,
         amount
       ),
-    }
+    })
 
-    const transactions = [transferFromTx, splitPositionTx]
+    const txObject = await this.cpk.execTransactions(transactions, txOptions)
 
-    const { hash, transactionResponse } = await this.cpk.execTransactions(transactions)
-    logger.log(`Transaction hash: ${hash}`)
+    const txHash = await this.getTransactionHash(txObject)
+    logger.log(`Transaction hash: ${txHash}`)
     logger.log(`CPK address: ${this.cpk.address}`)
-
-    return transactionResponse
-      .wait(CONFIRMATIONS_TO_WAIT)
+    return this.provider
+      .waitForTransaction(txHash, CONFIRMATIONS_TO_WAIT)
       .then((receipt: TransactionReceipt) => {
         logger.log(`Transaction was mined in block`, receipt)
         return receipt
@@ -326,12 +408,98 @@ class CPKService {
 
     const transactions = [mergePositionsTx]
 
-    const { hash, transactionResponse } = await this.cpk.execTransactions(transactions)
-    logger.log(`Transaction hash: ${hash}`)
-    logger.log(`CPK address: ${this.cpk.address}`)
+    const txHash = await this.cpk.execTransactions(transactions)
 
-    return transactionResponse
-      .wait(CONFIRMATIONS_TO_WAIT)
+    logger.log(`Transaction hash: ${txHash}`)
+    logger.log(`CPK address: ${this.cpk.address}`)
+    return this.provider
+      .waitForTransaction(txHash, CONFIRMATIONS_TO_WAIT)
+      .then((receipt: TransactionReceipt) => {
+        logger.log(`Transaction was mined in block`, receipt)
+        return receipt
+      })
+      .catch((error: Error) => {
+        logger.error(error)
+        throw improveErrorMessage(error)
+      })
+  }
+
+  wrapOrTransfer = async (wrapFromParams: CPKWrapParams): Promise<TransactionReceipt | void> => {
+    const { CTService, addressFrom, addressTo, amount, positionId } = wrapFromParams
+
+    const transactions = []
+
+    const wasCPKApproved = await CTService.isApprovedForAll(addressFrom, addressTo)
+
+    logger.log(`Was CPK approved for all to make the transaction?`, wasCPKApproved)
+    if (!wasCPKApproved) {
+      transactions.push({
+        to: CTService.address,
+        data: ConditionalTokensService.encodeSetApprovalForAll(addressTo),
+      })
+    }
+
+    transactions.push({
+      to: CTService.address,
+      data: ConditionalTokensService.encodeSafeTransferFrom(
+        addressFrom,
+        addressTo,
+        positionId,
+        amount
+      ),
+    })
+
+    const txObject = await this.cpk.execTransactions(transactions)
+
+    const txHash = await this.getTransactionHash(txObject)
+    logger.log(`Transaction hash: ${txHash}`)
+    logger.log(`CPK address: ${this.cpk.address}`)
+    return this.provider
+      .waitForTransaction(txHash, CONFIRMATIONS_TO_WAIT)
+      .then((receipt: TransactionReceipt) => {
+        logger.log(`Transaction was mined in block`, receipt)
+        return receipt
+      })
+      .catch((error: Error) => {
+        logger.error(error)
+        throw improveErrorMessage(error)
+      })
+  }
+
+  unwrap = async (unwrapFromParams: CPKUnwrapParams): Promise<TransactionReceipt | void> => {
+    const {
+      CTService,
+      WrapperService,
+      addressFrom,
+      addressTo,
+      amount,
+      positionId,
+    } = unwrapFromParams
+
+    const transactions = []
+
+    const wasCPKApproved = await CTService.isApprovedForAll(addressFrom, addressTo)
+
+    logger.log(`Was CPK approved for all to make the transaction?`, wasCPKApproved)
+    if (!wasCPKApproved) {
+      transactions.push({
+        to: CTService.address,
+        data: ConditionalTokensService.encodeSetApprovalForAll(addressTo),
+      })
+    }
+
+    transactions.push({
+      to: WrapperService.address,
+      data: Wrapper1155Service.encodeUnwrap(addressFrom, positionId, amount, addressTo),
+    })
+
+    const txObject = await this.cpk.execTransactions(transactions)
+
+    const txHash = await this.getTransactionHash(txObject)
+    logger.log(`Transaction hash: ${txHash}`)
+    logger.log(`CPK address: ${this.cpk.address}`)
+    return this.provider
+      .waitForTransaction(txHash, CONFIRMATIONS_TO_WAIT)
       .then((receipt: TransactionReceipt) => {
         logger.log(`Transaction was mined in block`, receipt)
         return receipt
