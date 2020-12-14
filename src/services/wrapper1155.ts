@@ -1,6 +1,6 @@
 import { Contract, ethers } from 'ethers'
 import { TransactionReceipt } from 'ethers/providers'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, Interface } from 'ethers/utils'
 
 import { CONFIRMATIONS_TO_WAIT } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
@@ -9,6 +9,8 @@ const wrapper1155Abi = [
   'function unwrap(address multiToken,uint256 tokenId,uint256 amount,address recipient,bytes data) external',
   'function batchUnwrap(address multiToken, uint256[] tokenIds, uint256[] amounts, address recipient, bytes data) external',
   'function getWrapped1155(address multiToken, uint256 tokenId)',
+  'function setApprovalForAll(address operator, bool approved) external',
+  'function isApprovedForAll(address owner, address operator) external view returns (bool)',
 ]
 
 class Wrapper1155Service {
@@ -45,6 +47,33 @@ class Wrapper1155Service {
       '0x'
     )
     return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
+  }
+
+  // Method  used to unwrapp some erc1155
+  static encodeUnwrap = (
+    conditionalTokenAddress: string,
+    tokenId: string,
+    amount: BigNumber,
+    userAddress: string
+  ): string => {
+    const unwrapInterface = new Interface(wrapper1155Abi)
+
+    return unwrapInterface.functions.unwrap.encode([
+      conditionalTokenAddress,
+      tokenId,
+      amount,
+      userAddress,
+      '0x',
+    ])
+  }
+
+  static encodeSetApprovalForAll = (spenderAccount: string): string => {
+    const setApprovalForAllInterface = new Interface(wrapper1155Abi)
+    return setApprovalForAllInterface.functions.setApprovalForAll.encode([spenderAccount, true])
+  }
+
+  async isApprovedForAll(owner: string, spender: string): Promise<boolean> {
+    return this.contract.isApprovedForAll(owner, spender)
   }
 
   async batchUnwrap(
