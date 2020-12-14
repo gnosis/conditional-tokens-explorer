@@ -30,17 +30,6 @@ export interface PaginatedConditionsVariables {
 // GraphQL query operation: ConditionsList
 // ====================================================
 
-export interface ConditionsList_conditions_positions_collateralToken {
-  __typename: "CollateralToken";
-  id: string;
-}
-
-export interface ConditionsList_conditions_positions {
-  __typename: "Position";
-  id: string;
-  collateralToken: ConditionsList_conditions_positions_collateralToken;
-}
-
 export interface ConditionsList_conditions {
   __typename: "Condition";
   id: string;
@@ -55,7 +44,6 @@ export interface ConditionsList_conditions {
   payoutDenominator: any | null;
   resolveTimestamp: any | null;
   resolveBlockNumber: any | null;
-  positions: ConditionsList_conditions_positions[] | null;
 }
 
 export interface ConditionsList {
@@ -71,17 +59,6 @@ export interface ConditionsList {
 // GraphQL query operation: GetCondition
 // ====================================================
 
-export interface GetCondition_condition_positions_collateralToken {
-  __typename: "CollateralToken";
-  id: string;
-}
-
-export interface GetCondition_condition_positions {
-  __typename: "Position";
-  id: string;
-  collateralToken: GetCondition_condition_positions_collateralToken;
-}
-
 export interface GetCondition_condition {
   __typename: "Condition";
   id: string;
@@ -96,7 +73,6 @@ export interface GetCondition_condition {
   payoutDenominator: any | null;
   resolveTimestamp: any | null;
   resolveBlockNumber: any | null;
-  positions: GetCondition_condition_positions[] | null;
 }
 
 export interface GetCondition {
@@ -504,17 +480,6 @@ export interface UserPositionBalancesVariables {
 // GraphQL fragment: ConditionData
 // ====================================================
 
-export interface ConditionData_positions_collateralToken {
-  __typename: "CollateralToken";
-  id: string;
-}
-
-export interface ConditionData_positions {
-  __typename: "Position";
-  id: string;
-  collateralToken: ConditionData_positions_collateralToken;
-}
-
 export interface ConditionData {
   __typename: "Condition";
   id: string;
@@ -529,7 +494,6 @@ export interface ConditionData {
   payoutDenominator: any | null;
   resolveTimestamp: any | null;
   resolveBlockNumber: any | null;
-  positions: ConditionData_positions[] | null;
 }
 
 /* tslint:disable */
