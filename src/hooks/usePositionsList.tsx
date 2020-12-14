@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/react-hooks'
 import { ethers } from 'ethers'
 import lodashUniqBy from 'lodash.uniqby'
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import { ApolloError } from 'apollo-client/errors/ApolloError'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
@@ -33,7 +33,10 @@ type Variables = { [k: string]: any }
 /**
  * Return a array of positions, and the user balance if it's connected.
  */
-export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
+export const usePositionsList = (
+  advancedFilter: AdvancedFilterPosition,
+  clientFilter?: (position: PositionWithUserBalanceWithDecimals) => boolean
+) => {
   const { address, networkConfig, provider } = useWeb3ConnectedOrInfura()
 
   const [data, setData] = useState<Remote<Maybe<PositionWithUserBalanceWithDecimals[]>>>(
@@ -43,6 +46,14 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
   const { CollateralValue, FromCreationDate, TextToSearch, ToCreationDate } = advancedFilter
 
   const query = buildQueryPositionsList(advancedFilter)
+
+  const defaultFilter = useCallback(() => {
+    return true
+  }, [])
+
+  const currentFilter = useMemo(() => {
+    return clientFilter || defaultFilter
+  }, [clientFilter, defaultFilter])
 
   const variables = useMemo(() => {
     const variables: Variables = {}
@@ -185,8 +196,13 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
 
   const error = React.useMemo(() => positionsError || userError, [positionsError, userError])
 
+  const dataFiltered = useMemo(() => {
+    const maybeItems = data.isSuccess() && data.get()
+    return maybeItems && maybeItems.filter(currentFilter)
+  }, [data, currentFilter])
+
   return {
-    data: data.isSuccess() && data.get(),
+    data: dataFiltered,
     error: error as ApolloError,
     loading: data.isLoading(),
     refetchPositions,
