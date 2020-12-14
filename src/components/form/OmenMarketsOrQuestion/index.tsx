@@ -47,19 +47,21 @@ type Props =
     }
 
 export const OmenMarketsOrQuestion: React.FC<Props> = ({ conditionId, positionId }) => {
-  // TODO Reuse as a way to ask something from position or from condition
+  const variables = useMemo(() => {
+    return { id: positionId || conditionId }
+  }, [positionId, conditionId])
   const { data: conditionsFromPosition, loading: loadingConditionsFromPosition } = useQuery<
     FromPositionType
   >(GetConditionWithQuestionsOfPosition, {
     skip: !!conditionId,
-    variables: { id: positionId },
+    variables,
   })
 
   const { data: conditions, loading: loadingConditions } = useQuery<FromConditionType>(
     GetConditionWithQuestions,
     {
       skip: !!positionId,
-      variables: { id: conditionId },
+      variables,
     }
   )
 
@@ -71,19 +73,21 @@ export const OmenMarketsOrQuestion: React.FC<Props> = ({ conditionId, positionId
     }
   }, [conditions, conditionsFromPosition, loadingConditions, loadingConditionsFromPosition])
 
+  const conditionsIds = useMemo(() => conditionsWithQuestions.map((c) => c.id), [
+    conditionsWithQuestions,
+  ])
   const {
     areOmenMarketsMoreThanOne,
     data: dataOmenMarkets,
     firstMarket,
     loading: loadingOmenMarkets,
-  } = useOmenMarkets(conditionsWithQuestions.map((c) => c.id))
+  } = useOmenMarkets(conditionsIds)
 
   const loading = useMemo(
-    () => !loadingOmenMarkets && !loadingConditions && !loadingConditionsFromPosition,
-    [loadingConditions, loadingConditionsFromPosition, loadingOmenMarkets]
+    () => loadingOmenMarkets || loadingConditions || loadingConditionsFromPosition,
+    [loadingConditions, loadingOmenMarkets, loadingConditionsFromPosition]
   )
 
-  // TODO Narrow filtered type
   const titlesIDsPairs = useMemo(
     () =>
       conditionsWithQuestions
@@ -129,7 +133,7 @@ export const OmenMarketsOrQuestion: React.FC<Props> = ({ conditionId, positionId
     </Row>
   ) : titlesIDsPairs.length > 0 ? (
     <Row>
-      <TitleValue title="Question" value={titlesIDsPairs[0]} />
+      <TitleValue title="Question" value={titlesIDsPairs[0].title} />
     </Row>
   ) : (
     <Row>
