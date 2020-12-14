@@ -10,6 +10,7 @@ import { ConditionalTokensService } from 'services/conditionalTokens'
 import { CPKService as CPKServiceClass } from 'services/cpk'
 import { RealityService } from 'services/reality'
 import { Wrapper1155Service } from 'services/wrapper1155'
+import { createCPK } from 'util/cpk'
 import { getLogger } from 'util/logger'
 
 export enum Web3ContextStatus {
@@ -42,6 +43,7 @@ export type Connected = {
   _type: Web3ContextStatus.Connected
   provider: Web3Provider
   address: string
+  cpkAddress: string
   signer: JsonRpcSigner
   networkConfig: NetworkConfig
   CTService: ConditionalTokensService
@@ -213,7 +215,8 @@ export const Web3ContextProvider = ({ children }: Props) => {
         const RtyService = new RealityService(networkConfig, provider, signer)
         const CTService = new ConditionalTokensService(networkConfig, provider, signer)
         const WrapperService = new Wrapper1155Service(networkConfig, provider, signer)
-        const CPKService = await CPKServiceClass.create(networkConfig, provider, signer)
+        const cpk = await createCPK(provider, networkConfig)
+        const CPKService = new CPKServiceClass(cpk, provider)
 
         const address = await signer.getAddress()
         setWeb3Status({
@@ -226,6 +229,7 @@ export const Web3ContextProvider = ({ children }: Props) => {
           WrapperService,
           CPKService,
           address,
+          cpkAddress: CPKService.address,
         } as Connected)
       } else {
         setWeb3Status({
@@ -310,6 +314,7 @@ export const useWeb3ConnectedOrInfura = () => {
     return {
       ...status,
       address: status._type === Web3ContextStatus.Connected ? status.address : null,
+      cpkAddress: status._type === Web3ContextStatus.Connected ? status.cpkAddress : null,
       CPKService: status._type === Web3ContextStatus.Connected ? status.CPKService : null,
       signer: status._type === Web3ContextStatus.Connected ? status.signer : null,
       connect,
