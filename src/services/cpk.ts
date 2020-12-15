@@ -49,6 +49,8 @@ interface CPKRedeemPositionParams {
   parentCollectionId: string // If doesn't exist, must be zero, ethers.constants.HashZero
   conditionId: string
   indexSets: string[]
+  account: string
+  earnedCollateral: BigNumber
 }
 
 interface CPKSplitPositionParams {
@@ -240,7 +242,7 @@ class CPKService {
       })
   }
 
-  reportPayout = async (
+  reportPayouts = async (
     reportPayoutParams: CPKReportPayoutParams
   ): Promise<TransactionReceipt | void> => {
     const { CTService, payouts, questionId } = reportPayoutParams
@@ -273,13 +275,22 @@ class CPKService {
   ): Promise<TransactionReceipt | void> => {
     const {
       CTService,
+      account,
       collateralToken,
       conditionId,
+      earnedCollateral,
       indexSets,
       parentCollectionId,
     } = redeemPositionParams
 
-    const redeemPositionTx = {
+    const transactions = []
+    const txOptions: TxOptions = {}
+
+    if (this.cpk.isSafeApp()) {
+      txOptions.gas = 500000
+    }
+
+    transactions.push({
       to: CTService.address,
       data: ConditionalTokensService.encodeRedeemPositions(
         collateralToken,
@@ -287,11 +298,17 @@ class CPKService {
         conditionId,
         indexSets
       ),
+    })
+
+    // If we are signed in as a safe we don't need to transfer
+    if (!this.cpk.isSafeApp() && earnedCollateral) {
+      transactions.push({
+        to: collateralToken,
+        data: ERC20Service.encodeTransfer(account, earnedCollateral),
+      })
     }
 
-    const transactions = [redeemPositionTx]
-
-    const txObject = await this.cpk.execTransactions(transactions)
+    const txObject = await this.cpk.execTransactions(transactions, txOptions)
 
     const txHash = await this.getTransactionHash(txObject)
     logger.log(`Transaction hash: ${txHash}`)

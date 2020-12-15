@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useMemo, useState } from 'react'
 import { Prompt } from 'react-router'
 
@@ -14,21 +15,20 @@ import { SelectablePositionTable } from 'components/table/SelectablePositionTabl
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useCondition } from 'hooks/useCondition'
 import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
-import { CPKService } from 'services/cpk'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
-import { getParentCollectionId } from 'util/tools'
+import { getParentCollectionId, getRedeemedBalance } from 'util/tools'
 
 const logger = getLogger('RedeemPosition')
 
 export const Contents = () => {
   const {
     _type: status,
+    CPKService,
     CTService,
+    address,
     connect,
     networkConfig,
-    provider,
-    signer,
   } = useWeb3ConnectedOrInfura()
 
   const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<boolean>>>(
@@ -52,9 +52,25 @@ export const Contents = () => {
     setTransactionStatus(Remote.notAsked<Maybe<boolean>>())
   }, [])
 
+  const redeemedBalance = useMemo(
+    () =>
+      position && condition
+        ? getRedeemedBalance(position, condition, position.userBalanceERC1155)
+        : new BigNumber(0),
+    [condition, position]
+  )
+
+  logger.log(`Balance to redeem`, redeemedBalance.toString())
+
   const onRedeem = useCallback(async () => {
     try {
-      if (position && conditionId && status === Web3ContextStatus.Connected && signer) {
+      if (
+        position &&
+        conditionId &&
+        status === Web3ContextStatus.Connected &&
+        CPKService &&
+        address
+      ) {
         setTransactionStatus(Remote.loading())
 
         const { collateralToken, conditionIds, indexSets } = position
@@ -72,14 +88,14 @@ export const Contents = () => {
           indexSets[conditionIds.findIndex((condId) => condId === conditionId)],
         ]
 
-        const cpk = await CPKService.create(networkConfig, provider, signer)
-
-        await cpk.redeemPosition({
+        await CPKService.redeemPosition({
           CTService,
           collateralToken,
           parentCollectionId,
           conditionId,
           indexSets: redeemedIndexSet,
+          account: address,
+          earnedCollateral: redeemedBalance,
         })
 
         setPosition(null)
@@ -94,7 +110,7 @@ export const Contents = () => {
       setTransactionStatus(Remote.failure(err))
       logger.error(err)
     }
-  }, [status, CTService, connect, conditionId, position, provider, networkConfig, signer])
+  }, [status, CPKService, CTService, address, connect, redeemedBalance, conditionId, position])
 
   const disabled =
     transactionStatus.isLoading() || !conditionIds.length || !position || !conditionId

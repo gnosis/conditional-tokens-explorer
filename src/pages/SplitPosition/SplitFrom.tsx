@@ -5,7 +5,7 @@ import { SelectCollateral } from 'components/form/SelectCollateral'
 import { CustomCollateralModal } from 'components/modals/CustomCollateralModal'
 import { TitleControl } from 'components/pureStyledComponents/TitleControl'
 import { SelectablePositionTable } from 'components/table/SelectablePositionTable'
-import { PositionWithUserBalanceWithDecimals } from 'hooks'
+import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
 import { SplitFromType, Token } from 'util/types'
 
 const Controls = styled.div`
