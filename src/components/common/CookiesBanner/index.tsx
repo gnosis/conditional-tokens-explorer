@@ -5,11 +5,14 @@ import styled from 'styled-components'
 import { Button } from 'components/buttons/Button'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CloseIcon } from 'components/icons/CloseIcon'
+import { Checkbox } from 'components/pureStyledComponents/Checkbox'
 import { GOOGLE_ANALYTICS_ID } from 'config/constants'
 import GoogleAnalytics from 'react-ga'
 import { getLogger } from 'util/logger'
 
 const logger = getLogger('Analytics::Google')
+
+const INNER_WIDTH = '840px'
 
 const Wrapper = styled.div`
   background-color: #fff;
@@ -41,7 +44,7 @@ const Text = styled.p`
   padding: 0 20px;
   position: relative;
   text-align: center;
-  width: 840px;
+  width: ${INNER_WIDTH};
   z-index: 1;
 `
 
@@ -58,6 +61,35 @@ const ButtonContainer = styled.div`
   align-items: center;
   display: flex;
   justify-content: center;
+`
+
+const Labels = styled.div`
+  align-items: center;
+  display: flex;
+`
+
+const Label = styled.div<{ clickable?: boolean }>`
+  align-items: center;
+  color: ${(props) => props.theme.colors.darkerGrey};
+  display: flex;
+  font-size: 17px;
+  font-weight: normal;
+  line-height: 1.4;
+  margin: 0 25px 0 0;
+
+  &:last-child {
+    margin-right: 80px;
+  }
+
+  ${(props) => props.clickable && 'cursor: pointer'}
+`
+
+Label.defaultProps = {
+  clickable: false,
+}
+
+const CheckboxStyled = styled(Checkbox)`
+  margin: 0 10px 0 0;
 `
 
 const ButtonAccept = styled(Button)`
@@ -146,17 +178,24 @@ export const CookiesBanner = () => {
         <Text>
           We use cookies to give you the best experience and to help improve our website. Please
           read our <Link to={'/cookie-policy'}>Cookie Policy</Link> for more information. By
-          clicking <strong>&quot;Accept Cookies&quot;</strong>, you agree to the storing of cookies
-          on your device to enhance site navigation, analyze site usage and provide customer
-          support.
+          clicking <strong>&quot;Accept All&quot;</strong>, you agree to the storing of cookies on
+          your device to enhance site navigation, analyze site usage and provide customer support.
         </Text>
         <ButtonContainer>
+          <Labels>
+            <Label>
+              <CheckboxStyled checked disabled /> Necessary
+            </Label>
+            <Label clickable>
+              <CheckboxStyled /> Analytics
+            </Label>
+          </Labels>
           <ButtonAccept
             buttonType={ButtonType.primaryInverted}
             className="buttonAccept"
             onClick={acceptCookies}
           >
-            Accept Cookies
+            Accept All
           </ButtonAccept>
         </ButtonContainer>
         <ButtonClose
