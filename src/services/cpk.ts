@@ -2,6 +2,7 @@ import { ethers } from 'ethers'
 import { TransactionReceipt } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 import { Moment } from 'moment'
+import { toChecksumAddress } from 'web3-utils'
 
 import { txs } from '@gnosis.pm/safe-apps-sdk/dist/txs'
 import { CONFIRMATIONS_TO_WAIT } from 'config/constants'
@@ -68,8 +69,10 @@ interface CPKMergePositionParams {
   collateralToken: string
   parentCollectionId: string // If doesn't exist, must be zero, ethers.constants.HashZero
   conditionId: string
-  partition: string[]
+  partition: BigNumber[]
   amount: BigNumber
+  shouldTransferAmount: boolean
+  address: string
 }
 
 interface TransactionResult {
@@ -160,7 +163,7 @@ class CPKService {
       to: CTService.address,
       data: ConditionalTokensService.encodePrepareCondition(
         questionId,
-        oracleAddress,
+        toChecksumAddress(oracleAddress),
         outcomesSlotCount
       ),
     }
@@ -218,7 +221,7 @@ class CPKService {
       to: CTService.address,
       data: ConditionalTokensService.encodePrepareCondition(
         questionId,
-        oracleAddress,
+        toChecksumAddress(oracleAddress),
         outcomes.length
       ),
     }
@@ -293,7 +296,7 @@ class CPKService {
     transactions.push({
       to: CTService.address,
       data: ConditionalTokensService.encodeRedeemPositions(
-        collateralToken,
+        toChecksumAddress(collateralToken),
         parentCollectionId,
         conditionId,
         indexSets
@@ -375,7 +378,7 @@ class CPKService {
     transactions.push({
       to: CTService.address,
       data: ConditionalTokensService.encodeSplitPositions(
-        collateralToken,
+        toChecksumAddress(collateralToken),
         parentCollectionId,
         conditionId,
         partition,
@@ -405,14 +408,26 @@ class CPKService {
   ): Promise<TransactionReceipt | void> => {
     const {
       CTService,
+      address,
       amount,
       collateralToken,
       conditionId,
       parentCollectionId,
       partition,
+      shouldTransferAmount,
     } = mergePositionParams
 
-    const mergePositionsTx = {
+    const transactions = []
+
+    const txOptions: TxOptions = {}
+
+    if (this.cpk.isSafeApp()) {
+      txOptions.gas = 500000
+    }
+
+    logger.log(`Should transfer amount ${shouldTransferAmount}`)
+
+    transactions.push({
       to: CTService.address,
       data: ConditionalTokensService.encodeMergePositions(
         collateralToken,
@@ -421,12 +436,11 @@ class CPKService {
         partition,
         amount
       ),
-    }
+    })
 
-    const transactions = [mergePositionsTx]
+    const txObject = await this.cpk.execTransactions(transactions, txOptions)
 
-    const txHash = await this.cpk.execTransactions(transactions)
-
+    const txHash = await this.getTransactionHash(txObject)
     logger.log(`Transaction hash: ${txHash}`)
     logger.log(`CPK address: ${this.cpk.address}`)
     return this.provider

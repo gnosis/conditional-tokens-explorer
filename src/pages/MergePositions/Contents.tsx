@@ -34,6 +34,7 @@ import {
   getFullIndexSet,
   getTokenSummary,
   indexSetsByCondition,
+  isConditionFullIndexSet,
   isPartitionFullIndexSet,
   minBigNumber,
   positionString,
@@ -50,7 +51,16 @@ import {
 const logger = getLogger('MergePosition')
 
 export const Contents = () => {
-  const { _type: status, CTService, connect, networkConfig, provider } = useWeb3ConnectedOrInfura()
+  const {
+    _type: status,
+    CPKService,
+    CTService,
+    address,
+    connect,
+    cpkAddress,
+    networkConfig,
+    provider,
+  } = useWeb3ConnectedOrInfura()
 
   const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<boolean>>>(
     Remote.notAsked<Maybe<boolean>>()
@@ -170,7 +180,9 @@ export const Contents = () => {
         conditionId &&
         selectedPositions.length > 0 &&
         condition &&
-        status === Web3ContextStatus.Connected
+        status === Web3ContextStatus.Connected &&
+        CPKService &&
+        address
       ) {
         setTransactionStatus(Remote.loading())
 
@@ -191,14 +203,24 @@ export const Contents = () => {
           ({ conditionIds, indexSets }) =>
             indexSets[conditionIds.findIndex((id) => conditionId === id)]
         )
-
-        await CTService.mergePositions(
-          collateralToken,
-          parentCollectionId,
+        const shouldTransferAmount = isConditionFullIndexSet(
+          selectedPositions,
           conditionId,
-          partition,
-          amount
+          condition.outcomeSlotCount
         )
+
+        const partitionBN: BigNumber[] = partition.map((o: string) => new BigNumber(o))
+
+        await CPKService.mergePositions({
+          CTService,
+          amount,
+          collateralToken,
+          conditionId,
+          parentCollectionId,
+          partition: partitionBN,
+          shouldTransferAmount,
+          address,
+        })
 
         // if freeindexset == 0, everything was merged to...
         if (isPartitionFullIndexSet(condition.outcomeSlotCount, partition)) {
@@ -239,7 +261,18 @@ export const Contents = () => {
       setTransactionStatus(Remote.failure(err))
       logger.error(err)
     }
-  }, [selectedPositions, position, conditionId, condition, status, CTService, amount, connect])
+  }, [
+    selectedPositions,
+    position,
+    address,
+    CPKService,
+    conditionId,
+    condition,
+    status,
+    CTService,
+    amount,
+    connect,
+  ])
 
   const advancedFilters: AdvancedFilterPosition = useMemo(() => {
     return {
@@ -352,8 +385,8 @@ export const Contents = () => {
   useEffect(() => {
     const getBalance = async (positionIds: Array<string>) => {
       try {
-        if (positionIds.length > 0 && position) {
-          const balancePositions = await CTService.balanceOfBatch(positionIds)
+        if (positionIds.length > 0 && position && cpkAddress) {
+          const balancePositions = await CTService.balanceOfBatch(positionIds, cpkAddress)
           setSelectedBalancePositions(balancePositions)
         } else {
           setSelectedBalancePositions([])
@@ -372,7 +405,7 @@ export const Contents = () => {
       selectedPositionsIds.push(position.id)
     }
     getBalance(selectedPositionsIds)
-  }, [CTService, selectedPositions, position])
+  }, [CTService, selectedPositions, position, cpkAddress])
 
   const fullLoadingActionButton = useMemo(
     () =>

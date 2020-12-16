@@ -2,7 +2,7 @@ import CTHelpersConstructor from '@gnosis.pm/conditional-tokens-contracts/utils/
 import { Contract, ethers } from 'ethers'
 import { TransactionReceipt, TransactionResponse } from 'ethers/providers'
 import { BigNumber, Interface } from 'ethers/utils'
-import Web3Utils, { toChecksumAddress } from 'web3-utils'
+import Web3Utils from 'web3-utils'
 
 import { CONFIRMATIONS_TO_WAIT } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
@@ -260,10 +260,9 @@ export class ConditionalTokensService {
     }
   }
 
-  async balanceOfBatch(positionIds: Array<string>): Promise<Array<BigNumber>> {
-    if (this.signer) {
-      const owner = await this.signer.getAddress()
-      const owners = Array.from(new Array(positionIds.length), () => owner)
+  async balanceOfBatch(positionIds: Array<string>, address?: string): Promise<Array<BigNumber>> {
+    if (address) {
+      const owners = Array.from(new Array(positionIds.length), () => address)
       return this.contract.balanceOfBatch(owners, positionIds)
     } else {
       return [new BigNumber(0)]
@@ -380,7 +379,7 @@ export class ConditionalTokensService {
     const prepareConditionInterface = new Interface(conditionalTokensAbi)
 
     return prepareConditionInterface.functions.prepareCondition.encode([
-      toChecksumAddress(oracleAddress),
+      oracleAddress,
       questionId,
       new BigNumber(outcomeSlotCount),
     ])
@@ -429,7 +428,7 @@ export class ConditionalTokensService {
     collateralToken: string,
     parentCollectionId: string,
     conditionId: string,
-    partition: string[],
+    partition: BigNumber[],
     amount: BigNumber
   ): string => {
     const mergePositionsInterface = new Interface(conditionalTokensAbi)
