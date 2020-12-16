@@ -25,7 +25,7 @@ interface Props {
 
 export const PositionPreview = (props: Props) => {
   const { condition, isLoading, position } = props
-  const { balanceERC1155, refetch } = useBalanceForPosition(position?.id || '')
+  const { balanceERC1155, loading, refetch } = useBalanceForPosition(position?.id || '')
   const { collateral: token } = useCollateral(position ? position.collateralToken : '')
 
   useEffect(() => {
@@ -54,7 +54,7 @@ export const PositionPreview = (props: Props) => {
       title="Redeemed Position Preview"
       value={
         <StripedList>
-          {isLoading ? (
+          {(isLoading || loading) ? (
             <InlineLoading size={SpinnerSize.small} />
           ) : redeemedPreview ? (
             <StripedListItem>
