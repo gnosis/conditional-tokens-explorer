@@ -54,7 +54,7 @@ export const PositionPreview = (props: Props) => {
       title="Redeemed Position Preview"
       value={
         <StripedList>
-          {(isLoading || loading) ? (
+          {isLoading || loading ? (
             <InlineLoading size={SpinnerSize.small} />
           ) : redeemedPreview ? (
             <StripedListItem>
