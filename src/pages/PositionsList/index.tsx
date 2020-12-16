@@ -19,6 +19,7 @@ import {
 import { TokenIcon } from 'components/common/TokenIcon'
 import { CollateralFilterDropdown } from 'components/filters/CollateralFilterDropdown'
 import { DateFilter } from 'components/filters/DateFilter'
+import { WithBalanceFilterDropdown } from 'components/filters/WithBalanceFilterDropdown'
 import { WrappedCollateralFilterDropdown } from 'components/filters/WrappedCollateralFilterDropdown'
 import { SearchField } from 'components/form/SearchField'
 import { Switch } from 'components/form/Switch'
@@ -58,6 +59,7 @@ import {
   PositionSearchOptions,
   Token,
   TransferOptions,
+  WithBalanceOptions,
   WrappedCollateralOptions,
 } from 'util/types'
 
@@ -97,6 +99,10 @@ export const PositionsList = () => {
   const [wrappedCollateral, setWrappedCollateral] = useState<WrappedCollateralOptions>(
     WrappedCollateralOptions.All
   )
+  const [positionsWithBalance, setPositionsWithBalance] = useState<WithBalanceOptions>(
+    WithBalanceOptions.All
+  )
+
   const [isTransferOutcomeModalOpen, setIsTransferOutcomeModalOpen] = useState(false)
   const [selectedPositionId, setSelectedPositionId] = useState<string>('')
   const [selectedCollateralToken, setSelectedCollateralToken] = useState<Maybe<Token>>(null)
@@ -142,6 +148,7 @@ export const PositionsList = () => {
     setSelectedCollateralFilter(null)
     setSelectedCollateralValue(CollateralFilterOptions.All)
     setWrappedCollateral(WrappedCollateralOptions.All)
+    setPositionsWithBalance(WithBalanceOptions.All)
   }, [resetPagination])
 
   useEffect(() => {
@@ -151,10 +158,12 @@ export const PositionsList = () => {
         wrappedCollateral !== WrappedCollateralOptions.All ||
         selectedCollateralValue !== CollateralFilterOptions.All ||
         wrappedCollateral !== WrappedCollateralOptions.All ||
-        selectedCollateralFilter !== null
+        selectedCollateralFilter !== null ||
+        positionsWithBalance !== WithBalanceOptions.All
     )
   }, [
     isFiltering,
+    positionsWithBalance,
     selectedCollateralFilter,
     selectedCollateralValue,
     selectedFromCreationDate,
@@ -191,8 +200,26 @@ export const PositionsList = () => {
     debouncedHandlerTextToSearch('')
   }, [debouncedHandlerTextToSearch])
 
+  const filterPositions = useCallback(
+    (position: PositionWithUserBalanceWithDecimals) => {
+      switch (positionsWithBalance) {
+        case WithBalanceOptions.Yes:
+          return position.userBalanceERC1155Numbered > 0 || position.userBalanceERC20Numbered > 0
+        case WithBalanceOptions.No:
+          return (
+            position.userBalanceERC1155Numbered === 0 && position.userBalanceERC20Numbered === 0
+          )
+        case WithBalanceOptions.All:
+        default:
+          return true
+      }
+    },
+    [positionsWithBalance]
+  )
+
   const { data, error, loading, refetchPositions, refetchUserPositions } = usePositionsList(
-    advancedFilters
+    advancedFilters,
+    filterPositions
   )
 
   const isLoading = useMemo(() => !textToSearch && loading && transfer.isNotAsked(), [
@@ -757,6 +784,16 @@ export const PositionsList = () => {
                 value={wrappedCollateral}
               />
             </SidebarRow>
+            {isConnected && (
+              <SidebarRow>
+                <WithBalanceFilterDropdown
+                  onClick={(value: WithBalanceOptions) => {
+                    setPositionsWithBalance(value)
+                  }}
+                  value={positionsWithBalance}
+                />
+              </SidebarRow>
+            )}
             <SidebarRow>
               <DateFilter
                 fromValue={selectedFromCreationDate}
