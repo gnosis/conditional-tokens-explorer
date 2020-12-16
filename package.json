@@ -3,7 +3,7 @@
   "version": "0.3.0",
   "private": true,
   "engines": {
-    "node": ">=4.4.7 <=14.15.1"
+    "node": ">=4.4.7 <=14.15.2"
   },
   "dependencies": {
     "@apollo/react-hooks": "^3.1.5",
