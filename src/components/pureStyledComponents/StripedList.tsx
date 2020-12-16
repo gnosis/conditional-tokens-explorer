@@ -13,7 +13,7 @@ export const StripedList = styled.div<{ maxHeight?: string; minHeight?: string }
 
 StripedList.defaultProps = {
   maxHeight: '200px',
-  minHeight: '41px',
+  minHeight: '45px',
 }
 
 export const StripedListItem = styled.div<{ justifyContent?: string; wordBreak?: string }>`
