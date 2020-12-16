@@ -438,6 +438,14 @@ class CPKService {
       ),
     })
 
+    if (!this.cpk.isSafeApp() && shouldTransferAmount) {
+      // Transfer amount to the user wallet
+      transactions.push({
+        to: collateralToken,
+        data: ERC20Service.encodeTransfer(address, amount),
+      })
+    }
+
     const txObject = await this.cpk.execTransactions(transactions, txOptions)
 
     const txHash = await this.getTransactionHash(txObject)
