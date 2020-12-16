@@ -34,6 +34,12 @@ export enum WrappedCollateralOptions {
   No = 'no',
 }
 
+export enum WithBalanceOptions {
+  All = 'all',
+  Yes = 'yes',
+  No = 'no',
+}
+
 export enum ValidityOptions {
   All = 'all',
   Invalid = 'invalid',

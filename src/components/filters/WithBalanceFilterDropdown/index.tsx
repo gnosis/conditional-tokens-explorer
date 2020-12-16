@@ -9,54 +9,47 @@ import {
   FilterTitleButton,
   FilterWrapper,
 } from 'components/pureStyledComponents/FilterTitle'
-import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { ConditionType, ConditionTypeAll } from 'util/types'
+import { WithBalanceOptions } from 'util/types'
 
 const Wrapper = styled.div``
 
 interface Props {
   onClear?: () => void
-  onClick: (value: ConditionType | ConditionTypeAll, filter: Maybe<string>) => void
-  value: Maybe<string>
+  onClick: (value: WithBalanceOptions) => void
+  value: string
 }
 
-export const ConditionTypeFilterDropdown: React.FC<Props> = (props) => {
-  const { networkConfig } = useWeb3ConnectedOrInfura()
+export const WithBalanceFilterDropdown: React.FC<Props> = (props) => {
   const { onClear, onClick, value, ...restProps } = props
-
-  const oracleReality = React.useMemo(
-    () => networkConfig.getOracleFromName('reality' as KnownOracle),
-    [networkConfig]
-  )
 
   const dropdownItems = [
     {
       onClick: () => {
-        onClick(ConditionTypeAll.all, null)
+        onClick(WithBalanceOptions.All)
       },
       text: 'All',
-      value: ConditionTypeAll.all,
+      value: WithBalanceOptions.All,
     },
     {
       onClick: () => {
-        onClick(ConditionType.omen, oracleReality.address.toLowerCase())
+        onClick(WithBalanceOptions.Yes)
       },
-      text: 'Omen Condition',
-      value: ConditionType.omen,
+      text: 'Yes',
+      value: WithBalanceOptions.Yes,
     },
     {
       onClick: () => {
-        onClick(ConditionType.custom, oracleReality.address.toLowerCase())
+        onClick(WithBalanceOptions.No)
       },
-      text: 'Custom Reporter',
-      value: ConditionType.custom,
+      text: 'No',
+      value: WithBalanceOptions.No,
     },
   ]
 
   return (
     <Wrapper {...restProps}>
       <FilterWrapper>
-        <FilterTitle>Condition Type</FilterTitle>
+        <FilterTitle>With Balance</FilterTitle>
         {onClear && <FilterTitleButton onClick={onClear}>Clear</FilterTitleButton>}
       </FilterWrapper>
       <FilterDropdown

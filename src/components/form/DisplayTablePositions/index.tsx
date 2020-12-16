@@ -120,7 +120,7 @@ export const DisplayTablePositions: React.FC<Props> = (props) => {
       data={isLoading ? [] : positions.length ? positions : []}
       noDataComponent={
         isLoading ? (
-          <InlineLoading size={SpinnerSize.regular} />
+          <InlineLoading size={SpinnerSize.small} />
         ) : (
           <EmptyContentText>No positions.</EmptyContentText>
         )
@@ -129,7 +129,7 @@ export const DisplayTablePositions: React.FC<Props> = (props) => {
       pagination
       paginationPerPage={5}
       paginationRowsPerPageOptions={[5, 10, 15]}
-      style={{ minHeight: isLoading || !positions.length ? '41px' : '280px' }}
+      style={{ minHeight: isLoading || !positions.length ? '45px' : '280px' }}
     />
   )
 }

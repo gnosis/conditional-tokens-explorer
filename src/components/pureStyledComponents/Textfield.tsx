@@ -56,6 +56,15 @@ export const TextfieldCSS = css<TexfieldCSSProps>`
     cursor: default;
     font-style: italic;
   }
+
+  &[type='number'] {
+    -moz-appearance: textfield;
+    ::-webkit-inner-spin-button,
+    ::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
 `
 
 export const Textfield = styled.input<TextfieldProps>`
