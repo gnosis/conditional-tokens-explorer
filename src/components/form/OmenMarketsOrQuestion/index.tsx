@@ -5,7 +5,6 @@ import { OmenMarkets } from 'components/form/OmenMarketsOrQuestion/OmenMarkets'
 import { Questions } from 'components/form/OmenMarketsOrQuestion/Questions'
 import { Row } from 'components/pureStyledComponents/Row'
 import { TitleValue } from 'components/text/TitleValue'
-import { INFORMATION_NOT_AVAILABLE } from 'config/constants'
 import { useOmenMarkets } from 'hooks/useOmenMarkets'
 import {
   GetConditionWithQuestions,
@@ -56,8 +55,8 @@ export const OmenMarketsOrQuestion: React.FC<Props> = ({ conditionId, positionId
       return []
     }
   }, [
-    conditionsFromConditionId?.condition,
-    conditionsFromPositionId?.position?.conditions,
+    conditionsFromConditionId,
+    conditionsFromPositionId,
     loadingConditionsFromConditionId,
     loadingConditionsFromPositionId,
   ])
