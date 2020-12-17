@@ -146,7 +146,7 @@ const mockQueryResult = [
   },
 ]
 
-test('Pass conditionId with 1 omen market', async () => {
+xtest('Pass conditionId with 1 omen market', async () => {
   await act(async () => {
     const { findByText, queryByText } = await renderWithConnectedProvider(
       <OmenMarketsOrQuestion conditionId={'0xconditionWith1FPMM'} />,
