@@ -1,6 +1,6 @@
 FROM node:12-alpine
 
-ENV PATH="./hg-subgraph/node_modules/.bin:${PATH}"
+ENV PATH="./omen-subgraph/node_modules/.bin:${PATH}"
 
 COPY create_subgraph.sh ./
 
@@ -8,9 +8,9 @@ RUN apk --update add bash git python make g++ libsecret-dev pkgconfig && rm -rf 
     pkg-config --libs-only-l libsecret-1 && \
     npm install -g ganache-cli && \
     chmod +x create_subgraph.sh && \
-    git clone https://github.com/gnosis/hg-subgraph.git && \
-    cd hg-subgraph && \
-    git checkout 26150148260173ebc2e890d9212e66dae9409404 && \
-    npm install && cd -
+    git clone https://github.com/protofire/omen-subgraph.git && \
+    cd omen-subgraph && \
+    git checkout 8fcc34a92020d9707eae26ad3a19579554ecc227 && \
+    yarn install && cd -
 
 ENTRYPOINT [ "./create_subgraph.sh" ]

@@ -33,6 +33,10 @@ services:
     build: ./docker/hg-subgraph/
     depends_on:
       - graph-node
+  omen-subgraph:
+    build: ./docker/omen-subgraph/
+    depends_on:
+      - graph-node
   deploy-contracts:
     build: ./docker/deploy-contracts/
     command: "./prepare_db.sh"
