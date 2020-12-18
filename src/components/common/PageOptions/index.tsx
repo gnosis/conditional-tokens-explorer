@@ -104,40 +104,78 @@ const ApplyButton = styled(Button)`
   width: 100%;
 `
 
-interface CommonProps {
-  onApply: () => void
+interface PageOptionsProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onApply: (items: any[]) => void
+  disabled?: boolean
+  title?: string
   options: Array<{
     mandatory?: boolean
     isVisible?: boolean
-    toggleStatus: () => void
     name: string
   }>
 }
 
-interface Props extends CommonProps {
-  disabled?: boolean
-  title?: string
+interface DropdownContentProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onApply: (items: any[]) => void
+  onTriggerClose: (value: boolean) => void
+  options: Array<{
+    mandatory?: boolean
+    isVisible?: boolean
+    name: string
+  }>
 }
 
-const DropdownContent: React.FC<CommonProps> = (props) => {
-  const { onApply, options } = props
+const DropdownContent: React.FC<DropdownContentProps> = (props) => {
+  const { onApply, onTriggerClose, options } = props
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [columns, setColumns] = React.useState<any[]>([])
+
+  React.useEffect(() => {
+    const columns = options.map((item) => {
+      const isChecked = item.isVisible || item.mandatory
+      return {
+        isChecked,
+        isMandatory: item.mandatory,
+        name: item.name,
+      }
+    })
+
+    setColumns(columns)
+    onTriggerClose(false)
+  }, [options, onTriggerClose])
+
+  const onChangeHandler = (checked: boolean, index: number) => {
+    const columnsCloned = [...columns]
+    columnsCloned[index].isChecked = !checked
+    setColumns(columnsCloned)
+  }
 
   return (
     <>
       <Title>Table Columns</Title>
       <Items>
-        {options.map((item, index) => {
-          const isChecked = item.isVisible || item.mandatory
-
+        {columns.map((item, index) => {
           return (
-            <Item disabled={item.mandatory} key={index} onClick={item.toggleStatus}>
-              <Checkbox checked={isChecked} /> <ItemText>{item.name}</ItemText>
+            <Item
+              disabled={item.isMandatory}
+              key={index}
+              onClick={() => onChangeHandler(item.isChecked, index)}
+            >
+              <Checkbox checked={item.isChecked} /> <ItemText>{item.name}</ItemText>
             </Item>
           )
         })}
       </Items>
       <ApplyButtonContainer>
-        <ApplyButton buttonType={ButtonType.primary} onClick={onApply}>
+        <ApplyButton
+          buttonType={ButtonType.primary}
+          onClick={() => {
+            onApply(columns)
+            onTriggerClose(true)
+          }}
+        >
           Apply
         </ApplyButton>
       </ApplyButtonContainer>
@@ -145,8 +183,9 @@ const DropdownContent: React.FC<CommonProps> = (props) => {
   )
 }
 
-export const PageOptions: React.FC<Props> = (props) => {
+export const PageOptions: React.FC<PageOptionsProps> = (props) => {
   const { disabled, onApply, options, title = 'Page Settings', ...restProps } = props
+  const [triggerClose, setTriggerClose] = React.useState<boolean>(false)
 
   return (
     <Wrapper
@@ -161,7 +200,15 @@ export const PageOptions: React.FC<Props> = (props) => {
         </DropdownButton>
       }
       dropdownPosition={DropdownPosition.right}
-      items={[<DropdownContent key="1" onApply={onApply} options={options} />]}
+      items={[
+        <DropdownContent
+          key="1"
+          onApply={onApply}
+          onTriggerClose={setTriggerClose}
+          options={options}
+        />,
+      ]}
+      triggerClose={triggerClose}
     />
   )
 }

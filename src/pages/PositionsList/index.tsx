@@ -90,7 +90,6 @@ export const PositionsList = () => {
   const [resetPagination, setResetPagination] = useState<boolean>(false)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [connectedItems, setConnectedItems] = useState<Array<any>>([])
   const [selectedCollateralFilter, setSelectedCollateralFilter] = useState<Maybe<string[]>>(null)
   const [selectedCollateralValue, setSelectedCollateralValue] = useState<string>(
     CollateralFilterOptions.All
@@ -123,6 +122,8 @@ export const PositionsList = () => {
   const [hashesTableModal, setHashesTableModal] = useState<Array<HashArray>>([])
   const [titleTableModal, setTitleTableModal] = useState('')
   const [titleModal, setTitleModal] = useState('')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [columns, setColumns] = useState<any[]>([])
 
   const debouncedHandlerTextToSearch = useDebounceCallback((textToSearch) => {
     setTextToSearch(textToSearch)
@@ -298,95 +299,8 @@ export const PositionsList = () => {
     [history]
   )
 
-  const menu = useMemo(() => {
-    return [
-      {
-        // eslint-disable-next-line react/display-name
-        cell: (row: PositionWithUserBalanceWithDecimals) => (
-          <Dropdown
-            activeItemHighlight={false}
-            dropdownButtonContent={<ButtonDots />}
-            dropdownPosition={DropdownPosition.right}
-            items={buildMenuForRow(row).map((item, index) => {
-              if (item.href) {
-                return (
-                  <DropdownItemLink
-                    disabled={item.disabled}
-                    onMouseDown={item.onClick}
-                    to={item.href}
-                  >
-                    {item.text}
-                  </DropdownItemLink>
-                )
-              } else {
-                return (
-                  <DropdownItem disabled={item.disabled} key={index} onClick={item.onClick}>
-                    {item.text}
-                  </DropdownItem>
-                )
-              }
-            })}
-          />
-        ),
-        mandatory: true,
-        minWidth: '60px',
-        name: 'Menu',
-        right: true,
-      },
-    ]
-  }, [buildMenuForRow])
-
   useEffect(() => {
-    setConnectedItems([
-      {
-        // eslint-disable-next-line react/display-name
-        cell: (row: PositionWithUserBalanceWithDecimals) => (
-          <span
-            onClick={() => handleRowClick(row)}
-            title={
-              isConnected
-                ? row.userBalanceERC1155.toString()
-                : 'Connect to your wallet to access these values.'
-            }
-          >
-            {isConnected ? row.userBalanceERC1155WithDecimals : '-'}
-          </span>
-        ),
-        mandatory: true,
-        minWidth: '180px',
-        name: 'ERC1155 Amount',
-        right: true,
-        selector: 'userBalanceERC1155Numbered',
-        sortable: true,
-      },
-      {
-        // eslint-disable-next-line react/display-name
-        cell: (row: PositionWithUserBalanceWithDecimals) => (
-          <span
-            onClick={() => handleRowClick(row)}
-            title={
-              isConnected
-                ? row.userBalanceERC20.toString()
-                : 'Connect to your wallet to access these values.'
-            }
-          >
-            {isConnected ? row.userBalanceERC20WithDecimals : '-'}
-          </span>
-        ),
-        mandatory: true,
-        minWidth: '180px',
-        name: 'ERC20 Amount',
-        right: true,
-        selector: 'userBalanceERC20Numbered',
-        sortable: true,
-      },
-    ])
-  }, [status, handleRowClick, isConnected])
-
-  const getColumns = useCallback(() => {
-    // If you move this outside of the useCallback, can cause performance issues as a dep of this useCallback
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const defaultColumns: Array<any> = [
+    const columnsDefault = [
       {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimals) => (
@@ -579,10 +493,85 @@ export const PositionsList = () => {
         sortable: false,
         isVisible: true,
       },
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: PositionWithUserBalanceWithDecimals) => (
+          <span
+            onClick={() => handleRowClick(row)}
+            title={
+              isConnected
+                ? row.userBalanceERC1155.toString()
+                : 'Connect to your wallet to access these values.'
+            }
+          >
+            {isConnected ? row.userBalanceERC1155WithDecimals : '-'}
+          </span>
+        ),
+        mandatory: true,
+        minWidth: '180px',
+        name: 'ERC1155 Amount',
+        right: true,
+        selector: 'userBalanceERC1155Numbered',
+        sortable: true,
+      },
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: PositionWithUserBalanceWithDecimals) => (
+          <span
+            onClick={() => handleRowClick(row)}
+            title={
+              isConnected
+                ? row.userBalanceERC20.toString()
+                : 'Connect to your wallet to access these values.'
+            }
+          >
+            {isConnected ? row.userBalanceERC20WithDecimals : '-'}
+          </span>
+        ),
+        mandatory: true,
+        minWidth: '180px',
+        name: 'ERC20 Amount',
+        right: true,
+        selector: 'userBalanceERC20Numbered',
+        sortable: true,
+      },
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: PositionWithUserBalanceWithDecimals) => (
+          <Dropdown
+            activeItemHighlight={false}
+            dropdownButtonContent={<ButtonDots />}
+            dropdownPosition={DropdownPosition.right}
+            items={buildMenuForRow(row).map((item, index) => {
+              if (item.href) {
+                return (
+                  <DropdownItemLink
+                    disabled={item.disabled}
+                    onMouseDown={item.onClick}
+                    to={item.href}
+                  >
+                    {item.text}
+                  </DropdownItemLink>
+                )
+              } else {
+                return (
+                  <DropdownItem disabled={item.disabled} key={index} onClick={item.onClick}>
+                    {item.text}
+                  </DropdownItem>
+                )
+              }
+            })}
+          />
+        ),
+        mandatory: true,
+        minWidth: '60px',
+        name: 'Menu',
+        right: true,
+      },
     ]
 
-    return [...defaultColumns, ...connectedItems, ...menu]
-  }, [connectedItems, menu, handleRowClick, networkConfig])
+    setColumns(columnsDefault)
+  }, [buildMenuForRow, status, networkConfig, handleRowClick, isConnected])
 
   const onWrap = useCallback(
     async (transferValue: TransferOptions) => {
@@ -746,8 +735,19 @@ export const PositionsList = () => {
   ])
 
   const getVisibleColumns = useCallback(() => {
-    return getColumns().filter((item) => item.isVisible || item.mandatory)
-  }, [getColumns])
+    return columns.filter((item) => item.isVisible || item.mandatory)
+  }, [columns])
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const onApplyPageOptions = (items: any[]) => {
+    const newColumns = [...columns]
+
+    const newColumnsUpdated = newColumns.map((newColumn, index) => {
+      newColumn.isVisible = items[index].isChecked
+      return newColumn
+    })
+    setColumns(newColumnsUpdated)
+  }
 
   useEffect(() => {
     resetFilters()
@@ -760,17 +760,8 @@ export const PositionsList = () => {
         extraControls={
           <PageOptions
             disabled={showSpinner ? true : false}
-            onApply={() => console.log('disable or enable the fucking columns')}
-            options={[
-              ...getColumns().map((item) => {
-                return {
-                  ...item,
-                  toggleStatus: () => {
-                    console.log('toggle the fucking checkbox')
-                  },
-                }
-              }),
-            ]}
+            onApply={onApplyPageOptions}
+            options={columns}
           />
         }
       >
