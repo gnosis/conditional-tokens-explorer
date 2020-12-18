@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { PageTitle } from 'components/pureStyledComponents/PageTitle'
+import { PageTitle } from 'components/text/PageTitle'
 import { Contents } from 'pages/MergePositions/Contents'
 
 export const MergePositions = () => {
