@@ -1,5 +1,8 @@
 import React, { useMemo, useState } from 'react'
+import styled from 'styled-components'
 
+import { ButtonCopy } from 'components/buttons'
+import { ButtonExpand } from 'components/buttons/ButtonExpand'
 import { DisplayHashesTableModal } from 'components/modals/DisplayHashesTableModal'
 import { Row } from 'components/pureStyledComponents/Row'
 import { TitleValue } from 'components/text/TitleValue'
@@ -15,6 +18,19 @@ interface Props {
   data: ConditionsProps[]
 }
 
+// TODO Move to common
+const ButtonCopyInlineFlex = styled(ButtonCopy)`
+  display: inline-flex;
+`
+
+const ButtonExpandInlineFlex = styled(ButtonExpand)`
+  display: inline-flex;
+`
+
+const DisplayBlock = styled.div`
+  display: block;
+`
+
 export const Questions = ({ data: conditionsWithQuestions }: Props) => {
   const [openQuestions, setOpenQuestions] = useState(false)
   const areQuestionsMoreThanOne = useMemo(() => conditionsWithQuestions.length > 1, [
@@ -25,7 +41,15 @@ export const Questions = ({ data: conditionsWithQuestions }: Props) => {
     <Row>
       <TitleValue
         title={areQuestionsMoreThanOne ? 'Questions' : 'Question'}
-        value={conditionsWithQuestions[0].question?.title || conditionsWithQuestions[0].id}
+        value={
+          <DisplayBlock>
+            {conditionsWithQuestions[0].question?.title || conditionsWithQuestions[0].id}
+            <ButtonCopyInlineFlex value={conditionsWithQuestions[0].id} />
+            {areQuestionsMoreThanOne && (
+              <ButtonExpandInlineFlex onClick={() => setOpenQuestions(true)} />
+            )}
+          </DisplayBlock>
+        }
       />
       {openQuestions && areQuestionsMoreThanOne && (
         <DisplayHashesTableModal
