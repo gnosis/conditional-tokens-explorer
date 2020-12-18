@@ -46,6 +46,7 @@ import { TableControls } from 'components/table/TableControls'
 import { Hash } from 'components/text/Hash'
 import { PageTitle } from 'components/text/PageTitle'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { PositionWithUserBalanceWithDecimals, usePositionsList } from 'hooks/usePositionsList'
 import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
 import { ConditionInformation } from 'hooks/utils'
@@ -124,6 +125,8 @@ export const PositionsList = () => {
   const [titleModal, setTitleModal] = useState('')
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [columns, setColumns] = useState<any[]>([])
+
+  const { getValue, setValue } = useLocalStorage('positionListColumns')
 
   const debouncedHandlerTextToSearch = useDebounceCallback((textToSearch) => {
     setTextToSearch(textToSearch)
@@ -300,6 +303,8 @@ export const PositionsList = () => {
   )
 
   useEffect(() => {
+    const columnsSaved = getValue()
+
     const columnsDefault = [
       {
         // eslint-disable-next-line react/display-name
@@ -329,7 +334,7 @@ export const PositionsList = () => {
         name: 'Collateral',
         selector: 'collateralTokenSymbol',
         sortable: true,
-        isVisible: true,
+        isVisible: columnsSaved && columnsSaved.length > 0 ? columnsSaved[1]?.isChecked : true,
       },
       {
         // eslint-disable-next-line react/display-name
@@ -340,7 +345,7 @@ export const PositionsList = () => {
         right: true,
         selector: 'createTimestamp',
         sortable: true,
-        isVisible: true,
+        isVisible: columnsSaved && columnsSaved.length > 0 ? columnsSaved[2]?.isChecked : true,
       },
       {
         // eslint-disable-next-line react/display-name
@@ -378,7 +383,7 @@ export const PositionsList = () => {
         name: 'Condition Id',
         selector: 'conditionId',
         sortable: false,
-        isVisible: true,
+        isVisible: columnsSaved && columnsSaved.length > 0 ? columnsSaved[3]?.isChecked : true,
       },
       {
         // eslint-disable-next-line react/display-name
@@ -448,7 +453,7 @@ export const PositionsList = () => {
         name: 'Oracle',
         selector: 'oracle',
         sortable: false,
-        isVisible: true,
+        isVisible: columnsSaved && columnsSaved.length > 0 ? columnsSaved[4]?.isChecked : true,
       },
       {
         // eslint-disable-next-line react/display-name
@@ -491,7 +496,7 @@ export const PositionsList = () => {
         name: 'Question Id',
         selector: 'questionId',
         sortable: false,
-        isVisible: true,
+        isVisible: columnsSaved && columnsSaved.length > 0 ? columnsSaved[5]?.isChecked : true,
       },
       {
         // eslint-disable-next-line react/display-name
@@ -512,7 +517,7 @@ export const PositionsList = () => {
         name: 'ERC1155 Amount',
         right: true,
         selector: 'userBalanceERC1155Numbered',
-        sortable: true,
+        sortable: columnsSaved && columnsSaved.length > 0 ? columnsSaved[6]?.isChecked : true,
       },
       {
         // eslint-disable-next-line react/display-name
@@ -571,7 +576,7 @@ export const PositionsList = () => {
     ]
 
     setColumns(columnsDefault)
-  }, [buildMenuForRow, status, networkConfig, handleRowClick, isConnected])
+  }, [buildMenuForRow, status, networkConfig, handleRowClick, getValue, isConnected])
 
   const onWrap = useCallback(
     async (transferValue: TransferOptions) => {
@@ -746,6 +751,8 @@ export const PositionsList = () => {
       newColumn.isVisible = items[index].isChecked
       return newColumn
     })
+
+    setValue(items)
     setColumns(newColumnsUpdated)
   }
 

@@ -21,7 +21,8 @@ export const useLocalStorage = <T extends string>(key: T) => {
   )
 
   const setValue = useCallback(
-    (value: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (value: any) => {
       window.localStorage.setItem(key, JSON.stringify(value))
     },
     [key]
