@@ -16,6 +16,7 @@ import { CategoriesDropdown } from 'components/form/CategoriesDropdown'
 import { ConditionTypesDropdown } from 'components/form/ConditionTypesDropdown'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { ErrorContainer, Error as ErrorMessage } from 'components/pureStyledComponents/Error'
+import { FilterTitleButton, FilterWrapper } from 'components/pureStyledComponents/FilterTitle'
 import { Row } from 'components/pureStyledComponents/Row'
 import { SmallNote } from 'components/pureStyledComponents/SmallNote'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
@@ -130,6 +131,7 @@ export const PrepareCondition = () => {
   } = formStateCustomCondition
 
   const {
+    clearError: clearErrorOmenCondition,
     control: omenControl,
     errors: errorsOmenCondition,
     formState: formStateOmenCondition,
@@ -729,6 +731,18 @@ export const PrepareCondition = () => {
                 title="Resolution Date"
                 value={
                   <>
+                    <FilterWrapper>
+                      <FilterTitleButton
+                        disabled={!getValuesOmenCondition().resolutionDate}
+                        onClick={() => {
+                          setValueOmenCondition('resolutionDate', null)
+                          clearErrorOmenCondition('resolutionDate')
+                        }}
+                      >
+                        Clear
+                      </FilterTitleButton>
+                    </FilterWrapper>
+
                     <Textfield
                       error={errorsOmenCondition.resolutionDate && true}
                       max={MAX_DATE}
