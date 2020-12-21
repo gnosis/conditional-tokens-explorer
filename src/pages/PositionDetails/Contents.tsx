@@ -548,7 +548,7 @@ export const Contents = (props: Props) => {
           />
         )}
       </Row>
-      <OmenMarketsOrQuestion conditionsIds={conditions.map((condition) => condition.hash)} />
+      <OmenMarketsOrQuestion positionId={position.id} />
       <Row paddingTop>
         <TitleValue
           title="Wrapped Collateral"
