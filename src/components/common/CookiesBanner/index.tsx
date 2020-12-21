@@ -139,9 +139,9 @@ export const CookiesBanner = () => {
 
   const [loadAnalytics, setLoadAnalytics] = useState<string>(
     storage.getItem(loadAnalyticsKey) === null ||
-      storage.getItem(loadAnalyticsKey) === AnalyticsStates.notaccepted
-      ? AnalyticsStates.notaccepted
-      : AnalyticsStates.accepted
+      storage.getItem(loadAnalyticsKey) === AnalyticsStates.notaccepted.toString()
+      ? AnalyticsStates.notaccepted.toString()
+      : AnalyticsStates.accepted.toString()
   )
 
   const loadGoogleAnalytics = useCallback(() => {
@@ -160,16 +160,34 @@ export const CookiesBanner = () => {
     GoogleAnalytics.pageview(location.pathname)
   }, [location])
 
-  const acceptCookies = useCallback(() => {
+  const acceptAnalytics = useCallback(() => {
     setLoadAnalytics(AnalyticsStates.accepted)
     storage.setItem(loadAnalyticsKey, AnalyticsStates.accepted)
   }, [storage])
+
+  const rejectAnalytics = useCallback(() => {
+    setLoadAnalytics(AnalyticsStates.notaccepted)
+    storage.setItem(loadAnalyticsKey, AnalyticsStates.notaccepted)
+  }, [storage])
+
+  const toggleAcceptAnalytics = useCallback(() => {
+    console.log('culo')
+    if (loadAnalytics === AnalyticsStates.accepted.toString()) {
+      console.log('a')
+      acceptAnalytics()
+    } else {
+      console.log('b')
+      rejectAnalytics()
+    }
+  }, [acceptAnalytics, loadAnalytics, rejectAnalytics])
 
   useEffect(() => {
     if (loadAnalytics === AnalyticsStates.accepted) {
       loadGoogleAnalytics()
     }
   }, [loadAnalytics, loadGoogleAnalytics])
+
+  console.log(AnalyticsStates.accepted.toString())
 
   return hideCookiesWarning || GOOGLE_ANALYTICS_ID === null ? null : loadAnalytics ===
     AnalyticsStates.notaccepted ? (
@@ -186,14 +204,15 @@ export const CookiesBanner = () => {
             <Label>
               <CheckboxStyled checked disabled /> Necessary
             </Label>
-            <Label clickable>
-              <CheckboxStyled /> Analytics
+            <Label clickable onClick={toggleAcceptAnalytics}>
+              <CheckboxStyled checked={loadAnalytics === AnalyticsStates.accepted.toString()} />{' '}
+              Analytics
             </Label>
           </Labels>
           <ButtonAccept
             buttonType={ButtonType.primaryInverted}
             className="buttonAccept"
-            onClick={acceptCookies}
+            onClick={acceptAnalytics}
           >
             Accept All
           </ButtonAccept>
