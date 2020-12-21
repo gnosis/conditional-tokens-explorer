@@ -1,7 +1,7 @@
 import React from 'react'
 
-import { PageTitle } from 'components/pureStyledComponents/PageTitle'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { PageTitle } from 'components/text/PageTitle'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { Form } from 'pages/SplitPosition/Form'
 
