@@ -125,24 +125,68 @@ const ButtonClose = styled.button`
   }
 `
 
-enum AnalyticsStates {
-  accepted = 'accepted',
-  notaccepted = 'notaccepted',
-}
+const VISIBLE_COOKIES_BANNER = 'VISIBLE_COOKIES_BANNER'
+const COOKIES_FALSE = 'false'
+const ACCEPT_GOOGLE_ANALYTICS = 'ACCEPT_GOOGLE_ANALYTICS'
 
 export const CookiesBanner = () => {
-  const location = useLocation()
-  const [hideCookiesWarning, setHideCookiesWarning] = useState(false)
-
   const storage = window.localStorage
-  const loadAnalyticsKey = 'loadAnalytics'
 
-  const [loadAnalytics, setLoadAnalytics] = useState<string>(
-    storage.getItem(loadAnalyticsKey) === null ||
-      storage.getItem(loadAnalyticsKey) === AnalyticsStates.notaccepted.toString()
-      ? AnalyticsStates.notaccepted.toString()
-      : AnalyticsStates.accepted.toString()
+  const isCookiesBannerVisible = useCallback(() => {
+    if (storage.getItem(VISIBLE_COOKIES_BANNER) === COOKIES_FALSE) {
+      return false
+    } else {
+      return true
+    }
+  }, [storage])
+
+  const location = useLocation()
+  const [cookiesWarningVisible, setCookiesWarningVisible] = useState(isCookiesBannerVisible())
+
+  const showCookiesWarning = useCallback(() => {
+    setCookiesWarningVisible(true)
+    storage.setItem(VISIBLE_COOKIES_BANNER, '')
+  }, [storage])
+
+  const hideCookiesWarning = useCallback(() => {
+    setCookiesWarningVisible(false)
+    storage.setItem(VISIBLE_COOKIES_BANNER, COOKIES_FALSE)
+  }, [storage])
+
+  const isGoogleAnalyticsAccepted = useCallback(() => {
+    if (storage.getItem(ACCEPT_GOOGLE_ANALYTICS) === ACCEPT_GOOGLE_ANALYTICS) {
+      return true
+    } else {
+      return false
+    }
+  }, [storage])
+
+  const [googleAnalyticsAccepted, setGoogleAnalyticsAccepted] = useState(
+    isGoogleAnalyticsAccepted()
   )
+
+  const acceptGoogleAnalytics = useCallback(() => {
+    setGoogleAnalyticsAccepted(true)
+    storage.setItem(ACCEPT_GOOGLE_ANALYTICS, ACCEPT_GOOGLE_ANALYTICS)
+  }, [storage])
+
+  const rejectGoogleAnalytics = useCallback(() => {
+    setGoogleAnalyticsAccepted(false)
+    storage.setItem(ACCEPT_GOOGLE_ANALYTICS, '')
+  }, [storage])
+
+  const toggleAcceptGoogleAnalytics = useCallback(() => {
+    if (googleAnalyticsAccepted) {
+      rejectGoogleAnalytics()
+    } else {
+      acceptGoogleAnalytics()
+    }
+  }, [acceptGoogleAnalytics, googleAnalyticsAccepted, rejectGoogleAnalytics])
+
+  const acceptAll = useCallback(() => {
+    acceptGoogleAnalytics()
+    hideCookiesWarning()
+  }, [acceptGoogleAnalytics, hideCookiesWarning])
 
   const loadGoogleAnalytics = useCallback(() => {
     if (!GOOGLE_ANALYTICS_ID) {
@@ -160,37 +204,13 @@ export const CookiesBanner = () => {
     GoogleAnalytics.pageview(location.pathname)
   }, [location])
 
-  const acceptAnalytics = useCallback(() => {
-    setLoadAnalytics(AnalyticsStates.accepted)
-    storage.setItem(loadAnalyticsKey, AnalyticsStates.accepted)
-  }, [storage])
-
-  const rejectAnalytics = useCallback(() => {
-    setLoadAnalytics(AnalyticsStates.notaccepted)
-    storage.setItem(loadAnalyticsKey, AnalyticsStates.notaccepted)
-  }, [storage])
-
-  const toggleAcceptAnalytics = useCallback(() => {
-    console.log('culo')
-    if (loadAnalytics === AnalyticsStates.accepted.toString()) {
-      console.log('a')
-      acceptAnalytics()
-    } else {
-      console.log('b')
-      rejectAnalytics()
-    }
-  }, [acceptAnalytics, loadAnalytics, rejectAnalytics])
-
   useEffect(() => {
-    if (loadAnalytics === AnalyticsStates.accepted) {
+    if (googleAnalyticsAccepted) {
       loadGoogleAnalytics()
     }
-  }, [loadAnalytics, loadGoogleAnalytics])
+  }, [googleAnalyticsAccepted, loadGoogleAnalytics])
 
-  console.log(AnalyticsStates.accepted.toString())
-
-  return hideCookiesWarning || GOOGLE_ANALYTICS_ID === null ? null : loadAnalytics ===
-    AnalyticsStates.notaccepted ? (
+  return cookiesWarningVisible ? (
     <Wrapper>
       <Content>
         <Text>
@@ -204,24 +224,19 @@ export const CookiesBanner = () => {
             <Label>
               <CheckboxStyled checked disabled /> Necessary
             </Label>
-            <Label clickable onClick={toggleAcceptAnalytics}>
-              <CheckboxStyled checked={loadAnalytics === AnalyticsStates.accepted.toString()} />{' '}
-              Analytics
+            <Label clickable onClick={toggleAcceptGoogleAnalytics}>
+              <CheckboxStyled checked={googleAnalyticsAccepted} /> Analytics
             </Label>
           </Labels>
           <ButtonAccept
             buttonType={ButtonType.primaryInverted}
             className="buttonAccept"
-            onClick={acceptAnalytics}
+            onClick={acceptAll}
           >
             Accept All
           </ButtonAccept>
         </ButtonContainer>
-        <ButtonClose
-          onClick={() => {
-            setHideCookiesWarning(true)
-          }}
-        >
+        <ButtonClose onClick={hideCookiesWarning}>
           <CloseIcon />
         </ButtonClose>
       </Content>
