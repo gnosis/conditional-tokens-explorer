@@ -16,11 +16,10 @@ import { CategoriesDropdown } from 'components/form/CategoriesDropdown'
 import { ConditionTypesDropdown } from 'components/form/ConditionTypesDropdown'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { ErrorContainer, Error as ErrorMessage } from 'components/pureStyledComponents/Error'
-import { FilterTitleButton, FilterWrapper } from 'components/pureStyledComponents/FilterTitle'
 import { Row } from 'components/pureStyledComponents/Row'
 import { SmallNote } from 'components/pureStyledComponents/SmallNote'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
-import { TitleControl } from 'components/pureStyledComponents/TitleControl'
+import { TitleControl, TitleControlButton } from 'components/pureStyledComponents/TitleControl'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { StatusInfoInline, StatusInfoType } from 'components/statusInfo/StatusInfoInline'
 import { IconTypes } from 'components/statusInfo/common'
@@ -192,6 +191,12 @@ export const PrepareCondition = () => {
   const onChangeOutcome = (e: ChangeEvent<HTMLInputElement>) => {
     setOutcome(e.currentTarget.value)
   }
+
+  const clearResolutionDateEnabled = useMemo(() => {
+    const resolutionDateHasError = !!errorsOmenCondition.resolutionDate
+    const resolutionDateNotEmpty = resolutionDate !== null && resolutionDate !== ''
+    return resolutionDateNotEmpty || resolutionDateHasError
+  }, [errorsOmenCondition.resolutionDate, resolutionDate])
 
   useEffect(() => {
     const getConditionIdPreview = async () => {
@@ -729,20 +734,19 @@ export const PrepareCondition = () => {
             <Row>
               <TitleValue
                 title="Resolution Date"
+                titleControl={
+                  <TitleControlButton
+                    disabled={!clearResolutionDateEnabled}
+                    onClick={() => {
+                      setValueOmenCondition('resolutionDate', null)
+                      clearErrorOmenCondition('resolutionDate')
+                    }}
+                  >
+                    Clear
+                  </TitleControlButton>
+                }
                 value={
                   <>
-                    <FilterWrapper>
-                      <FilterTitleButton
-                        disabled={!getValuesOmenCondition().resolutionDate}
-                        onClick={() => {
-                          setValueOmenCondition('resolutionDate', null)
-                          clearErrorOmenCondition('resolutionDate')
-                        }}
-                      >
-                        Clear
-                      </FilterTitleButton>
-                    </FilterWrapper>
-
                     <Textfield
                       error={errorsOmenCondition.resolutionDate && true}
                       max={MAX_DATE}
