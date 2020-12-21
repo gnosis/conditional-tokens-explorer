@@ -84,7 +84,7 @@ export const web3ModalCSS = css`
 
     &::before {
       color: ${(props) => props.theme.colors.darkBlue};
-      content: 'Connect A Wallet';
+      content: 'Connect to Wallet';
       font-family: ${(props) => props.theme.fonts.fontFamily};
       font-size: 22px;
       font-weight: 400;

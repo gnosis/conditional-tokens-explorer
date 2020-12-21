@@ -133,9 +133,11 @@ const logger = getLogger('Contents')
 export const Contents = (props: Props) => {
   const {
     _type: status,
+    CPKService,
     CTService,
     WrapperService,
     connect,
+    cpkAddress,
     networkConfig,
     signer,
   } = useWeb3ConnectedOrInfura()
@@ -223,15 +225,20 @@ export const Contents = (props: Props) => {
 
   const onWrap = useCallback(
     async (transferValue: TransferOptions) => {
-      if (signer) {
+      if (CPKService && cpkAddress) {
         try {
           setTransactionTitle('Wrapping ERC1155')
           setTransfer(Remote.loading())
 
           const { address: addressTo, amount, positionId } = transferValue
-          const addressFrom = await signer.getAddress()
 
-          await CTService.safeTransferFrom(addressFrom, addressTo, positionId, amount)
+          await CPKService.wrapOrTransfer({
+            CTService,
+            addressFrom: cpkAddress,
+            addressTo, // Is the wrapper service address
+            positionId,
+            amount,
+          })
 
           refetchBalances()
 
@@ -244,20 +251,26 @@ export const Contents = (props: Props) => {
         connect()
       }
     },
-    [setTransfer, CTService, connect, refetchBalances, signer]
+    [setTransfer, CTService, CPKService, cpkAddress, connect, refetchBalances]
   )
 
   const onUnwrap = useCallback(
     async (transferValue: TransferOptions) => {
-      if (signer) {
+      if (cpkAddress && CPKService) {
         try {
           setTransactionTitle('Unwrapping ERC20')
           setTransfer(Remote.loading())
 
           const { address: addressFrom, amount, positionId } = transferValue
-          const addressTo = await signer.getAddress()
 
-          await WrapperService.unwrap(addressFrom, positionId, amount, addressTo)
+          await CPKService.unwrap({
+            CTService,
+            WrapperService,
+            addressFrom, // Is the conditional token address
+            positionId,
+            amount,
+            addressTo: cpkAddress,
+          })
 
           refetchBalances()
 
@@ -270,20 +283,24 @@ export const Contents = (props: Props) => {
         connect()
       }
     },
-    [WrapperService, connect, signer, setTransfer, refetchBalances]
+    [WrapperService, CTService, connect, cpkAddress, CPKService, setTransfer, refetchBalances]
   )
 
   const onTransferOutcomeTokens = useCallback(
     async (transferValue: TransferOptions) => {
-      if (signer) {
+      if (cpkAddress && CPKService) {
         try {
           setTransfer(Remote.loading())
           setTransactionTitle('Transfer Tokens')
 
           const { address: addressTo, amount, positionId } = transferValue
-          const addressFrom = await signer.getAddress()
-
-          await CTService.safeTransferFrom(addressFrom, addressTo, positionId, amount)
+          await CPKService.wrapOrTransfer({
+            CTService,
+            addressFrom: cpkAddress,
+            addressTo, // Is the address entered by the user
+            positionId,
+            amount,
+          })
 
           refetchBalances()
           setTransfer(Remote.success(transferValue))
@@ -293,7 +310,7 @@ export const Contents = (props: Props) => {
         }
       }
     },
-    [signer, CTService, refetchBalances]
+    [cpkAddress, CPKService, CTService, refetchBalances]
   )
 
   const fullLoadingActionButton = transfer.isSuccess()
@@ -670,6 +687,7 @@ export const Contents = (props: Props) => {
       )}
       {openTransferOutcomeTokensModal && positionId && collateralTokenAddress && (
         <TransferOutcomeTokensModal
+          balance={balanceERC1155}
           collateralToken={collateralTokenAddress}
           isOpen={openTransferOutcomeTokensModal}
           onRequestClose={() => setOpenTransferOutcomeTokensModal(false)}

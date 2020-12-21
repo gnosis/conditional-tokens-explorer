@@ -37,7 +37,7 @@ export const usePositionsList = (
   advancedFilter: AdvancedFilterPosition,
   clientFilter?: (position: PositionWithUserBalanceWithDecimals) => boolean
 ) => {
-  const { address, networkConfig, provider } = useWeb3ConnectedOrInfura()
+  const { cpkAddress, networkConfig, provider } = useWeb3ConnectedOrInfura()
 
   const [data, setData] = useState<Remote<Maybe<PositionWithUserBalanceWithDecimals[]>>>(
     Remote.loading()
@@ -98,10 +98,10 @@ export const usePositionsList = (
   const { data: userData, error: userError, refetch: refetchUserPositions } = useQuery<
     UserWithPositions
   >(UserWithPositionsQuery, {
-    skip: !address,
+    skip: !cpkAddress,
     fetchPolicy: 'no-cache',
     variables: {
-      account: address?.toLowerCase(),
+      account: cpkAddress?.toLowerCase(),
     },
   })
 

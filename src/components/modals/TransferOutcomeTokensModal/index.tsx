@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React from 'react'
+import React, { useMemo } from 'react'
 import styled from 'styled-components'
 
 import { Button } from 'components/buttons'
@@ -34,19 +34,21 @@ interface Props extends ModalProps {
   onSubmit: (transfer: TransferOptions) => void
   positionId: string
   collateralToken: string
+  balance: BigNumber
 }
 
 export const TransferOutcomeTokensModal: React.FC<Props> = (props) => {
-  const { collateralToken, onRequestClose, onSubmit, positionId, ...restProps } = props
+  const { balance, collateralToken, onRequestClose, onSubmit, positionId, ...restProps } = props
 
-  const { CTService, address: addressConnectedUser, provider, signer } = useWeb3Connected()
+  const { CTService, cpkAddress, provider } = useWeb3Connected()
 
-  const [balance, setBalance] = React.useState<BigNumber>(ZERO_BN)
   const [token, setToken] = React.useState<Maybe<Token>>(null)
   const [amount, setAmount] = React.useState<BigNumber>(ZERO_BN)
   const [address, setAddress] = React.useState('')
   const [error, setError] = React.useState(false)
   const [isLoading, setLoading] = React.useState(true)
+
+  const maxBalance = useMemo(() => (balance ? balance : ZERO_BN), [balance])
 
   const onClickTransfer = (
     e: React.MouseEvent<Element, MouseEvent> | React.KeyboardEvent<Element>
@@ -70,28 +72,26 @@ export const TransferOutcomeTokensModal: React.FC<Props> = (props) => {
   }, [])
 
   const useWalletHandler = React.useCallback(() => {
-    if (balance.gt(ZERO_BN)) {
-      setAmount(balance)
+    if (maxBalance.gt(ZERO_BN)) {
+      setAmount(maxBalance)
     }
-  }, [balance])
+  }, [maxBalance])
 
   const isAddressToSendTheConnectedUser = React.useMemo(
-    () => addressConnectedUser.toLowerCase() === address.toLowerCase(),
-    [addressConnectedUser, address]
+    () => cpkAddress.toLowerCase() === address.toLowerCase(),
+    [cpkAddress, address]
   )
 
   React.useEffect(() => {
     let cancelled = false
 
-    if (signer) {
+    if (cpkAddress) {
       setLoading(true)
       const fetchBalanceAndTokenInformation = async () => {
-        const balanceOfPositionId = await CTService.balanceOf(positionId)
         const erc20Service = new ERC20Service(provider, collateralToken)
         const token = await erc20Service.getProfileSummary()
         if (!cancelled) {
           setToken(token)
-          setBalance(balanceOfPositionId)
           setLoading(false)
         }
       }
@@ -101,7 +101,7 @@ export const TransferOutcomeTokensModal: React.FC<Props> = (props) => {
     return () => {
       cancelled = true
     }
-  }, [provider, signer, CTService, positionId, collateralToken])
+  }, [provider, cpkAddress, CTService, positionId, collateralToken])
 
   return (
     <Modal
@@ -135,10 +135,10 @@ export const TransferOutcomeTokensModal: React.FC<Props> = (props) => {
             <Row>
               <Amount
                 amount={amount}
-                balance={balance}
+                balance={maxBalance}
                 decimals={token.decimals}
                 isFromAPosition={true}
-                max={balance.toString()}
+                max={maxBalance.toString()}
                 onAmountChange={amountChangeHandler}
                 onUseWalletBalance={useWalletHandler}
                 tokenSymbol={token.symbol}

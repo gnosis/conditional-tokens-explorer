@@ -78,11 +78,12 @@ const logger = getLogger('PositionsList')
 export const PositionsList = () => {
   const {
     _type: status,
+    CPKService,
     CTService,
     WrapperService,
     connect,
+    cpkAddress,
     networkConfig,
-    signer,
   } = useWeb3ConnectedOrInfura()
   const history = useHistory()
 
@@ -235,7 +236,6 @@ export const PositionsList = () => {
 
   const isSearching = useMemo(() => textToSearch && loading, [textToSearch, loading])
   const isConnected = useMemo(() => status === Web3ContextStatus.Connected, [status])
-  const isSigner = useMemo(() => signer !== null, [signer])
 
   const buildMenuForRow = useCallback(
     (row: PositionWithUserBalanceWithDecimals) => {
@@ -256,17 +256,18 @@ export const PositionsList = () => {
           text: 'Redeem',
         },
         {
-          disabled: !userHasERC1155Balance || !isConnected || !isSigner,
+          disabled: !userHasERC1155Balance || !isConnected,
           href: undefined,
           text: 'Transfer Outcome Tokens',
           onClick: () => {
             setSelectedPositionId(id)
             setSelectedCollateralToken(collateralTokenERC1155)
+            setUserBalance(userBalanceERC1155)
             setIsTransferOutcomeModalOpen(true)
           },
         },
         {
-          disabled: !userHasERC1155Balance || !isConnected || !isSigner,
+          disabled: !userHasERC1155Balance || !isConnected,
           href: undefined,
           text: 'Wrap ERC1155',
           onClick: () => {
@@ -277,7 +278,7 @@ export const PositionsList = () => {
           },
         },
         {
-          disabled: !userHasERC20Balance || !isConnected || !isSigner,
+          disabled: !userHasERC20Balance || !isConnected,
           href: undefined,
           text: 'Unwrap ERC20',
           onClick: () => {
@@ -292,7 +293,7 @@ export const PositionsList = () => {
 
       return menu
     },
-    [isConnected, isSigner]
+    [isConnected]
   )
 
   const handleRowClick = useCallback(
@@ -580,15 +581,19 @@ export const PositionsList = () => {
 
   const onWrap = useCallback(
     async (transferValue: TransferOptions) => {
-      if (signer) {
+      if (CPKService && cpkAddress) {
         try {
           setTransactionTitle('Wrapping ERC1155')
           setTransfer(Remote.loading())
 
           const { address: addressTo, amount, positionId } = transferValue
-          const addressFrom = await signer.getAddress()
-
-          await CTService.safeTransferFrom(addressFrom, addressTo, positionId, amount)
+          await CPKService.wrapOrTransfer({
+            CTService,
+            addressFrom: cpkAddress,
+            addressTo, // Is the wrapper service address
+            positionId,
+            amount,
+          })
 
           refetchPositions()
           refetchUserPositions()
@@ -602,20 +607,33 @@ export const PositionsList = () => {
         connect()
       }
     },
-    [setTransfer, CTService, connect, refetchPositions, refetchUserPositions, signer]
+    [
+      cpkAddress,
+      CPKService,
+      setTransfer,
+      CTService,
+      connect,
+      refetchPositions,
+      refetchUserPositions,
+    ]
   )
 
   const onUnwrap = useCallback(
     async (transferValue: TransferOptions) => {
-      if (signer) {
+      if (cpkAddress && CPKService) {
         try {
           setTransactionTitle('Unwrapping ERC20')
           setTransfer(Remote.loading())
 
           const { address: addressFrom, amount, positionId } = transferValue
-          const addressTo = await signer.getAddress()
-
-          await WrapperService.unwrap(addressFrom, positionId, amount, addressTo)
+          await CPKService.unwrap({
+            CTService,
+            WrapperService,
+            addressFrom, // Is the conditional token address
+            positionId,
+            amount,
+            addressTo: cpkAddress,
+          })
 
           refetchPositions()
           refetchUserPositions()
@@ -629,19 +647,33 @@ export const PositionsList = () => {
         connect()
       }
     },
-    [WrapperService, connect, signer, setTransfer, refetchPositions, refetchUserPositions]
+    [
+      CTService,
+      CPKService,
+      WrapperService,
+      connect,
+      cpkAddress,
+      setTransfer,
+      refetchPositions,
+      refetchUserPositions,
+    ]
   )
 
   const onTransferOutcomeTokens = useCallback(
     async (transferValue: TransferOptions) => {
-      if (signer) {
+      if (cpkAddress && CPKService) {
         try {
           setTransactionTitle('Transfer Tokens')
           setTransfer(Remote.loading())
 
           const { address: addressTo, amount, positionId } = transferValue
-          const addressFrom = await signer.getAddress()
-          await CTService.safeTransferFrom(addressFrom, addressTo, positionId, amount)
+          await CPKService.wrapOrTransfer({
+            CTService,
+            addressFrom: cpkAddress,
+            addressTo, // Is the address entered by the user
+            positionId,
+            amount,
+          })
 
           refetchPositions()
           refetchUserPositions()
@@ -655,7 +687,7 @@ export const PositionsList = () => {
         connect()
       }
     },
-    [signer, CTService, connect, refetchUserPositions, refetchPositions]
+    [cpkAddress, CPKService, CTService, connect, refetchUserPositions, refetchPositions]
   )
 
   const fullLoadingActionButton = useMemo(
@@ -889,6 +921,7 @@ export const PositionsList = () => {
       )}
       {isTransferOutcomeModalOpen && selectedPositionId && selectedCollateralToken && (
         <TransferOutcomeTokensModal
+          balance={userBalance}
           collateralToken={selectedCollateralToken.address}
           isOpen={isTransferOutcomeModalOpen}
           onRequestClose={() => setIsTransferOutcomeModalOpen(false)}
