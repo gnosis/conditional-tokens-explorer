@@ -46,6 +46,10 @@ interface Props {
   condition: GetCondition_condition
 }
 
+const optionsDisplayTable = {
+  showCollectionColumn: true,
+}
+
 export const Contents: React.FC<Props> = ({ condition }) => {
   const { _type: status, address, networkConfig } = useWeb3ConnectedOrInfura()
 
@@ -207,7 +211,13 @@ export const Contents: React.FC<Props> = ({ condition }) => {
       <Row paddingTop>
         <TitleValue
           title={"Condition's split positions"}
-          value={<DisplayTablePositions isLoading={loadingPositions} positions={positions || []} />}
+          value={
+            <DisplayTablePositions
+              isLoading={loadingPositions}
+              options={optionsDisplayTable}
+              positions={positions || []}
+            />
+          }
         />
       </Row>
     </CenteredCard>
