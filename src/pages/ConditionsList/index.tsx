@@ -40,7 +40,6 @@ import { useConditionsList } from 'hooks/useConditionsList'
 import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
 import { GetCondition_condition } from 'types/generatedGQLForCTE'
-import { getLogger } from 'util/logger'
 import { formatTSSimple, getRealityQuestionUrl, isOracleRealitio } from 'util/tools'
 import {
   AdvancedFilterConditions,
@@ -54,8 +53,6 @@ import {
 const DropdownItemLink = styled(NavLink)<DropdownItemProps>`
   ${DropdownItemCSS}
 `
-
-const logger = getLogger('ConditionsList')
 
 export const ConditionsList: React.FC = () => {
   const { _type: status, CPKService, address, networkConfig } = useWeb3ConnectedOrInfura()
@@ -88,8 +85,6 @@ export const ConditionsList: React.FC = () => {
   const [isFiltering, setIsFiltering] = useState(false)
 
   const dropdownItems = useConditionsSearchOptions(setSearchBy)
-
-  logger.log(`Search by ${searchBy}`)
 
   const debouncedHandlerTextToSearch = useDebounceCallback((conditionIdToSearch) => {
     setTextToSearch(conditionIdToSearch)
