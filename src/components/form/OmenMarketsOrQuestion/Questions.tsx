@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
 import { ButtonCopy } from 'components/buttons'
@@ -10,6 +10,9 @@ import {
   GetConditionWithQuestionsOfPosition_position_conditions,
   GetConditionWithQuestions_condition,
 } from 'types/generatedGQLForCTE'
+import { getRealityQuestionUrl } from 'util/tools'
+import { ExternalLink } from 'components/navigation/ExternalLink'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 
 type ConditionsProps =
   | GetConditionWithQuestionsOfPosition_position_conditions
@@ -27,15 +30,26 @@ const ButtonExpandInlineFlex = styled(ButtonExpand)`
   display: inline-flex;
 `
 
+const ExternalLinkInlineFlex = styled(ExternalLink)`
+  display: inline-flex;
+`
+
 const DisplayBlock = styled.div`
   display: block;
 `
 
 export const Questions = ({ data: conditionsWithQuestions }: Props) => {
+  const { networkConfig } = useWeb3ConnectedOrInfura()
+
   const [openQuestions, setOpenQuestions] = useState(false)
   const areQuestionsMoreThanOne = useMemo(() => conditionsWithQuestions.length > 1, [
     conditionsWithQuestions,
   ])
+
+  const getRealityQuestionUrlMemoized = useCallback(
+    (questionId: string): string => getRealityQuestionUrl(questionId, networkConfig),
+    [networkConfig]
+  )
 
   return (
     <Row>
@@ -44,7 +58,8 @@ export const Questions = ({ data: conditionsWithQuestions }: Props) => {
         value={
           <DisplayBlock>
             {conditionsWithQuestions[0].question?.title || conditionsWithQuestions[0].id}
-            <ButtonCopyInlineFlex value={conditionsWithQuestions[0].id} />
+            <ButtonCopyInlineFlex value={conditionsWithQuestions[0].question?.id} />
+            {conditionsWithQuestions[0].question?.id && <ExternalLinkInlineFlex href={getRealityQuestionUrlMemoized(conditionsWithQuestions[0].question?.id)} />}
             {areQuestionsMoreThanOne && (
               <ButtonExpandInlineFlex onClick={() => setOpenQuestions(true)} />
             )}

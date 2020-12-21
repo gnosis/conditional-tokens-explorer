@@ -70,14 +70,17 @@ export const OmenMarketsOrQuestion: React.FC<Props> = ({ conditionId, positionId
     [loadingConditionsFromConditionId, loadingOmenMarkets, loadingConditionsFromPositionId]
   )
 
+  const omenMarketsComponent = useMemo(() => omenMarkets.length > 0 && <OmenMarkets data={omenMarkets} />, [omenMarkets])
+  const questionComponent = useMemo(() => omenMarkets.length === 0 && conditionsMerged.length > 0 && conditionsMerged[0].question && <Questions data={conditionsMerged} /> , [conditionsMerged, omenMarkets])
+
   return loading ? (
     <Row>
       <TitleValue title="Loading" value="-" />
     </Row>
   ) : (
     <>
-      {omenMarkets.length > 0 && <OmenMarkets data={omenMarkets} />}
-      {conditionsMerged.length > 0 && <Questions data={conditionsMerged} />}
+      {omenMarketsComponent}
+      {questionComponent}
     </>
   )
 }
