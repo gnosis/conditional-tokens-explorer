@@ -302,7 +302,7 @@ export const Contents = () => {
       setMergeResult('')
       setSelectedPositions([position])
 
-      if (positions && positions.length > 0 && !!position) {
+      if (positions && positions.length > 0 && !!position && cpkAddress) {
         setIsLoadingConditions(true)
         setIsLoadingMergeablePositions(true)
 
@@ -343,7 +343,7 @@ export const Contents = () => {
 
         const positionsPromises = positionsMergeables.map(async (positionFiltered) => {
           const { collateralToken, conditionIds, indexSets } = positionFiltered
-          const balanceOfPositionId = await CTService.balanceOf(positionFiltered.id)
+          const balanceOfPositionId = await CTService.balanceOf(positionFiltered.id, cpkAddress)
           const erc20Service = new ERC20Service(provider, collateralToken)
           const tokenPosition = await erc20Service.getProfileSummary()
 
@@ -368,7 +368,7 @@ export const Contents = () => {
         setConditionId(possibleConditions[0])
       }
     },
-    [positions, CTService, provider]
+    [positions, CTService, cpkAddress, provider]
   )
 
   const maxBalance = useMemo(
