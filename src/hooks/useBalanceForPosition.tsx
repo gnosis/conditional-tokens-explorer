@@ -6,14 +6,14 @@ import { UserPositionBalancesQuery } from 'queries/CTEUsers'
 import { UserPositionBalances } from 'types/generatedGQLForCTE'
 
 export const useBalanceForPosition = (positionId: string) => {
-  const { address } = useWeb3ConnectedOrInfura()
+  const { cpkAddress } = useWeb3ConnectedOrInfura()
 
   const { data, error, loading, refetch } = useQuery<UserPositionBalances>(
     UserPositionBalancesQuery,
     {
-      skip: !address || !positionId,
+      skip: !cpkAddress || !positionId,
       variables: {
-        account: address && address.toLowerCase(),
+        account: cpkAddress && cpkAddress.toLowerCase(),
         positionId: positionId,
       },
     }

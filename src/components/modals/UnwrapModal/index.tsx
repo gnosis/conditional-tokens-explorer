@@ -71,7 +71,7 @@ export const UnwrapModal: React.FC<Props> = (props) => {
 
       if (onRequestClose) onRequestClose(e)
     },
-    [CTService.address, amount, isSubmitDisabled, onRequestClose, onUnWrap, positionId]
+    [CTService, amount, isSubmitDisabled, onRequestClose, onUnWrap, positionId]
   )
 
   const onPressEnter = useCallback(

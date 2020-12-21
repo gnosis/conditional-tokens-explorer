@@ -53,7 +53,7 @@ export const ButtonConnect: React.FC<ButtonHTMLAttributes<HTMLButtonElement>> = 
 
   return (
     <Wrapper className={`buttonConnect ${className}`} onClick={connect} {...restProps}>
-      <Text>Connect To Wallet</Text>
+      <Text>Connect a Wallet</Text>
       <ChevronRight />
     </Wrapper>
   )

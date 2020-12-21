@@ -93,6 +93,15 @@ class ERC20Service {
     return await this.contract.balanceOf(owner)
   }
 
+  hasEnoughAllowance = async (
+    owner: string,
+    spender: string,
+    neededAmount: BigNumber
+  ): Promise<boolean> => {
+    const allowance: BigNumber = await this.contract.allowance(owner, spender)
+    return allowance.gte(neededAmount)
+  }
+
   static encodeApprove = (spenderAccount: string, amount: BigNumber): string => {
     const approveInterface = new Interface(erc20Abi)
 
