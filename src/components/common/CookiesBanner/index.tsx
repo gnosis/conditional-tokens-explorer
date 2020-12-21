@@ -191,7 +191,7 @@ export const CookiesBanner = () => {
   const loadGoogleAnalytics = useCallback(() => {
     if (!GOOGLE_ANALYTICS_ID) {
       logger.error(
-        '[GoogleAnalytics] - In order to use Google analytics you need to add a trackingID using REACT_APP_GOOGLE_ANALYTICS_ID'
+        'In order to use Google Analytics you need to add a trackingID using the REACT_APP_GOOGLE_ANALYTICS_ID environment variable.'
       )
       return
     }
