@@ -16,6 +16,7 @@ import {
   DropdownItemProps,
   DropdownPosition,
 } from 'components/common/Dropdown'
+import { PageOptions } from 'components/common/PageOptions'
 import { TokenIcon } from 'components/common/TokenIcon'
 import { CollateralFilterDropdown } from 'components/filters/CollateralFilterDropdown'
 import { DateFilter } from 'components/filters/DateFilter'
@@ -34,7 +35,6 @@ import {
   FilterResultsText,
 } from 'components/pureStyledComponents/FilterResultsText'
 import { FiltersSwitchWrapper } from 'components/pureStyledComponents/FiltersSwitchWrapper'
-import { PageTitle } from 'components/pureStyledComponents/PageTitle'
 import { Sidebar } from 'components/pureStyledComponents/Sidebar'
 import { SidebarRow } from 'components/pureStyledComponents/SidebarRow'
 import { TwoColumnsCollapsibleLayout } from 'components/pureStyledComponents/TwoColumnsCollapsibleLayout'
@@ -44,7 +44,9 @@ import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { IconTypes } from 'components/statusInfo/common'
 import { TableControls } from 'components/table/TableControls'
 import { Hash } from 'components/text/Hash'
+import { PageTitle } from 'components/text/PageTitle'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { PositionWithUserBalanceWithDecimals, usePositionsList } from 'hooks/usePositionsList'
 import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
 import { ConditionInformation } from 'hooks/utils'
@@ -90,7 +92,6 @@ export const PositionsList = () => {
   const [resetPagination, setResetPagination] = useState<boolean>(false)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [connectedItems, setConnectedItems] = useState<Array<any>>([])
   const [selectedCollateralFilter, setSelectedCollateralFilter] = useState<Maybe<string[]>>(null)
   const [selectedCollateralValue, setSelectedCollateralValue] = useState<string>(
     CollateralFilterOptions.All
@@ -123,6 +124,10 @@ export const PositionsList = () => {
   const [hashesTableModal, setHashesTableModal] = useState<Array<HashArray>>([])
   const [titleTableModal, setTitleTableModal] = useState('')
   const [titleModal, setTitleModal] = useState('')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [columns, setColumns] = useState<any[]>([])
+
+  const { getValue, setValue } = useLocalStorage('positionListColumns')
 
   const debouncedHandlerTextToSearch = useDebounceCallback((textToSearch) => {
     setTextToSearch(textToSearch)
@@ -230,7 +235,6 @@ export const PositionsList = () => {
   ])
 
   const isSearching = useMemo(() => textToSearch && loading, [textToSearch, loading])
-
   const isConnected = useMemo(() => status === Web3ContextStatus.Connected, [status])
 
   const buildMenuForRow = useCallback(
@@ -299,100 +303,20 @@ export const PositionsList = () => {
     [history]
   )
 
-  const menu = useMemo(() => {
-    return [
-      {
-        // eslint-disable-next-line react/display-name
-        cell: (row: PositionWithUserBalanceWithDecimals) => (
-          <Dropdown
-            activeItemHighlight={false}
-            dropdownButtonContent={<ButtonDots />}
-            dropdownPosition={DropdownPosition.right}
-            items={buildMenuForRow(row).map((item, index) => {
-              if (item.href) {
-                return (
-                  <DropdownItemLink
-                    disabled={item.disabled}
-                    onMouseDown={item.onClick}
-                    to={item.href}
-                  >
-                    {item.text}
-                  </DropdownItemLink>
-                )
-              } else {
-                return (
-                  <DropdownItem disabled={item.disabled} key={index} onClick={item.onClick}>
-                    {item.text}
-                  </DropdownItem>
-                )
-              }
-            })}
-          />
-        ),
-        minWidth: '60px',
-        name: '',
-        right: true,
-      },
-    ]
-  }, [buildMenuForRow])
-
   useEffect(() => {
-    setConnectedItems([
-      {
-        // eslint-disable-next-line react/display-name
-        cell: (row: PositionWithUserBalanceWithDecimals) => (
-          <span
-            onClick={() => handleRowClick(row)}
-            title={
-              isConnected
-                ? row.userBalanceERC1155.toString()
-                : 'Connect to your wallet to access these values.'
-            }
-          >
-            {isConnected ? row.userBalanceERC1155WithDecimals : '-'}
-          </span>
-        ),
-        minWidth: '180px',
-        name: 'ERC1155 Amount',
-        right: true,
-        selector: 'userBalanceERC1155Numbered',
-        sortable: true,
-      },
-      {
-        // eslint-disable-next-line react/display-name
-        cell: (row: PositionWithUserBalanceWithDecimals) => (
-          <span
-            onClick={() => handleRowClick(row)}
-            title={
-              isConnected
-                ? row.userBalanceERC20.toString()
-                : 'Connect to your wallet to access these values.'
-            }
-          >
-            {isConnected ? row.userBalanceERC20WithDecimals : '-'}
-          </span>
-        ),
-        minWidth: '180px',
-        name: 'ERC20 Amount',
-        right: true,
-        selector: 'userBalanceERC20Numbered',
-        sortable: true,
-      },
-    ])
-  }, [status, handleRowClick, isConnected])
+    const columnsSaved = getValue()
 
-  const getColumns = useCallback(() => {
-    // If you move this outside of the useCallback, can cause performance issues as a dep of this useCallback
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const defaultColumns: Array<any> = [
+    const columnsDefault = [
       {
         // eslint-disable-next-line react/display-name
         cell: (row: PositionWithUserBalanceWithDecimals) => (
           <Hash href={`/positions/${row.id}`} value={row.id} />
         ),
+        mandatory: true,
         maxWidth: '270px',
         minWidth: '270px',
         name: 'Position Id',
+        selector: 'positionId',
         sortable: false,
       },
       {
@@ -411,6 +335,7 @@ export const PositionsList = () => {
         name: 'Collateral',
         selector: 'collateralTokenSymbol',
         sortable: true,
+        isVisible: columnsSaved && columnsSaved.length > 0 ? columnsSaved[1]?.isChecked : true,
       },
       {
         // eslint-disable-next-line react/display-name
@@ -421,6 +346,7 @@ export const PositionsList = () => {
         right: true,
         selector: 'createTimestamp',
         sortable: true,
+        isVisible: columnsSaved && columnsSaved.length > 0 ? columnsSaved[2]?.isChecked : true,
       },
       {
         // eslint-disable-next-line react/display-name
@@ -456,7 +382,9 @@ export const PositionsList = () => {
         maxWidth: '290px',
         minWidth: '270px',
         name: 'Condition Id',
+        selector: 'conditionId',
         sortable: false,
+        isVisible: columnsSaved && columnsSaved.length > 0 ? columnsSaved[3]?.isChecked : true,
       },
       {
         // eslint-disable-next-line react/display-name
@@ -524,7 +452,9 @@ export const PositionsList = () => {
         maxWidth: '290px',
         minWidth: '270px',
         name: 'Oracle',
+        selector: 'oracle',
         sortable: false,
+        isVisible: columnsSaved && columnsSaved.length > 0 ? columnsSaved[4]?.isChecked : true,
       },
       {
         // eslint-disable-next-line react/display-name
@@ -565,12 +495,89 @@ export const PositionsList = () => {
         maxWidth: '270px',
         minWidth: '270px',
         name: 'Question Id',
+        selector: 'questionId',
         sortable: false,
+        isVisible: columnsSaved && columnsSaved.length > 0 ? columnsSaved[5]?.isChecked : true,
+      },
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: PositionWithUserBalanceWithDecimals) => (
+          <span
+            onClick={() => handleRowClick(row)}
+            title={
+              isConnected
+                ? row.userBalanceERC1155.toString()
+                : 'Connect to your wallet to access these values.'
+            }
+          >
+            {isConnected ? row.userBalanceERC1155WithDecimals : '-'}
+          </span>
+        ),
+        mandatory: true,
+        minWidth: '180px',
+        name: 'ERC1155 Amount',
+        right: true,
+        selector: 'userBalanceERC1155Numbered',
+        sortable: columnsSaved && columnsSaved.length > 0 ? columnsSaved[6]?.isChecked : true,
+      },
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: PositionWithUserBalanceWithDecimals) => (
+          <span
+            onClick={() => handleRowClick(row)}
+            title={
+              isConnected
+                ? row.userBalanceERC20.toString()
+                : 'Connect to your wallet to access these values.'
+            }
+          >
+            {isConnected ? row.userBalanceERC20WithDecimals : '-'}
+          </span>
+        ),
+        mandatory: true,
+        minWidth: '180px',
+        name: 'ERC20 Amount',
+        right: true,
+        selector: 'userBalanceERC20Numbered',
+        sortable: true,
+      },
+      {
+        // eslint-disable-next-line react/display-name
+        cell: (row: PositionWithUserBalanceWithDecimals) => (
+          <Dropdown
+            activeItemHighlight={false}
+            dropdownButtonContent={<ButtonDots />}
+            dropdownPosition={DropdownPosition.right}
+            items={buildMenuForRow(row).map((item, index) => {
+              if (item.href) {
+                return (
+                  <DropdownItemLink
+                    disabled={item.disabled}
+                    onMouseDown={item.onClick}
+                    to={item.href}
+                  >
+                    {item.text}
+                  </DropdownItemLink>
+                )
+              } else {
+                return (
+                  <DropdownItem disabled={item.disabled} key={index} onClick={item.onClick}>
+                    {item.text}
+                  </DropdownItem>
+                )
+              }
+            })}
+          />
+        ),
+        mandatory: true,
+        minWidth: '60px',
+        name: 'Menu',
+        right: true,
       },
     ]
 
-    return [...defaultColumns, ...connectedItems, ...menu]
-  }, [connectedItems, menu, handleRowClick, networkConfig])
+    setColumns(columnsDefault)
+  }, [buildMenuForRow, status, networkConfig, handleRowClick, getValue, isConnected])
 
   const onWrap = useCallback(
     async (transferValue: TransferOptions) => {
@@ -764,6 +771,23 @@ export const PositionsList = () => {
     selectedFromCreationDate,
   ])
 
+  const getVisibleColumns = useCallback(() => {
+    return columns.filter((item) => item.isVisible || item.mandatory)
+  }, [columns])
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const onApplyPageOptions = (items: any[]) => {
+    const newColumns = [...columns]
+
+    const newColumnsUpdated = newColumns.map((newColumn, index) => {
+      newColumn.isVisible = items[index].isChecked
+      return newColumn
+    })
+
+    setValue(items)
+    setColumns(newColumnsUpdated)
+  }
+
   useEffect(() => {
     resetFilters()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -771,7 +795,17 @@ export const PositionsList = () => {
 
   return (
     <>
-      <PageTitle>Positions</PageTitle>
+      <PageTitle
+        extraControls={
+          <PageOptions
+            disabled={showSpinner ? true : false}
+            onApply={onApplyPageOptions}
+            options={columns}
+          />
+        }
+      >
+        Positions
+      </PageTitle>
       <TableControls
         end={
           <SearchField
@@ -844,7 +878,7 @@ export const PositionsList = () => {
           </Sidebar>
           <DataTable
             className="outerTableWrapper"
-            columns={getColumns()}
+            columns={getVisibleColumns()}
             customStyles={customStyles}
             data={showSpinner ? [] : data || []}
             highlightOnHover

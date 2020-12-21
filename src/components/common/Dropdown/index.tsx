@@ -156,6 +156,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   dropdownPosition?: DropdownPosition | undefined
   fullWidth?: boolean
   items: Array<unknown>
+  triggerClose?: boolean
 }
 
 export const Dropdown: React.FC<Props> = (props) => {
@@ -170,6 +171,7 @@ export const Dropdown: React.FC<Props> = (props) => {
     dropdownPosition,
     fullWidth,
     items,
+    triggerClose,
     ...restProps
   } = props
   const [isOpen, setIsOpen] = useState<boolean>(false)
@@ -185,12 +187,17 @@ export const Dropdown: React.FC<Props> = (props) => {
   )
 
   useEffect(() => {
+    if (triggerClose) {
+      setIsOpen(false)
+    }
+  }, [triggerClose])
+
+  useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleClick = (e: any) => {
       if (node && node.current && node.current.contains(e.target)) {
         return
       }
-      setIsOpen(false)
     }
 
     document.addEventListener('mousedown', handleClick)

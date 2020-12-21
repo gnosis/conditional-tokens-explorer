@@ -43,7 +43,7 @@ export const Contents = () => {
     setConditionId(conditionId)
   }, [])
 
-  const { condition } = useCondition(conditionId)
+  const { condition, loading: loadingCondition } = useCondition(conditionId)
 
   const clearComponent = useCallback(() => {
     setPosition(null)
@@ -205,7 +205,12 @@ export const Contents = () => {
         />
       </Row>
       <Row>
-        <PositionPreview condition={condition} networkConfig={networkConfig} position={position} />
+        <PositionPreview
+          condition={condition}
+          isLoading={loadingCondition}
+          networkConfig={networkConfig}
+          position={position}
+        />
       </Row>
       {isWorking && (
         <FullLoading
