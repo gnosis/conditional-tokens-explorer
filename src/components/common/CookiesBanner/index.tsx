@@ -186,9 +186,9 @@ export const CookiesBanner: React.FC<Props> = (props) => {
     if (googleAnalyticsAccepted) {
       rejectGoogleAnalytics()
     } else {
-      acceptGoogleAnalytics()
+      setGoogleAnalyticsAccepted(true)
     }
-  }, [acceptGoogleAnalytics, googleAnalyticsAccepted, rejectGoogleAnalytics])
+  }, [googleAnalyticsAccepted, rejectGoogleAnalytics])
 
   const acceptAll = useCallback(() => {
     acceptGoogleAnalytics()
