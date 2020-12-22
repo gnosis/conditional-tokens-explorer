@@ -58,9 +58,13 @@ const Link = styled(NavLink)`
 `
 
 const ButtonContainer = styled.div`
-  align-items: center;
-  display: flex;
-  justify-content: center;
+  &.buttonContainer {
+    align-items: center;
+    display: flex;
+    inset: auto;
+    justify-content: center;
+    position: relative;
+  }
 `
 
 const Labels = styled.div`
@@ -232,7 +236,7 @@ export const CookiesBanner: React.FC<Props> = (props) => {
           clicking <strong>&quot;Accept All&quot;</strong>, you agree to the storing of cookies on
           your device to enhance site navigation, analyze site usage and provide customer support.
         </Text>
-        <ButtonContainer>
+        <ButtonContainer className="buttonContainer">
           <Labels>
             <Label>
               <CheckboxStyled checked disabled /> Necessary
