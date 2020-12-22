@@ -3,15 +3,9 @@ import ReactDOM from 'react-dom'
 import { HashRouter as Router } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
 
-import { CookiesBanner } from 'components/common/CookiesBanner'
-import { Footer, Header } from 'components/layout'
-import { Mainmenu } from 'components/navigation/Mainmenu'
-import { InnerContainer } from 'components/pureStyledComponents/InnerContainer'
-import { MainScroll } from 'components/pureStyledComponents/MainScroll'
-import { MainWrapper } from 'components/pureStyledComponents/MainWrapper'
+import { Contents } from 'components/layout/Contents'
 import { ApolloProviderWrapper } from 'contexts/Apollo'
 import { Web3ContextProvider } from 'contexts/Web3Context'
-import { Routes } from 'pages/Routes'
 import theme from 'theme'
 import { GlobalStyle } from 'theme/globalStyle'
 import 'sanitize.css'
@@ -23,17 +17,7 @@ ReactDOM.render(
         <ThemeProvider theme={theme}>
           <GlobalStyle />
           <Router>
-            <MainWrapper>
-              <Header />
-              <Mainmenu />
-              <MainScroll>
-                <InnerContainer>
-                  <Routes />
-                </InnerContainer>
-                <Footer />
-              </MainScroll>
-              <CookiesBanner />
-            </MainWrapper>
+            <Contents />
           </Router>
         </ThemeProvider>
       </ApolloProviderWrapper>

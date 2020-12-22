@@ -129,7 +129,13 @@ const VISIBLE_COOKIES_BANNER = 'VISIBLE_COOKIES_BANNER'
 const COOKIES_FALSE = 'false'
 const ACCEPT_GOOGLE_ANALYTICS = 'ACCEPT_GOOGLE_ANALYTICS'
 
-export const CookiesBanner = () => {
+interface Props {
+  isBannerVisible: boolean
+  onHide: () => void
+}
+
+export const CookiesBanner: React.FC<Props> = (props) => {
+  const { isBannerVisible, onHide } = props
   const storage = window.localStorage
 
   const isCookiesBannerVisible = useCallback(() => {
@@ -151,7 +157,8 @@ export const CookiesBanner = () => {
   const hideCookiesWarning = useCallback(() => {
     setCookiesWarningVisible(false)
     storage.setItem(VISIBLE_COOKIES_BANNER, COOKIES_FALSE)
-  }, [storage])
+    onHide()
+  }, [onHide, storage])
 
   const isGoogleAnalyticsAccepted = useCallback(() => {
     if (storage.getItem(ACCEPT_GOOGLE_ANALYTICS) === ACCEPT_GOOGLE_ANALYTICS) {
@@ -208,7 +215,10 @@ export const CookiesBanner = () => {
     if (googleAnalyticsAccepted) {
       loadGoogleAnalytics()
     }
-  }, [googleAnalyticsAccepted, loadGoogleAnalytics])
+    if (isBannerVisible) {
+      showCookiesWarning()
+    }
+  }, [googleAnalyticsAccepted, isBannerVisible, loadGoogleAnalytics, showCookiesWarning])
 
   return cookiesWarningVisible ? (
     <Wrapper>
