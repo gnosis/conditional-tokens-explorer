@@ -63,7 +63,7 @@ export const WrapModal: React.FC<Props> = (props) => {
 
       if (onRequestClose) onRequestClose(e)
     },
-    [WrapperService.address, amount, isSubmitDisabled, onRequestClose, onWrap, positionId]
+    [WrapperService, amount, isSubmitDisabled, onRequestClose, onWrap, positionId]
   )
 
   const onPressEnter = useCallback(

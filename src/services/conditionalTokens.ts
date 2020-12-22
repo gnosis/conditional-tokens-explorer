@@ -2,7 +2,7 @@ import CTHelpersConstructor from '@gnosis.pm/conditional-tokens-contracts/utils/
 import { Contract, ethers } from 'ethers'
 import { TransactionReceipt, TransactionResponse } from 'ethers/providers'
 import { BigNumber, Interface } from 'ethers/utils'
-import Web3Utils, { toChecksumAddress } from 'web3-utils'
+import Web3Utils from 'web3-utils'
 
 import { CONFIRMATIONS_TO_WAIT } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
@@ -106,7 +106,8 @@ export class ConditionalTokensService {
     partition: BigNumber[],
     parentCollection: string,
     conditionId: string,
-    collateral: string
+    collateral: string,
+    address: string
   ): Promise<PositionIdsArray[]> {
     const partitionsPromises = partition.map(async (indexSet: BigNumber) => {
       const collectionId = await this.getCollectionId(parentCollection, conditionId, indexSet)
@@ -117,7 +118,7 @@ export class ConditionalTokensService {
       )
       logger.info(`Position: ${positionId}`)
 
-      const balance = await this.balanceOf(positionId)
+      const balance = await this.balanceOf(positionId, address)
 
       return { positionId, balance }
     })
@@ -248,8 +249,10 @@ export class ConditionalTokensService {
     return !(await this.getOutcomeSlotCount(conditionId)).isZero()
   }
 
-  async balanceOf(positionId: string): Promise<BigNumber> {
-    if (this.signer) {
+  async balanceOf(positionId: string, address?: string): Promise<BigNumber> {
+    if (address) {
+      return await this.contract.balanceOf(address, positionId)
+    } else if (this.signer) {
       const owner = await this.signer.getAddress()
       return await this.contract.balanceOf(owner, positionId)
     } else {
@@ -257,10 +260,9 @@ export class ConditionalTokensService {
     }
   }
 
-  async balanceOfBatch(positionIds: Array<string>): Promise<Array<BigNumber>> {
-    if (this.signer) {
-      const owner = await this.signer.getAddress()
-      const owners = Array.from(new Array(positionIds.length), () => owner)
+  async balanceOfBatch(positionIds: Array<string>, address?: string): Promise<Array<BigNumber>> {
+    if (address) {
+      const owners = Array.from(new Array(positionIds.length), () => address)
       return this.contract.balanceOfBatch(owners, positionIds)
     } else {
       return [new BigNumber(0)]
@@ -377,7 +379,7 @@ export class ConditionalTokensService {
     const prepareConditionInterface = new Interface(conditionalTokensAbi)
 
     return prepareConditionInterface.functions.prepareCondition.encode([
-      toChecksumAddress(oracleAddress),
+      oracleAddress,
       questionId,
       new BigNumber(outcomeSlotCount),
     ])
@@ -426,7 +428,7 @@ export class ConditionalTokensService {
     collateralToken: string,
     parentCollectionId: string,
     conditionId: string,
-    partition: string[],
+    partition: BigNumber[],
     amount: BigNumber
   ): string => {
     const mergePositionsInterface = new Interface(conditionalTokensAbi)
@@ -438,5 +440,50 @@ export class ConditionalTokensService {
       partition,
       amount,
     ])
+  }
+
+  // Method  used to wrapp multiple erc1155
+  static encodeSafeBatchTransferFrom = (
+    addressFrom: string,
+    addressTo: string,
+    positionIds: Array<string>,
+    outcomeTokensToTransfer: Array<BigNumber>
+  ): string => {
+    const safeBatchTransferFromInterface = new Interface(conditionalTokensAbi)
+
+    return safeBatchTransferFromInterface.functions.safeTransferFrom.encode([
+      addressFrom,
+      addressTo,
+      positionIds,
+      outcomeTokensToTransfer,
+      '0x',
+    ])
+  }
+
+  // Method  used to wrapp some erc1155
+  static encodeSafeTransferFrom = (
+    addressFrom: string,
+    addressTo: string,
+    positionId: string,
+    outcomeTokensToTransfer: BigNumber
+  ): string => {
+    const safeTransferFromInterface = new Interface(conditionalTokensAbi)
+
+    return safeTransferFromInterface.functions.safeTransferFrom.encode([
+      addressFrom,
+      addressTo,
+      positionId,
+      outcomeTokensToTransfer,
+      '0x',
+    ])
+  }
+
+  async isApprovedForAll(owner: string, spender: string): Promise<boolean> {
+    return this.contract.isApprovedForAll(owner, spender)
+  }
+
+  static encodeSetApprovalForAll = (spenderAccount: string): string => {
+    const setApprovalForAllInterface = new Interface(conditionalTokensAbi)
+    return setApprovalForAllInterface.functions.setApprovalForAll.encode([spenderAccount, true])
   }
 }

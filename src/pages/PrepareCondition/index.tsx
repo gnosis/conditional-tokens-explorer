@@ -35,11 +35,9 @@ import {
   MAX_OUTCOMES_ALLOWED,
   MIN_OUTCOMES,
   MIN_OUTCOMES_ALLOWED,
-  USE_CPK,
 } from 'config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { ConditionalTokensService } from 'services/conditionalTokens'
-import { CPKService } from 'services/cpk'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import { isAddress } from 'util/tools'
@@ -78,13 +76,13 @@ interface OmenConditionType {
 export const PrepareCondition = () => {
   const {
     _type: status,
+    CPKService,
     CTService,
     RtyService,
     address,
     connect,
+    cpkAddress,
     networkConfig,
-    provider,
-    signer,
   } = useWeb3ConnectedOrInfura()
 
   const history = useHistory()
@@ -221,7 +219,7 @@ export const PrepareCondition = () => {
             oracleOmenCondition &&
             outcomes.length > 0 &&
             resolutionDate &&
-            address &&
+            cpkAddress &&
             category
           ) {
             const openingDateMoment = moment(resolutionDate + '')
@@ -232,7 +230,7 @@ export const PrepareCondition = () => {
               outcomes,
               question: questionTitle + '',
               networkConfig,
-              signerAddress: address,
+              signerAddress: cpkAddress,
             }
             const questionId = await RtyService.askQuestionConstant(questionOptions)
             setConditionIdPreview(
@@ -258,6 +256,7 @@ export const PrepareCondition = () => {
     outcomes,
     RtyService,
     address,
+    cpkAddress,
     networkConfig,
     questionTitle,
     CTService,
@@ -304,23 +303,18 @@ export const PrepareCondition = () => {
 
   const prepareCondition = useCallback(async () => {
     try {
-      if (status === Web3ContextStatus.Connected && address && signer) {
+      if (status === Web3ContextStatus.Connected && address && cpkAddress && CPKService) {
         setPrepareConditionStatus(Remote.loading())
         let conditionIdToUpdate: Maybe<string> = null
-        const cpk = await CPKService.create(networkConfig, provider, signer)
         if (conditionType === ConditionType.custom) {
           const { oracle: oracleCustom, outcomesSlotCount, questionId } = getValuesCustomCondition()
           if (outcomesSlotCount) {
-            if (USE_CPK) {
-              await cpk.prepareCustomCondition({
-                CTService,
-                questionId,
-                oracleAddress: oracleCustom,
-                outcomesSlotCount,
-              })
-            } else {
-              await CTService.prepareCondition(questionId, oracleCustom, outcomesSlotCount)
-            }
+            await CPKService.prepareCustomCondition({
+              CTService,
+              questionId,
+              oracleAddress: oracleCustom,
+              outcomesSlotCount,
+            })
 
             conditionIdToUpdate = ConditionalTokensService.getConditionId(
               questionId,
@@ -347,28 +341,23 @@ export const PrepareCondition = () => {
               outcomes,
               question: questionTitle + '',
               networkConfig,
-              signerAddress: USE_CPK ? cpk.address : address,
+              signerAddress: cpkAddress,
             }
 
             const questionId = await RtyService.askQuestionConstant(questionOptions)
 
-            if (USE_CPK) {
-              await cpk.prepareOmenCondition({
-                CTService,
-                RtyService,
-                arbitrator: (arbitrator as Arbitrator).address,
-                category,
-                networkConfig,
-                oracleAddress: oracleOmen + '',
-                outcomes,
-                question: questionTitle + '',
-                questionId,
-                openingDateMoment,
-              })
-            } else {
-              await RtyService.askQuestion(questionOptions)
-              await CTService.prepareCondition(questionId, oracleOmen + '', outcomes.length)
-            }
+            await CPKService.prepareOmenCondition({
+              CTService,
+              RtyService,
+              arbitrator: (arbitrator as Arbitrator).address,
+              category,
+              networkConfig,
+              oracleAddress: oracleOmen + '',
+              outcomes,
+              question: questionTitle + '',
+              questionId,
+              openingDateMoment,
+            })
 
             conditionIdToUpdate = ConditionalTokensService.getConditionId(
               questionId,
@@ -398,17 +387,17 @@ export const PrepareCondition = () => {
     networkConfig,
     outcomes,
     status,
-    provider,
-    signer,
+    CPKService,
+    cpkAddress,
   ])
 
   const onClickUseMyWallet = useCallback(() => {
-    if (status === Web3ContextStatus.Connected && address) {
-      setValueCustomCondition('oracle', address, true)
+    if (status === Web3ContextStatus.Connected && address && cpkAddress) {
+      setValueCustomCondition('oracle', cpkAddress, true)
     } else if (status === Web3ContextStatus.Infura) {
       connect()
     }
-  }, [address, connect, setValueCustomCondition, status])
+  }, [address, cpkAddress, connect, setValueCustomCondition, status])
 
   const submitDisabled = useMemo(
     () =>
@@ -649,7 +638,12 @@ export const PrepareCondition = () => {
               <TitleValue
                 title="Reporting Address"
                 titleControl={
-                  <TitleControl onClick={onClickUseMyWallet}>Use My Wallet</TitleControl>
+                  <TitleControl
+                    onClick={onClickUseMyWallet}
+                    title={`My CPK address is ${cpkAddress}`}
+                  >
+                    Use My Wallet
+                  </TitleControl>
                 }
                 value={
                   <>

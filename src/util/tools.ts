@@ -465,3 +465,8 @@ export const getParentCollectionId = (
     ? ConditionalTokensService.getCombinedCollectionId(newCollectionsSet)
     : ethers.constants.HashZero
 }
+
+export const sleep = (milliseconds = 1000) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, milliseconds)
+  })

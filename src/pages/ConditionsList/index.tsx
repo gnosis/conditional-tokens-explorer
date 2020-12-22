@@ -55,7 +55,7 @@ const DropdownItemLink = styled(NavLink)<DropdownItemProps>`
 `
 
 export const ConditionsList: React.FC = () => {
-  const { _type: status, CPKService, address, networkConfig } = useWeb3ConnectedOrInfura()
+  const { _type: status, address, cpkAddress, networkConfig } = useWeb3ConnectedOrInfura()
 
   const history = useHistory()
 
@@ -186,9 +186,9 @@ export const ConditionsList: React.FC = () => {
       selectedOracleValue === OracleFilterOptions.Current &&
       status === Web3ContextStatus.Connected &&
       address &&
-      CPKService
+      cpkAddress
     ) {
-      setSelectedOracleFilter([address.toLowerCase(), CPKService.address.toLowerCase()])
+      setSelectedOracleFilter([cpkAddress.toLowerCase(), address.toLowerCase()])
     }
 
     if (
@@ -197,7 +197,7 @@ export const ConditionsList: React.FC = () => {
     ) {
       setSelectedOracleFilter([])
     }
-  }, [status, CPKService, address, selectedOracleValue])
+  }, [status, cpkAddress, address, selectedOracleValue])
 
   const { data, error, loading } = useConditionsList(advancedFilters)
 
@@ -208,7 +208,7 @@ export const ConditionsList: React.FC = () => {
   const buildMenuForRow = useCallback(
     (row: GetCondition_condition) => {
       const { id, oracle, resolved } = row
-      const isAllowedToReport = address && address.toLowerCase() === oracle.toLowerCase()
+      const isAllowedToReport = cpkAddress && cpkAddress.toLowerCase() === oracle.toLowerCase()
 
       const menu = [
         {
@@ -230,7 +230,7 @@ export const ConditionsList: React.FC = () => {
 
       return menu
     },
-    [address, isConnected]
+    [cpkAddress, isConnected]
   )
 
   const handleRowClick = useCallback(

@@ -364,7 +364,7 @@ export class NetworkConfig {
 
     for (const oracle of oracles) {
       const oracleAddress = oracle.address
-      if (oracleAddress.toLowerCase() === address.toLowerCase()) {
+      if (address && oracleAddress.toLowerCase() === address.toLowerCase()) {
         return oracle
       }
     }

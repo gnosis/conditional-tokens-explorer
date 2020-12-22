@@ -63,7 +63,14 @@ interface Props {
 const logger = getLogger('Form')
 
 export const Form = (props: Props) => {
-  const { _type: status, CTService, connect } = useWeb3ConnectedOrInfura()
+  const {
+    _type: status,
+    CPKService,
+    CTService,
+    address,
+    connect,
+    cpkAddress,
+  } = useWeb3ConnectedOrInfura()
   const { tokens } = props
 
   const defaultSplitFrom = SplitFromType.collateral
@@ -125,26 +132,29 @@ export const Form = (props: Props) => {
 
   const onSubmit = useCallback(async () => {
     try {
-      if (status === Web3ContextStatus.Connected) {
+      if (status === Web3ContextStatus.Connected && address && cpkAddress && CPKService) {
         setTransactionStatus(Remote.loading())
 
         let positionIds: PositionIdsArray[]
         let collateralFromSplit: string = collateralAddress
 
         if (isSplittingFromCollateral) {
-          await CTService.splitPosition(
-            collateralFromSplit,
-            NULL_PARENT_ID,
+          await CPKService.splitPosition({
+            CTService,
+            address,
+            amount,
+            collateralToken: collateralFromSplit,
             conditionId,
+            parentCollectionId: NULL_PARENT_ID,
             partition,
-            amount
-          )
+          })
 
           positionIds = await CTService.getPositionsFromPartition(
             partition,
             NULL_PARENT_ID,
             conditionId,
-            collateralFromSplit
+            collateralFromSplit,
+            cpkAddress
           )
         } else if (
           isSplittingFromPosition &&
@@ -155,19 +165,22 @@ export const Form = (props: Props) => {
           collateralFromSplit = position.collateralToken
           const collectionId = position.collection.id
 
-          await CTService.splitPosition(
-            collateralFromSplit,
-            collectionId,
+          await CPKService.splitPosition({
+            CTService,
+            address,
+            amount,
+            collateralToken: collateralFromSplit,
             conditionId,
+            parentCollectionId: collectionId,
             partition,
-            amount
-          )
+          })
 
           positionIds = await CTService.getPositionsFromPartition(
             partition,
             collectionId,
             conditionId,
-            collateralFromSplit
+            collateralFromSplit,
+            cpkAddress
           )
         } else {
           throw Error('Invalid split origin')
@@ -186,6 +199,9 @@ export const Form = (props: Props) => {
     CTService,
     connect,
     status,
+    address,
+    cpkAddress,
+    CPKService,
     partition,
     isSplittingFromCollateral,
     isSplittingFromPosition,

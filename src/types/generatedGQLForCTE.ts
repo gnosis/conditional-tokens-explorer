@@ -89,6 +89,77 @@ export interface GetConditionVariables {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL query operation: GetConditionWithQuestions
+// ====================================================
+
+export interface GetConditionWithQuestions_condition_question {
+  __typename: "Question";
+  id: string;
+  title: string | null;
+}
+
+export interface GetConditionWithQuestions_condition {
+  __typename: "Condition";
+  id: string;
+  oracle: string;
+  questionId: string;
+  outcomeSlotCount: number;
+  resolved: boolean;
+  question: GetConditionWithQuestions_condition_question | null;
+}
+
+export interface GetConditionWithQuestions {
+  condition: GetConditionWithQuestions_condition | null;
+}
+
+export interface GetConditionWithQuestionsVariables {
+  id: string;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL query operation: GetConditionWithQuestionsOfPosition
+// ====================================================
+
+export interface GetConditionWithQuestionsOfPosition_position_conditions_question {
+  __typename: "Question";
+  id: string;
+  title: string | null;
+}
+
+export interface GetConditionWithQuestionsOfPosition_position_conditions {
+  __typename: "Condition";
+  id: string;
+  oracle: string;
+  questionId: string;
+  outcomeSlotCount: number;
+  resolved: boolean;
+  question: GetConditionWithQuestionsOfPosition_position_conditions_question | null;
+}
+
+export interface GetConditionWithQuestionsOfPosition_position {
+  __typename: "Position";
+  conditions: GetConditionWithQuestionsOfPosition_position_conditions[];
+}
+
+export interface GetConditionWithQuestionsOfPosition {
+  position: GetConditionWithQuestionsOfPosition_position | null;
+}
+
+export interface GetConditionWithQuestionsOfPositionVariables {
+  id: string;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL query operation: Positions
 // ====================================================
 
@@ -494,6 +565,46 @@ export interface ConditionData {
   payoutDenominator: any | null;
   resolveTimestamp: any | null;
   resolveBlockNumber: any | null;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL fragment: QuestionData
+// ====================================================
+
+export interface QuestionData {
+  __typename: "Question";
+  id: string;
+  title: string | null;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL fragment: ConditionWithQuestionsFragment
+// ====================================================
+
+export interface ConditionWithQuestionsFragment_question {
+  __typename: "Question";
+  id: string;
+  title: string | null;
+}
+
+export interface ConditionWithQuestionsFragment {
+  __typename: "Condition";
+  id: string;
+  oracle: string;
+  questionId: string;
+  outcomeSlotCount: number;
+  resolved: boolean;
+  question: ConditionWithQuestionsFragment_question | null;
 }
 
 /* tslint:disable */
