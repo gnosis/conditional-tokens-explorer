@@ -154,12 +154,6 @@ export const CookiesBanner: React.FC<Props> = (props) => {
     storage.setItem(VISIBLE_COOKIES_BANNER, '')
   }, [storage])
 
-  const hideCookiesWarning = useCallback(() => {
-    setCookiesWarningVisible(false)
-    storage.setItem(VISIBLE_COOKIES_BANNER, COOKIES_FALSE)
-    onHide()
-  }, [onHide, storage])
-
   const isGoogleAnalyticsAccepted = useCallback(() => {
     if (storage.getItem(ACCEPT_GOOGLE_ANALYTICS) === ACCEPT_GOOGLE_ANALYTICS) {
       return true
@@ -167,6 +161,15 @@ export const CookiesBanner: React.FC<Props> = (props) => {
       return false
     }
   }, [storage])
+
+  const hideCookiesWarning = useCallback(() => {
+    setCookiesWarningVisible(false)
+    storage.setItem(VISIBLE_COOKIES_BANNER, COOKIES_FALSE)
+    onHide()
+    if (!isGoogleAnalyticsAccepted()) {
+      setGoogleAnalyticsAccepted(false)
+    }
+  }, [isGoogleAnalyticsAccepted, onHide, storage])
 
   const [googleAnalyticsAccepted, setGoogleAnalyticsAccepted] = useState(
     isGoogleAnalyticsAccepted()
