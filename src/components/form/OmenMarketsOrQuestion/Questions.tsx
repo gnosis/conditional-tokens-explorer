@@ -4,15 +4,15 @@ import styled from 'styled-components'
 import { ButtonCopy } from 'components/buttons'
 import { ButtonExpand } from 'components/buttons/ButtonExpand'
 import { DisplayHashesTableModal } from 'components/modals/DisplayHashesTableModal'
+import { ExternalLink } from 'components/navigation/ExternalLink'
 import { Row } from 'components/pureStyledComponents/Row'
 import { TitleValue } from 'components/text/TitleValue'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import {
   GetConditionWithQuestionsOfPosition_position_conditions,
   GetConditionWithQuestions_condition,
 } from 'types/generatedGQLForCTE'
 import { getRealityQuestionUrl } from 'util/tools'
-import { ExternalLink } from 'components/navigation/ExternalLink'
-import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 
 type ConditionsProps =
   | GetConditionWithQuestionsOfPosition_position_conditions
@@ -59,7 +59,11 @@ export const Questions = ({ data: conditionsWithQuestions }: Props) => {
           <DisplayBlock>
             {conditionsWithQuestions[0].question?.title || conditionsWithQuestions[0].id}
             <ButtonCopyInlineFlex value={conditionsWithQuestions[0].question?.id} />
-            {conditionsWithQuestions[0].question?.id && <ExternalLinkInlineFlex href={getRealityQuestionUrlMemoized(conditionsWithQuestions[0].question?.id)} />}
+            {conditionsWithQuestions[0].question?.id && (
+              <ExternalLinkInlineFlex
+                href={getRealityQuestionUrlMemoized(conditionsWithQuestions[0].question?.id)}
+              />
+            )}
             {areQuestionsMoreThanOne && (
               <ButtonExpandInlineFlex onClick={() => setOpenQuestions(true)} />
             )}

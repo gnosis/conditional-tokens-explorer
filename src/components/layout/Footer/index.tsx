@@ -1,7 +1,7 @@
 import React from 'react'
-import { NavLink } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 
+import { SettingsIcon } from 'components/icons/SettingsIcon'
 import { HashLink } from 'react-router-hash-link'
 
 // eslint-disable-next-line no-restricted-imports
@@ -62,10 +62,6 @@ const ExternalLink = styled.a`
   ${LinkCSS}
 `
 
-const FooterLink = styled(NavLink)`
-  ${LinkCSS}
-`
-
 const FooterLinkHash = styled(HashLink)`
   ${LinkCSS}
 `
@@ -80,69 +76,84 @@ const Break = styled.span`
   }
 `
 
-const Text = styled.span``
+const IconWrapper = styled.span`
+  cursor: pointer;
+  display: inline-block;
+  height: 12px;
+  margin-left: 6px;
+  position: relative;
+  top: -1px;
+  width: 12px;
+`
 
-export const Footer: React.FC = (props) => {
+const SettingsIconStyled = styled(SettingsIcon)`
+  height: 11px;
+  width: 11px;
+
+  .fill {
+    fill: ${(props) => props.theme.colors.textColor};
+  }
+
+  &:hover {
+    .fill {
+      fill: ${(props) => props.theme.colors.darkerGrey};
+    }
+  }
+`
+
+interface Props {
+  onCookiesBannerShow: () => void
+}
+
+export const Footer: React.FC<Props> = (props) => {
+  const { onCookiesBannerShow } = props
   const date = new Date()
   const year = date.getFullYear()
   const version = appVersion || 'Invalid Version Number'
 
-  const items = [
-    {
-      externalLink: true,
-      text: `©${year} Gnosis`,
-      url: 'https://gnosis.io/',
-    },
-    {
-      hash: 'mainTitle',
-      text: 'Terms & Conditions',
-      url: '/terms-and-conditions',
-    },
-    {
-      hash: 'mainTitle',
-      text: 'Privacy Policy',
-      url: '/privacy-policy',
-    },
-    {
-      hash: 'mainTitle',
-      text: 'Cookie Policy',
-      url: '/cookie-policy',
-    },
-    {
-      externalLink: true,
-      text: `Documentation`,
-      url: 'https://docs.gnosis.io/conditionaltokens/',
-    },
-    {
-      externalLink: true,
-      text: `v${version}`,
-      url: 'https://github.com/gnosis/conditional-tokens-explorer/',
-    },
-  ]
-
   return (
     <Wrapper className="siteFooter" {...props}>
       <Items className="footerItems">
-        {items.map((item, index) => {
-          return (
-            <Item key={index}>
-              {item.url ? (
-                item.externalLink ? (
-                  <ExternalLink href={item.url} rel="noopener noreferrer" target="_blank">
-                    {item.text}
-                  </ExternalLink>
-                ) : item.hash ? (
-                  <FooterLinkHash to={`${item.url}#${item.hash}`}>{item.text}</FooterLinkHash>
-                ) : (
-                  <FooterLink to={item.url}>{item.text}</FooterLink>
-                )
-              ) : (
-                <Text>{item.text}</Text>
-              )}
-              <Break className="break" />
-            </Item>
-          )
-        })}
+        <Item>
+          <ExternalLink href="https://gnosis.io/" rel="noopener noreferrer" target="_blank">
+            {`©${year} Gnosis`}
+          </ExternalLink>
+          <Break className="break" />
+        </Item>
+        <Item>
+          <FooterLinkHash to="/terms-and-conditions#mainTitle">
+            Terms &amp; Conditions
+          </FooterLinkHash>
+          <Break className="break" />
+        </Item>
+        <Item>
+          <FooterLinkHash to="/privacy-policy#mainTitle">Privacy Policy</FooterLinkHash>
+          <Break className="break" />
+        </Item>
+        <Item>
+          <FooterLinkHash to="/cookie-policy#mainTitle">Cookie Policy</FooterLinkHash>
+          <IconWrapper onClick={onCookiesBannerShow}>
+            <SettingsIconStyled />
+          </IconWrapper>
+          <Break className="break" />
+        </Item>
+        <Item>
+          <ExternalLink
+            href="https://docs.gnosis.io/conditionaltokens/"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Documentation
+          </ExternalLink>
+          <Break className="break" />
+        </Item>
+        <Item>
+          <ExternalLink
+            href="https://github.com/gnosis/conditional-tokens-explorer/"
+            rel="noopener noreferrer"
+            target="_blank"
+          >{`v${version}`}</ExternalLink>
+        </Item>
       </Items>
     </Wrapper>
   )
