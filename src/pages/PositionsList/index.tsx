@@ -127,7 +127,11 @@ export const PositionsList = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [columns, setColumns] = useState<any[]>([])
 
-  const { getValue, setValue } = useLocalStorage('positionListColumns')
+  const { getValue, setValue } = useLocalStorage(
+    `positionListColumns-${networkConfig.getNetworkName()}-${
+      status === Web3ContextStatus.Connected ? 'online' : 'offline'
+    }`
+  )
 
   const debouncedHandlerTextToSearch = useDebounceCallback((textToSearch) => {
     setTextToSearch(textToSearch)
@@ -304,7 +308,7 @@ export const PositionsList = () => {
   )
 
   useEffect(() => {
-    const columnsSaved = getValue()
+    const columnsSaved = getValue(false)
 
     const columnsDefault = [
       {
