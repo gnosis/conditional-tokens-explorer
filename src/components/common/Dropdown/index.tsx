@@ -187,17 +187,18 @@ export const Dropdown: React.FC<Props> = (props) => {
   )
 
   useEffect(() => {
+    // Note: you can use triggerClose to close the dropdown when clicking on a specific element
     if (triggerClose) {
       setIsOpen(false)
     }
-  }, [triggerClose])
 
-  useEffect(() => {
+    // Note: This code handles closing when clickin outside of the dropdown
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleClick = (e: any) => {
       if (node && node.current && node.current.contains(e.target)) {
         return
       }
+      setIsOpen(false)
     }
 
     document.addEventListener('mousedown', handleClick)
@@ -205,7 +206,7 @@ export const Dropdown: React.FC<Props> = (props) => {
     return () => {
       document.removeEventListener('mousedown', handleClick)
     }
-  }, [node])
+  }, [node, triggerClose])
 
   return (
     <Wrapper
