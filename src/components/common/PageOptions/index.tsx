@@ -121,8 +121,8 @@ interface DropdownContentProps {
   onApply: (items: any[]) => void
   onTriggerClose: (value: boolean) => void
   options: Array<{
-    mandatory?: boolean
     isVisible?: boolean
+    mandatory?: boolean
     name: string
   }>
 }
