@@ -58,8 +58,7 @@ import {
   truncateStringInTheMiddle,
 } from 'util/tools'
 import { HashArray, NetworkIds, OutcomeProps, TransferOptions } from 'util/types'
-
-import { useGraphMeta } from '../../hooks/useGraphMeta'
+import { useGraphMeta } from 'hooks/useGraphMeta'
 
 const CollateralText = styled.span`
   color: ${(props) => props.theme.colors.darkerGrey};
@@ -232,8 +231,6 @@ export const Contents = (props: Props) => {
     wrappedTokenAddress,
     balanceERC20,
   ])
-
-  console.log(wtmAddress)
 
   const onWrap = useCallback(
     async (transferValue: TransferOptions) => {
