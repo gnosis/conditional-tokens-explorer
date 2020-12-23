@@ -211,6 +211,9 @@ export const Web3ContextProvider = ({ children }: Props) => {
     try {
       web3Provider = await web3Modal.connect()
     } catch (error) {
+      if (error.match(/modal closed/i)) {
+        return
+      }
       web3Modal.clearCachedProvider()
       setWeb3Status({ _type: Web3ContextStatus.Error, error } as ErrorWeb3)
       return
