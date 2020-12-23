@@ -219,8 +219,10 @@ export const Contents = (props: Props) => {
     [collateralERC20]
   )
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const wtmAddress = useMemo(() => (wrappedTokenAddress ? wrappedTokenAddress : ''), [
     wrappedTokenAddress,
+    balanceERC20,
   ])
 
   const onWrap = useCallback(
