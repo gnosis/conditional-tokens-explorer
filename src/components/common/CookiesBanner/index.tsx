@@ -5,11 +5,14 @@ import styled from 'styled-components'
 import { Button } from 'components/buttons/Button'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { CloseIcon } from 'components/icons/CloseIcon'
+import { Checkbox } from 'components/pureStyledComponents/Checkbox'
 import { GOOGLE_ANALYTICS_ID } from 'config/constants'
 import GoogleAnalytics from 'react-ga'
 import { getLogger } from 'util/logger'
 
 const logger = getLogger('Analytics::Google')
+
+const INNER_WIDTH = '840px'
 
 const Wrapper = styled.div`
   background-color: #fff;
@@ -41,7 +44,7 @@ const Text = styled.p`
   padding: 0 20px;
   position: relative;
   text-align: center;
-  width: 840px;
+  width: ${INNER_WIDTH};
   z-index: 1;
 `
 
@@ -55,9 +58,42 @@ const Link = styled(NavLink)`
 `
 
 const ButtonContainer = styled.div`
+  &.buttonContainer {
+    align-items: center;
+    display: flex;
+    inset: auto;
+    justify-content: center;
+    position: relative;
+  }
+`
+
+const Labels = styled.div`
   align-items: center;
   display: flex;
-  justify-content: center;
+`
+
+const Label = styled.div<{ clickable?: boolean }>`
+  align-items: center;
+  color: ${(props) => props.theme.colors.darkerGrey};
+  display: flex;
+  font-size: 17px;
+  font-weight: normal;
+  line-height: 1.4;
+  margin: 0 25px 0 0;
+
+  &:last-child {
+    margin-right: 80px;
+  }
+
+  ${(props) => props.clickable && 'cursor: pointer'}
+`
+
+Label.defaultProps = {
+  clickable: false,
+}
+
+const CheckboxStyled = styled(Checkbox)`
+  margin: 0 10px 0 0;
 `
 
 const ButtonAccept = styled(Button)`
@@ -93,29 +129,77 @@ const ButtonClose = styled.button`
   }
 `
 
-enum AnalyticsStates {
-  accepted = 'accepted',
-  notaccepted = 'notaccepted',
+const VISIBLE_COOKIES_BANNER = 'VISIBLE_COOKIES_BANNER'
+const COOKIES_FALSE = 'false'
+const ACCEPT_GOOGLE_ANALYTICS = 'ACCEPT_GOOGLE_ANALYTICS'
+
+interface Props {
+  isBannerVisible: boolean
+  onHide: () => void
 }
 
-export const CookiesBanner = () => {
-  const location = useLocation()
-  const [hideCookiesWarning, setHideCookiesWarning] = useState(false)
-
+export const CookiesBanner: React.FC<Props> = (props) => {
+  const { isBannerVisible, onHide } = props
   const storage = window.localStorage
-  const loadAnalyticsKey = 'loadAnalytics'
 
-  const [loadAnalytics, setLoadAnalytics] = useState<string>(
-    storage.getItem(loadAnalyticsKey) === null ||
-      storage.getItem(loadAnalyticsKey) === AnalyticsStates.notaccepted
-      ? AnalyticsStates.notaccepted
-      : AnalyticsStates.accepted
+  const isCookiesBannerVisible = useCallback(
+    () => !(storage.getItem(VISIBLE_COOKIES_BANNER) === COOKIES_FALSE),
+    [storage]
   )
+
+  const location = useLocation()
+  const [cookiesWarningVisible, setCookiesWarningVisible] = useState(isCookiesBannerVisible())
+
+  const showCookiesWarning = useCallback(() => {
+    setCookiesWarningVisible(true)
+    storage.setItem(VISIBLE_COOKIES_BANNER, '')
+  }, [storage])
+
+  const isGoogleAnalyticsAccepted = useCallback(
+    () => storage.getItem(ACCEPT_GOOGLE_ANALYTICS) === ACCEPT_GOOGLE_ANALYTICS,
+    [storage]
+  )
+
+  const hideCookiesWarning = useCallback(() => {
+    setCookiesWarningVisible(false)
+    storage.setItem(VISIBLE_COOKIES_BANNER, COOKIES_FALSE)
+    onHide()
+    if (!isGoogleAnalyticsAccepted()) {
+      setGoogleAnalyticsAccepted(false)
+    }
+  }, [isGoogleAnalyticsAccepted, onHide, storage])
+
+  const [googleAnalyticsAccepted, setGoogleAnalyticsAccepted] = useState(
+    isGoogleAnalyticsAccepted()
+  )
+
+  const acceptGoogleAnalytics = useCallback(() => {
+    setGoogleAnalyticsAccepted(true)
+    storage.setItem(ACCEPT_GOOGLE_ANALYTICS, ACCEPT_GOOGLE_ANALYTICS)
+  }, [storage])
+
+  const rejectGoogleAnalytics = useCallback(() => {
+    setGoogleAnalyticsAccepted(false)
+    storage.setItem(ACCEPT_GOOGLE_ANALYTICS, '')
+  }, [storage])
+
+  const toggleAcceptGoogleAnalytics = useCallback(() => {
+    if (googleAnalyticsAccepted) {
+      rejectGoogleAnalytics()
+    } else {
+      setGoogleAnalyticsAccepted(true)
+    }
+  }, [googleAnalyticsAccepted, rejectGoogleAnalytics])
+
+  const acceptAll = useCallback(() => {
+    acceptGoogleAnalytics()
+    hideCookiesWarning()
+  }, [acceptGoogleAnalytics, hideCookiesWarning])
 
   const loadGoogleAnalytics = useCallback(() => {
     if (!GOOGLE_ANALYTICS_ID) {
       logger.error(
-        '[GoogleAnalytics] - In order to use Google analytics you need to add a trackingID using REACT_APP_GOOGLE_ANALYTICS_ID'
+        'In order to use Google Analytics you need to add a trackingID using the REACT_APP_GOOGLE_ANALYTICS_ID environment variable.'
       )
       return
     }
@@ -128,42 +212,42 @@ export const CookiesBanner = () => {
     GoogleAnalytics.pageview(location.pathname)
   }, [location])
 
-  const acceptCookies = useCallback(() => {
-    setLoadAnalytics(AnalyticsStates.accepted)
-    storage.setItem(loadAnalyticsKey, AnalyticsStates.accepted)
-  }, [storage])
-
   useEffect(() => {
-    if (loadAnalytics === AnalyticsStates.accepted) {
+    if (googleAnalyticsAccepted) {
       loadGoogleAnalytics()
     }
-  }, [loadAnalytics, loadGoogleAnalytics])
+    if (isBannerVisible) {
+      showCookiesWarning()
+    }
+  }, [googleAnalyticsAccepted, isBannerVisible, loadGoogleAnalytics, showCookiesWarning])
 
-  return hideCookiesWarning || GOOGLE_ANALYTICS_ID === null ? null : loadAnalytics ===
-    AnalyticsStates.notaccepted ? (
+  return cookiesWarningVisible ? (
     <Wrapper>
       <Content>
         <Text>
           We use cookies to give you the best experience and to help improve our website. Please
           read our <Link to={'/cookie-policy'}>Cookie Policy</Link> for more information. By
-          clicking <strong>&quot;Accept Cookies&quot;</strong>, you agree to the storing of cookies
-          on your device to enhance site navigation, analyze site usage and provide customer
-          support.
+          clicking <strong>&quot;Accept All&quot;</strong>, you agree to the storing of cookies on
+          your device to enhance site navigation, analyze site usage and provide customer support.
         </Text>
-        <ButtonContainer>
+        <ButtonContainer className="buttonContainer">
+          <Labels>
+            <Label>
+              <CheckboxStyled checked disabled /> Necessary
+            </Label>
+            <Label clickable onClick={toggleAcceptGoogleAnalytics}>
+              <CheckboxStyled checked={googleAnalyticsAccepted} /> Analytics
+            </Label>
+          </Labels>
           <ButtonAccept
             buttonType={ButtonType.primaryInverted}
             className="buttonAccept"
-            onClick={acceptCookies}
+            onClick={acceptAll}
           >
-            Accept Cookies
+            Accept All
           </ButtonAccept>
         </ButtonContainer>
-        <ButtonClose
-          onClick={() => {
-            setHideCookiesWarning(true)
-          }}
-        >
+        <ButtonClose onClick={hideCookiesWarning}>
           <CloseIcon />
         </ButtonClose>
       </Content>

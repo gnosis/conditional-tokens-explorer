@@ -2,11 +2,11 @@ import React from 'react'
 import { useHistory } from 'react-router-dom'
 
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
-import { PageTitle } from 'components/pureStyledComponents/PageTitle'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { IconTypes } from 'components/statusInfo/common'
+import { PageTitle } from 'components/text/PageTitle'
 import { useConditionContext } from 'contexts/ConditionContext'
 import { Contents } from 'pages/ConditionDetails/Contents'
 import {

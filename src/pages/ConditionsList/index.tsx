@@ -26,7 +26,6 @@ import {
   FilterResultsText,
 } from 'components/pureStyledComponents/FilterResultsText'
 import { FiltersSwitchWrapper } from 'components/pureStyledComponents/FiltersSwitchWrapper'
-import { PageTitle } from 'components/pureStyledComponents/PageTitle'
 import { Pill, PillTypes } from 'components/pureStyledComponents/Pill'
 import { Sidebar } from 'components/pureStyledComponents/Sidebar'
 import { SidebarRow } from 'components/pureStyledComponents/SidebarRow'
@@ -35,13 +34,13 @@ import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { TableControls } from 'components/table/TableControls'
 import { Hash } from 'components/text/Hash'
+import { PageTitle } from 'components/text/PageTitle'
 import { Question } from 'components/text/Question'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useConditionsList } from 'hooks/useConditionsList'
 import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
 import { GetCondition_condition } from 'types/generatedGQLForCTE'
-import { getLogger } from 'util/logger'
 import { formatTSSimple, getRealityQuestionUrl, isOracleRealitio } from 'util/tools'
 import {
   AdvancedFilterConditions,
@@ -56,10 +55,8 @@ const DropdownItemLink = styled(NavLink)<DropdownItemProps>`
   ${DropdownItemCSS}
 `
 
-const logger = getLogger('ConditionsList')
-
 export const ConditionsList: React.FC = () => {
-  const { _type: status, CPKService, address, networkConfig } = useWeb3ConnectedOrInfura()
+  const { _type: status, address, cpkAddress, networkConfig } = useWeb3ConnectedOrInfura()
 
   const history = useHistory()
 
@@ -89,8 +86,6 @@ export const ConditionsList: React.FC = () => {
   const [isFiltering, setIsFiltering] = useState(false)
 
   const dropdownItems = useConditionsSearchOptions(setSearchBy)
-
-  logger.log(`Search by ${searchBy}`)
 
   const debouncedHandlerTextToSearch = useDebounceCallback((conditionIdToSearch) => {
     setTextToSearch(conditionIdToSearch)
@@ -192,9 +187,9 @@ export const ConditionsList: React.FC = () => {
       selectedOracleValue === OracleFilterOptions.Current &&
       status === Web3ContextStatus.Connected &&
       address &&
-      CPKService
+      cpkAddress
     ) {
-      setSelectedOracleFilter([address.toLowerCase(), CPKService.address.toLowerCase()])
+      setSelectedOracleFilter([cpkAddress.toLowerCase(), address.toLowerCase()])
     }
 
     if (
@@ -203,7 +198,7 @@ export const ConditionsList: React.FC = () => {
     ) {
       setSelectedOracleFilter([])
     }
-  }, [status, CPKService, address, selectedOracleValue])
+  }, [status, cpkAddress, address, selectedOracleValue])
 
   const { data, error, loading } = useConditionsList(advancedFilters)
 
@@ -214,7 +209,7 @@ export const ConditionsList: React.FC = () => {
   const buildMenuForRow = useCallback(
     (row: GetCondition_condition) => {
       const { id, oracle, resolved } = row
-      const isAllowedToReport = address && address.toLowerCase() === oracle.toLowerCase()
+      const isAllowedToReport = cpkAddress && cpkAddress.toLowerCase() === oracle.toLowerCase()
 
       const menu = [
         {
@@ -236,7 +231,7 @@ export const ConditionsList: React.FC = () => {
 
       return menu
     },
-    [address, isConnected]
+    [cpkAddress, isConnected]
   )
 
   const handleRowClick = useCallback(

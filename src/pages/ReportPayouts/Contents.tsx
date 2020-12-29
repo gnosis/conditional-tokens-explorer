@@ -20,7 +20,7 @@ import { Remote } from 'util/remoteData'
 const logger = getLogger('ReportPayouts')
 
 export const Contents: React.FC = () => {
-  const { _type: status, CTService, address, connect } = useWeb3ConnectedOrInfura()
+  const { _type: status, CPKService, CTService, connect, cpkAddress } = useWeb3ConnectedOrInfura()
 
   const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<string>>>(
     Remote.notAsked<Maybe<string>>()
@@ -34,13 +34,14 @@ export const Contents: React.FC = () => {
   const questionId = useMemo(() => condition && condition.questionId, [condition])
   const outcomeSlotCount = useMemo(() => condition && condition.outcomeSlotCount, [condition])
   const [isDirty, setIsDirty] = useState(false)
+  const [resetFilterUpdate, setResetFilterUpdate] = useState(false)
 
   const isConditionResolved = useMemo(() => condition && condition.resolved, [condition])
   const oracle = useMemo(() => condition && condition.oracle, [condition])
 
   const isOracleValidToReportPayout = useMemo(
-    () => address && oracle && oracle.toLowerCase() === address.toLowerCase(),
-    [address, oracle]
+    () => cpkAddress && oracle && oracle.toLowerCase() === cpkAddress.toLowerCase(),
+    [cpkAddress, oracle]
   )
 
   const isPayoutsEmpty = useMemo(() => !payouts.some((currentValue: number) => currentValue > 0), [
@@ -53,12 +54,16 @@ export const Contents: React.FC = () => {
 
   const onReportPayout = useCallback(async () => {
     try {
-      if (status === Web3ContextStatus.Connected && questionId) {
+      if (status === Web3ContextStatus.Connected && questionId && CPKService) {
         setTransactionStatus(Remote.loading())
 
         // We can't use the CPK here, if you put in as the reporter the original account, you'd have to use the original account, so use a plain transaction
         // or else it will derive a different condition ID
-        await CTService.reportPayouts(questionId, payouts)
+        await CPKService.reportPayouts({
+          CTService,
+          questionId,
+          payouts,
+        })
 
         setTransactionStatus(Remote.success(questionId))
         setIsDirty(false)
@@ -69,7 +74,7 @@ export const Contents: React.FC = () => {
       setTransactionStatus(Remote.failure(err))
       logger.error(err)
     }
-  }, [status, payouts, connect, questionId, CTService])
+  }, [status, payouts, CPKService, connect, questionId, CTService])
 
   const onRowClicked = useCallback(
     (row: GetCondition_condition) => {
@@ -175,8 +180,15 @@ export const Contents: React.FC = () => {
     [condition, status, isDirty, isPayoutsEmpty]
   )
 
-  const thereAreErrors =
-    isNotAllowedToReportPayout || isNotConnected || isPayoutPositive || isConditionResolved
+  useEffect(() => {
+    setResetFilterUpdate(!resetFilterUpdate)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status])
+
+  const thereAreErrors = useMemo(
+    () => isNotAllowedToReportPayout || isNotConnected || isPayoutPositive || isConditionResolved,
+    [isNotAllowedToReportPayout, isNotConnected, isPayoutPositive, isConditionResolved]
+  )
 
   return (
     <CenteredCard>
@@ -187,6 +199,7 @@ export const Contents: React.FC = () => {
         }}
         onRowClicked={onRowClicked}
         refetch={transactionStatus.isSuccess()}
+        resetFilterUpdate={resetFilterUpdate}
         selectedConditionId={conditionId}
       />
       <TitleValue

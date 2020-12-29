@@ -1,3 +1,4 @@
+import { ethers } from 'ethers'
 import { Provider } from 'ethers/providers'
 import { BigNumber, formatUnits, getAddress } from 'ethers/utils'
 import moment from 'moment-timezone'
@@ -9,6 +10,7 @@ import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
 import { ConditionInformation } from 'hooks/utils'
 import isEqual from 'lodash.isequal'
 import zipObject from 'lodash.zipobject'
+import { ConditionalTokensService } from 'services/conditionalTokens'
 import { ERC20Service } from 'services/erc20'
 import { GetCondition_condition } from 'types/generatedGQLForCTE'
 import { CollateralErrors, ConditionErrors, NetworkIds, PositionErrors, Token } from 'util/types'
@@ -446,3 +448,25 @@ export const isOracleRealitio = (oracleAddress: string, networkConfig: NetworkCo
   const oracle = networkConfig.getOracleFromAddress(oracleAddress)
   return oracle.name === ('reality' as KnownOracle)
 }
+
+export const getParentCollectionId = (
+  indexSets: string[],
+  conditionIds: string[],
+  conditionId: string
+) => {
+  const newCollectionsSet = conditionIds.reduce(
+    (acc, id, i) =>
+      id !== conditionId
+        ? [...acc, { conditionId: id, indexSet: new BigNumber(indexSets[i]) }]
+        : acc,
+    new Array<{ conditionId: string; indexSet: BigNumber }>()
+  )
+  return newCollectionsSet.length
+    ? ConditionalTokensService.getCombinedCollectionId(newCollectionsSet)
+    : ethers.constants.HashZero
+}
+
+export const sleep = (milliseconds = 1000) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, milliseconds)
+  })

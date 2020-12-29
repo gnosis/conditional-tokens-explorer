@@ -1,4 +1,3 @@
-import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useMemo, useState } from 'react'
 import { Prompt } from 'react-router'
@@ -13,25 +12,23 @@ import { PositionPreview } from 'components/redeemPosition/PositionPreview'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
 import { SelectablePositionTable } from 'components/table/SelectablePositionTable'
-import { USE_CPK } from 'config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useCondition } from 'hooks/useCondition'
 import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
-import { ConditionalTokensService } from 'services/conditionalTokens'
-import { CPKService } from 'services/cpk'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
+import { getParentCollectionId, getRedeemedBalance } from 'util/tools'
 
 const logger = getLogger('RedeemPosition')
 
 export const Contents = () => {
   const {
     _type: status,
+    CPKService,
     CTService,
+    address,
     connect,
     networkConfig,
-    provider,
-    signer,
   } = useWeb3ConnectedOrInfura()
 
   const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<boolean>>>(
@@ -46,7 +43,7 @@ export const Contents = () => {
     setConditionId(conditionId)
   }, [])
 
-  const { condition } = useCondition(conditionId)
+  const { condition, loading: loadingCondition } = useCondition(conditionId)
 
   const clearComponent = useCallback(() => {
     setPosition(null)
@@ -55,23 +52,30 @@ export const Contents = () => {
     setTransactionStatus(Remote.notAsked<Maybe<boolean>>())
   }, [])
 
+  const redeemedBalance = useMemo(
+    () =>
+      position && condition
+        ? getRedeemedBalance(position, condition, position.userBalanceERC1155)
+        : new BigNumber(0),
+    [condition, position]
+  )
+
+  logger.log(`Balance to redeem`, redeemedBalance.toString())
+
   const onRedeem = useCallback(async () => {
     try {
-      if (position && conditionId && status === Web3ContextStatus.Connected && signer) {
+      if (
+        position &&
+        conditionId &&
+        status === Web3ContextStatus.Connected &&
+        CPKService &&
+        address
+      ) {
         setTransactionStatus(Remote.loading())
 
         const { collateralToken, conditionIds, indexSets } = position
-        const newCollectionsSet = conditionIds.reduce(
-          (acc, condId, i) =>
-            condId !== conditionId
-              ? [...acc, { conditionId, indexSet: new BigNumber(indexSets[i]) }]
-              : acc,
-          new Array<{ conditionId: string; indexSet: BigNumber }>()
-        )
-        const parentCollectionId = newCollectionsSet.length
-          ? ConditionalTokensService.getCombinedCollectionId(newCollectionsSet)
-          : ethers.constants.HashZero
 
+        const parentCollectionId = getParentCollectionId(indexSets, conditionIds, conditionId)
         // This UI only allows to redeem 1 position although it's possible to redeem multiple position when you the user owns different positions with the same set of conditions and several indexSets for the resolved condition.
         // i.e.
         // - DAI C:0x123 0:0b01 && C:0x345 O:0b01
@@ -84,24 +88,15 @@ export const Contents = () => {
           indexSets[conditionIds.findIndex((condId) => condId === conditionId)],
         ]
 
-        const cpk = await CPKService.create(networkConfig, provider, signer)
-
-        if (USE_CPK) {
-          await cpk.redeemPosition({
-            CTService,
-            collateralToken,
-            parentCollectionId,
-            conditionId,
-            indexSets: redeemedIndexSet,
-          })
-        } else {
-          await CTService.redeemPositions(
-            collateralToken,
-            parentCollectionId,
-            conditionId,
-            redeemedIndexSet
-          )
-        }
+        await CPKService.redeemPosition({
+          CTService,
+          collateralToken,
+          parentCollectionId,
+          conditionId,
+          indexSets: redeemedIndexSet,
+          account: address,
+          earnedCollateral: redeemedBalance,
+        })
 
         setPosition(null)
         setConditionIds([])
@@ -115,7 +110,7 @@ export const Contents = () => {
       setTransactionStatus(Remote.failure(err))
       logger.error(err)
     }
-  }, [status, CTService, connect, conditionId, position, provider, networkConfig, signer])
+  }, [status, CPKService, CTService, address, connect, redeemedBalance, conditionId, position])
 
   const disabled =
     transactionStatus.isLoading() || !conditionIds.length || !position || !conditionId
@@ -174,17 +169,20 @@ export const Contents = () => {
   )
 
   const onRowClicked = useCallback((position: PositionWithUserBalanceWithDecimals) => {
+    const resolvedConditionsIds = position.conditions
+      .filter((c) => c.resolved)
+      .map((c) => c.conditionId)
     setIsLoadingConditionIds(true)
     setPosition(position)
-    setConditionIds(position.conditionIds)
-    setConditionId(position.conditionIds[0])
+    setConditionIds(resolvedConditionsIds)
+    setConditionId(resolvedConditionsIds[0])
     setIsLoadingConditionIds(false)
   }, [])
 
   const onFilterCallback = (positions: PositionWithUserBalanceWithDecimals[]) => {
     return positions.filter(
       (position: PositionWithUserBalanceWithDecimals) =>
-        position.conditions.every((condition) => condition.resolved) &&
+        position.conditions.some((condition) => condition.resolved) &&
         !position.userBalanceERC1155.isZero()
     )
   }
@@ -207,7 +205,12 @@ export const Contents = () => {
         />
       </Row>
       <Row>
-        <PositionPreview condition={condition} networkConfig={networkConfig} position={position} />
+        <PositionPreview
+          condition={condition}
+          isLoading={loadingCondition}
+          networkConfig={networkConfig}
+          position={position}
+        />
       </Row>
       {isWorking && (
         <FullLoading

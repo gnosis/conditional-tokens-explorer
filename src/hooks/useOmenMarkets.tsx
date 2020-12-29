@@ -25,7 +25,7 @@ type ConditionWithMarket = {
 const hasCondition = (data: MaybeConditionWithMarket) => !!data.condition
 const hasTitle = (data: OmenMarketFromTheGraph) => !!(data.question && data.question.title)
 
-type OmenMarketWithURL = ValidOmenMarket & { url: string }
+export type OmenMarketWithURL = ValidOmenMarket & { url: string }
 
 export const useOmenMarkets = (conditionsIds: string[]) => {
   const client = useApolloClient()
@@ -84,8 +84,6 @@ export const useOmenMarkets = (conditionsIds: string[]) => {
 
   return {
     data: queryResult || [],
-    areOmenMarketsMoreThanOne: queryResult ? queryResult.length > 1 : false,
-    firstMarket: queryResult ? queryResult[0] : null,
     error,
     loading,
   }

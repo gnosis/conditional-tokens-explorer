@@ -156,6 +156,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   dropdownPosition?: DropdownPosition | undefined
   fullWidth?: boolean
   items: Array<unknown>
+  triggerClose?: boolean
 }
 
 export const Dropdown: React.FC<Props> = (props) => {
@@ -170,6 +171,7 @@ export const Dropdown: React.FC<Props> = (props) => {
     dropdownPosition,
     fullWidth,
     items,
+    triggerClose,
     ...restProps
   } = props
   const [isOpen, setIsOpen] = useState<boolean>(false)
@@ -185,6 +187,12 @@ export const Dropdown: React.FC<Props> = (props) => {
   )
 
   useEffect(() => {
+    // Note: you can use triggerClose to close the dropdown when clicking on a specific element
+    if (triggerClose) {
+      setIsOpen(false)
+    }
+
+    // Note: This code handles closing when clickin outside of the dropdown
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleClick = (e: any) => {
       if (node && node.current && node.current.contains(e.target)) {
@@ -198,7 +206,7 @@ export const Dropdown: React.FC<Props> = (props) => {
     return () => {
       document.removeEventListener('mousedown', handleClick)
     }
-  }, [node])
+  }, [node, triggerClose])
 
   return (
     <Wrapper

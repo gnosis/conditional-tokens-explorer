@@ -54,12 +54,10 @@ export const InputAmount = (props: Props) => {
         }
       })
     } else if (splitFrom === SplitFromType.position && signer && address && position) {
-      CTService.balanceOf(position.id).then((result) => {
-        if (!cancelled) {
-          setDecimals(+position.token.decimals)
-          setBalance(result)
-        }
-      })
+      if (!cancelled) {
+        setDecimals(+position.token.decimals)
+        setBalance(position.userBalanceERC1155)
+      }
     } else {
       setDecimals(18)
       setBalance(null)
