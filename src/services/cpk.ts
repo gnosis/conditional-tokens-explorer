@@ -367,7 +367,10 @@ class CPKService {
     }
 
     // If we are signed in as a safe we don't need to transfer
-    if (!this.cpk.isSafeApp() && parentCollectionId.toLowerCase() === NULL_PARENT_ID.toLowerCase()) {
+    if (
+      !this.cpk.isSafeApp() &&
+      parentCollectionId.toLowerCase() === NULL_PARENT_ID.toLowerCase()
+    ) {
       // Transfer amount from user
       transactions.push({
         to: collateralToken,
