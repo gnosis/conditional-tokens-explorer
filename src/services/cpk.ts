@@ -5,7 +5,7 @@ import { Moment } from 'moment'
 import { toChecksumAddress } from 'web3-utils'
 
 import { txs } from '@gnosis.pm/safe-apps-sdk/dist/txs'
-import { CONFIRMATIONS_TO_WAIT } from 'config/constants'
+import { CONFIRMATIONS_TO_WAIT, NULL_PARENT_ID } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
 import CPK from 'contract-proxy-kit/lib/esm'
 import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapter'
@@ -367,7 +367,7 @@ class CPKService {
     }
 
     // If we are signed in as a safe we don't need to transfer
-    if (!this.cpk.isSafeApp()) {
+    if (!this.cpk.isSafeApp() && parentCollectionId.toLowerCase() === NULL_PARENT_ID.toLowerCase()) {
       // Transfer amount from user
       transactions.push({
         to: collateralToken,
