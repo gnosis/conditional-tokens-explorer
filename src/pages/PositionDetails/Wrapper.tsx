@@ -27,6 +27,7 @@ export const Wrapper = (props: WrapperProps) => {
     loading,
     position,
     refetchBalances,
+    refetchPosition,
     setPositionId,
     wrappedTokenAddress,
   } = usePositionContext()
@@ -68,6 +69,7 @@ export const Wrapper = (props: WrapperProps) => {
           conditions={conditions || []}
           position={position}
           refetchBalances={refetchBalances}
+          refetchPosition={refetchPosition}
           wrappedTokenAddress={wrappedTokenAddress}
         />
       )}
