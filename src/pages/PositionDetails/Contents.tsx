@@ -1,3 +1,4 @@
+import { TransactionReceipt } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 import uniqby from 'lodash.uniqby'
 import React, { useCallback, useMemo, useState } from 'react'
@@ -57,6 +58,7 @@ import {
   truncateStringInTheMiddle,
 } from 'util/tools'
 import { HashArray, NetworkIds, OutcomeProps, TransferOptions } from 'util/types'
+import { useGraphMeta } from 'hooks/useGraphMeta'
 
 const CollateralText = styled.span`
   color: ${(props) => props.theme.colors.darkerGrey};
@@ -125,6 +127,7 @@ interface Props {
   collateralTokenAddress: string
   position: Position
   refetchBalances: () => void
+  refetchPosition: () => void
   wrappedTokenAddress: string
 }
 
@@ -141,6 +144,7 @@ export const Contents = (props: Props) => {
     networkConfig,
     signer,
   } = useWeb3ConnectedOrInfura()
+
   const {
     balanceERC20,
     balanceERC1155,
@@ -148,6 +152,7 @@ export const Contents = (props: Props) => {
     conditions,
     position,
     refetchBalances,
+    refetchPosition,
     wrappedTokenAddress,
   } = props
 
@@ -167,6 +172,8 @@ export const Contents = (props: Props) => {
     Remote.notAsked<TransferOptions>()
   )
   const [transactionTitle, setTransactionTitle] = useState<string>('')
+
+  const { waitForBlockToSync } = useGraphMeta()
 
   const oracleIds = useMemo(() => uniqby(position.conditions, 'oracle').map((c) => c.oracle), [
     position,
@@ -219,8 +226,10 @@ export const Contents = (props: Props) => {
     [collateralERC20]
   )
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const wtmAddress = useMemo(() => (wrappedTokenAddress ? wrappedTokenAddress : ''), [
     wrappedTokenAddress,
+    balanceERC20,
   ])
 
   const onWrap = useCallback(
@@ -232,7 +241,7 @@ export const Contents = (props: Props) => {
 
           const { address: addressTo, amount, positionId } = transferValue
 
-          await CPKService.wrapOrTransfer({
+          const transaction: void | TransactionReceipt = await CPKService.wrapOrTransfer({
             CTService,
             addressFrom: cpkAddress,
             addressTo, // Is the wrapper service address
@@ -240,7 +249,12 @@ export const Contents = (props: Props) => {
             amount,
           })
 
+          if (transaction && transaction.blockNumber) {
+            await waitForBlockToSync(transaction.blockNumber)
+          }
+
           refetchBalances()
+          refetchPosition()
 
           setTransfer(Remote.success(transferValue))
         } catch (err) {
@@ -251,7 +265,16 @@ export const Contents = (props: Props) => {
         connect()
       }
     },
-    [setTransfer, CTService, CPKService, cpkAddress, connect, refetchBalances]
+    [
+      setTransfer,
+      CTService,
+      CPKService,
+      cpkAddress,
+      connect,
+      refetchBalances,
+      waitForBlockToSync,
+      refetchPosition,
+    ]
   )
 
   const onUnwrap = useCallback(
@@ -263,7 +286,7 @@ export const Contents = (props: Props) => {
 
           const { address: addressFrom, amount, positionId } = transferValue
 
-          await CPKService.unwrap({
+          const transaction: void | TransactionReceipt = await CPKService.unwrap({
             CTService,
             WrapperService,
             addressFrom, // Is the conditional token address
@@ -272,7 +295,12 @@ export const Contents = (props: Props) => {
             addressTo: cpkAddress,
           })
 
+          if (transaction && transaction.blockNumber) {
+            await waitForBlockToSync(transaction.blockNumber)
+          }
+
           refetchBalances()
+          refetchPosition()
 
           setTransfer(Remote.success(transferValue))
         } catch (err) {
@@ -283,7 +311,17 @@ export const Contents = (props: Props) => {
         connect()
       }
     },
-    [WrapperService, CTService, connect, cpkAddress, CPKService, setTransfer, refetchBalances]
+    [
+      WrapperService,
+      CTService,
+      connect,
+      cpkAddress,
+      CPKService,
+      setTransfer,
+      refetchBalances,
+      waitForBlockToSync,
+      refetchPosition,
+    ]
   )
 
   const onTransferOutcomeTokens = useCallback(
@@ -294,7 +332,7 @@ export const Contents = (props: Props) => {
           setTransactionTitle('Transfer Tokens')
 
           const { address: addressTo, amount, positionId } = transferValue
-          await CPKService.wrapOrTransfer({
+          const transaction: void | TransactionReceipt = await CPKService.wrapOrTransfer({
             CTService,
             addressFrom: cpkAddress,
             addressTo, // Is the address entered by the user
@@ -302,7 +340,13 @@ export const Contents = (props: Props) => {
             amount,
           })
 
+          if (transaction && transaction.blockNumber) {
+            await waitForBlockToSync(transaction.blockNumber)
+          }
+
           refetchBalances()
+          refetchPosition()
+
           setTransfer(Remote.success(transferValue))
         } catch (err) {
           logger.error(err)
@@ -310,7 +354,7 @@ export const Contents = (props: Props) => {
         }
       }
     },
-    [cpkAddress, CPKService, CTService, refetchBalances]
+    [cpkAddress, CPKService, CTService, refetchBalances, waitForBlockToSync, refetchPosition]
   )
 
   const fullLoadingActionButton = transfer.isSuccess()
