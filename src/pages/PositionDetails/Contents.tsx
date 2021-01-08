@@ -44,6 +44,7 @@ import { FormatHash } from 'components/text/FormatHash'
 import { TitleValue } from 'components/text/TitleValue'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useCollateral } from 'hooks/useCollateral'
+import { useGraphMeta } from 'hooks/useGraphMeta'
 import { useIsConditionFromOmen } from 'hooks/useIsConditionFromOmen'
 import { GetPosition_position as Position } from 'types/generatedGQLForCTE'
 import { getLogger } from 'util/logger'
@@ -58,7 +59,6 @@ import {
   truncateStringInTheMiddle,
 } from 'util/tools'
 import { HashArray, NetworkIds, OutcomeProps, TransferOptions } from 'util/types'
-import { useGraphMeta } from 'hooks/useGraphMeta'
 
 const CollateralText = styled.span`
   color: ${(props) => props.theme.colors.darkerGrey};

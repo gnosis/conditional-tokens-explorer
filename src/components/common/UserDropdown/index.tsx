@@ -10,6 +10,7 @@ import { ChevronDown } from 'components/icons/ChevronDown'
 import { Pill } from 'components/pureStyledComponents/Pill'
 import { FormatHash } from 'components/text/FormatHash'
 import { useWeb3Connected } from 'contexts/Web3Context'
+import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { truncateStringInTheMiddle } from 'util/tools'
 
 const Wrapper = styled(Dropdown)`
@@ -173,14 +174,20 @@ const UserDropdownButton = () => {
 }
 
 const UserDropdownContent = () => {
-  const { disconnect, networkConfig, provider } = useWeb3Connected()
-  const cpkAddress = '0x1234...5678'
-  const [cpkActive, setCpkActive] = React.useState(true)
-
-  const toggleCpkActive = React.useCallback(
-    () => (cpkActive ? setCpkActive(false) : setCpkActive(true)),
-    [cpkActive]
+  const { cpkAddress, disconnect, networkConfig, provider } = useWeb3Connected()
+  const { getValue: getIsUsingTheCPK, setValue: setIsUsingTheCPK } = useLocalStorage(
+    `isUsingTheCPK`
   )
+
+  const isUsingTheCPKFromTheStorage = React.useMemo(() => getIsUsingTheCPK(false), [
+    getIsUsingTheCPK,
+  ])
+  const [isCPKActive, setIsCPKActive] = React.useState(isUsingTheCPKFromTheStorage)
+
+  const toggleCpkActive = React.useCallback(() => {
+    setIsUsingTheCPK(!isCPKActive)
+    setIsCPKActive(!isCPKActive)
+  }, [isCPKActive, setIsUsingTheCPK])
 
   const items = [
     {
@@ -198,16 +205,17 @@ const UserDropdownContent = () => {
     {
       onClick: toggleCpkActive,
       title: 'Use CPK Address',
-      value: <Switch active={cpkActive} onClick={toggleCpkActive} small />,
+      value: <Switch active={isCPKActive} onClick={toggleCpkActive} small />,
     },
   ]
 
-  if (cpkActive) {
+  if (isCPKActive) {
     items.push({
       title: 'CPK Address',
       value: (
         <TextAndButton>
-          <span>{cpkAddress}</span> <ButtonCopy value={cpkAddress} />
+          <span>{truncateStringInTheMiddle(cpkAddress, 6, 4)}</span>{' '}
+          <ButtonCopy value={cpkAddress} />
         </TextAndButton>
       ),
     })
