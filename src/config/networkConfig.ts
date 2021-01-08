@@ -3,20 +3,26 @@ import {
   CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_GANACHE,
   CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_MAINNET,
   CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_RINKEBY,
+  CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_XDAI,
   CTE_GRAPH_HTTP_GANACHE,
   CTE_GRAPH_HTTP_MAINNET,
   CTE_GRAPH_HTTP_RINKEBY,
+  CTE_GRAPH_HTTP_XDAI,
   EARLIEST_GANACHE_BLOCK_TO_CHECK,
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
   EARLIEST_RINKEBY_BLOCK_TO_CHECK,
+  EARLIEST_XDAI_BLOCK_TO_CHECK,
   OMEN_GRAPH_HTTP_MAINNET,
   OMEN_GRAPH_HTTP_RINKEBY,
+  OMEN_GRAPH_HTTP_XDAI,
   REALITY_CONTRACT_ADDRESS_FOR_GANACHE,
   REALITY_CONTRACT_ADDRESS_FOR_MAINNET,
   REALITY_CONTRACT_ADDRESS_FOR_RINKEBY,
+  REALITY_CONTRACT_ADDRESS_FOR_XDAI,
   WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_GANACHE,
   WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_MAINNET,
   WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_RINKEBY,
+  WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_XDAI,
 } from 'config/constants'
 import { Arbitrator, NetworkIds, Oracle, Token } from 'util/types'
 
@@ -272,13 +278,84 @@ const networks: { [K in NetworkIds]: Network } = {
     ],
     realityTimeout: 10,
   },
+  [NetworkIds.XDAI]: {
+    earliestBlockToCheck: EARLIEST_XDAI_BLOCK_TO_CHECK,
+    contracts: {
+      conditionalTokensAddress: CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_XDAI,
+      realityAddress: REALITY_CONTRACT_ADDRESS_FOR_XDAI,
+      wrapped1155FactoryAddress: WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_XDAI,
+    },
+    tokens: [
+      {
+        symbol: 'DAI',
+        address: '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7',
+        decimals: 18,
+      },
+      {
+        symbol: 'USDC',
+        address: '0xe982E462b094850F12AF94d21D470e21bE9D0E9C',
+        decimals: 6,
+      },
+      {
+        symbol: 'CDAI',
+        address: '0xD833215cBcc3f914bD1C9ece3EE7BF8B14f841bb',
+        decimals: 18,
+      },
+      {
+        symbol: 'WETH',
+        address: '0x0290FB167208Af455bB137780163b7B7a9a10C16',
+        decimals: 18,
+      },
+      {
+        symbol: 'OWL',
+        address: '0x59d3631c86BbE35EF041872d502F218A39FBa150',
+        decimals: 18,
+      },
+      {
+        symbol: 'GNO',
+        address: '0x9b1f7F645351AF3631a656421eD2e40f2802E6c0',
+        decimals: 18,
+      },
+    ],
+    CTEGraphHttpUri: CTE_GRAPH_HTTP_XDAI,
+    OMENGraphHttpUri: OMEN_GRAPH_HTTP_XDAI,
+    oracles: [
+      {
+        name: 'kleros',
+        description: 'Kleros',
+        url: 'https://kleros.io/',
+        address: '0x0000000000000000000000000000000000000000',
+      },
+      {
+        name: 'reality',
+        description: 'Reality.eth',
+        url: 'https://reality.eth.link/',
+        address: '0xDb56f2e9369E0D7bD191099125a3f6C370F8ed15',
+      },
+    ],
+    arbitrators: [
+      {
+        name: 'kleros',
+        description: 'Kleros',
+        url: 'https://kleros.io/',
+        address: '0x0000000000000000000000000000000000000000',
+      },
+      {
+        name: 'reality',
+        description: 'Reality.eth',
+        url: 'https://reality.eth.link/',
+        address: '0x0000000000000000000000000000000000000000',
+      },
+    ],
+    realityTimeout: 10,
+  },
 }
 
 export class NetworkConfig {
   constructor(public networkId: NetworkIds) {}
 
   static isKnownNetwork(networkId: number): networkId is NetworkIds {
-    return networkId === 1 || networkId === 4 || networkId === 50
+    return [1, 4, 50, 100].includes(networkId)
   }
 
   getNetworkName(): string {
