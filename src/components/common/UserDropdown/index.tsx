@@ -10,7 +10,6 @@ import { ChevronDown } from 'components/icons/ChevronDown'
 import { Pill } from 'components/pureStyledComponents/Pill'
 import { FormatHash } from 'components/text/FormatHash'
 import { useWeb3Connected } from 'contexts/Web3Context'
-import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { truncateStringInTheMiddle } from 'util/tools'
 
 const Wrapper = styled(Dropdown)`
@@ -174,20 +173,23 @@ const UserDropdownButton = () => {
 }
 
 const UserDropdownContent = () => {
-  const { cpkAddress, disconnect, networkConfig, provider } = useWeb3Connected()
-  const { getValue: getIsUsingTheCPK, setValue: setIsUsingTheCPK } = useLocalStorage(
-    `isUsingTheCPK`
-  )
+  const {
+    cpkAddress,
+    disconnect,
+    isUsingTheCPKAddress,
+    networkConfig,
+    provider,
+    toggleCPK,
+  } = useWeb3Connected()
 
-  const isUsingTheCPKFromTheStorage = React.useMemo(() => getIsUsingTheCPK(false), [
-    getIsUsingTheCPK,
-  ])
-  const [isCPKActive, setIsCPKActive] = React.useState(isUsingTheCPKFromTheStorage)
+  const [isCPKActive, setIsCPKActive] = React.useState(isUsingTheCPKAddress())
 
   const toggleCpkActive = React.useCallback(() => {
-    setIsUsingTheCPK(!isCPKActive)
-    setIsCPKActive(!isCPKActive)
-  }, [isCPKActive, setIsUsingTheCPK])
+    toggleCPK()
+
+    const isCPKActive = isUsingTheCPKAddress()
+    setIsCPKActive(isCPKActive)
+  }, [toggleCPK, isUsingTheCPKAddress])
 
   const items = [
     {
