@@ -17,7 +17,9 @@ export const CTE_GRAPH_HTTP_RINKEBY =
 export const CTE_GRAPH_HTTP_GANACHE =
   process.env.REACT_APP_CTE_GRAPH_HTTP_GANACHE || 'http://localhost:8000/subgraphs/name/gnosis/hg'
 
-export const CTE_GRAPH_HTTP_XDAI = process.env.REACT_APP_CTE_GRAPH_HTTP_XDAI || ''
+export const CTE_GRAPH_HTTP_XDAI =
+  process.env.REACT_APP_CTE_GRAPH_HTTP_XDAI ||
+  'https://api.thegraph.com/subgraphs/name/davidalbela/conditional-tokens-xdai'
 
 export const OMEN_GRAPH_HTTP_MAINNET =
   process.env.REACT_APP_OMEN_GRAPH_HTTP_MAINNET ||

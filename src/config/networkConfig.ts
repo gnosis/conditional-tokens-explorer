@@ -284,38 +284,59 @@ const networks: { [K in NetworkIds]: Network } = {
       conditionalTokensAddress: CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_XDAI,
       realityAddress: REALITY_CONTRACT_ADDRESS_FOR_XDAI,
       wrapped1155FactoryAddress: WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_XDAI,
+      cpk: {
+        masterCopyAddress: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
+        proxyFactoryAddress: '0xfC7577774887aAE7bAcdf0Fc8ce041DA0b3200f7',
+        multiSendAddress: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
+        fallbackHandlerAddress: '0x602DF5F404f86469459D5e604CDa43A2cdFb7580',
+      },
     },
     tokens: [
       {
         symbol: 'DAI',
-        address: '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7',
+        address: '0x44fa8e6f47987339850636f88629646662444217',
         decimals: 18,
       },
       {
         symbol: 'USDC',
-        address: '0xe982E462b094850F12AF94d21D470e21bE9D0E9C',
+        address: '0xddafbb505ad214d7b80b1f830fccc89b60fb7a83',
         decimals: 6,
       },
-      {
-        symbol: 'CDAI',
-        address: '0xD833215cBcc3f914bD1C9ece3EE7BF8B14f841bb',
-        decimals: 18,
-      },
+      // {
+      //   symbol: 'CDAI',
+      //   address: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643',
+      //   decimals: 18,
+      // },
       {
         symbol: 'WETH',
-        address: '0x0290FB167208Af455bB137780163b7B7a9a10C16',
+        address: '0x6a023ccd1ff6f2045c3309768ead9e68f978f6e1',
         decimals: 18,
       },
       {
         symbol: 'OWL',
-        address: '0x59d3631c86BbE35EF041872d502F218A39FBa150',
+        address: '0x0905ab807f8fd040255f0cf8fa14756c1d824931',
         decimals: 18,
       },
       {
         symbol: 'GNO',
-        address: '0x9b1f7F645351AF3631a656421eD2e40f2802E6c0',
+        address: '0x9c58bacc331c9aa871afd802db6379a98e80cedb',
         decimals: 18,
       },
+      // {
+      //   symbol: 'CHAI',
+      //   address: '0x06AF07097C9Eeb7fD685c692751D5C66dB49c215',
+      //   decimals: 18,
+      // },
+      {
+        symbol: 'PNK',
+        address: '0x37b60f4e9a31a64ccc0024dce7d0fd07eaa0f7b3',
+        decimals: 18,
+      },
+      // {
+      //   symbol: 'DXD',
+      //   address: '0xa1d65E8fB6e87b60FECCBc582F7f97804B725521',
+      //   decimals: 18,
+      // },
     ],
     CTEGraphHttpUri: CTE_GRAPH_HTTP_XDAI,
     OMENGraphHttpUri: OMEN_GRAPH_HTTP_XDAI,
@@ -330,7 +351,7 @@ const networks: { [K in NetworkIds]: Network } = {
         name: 'reality',
         description: 'Reality.eth',
         url: 'https://reality.eth.link/',
-        address: '0xDb56f2e9369E0D7bD191099125a3f6C370F8ed15',
+        address: '0x2bf1BFb0eB6276a4F4B60044068Cb8CdEB89f79B',
       },
     ],
     arbitrators: [
@@ -338,7 +359,7 @@ const networks: { [K in NetworkIds]: Network } = {
         name: 'kleros',
         description: 'Kleros',
         url: 'https://kleros.io/',
-        address: '0x0000000000000000000000000000000000000000',
+        address: '0xa0Baf56D83be19Eb6bA8aFAD2Db812Bc13D8Be1d',
       },
       {
         name: 'reality',
@@ -366,6 +387,8 @@ export class NetworkConfig {
         return 'rinkeby'
       case NetworkIds.GANACHE:
         return 'ganache'
+      case NetworkIds.XDAI:
+        return 'xdai'
       default:
         return 'unknown'
     }
