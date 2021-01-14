@@ -257,6 +257,7 @@ export const UserDropdown: React.FC = (props) => {
   return (
     <Wrapper
       activeItemHighlight={false}
+      closeOnClick={false}
       dropdownButtonContent={<UserDropdownButton />}
       dropdownPosition={DropdownPosition.right}
       items={headerDropdownItems}
