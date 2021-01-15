@@ -219,6 +219,7 @@ export const Form = (props: Props) => {
       setTransactionStatus(Remote.failure(err))
     }
   }, [
+    walletAddress,
     isUsingTheCPKAddress,
     CTService,
     connect,
