@@ -6,7 +6,7 @@ export const useActiveAddress = () => {
   const { address: walletAddress, cpkAddress, isUsingTheCPKAddress } = useWeb3ConnectedOrInfura()
 
   const activeAddress = React.useMemo(() => {
-    return isUsingTheCPKAddress() ? cpkAddress : walletAddress
+    return isUsingTheCPKAddress && isUsingTheCPKAddress() ? cpkAddress : walletAddress
   }, [isUsingTheCPKAddress, cpkAddress, walletAddress])
 
   return activeAddress
