@@ -139,11 +139,17 @@ export const Contents = (props: Props) => {
     CPKService,
     CTService,
     WrapperService,
+    address: walletAddress,
     connect,
     cpkAddress,
+    isUsingTheCPKAddress,
     networkConfig,
     signer,
   } = useWeb3ConnectedOrInfura()
+
+  const activeAddress = useMemo(() => {
+    return isUsingTheCPKAddress() ? cpkAddress : walletAddress
+  }, [isUsingTheCPKAddress, cpkAddress, walletAddress])
 
   const {
     balanceERC20,
@@ -234,20 +240,29 @@ export const Contents = (props: Props) => {
 
   const onWrap = useCallback(
     async (transferValue: TransferOptions) => {
-      if (CPKService && cpkAddress) {
+      if (CPKService && activeAddress) {
         try {
           setTransactionTitle('Wrapping ERC1155')
           setTransfer(Remote.loading())
 
           const { address: addressTo, amount, positionId } = transferValue
-
-          const transaction: void | TransactionReceipt = await CPKService.wrapOrTransfer({
-            CTService,
-            addressFrom: cpkAddress,
-            addressTo, // Is the wrapper service address
-            positionId,
-            amount,
-          })
+          let transaction: void | TransactionReceipt
+          if (isUsingTheCPKAddress()) {
+            transaction = await CPKService.wrapOrTransfer({
+              CTService,
+              addressFrom: activeAddress,
+              addressTo, // Is the wrapper service address
+              positionId,
+              amount,
+            })
+          } else {
+            transaction = await CTService.safeTransferFrom(
+              activeAddress,
+              addressTo,
+              positionId,
+              amount
+            )
+          }
 
           if (transaction && transaction.blockNumber) {
             await waitForBlockToSync(transaction.blockNumber)
@@ -266,10 +281,11 @@ export const Contents = (props: Props) => {
       }
     },
     [
+      isUsingTheCPKAddress,
       setTransfer,
       CTService,
       CPKService,
-      cpkAddress,
+      activeAddress,
       connect,
       refetchBalances,
       waitForBlockToSync,
@@ -279,21 +295,31 @@ export const Contents = (props: Props) => {
 
   const onUnwrap = useCallback(
     async (transferValue: TransferOptions) => {
-      if (cpkAddress && CPKService) {
+      if (activeAddress && CPKService) {
         try {
           setTransactionTitle('Unwrapping ERC20')
           setTransfer(Remote.loading())
 
           const { address: addressFrom, amount, positionId } = transferValue
 
-          const transaction: void | TransactionReceipt = await CPKService.unwrap({
-            CTService,
-            WrapperService,
-            addressFrom, // Is the conditional token address
-            positionId,
-            amount,
-            addressTo: cpkAddress,
-          })
+          let transaction: void | TransactionReceipt
+          if (isUsingTheCPKAddress()) {
+            transaction = await CPKService.unwrap({
+              CTService,
+              WrapperService,
+              addressFrom, // Is the conditional token address
+              positionId,
+              amount,
+              addressTo: activeAddress,
+            })
+          } else {
+            transaction = await WrapperService.unwrap(
+              addressFrom,
+              positionId,
+              amount,
+              activeAddress
+            )
+          }
 
           if (transaction && transaction.blockNumber) {
             await waitForBlockToSync(transaction.blockNumber)
@@ -312,10 +338,11 @@ export const Contents = (props: Props) => {
       }
     },
     [
+      isUsingTheCPKAddress,
       WrapperService,
       CTService,
       connect,
-      cpkAddress,
+      activeAddress,
       CPKService,
       setTransfer,
       refetchBalances,
@@ -326,19 +353,29 @@ export const Contents = (props: Props) => {
 
   const onTransferOutcomeTokens = useCallback(
     async (transferValue: TransferOptions) => {
-      if (cpkAddress && CPKService) {
+      if (activeAddress && CPKService) {
         try {
           setTransfer(Remote.loading())
           setTransactionTitle('Transfer Tokens')
 
           const { address: addressTo, amount, positionId } = transferValue
-          const transaction: void | TransactionReceipt = await CPKService.wrapOrTransfer({
-            CTService,
-            addressFrom: cpkAddress,
-            addressTo, // Is the address entered by the user
-            positionId,
-            amount,
-          })
+          let transaction: void | TransactionReceipt
+          if (isUsingTheCPKAddress()) {
+            transaction = await CPKService.wrapOrTransfer({
+              CTService,
+              addressFrom: activeAddress,
+              addressTo, // Is the address entered by the user
+              positionId,
+              amount,
+            })
+          } else {
+            transaction = await CTService.safeTransferFrom(
+              activeAddress,
+              addressTo,
+              positionId,
+              amount
+            )
+          }
 
           if (transaction && transaction.blockNumber) {
             await waitForBlockToSync(transaction.blockNumber)
@@ -354,7 +391,15 @@ export const Contents = (props: Props) => {
         }
       }
     },
-    [cpkAddress, CPKService, CTService, refetchBalances, waitForBlockToSync, refetchPosition]
+    [
+      activeAddress,
+      isUsingTheCPKAddress,
+      CPKService,
+      CTService,
+      refetchBalances,
+      waitForBlockToSync,
+      refetchPosition,
+    ]
   )
 
   const fullLoadingActionButton = transfer.isSuccess()

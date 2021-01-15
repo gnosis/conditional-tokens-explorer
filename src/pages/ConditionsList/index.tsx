@@ -55,9 +55,19 @@ const DropdownItemLink = styled(NavLink)<DropdownItemProps>`
 `
 
 export const ConditionsList: React.FC = () => {
-  const { _type: status, address, cpkAddress, networkConfig } = useWeb3ConnectedOrInfura()
+  const {
+    _type: status,
+    address: walletAddress,
+    cpkAddress,
+    isUsingTheCPKAddress,
+    networkConfig,
+  } = useWeb3ConnectedOrInfura()
 
   const history = useHistory()
+
+  const activeAddress = useMemo(() => {
+    return isUsingTheCPKAddress() ? cpkAddress : walletAddress
+  }, [isUsingTheCPKAddress, cpkAddress, walletAddress])
 
   const [textToSearch, setTextToSearch] = useState<string>('')
   const [textToShow, setTextToShow] = useState<string>('')
@@ -185,10 +195,9 @@ export const ConditionsList: React.FC = () => {
     if (
       selectedOracleValue === OracleFilterOptions.Current &&
       status === Web3ContextStatus.Connected &&
-      address &&
-      cpkAddress
+      activeAddress
     ) {
-      setSelectedOracleFilter([cpkAddress.toLowerCase(), address.toLowerCase()])
+      setSelectedOracleFilter([activeAddress.toLowerCase()])
     }
 
     if (
@@ -197,7 +206,7 @@ export const ConditionsList: React.FC = () => {
     ) {
       setSelectedOracleFilter([])
     }
-  }, [status, cpkAddress, address, selectedOracleValue])
+  }, [status, activeAddress, selectedOracleValue])
 
   const { data, error, loading } = useConditionsList(advancedFilters)
 
@@ -208,7 +217,8 @@ export const ConditionsList: React.FC = () => {
   const buildMenuForRow = useCallback(
     (row: GetCondition_condition) => {
       const { id, oracle, resolved } = row
-      const isAllowedToReport = cpkAddress && cpkAddress.toLowerCase() === oracle.toLowerCase()
+      const isAllowedToReport =
+        activeAddress && activeAddress.toLowerCase() === oracle.toLowerCase()
 
       const menu = [
         {
@@ -230,7 +240,7 @@ export const ConditionsList: React.FC = () => {
 
       return menu
     },
-    [cpkAddress, isConnected]
+    [activeAddress, isConnected]
   )
 
   const handleRowClick = useCallback(

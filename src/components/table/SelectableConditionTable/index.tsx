@@ -68,7 +68,17 @@ interface Params {
 }
 
 const SelectConditionTable: React.FC<Props> = (props) => {
-  const { _type: status, address, cpkAddress, networkConfig } = useWeb3ConnectedOrInfura()
+  const {
+    _type: status,
+    address: walletAddress,
+    cpkAddress,
+    isUsingTheCPKAddress,
+    networkConfig,
+  } = useWeb3ConnectedOrInfura()
+
+  const activeAddress = useMemo(() => {
+    return isUsingTheCPKAddress() ? cpkAddress : walletAddress
+  }, [isUsingTheCPKAddress, cpkAddress, walletAddress])
 
   const {
     allowToDisplayOnlyConditionsToReport = false,
@@ -89,9 +99,7 @@ const SelectConditionTable: React.FC<Props> = (props) => {
   const [resetPagination, setResetPagination] = useState<boolean>(false)
 
   const [selectedOracleFilter, setSelectedOracleFilter] = useState<string[]>(() =>
-    allowToDisplayOnlyConditionsToReport && cpkAddress && address
-      ? [cpkAddress.toLowerCase(), address.toLowerCase()]
-      : []
+    allowToDisplayOnlyConditionsToReport && activeAddress ? [activeAddress.toLowerCase()] : []
   )
   const [selectedOracleValue, setSelectedOracleValue] = useState<OracleFilterOptions>(() =>
     allowToDisplayOnlyConditionsToReport ? OracleFilterOptions.Current : OracleFilterOptions.All
@@ -146,9 +154,7 @@ const SelectConditionTable: React.FC<Props> = (props) => {
       allowToDisplayOnlyConditionsToReport ? OracleFilterOptions.Current : OracleFilterOptions.All
     )
     setSelectedOracleFilter(
-      allowToDisplayOnlyConditionsToReport && cpkAddress && address
-        ? [cpkAddress.toLowerCase(), address.toLowerCase()]
-        : []
+      allowToDisplayOnlyConditionsToReport && activeAddress ? [activeAddress.toLowerCase()] : []
     )
     setSelectedConditionTypeValue(ConditionTypeAll.all)
     setSelectedConditionTypeFilter(null)
@@ -158,7 +164,7 @@ const SelectConditionTable: React.FC<Props> = (props) => {
     setSelectedToCreationDate(null)
     setSelectedFromCreationDate(null)
     onClearSelection()
-  }, [resetPagination, cpkAddress, address, allowToDisplayOnlyConditionsToReport, onClearSelection])
+  }, [resetPagination, activeAddress, allowToDisplayOnlyConditionsToReport, onClearSelection])
 
   useEffect(() => {
     resetFilters()
@@ -232,10 +238,9 @@ const SelectConditionTable: React.FC<Props> = (props) => {
     if (
       selectedOracleValue === OracleFilterOptions.Current &&
       status === Web3ContextStatus.Connected &&
-      cpkAddress &&
-      address
+      activeAddress
     ) {
-      setSelectedOracleFilter([cpkAddress.toLowerCase(), address.toLowerCase()])
+      setSelectedOracleFilter([activeAddress.toLowerCase()])
     }
 
     if (
@@ -244,7 +249,7 @@ const SelectConditionTable: React.FC<Props> = (props) => {
     ) {
       setSelectedOracleFilter([])
     }
-  }, [status, cpkAddress, address, selectedOracleValue])
+  }, [status, activeAddress, selectedOracleValue])
 
   const { data, error, loading, refetch: refetchConditionList } = useConditionsList(advancedFilters)
 

@@ -24,8 +24,18 @@ interface Props {
 const logger = getLogger('Oracle Filter')
 
 export const OraclesFilterDropdown = ({ onClear, onClick, value }: Props) => {
-  const { CPKService, address, networkConfig, ...restProps } = useWeb3ConnectedOrInfura()
+  const {
+    address: walletAddress,
+    cpkAddress,
+    isUsingTheCPKAddress,
+    networkConfig,
+    ...restProps
+  } = useWeb3ConnectedOrInfura()
   const oracles: Oracle[] = networkConfig.getOracles()
+
+  const activeAddress = React.useMemo(() => {
+    return isUsingTheCPKAddress() ? cpkAddress : walletAddress
+  }, [isUsingTheCPKAddress, cpkAddress, walletAddress])
 
   const oraclesAdresses: string[] = oracles.map((oracle: Oracle) => oracle.address.toLowerCase())
 
@@ -41,8 +51,7 @@ export const OraclesFilterDropdown = ({ onClear, onClick, value }: Props) => {
       {
         text: 'Current Wallet',
         onClick: () => {
-          const currentWallet =
-            address && CPKService ? [address.toLowerCase(), CPKService.address.toLowerCase()] : []
+          const currentWallet = activeAddress ? [activeAddress] : []
           logger.log(`Current Wallet`, currentWallet)
           onClick(OracleFilterOptions.Current, currentWallet)
         },
@@ -67,7 +76,7 @@ export const OraclesFilterDropdown = ({ onClear, onClick, value }: Props) => {
           }
         }),
     ],
-    [CPKService, address, onClick, oracles, oraclesAdresses]
+    [activeAddress, onClick, oracles, oraclesAdresses]
   )
 
   const currentItem = useMemo(

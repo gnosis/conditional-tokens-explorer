@@ -57,7 +57,17 @@ const optionsDisplayTable = {
 }
 
 export const Contents: React.FC<Props> = ({ condition }) => {
-  const { _type: status, cpkAddress, networkConfig } = useWeb3ConnectedOrInfura()
+  const {
+    _type: status,
+    address: walletAddress,
+    cpkAddress,
+    isUsingTheCPKAddress,
+    networkConfig,
+  } = useWeb3ConnectedOrInfura()
+
+  const activeAddress = useMemo(() => {
+    return isUsingTheCPKAddress() ? cpkAddress : walletAddress
+  }, [isUsingTheCPKAddress, cpkAddress, walletAddress])
 
   const {
     createTimestamp,
@@ -73,8 +83,8 @@ export const Contents: React.FC<Props> = ({ condition }) => {
 
   const isConnected = useMemo(() => status === Web3ContextStatus.Connected, [status])
   const isAllowedToReport = useMemo(
-    () => cpkAddress && cpkAddress.toLowerCase() === oracle.toLowerCase(),
-    [cpkAddress, oracle]
+    () => activeAddress && activeAddress.toLowerCase() === oracle.toLowerCase(),
+    [activeAddress, oracle]
   )
 
   const dropdownItems = useMemo(() => {

@@ -55,12 +55,17 @@ export const Contents = () => {
     _type: status,
     CPKService,
     CTService,
-    address,
+    address: walletAddress,
     connect,
     cpkAddress,
+    isUsingTheCPKAddress,
     networkConfig,
     provider,
   } = useWeb3ConnectedOrInfura()
+
+  const activeAddress = useMemo(() => {
+    return isUsingTheCPKAddress() ? cpkAddress : walletAddress
+  }, [isUsingTheCPKAddress, cpkAddress, walletAddress])
 
   const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<boolean>>>(
     Remote.notAsked<Maybe<boolean>>()
@@ -182,7 +187,7 @@ export const Contents = () => {
         condition &&
         status === Web3ContextStatus.Connected &&
         CPKService &&
-        address
+        activeAddress
       ) {
         setTransactionStatus(Remote.loading())
 
@@ -211,16 +216,26 @@ export const Contents = () => {
 
         const partitionBN: BigNumber[] = partition.map((o: string) => new BigNumber(o))
 
-        await CPKService.mergePositions({
-          CTService,
-          amount,
-          collateralToken,
-          conditionId,
-          parentCollectionId,
-          partition: partitionBN,
-          shouldTransferAmount,
-          address,
-        })
+        if (isUsingTheCPKAddress()) {
+          await CPKService.mergePositions({
+            CTService,
+            amount,
+            collateralToken,
+            conditionId,
+            parentCollectionId,
+            partition: partitionBN,
+            shouldTransferAmount,
+            address: activeAddress,
+          })
+        } else {
+          await CTService.mergePositions(
+            collateralToken,
+            parentCollectionId,
+            conditionId,
+            partition,
+            amount
+          )
+        }
 
         // if freeindexset == 0, everything was merged to...
         if (isPartitionFullIndexSet(condition.outcomeSlotCount, partition)) {
@@ -262,9 +277,10 @@ export const Contents = () => {
       logger.error(err)
     }
   }, [
+    isUsingTheCPKAddress,
     selectedPositions,
     position,
-    address,
+    activeAddress,
     CPKService,
     conditionId,
     condition,

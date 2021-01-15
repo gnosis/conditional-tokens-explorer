@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useMemo } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 
 import { Button } from 'components/buttons'
@@ -40,7 +40,17 @@ interface Props extends ModalProps {
 export const TransferOutcomeTokensModal: React.FC<Props> = (props) => {
   const { balance, collateralToken, onRequestClose, onSubmit, positionId, ...restProps } = props
 
-  const { CTService, cpkAddress, provider } = useWeb3Connected()
+  const {
+    CTService,
+    address: walletAddress,
+    cpkAddress,
+    isUsingTheCPKAddress,
+    provider,
+  } = useWeb3Connected()
+
+  const activeAddress = React.useMemo(() => {
+    return isUsingTheCPKAddress() ? cpkAddress : walletAddress
+  }, [isUsingTheCPKAddress, cpkAddress, walletAddress])
 
   const [token, setToken] = React.useState<Maybe<Token>>(null)
   const [amount, setAmount] = React.useState<BigNumber>(ZERO_BN)
@@ -48,7 +58,7 @@ export const TransferOutcomeTokensModal: React.FC<Props> = (props) => {
   const [error, setError] = React.useState(false)
   const [isLoading, setLoading] = React.useState(true)
 
-  const maxBalance = useMemo(() => (balance ? balance : ZERO_BN), [balance])
+  const maxBalance = React.useMemo(() => (balance ? balance : ZERO_BN), [balance])
 
   const onClickTransfer = (
     e: React.MouseEvent<Element, MouseEvent> | React.KeyboardEvent<Element>
@@ -78,8 +88,8 @@ export const TransferOutcomeTokensModal: React.FC<Props> = (props) => {
   }, [maxBalance])
 
   const isAddressToSendTheConnectedUser = React.useMemo(
-    () => cpkAddress.toLowerCase() === address.toLowerCase(),
-    [cpkAddress, address]
+    () => activeAddress.toLowerCase() === address.toLowerCase(),
+    [activeAddress, address]
   )
 
   React.useEffect(() => {

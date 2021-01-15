@@ -26,10 +26,16 @@ export const Contents = () => {
     _type: status,
     CPKService,
     CTService,
-    address,
+    address: walletAddress,
     connect,
+    cpkAddress,
+    isUsingTheCPKAddress,
     networkConfig,
   } = useWeb3ConnectedOrInfura()
+
+  const activeAddress = React.useMemo(() => {
+    return isUsingTheCPKAddress() ? cpkAddress : walletAddress
+  }, [isUsingTheCPKAddress, cpkAddress, walletAddress])
 
   const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<boolean>>>(
     Remote.notAsked<Maybe<boolean>>()
@@ -69,7 +75,7 @@ export const Contents = () => {
         conditionId &&
         status === Web3ContextStatus.Connected &&
         CPKService &&
-        address
+        activeAddress
       ) {
         setTransactionStatus(Remote.loading())
 
@@ -88,15 +94,24 @@ export const Contents = () => {
           indexSets[conditionIds.findIndex((condId) => condId === conditionId)],
         ]
 
-        await CPKService.redeemPosition({
-          CTService,
-          collateralToken,
-          parentCollectionId,
-          conditionId,
-          indexSets: redeemedIndexSet,
-          account: address,
-          earnedCollateral: redeemedBalance,
-        })
+        if (isUsingTheCPKAddress()) {
+          await CPKService.redeemPosition({
+            CTService,
+            collateralToken,
+            parentCollectionId,
+            conditionId,
+            indexSets: redeemedIndexSet,
+            account: activeAddress,
+            earnedCollateral: redeemedBalance,
+          })
+        } else {
+          await CTService.redeemPositions(
+            collateralToken,
+            parentCollectionId,
+            conditionId,
+            redeemedIndexSet
+          )
+        }
 
         setPosition(null)
         setConditionIds([])
@@ -110,7 +125,17 @@ export const Contents = () => {
       setTransactionStatus(Remote.failure(err))
       logger.error(err)
     }
-  }, [status, CPKService, CTService, address, connect, redeemedBalance, conditionId, position])
+  }, [
+    status,
+    CPKService,
+    CTService,
+    activeAddress,
+    connect,
+    redeemedBalance,
+    isUsingTheCPKAddress,
+    conditionId,
+    position,
+  ])
 
   const disabled =
     transactionStatus.isLoading() || !conditionIds.length || !position || !conditionId

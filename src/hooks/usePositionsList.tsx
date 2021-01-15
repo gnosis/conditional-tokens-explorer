@@ -37,7 +37,17 @@ export const usePositionsList = (
   advancedFilter: AdvancedFilterPosition,
   clientFilter?: (position: PositionWithUserBalanceWithDecimals) => boolean
 ) => {
-  const { cpkAddress, networkConfig, provider } = useWeb3ConnectedOrInfura()
+  const {
+    address: walletAddress,
+    cpkAddress,
+    isUsingTheCPKAddress,
+    networkConfig,
+    provider,
+  } = useWeb3ConnectedOrInfura()
+
+  const activeAddress = React.useMemo(() => {
+    return isUsingTheCPKAddress() ? cpkAddress : walletAddress
+  }, [isUsingTheCPKAddress, cpkAddress, walletAddress])
 
   const [data, setData] = useState<Remote<Maybe<PositionWithUserBalanceWithDecimals[]>>>(
     Remote.loading()
@@ -98,10 +108,10 @@ export const usePositionsList = (
   const { data: userData, error: userError, refetch: refetchUserPositions } = useQuery<
     UserWithPositions
   >(UserWithPositionsQuery, {
-    skip: !cpkAddress,
+    skip: !activeAddress,
     fetchPolicy: 'no-cache',
     variables: {
-      account: cpkAddress?.toLowerCase(),
+      account: activeAddress?.toLowerCase(),
     },
   })
 

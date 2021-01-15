@@ -1,19 +1,24 @@
 import { useQuery } from '@apollo/react-hooks'
 import { BigNumber } from 'ethers/utils'
+import { useMemo } from 'react'
 
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { UserPositionBalancesQuery } from 'queries/CTEUsers'
 import { UserPositionBalances } from 'types/generatedGQLForCTE'
 
 export const useBalanceForPosition = (positionId: string) => {
-  const { cpkAddress } = useWeb3ConnectedOrInfura()
+  const { address: walletAddress, cpkAddress, isUsingTheCPKAddress } = useWeb3ConnectedOrInfura()
+
+  const activeAddress = useMemo(() => {
+    return isUsingTheCPKAddress() ? cpkAddress : walletAddress
+  }, [isUsingTheCPKAddress, cpkAddress, walletAddress])
 
   const { data, error, loading, refetch } = useQuery<UserPositionBalances>(
     UserPositionBalancesQuery,
     {
-      skip: !cpkAddress || !positionId,
+      skip: !activeAddress || !positionId,
       variables: {
-        account: cpkAddress && cpkAddress.toLowerCase(),
+        account: activeAddress && activeAddress.toLowerCase(),
         positionId: positionId,
       },
     }
