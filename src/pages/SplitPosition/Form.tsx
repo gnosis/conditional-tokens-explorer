@@ -68,6 +68,7 @@ export const Form = (props: Props) => {
     _type: status,
     CPKService,
     CTService,
+    address: walletAddress,
     connect,
     isUsingTheCPKAddress,
   } = useWeb3ConnectedOrInfura()
@@ -134,7 +135,7 @@ export const Form = (props: Props) => {
 
   const onSubmit = useCallback(async () => {
     try {
-      if (status === Web3ContextStatus.Connected && activeAddress && CPKService) {
+      if (status === Web3ContextStatus.Connected && activeAddress && walletAddress && CPKService) {
         setTransactionStatus(Remote.loading())
 
         let positionIds: PositionIdsArray[]
@@ -144,7 +145,7 @@ export const Form = (props: Props) => {
           if (isUsingTheCPKAddress()) {
             await CPKService.splitPosition({
               CTService,
-              address: activeAddress,
+              address: walletAddress,
               amount,
               collateralToken: collateralFromSplit,
               conditionId,
@@ -180,7 +181,7 @@ export const Form = (props: Props) => {
           if (isUsingTheCPKAddress()) {
             await CPKService.splitPosition({
               CTService,
-              address: activeAddress,
+              address: walletAddress,
               amount,
               collateralToken: collateralFromSplit,
               conditionId,
