@@ -30,6 +30,7 @@ import { SelectableConditionTable } from 'components/table/SelectableConditionTa
 import { TitleValue } from 'components/text/TitleValue'
 import { NULL_PARENT_ID, ZERO_BN } from 'config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useActiveAddress } from 'hooks/useActiveAddress'
 import { useAllowance } from 'hooks/useAllowance'
 import { useAllowanceState } from 'hooks/useAllowanceState'
 import { useCollateral } from 'hooks/useCollateral'
@@ -67,16 +68,12 @@ export const Form = (props: Props) => {
     _type: status,
     CPKService,
     CTService,
-    address: walletAddress,
     connect,
-    cpkAddress,
     isUsingTheCPKAddress,
   } = useWeb3ConnectedOrInfura()
   const { tokens } = props
 
-  const activeAddress = useMemo(() => {
-    return isUsingTheCPKAddress() ? cpkAddress : walletAddress
-  }, [isUsingTheCPKAddress, cpkAddress, walletAddress])
+  const activeAddress = useActiveAddress()
 
   const defaultSplitFrom = SplitFromType.collateral
 

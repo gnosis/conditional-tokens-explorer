@@ -46,6 +46,7 @@ import { TableControls } from 'components/table/TableControls'
 import { Hash } from 'components/text/Hash'
 import { PageTitle } from 'components/text/PageTitle'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useActiveAddress } from 'hooks/useActiveAddress'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { PositionWithUserBalanceWithDecimals, usePositionsList } from 'hooks/usePositionsList'
 import { usePositionsSearchOptions } from 'hooks/usePositionsSearchOptions'
@@ -81,17 +82,13 @@ export const PositionsList = () => {
     CPKService,
     CTService,
     WrapperService,
-    address: walletAddress,
     connect,
-    cpkAddress,
     isUsingTheCPKAddress,
     networkConfig,
   } = useWeb3ConnectedOrInfura()
   const history = useHistory()
 
-  const activeAddress = useMemo(() => {
-    return isUsingTheCPKAddress() ? cpkAddress : walletAddress
-  }, [isUsingTheCPKAddress, cpkAddress, walletAddress])
+  const activeAddress = useActiveAddress()
 
   const [textToSearch, setTextToSearch] = useState<string>('')
   const [textToShow, setTextToShow] = useState<string>('')

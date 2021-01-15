@@ -37,6 +37,7 @@ import {
   MIN_OUTCOMES_ALLOWED,
 } from 'config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useActiveAddress } from 'hooks/useActiveAddress'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
@@ -79,18 +80,14 @@ export const PrepareCondition = () => {
     CPKService,
     CTService,
     RtyService,
-    address: walletAddress,
     connect,
-    cpkAddress,
     isUsingTheCPKAddress,
     networkConfig,
   } = useWeb3ConnectedOrInfura()
 
   const history = useHistory()
 
-  const activeAddress = useMemo(() => {
-    return isUsingTheCPKAddress() ? cpkAddress : walletAddress
-  }, [isUsingTheCPKAddress, cpkAddress, walletAddress])
+  const activeAddress = useActiveAddress()
 
   const [prepareConditionStatus, setPrepareConditionStatus] = useState<Remote<Maybe<string>>>(
     Remote.notAsked<Maybe<string>>()

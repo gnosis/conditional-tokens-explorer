@@ -28,6 +28,7 @@ import { TableControls } from 'components/table/TableControls'
 import { FormatHash } from 'components/text/FormatHash'
 import { TitleValue } from 'components/text/TitleValue'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useActiveAddress } from 'hooks/useActiveAddress'
 import { useConditionsList } from 'hooks/useConditionsList'
 import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
@@ -68,18 +69,9 @@ interface Params {
 }
 
 const SelectConditionTable: React.FC<Props> = (props) => {
-  const {
-    _type: status,
-    address: walletAddress,
-    cpkAddress,
-    isUsingTheCPKAddress,
-    networkConfig,
-  } = useWeb3ConnectedOrInfura()
+  const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
 
-  const activeAddress = useMemo(() => {
-    return isUsingTheCPKAddress() ? cpkAddress : walletAddress
-  }, [isUsingTheCPKAddress, cpkAddress, walletAddress])
-
+  const activeAddress = useActiveAddress()
   const {
     allowToDisplayOnlyConditionsToReport = false,
     onClearSelection,

@@ -10,6 +10,7 @@ import {
   FilterWrapper,
 } from 'components/pureStyledComponents/FilterTitle'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useActiveAddress } from 'hooks/useActiveAddress'
 import { getLogger } from 'util/logger'
 import { Oracle, OracleFilterOptions } from 'util/types'
 
@@ -24,19 +25,10 @@ interface Props {
 const logger = getLogger('Oracle Filter')
 
 export const OraclesFilterDropdown = ({ onClear, onClick, value }: Props) => {
-  const {
-    address: walletAddress,
-    cpkAddress,
-    isUsingTheCPKAddress,
-    networkConfig,
-    ...restProps
-  } = useWeb3ConnectedOrInfura()
+  const { networkConfig, ...restProps } = useWeb3ConnectedOrInfura()
   const oracles: Oracle[] = networkConfig.getOracles()
 
-  const activeAddress = React.useMemo(() => {
-    return isUsingTheCPKAddress() ? cpkAddress : walletAddress
-  }, [isUsingTheCPKAddress, cpkAddress, walletAddress])
-
+  const activeAddress = useActiveAddress()
   const oraclesAdresses: string[] = oracles.map((oracle: Oracle) => oracle.address.toLowerCase())
 
   const oraclesItems = useMemo(

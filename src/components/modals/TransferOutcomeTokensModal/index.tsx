@@ -12,6 +12,7 @@ import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { StatusInfoInline, StatusInfoType } from 'components/statusInfo/StatusInfoInline'
 import { ZERO_BN } from 'config/constants'
 import { useWeb3Connected } from 'contexts/Web3Context'
+import { useActiveAddress } from 'hooks/useActiveAddress'
 import { ERC20Service } from 'services/erc20'
 import { Token, TransferOptions } from 'util/types'
 
@@ -40,17 +41,9 @@ interface Props extends ModalProps {
 export const TransferOutcomeTokensModal: React.FC<Props> = (props) => {
   const { balance, collateralToken, onRequestClose, onSubmit, positionId, ...restProps } = props
 
-  const {
-    CTService,
-    address: walletAddress,
-    cpkAddress,
-    isUsingTheCPKAddress,
-    provider,
-  } = useWeb3Connected()
+  const { CTService, provider } = useWeb3Connected()
 
-  const activeAddress = React.useMemo(() => {
-    return isUsingTheCPKAddress() ? cpkAddress : walletAddress
-  }, [isUsingTheCPKAddress, cpkAddress, walletAddress])
+  const activeAddress = useActiveAddress()
 
   const [token, setToken] = React.useState<Maybe<Token>>(null)
   const [amount, setAmount] = React.useState<BigNumber>(ZERO_BN)
@@ -88,14 +81,14 @@ export const TransferOutcomeTokensModal: React.FC<Props> = (props) => {
   }, [maxBalance])
 
   const isAddressToSendTheConnectedUser = React.useMemo(
-    () => activeAddress.toLowerCase() === address.toLowerCase(),
+    () => activeAddress && activeAddress.toLowerCase() === address.toLowerCase(),
     [activeAddress, address]
   )
 
   React.useEffect(() => {
     let cancelled = false
 
-    if (cpkAddress) {
+    if (activeAddress) {
       setLoading(true)
       const fetchBalanceAndTokenInformation = async () => {
         const erc20Service = new ERC20Service(provider, collateralToken)
@@ -111,7 +104,7 @@ export const TransferOutcomeTokensModal: React.FC<Props> = (props) => {
     return () => {
       cancelled = true
     }
-  }, [provider, cpkAddress, CTService, positionId, collateralToken])
+  }, [provider, activeAddress, CTService, positionId, collateralToken])
 
   return (
     <Modal

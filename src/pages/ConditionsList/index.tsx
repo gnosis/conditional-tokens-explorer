@@ -36,6 +36,7 @@ import { TableControls } from 'components/table/TableControls'
 import { Hash } from 'components/text/Hash'
 import { PageTitle } from 'components/text/PageTitle'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useActiveAddress } from 'hooks/useActiveAddress'
 import { useConditionsList } from 'hooks/useConditionsList'
 import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
@@ -55,19 +56,11 @@ const DropdownItemLink = styled(NavLink)<DropdownItemProps>`
 `
 
 export const ConditionsList: React.FC = () => {
-  const {
-    _type: status,
-    address: walletAddress,
-    cpkAddress,
-    isUsingTheCPKAddress,
-    networkConfig,
-  } = useWeb3ConnectedOrInfura()
+  const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
 
   const history = useHistory()
 
-  const activeAddress = useMemo(() => {
-    return isUsingTheCPKAddress() ? cpkAddress : walletAddress
-  }, [isUsingTheCPKAddress, cpkAddress, walletAddress])
+  const activeAddress = useActiveAddress()
 
   const [textToSearch, setTextToSearch] = useState<string>('')
   const [textToShow, setTextToShow] = useState<string>('')

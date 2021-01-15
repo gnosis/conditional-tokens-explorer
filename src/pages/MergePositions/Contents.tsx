@@ -20,6 +20,7 @@ import { IconTypes } from 'components/statusInfo/common'
 import { SelectablePositionTable } from 'components/table/SelectablePositionTable'
 import { NULL_PARENT_ID, ZERO_BN } from 'config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useActiveAddress } from 'hooks/useActiveAddress'
 import { useCondition } from 'hooks/useCondition'
 import { useIsConditionResolved } from 'hooks/useIsConditionResolved'
 import { PositionWithUserBalanceWithDecimals, usePositionsList } from 'hooks/usePositionsList'
@@ -55,7 +56,6 @@ export const Contents = () => {
     _type: status,
     CPKService,
     CTService,
-    address: walletAddress,
     connect,
     cpkAddress,
     isUsingTheCPKAddress,
@@ -63,9 +63,7 @@ export const Contents = () => {
     provider,
   } = useWeb3ConnectedOrInfura()
 
-  const activeAddress = useMemo(() => {
-    return isUsingTheCPKAddress() ? cpkAddress : walletAddress
-  }, [isUsingTheCPKAddress, cpkAddress, walletAddress])
+  const activeAddress = useActiveAddress()
 
   const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<boolean>>>(
     Remote.notAsked<Maybe<boolean>>()

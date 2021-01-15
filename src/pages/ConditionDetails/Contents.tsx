@@ -22,6 +22,7 @@ import { FormatHash } from 'components/text/FormatHash'
 import { TitleValue } from 'components/text/TitleValue'
 import { INFORMATION_NOT_AVAILABLE } from 'config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useActiveAddress } from 'hooks/useActiveAddress'
 import { useIsConditionFromOmen } from 'hooks/useIsConditionFromOmen'
 import { usePositionsList } from 'hooks/usePositionsList'
 import { useQuestion } from 'hooks/useQuestion'
@@ -57,17 +58,9 @@ const optionsDisplayTable = {
 }
 
 export const Contents: React.FC<Props> = ({ condition }) => {
-  const {
-    _type: status,
-    address: walletAddress,
-    cpkAddress,
-    isUsingTheCPKAddress,
-    networkConfig,
-  } = useWeb3ConnectedOrInfura()
+  const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
 
-  const activeAddress = useMemo(() => {
-    return isUsingTheCPKAddress() ? cpkAddress : walletAddress
-  }, [isUsingTheCPKAddress, cpkAddress, walletAddress])
+  const activeAddress = useActiveAddress()
 
   const {
     createTimestamp,

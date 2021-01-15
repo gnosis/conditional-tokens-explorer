@@ -11,6 +11,7 @@ import { IconTypes } from 'components/statusInfo/common'
 import { SelectableConditionTable } from 'components/table/SelectableConditionTable'
 import { TitleValue } from 'components/text/TitleValue'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useActiveAddress } from 'hooks/useActiveAddress'
 import { useCondition } from 'hooks/useCondition'
 import { OutcomesTable } from 'pages/ReportPayouts/OutcomesTable'
 import { GetCondition_condition } from 'types/generatedGQLForCTE'
@@ -24,15 +25,11 @@ export const Contents: React.FC = () => {
     _type: status,
     CPKService,
     CTService,
-    address: walletAddress,
     connect,
-    cpkAddress,
     isUsingTheCPKAddress,
   } = useWeb3ConnectedOrInfura()
 
-  const activeAddress = useMemo(() => {
-    return isUsingTheCPKAddress() ? cpkAddress : walletAddress
-  }, [isUsingTheCPKAddress, cpkAddress, walletAddress])
+  const activeAddress = useActiveAddress()
 
   const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<string>>>(
     Remote.notAsked<Maybe<string>>()

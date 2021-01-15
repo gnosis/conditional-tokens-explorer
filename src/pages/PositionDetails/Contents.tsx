@@ -43,6 +43,7 @@ import { IconTypes } from 'components/statusInfo/common'
 import { FormatHash } from 'components/text/FormatHash'
 import { TitleValue } from 'components/text/TitleValue'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useActiveAddress } from 'hooks/useActiveAddress'
 import { useCollateral } from 'hooks/useCollateral'
 import { useGraphMeta } from 'hooks/useGraphMeta'
 import { useIsConditionFromOmen } from 'hooks/useIsConditionFromOmen'
@@ -139,17 +140,13 @@ export const Contents = (props: Props) => {
     CPKService,
     CTService,
     WrapperService,
-    address: walletAddress,
     connect,
-    cpkAddress,
     isUsingTheCPKAddress,
     networkConfig,
     signer,
   } = useWeb3ConnectedOrInfura()
 
-  const activeAddress = useMemo(() => {
-    return isUsingTheCPKAddress() ? cpkAddress : walletAddress
-  }, [isUsingTheCPKAddress, cpkAddress, walletAddress])
+  const activeAddress = useActiveAddress()
 
   const {
     balanceERC20,
