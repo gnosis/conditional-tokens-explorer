@@ -351,7 +351,7 @@ const networks: { [K in NetworkIds]: Network } = {
         name: 'reality',
         description: 'Reality.eth',
         url: 'https://reality.eth.link/',
-        address: '0x2bf1BFb0eB6276a4F4B60044068Cb8CdEB89f79B',
+        address: '0xAB16D643bA051C11962DA645f74632d3130c81E2',
       },
     ],
     arbitrators: [
@@ -359,7 +359,7 @@ const networks: { [K in NetworkIds]: Network } = {
         name: 'kleros',
         description: 'Kleros',
         url: 'https://kleros.io/',
-        address: '0xa0Baf56D83be19Eb6bA8aFAD2Db812Bc13D8Be1d',
+        address: '0x0000000000000000000000000000000000000000',
       },
       {
         name: 'reality',
