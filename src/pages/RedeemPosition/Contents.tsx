@@ -13,6 +13,7 @@ import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
 import { SelectablePositionTable } from 'components/table/SelectablePositionTable'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useActiveAddress } from 'hooks/useActiveAddress'
 import { useCondition } from 'hooks/useCondition'
 import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
 import { getLogger } from 'util/logger'
@@ -26,10 +27,12 @@ export const Contents = () => {
     _type: status,
     CPKService,
     CTService,
-    address,
     connect,
+    isUsingTheCPKAddress,
     networkConfig,
   } = useWeb3ConnectedOrInfura()
+
+  const activeAddress = useActiveAddress()
 
   const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<boolean>>>(
     Remote.notAsked<Maybe<boolean>>()
@@ -69,7 +72,7 @@ export const Contents = () => {
         conditionId &&
         status === Web3ContextStatus.Connected &&
         CPKService &&
-        address
+        activeAddress
       ) {
         setTransactionStatus(Remote.loading())
 
@@ -88,15 +91,24 @@ export const Contents = () => {
           indexSets[conditionIds.findIndex((condId) => condId === conditionId)],
         ]
 
-        await CPKService.redeemPosition({
-          CTService,
-          collateralToken,
-          parentCollectionId,
-          conditionId,
-          indexSets: redeemedIndexSet,
-          account: address,
-          earnedCollateral: redeemedBalance,
-        })
+        if (isUsingTheCPKAddress()) {
+          await CPKService.redeemPosition({
+            CTService,
+            collateralToken,
+            parentCollectionId,
+            conditionId,
+            indexSets: redeemedIndexSet,
+            account: activeAddress,
+            earnedCollateral: redeemedBalance,
+          })
+        } else {
+          await CTService.redeemPositions(
+            collateralToken,
+            parentCollectionId,
+            conditionId,
+            redeemedIndexSet
+          )
+        }
 
         setPosition(null)
         setConditionIds([])
@@ -110,7 +122,17 @@ export const Contents = () => {
       setTransactionStatus(Remote.failure(err))
       logger.error(err)
     }
-  }, [status, CPKService, CTService, address, connect, redeemedBalance, conditionId, position])
+  }, [
+    status,
+    CPKService,
+    CTService,
+    activeAddress,
+    connect,
+    redeemedBalance,
+    isUsingTheCPKAddress,
+    conditionId,
+    position,
+  ])
 
   const disabled =
     transactionStatus.isLoading() || !conditionIds.length || !position || !conditionId

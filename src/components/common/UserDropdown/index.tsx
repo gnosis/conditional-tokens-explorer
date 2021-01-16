@@ -2,8 +2,10 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { Button } from 'components/buttons/Button'
+import { ButtonCopy } from 'components/buttons/ButtonCopy'
 import { ButtonType } from 'components/buttons/buttonStylingTypes'
 import { Dropdown, DropdownItem, DropdownPosition } from 'components/common/Dropdown'
+import { Switch } from 'components/form/Switch'
 import { ChevronDown } from 'components/icons/ChevronDown'
 import { Pill } from 'components/pureStyledComponents/Pill'
 import { FormatHash } from 'components/text/FormatHash'
@@ -60,12 +62,12 @@ const AddressText = styled.div`
   margin-right: 8px;
 `
 
-const Network = styled.div`
+const Connection = styled.div`
   align-items: center;
   display: flex;
 `
 
-const NetworkStatus = styled.div`
+const ConnectionStatus = styled.div`
   background-color: ${(props) => props.theme.colors.holdGreen};
   border-radius: 8px;
   flex-grow: 0;
@@ -75,12 +77,13 @@ const NetworkStatus = styled.div`
   width: 8px;
 `
 
-const NetworkText = styled.div`
+const ConnectionText = styled.div`
   color: ${(props) => props.theme.colors.holdGreen};
   font-size: 9px;
   font-weight: 600;
   line-height: 1.2;
   margin-bottom: -2px;
+  text-transform: capitalize;
 `
 
 const Content = styled.div`
@@ -114,6 +117,7 @@ const Title = styled.div`
 const Value = styled.div`
   font-weight: 600;
   text-transform: capitalize;
+  position: relative;
 `
 
 const DisconnectButton = styled(Button)`
@@ -129,6 +133,12 @@ const StatusPill = styled(Pill)`
   padding-left: 8px;
   padding-right: 8px;
 `
+const TextAndButton = styled.span`
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+`
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getWalletName = (provider: any): string => {
   const isMetaMask =
@@ -140,28 +150,46 @@ const getWalletName = (provider: any): string => {
 }
 
 const UserDropdownButton = () => {
-  const { address, networkConfig } = useWeb3Connected()
+  const { address, networkConfig, provider } = useWeb3Connected()
 
   return (
     <DropdownButton>
       <Address>
         <AddressText className="addressText" title={address}>
           <FormatHash hash={truncateStringInTheMiddle(address, 6, 4)} />
-        </AddressText>{' '}
+        </AddressText>
         <ChevronDown />
       </Address>
       {networkConfig.networkId && (
-        <Network>
-          <NetworkStatus />
-          <NetworkText>{networkConfig.getNetworkName()}</NetworkText>
-        </Network>
+        <Connection>
+          <ConnectionStatus />
+          <ConnectionText>
+            {networkConfig.getNetworkName()} / {getWalletName(provider)}
+          </ConnectionText>
+        </Connection>
       )}
     </DropdownButton>
   )
 }
 
 const UserDropdownContent = () => {
-  const { disconnect, networkConfig, provider } = useWeb3Connected()
+  const {
+    cpkAddress,
+    disconnect,
+    isUsingTheCPKAddress,
+    networkConfig,
+    provider,
+    toggleCPK,
+  } = useWeb3Connected()
+
+  const [isCPKActive, setIsCPKActive] = React.useState(isUsingTheCPKAddress())
+
+  const toggleCpkActive = React.useCallback(() => {
+    toggleCPK()
+
+    const isCPKActive = isUsingTheCPKAddress()
+    setIsCPKActive(isCPKActive)
+  }, [toggleCPK, isUsingTheCPKAddress])
 
   const items = [
     {
@@ -169,14 +197,31 @@ const UserDropdownContent = () => {
       value: <StatusPill>Connected</StatusPill>,
     },
     {
+      title: 'Network',
+      value: networkConfig.getNetworkName(),
+    },
+    {
       title: 'Wallet',
       value: getWalletName(provider),
     },
     {
-      title: 'Network',
-      value: networkConfig.getNetworkName(),
+      onClick: toggleCpkActive,
+      title: 'Use CPK Address',
+      value: <Switch active={isCPKActive} onClick={toggleCpkActive} small />,
     },
   ]
+
+  if (isCPKActive) {
+    items.push({
+      title: 'CPK Address',
+      value: (
+        <TextAndButton>
+          <span>{truncateStringInTheMiddle(cpkAddress, 6, 4)}</span>{' '}
+          <ButtonCopy value={cpkAddress} />
+        </TextAndButton>
+      ),
+    })
+  }
 
   return (
     <Content>
@@ -212,6 +257,7 @@ export const UserDropdown: React.FC = (props) => {
   return (
     <Wrapper
       activeItemHighlight={false}
+      closeOnClick={false}
       dropdownButtonContent={<UserDropdownButton />}
       dropdownPosition={DropdownPosition.right}
       items={headerDropdownItems}

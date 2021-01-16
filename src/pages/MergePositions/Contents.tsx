@@ -20,6 +20,7 @@ import { IconTypes } from 'components/statusInfo/common'
 import { SelectablePositionTable } from 'components/table/SelectablePositionTable'
 import { NULL_PARENT_ID, ZERO_BN } from 'config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useActiveAddress } from 'hooks/useActiveAddress'
 import { useCondition } from 'hooks/useCondition'
 import { useIsConditionResolved } from 'hooks/useIsConditionResolved'
 import { PositionWithUserBalanceWithDecimals, usePositionsList } from 'hooks/usePositionsList'
@@ -55,12 +56,14 @@ export const Contents = () => {
     _type: status,
     CPKService,
     CTService,
-    address,
     connect,
     cpkAddress,
+    isUsingTheCPKAddress,
     networkConfig,
     provider,
   } = useWeb3ConnectedOrInfura()
+
+  const activeAddress = useActiveAddress()
 
   const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<boolean>>>(
     Remote.notAsked<Maybe<boolean>>()
@@ -182,7 +185,7 @@ export const Contents = () => {
         condition &&
         status === Web3ContextStatus.Connected &&
         CPKService &&
-        address
+        activeAddress
       ) {
         setTransactionStatus(Remote.loading())
 
@@ -211,16 +214,26 @@ export const Contents = () => {
 
         const partitionBN: BigNumber[] = partition.map((o: string) => new BigNumber(o))
 
-        await CPKService.mergePositions({
-          CTService,
-          amount,
-          collateralToken,
-          conditionId,
-          parentCollectionId,
-          partition: partitionBN,
-          shouldTransferAmount,
-          address,
-        })
+        if (isUsingTheCPKAddress()) {
+          await CPKService.mergePositions({
+            CTService,
+            amount,
+            collateralToken,
+            conditionId,
+            parentCollectionId,
+            partition: partitionBN,
+            shouldTransferAmount,
+            address: activeAddress,
+          })
+        } else {
+          await CTService.mergePositions(
+            collateralToken,
+            parentCollectionId,
+            conditionId,
+            partition,
+            amount
+          )
+        }
 
         // if freeindexset == 0, everything was merged to...
         if (isPartitionFullIndexSet(condition.outcomeSlotCount, partition)) {
@@ -262,9 +275,10 @@ export const Contents = () => {
       logger.error(err)
     }
   }, [
+    isUsingTheCPKAddress,
     selectedPositions,
     position,
-    address,
+    activeAddress,
     CPKService,
     conditionId,
     condition,

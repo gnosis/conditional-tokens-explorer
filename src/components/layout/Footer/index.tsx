@@ -106,13 +106,13 @@ interface Props {
 }
 
 export const Footer: React.FC<Props> = (props) => {
-  const { onCookiesBannerShow } = props
+  const { onCookiesBannerShow, ...restProps } = props
   const date = new Date()
   const year = date.getFullYear()
   const version = appVersion || 'Invalid Version Number'
 
   return (
-    <Wrapper className="siteFooter" {...props}>
+    <Wrapper className="siteFooter" {...restProps}>
       <Items className="footerItems">
         <Item>
           <ExternalLink href="https://gnosis.io/" rel="noopener noreferrer" target="_blank">

@@ -9,7 +9,7 @@ import { Status } from 'util/types'
 const logger = getLogger('useMeta')
 
 const query = gql`
-  query {
+  query Meta {
     _meta {
       block {
         hash
@@ -43,6 +43,7 @@ export const useGraphMeta = (): Result => {
   // ref used for waitForBlockToSync to access updated meta data
   const blockRef = useRef(data)
   if (data) {
+    logger.log(`Data`, data)
     blockRef.current = data._meta.block
   }
 
