@@ -280,7 +280,6 @@ export const Form = (props: Props) => {
   )
 
   const questionTitle = useMemo(() => {
-    console.log(condition && condition.question)
     if (condition && condition.question) {
       return condition.question.title
     } else {
