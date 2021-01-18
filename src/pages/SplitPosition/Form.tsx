@@ -106,10 +106,11 @@ export const Form = (props: Props) => {
 
   useEffect(() => {
     const numberedOutcomesToSet = originalPartition.map((outcome: BigNumber, key: number) => {
-      return [{ value: key, id: outcome.toString() }]
+      const value = condition && condition.outcomes ? condition.outcomes[key] : key
+      return [{ value, id: outcome.toString() }]
     })
     setNumberedOutcomes(numberedOutcomesToSet)
-  }, [originalPartition, setNumberedOutcomes])
+  }, [condition, originalPartition, setNumberedOutcomes])
 
   const partition = useMemo(() => {
     const outcomes = numberedOutcomes.map((collection) => collection.map((c) => c.id))
@@ -278,6 +279,15 @@ export const Form = (props: Props) => {
     [isSplittingFromCollateral, isValid, allowanceFinished]
   )
 
+  const questionTitle = useMemo(() => {
+    console.log(condition && condition.question)
+    if (condition && condition.question) {
+      return condition.question.title
+    } else {
+      return null
+    }
+  }, [condition])
+
   const outcomesByRow = '14'
 
   const fullLoadingActionButton = useMemo(
@@ -413,30 +423,33 @@ export const Form = (props: Props) => {
               {conditionId && loading ? (
                 <InlineLoading />
               ) : (
-                <StripedListStyled>
-                  {numberedOutcomes && numberedOutcomes.length ? (
-                    numberedOutcomes.map(
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      (outcomeList: OutcomeProps[], outcomeListIndex: number) => {
-                        return (
-                          <StripedListItemLessPadding key={outcomeListIndex}>
-                            <OutcomesContainer columnGap="0" columns={outcomesByRow}>
-                              {outcomeList.map((outcome: OutcomeProps, outcomeIndex: number) => (
-                                <Outcome
-                                  key={outcomeIndex}
-                                  lastInRow={outcomesByRow}
-                                  outcome={outcome}
-                                />
-                              ))}
-                            </OutcomesContainer>
-                          </StripedListItemLessPadding>
-                        )
-                      }
-                    )
-                  ) : (
-                    <StripedListEmpty>No Collections.</StripedListEmpty>
-                  )}
-                </StripedListStyled>
+                <>
+                  {questionTitle && <CardTextSm>{questionTitle}</CardTextSm>}
+                  <StripedListStyled>
+                    {numberedOutcomes && numberedOutcomes.length ? (
+                      numberedOutcomes.map(
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        (outcomeList: OutcomeProps[], outcomeListIndex: number) => {
+                          return (
+                            <StripedListItemLessPadding key={outcomeListIndex}>
+                              <OutcomesContainer columnGap="0" columns={outcomesByRow}>
+                                {outcomeList.map((outcome: OutcomeProps, outcomeIndex: number) => (
+                                  <Outcome
+                                    key={outcomeIndex}
+                                    lastInRow={outcomesByRow}
+                                    outcome={outcome}
+                                  />
+                                ))}
+                              </OutcomesContainer>
+                            </StripedListItemLessPadding>
+                          )
+                        }
+                      )
+                    ) : (
+                      <StripedListEmpty>No Collections.</StripedListEmpty>
+                    )}
+                  </StripedListStyled>
+                </>
               )}
             </>
           }
