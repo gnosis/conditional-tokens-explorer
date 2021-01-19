@@ -7,7 +7,7 @@ import Web3Utils from 'web3-utils'
 import { CONFIRMATIONS_TO_WAIT } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
 import { getLogger } from 'util/logger'
-import { improveErrorMessage } from 'util/tools'
+import { improveErrorMessage, waitForBlockToSync } from 'util/tools'
 import { PositionIdsArray, Token } from 'util/types'
 
 const logger = getLogger('Conditional Tokens')
@@ -47,11 +47,14 @@ const conditionalTokensAbi = [
 
 export class ConditionalTokensService {
   private contract: Contract
+  private networkConfig: NetworkConfig
+  private provider: ethers.providers.Provider
+  private signer?: ethers.Signer
 
   constructor(
-    private networkConfig: NetworkConfig,
-    private provider: ethers.providers.Provider,
-    private signer?: ethers.Signer
+    networkConfig: NetworkConfig,
+    provider: ethers.providers.Provider,
+    signer?: ethers.Signer
   ) {
     const contractAddress = networkConfig.getConditionalTokensAddress()
 
@@ -62,6 +65,9 @@ export class ConditionalTokensService {
     } else {
       this.contract = new ethers.Contract(contractAddress, conditionalTokensAbi, provider)
     }
+    this.networkConfig = networkConfig
+    this.provider = provider
+    this.signer = signer
   }
 
   static getConditionId(
@@ -131,21 +137,22 @@ export class ConditionalTokensService {
     oracleAddress: string,
     outcomeSlotCount: number
   ): Promise<TransactionReceipt | void> {
-    const tx: TransactionResponse = await this.contract.prepareCondition(
-      oracleAddress,
-      questionId,
-      outcomeSlotCount
-    )
-    return tx
-      .wait(CONFIRMATIONS_TO_WAIT)
-      .then((receipt: TransactionReceipt) => {
-        logger.log(`Transaction was mined in block`, receipt)
-        return receipt
-      })
-      .catch((error) => {
-        logger.error(error)
-        throw improveErrorMessage(error)
-      })
+    try {
+      const tx: TransactionResponse = await this.contract.prepareCondition(
+        oracleAddress,
+        questionId,
+        outcomeSlotCount
+      )
+      const transaction = tx.wait(CONFIRMATIONS_TO_WAIT)
+      logger.log(`Transaction was mined in block`, transaction)
+      if (tx && tx.blockNumber) {
+        await waitForBlockToSync(this.networkConfig, tx.blockNumber)
+      }
+      return transaction
+    } catch (error) {
+      logger.error(error)
+      throw improveErrorMessage(error)
+    }
   }
 
   async splitPosition(
@@ -155,26 +162,26 @@ export class ConditionalTokensService {
     partition: BigNumber[],
     amount: BigNumber
   ): Promise<TransactionReceipt | void> {
-    const tx: TransactionResponse = await this.contract.splitPosition(
-      collateralToken,
-      parentCollectionId,
-      conditionId,
-      partition,
-      amount
-    )
+    try {
+      const tx: TransactionResponse = await this.contract.splitPosition(
+        collateralToken,
+        parentCollectionId,
+        conditionId,
+        partition,
+        amount
+      )
 
-    logger.log(`Transaction hash: ${tx.hash}`)
-
-    return tx
-      .wait(CONFIRMATIONS_TO_WAIT)
-      .then((receipt: TransactionReceipt) => {
-        logger.log(`Transaction was mined in block`, receipt)
-        return receipt
-      })
-      .catch((error) => {
-        logger.error(error)
-        throw improveErrorMessage(error)
-      })
+      logger.log(`Transaction hash: ${tx.hash}`)
+      const transaction = await tx.wait(CONFIRMATIONS_TO_WAIT)
+      logger.log(`Transaction was mined in block`, transaction)
+      if (tx && tx.blockNumber) {
+        await waitForBlockToSync(this.networkConfig, tx.blockNumber)
+      }
+      return transaction
+    } catch (error) {
+      logger.error(error)
+      throw improveErrorMessage(error)
+    }
   }
 
   async redeemPositions(
@@ -183,25 +190,25 @@ export class ConditionalTokensService {
     conditionId: string,
     indexSets: string[]
   ): Promise<TransactionReceipt | void> {
-    const tx: TransactionResponse = await this.contract.redeemPositions(
-      collateralToken,
-      parentCollectionId,
-      conditionId,
-      indexSets
-    )
+    try {
+      const tx: TransactionResponse = await this.contract.redeemPositions(
+        collateralToken,
+        parentCollectionId,
+        conditionId,
+        indexSets
+      )
 
-    logger.log(`Transaction hash: ${tx.hash}`)
-
-    return tx
-      .wait(CONFIRMATIONS_TO_WAIT)
-      .then((receipt: TransactionReceipt) => {
-        logger.log(`Transaction was mined in block`, receipt)
-        return receipt
-      })
-      .catch((error) => {
-        logger.error(error)
-        throw improveErrorMessage(error)
-      })
+      logger.log(`Transaction hash: ${tx.hash}`)
+      const transaction = await tx.wait(CONFIRMATIONS_TO_WAIT)
+      logger.log(`Transaction was mined in block`, transaction)
+      if (tx && tx.blockNumber) {
+        await waitForBlockToSync(this.networkConfig, tx.blockNumber)
+      }
+      return transaction
+    } catch (error) {
+      logger.error(error)
+      throw improveErrorMessage(error)
+    }
   }
 
   async getCollectionId(
@@ -219,26 +226,26 @@ export class ConditionalTokensService {
     partition: string[],
     amount: BigNumber
   ): Promise<TransactionReceipt | void> {
-    const tx: TransactionResponse = await this.contract.mergePositions(
-      collateralToken,
-      parentCollectionId,
-      conditionId,
-      partition,
-      amount
-    )
+    try {
+      const tx: TransactionResponse = await this.contract.mergePositions(
+        collateralToken,
+        parentCollectionId,
+        conditionId,
+        partition,
+        amount
+      )
 
-    logger.log(`Transaction hash: ${tx.hash}`)
-
-    return tx
-      .wait(CONFIRMATIONS_TO_WAIT)
-      .then((receipt: TransactionReceipt) => {
-        logger.log(`Transaction was mined in block`, receipt)
-        return receipt
-      })
-      .catch((error) => {
-        logger.error(error)
-        throw improveErrorMessage(error)
-      })
+      logger.log(`Transaction hash: ${tx.hash}`)
+      const transaction = await tx.wait(CONFIRMATIONS_TO_WAIT)
+      logger.log(`Transaction was mined in block`, transaction)
+      if (tx && tx.blockNumber) {
+        await waitForBlockToSync(this.networkConfig, tx.blockNumber)
+      }
+      return transaction
+    } catch (error) {
+      logger.error(error)
+      throw improveErrorMessage(error)
+    }
   }
 
   async getOutcomeSlotCount(conditionId: string): Promise<BigNumber> {
@@ -270,19 +277,20 @@ export class ConditionalTokensService {
   }
 
   async reportPayouts(questionId: string, payouts: number[]): Promise<TransactionReceipt | void> {
-    const tx: TransactionResponse = await this.contract.reportPayouts(questionId, payouts)
-    logger.log(`Transaction hash: ${tx.hash}`)
+    try {
+      const tx: TransactionResponse = await this.contract.reportPayouts(questionId, payouts)
+      logger.log(`Transaction hash: ${tx.hash}`)
 
-    return tx
-      .wait(CONFIRMATIONS_TO_WAIT)
-      .then((receipt: TransactionReceipt) => {
-        logger.log(`Transaction was mined in block`, receipt)
-        return receipt
-      })
-      .catch((error) => {
-        logger.error(error)
-        throw improveErrorMessage(error)
-      })
+      const transaction = tx.wait(CONFIRMATIONS_TO_WAIT)
+      logger.log(`Transaction was mined in block`, transaction)
+      if (tx && tx.blockNumber) {
+        await waitForBlockToSync(this.networkConfig, tx.blockNumber)
+      }
+      return transaction
+    } catch (error) {
+      logger.error(error)
+      throw improveErrorMessage(error)
+    }
   }
 
   // Method  used to wrapp multiple erc1155
@@ -292,14 +300,24 @@ export class ConditionalTokensService {
     positionIds: Array<string>,
     outcomeTokensToTransfer: Array<BigNumber>
   ): Promise<TransactionReceipt> {
-    const tx = await this.contract.safeTransferFrom(
-      addressFrom,
-      addressTo,
-      positionIds,
-      outcomeTokensToTransfer,
-      ethers.constants.HashZero
-    )
-    return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
+    try {
+      const tx = await this.contract.safeTransferFrom(
+        addressFrom,
+        addressTo,
+        positionIds,
+        outcomeTokensToTransfer,
+        ethers.constants.HashZero
+      )
+      const transaction = tx.wait(CONFIRMATIONS_TO_WAIT)
+      logger.log(`Transaction was mined in block`, transaction)
+      if (tx && tx.blockNumber) {
+        await waitForBlockToSync(this.networkConfig, tx.blockNumber)
+      }
+      return transaction
+    } catch (error) {
+      logger.error(error)
+      throw improveErrorMessage(error)
+    }
   }
 
   // Method  used to wrapp some erc1155
@@ -309,14 +327,24 @@ export class ConditionalTokensService {
     positionId: string,
     outcomeTokensToTransfer: BigNumber
   ): Promise<TransactionReceipt> {
-    const tx = await this.contract.safeTransferFrom(
-      addressFrom,
-      addressTo,
-      positionId,
-      outcomeTokensToTransfer,
-      '0x'
-    )
-    return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
+    try {
+      const tx = await this.contract.safeTransferFrom(
+        addressFrom,
+        addressTo,
+        positionId,
+        outcomeTokensToTransfer,
+        '0x'
+      )
+      const transaction = tx.wait(CONFIRMATIONS_TO_WAIT)
+      logger.log(`Transaction was mined in block`, transaction)
+      if (tx && tx.blockNumber) {
+        await waitForBlockToSync(this.networkConfig, tx.blockNumber)
+      }
+      return transaction
+    } catch (error) {
+      logger.error(error)
+      throw improveErrorMessage(error)
+    }
   }
 
   async getProfileSummary(): Promise<Token> {

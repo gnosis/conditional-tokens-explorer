@@ -299,9 +299,8 @@ export const Contents = (props: Props) => {
 
           const { address: addressFrom, amount, positionId } = transferValue
 
-          let transaction: void | TransactionReceipt
           if (isUsingTheCPKAddress()) {
-            transaction = await CPKService.unwrap({
+            await CPKService.unwrap({
               CTService,
               WrapperService,
               addressFrom, // Is the conditional token address
@@ -310,16 +309,7 @@ export const Contents = (props: Props) => {
               addressTo: activeAddress,
             })
           } else {
-            transaction = await WrapperService.unwrap(
-              addressFrom,
-              positionId,
-              amount,
-              activeAddress
-            )
-          }
-
-          if (transaction && transaction.blockNumber) {
-            await waitForBlockToSync(transaction.blockNumber)
+            await WrapperService.unwrap(addressFrom, positionId, amount, activeAddress)
           }
 
           refetchBalances()
@@ -343,7 +333,6 @@ export const Contents = (props: Props) => {
       CPKService,
       setTransfer,
       refetchBalances,
-      waitForBlockToSync,
       refetchPosition,
     ]
   )

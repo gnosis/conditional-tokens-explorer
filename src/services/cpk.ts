@@ -5,7 +5,7 @@ import { Moment } from 'moment'
 import { toChecksumAddress } from 'web3-utils'
 
 import { txs } from '@gnosis.pm/safe-apps-sdk/dist/txs'
-import { CONFIRMATIONS_TO_WAIT, NULL_PARENT_ID } from 'config/constants'
+import { NULL_PARENT_ID } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
 import CPK from 'contract-proxy-kit/lib/esm'
 import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapter'
@@ -14,9 +14,17 @@ import { ERC20Service } from 'services/erc20'
 import { RealityService } from 'services/reality'
 import { Wrapper1155Service } from 'services/wrapper1155'
 import { getLogger } from 'util/logger'
-import { improveErrorMessage, sleep } from 'util/tools'
+import { improveErrorMessage, sleep, waitForBlockToSync } from 'util/tools'
 
 const logger = getLogger('Services::CPKService')
+
+const proxyAbi = [
+  'function masterCopy() external view returns (address)',
+  'function changeMasterCopy(address _masterCopy) external',
+  'function swapOwner(address prevOwner, address oldOwner, address newOwner) external',
+  'function getOwners() public view returns (address[] memory)',
+  'function getThreshold() public view returns (uint256)',
+]
 
 interface CPKPrepareCustomConditionParams {
   questionId: string
@@ -102,15 +110,24 @@ interface CPKUnwrapParams {
   amount: BigNumber
 }
 
+const fallbackMultisigTransactionReceipt: TransactionReceipt = {
+  byzantium: true,
+}
+
 class CPKService {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   cpk: any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  proxy: any
   provider: ethers.providers.Provider
+  networkConfig: NetworkConfig
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  constructor(cpk: any, provider: ethers.providers.Provider) {
+  constructor(cpk: any, provider: ethers.providers.Provider, networkConfig: NetworkConfig) {
     this.cpk = cpk
     this.provider = provider
+    this.networkConfig = networkConfig
+    this.proxy = new ethers.Contract(cpk.address, proxyAbi, provider)
   }
 
   static async create(
@@ -131,7 +148,45 @@ class CPKService {
       }),
       networks,
     })
-    return new CPKService(cpk, provider)
+    return new CPKService(cpk, provider, networkConfig)
+  }
+
+  waitForTransaction = async (txObject: TransactionResult): Promise<TransactionReceipt> => {
+    let transactionReceipt: TransactionReceipt
+    if (txObject.hash) {
+      // standard transaction
+      logger.log(`Transaction hash: ${txObject.hash}`)
+      transactionReceipt = await this.provider.waitForTransaction(txObject.hash)
+    } else {
+      // transaction through the safe app sdk
+      const threshold = await this.proxy.getThreshold()
+      if (threshold.toNumber() === 1 && txObject.safeTxHash) {
+        logger.log(`Safe transaction hash: ${txObject.safeTxHash}`)
+        let transactionHash
+        // poll for safe tx data
+        while (!transactionHash) {
+          try {
+            const safeTransaction = await txs.getBySafeTxHash(txObject.safeTxHash)
+            if (safeTransaction.transactionHash) {
+              transactionHash = safeTransaction.transactionHash
+            }
+          } catch (e) {
+            logger.log(`getBySafeTxHash: ${e.message}`)
+          }
+          await sleep()
+        }
+        logger.log(`Transaction hash: ${transactionHash}`)
+        transactionReceipt = await this.provider.waitForTransaction(transactionHash)
+      } else {
+        // if threshold is > 1 the tx needs more sigs, return dummy tx receipt
+        return fallbackMultisigTransactionReceipt
+      }
+    }
+    // wait for subgraph to sync tx
+    if (transactionReceipt.blockNumber) {
+      await waitForBlockToSync(this.networkConfig, transactionReceipt.blockNumber)
+    }
+    return transactionReceipt
   }
 
   getTransactionHash = async (txObject: TransactionResult): Promise<string> => {
@@ -170,11 +225,9 @@ class CPKService {
 
     const txObject = await this.cpk.execTransactions([prepareConditionTx])
 
-    const txHash = await this.getTransactionHash(txObject)
-    logger.log(`Transaction hash: ${txHash}`)
+    logger.log(`Transaction: ${txObject}`)
     logger.log(`CPK address: ${this.cpk.address}`)
-    return this.provider
-      .waitForTransaction(txHash, CONFIRMATIONS_TO_WAIT)
+    return this.waitForTransaction(txObject)
       .then((receipt: TransactionReceipt) => {
         logger.log(`Transaction was mined in block`, receipt)
         return receipt
@@ -230,11 +283,9 @@ class CPKService {
 
     const txObject = await this.cpk.execTransactions(transactions)
 
-    const txHash = await this.getTransactionHash(txObject)
-    logger.log(`Transaction hash: ${txHash}`)
+    logger.log(`Transaction hash: ${txObject}`)
     logger.log(`CPK address: ${this.cpk.address}`)
-    return this.provider
-      .waitForTransaction(txHash, CONFIRMATIONS_TO_WAIT)
+    return this.waitForTransaction(txObject)
       .then((receipt: TransactionReceipt) => {
         logger.log(`Transaction was mined in block`, receipt)
         return receipt
@@ -258,11 +309,9 @@ class CPKService {
 
     const txObject = await this.cpk.execTransactions(transactions)
 
-    const txHash = await this.getTransactionHash(txObject)
-    logger.log(`Transaction hash: ${txHash}`)
+    logger.log(`Transaction hash: ${txObject}`)
     logger.log(`CPK address: ${this.cpk.address}`)
-    return this.provider
-      .waitForTransaction(txHash, CONFIRMATIONS_TO_WAIT)
+    return this.waitForTransaction(txObject)
       .then((receipt: TransactionReceipt) => {
         logger.log(`Transaction was mined in block`, receipt)
         return receipt
@@ -313,11 +362,9 @@ class CPKService {
 
     const txObject = await this.cpk.execTransactions(transactions, txOptions)
 
-    const txHash = await this.getTransactionHash(txObject)
-    logger.log(`Transaction hash: ${txHash}`)
+    logger.log(`Transaction hash: ${txObject}`)
     logger.log(`CPK address: ${this.cpk.address}`)
-    return this.provider
-      .waitForTransaction(txHash, CONFIRMATIONS_TO_WAIT)
+    return this.waitForTransaction(txObject)
       .then((receipt: TransactionReceipt) => {
         logger.log(`Transaction was mined in block`, receipt)
         return receipt
@@ -391,11 +438,9 @@ class CPKService {
 
     const txObject = await this.cpk.execTransactions(transactions, txOptions)
 
-    const txHash = await this.getTransactionHash(txObject)
-    logger.log(`Transaction hash: ${txHash}`)
+    logger.log(`Transaction hash: ${txObject}`)
     logger.log(`CPK address: ${this.cpk.address}`)
-    return this.provider
-      .waitForTransaction(txHash, CONFIRMATIONS_TO_WAIT)
+    return this.waitForTransaction(txObject)
       .then((receipt: TransactionReceipt) => {
         logger.log(`Transaction was mined in block`, receipt)
         return receipt
@@ -451,11 +496,9 @@ class CPKService {
 
     const txObject = await this.cpk.execTransactions(transactions, txOptions)
 
-    const txHash = await this.getTransactionHash(txObject)
-    logger.log(`Transaction hash: ${txHash}`)
+    logger.log(`Transaction hash: ${txObject}`)
     logger.log(`CPK address: ${this.cpk.address}`)
-    return this.provider
-      .waitForTransaction(txHash, CONFIRMATIONS_TO_WAIT)
+    return this.waitForTransaction(txObject)
       .then((receipt: TransactionReceipt) => {
         logger.log(`Transaction was mined in block`, receipt)
         return receipt
@@ -493,11 +536,9 @@ class CPKService {
 
     const txObject = await this.cpk.execTransactions(transactions)
 
-    const txHash = await this.getTransactionHash(txObject)
-    logger.log(`Transaction hash: ${txHash}`)
+    logger.log(`Transaction hash: ${txObject}`)
     logger.log(`CPK address: ${this.cpk.address}`)
-    return this.provider
-      .waitForTransaction(txHash, CONFIRMATIONS_TO_WAIT)
+    return this.waitForTransaction(txObject)
       .then((receipt: TransactionReceipt) => {
         logger.log(`Transaction was mined in block`, receipt)
         return receipt
@@ -537,11 +578,8 @@ class CPKService {
 
     const txObject = await this.cpk.execTransactions(transactions)
 
-    const txHash = await this.getTransactionHash(txObject)
-    logger.log(`Transaction hash: ${txHash}`)
     logger.log(`CPK address: ${this.cpk.address}`)
-    return this.provider
-      .waitForTransaction(txHash, CONFIRMATIONS_TO_WAIT)
+    return this.waitForTransaction(txObject)
       .then((receipt: TransactionReceipt) => {
         logger.log(`Transaction was mined in block`, receipt)
         return receipt

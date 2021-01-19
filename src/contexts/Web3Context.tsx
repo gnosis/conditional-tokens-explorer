@@ -243,7 +243,7 @@ export const Web3ContextProvider = ({ children }: Props) => {
         const CTService = new ConditionalTokensService(networkConfig, provider, signer)
         const WrapperService = new Wrapper1155Service(networkConfig, provider, signer)
         const cpk = await createCPK(provider, networkConfig)
-        const CPKService = new CPKServiceClass(cpk, provider)
+        const CPKService = new CPKServiceClass(cpk, provider, networkConfig)
 
         const address = await signer.getAddress()
         setWeb3Status({
