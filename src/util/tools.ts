@@ -3,6 +3,7 @@ import { Provider } from 'ethers/providers'
 import { BigNumber, formatUnits, getAddress } from 'ethers/utils'
 import moment from 'moment-timezone'
 
+import axios from 'axios'
 import BN from 'bn.js'
 import { BYTES_REGEX, OMEN_URL_DAPP } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
@@ -470,3 +471,27 @@ export const sleep = (milliseconds = 1000) =>
   new Promise((resolve) => {
     setTimeout(resolve, milliseconds)
   })
+
+export const getGraphMeta = async (networkConfig: NetworkConfig) => {
+  const query = `
+    query Meta {
+      _meta {
+        block {
+          hash
+          number
+        }
+      }
+    }
+  `
+  const { CTEhttpUri } = networkConfig.getGraphUris()
+  const result = await axios.post(CTEhttpUri, { query })
+  return result.data.data._meta.block
+}
+
+export const waitForBlockToSync = async (networkConfig: NetworkConfig, blockNum: number) => {
+  let block
+  while (!block || block.number < blockNum + 1) {
+    block = await getGraphMeta(networkConfig)
+    await sleep()
+  }
+}

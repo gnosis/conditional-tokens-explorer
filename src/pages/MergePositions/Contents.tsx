@@ -57,7 +57,6 @@ export const Contents = () => {
     CPKService,
     CTService,
     connect,
-    cpkAddress,
     isUsingTheCPKAddress,
     networkConfig,
     provider,
@@ -316,7 +315,7 @@ export const Contents = () => {
       setMergeResult('')
       setSelectedPositions([position])
 
-      if (positions && positions.length > 0 && !!position && cpkAddress) {
+      if (positions && positions.length > 0 && !!position && activeAddress) {
         setIsLoadingConditions(true)
         setIsLoadingMergeablePositions(true)
 
@@ -357,7 +356,7 @@ export const Contents = () => {
 
         const positionsPromises = positionsMergeables.map(async (positionFiltered) => {
           const { collateralToken, conditionIds, indexSets } = positionFiltered
-          const balanceOfPositionId = await CTService.balanceOf(positionFiltered.id, cpkAddress)
+          const balanceOfPositionId = await CTService.balanceOf(positionFiltered.id, activeAddress)
           const erc20Service = new ERC20Service(provider, collateralToken)
           const tokenPosition = await erc20Service.getProfileSummary()
 
@@ -382,7 +381,7 @@ export const Contents = () => {
         setConditionId(possibleConditions[0])
       }
     },
-    [positions, CTService, cpkAddress, provider]
+    [positions, CTService, activeAddress, provider]
   )
 
   const maxBalance = useMemo(
@@ -399,8 +398,8 @@ export const Contents = () => {
   useEffect(() => {
     const getBalance = async (positionIds: Array<string>) => {
       try {
-        if (positionIds.length > 0 && position && cpkAddress) {
-          const balancePositions = await CTService.balanceOfBatch(positionIds, cpkAddress)
+        if (positionIds.length > 0 && position && activeAddress) {
+          const balancePositions = await CTService.balanceOfBatch(positionIds, activeAddress)
           setSelectedBalancePositions(balancePositions)
         } else {
           setSelectedBalancePositions([])
@@ -419,7 +418,7 @@ export const Contents = () => {
       selectedPositionsIds.push(position.id)
     }
     getBalance(selectedPositionsIds)
-  }, [CTService, selectedPositions, position, cpkAddress])
+  }, [CTService, selectedPositions, position, activeAddress])
 
   const fullLoadingActionButton = useMemo(
     () =>
