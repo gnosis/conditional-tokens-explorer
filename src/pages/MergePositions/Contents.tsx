@@ -20,6 +20,7 @@ import { IconTypes } from 'components/statusInfo/common'
 import { SelectablePositionTable } from 'components/table/SelectablePositionTable'
 import { NULL_PARENT_ID, ZERO_BN } from 'config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useActiveAddress } from 'hooks/useActiveAddress'
 import { useCondition } from 'hooks/useCondition'
 import { useIsConditionResolved } from 'hooks/useIsConditionResolved'
 import { PositionWithUserBalanceWithDecimals, usePositionsList } from 'hooks/usePositionsList'
@@ -55,12 +56,13 @@ export const Contents = () => {
     _type: status,
     CPKService,
     CTService,
-    address,
     connect,
-    cpkAddress,
+    isUsingTheCPKAddress,
     networkConfig,
     provider,
   } = useWeb3ConnectedOrInfura()
+
+  const activeAddress = useActiveAddress()
 
   const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<boolean>>>(
     Remote.notAsked<Maybe<boolean>>()
@@ -182,7 +184,7 @@ export const Contents = () => {
         condition &&
         status === Web3ContextStatus.Connected &&
         CPKService &&
-        address
+        activeAddress
       ) {
         setTransactionStatus(Remote.loading())
 
@@ -211,16 +213,26 @@ export const Contents = () => {
 
         const partitionBN: BigNumber[] = partition.map((o: string) => new BigNumber(o))
 
-        await CPKService.mergePositions({
-          CTService,
-          amount,
-          collateralToken,
-          conditionId,
-          parentCollectionId,
-          partition: partitionBN,
-          shouldTransferAmount,
-          address,
-        })
+        if (isUsingTheCPKAddress()) {
+          await CPKService.mergePositions({
+            CTService,
+            amount,
+            collateralToken,
+            conditionId,
+            parentCollectionId,
+            partition: partitionBN,
+            shouldTransferAmount,
+            address: activeAddress,
+          })
+        } else {
+          await CTService.mergePositions(
+            collateralToken,
+            parentCollectionId,
+            conditionId,
+            partition,
+            amount
+          )
+        }
 
         // if freeindexset == 0, everything was merged to...
         if (isPartitionFullIndexSet(condition.outcomeSlotCount, partition)) {
@@ -262,9 +274,10 @@ export const Contents = () => {
       logger.error(err)
     }
   }, [
+    isUsingTheCPKAddress,
     selectedPositions,
     position,
-    address,
+    activeAddress,
     CPKService,
     conditionId,
     condition,
@@ -302,7 +315,7 @@ export const Contents = () => {
       setMergeResult('')
       setSelectedPositions([position])
 
-      if (positions && positions.length > 0 && !!position && cpkAddress) {
+      if (positions && positions.length > 0 && !!position && activeAddress) {
         setIsLoadingConditions(true)
         setIsLoadingMergeablePositions(true)
 
@@ -343,7 +356,7 @@ export const Contents = () => {
 
         const positionsPromises = positionsMergeables.map(async (positionFiltered) => {
           const { collateralToken, conditionIds, indexSets } = positionFiltered
-          const balanceOfPositionId = await CTService.balanceOf(positionFiltered.id, cpkAddress)
+          const balanceOfPositionId = await CTService.balanceOf(positionFiltered.id, activeAddress)
           const erc20Service = new ERC20Service(provider, collateralToken)
           const tokenPosition = await erc20Service.getProfileSummary()
 
@@ -368,7 +381,7 @@ export const Contents = () => {
         setConditionId(possibleConditions[0])
       }
     },
-    [positions, CTService, cpkAddress, provider]
+    [positions, CTService, activeAddress, provider]
   )
 
   const maxBalance = useMemo(
@@ -385,8 +398,8 @@ export const Contents = () => {
   useEffect(() => {
     const getBalance = async (positionIds: Array<string>) => {
       try {
-        if (positionIds.length > 0 && position && cpkAddress) {
-          const balancePositions = await CTService.balanceOfBatch(positionIds, cpkAddress)
+        if (positionIds.length > 0 && position && activeAddress) {
+          const balancePositions = await CTService.balanceOfBatch(positionIds, activeAddress)
           setSelectedBalancePositions(balancePositions)
         } else {
           setSelectedBalancePositions([])
@@ -405,7 +418,7 @@ export const Contents = () => {
       selectedPositionsIds.push(position.id)
     }
     getBalance(selectedPositionsIds)
-  }, [CTService, selectedPositions, position, cpkAddress])
+  }, [CTService, selectedPositions, position, activeAddress])
 
   const fullLoadingActionButton = useMemo(
     () =>

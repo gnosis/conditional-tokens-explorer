@@ -7,6 +7,7 @@ import { Moment } from 'moment'
 import { REALITY_TIMEOUT, SINGLE_SELECT_TEMPLATE_ID } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
 import { getLogger } from 'util/logger'
+import { waitForBlockToSync } from 'util/tools'
 import { Question, QuestionLog, QuestionOptions } from 'util/types'
 
 const logger = getLogger('Reality Service')
@@ -26,11 +27,12 @@ export class RealityService {
   private contract: Contract
   private constantContract: Contract
   private provider: ethers.providers.Provider
+  private networkConfig: NetworkConfig
 
   constructor(
-    private networkConfig: NetworkConfig,
-    private providerContext: ethers.providers.Provider,
-    private signer?: ethers.Signer
+    networkConfig: NetworkConfig,
+    providerContext: ethers.providers.Provider,
+    signer?: ethers.Signer
   ) {
     const contractAddress = networkConfig.getRealityAddress()
 
@@ -43,6 +45,7 @@ export class RealityService {
     }
     this.constantContract = new ethers.Contract(contractAddress, realityCallAbi, providerContext)
     this.provider = providerContext
+    this.networkConfig = networkConfig
   }
 
   get address(): string {
@@ -84,11 +87,12 @@ export class RealityService {
     })
 
     // send the transaction and wait until it's mined
-    const transactionObject = await this.contract.askQuestion(...args, {
+    const tx = await this.contract.askQuestion(...args, {
       value: '0x0',
     })
-    logger.log(`Ask question transaction hash: ${transactionObject.hash}`)
-    await this.provider.waitForTransaction(transactionObject.hash)
+    logger.log(`Ask question transaction hash: ${tx.hash}`)
+    await this.provider.waitForTransaction(tx.hash)
+    await waitForBlockToSync(this.networkConfig, tx.blockNumber)
 
     return questionId
   }

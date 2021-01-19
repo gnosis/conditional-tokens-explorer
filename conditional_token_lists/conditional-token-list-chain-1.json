@@ -1,0 +1,106 @@
+{
+    "name": "Conditional Tokens",
+    "logoURI": "ipfs://Qmd2xn6yykqsZYe1pKvUpcdVD2WmP75dNDWqodvf6h2SGH",
+    "keywords": [
+        "conditional tokens",
+        "gnosis",
+        "prediction markets"
+    ],
+    "tags": {},
+    "timestamp": "2021-01-05T22:06:28-03:00",
+    "version": {
+        "major": 1,
+        "minor": 0,
+        "patch": 0
+    },
+    "tokens": [
+        {
+            "chainId": 1,
+            "address": "0xeab28d21b62fd47e0de43eafada1ae99610f1bd3",
+            "symbol": "WMT",
+            "name": "Wrapped ERC-1155",
+            "decimals": 18,
+            "tags": []
+        },
+        {
+            "chainId": 1,
+            "address": "0x7454a62e3e35239a8db3b803755a7fc3ff943ff8",
+            "symbol": "WMT",
+            "name": "Wrapped ERC-1155",
+            "decimals": 18,
+            "tags": []
+        },
+        {
+            "chainId": 1,
+            "address": "0x788dcc0754c9e84627f753d6711791793ab14edc",
+            "symbol": "WMT",
+            "name": "Wrapped ERC-1155",
+            "decimals": 18,
+            "tags": []
+        },
+        {
+            "chainId": 1,
+            "address": "0x987cf7ad3beb2f5240f5e011d835fdd8d161cd31",
+            "symbol": "WMT",
+            "name": "Wrapped ERC-1155",
+            "decimals": 18,
+            "tags": []
+        },
+        {
+            "chainId": 1,
+            "address": "0xd72350cd08cc3169de053d01fd5fd0ba11c02f01",
+            "symbol": "WMT",
+            "name": "Wrapped ERC-1155",
+            "decimals": 18,
+            "tags": []
+        },
+        {
+            "chainId": 1,
+            "address": "0x99be08cbaaab039798aa6d55a5707196a5f8b709",
+            "symbol": "WMT",
+            "name": "Wrapped ERC-1155",
+            "decimals": 18,
+            "tags": []
+        },
+        {
+            "chainId": 1,
+            "address": "0x40ce0a1d8f4999807b92ec266a025f071814b15d",
+            "symbol": "WMT",
+            "name": "Wrapped ERC-1155",
+            "decimals": 18,
+            "tags": []
+        },
+        {
+            "chainId": 1,
+            "address": "0x5963fd7ca9b17b85768476019f81cb43d9d1818e",
+            "symbol": "WMT",
+            "name": "Wrapped ERC-1155",
+            "decimals": 18,
+            "tags": []
+        },
+        {
+            "chainId": 1,
+            "address": "0x62b01a47123bc4376bfa7f1eb76a6de3ee957b0a",
+            "symbol": "WMT",
+            "name": "Wrapped ERC-1155",
+            "decimals": 18,
+            "tags": []
+        },
+        {
+            "chainId": 1,
+            "address": "0x644c4992a4a7a6b5b4d6ebc82beb62ef5c850545",
+            "symbol": "WMT",
+            "name": "Wrapped ERC-1155",
+            "decimals": 18,
+            "tags": []
+        },
+        {
+            "chainId": 1,
+            "address": "0x9411cdb856adf107b68426d7e3321c8118ef56bd",
+            "symbol": "WMT",
+            "name": "Wrapped ERC-1155",
+            "decimals": 18,
+            "tags": []
+        }
+    ]
+}

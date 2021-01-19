@@ -5,6 +5,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 
 import { ApolloError } from 'apollo-client/errors/ApolloError'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useActiveAddress } from 'hooks/useActiveAddress'
 import { useQueryTotalResults } from 'hooks/useQueryTotalResults'
 import { Position, marshalPositionListData } from 'hooks/utils'
 import { buildQueryPositionsList } from 'queries/CTEPositions'
@@ -37,7 +38,9 @@ export const usePositionsList = (
   advancedFilter: AdvancedFilterPosition,
   clientFilter?: (position: PositionWithUserBalanceWithDecimals) => boolean
 ) => {
-  const { cpkAddress, networkConfig, provider } = useWeb3ConnectedOrInfura()
+  const { networkConfig, provider } = useWeb3ConnectedOrInfura()
+
+  const activeAddress = useActiveAddress()
 
   const [data, setData] = useState<Remote<Maybe<PositionWithUserBalanceWithDecimals[]>>>(
     Remote.loading()
@@ -98,10 +101,10 @@ export const usePositionsList = (
   const { data: userData, error: userError, refetch: refetchUserPositions } = useQuery<
     UserWithPositions
   >(UserWithPositionsQuery, {
-    skip: !cpkAddress,
+    skip: !activeAddress,
     fetchPolicy: 'no-cache',
     variables: {
-      account: cpkAddress?.toLowerCase(),
+      account: activeAddress?.toLowerCase(),
     },
   })
 

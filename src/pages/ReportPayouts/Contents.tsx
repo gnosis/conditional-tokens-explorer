@@ -11,6 +11,7 @@ import { IconTypes } from 'components/statusInfo/common'
 import { SelectableConditionTable } from 'components/table/SelectableConditionTable'
 import { TitleValue } from 'components/text/TitleValue'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useActiveAddress } from 'hooks/useActiveAddress'
 import { useCondition } from 'hooks/useCondition'
 import { OutcomesTable } from 'pages/ReportPayouts/OutcomesTable'
 import { GetCondition_condition } from 'types/generatedGQLForCTE'
@@ -20,7 +21,15 @@ import { Remote } from 'util/remoteData'
 const logger = getLogger('ReportPayouts')
 
 export const Contents: React.FC = () => {
-  const { _type: status, CPKService, CTService, connect, cpkAddress } = useWeb3ConnectedOrInfura()
+  const {
+    _type: status,
+    CPKService,
+    CTService,
+    connect,
+    isUsingTheCPKAddress,
+  } = useWeb3ConnectedOrInfura()
+
+  const activeAddress = useActiveAddress()
 
   const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<string>>>(
     Remote.notAsked<Maybe<string>>()
@@ -40,8 +49,8 @@ export const Contents: React.FC = () => {
   const oracle = useMemo(() => condition && condition.oracle, [condition])
 
   const isOracleValidToReportPayout = useMemo(
-    () => cpkAddress && oracle && oracle.toLowerCase() === cpkAddress.toLowerCase(),
-    [cpkAddress, oracle]
+    () => activeAddress && oracle && oracle.toLowerCase() === activeAddress.toLowerCase(),
+    [activeAddress, oracle]
   )
 
   const isPayoutsEmpty = useMemo(() => !payouts.some((currentValue: number) => currentValue > 0), [
@@ -57,13 +66,15 @@ export const Contents: React.FC = () => {
       if (status === Web3ContextStatus.Connected && questionId && CPKService) {
         setTransactionStatus(Remote.loading())
 
-        // We can't use the CPK here, if you put in as the reporter the original account, you'd have to use the original account, so use a plain transaction
-        // or else it will derive a different condition ID
-        await CPKService.reportPayouts({
-          CTService,
-          questionId,
-          payouts,
-        })
+        if (isUsingTheCPKAddress()) {
+          await CPKService.reportPayouts({
+            CTService,
+            questionId,
+            payouts,
+          })
+        } else {
+          await CTService.reportPayouts(questionId, payouts)
+        }
 
         setTransactionStatus(Remote.success(questionId))
         setIsDirty(false)
@@ -74,7 +85,7 @@ export const Contents: React.FC = () => {
       setTransactionStatus(Remote.failure(err))
       logger.error(err)
     }
-  }, [status, payouts, CPKService, connect, questionId, CTService])
+  }, [status, isUsingTheCPKAddress, payouts, CPKService, connect, questionId, CTService])
 
   const onRowClicked = useCallback(
     (row: GetCondition_condition) => {

@@ -10,6 +10,7 @@ import {
   FilterWrapper,
 } from 'components/pureStyledComponents/FilterTitle'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useActiveAddress } from 'hooks/useActiveAddress'
 import { getLogger } from 'util/logger'
 import { Oracle, OracleFilterOptions } from 'util/types'
 
@@ -24,9 +25,10 @@ interface Props {
 const logger = getLogger('Oracle Filter')
 
 export const OraclesFilterDropdown = ({ onClear, onClick, value }: Props) => {
-  const { CPKService, address, networkConfig, ...restProps } = useWeb3ConnectedOrInfura()
+  const { networkConfig, ...restProps } = useWeb3ConnectedOrInfura()
   const oracles: Oracle[] = networkConfig.getOracles()
 
+  const activeAddress = useActiveAddress()
   const oraclesAdresses: string[] = oracles.map((oracle: Oracle) => oracle.address.toLowerCase())
 
   const oraclesItems = useMemo(
@@ -41,8 +43,7 @@ export const OraclesFilterDropdown = ({ onClear, onClick, value }: Props) => {
       {
         text: 'Current Wallet',
         onClick: () => {
-          const currentWallet =
-            address && CPKService ? [address.toLowerCase(), CPKService.address.toLowerCase()] : []
+          const currentWallet = activeAddress ? [activeAddress] : []
           logger.log(`Current Wallet`, currentWallet)
           onClick(OracleFilterOptions.Current, currentWallet)
         },
@@ -67,7 +68,7 @@ export const OraclesFilterDropdown = ({ onClear, onClick, value }: Props) => {
           }
         }),
     ],
-    [CPKService, address, onClick, oracles, oraclesAdresses]
+    [activeAddress, onClick, oracles, oraclesAdresses]
   )
 
   const currentItem = useMemo(

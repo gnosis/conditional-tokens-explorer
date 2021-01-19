@@ -36,6 +36,7 @@ import { TableControls } from 'components/table/TableControls'
 import { Hash } from 'components/text/Hash'
 import { PageTitle } from 'components/text/PageTitle'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useActiveAddress } from 'hooks/useActiveAddress'
 import { useConditionsList } from 'hooks/useConditionsList'
 import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
@@ -55,9 +56,11 @@ const DropdownItemLink = styled(NavLink)<DropdownItemProps>`
 `
 
 export const ConditionsList: React.FC = () => {
-  const { _type: status, address, cpkAddress, networkConfig } = useWeb3ConnectedOrInfura()
+  const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
 
   const history = useHistory()
+
+  const activeAddress = useActiveAddress()
 
   const [textToSearch, setTextToSearch] = useState<string>('')
   const [textToShow, setTextToShow] = useState<string>('')
@@ -185,10 +188,9 @@ export const ConditionsList: React.FC = () => {
     if (
       selectedOracleValue === OracleFilterOptions.Current &&
       status === Web3ContextStatus.Connected &&
-      address &&
-      cpkAddress
+      activeAddress
     ) {
-      setSelectedOracleFilter([cpkAddress.toLowerCase(), address.toLowerCase()])
+      setSelectedOracleFilter([activeAddress.toLowerCase()])
     }
 
     if (
@@ -197,7 +199,7 @@ export const ConditionsList: React.FC = () => {
     ) {
       setSelectedOracleFilter([])
     }
-  }, [status, cpkAddress, address, selectedOracleValue])
+  }, [status, activeAddress, selectedOracleValue])
 
   const { data, error, loading } = useConditionsList(advancedFilters)
 
@@ -208,7 +210,8 @@ export const ConditionsList: React.FC = () => {
   const buildMenuForRow = useCallback(
     (row: GetCondition_condition) => {
       const { id, oracle, resolved } = row
-      const isAllowedToReport = cpkAddress && cpkAddress.toLowerCase() === oracle.toLowerCase()
+      const isAllowedToReport =
+        activeAddress && activeAddress.toLowerCase() === oracle.toLowerCase()
 
       const menu = [
         {
@@ -230,7 +233,7 @@ export const ConditionsList: React.FC = () => {
 
       return menu
     },
-    [cpkAddress, isConnected]
+    [activeAddress, isConnected]
   )
 
   const handleRowClick = useCallback(
