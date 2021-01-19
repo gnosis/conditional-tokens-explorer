@@ -16,7 +16,6 @@ export const CTE_GRAPH_HTTP_RINKEBY =
   'https://api.thegraph.com/subgraphs/name/gnosis/hg-rinkeby'
 export const CTE_GRAPH_HTTP_GANACHE =
   process.env.REACT_APP_CTE_GRAPH_HTTP_GANACHE || 'http://localhost:8000/subgraphs/name/gnosis/hg'
-
 export const CTE_GRAPH_HTTP_XDAI =
   process.env.REACT_APP_CTE_GRAPH_HTTP_XDAI ||
   'https://api.thegraph.com/subgraphs/name/davidalbela/conditional-tokens-xdai'
@@ -27,7 +26,6 @@ export const OMEN_GRAPH_HTTP_MAINNET =
 export const OMEN_GRAPH_HTTP_RINKEBY =
   process.env.REACT_APP_OMEN_GRAPH_HTTP_RINKEBY ||
   'https://api.thegraph.com/subgraphs/name/gnosis/omen-rinkeby'
-
 export const OMEN_GRAPH_HTTP_XDAI =
   process.env.REACT_APP_OMEN_GRAPH_HTTP_XDAI ||
   'https://api.thegraph.com/subgraphs/name/protofire/omen-xdai'
@@ -67,7 +65,6 @@ export const CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_RINKEBY =
 export const CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_GANACHE =
   process.env.REACT_APP_CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_GANACHE ||
   '0xA57B8a5584442B467b4689F1144D269d096A3daF'
-
 export const CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_XDAI =
   process.env.REACT_APP_CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_XDAI ||
   '0xCeAfDD6bc0bEF976fdCd1112955828E00543c0Ce'
@@ -81,7 +78,6 @@ export const REALITY_CONTRACT_ADDRESS_FOR_RINKEBY =
 export const REALITY_CONTRACT_ADDRESS_FOR_GANACHE =
   process.env.REACT_APP_REALITY_CONTRACT_ADDRESS_FOR_GANACHE ||
   '0xcfeb869f69431e42cdb54a4f4f105c19c080a601'
-
 export const REALITY_CONTRACT_ADDRESS_FOR_XDAI =
   process.env.REACT_APP_REALITY_CONTRACT_ADDRESS_FOR_XDAI ||
   '0x90a617ed516ab7fAaBA56CcEDA0C5D952f294d03'
@@ -96,7 +92,7 @@ export const WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_GANACHE =
   process.env.REACT_APP_WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_GANACHE || ''
 export const WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_XDAI =
   process.env.REACT_APP_WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_XDAI ||
-  '0x0000000000000000000000000000000000000000'
+  '0xDE6943f3717738038159a406FF157d4eb3238c1B'
 
 export const CONFIRMATIONS_TO_WAIT = Number(process.env.REACT_APP_CONFIRMATIONS_TO_WAIT || 4)
 
