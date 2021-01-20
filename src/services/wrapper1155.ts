@@ -4,6 +4,7 @@ import { BigNumber, Interface } from 'ethers/utils'
 
 import { CONFIRMATIONS_TO_WAIT } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
+import { waitForBlockToSync } from 'util/tools'
 
 const wrapper1155Abi = [
   'function unwrap(address multiToken,uint256 tokenId,uint256 amount,address recipient,bytes data) external',
@@ -15,13 +16,17 @@ const wrapper1155Abi = [
 
 class Wrapper1155Service {
   private contract: Contract
+  private networkConfig: NetworkConfig
+  private provider: ethers.providers.Provider
 
   constructor(
-    private networkConfig: NetworkConfig,
-    private provider: ethers.providers.Provider,
-    private signer?: ethers.Signer
+    networkConfig: NetworkConfig,
+    provider: ethers.providers.Provider,
+    signer?: ethers.Signer
   ) {
     const contractAddress = networkConfig.getWrapped1155FactoryAddress()
+    this.networkConfig = networkConfig
+    this.provider = provider
     if (signer) {
       this.contract = new ethers.Contract(contractAddress, wrapper1155Abi, provider).connect(signer)
     } else {
@@ -46,7 +51,9 @@ class Wrapper1155Service {
       userAddress,
       '0x'
     )
-    return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
+    const transaction = await this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
+    await waitForBlockToSync(this.networkConfig, tx.blockNumber)
+    return transaction
   }
 
   // Method  used to unwrapp some erc1155
@@ -89,7 +96,9 @@ class Wrapper1155Service {
       userAddress,
       ethers.constants.HashZero
     )
-    return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
+    const transaction = this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
+    await waitForBlockToSync(this.networkConfig, tx.blockNumber)
+    return transaction
   }
 
   async getWrapped1155(
@@ -97,7 +106,9 @@ class Wrapper1155Service {
     tokenId: string
   ): Promise<TransactionReceipt> {
     const tx = await this.contract.getWrapped1155(conditionalTokenAddress, tokenId)
-    return this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
+    const transaction = this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
+    await waitForBlockToSync(this.networkConfig, tx.blockNumber)
+    return transaction
   }
 }
 
