@@ -101,8 +101,8 @@ const BaseOutcome: React.FC<Props> = (props) => {
   } = props
 
   const tooltipInfo = outcome.id
-  const outcomeText = outcome.text ? `<div><strong>value:</strong> ${outcome.text}</div>` : ''
-  const tooltipText = `<div><div><strong>id:</strong> ${outcome.id}</div>${outcomeText}</div>`
+  const outcomeText = outcome.text ? `<div><strong>Value:</strong> ${outcome.text}</div>` : ''
+  const tooltipText = `<div><div><strong>Id:</strong> ${outcome.id}</div>${outcomeText}</div>`
 
   return (
     <Wrapper
