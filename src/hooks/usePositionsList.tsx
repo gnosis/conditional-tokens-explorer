@@ -196,7 +196,13 @@ export const usePositionsList = (
           } as PositionWithUserBalanceWithDecimals
         })
 
-        setData(Remote.success(positionListDataEnhanced))
+        const positionListDataEnhancedOrdered = positionListDataEnhanced.sort(
+          (
+            positionA: PositionWithUserBalanceWithDecimals,
+            positionB: PositionWithUserBalanceWithDecimals
+          ) => (+positionA.indexSets[0] > +positionB.indexSets[0] ? 1 : -1)
+        )
+        setData(Remote.success(positionListDataEnhancedOrdered))
       }
       fetchUserBalanceWithDecimals()
     }
