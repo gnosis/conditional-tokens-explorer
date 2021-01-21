@@ -61,6 +61,11 @@ export const Contents: React.FC = () => {
     if (outcomeSlotCount) setPayouts(new Array(outcomeSlotCount).fill(0))
   }, [outcomeSlotCount])
 
+  const clearComponent = useCallback(() => {
+    setConditionId('')
+    setPayouts([])
+  }, [])
+
   const onReportPayout = useCallback(async () => {
     try {
       if (status === Web3ContextStatus.Connected && questionId && CPKService) {
@@ -76,7 +81,8 @@ export const Contents: React.FC = () => {
           await CTService.reportPayouts(questionId, payouts)
         }
 
-        setTransactionStatus(Remote.success(questionId))
+        setTransactionStatus(Remote.success(payouts.toString()))
+        clearComponent()
         setIsDirty(false)
       } else if (status === Web3ContextStatus.Infura) {
         connect()
@@ -85,7 +91,16 @@ export const Contents: React.FC = () => {
       setTransactionStatus(Remote.failure(err))
       logger.error(err)
     }
-  }, [status, isUsingTheCPKAddress, payouts, CPKService, connect, questionId, CTService])
+  }, [
+    status,
+    isUsingTheCPKAddress,
+    clearComponent,
+    payouts,
+    CPKService,
+    connect,
+    questionId,
+    CTService,
+  ])
 
   const onRowClicked = useCallback(
     (row: GetCondition_condition) => {
@@ -96,13 +111,6 @@ export const Contents: React.FC = () => {
     },
     [setConditionId, setPayouts]
   )
-
-  const clearComponent = useCallback(() => {
-    setConditionId('')
-    setPayouts([])
-    setTransactionStatus(Remote.notAsked<Maybe<string>>())
-    logger.log(`ClearComponent`)
-  }, [])
 
   const fullLoadingActionButton = useMemo(
     () =>
@@ -115,13 +123,11 @@ export const Contents: React.FC = () => {
         : transactionStatus.isSuccess()
         ? {
             buttonType: ButtonType.primary,
-            onClick: () => {
-              clearComponent()
-            },
+            onClick: () => setTransactionStatus(Remote.notAsked<Maybe<string>>()),
             text: 'OK',
           }
         : undefined,
-    [transactionStatus, clearComponent]
+    [transactionStatus]
   )
 
   const fullLoadingMessage = useMemo(
@@ -130,8 +136,8 @@ export const Contents: React.FC = () => {
         ? transactionStatus.getFailure()
         : transactionStatus.isLoading()
         ? 'Working...'
-        : `Report payout finished! The reported array is [${payouts.toString()}]`,
-    [transactionStatus, payouts]
+        : `Report payout finished! The reported array is [${transactionStatus.get()}]`,
+    [transactionStatus]
   )
 
   const fullLoadingTitle = useMemo(
