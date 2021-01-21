@@ -24,6 +24,7 @@ import {
 import { TitleControlButton } from 'components/pureStyledComponents/TitleControl'
 import { PositionPreview } from 'components/splitPosition/PositionPreview'
 import { FullLoading } from 'components/statusInfo/FullLoading'
+import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { StatusInfoInline, StatusInfoType } from 'components/statusInfo/StatusInfoInline'
 import { IconTypes } from 'components/statusInfo/common'
 import { SelectableConditionTable } from 'components/table/SelectableConditionTable'
@@ -95,7 +96,7 @@ export const Form = (props: Props) => {
   const allowanceMethods = useAllowance(collateralAddress)
   const { collateral } = useCollateral(collateralAddress)
 
-  const { condition } = useCondition(conditionId)
+  const { condition, loading } = useCondition(conditionId)
   const outcomeSlot = useMemo(() => (condition ? condition.outcomeSlotCount : 0), [condition])
   const conditionIdToPreviewShow = useMemo(() => (condition ? condition.id : ''), [condition])
 
@@ -105,10 +106,11 @@ export const Form = (props: Props) => {
 
   useEffect(() => {
     const numberedOutcomesToSet = originalPartition.map((outcome: BigNumber, key: number) => {
-      return [{ value: key, id: outcome.toString() }]
+      const text = condition && condition.outcomes ? condition.outcomes[key] : undefined
+      return [{ value: key, text, id: outcome.toString() }]
     })
     setNumberedOutcomes(numberedOutcomesToSet)
-  }, [originalPartition, setNumberedOutcomes])
+  }, [condition, originalPartition, setNumberedOutcomes])
 
   const partition = useMemo(() => {
     const outcomes = numberedOutcomes.map((collection) => collection.map((c) => c.id))
@@ -277,6 +279,14 @@ export const Form = (props: Props) => {
     [isSplittingFromCollateral, isValid, allowanceFinished]
   )
 
+  const questionTitle = useMemo(() => {
+    if (condition && condition.question) {
+      return condition.question.title
+    } else {
+      return null
+    }
+  }, [condition])
+
   const outcomesByRow = '14'
 
   const fullLoadingActionButton = useMemo(
@@ -395,12 +405,18 @@ export const Form = (props: Props) => {
           />
         )}
       </Row>
+      {questionTitle && (
+        <Row>
+          <TitleValue title="Question" value={questionTitle} />
+        </Row>
+      )}
+
       <Row paddingTop>
         <TitleValue
           title="Partition"
           titleControl={
             <TitleControlButton
-              disabled={!conditionIdToPreviewShow}
+              disabled={!conditionIdToPreviewShow || loading}
               onClick={() => setIsEditPartitionModalOpen(true)}
             >
               Edit Partition
@@ -409,30 +425,34 @@ export const Form = (props: Props) => {
           value={
             <>
               <CardTextSm>Outcomes Collections</CardTextSm>
-              <StripedListStyled>
-                {numberedOutcomes && numberedOutcomes.length ? (
-                  numberedOutcomes.map(
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    (outcomeList: OutcomeProps[], outcomeListIndex: number) => {
-                      return (
-                        <StripedListItemLessPadding key={outcomeListIndex}>
-                          <OutcomesContainer columnGap="0" columns={outcomesByRow}>
-                            {outcomeList.map((outcome: OutcomeProps, outcomeIndex: number) => (
-                              <Outcome
-                                key={outcomeIndex}
-                                lastInRow={outcomesByRow}
-                                outcome={outcome}
-                              />
-                            ))}
-                          </OutcomesContainer>
-                        </StripedListItemLessPadding>
-                      )
-                    }
-                  )
-                ) : (
-                  <StripedListEmpty>No Collections.</StripedListEmpty>
-                )}
-              </StripedListStyled>
+              {conditionId && loading ? (
+                <InlineLoading />
+              ) : (
+                <StripedListStyled>
+                  {numberedOutcomes && numberedOutcomes.length ? (
+                    numberedOutcomes.map(
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      (outcomeList: OutcomeProps[], outcomeListIndex: number) => {
+                        return (
+                          <StripedListItemLessPadding key={outcomeListIndex}>
+                            <OutcomesContainer columnGap="0" columns={outcomesByRow}>
+                              {outcomeList.map((outcome: OutcomeProps, outcomeIndex: number) => (
+                                <Outcome
+                                  key={outcomeIndex}
+                                  lastInRow={outcomesByRow}
+                                  outcome={outcome}
+                                />
+                              ))}
+                            </OutcomesContainer>
+                          </StripedListItemLessPadding>
+                        )
+                      }
+                    )
+                  ) : (
+                    <StripedListEmpty>No Collections.</StripedListEmpty>
+                  )}
+                </StripedListStyled>
+              )}
             </>
           }
         />

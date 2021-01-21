@@ -55,6 +55,10 @@ const conditionFragment = gql`
     payoutDenominator
     resolveTimestamp
     resolveBlockNumber
+    outcomes
+    question {
+      title
+    }
   }
 `
 export const buildQueryConditionsList = (
