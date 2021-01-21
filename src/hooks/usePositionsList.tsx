@@ -98,9 +98,12 @@ export const usePositionsList = (
     entityName: 'positions',
   })
 
-  const { data: userData, error: userError, refetch: refetchUserPositions } = useQuery<
-    UserWithPositions
-  >(UserWithPositionsQuery, {
+  const {
+    data: userData,
+    error: userError,
+    loading: loadingUserData,
+    refetch: refetchUserPositions,
+  } = useQuery<UserWithPositions>(UserWithPositionsQuery, {
     skip: !activeAddress,
     fetchPolicy: 'no-cache',
     variables: {
@@ -110,8 +113,10 @@ export const usePositionsList = (
 
   React.useEffect(() => {
     // The use of loadingPositions act as a blocker when the useQuery is executing again
-    if (loadingPositions) setData(Remote.loading)
-    else if (positionsData) {
+    if (loadingPositions || loadingUserData) setData(Remote.loading)
+    if (positionsData && userData) {
+      setData(Remote.loading)
+
       const positionListData = marshalPositionListData(positionsData, userData?.user)
 
       const fetchUserBalanceWithDecimals = async () => {
@@ -195,7 +200,7 @@ export const usePositionsList = (
       }
       fetchUserBalanceWithDecimals()
     }
-  }, [loadingPositions, positionsData, userData, networkConfig, provider])
+  }, [loadingPositions, loadingUserData, positionsData, userData, networkConfig, provider])
 
   const error = React.useMemo(() => positionsError || userError, [positionsError, userError])
 
