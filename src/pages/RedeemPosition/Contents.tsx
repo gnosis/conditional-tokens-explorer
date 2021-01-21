@@ -13,7 +13,6 @@ import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
 import { SelectablePositionTable } from 'components/table/SelectablePositionTable'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { useActiveAddress } from 'hooks/useActiveAddress'
 import { useCondition } from 'hooks/useCondition'
 import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
 import { getLogger } from 'util/logger'
@@ -27,12 +26,11 @@ export const Contents = () => {
     _type: status,
     CPKService,
     CTService,
+    address: walletAddress,
     connect,
     isUsingTheCPKAddress,
     networkConfig,
   } = useWeb3ConnectedOrInfura()
-
-  const activeAddress = useActiveAddress()
 
   const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<boolean>>>(
     Remote.notAsked<Maybe<boolean>>()
@@ -72,7 +70,7 @@ export const Contents = () => {
         conditionId &&
         status === Web3ContextStatus.Connected &&
         CPKService &&
-        activeAddress
+        walletAddress
       ) {
         setTransactionStatus(Remote.loading())
 
@@ -98,7 +96,7 @@ export const Contents = () => {
             parentCollectionId,
             conditionId,
             indexSets: redeemedIndexSet,
-            account: activeAddress,
+            account: walletAddress,
             earnedCollateral: redeemedBalance,
           })
         } else {
@@ -126,7 +124,7 @@ export const Contents = () => {
     status,
     CPKService,
     CTService,
-    activeAddress,
+    walletAddress,
     connect,
     redeemedBalance,
     isUsingTheCPKAddress,
