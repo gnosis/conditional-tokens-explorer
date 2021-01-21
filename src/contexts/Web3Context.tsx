@@ -85,6 +85,7 @@ export interface ConnectedWeb3Context {
   disconnect: () => void
   toggleCPK: () => void
   isUsingTheCPKAddress: () => boolean
+  refresh: boolean
 }
 
 export const Web3Context = React.createContext<Maybe<ConnectedWeb3Context>>(null)
@@ -117,9 +118,12 @@ export const Web3ContextProvider = ({ children }: Props) => {
 
   const isUsingTheCPKAddress = React.useCallback(() => getValue(false), [getValue])
 
+  const [refresh, setRefresh] = React.useState<boolean>(false)
+
   const toggleCPK = React.useCallback(() => {
     setValue(!isUsingTheCPKAddress())
-  }, [isUsingTheCPKAddress, setValue])
+    setRefresh(!refresh)
+  }, [isUsingTheCPKAddress, refresh, setValue])
 
   const resetApp = React.useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -318,6 +322,7 @@ export const Web3ContextProvider = ({ children }: Props) => {
         disconnect: disconnectWeb3Modal,
         toggleCPK,
         isUsingTheCPKAddress,
+        refresh,
       }}
     >
       {children}
@@ -334,15 +339,15 @@ export const useWeb3Context = () => {
 }
 
 export const useWeb3Connected = () => {
-  const { disconnect, isUsingTheCPKAddress, status, toggleCPK } = useWeb3Context()
+  const { disconnect, isUsingTheCPKAddress, refresh, status, toggleCPK } = useWeb3Context()
   if (status._type === Web3ContextStatus.Connected) {
-    return { ...status, disconnect, toggleCPK, isUsingTheCPKAddress }
+    return { ...status, disconnect, toggleCPK, isUsingTheCPKAddress, refresh }
   }
   throw new Error('[useWeb3Connected] Hook not used under a connected context')
 }
 
 export const useWeb3ConnectedOrInfura = () => {
-  const { connect, disconnect, isUsingTheCPKAddress, status, toggleCPK } = useWeb3Context()
+  const { connect, disconnect, isUsingTheCPKAddress, refresh, status, toggleCPK } = useWeb3Context()
   if (status._type === Web3ContextStatus.Connected || status._type === Web3ContextStatus.Infura) {
     return {
       ...status,
@@ -354,6 +359,7 @@ export const useWeb3ConnectedOrInfura = () => {
       disconnect,
       toggleCPK,
       isUsingTheCPKAddress,
+      refresh,
     }
   }
 

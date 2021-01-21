@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 
+import { useActiveAddress } from 'hooks/useActiveAddress'
 import { useQueryTotalResults } from 'hooks/useQueryTotalResults'
 import { buildQueryConditionsList } from 'queries/CTEConditions'
 import { GetCondition_condition } from 'types/generatedGQLForCTE'
@@ -27,6 +28,8 @@ export const useConditionsList = (advancedFilter: AdvancedFilterConditions) => {
     ToCreationDate,
   } = advancedFilter
 
+  const activeAddress = useActiveAddress()
+
   const query = buildQueryConditionsList(advancedFilter)
   const variables = useMemo(() => {
     const variables: Variables = {}
@@ -34,8 +37,10 @@ export const useConditionsList = (advancedFilter: AdvancedFilterConditions) => {
     if (ReporterOracle.type === OracleFilterOptions.Custom) {
       variables['oracleNotIn'] = ReporterOracle.value
     }
+    if (ReporterOracle.type === OracleFilterOptions.Current && activeAddress) {
+      variables['oracleIn'] = [activeAddress.toLowerCase()]
+    }
     if (
-      ReporterOracle.type === OracleFilterOptions.Current ||
       ReporterOracle.type === OracleFilterOptions.Kleros ||
       ReporterOracle.type === OracleFilterOptions.Reality
     ) {
@@ -59,6 +64,7 @@ export const useConditionsList = (advancedFilter: AdvancedFilterConditions) => {
 
     return variables
   }, [
+    activeAddress,
     ConditionTypeFilter.type,
     ConditionTypeFilter.value,
     FromCreationDate,
