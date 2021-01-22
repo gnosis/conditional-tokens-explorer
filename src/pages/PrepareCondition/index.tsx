@@ -162,21 +162,38 @@ export const PrepareCondition = () => {
   const [conditionType, setConditionType] = useState<ConditionType>(ConditionType.custom)
   const [outcomes, setOutcomes] = useState<Array<string>>([])
   const [outcome, setOutcome] = useState<string>('')
+  const [outcomesBeingEdited, setOutcomesBeingEdited] = useState<boolean[]>([])
 
   const addOutcome = useCallback(() => {
     const sanitizedOutcome = outcome.trim()
     const outcomesCloned = lodashClonedeep(outcomes)
     setOutcome('')
     setOutcomes([...outcomesCloned, sanitizedOutcome])
-  }, [outcome, outcomes, setOutcomes])
+    setOutcomesBeingEdited([...outcomesBeingEdited, false])
+  }, [outcome, outcomes, outcomesBeingEdited])
 
   const removeOutcome = useCallback(
     (index: number) => {
       const outcomesCloned = lodashClonedeep(outcomes)
       outcomesCloned.splice(index, 1)
       setOutcomes([...outcomesCloned])
+      setOutcomesBeingEdited([
+        ...outcomesBeingEdited.slice(0, index),
+        ...outcomesBeingEdited.slice(index + 1),
+      ])
     },
-    [outcomes]
+    [outcomes, outcomesBeingEdited]
+  )
+
+  const toggleEditOutcome = useCallback(
+    (value: boolean, index: number) => {
+      setOutcomesBeingEdited([
+        ...outcomesBeingEdited.slice(0, index),
+        value,
+        ...outcomesBeingEdited.slice(index + 1),
+      ])
+    },
+    [outcomesBeingEdited]
   )
 
   const updateOutcome = useCallback(
@@ -550,6 +567,10 @@ export const PrepareCondition = () => {
   const todayLocalized = moment(today).format('LL')
   const maxDateLocalized = moment(MAX_DATE).format('LL')
 
+  const areOutcomesBeingEdited = useMemo(() => outcomesBeingEdited.some(Boolean), [
+    outcomesBeingEdited,
+  ])
+
   return (
     <>
       <PageTitle>Prepare Condition</PageTitle>
@@ -737,8 +758,14 @@ export const PrepareCondition = () => {
               outcome={outcome}
               outcomes={outcomes}
               removeOutcome={removeOutcome}
+              toggleEditOutcome={toggleEditOutcome}
               updateOutcome={updateOutcome}
             />
+            {areOutcomesBeingEdited && !submitDisabled && (
+              <ErrorContainer>
+                <ErrorMessage>Unsaved changes</ErrorMessage>
+              </ErrorContainer>
+            )}
             <Row>
               <TitleValue
                 title="Resolution Date"
@@ -898,6 +925,7 @@ export const PrepareCondition = () => {
               {newCustomConditionStatusInfo.contents}
             </StatusInfoInline>
           )}
+
         <ButtonContainer>
           <Button disabled={submitDisabled} onClick={prepareCondition}>
             Prepare

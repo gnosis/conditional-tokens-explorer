@@ -86,8 +86,17 @@ const EditableOutcome: React.FC<{
   outcomes: Array<string | undefined>
   removeOutcome: () => void
   updateOutcome: (value: string, index: number) => void
+  onEditOutcome: (value: boolean, index: number) => void
 }> = (props) => {
-  const { outcomeIndex, outcomeText, outcomes, removeOutcome, updateOutcome, ...restProps } = props
+  const {
+    onEditOutcome,
+    outcomeIndex,
+    outcomeText,
+    outcomes,
+    removeOutcome,
+    updateOutcome,
+    ...restProps
+  } = props
   const [isEditing, setIsEditing] = useState(false)
   const [value, setValue] = useState<string | undefined>(outcomeText)
   const outcomeField = createRef<HTMLInputElement>()
@@ -118,8 +127,10 @@ const EditableOutcome: React.FC<{
     if (value) {
       saveSanitizedValue(value)
       setIsEditing(false)
+      onEditOutcome(false, outcomeIndex)
       updateOutcome(value, outcomeIndex)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [updateOutcome, setIsEditing, saveSanitizedValue, value, outcomeIndex])
 
   const onPressEnter = useCallback(
@@ -130,9 +141,11 @@ const EditableOutcome: React.FC<{
       if (e.key === 'Escape') {
         resetValue()
         setIsEditing(false)
+        onEditOutcome(false, outcomeIndex)
       }
     },
-    [setIsEditing, resetValue, isOutcomeValueOK, onSave]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isOutcomeValueOK, onSave, resetValue, outcomeIndex]
   )
 
   return (
@@ -156,6 +169,7 @@ const EditableOutcome: React.FC<{
             buttonType={ButtonControlType.edit}
             onClick={() => {
               setIsEditing(true)
+              onEditOutcome(true, outcomeIndex)
               outcomeField.current?.focus()
             }}
             title="Edit"
@@ -179,6 +193,7 @@ const EditableOutcome: React.FC<{
             onClick={() => {
               resetValue()
               setIsEditing(false)
+              onEditOutcome(false, outcomeIndex)
             }}
             title="Cancel"
           />
@@ -189,6 +204,7 @@ const EditableOutcome: React.FC<{
           onClick={() => {
             removeOutcome()
             setIsEditing(false)
+            onEditOutcome(false, outcomeIndex)
           }}
           title="Remove"
         />
@@ -204,6 +220,7 @@ interface Props {
   outcomes: Array<string>
   removeOutcome: (index: number) => void
   updateOutcome: (value: string, index: number) => void
+  toggleEditOutcome: (value: boolean, index: number) => void
 }
 
 export const AddOutcome: React.FC<Props> = (props) => {
@@ -213,6 +230,7 @@ export const AddOutcome: React.FC<Props> = (props) => {
     outcome = '',
     outcomes,
     removeOutcome,
+    toggleEditOutcome,
     updateOutcome,
     ...restProps
   } = props
@@ -259,6 +277,7 @@ export const AddOutcome: React.FC<Props> = (props) => {
                 outcomes.map((item, index) => (
                   <StripedListItem key={`${index}_${item}`}>
                     <EditableOutcome
+                      onEditOutcome={(value, index) => toggleEditOutcome(value, index)}
                       outcomeIndex={index}
                       outcomeText={item}
                       outcomes={outcomes}
