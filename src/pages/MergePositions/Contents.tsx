@@ -56,6 +56,7 @@ export const Contents = () => {
     _type: status,
     CPKService,
     CTService,
+    address: walletAddress,
     connect,
     isUsingTheCPKAddress,
     networkConfig,
@@ -64,8 +65,8 @@ export const Contents = () => {
 
   const activeAddress = useActiveAddress()
 
-  const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<boolean>>>(
-    Remote.notAsked<Maybe<boolean>>()
+  const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<BigNumber>>>(
+    Remote.notAsked<Maybe<BigNumber>>()
   )
 
   const [conditionId, setConditionId] = useState<Maybe<string>>(null)
@@ -184,7 +185,7 @@ export const Contents = () => {
         condition &&
         status === Web3ContextStatus.Connected &&
         CPKService &&
-        activeAddress
+        walletAddress
       ) {
         setTransactionStatus(Remote.loading())
 
@@ -222,7 +223,7 @@ export const Contents = () => {
             parentCollectionId,
             partition: partitionBN,
             shouldTransferAmount,
-            address: activeAddress,
+            address: walletAddress,
           })
         } else {
           await CTService.mergePositions(
@@ -264,7 +265,7 @@ export const Contents = () => {
           )
         }
 
-        setTransactionStatus(Remote.success(true))
+        setTransactionStatus(Remote.success(amount))
         setIsDirty(false)
       } else {
         connect()
@@ -277,7 +278,7 @@ export const Contents = () => {
     isUsingTheCPKAddress,
     selectedPositions,
     position,
-    activeAddress,
+    walletAddress,
     CPKService,
     conditionId,
     condition,
@@ -425,7 +426,7 @@ export const Contents = () => {
       transactionStatus.isFailure()
         ? {
             buttonType: ButtonType.danger,
-            onClick: () => setTransactionStatus(Remote.notAsked<Maybe<boolean>>()),
+            onClick: () => setTransactionStatus(Remote.notAsked<Maybe<BigNumber>>()),
             text: 'Close',
           }
         : undefined,
@@ -545,10 +546,10 @@ export const Contents = () => {
       )}
       {transactionStatus.isSuccess() && collateralToken && (
         <MergeResultModal
-          amount={amount}
+          amount={transactionStatus.get() || new BigNumber(0)}
           closeAction={() => {
             clearComponent()
-            setTransactionStatus(Remote.notAsked<Maybe<boolean>>())
+            setTransactionStatus(Remote.notAsked<Maybe<BigNumber>>())
             setClearFilters(!clearFilters)
           }}
           collateralToken={collateralToken}

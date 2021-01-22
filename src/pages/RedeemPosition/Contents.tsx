@@ -13,12 +13,12 @@ import { FullLoading } from 'components/statusInfo/FullLoading'
 import { IconTypes } from 'components/statusInfo/common'
 import { SelectablePositionTable } from 'components/table/SelectablePositionTable'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
-import { useActiveAddress } from 'hooks/useActiveAddress'
+import { useCollateral } from 'hooks/useCollateral'
 import { useCondition } from 'hooks/useCondition'
 import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
-import { getParentCollectionId, getRedeemedBalance } from 'util/tools'
+import { formatBigNumber, getParentCollectionId, getRedeemedBalance } from 'util/tools'
 
 const logger = getLogger('RedeemPosition')
 
@@ -27,15 +27,14 @@ export const Contents = () => {
     _type: status,
     CPKService,
     CTService,
+    address: walletAddress,
     connect,
     isUsingTheCPKAddress,
     networkConfig,
   } = useWeb3ConnectedOrInfura()
 
-  const activeAddress = useActiveAddress()
-
-  const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<boolean>>>(
-    Remote.notAsked<Maybe<boolean>>()
+  const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<string>>>(
+    Remote.notAsked<Maybe<string>>()
   )
   const [position, setPosition] = useState<Maybe<PositionWithUserBalanceWithDecimals>>(null)
   const [conditionIds, setConditionIds] = useState<Array<string>>([])
@@ -52,7 +51,6 @@ export const Contents = () => {
     setPosition(null)
     setConditionIds([])
     setConditionId('')
-    setTransactionStatus(Remote.notAsked<Maybe<boolean>>())
   }, [])
 
   const redeemedBalance = useMemo(
@@ -65,6 +63,14 @@ export const Contents = () => {
 
   logger.log(`Balance to redeem`, redeemedBalance.toString())
 
+  const { collateral: token } = useCollateral(position ? position.collateralToken : '')
+
+  const getBalanceRedemeed = useCallback(() => {
+    return redeemedBalance && token
+      ? `${formatBigNumber(redeemedBalance, token.decimals)} ${token.symbol}`
+      : ''
+  }, [redeemedBalance, token])
+
   const onRedeem = useCallback(async () => {
     try {
       if (
@@ -72,7 +78,7 @@ export const Contents = () => {
         conditionId &&
         status === Web3ContextStatus.Connected &&
         CPKService &&
-        activeAddress
+        walletAddress
       ) {
         setTransactionStatus(Remote.loading())
 
@@ -98,7 +104,7 @@ export const Contents = () => {
             parentCollectionId,
             conditionId,
             indexSets: redeemedIndexSet,
-            account: activeAddress,
+            account: walletAddress,
             earnedCollateral: redeemedBalance,
           })
         } else {
@@ -109,12 +115,8 @@ export const Contents = () => {
             redeemedIndexSet
           )
         }
-
-        setPosition(null)
-        setConditionIds([])
-        setConditionId('')
-
-        setTransactionStatus(Remote.success(true))
+        setTransactionStatus(Remote.success(getBalanceRedemeed()))
+        clearComponent()
       } else if (status === Web3ContextStatus.Infura) {
         connect()
       }
@@ -126,10 +128,12 @@ export const Contents = () => {
     status,
     CPKService,
     CTService,
-    activeAddress,
+    walletAddress,
     connect,
     redeemedBalance,
     isUsingTheCPKAddress,
+    getBalanceRedemeed,
+    clearComponent,
     conditionId,
     position,
   ])
@@ -142,19 +146,17 @@ export const Contents = () => {
       transactionStatus.isFailure()
         ? {
             buttonType: ButtonType.danger,
-            onClick: () => setTransactionStatus(Remote.notAsked<Maybe<boolean>>()),
+            onClick: () => setTransactionStatus(Remote.notAsked<Maybe<string>>()),
             text: 'Close',
           }
         : transactionStatus.isSuccess()
         ? {
             buttonType: ButtonType.primary,
-            onClick: () => {
-              clearComponent()
-            },
+            onClick: () => setTransactionStatus(Remote.notAsked<Maybe<string>>()),
             text: 'OK',
           }
         : undefined,
-    [transactionStatus, clearComponent]
+    [transactionStatus]
   )
 
   const fullLoadingMessage = useMemo(
@@ -163,7 +165,7 @@ export const Contents = () => {
         ? transactionStatus.getFailure()
         : transactionStatus.isLoading()
         ? 'Working...'
-        : 'Redeeming finished!',
+        : `Redeeming of ${transactionStatus.get()} finished!`,
     [transactionStatus]
   )
 
