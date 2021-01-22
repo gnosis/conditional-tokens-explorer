@@ -81,6 +81,7 @@ export type Web3Status =
 
 export interface ConnectedWeb3Context {
   status: Web3Status
+  connectModalOpen: boolean
   connect: () => void
   disconnect: () => void
   toggleCPK: () => void
@@ -113,6 +114,7 @@ export const Web3ContextProvider = ({ children }: Props) => {
     ? { _type: Web3ContextStatus.Connecting }
     : { _type: Web3ContextStatus.NotAsked }
   const [web3Status, setWeb3Status] = React.useState<Web3Status>(web3StatusDefault)
+  const [connectModalOpen, setConnectModalOpen] = React.useState(false)
 
   const { getValue, setValue } = useLocalStorage(`isUsingTheCPK`)
 
@@ -222,9 +224,12 @@ export const Web3ContextProvider = ({ children }: Props) => {
     }
     let web3Provider: Web3Provider
     try {
+      setConnectModalOpen(true)
       web3Provider = await web3Modal.connect()
+      setConnectModalOpen(false)
     } catch (error) {
-      if (error.match(/modal closed/i)) {
+      setConnectModalOpen(false)
+      if (error && error.match(/modal closed/i)) {
         return
       }
       web3Modal.clearCachedProvider()
@@ -318,6 +323,7 @@ export const Web3ContextProvider = ({ children }: Props) => {
     <Web3Context.Provider
       value={{
         status: web3Status,
+        connectModalOpen,
         connect: connectWeb3Modal,
         disconnect: disconnectWeb3Modal,
         toggleCPK,

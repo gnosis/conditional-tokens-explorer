@@ -18,8 +18,11 @@ import { TermsAndConditions } from 'pages/TermsAndConditions'
 
 const ProtectedRoute: React.FC<RouteProps> = (props) => {
   const { component, path } = props
-  const { status } = useWeb3Context()
+  const { connectModalOpen, status } = useWeb3Context()
 
+  if (connectModalOpen) {
+    return <InfoCard message="Waiting for user to connect..." title="Error" />
+  }
   return (
     <>
       {status._type === Web3ContextStatus.Error && (
