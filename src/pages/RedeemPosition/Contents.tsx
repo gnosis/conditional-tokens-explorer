@@ -242,7 +242,7 @@ export const Contents = () => {
         <Row>
           <StatusInfoInline status={StatusInfoType.warning}>
             The redeemed balance is 0.00. You will not receive any {token && token.symbol} to your
-            wallet
+            wallet.
           </StatusInfoInline>
         </Row>
       )}
