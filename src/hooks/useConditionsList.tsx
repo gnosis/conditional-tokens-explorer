@@ -30,7 +30,7 @@ export const useConditionsList = (advancedFilter: AdvancedFilterConditions) => {
 
   const activeAddress = useActiveAddress()
 
-  const query = buildQueryConditionsList(advancedFilter)
+  const query = buildQueryConditionsList(advancedFilter, activeAddress)
   const variables = useMemo(() => {
     const variables: Variables = {}
 

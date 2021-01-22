@@ -62,7 +62,8 @@ const conditionFragment = gql`
   }
 `
 export const buildQueryConditionsList = (
-  advancedFilter: AdvancedFilterConditions = DEFAULT_OPTIONS_LIST
+  advancedFilter: AdvancedFilterConditions = DEFAULT_OPTIONS_LIST,
+  activeAddress: Maybe<string>
 ) => {
   const {
     ConditionType: ConditionTypeFilter,
@@ -77,7 +78,9 @@ export const buildQueryConditionsList = (
 
   const whereClauseInternal = [
     ReporterOracle.type === OracleFilterOptions.Custom ? 'oracle_not_in: $oracleNotIn' : '',
-    ReporterOracle.type === OracleFilterOptions.Current ||
+    ReporterOracle.type === OracleFilterOptions.Current && activeAddress
+      ? 'oracle_in: $oracleIn'
+      : '',
     ReporterOracle.type === OracleFilterOptions.Kleros ||
     ReporterOracle.type === OracleFilterOptions.Reality
       ? 'oracle_in: $oracleIn'
@@ -109,7 +112,9 @@ export const buildQueryConditionsList = (
 
   const variablesClauseInternal = [
     ReporterOracle.type === OracleFilterOptions.Custom ? '$oracleNotIn: [String]' : '',
-    ReporterOracle.type === OracleFilterOptions.Current ||
+    ReporterOracle.type === OracleFilterOptions.Current && activeAddress
+      ? '$oracleIn: [String]'
+      : '',
     ReporterOracle.type === OracleFilterOptions.Kleros ||
     ReporterOracle.type === OracleFilterOptions.Reality
       ? '$oracleIn: [String]'
