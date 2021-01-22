@@ -10,10 +10,12 @@ import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer
 import { Row } from 'components/pureStyledComponents/Row'
 import { PositionPreview } from 'components/redeemPosition/PositionPreview'
 import { FullLoading } from 'components/statusInfo/FullLoading'
+import { StatusInfoInline, StatusInfoType } from 'components/statusInfo/StatusInfoInline'
 import { IconTypes } from 'components/statusInfo/common'
 import { SelectablePositionTable } from 'components/table/SelectablePositionTable'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { useActiveAddress } from 'hooks/useActiveAddress'
+import { useCollateral } from 'hooks/useCollateral'
 import { useCondition } from 'hooks/useCondition'
 import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
 import { getLogger } from 'util/logger'
@@ -47,6 +49,8 @@ export const Contents = () => {
   }, [])
 
   const { condition, loading: loadingCondition } = useCondition(conditionId)
+
+  const { collateral: token } = useCollateral(position ? position.collateralToken : '')
 
   const clearComponent = useCallback(() => {
     setPosition(null)
@@ -234,6 +238,14 @@ export const Contents = () => {
           position={position}
         />
       </Row>
+      {redeemedBalance && redeemedBalance.isZero() && conditionId && (
+        <Row>
+          <StatusInfoInline status={StatusInfoType.warning}>
+            The redeemed balance is 0.00. You will not receive any {token && token.symbol} to your
+            wallet
+          </StatusInfoInline>
+        </Row>
+      )}
       {isWorking && (
         <FullLoading
           actionButton={fullLoadingActionButton}
