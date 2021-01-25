@@ -10,6 +10,7 @@ import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer
 import { Row } from 'components/pureStyledComponents/Row'
 import { PositionPreview } from 'components/redeemPosition/PositionPreview'
 import { FullLoading } from 'components/statusInfo/FullLoading'
+import { StatusInfoInline, StatusInfoType } from 'components/statusInfo/StatusInfoInline'
 import { IconTypes } from 'components/statusInfo/common'
 import { SelectablePositionTable } from 'components/table/SelectablePositionTable'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
@@ -236,6 +237,19 @@ export const Contents = () => {
           position={position}
         />
       </Row>
+      {redeemedBalance &&
+        redeemedBalance.isZero() &&
+        conditionId &&
+        !loadingCondition &&
+        position &&
+        position.conditionIds.length < 2 && (
+          <Row>
+            <StatusInfoInline status={StatusInfoType.warning}>
+              The redeemed balance is 0.00. You will not receive any {token && token.symbol} to your
+              wallet.
+            </StatusInfoInline>
+          </Row>
+        )}
       {isWorking && (
         <FullLoading
           actionButton={fullLoadingActionButton}
