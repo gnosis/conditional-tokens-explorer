@@ -314,6 +314,11 @@ const networks: { [K in NetworkIds]: Network } = {
         decimals: 18,
       },
       {
+        symbol: 'WXDAI',
+        address: '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d',
+        decimals: 18,
+      },
+      {
         symbol: 'USDC',
         address: '0xddafbb505ad214d7b80b1f830fccc89b60fb7a83',
         decimals: 6,
