@@ -69,6 +69,11 @@ export interface PaginatedConditionsVariables {
 // GraphQL query operation: ConditionsList
 // ====================================================
 
+export interface ConditionsList_conditions_question {
+  __typename: "Question";
+  title: string | null;
+}
+
 export interface ConditionsList_conditions {
   __typename: "Condition";
   id: string;
@@ -83,6 +88,8 @@ export interface ConditionsList_conditions {
   payoutDenominator: any | null;
   resolveTimestamp: any | null;
   resolveBlockNumber: any | null;
+  outcomes: string[] | null;
+  question: ConditionsList_conditions_question | null;
 }
 
 export interface ConditionsList {
@@ -98,6 +105,11 @@ export interface ConditionsList {
 // GraphQL query operation: GetCondition
 // ====================================================
 
+export interface GetCondition_condition_question {
+  __typename: "Question";
+  title: string | null;
+}
+
 export interface GetCondition_condition {
   __typename: "Condition";
   id: string;
@@ -112,6 +124,8 @@ export interface GetCondition_condition {
   payoutDenominator: any | null;
   resolveTimestamp: any | null;
   resolveBlockNumber: any | null;
+  outcomes: string[] | null;
+  question: GetCondition_condition_question | null;
 }
 
 export interface GetCondition {
@@ -590,6 +604,11 @@ export interface UserPositionBalancesVariables {
 // GraphQL fragment: ConditionData
 // ====================================================
 
+export interface ConditionData_question {
+  __typename: "Question";
+  title: string | null;
+}
+
 export interface ConditionData {
   __typename: "Condition";
   id: string;
@@ -604,6 +623,8 @@ export interface ConditionData {
   payoutDenominator: any | null;
   resolveTimestamp: any | null;
   resolveBlockNumber: any | null;
+  outcomes: string[] | null;
+  question: ConditionData_question | null;
 }
 
 /* tslint:disable */

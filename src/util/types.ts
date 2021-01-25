@@ -143,6 +143,7 @@ export type Arbitrator = {
 export interface OutcomeProps {
   id: string
   value: number
+  text?: string
 }
 
 export enum SplitFromType {
