@@ -1,3 +1,4 @@
+import { ethers } from 'ethers'
 import { useMemo } from 'react'
 
 import { useActiveAddress } from 'hooks/useActiveAddress'
@@ -39,6 +40,9 @@ export const useConditionsList = (advancedFilter: AdvancedFilterConditions) => {
     }
     if (ReporterOracle.type === OracleFilterOptions.Current && activeAddress) {
       variables['oracleIn'] = [activeAddress.toLowerCase()]
+    }
+    if (ReporterOracle.type === OracleFilterOptions.Current && !activeAddress) {
+      variables['oracleIn'] = [ethers.constants.HashZero]
     }
     if (
       ReporterOracle.type === OracleFilterOptions.Kleros ||
