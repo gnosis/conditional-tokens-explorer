@@ -3,7 +3,6 @@ import styled from 'styled-components'
 
 import { ButtonAdd } from 'components/buttons/ButtonAdd'
 import { ButtonControl, ButtonControlType } from 'components/buttons/ButtonControl'
-import { ErrorContainer, Error as ErrorMessage } from 'components/pureStyledComponents/Error'
 import { Row } from 'components/pureStyledComponents/Row'
 import { SmallNote } from 'components/pureStyledComponents/SmallNote'
 import {
@@ -310,11 +309,6 @@ export const AddOutcome: React.FC<Props> = (props) => {
                 <StripedListEmpty>No outcomes.</StripedListEmpty>
               )}
             </StripedList>
-            {areOutcomesBeingEdited && (
-              <ErrorContainer>
-                <ErrorMessage>Unsaved changes</ErrorMessage>
-              </ErrorContainer>
-            )}
             <SmallNote>
               <strong>Note:</strong> Omen supports min. {MIN_OUTCOMES_ALLOWED} and max.{' '}
               {MAX_OUTCOMES_ALLOWED} outcomes.
