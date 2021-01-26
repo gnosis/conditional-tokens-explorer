@@ -21,7 +21,7 @@ const ProtectedRoute: React.FC<RouteProps> = (props) => {
   const { connectModalOpen, status } = useWeb3Context()
 
   if (connectModalOpen) {
-    return <InfoCard message="Waiting for user to connect..." title="Error" />
+    return <InfoCard message="You need to unlock or connect your wallet..." title="Error" />
   }
   return (
     <>
