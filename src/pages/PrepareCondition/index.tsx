@@ -418,6 +418,10 @@ export const PrepareCondition = () => {
     CPKService,
   ])
 
+  const areOutcomesBeingEdited = useMemo(() => outcomesBeingEdited.some(Boolean), [
+    outcomesBeingEdited,
+  ])
+
   const onClickUseMyWallet = useCallback(() => {
     if (status === Web3ContextStatus.Connected && activeAddress) {
       setValueCustomCondition('oracle', activeAddress, true)
@@ -440,16 +444,18 @@ export const PrepareCondition = () => {
           prepareConditionStatus.isFailure() ||
           checkForExistingCondition.isLoading() ||
           checkForExistingCondition.isFailure() ||
+          areOutcomesBeingEdited ||
           isConditionAlreadyExist ||
           isQuestionAlreadyExist ||
           isOutcomesFromOmenConditionInvalid,
     [
-      isValidCustomCondition,
       conditionType,
-      isValidOmenCondition,
+      isValidCustomCondition,
       prepareConditionStatus,
       checkForExistingCondition,
       isConditionAlreadyExist,
+      isValidOmenCondition,
+      areOutcomesBeingEdited,
       isQuestionAlreadyExist,
       isOutcomesFromOmenConditionInvalid,
     ]
@@ -566,10 +572,6 @@ export const PrepareCondition = () => {
 
   const todayLocalized = moment(today).format('LL')
   const maxDateLocalized = moment(MAX_DATE).format('LL')
-
-  const areOutcomesBeingEdited = useMemo(() => outcomesBeingEdited.some(Boolean), [
-    outcomesBeingEdited,
-  ])
 
   return (
     <>
@@ -754,6 +756,7 @@ export const PrepareCondition = () => {
             )}
             <AddOutcome
               addOutcome={addOutcome}
+              areOutcomesBeingEdited={areOutcomesBeingEdited}
               onChange={onChangeOutcome}
               outcome={outcome}
               outcomes={outcomes}
@@ -761,11 +764,6 @@ export const PrepareCondition = () => {
               toggleEditOutcome={toggleEditOutcome}
               updateOutcome={updateOutcome}
             />
-            {areOutcomesBeingEdited && !submitDisabled && (
-              <ErrorContainer>
-                <ErrorMessage>Unsaved changes</ErrorMessage>
-              </ErrorContainer>
-            )}
             <Row>
               <TitleValue
                 title="Resolution Date"
