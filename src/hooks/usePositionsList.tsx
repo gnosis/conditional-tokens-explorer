@@ -114,7 +114,8 @@ export const usePositionsList = (
   React.useEffect(() => {
     // The use of loadingPositions act as a blocker when the useQuery is executing again
     if (loadingPositions || loadingUserData) setData(Remote.loading)
-    if (positionsData && userData) {
+    const existUserData = activeAddress ? userData : true
+    if (positionsData && existUserData) {
       setData(Remote.loading)
 
       const positionListData = marshalPositionListData(positionsData, userData?.user)
@@ -200,7 +201,15 @@ export const usePositionsList = (
       }
       fetchUserBalanceWithDecimals()
     }
-  }, [loadingPositions, loadingUserData, positionsData, userData, networkConfig, provider])
+  }, [
+    loadingPositions,
+    loadingUserData,
+    activeAddress,
+    positionsData,
+    userData,
+    networkConfig,
+    provider,
+  ])
 
   const error = React.useMemo(() => positionsError || userError, [positionsError, userError])
 
