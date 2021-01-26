@@ -89,9 +89,11 @@ const EditableOutcome: React.FC<{
   removeOutcome: () => void
   updateOutcome: (value: string, index: number) => void
   onEditOutcome: (value: boolean, index: number) => void
+  onBluredEditingOutcome: (value: boolean) => void
 }> = (props) => {
   const {
     areOutcomesBeingEdited,
+    onBluredEditingOutcome,
     onEditOutcome,
     outcomeIndex,
     outcomeText,
@@ -156,12 +158,19 @@ const EditableOutcome: React.FC<{
     areOutcomesBeingEdited,
   ])
 
+  const onBlurOutcome = useCallback(() => {
+    console.log('lose focus, isEditing: ', isEditing)
+    onBluredEditingOutcome(isEditing)
+  }, [isEditing, onBluredEditingOutcome])
+
   return (
     <OutcomeWrapper title={value} {...restProps}>
       <Outcome
         autoComplete="off"
         error={!isOutcomeValueOK}
+        onBlur={() => onBlurOutcome()}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.currentTarget.value)}
+        onFocus={() => onBluredEditingOutcome(false)}
         onKeyUp={(e: React.KeyboardEvent<HTMLInputElement>) => {
           onPressEnter(e)
         }}
@@ -258,6 +267,8 @@ export const AddOutcome: React.FC<Props> = (props) => {
     }
   }
 
+  const [bluredEditingOutcome, setBluredEditingOutcome] = useState(false)
+
   return (
     <Row {...restProps}>
       <TitleValue
@@ -290,6 +301,7 @@ export const AddOutcome: React.FC<Props> = (props) => {
                   <StripedListItem key={`${index}_${item}`}>
                     <EditableOutcome
                       areOutcomesBeingEdited={areOutcomesBeingEdited}
+                      onBluredEditingOutcome={(value) => setBluredEditingOutcome(value)}
                       onEditOutcome={(value, index) => toggleEditOutcome(value, index)}
                       outcomeIndex={index}
                       outcomeText={item}
@@ -303,7 +315,7 @@ export const AddOutcome: React.FC<Props> = (props) => {
                 <StripedListEmpty>No outcomes.</StripedListEmpty>
               )}
             </StripedList>
-            {areOutcomesBeingEdited && true && (
+            {areOutcomesBeingEdited && bluredEditingOutcome && (
               <ErrorContainer>
                 <ErrorMessage>Unsaved changes</ErrorMessage>
               </ErrorContainer>
