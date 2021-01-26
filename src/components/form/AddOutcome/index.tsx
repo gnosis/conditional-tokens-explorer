@@ -1,4 +1,4 @@
-import React, { createRef, useCallback, useMemo, useState } from 'react'
+import React, { createRef, useCallback, useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
 import { ButtonAdd } from 'components/buttons/ButtonAdd'
@@ -159,6 +159,12 @@ const EditableOutcome: React.FC<{
   const onBlurOutcome = useCallback(() => {
     setBluredEditingOutcome(isEditing)
   }, [isEditing, setBluredEditingOutcome])
+
+  useEffect(() => {
+    if (!isEditing) {
+      setBluredEditingOutcome(false)
+    }
+  }, [isEditing])
 
   return (
     <OutcomeWrapper title={value} {...restProps}>
