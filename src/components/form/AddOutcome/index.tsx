@@ -89,11 +89,9 @@ const EditableOutcome: React.FC<{
   removeOutcome: () => void
   updateOutcome: (value: string, index: number) => void
   onEditOutcome: (value: boolean, index: number) => void
-  onBluredEditingOutcome: (value: boolean) => void
 }> = (props) => {
   const {
     areOutcomesBeingEdited,
-    onBluredEditingOutcome,
     onEditOutcome,
     outcomeIndex,
     outcomeText,
@@ -103,6 +101,7 @@ const EditableOutcome: React.FC<{
     ...restProps
   } = props
   const [isEditing, setIsEditing] = useState(false)
+  const [bluredEditingOutcome, setBluredEditingOutcome] = useState(false)
   const [value, setValue] = useState<string | undefined>(outcomeText)
   const outcomeField = createRef<HTMLInputElement>()
 
@@ -159,18 +158,17 @@ const EditableOutcome: React.FC<{
   ])
 
   const onBlurOutcome = useCallback(() => {
-    console.log('lose focus, isEditing: ', isEditing)
-    onBluredEditingOutcome(isEditing)
-  }, [isEditing, onBluredEditingOutcome])
+    setBluredEditingOutcome(isEditing)
+  }, [isEditing, setBluredEditingOutcome])
 
   return (
     <OutcomeWrapper title={value} {...restProps}>
       <Outcome
         autoComplete="off"
-        error={!isOutcomeValueOK}
+        error={!isOutcomeValueOK || bluredEditingOutcome}
         onBlur={() => onBlurOutcome()}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.currentTarget.value)}
-        onFocus={() => onBluredEditingOutcome(false)}
+        onFocus={() => setBluredEditingOutcome(false)}
         onKeyUp={(e: React.KeyboardEvent<HTMLInputElement>) => {
           onPressEnter(e)
         }}
@@ -267,8 +265,6 @@ export const AddOutcome: React.FC<Props> = (props) => {
     }
   }
 
-  const [bluredEditingOutcome, setBluredEditingOutcome] = useState(false)
-
   return (
     <Row {...restProps}>
       <TitleValue
@@ -301,7 +297,6 @@ export const AddOutcome: React.FC<Props> = (props) => {
                   <StripedListItem key={`${index}_${item}`}>
                     <EditableOutcome
                       areOutcomesBeingEdited={areOutcomesBeingEdited}
-                      onBluredEditingOutcome={(value) => setBluredEditingOutcome(value)}
                       onEditOutcome={(value, index) => toggleEditOutcome(value, index)}
                       outcomeIndex={index}
                       outcomeText={item}
@@ -315,7 +310,7 @@ export const AddOutcome: React.FC<Props> = (props) => {
                 <StripedListEmpty>No outcomes.</StripedListEmpty>
               )}
             </StripedList>
-            {areOutcomesBeingEdited && bluredEditingOutcome && (
+            {areOutcomesBeingEdited && (
               <ErrorContainer>
                 <ErrorMessage>Unsaved changes</ErrorMessage>
               </ErrorContainer>
