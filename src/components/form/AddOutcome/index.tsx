@@ -82,6 +82,7 @@ const isOutcomeTextValid = (outcome: string | undefined): boolean => {
 }
 
 const EditableOutcome: React.FC<{
+  areOutcomesBeingEdited: boolean
   outcomeIndex: number
   outcomeText: string | undefined
   outcomes: Array<string | undefined>
@@ -90,6 +91,7 @@ const EditableOutcome: React.FC<{
   onEditOutcome: (value: boolean, index: number) => void
 }> = (props) => {
   const {
+    areOutcomesBeingEdited,
     onEditOutcome,
     outcomeIndex,
     outcomeText,
@@ -149,6 +151,11 @@ const EditableOutcome: React.FC<{
     [isOutcomeValueOK, onSave, resetValue, outcomeIndex]
   )
 
+  const isEditingOther = useMemo(() => !isEditing && areOutcomesBeingEdited, [
+    isEditing,
+    areOutcomesBeingEdited,
+  ])
+
   return (
     <OutcomeWrapper title={value} {...restProps}>
       <Outcome
@@ -165,7 +172,7 @@ const EditableOutcome: React.FC<{
         value={value}
       />
       <Controls isEditing={isEditing}>
-        {!isEditing && (
+        {!isEditing && !isEditingOther && (
           <ButtonControl
             buttonType={ButtonControlType.edit}
             onClick={() => {
@@ -199,16 +206,18 @@ const EditableOutcome: React.FC<{
             title="Cancel"
           />
         )}
-        <ButtonControl
-          buttonType={ButtonControlType.delete}
-          disabled={isEditing}
-          onClick={() => {
-            removeOutcome()
-            setIsEditing(false)
-            onEditOutcome(false, outcomeIndex)
-          }}
-          title="Remove"
-        />
+        {!isEditingOther && (
+          <ButtonControl
+            buttonType={ButtonControlType.delete}
+            disabled={isEditing}
+            onClick={() => {
+              removeOutcome()
+              setIsEditing(false)
+              onEditOutcome(false, outcomeIndex)
+            }}
+            title="Remove"
+          />
+        )}
       </Controls>
     </OutcomeWrapper>
   )
@@ -280,6 +289,7 @@ export const AddOutcome: React.FC<Props> = (props) => {
                 outcomes.map((item, index) => (
                   <StripedListItem key={`${index}_${item}`}>
                     <EditableOutcome
+                      areOutcomesBeingEdited={areOutcomesBeingEdited}
                       onEditOutcome={(value, index) => toggleEditOutcome(value, index)}
                       outcomeIndex={index}
                       outcomeText={item}
