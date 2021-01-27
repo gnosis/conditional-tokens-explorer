@@ -1,4 +1,4 @@
-import React, { createRef, useCallback, useMemo, useState } from 'react'
+import React, { createRef, useCallback, useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
 import { ButtonAdd } from 'components/buttons/ButtonAdd'
@@ -81,14 +81,26 @@ const isOutcomeTextValid = (outcome: string | undefined): boolean => {
 }
 
 const EditableOutcome: React.FC<{
+  areOutcomesBeingEdited: boolean
   outcomeIndex: number
   outcomeText: string | undefined
   outcomes: Array<string | undefined>
   removeOutcome: () => void
   updateOutcome: (value: string, index: number) => void
+  onEditOutcome: (value: boolean, index: number) => void
 }> = (props) => {
-  const { outcomeIndex, outcomeText, outcomes, removeOutcome, updateOutcome, ...restProps } = props
+  const {
+    areOutcomesBeingEdited,
+    onEditOutcome,
+    outcomeIndex,
+    outcomeText,
+    outcomes,
+    removeOutcome,
+    updateOutcome,
+    ...restProps
+  } = props
   const [isEditing, setIsEditing] = useState(false)
+  const [bluredEditingOutcome, setBluredEditingOutcome] = useState(false)
   const [value, setValue] = useState<string | undefined>(outcomeText)
   const outcomeField = createRef<HTMLInputElement>()
 
@@ -118,8 +130,10 @@ const EditableOutcome: React.FC<{
     if (value) {
       saveSanitizedValue(value)
       setIsEditing(false)
+      onEditOutcome(false, outcomeIndex)
       updateOutcome(value, outcomeIndex)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [updateOutcome, setIsEditing, saveSanitizedValue, value, outcomeIndex])
 
   const onPressEnter = useCallback(
@@ -130,17 +144,36 @@ const EditableOutcome: React.FC<{
       if (e.key === 'Escape') {
         resetValue()
         setIsEditing(false)
+        onEditOutcome(false, outcomeIndex)
       }
     },
-    [setIsEditing, resetValue, isOutcomeValueOK, onSave]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isOutcomeValueOK, onSave, resetValue, outcomeIndex]
   )
+
+  const isEditingOther = useMemo(() => !isEditing && areOutcomesBeingEdited, [
+    isEditing,
+    areOutcomesBeingEdited,
+  ])
+
+  const onBlurOutcome = useCallback(() => {
+    setBluredEditingOutcome(isEditing)
+  }, [isEditing, setBluredEditingOutcome])
+
+  useEffect(() => {
+    if (!isEditing) {
+      setBluredEditingOutcome(false)
+    }
+  }, [isEditing])
 
   return (
     <OutcomeWrapper title={value} {...restProps}>
       <Outcome
         autoComplete="off"
-        error={!isOutcomeValueOK}
+        error={!isOutcomeValueOK || bluredEditingOutcome}
+        onBlur={() => onBlurOutcome()}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.currentTarget.value)}
+        onFocus={() => setBluredEditingOutcome(false)}
         onKeyUp={(e: React.KeyboardEvent<HTMLInputElement>) => {
           onPressEnter(e)
         }}
@@ -151,11 +184,12 @@ const EditableOutcome: React.FC<{
         value={value}
       />
       <Controls isEditing={isEditing}>
-        {!isEditing && (
+        {!isEditing && !isEditingOther && (
           <ButtonControl
             buttonType={ButtonControlType.edit}
             onClick={() => {
               setIsEditing(true)
+              onEditOutcome(true, outcomeIndex)
               outcomeField.current?.focus()
             }}
             title="Edit"
@@ -179,19 +213,23 @@ const EditableOutcome: React.FC<{
             onClick={() => {
               resetValue()
               setIsEditing(false)
+              onEditOutcome(false, outcomeIndex)
             }}
             title="Cancel"
           />
         )}
-        <ButtonControl
-          buttonType={ButtonControlType.delete}
-          disabled={isEditing}
-          onClick={() => {
-            removeOutcome()
-            setIsEditing(false)
-          }}
-          title="Remove"
-        />
+        {!isEditingOther && (
+          <ButtonControl
+            buttonType={ButtonControlType.delete}
+            disabled={isEditing}
+            onClick={() => {
+              removeOutcome()
+              setIsEditing(false)
+              onEditOutcome(false, outcomeIndex)
+            }}
+            title="Remove"
+          />
+        )}
       </Controls>
     </OutcomeWrapper>
   )
@@ -204,15 +242,19 @@ interface Props {
   outcomes: Array<string>
   removeOutcome: (index: number) => void
   updateOutcome: (value: string, index: number) => void
+  toggleEditOutcome: (value: boolean, index: number) => void
+  areOutcomesBeingEdited: boolean
 }
 
 export const AddOutcome: React.FC<Props> = (props) => {
   const {
     addOutcome,
+    areOutcomesBeingEdited,
     onChange,
     outcome = '',
     outcomes,
     removeOutcome,
+    toggleEditOutcome,
     updateOutcome,
     ...restProps
   } = props
@@ -259,6 +301,8 @@ export const AddOutcome: React.FC<Props> = (props) => {
                 outcomes.map((item, index) => (
                   <StripedListItem key={`${index}_${item}`}>
                     <EditableOutcome
+                      areOutcomesBeingEdited={areOutcomesBeingEdited}
+                      onEditOutcome={(value, index) => toggleEditOutcome(value, index)}
                       outcomeIndex={index}
                       outcomeText={item}
                       outcomes={outcomes}
