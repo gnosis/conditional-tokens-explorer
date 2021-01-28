@@ -101,7 +101,6 @@ const web3Modal = new Web3Modal({
       package: WalletConnectProvider,
       options: {
         infuraId: INFURA_ID,
-        bridge: 'https://safe-walletconnect.gnosis.io',
         rpc: {
           100: 'https://xdai-archive.blockscout.com',
         },
