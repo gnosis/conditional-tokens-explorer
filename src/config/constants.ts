@@ -148,6 +148,10 @@ export const ARBITRATOR_REALITY_ADDRESS_XDAI =
   process.env.REACT_APP_ARBITRATOR_REALITY_ADDRESS_XDAI ||
   '0x7202deD6f13525A8298Ea53fBFD4395fDCc8d5f1'
 
+export const RPC_XDAI_CHAIN =
+  process.env.REACT_APP_RPC_XDAI_CHAIN ||
+  'https://lively-empty-wind.xdai.quiknode.pro/827b90b45d544848ea8a880d30567297d3c9ef6e/'
+
 export const CONFIRMATIONS_TO_WAIT = Number(process.env.REACT_APP_CONFIRMATIONS_TO_WAIT || 4)
 
 export const GOOGLE_ANALYTICS_ID = process.env.REACT_APP_GOOGLE_ANALYTICS_ID || null

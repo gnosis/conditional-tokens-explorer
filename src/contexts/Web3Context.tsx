@@ -4,7 +4,7 @@ import React from 'react'
 import Web3Modal from 'web3modal'
 
 import WalletConnectProvider from '@walletconnect/web3-provider'
-import { DEFAULT_NETWORK_ID, INFURA_ID } from 'config/constants'
+import { DEFAULT_NETWORK_ID, INFURA_ID, RPC_XDAI_CHAIN } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
 import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { ConditionalTokensService } from 'services/conditionalTokens'
@@ -102,7 +102,7 @@ const web3Modal = new Web3Modal({
       options: {
         infuraId: INFURA_ID,
         rpc: {
-          100: 'https://xdai-archive.blockscout.com',
+          100: RPC_XDAI_CHAIN,
         },
       },
     },
