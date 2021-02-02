@@ -162,21 +162,38 @@ export const PrepareCondition = () => {
   const [conditionType, setConditionType] = useState<ConditionType>(ConditionType.custom)
   const [outcomes, setOutcomes] = useState<Array<string>>([])
   const [outcome, setOutcome] = useState<string>('')
+  const [outcomesBeingEdited, setOutcomesBeingEdited] = useState<boolean[]>([])
 
   const addOutcome = useCallback(() => {
     const sanitizedOutcome = outcome.trim()
     const outcomesCloned = lodashClonedeep(outcomes)
     setOutcome('')
     setOutcomes([...outcomesCloned, sanitizedOutcome])
-  }, [outcome, outcomes, setOutcomes])
+    setOutcomesBeingEdited([...outcomesBeingEdited, false])
+  }, [outcome, outcomes, outcomesBeingEdited])
 
   const removeOutcome = useCallback(
     (index: number) => {
       const outcomesCloned = lodashClonedeep(outcomes)
       outcomesCloned.splice(index, 1)
       setOutcomes([...outcomesCloned])
+      setOutcomesBeingEdited([
+        ...outcomesBeingEdited.slice(0, index),
+        ...outcomesBeingEdited.slice(index + 1),
+      ])
     },
-    [outcomes]
+    [outcomes, outcomesBeingEdited]
+  )
+
+  const toggleEditOutcome = useCallback(
+    (value: boolean, index: number) => {
+      setOutcomesBeingEdited([
+        ...outcomesBeingEdited.slice(0, index),
+        value,
+        ...outcomesBeingEdited.slice(index + 1),
+      ])
+    },
+    [outcomesBeingEdited]
   )
 
   const updateOutcome = useCallback(
@@ -401,6 +418,10 @@ export const PrepareCondition = () => {
     CPKService,
   ])
 
+  const areOutcomesBeingEdited = useMemo(() => outcomesBeingEdited.some(Boolean), [
+    outcomesBeingEdited,
+  ])
+
   const onClickUseMyWallet = useCallback(() => {
     if (status === Web3ContextStatus.Connected && activeAddress) {
       setValueCustomCondition('oracle', activeAddress, true)
@@ -423,16 +444,18 @@ export const PrepareCondition = () => {
           prepareConditionStatus.isFailure() ||
           checkForExistingCondition.isLoading() ||
           checkForExistingCondition.isFailure() ||
+          areOutcomesBeingEdited ||
           isConditionAlreadyExist ||
           isQuestionAlreadyExist ||
           isOutcomesFromOmenConditionInvalid,
     [
-      isValidCustomCondition,
       conditionType,
-      isValidOmenCondition,
+      isValidCustomCondition,
       prepareConditionStatus,
       checkForExistingCondition,
       isConditionAlreadyExist,
+      isValidOmenCondition,
+      areOutcomesBeingEdited,
       isQuestionAlreadyExist,
       isOutcomesFromOmenConditionInvalid,
     ]
@@ -733,10 +756,12 @@ export const PrepareCondition = () => {
             )}
             <AddOutcome
               addOutcome={addOutcome}
+              areOutcomesBeingEdited={areOutcomesBeingEdited}
               onChange={onChangeOutcome}
               outcome={outcome}
               outcomes={outcomes}
               removeOutcome={removeOutcome}
+              toggleEditOutcome={toggleEditOutcome}
               updateOutcome={updateOutcome}
             />
             <Row>
@@ -898,6 +923,7 @@ export const PrepareCondition = () => {
               {newCustomConditionStatusInfo.contents}
             </StatusInfoInline>
           )}
+
         <ButtonContainer>
           <Button disabled={submitDisabled} onClick={prepareCondition}>
             Prepare
