@@ -1,22 +1,44 @@
 import UniswapTokens from '@uniswap/default-token-list'
 import {
+  ARBITRATOR_KLEROS_ADDRESS_GANACHE,
+  ARBITRATOR_KLEROS_ADDRESS_MAINNET,
+  ARBITRATOR_KLEROS_ADDRESS_RINKEBY,
+  ARBITRATOR_KLEROS_ADDRESS_XDAI,
+  ARBITRATOR_REALITY_ADDRESS_GANACHE,
+  ARBITRATOR_REALITY_ADDRESS_MAINNET,
+  ARBITRATOR_REALITY_ADDRESS_RINKEBY,
+  ARBITRATOR_REALITY_ADDRESS_XDAI,
   CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_GANACHE,
   CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_MAINNET,
   CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_RINKEBY,
+  CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_XDAI,
   CTE_GRAPH_HTTP_GANACHE,
   CTE_GRAPH_HTTP_MAINNET,
   CTE_GRAPH_HTTP_RINKEBY,
+  CTE_GRAPH_HTTP_XDAI,
   EARLIEST_GANACHE_BLOCK_TO_CHECK,
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
   EARLIEST_RINKEBY_BLOCK_TO_CHECK,
+  EARLIEST_XDAI_BLOCK_TO_CHECK,
   OMEN_GRAPH_HTTP_MAINNET,
   OMEN_GRAPH_HTTP_RINKEBY,
+  OMEN_GRAPH_HTTP_XDAI,
+  ORACLE_KLEROS_ADDRESS_GANACHE,
+  ORACLE_KLEROS_ADDRESS_MAINNET,
+  ORACLE_KLEROS_ADDRESS_RINKEBY,
+  ORACLE_KLEROS_ADDRESS_XDAI,
+  ORACLE_REALITY_ADDRESS_GANACHE,
+  ORACLE_REALITY_ADDRESS_MAINNET,
+  ORACLE_REALITY_ADDRESS_RINKEBY,
+  ORACLE_REALITY_ADDRESS_XDAI,
   REALITY_CONTRACT_ADDRESS_FOR_GANACHE,
   REALITY_CONTRACT_ADDRESS_FOR_MAINNET,
   REALITY_CONTRACT_ADDRESS_FOR_RINKEBY,
+  REALITY_CONTRACT_ADDRESS_FOR_XDAI,
   WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_GANACHE,
   WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_MAINNET,
   WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_RINKEBY,
+  WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_XDAI,
 } from 'config/constants'
 import { Arbitrator, NetworkIds, Oracle, Token } from 'util/types'
 
@@ -105,13 +127,13 @@ const networks: { [K in NetworkIds]: Network } = {
         name: 'kleros',
         description: 'Kleros',
         url: 'https://kleros.io/',
-        address: '0x0000000000000000000000000000000000000000',
+        address: ORACLE_KLEROS_ADDRESS_MAINNET,
       },
       {
         name: 'reality',
         description: 'Reality.eth',
         url: 'http://reality.eth.link/',
-        address: '0x0e414d014a77971f4eaa22ab58e6d84d16ea838e',
+        address: ORACLE_REALITY_ADDRESS_MAINNET,
       },
     ],
     arbitrators: [
@@ -119,13 +141,13 @@ const networks: { [K in NetworkIds]: Network } = {
         name: 'kleros',
         description: 'Kleros',
         url: 'https://kleros.io/',
-        address: '0xd47f72a2d1d0E91b0Ec5e5f5d02B2dc26d00A14D',
+        address: ARBITRATOR_KLEROS_ADDRESS_MAINNET,
       },
       {
         name: 'reality',
         description: 'Reality.eth',
         url: 'https://reality.eth.link/',
-        address: '0xdc0a2185031ecf89f091a39c63c2857a7d5c301a',
+        address: ARBITRATOR_REALITY_ADDRESS_MAINNET,
       },
     ],
     realityTimeout: 86400,
@@ -176,13 +198,13 @@ const networks: { [K in NetworkIds]: Network } = {
         name: 'kleros',
         description: 'Kleros',
         url: 'https://kleros.io/',
-        address: '0x0000000000000000000000000000000000000000',
+        address: ORACLE_KLEROS_ADDRESS_RINKEBY,
       },
       {
         name: 'reality',
         description: 'Reality.eth',
         url: 'https://reality.eth.link/',
-        address: '0x17174dC1b62add32a1DE477A357e75b0dcDEed6E',
+        address: ORACLE_REALITY_ADDRESS_RINKEBY,
       },
     ],
     arbitrators: [
@@ -190,13 +212,13 @@ const networks: { [K in NetworkIds]: Network } = {
         name: 'kleros',
         description: 'Kleros',
         url: 'https://kleros.io/',
-        address: '0xcafa054b1b054581faf65adce667bf1c684b6ef0',
+        address: ARBITRATOR_KLEROS_ADDRESS_RINKEBY,
       },
       {
         name: 'reality',
         description: 'Reality.eth',
         url: 'https://reality.eth.link/',
-        address: '0x02321745bE4a141E78db6C39834396f8df00e2a0',
+        address: ARBITRATOR_REALITY_ADDRESS_RINKEBY,
       },
     ],
     realityTimeout: 10,
@@ -247,13 +269,13 @@ const networks: { [K in NetworkIds]: Network } = {
         name: 'kleros',
         description: 'Kleros',
         url: 'https://kleros.io/',
-        address: '0x0000000000000000000000000000000000000000',
+        address: ORACLE_KLEROS_ADDRESS_GANACHE,
       },
       {
         name: 'reality',
         description: 'Reality.eth',
         url: 'https://reality.eth.link/',
-        address: '0xDb56f2e9369E0D7bD191099125a3f6C370F8ed15',
+        address: ORACLE_REALITY_ADDRESS_GANACHE,
       },
     ],
     arbitrators: [
@@ -261,13 +283,110 @@ const networks: { [K in NetworkIds]: Network } = {
         name: 'kleros',
         description: 'Kleros',
         url: 'https://kleros.io/',
-        address: '0x0000000000000000000000000000000000000000',
+        address: ARBITRATOR_KLEROS_ADDRESS_GANACHE,
       },
       {
         name: 'reality',
         description: 'Reality.eth',
         url: 'https://reality.eth.link/',
-        address: '0x0000000000000000000000000000000000000000',
+        address: ARBITRATOR_REALITY_ADDRESS_GANACHE,
+      },
+    ],
+    realityTimeout: 10,
+  },
+  [NetworkIds.XDAI]: {
+    earliestBlockToCheck: EARLIEST_XDAI_BLOCK_TO_CHECK,
+    contracts: {
+      conditionalTokensAddress: CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_XDAI,
+      realityAddress: REALITY_CONTRACT_ADDRESS_FOR_XDAI,
+      wrapped1155FactoryAddress: WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_XDAI,
+      cpk: {
+        masterCopyAddress: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
+        proxyFactoryAddress: '0xfC7577774887aAE7bAcdf0Fc8ce041DA0b3200f7',
+        multiSendAddress: '0x8D29bE29923b68abfDD21e541b9374737B49cdAD',
+        fallbackHandlerAddress: '0xd5D82B6aDDc9027B22dCA772Aa68D5d74cdBdF44',
+      },
+    },
+    tokens: [
+      {
+        symbol: 'DAI',
+        address: '0x44fa8e6f47987339850636f88629646662444217',
+        decimals: 18,
+      },
+      {
+        symbol: 'WXDAI',
+        address: '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d',
+        decimals: 18,
+      },
+      {
+        symbol: 'USDC',
+        address: '0xddafbb505ad214d7b80b1f830fccc89b60fb7a83',
+        decimals: 6,
+      },
+      // {
+      //   symbol: 'CDAI',
+      //   address: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643',
+      //   decimals: 18,
+      // },
+      {
+        symbol: 'WETH',
+        address: '0x6a023ccd1ff6f2045c3309768ead9e68f978f6e1',
+        decimals: 18,
+      },
+      {
+        symbol: 'OWL',
+        address: '0x0905ab807f8fd040255f0cf8fa14756c1d824931',
+        decimals: 18,
+      },
+      {
+        symbol: 'GNO',
+        address: '0x9c58bacc331c9aa871afd802db6379a98e80cedb',
+        decimals: 18,
+      },
+      // {
+      //   symbol: 'CHAI',
+      //   address: '0x06AF07097C9Eeb7fD685c692751D5C66dB49c215',
+      //   decimals: 18,
+      // },
+      {
+        symbol: 'PNK',
+        address: '0x37b60f4e9a31a64ccc0024dce7d0fd07eaa0f7b3',
+        decimals: 18,
+      },
+      // {
+      //   symbol: 'DXD',
+      //   address: '0xa1d65E8fB6e87b60FECCBc582F7f97804B725521',
+      //   decimals: 18,
+      // },
+    ],
+    CTEGraphHttpUri: CTE_GRAPH_HTTP_XDAI,
+    OMENGraphHttpUri: OMEN_GRAPH_HTTP_XDAI,
+    oracles: [
+      {
+        name: 'kleros',
+        description: 'Kleros',
+        url: 'https://kleros.io/',
+        address: ORACLE_KLEROS_ADDRESS_XDAI,
+      },
+      {
+        name: 'reality',
+        description: 'Reality.eth',
+        url: 'https://reality.eth.link/',
+        address: ORACLE_REALITY_ADDRESS_XDAI,
+      },
+    ],
+    arbitrators: [
+      {
+        name: 'kleros',
+        description: 'Kleros',
+        url: 'https://kleros.io/',
+        address: ARBITRATOR_KLEROS_ADDRESS_XDAI,
+      },
+      {
+        name: 'reality',
+        description: 'Reality.eth',
+        url: 'https://reality.eth.link/',
+        address: ARBITRATOR_REALITY_ADDRESS_XDAI,
       },
     ],
     realityTimeout: 10,
@@ -278,7 +397,7 @@ export class NetworkConfig {
   constructor(public networkId: NetworkIds) {}
 
   static isKnownNetwork(networkId: number): networkId is NetworkIds {
-    return networkId === 1 || networkId === 4 || networkId === 50
+    return [1, 4, 50, 100].includes(networkId)
   }
 
   getNetworkName(): string {
@@ -289,6 +408,8 @@ export class NetworkConfig {
         return 'rinkeby'
       case NetworkIds.GANACHE:
         return 'ganache'
+      case NetworkIds.XDAI:
+        return 'xdai'
       default:
         return 'unknown'
     }
