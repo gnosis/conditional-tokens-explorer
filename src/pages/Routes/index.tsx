@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Redirect, Route, RouteProps, Switch } from 'react-router-dom'
 
 import { InfoCard } from 'components/statusInfo/InfoCard'
@@ -19,10 +19,29 @@ import { TermsAndConditions } from 'pages/TermsAndConditions'
 const ProtectedRoute: React.FC<RouteProps> = (props) => {
   const { component, path } = props
   const { status } = useWeb3Context()
+  const [connectingError, setConnectingError] = useState(false)
+  const typeRef = useRef(status._type)
+  typeRef.current = status._type
+
+  useEffect(() => {
+    let timer: Maybe<number> = null
+    if (typeRef.current === Web3ContextStatus.Connecting) {
+      timer = setTimeout(() => {
+        if (typeRef.current === Web3ContextStatus.Connecting) {
+          setConnectingError(true)
+        }
+      }, 2500)
+    } else {
+      setConnectingError(false)
+    }
+    return () => {
+      timer && clearTimeout(timer)
+    }
+  }, [status])
 
   return (
     <>
-      {status._type === Web3ContextStatus.Connecting && (
+      {connectingError && (
         <InfoCard message="You need to unlock or connect your wallet..." title="Error" />
       )}
       {status._type === Web3ContextStatus.Error && (
