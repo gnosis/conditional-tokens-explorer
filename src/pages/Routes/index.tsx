@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React from 'react'
 import { Redirect, Route, RouteProps, Switch } from 'react-router-dom'
 
 import { InfoCard } from 'components/statusInfo/InfoCard'
 import { Web3ContextStatus, useWeb3Context } from 'contexts/Web3Context'
+import { useIsStateStalled } from 'hooks/useIsStateStalled'
 import { ConditionDetails } from 'pages/ConditionDetails'
 import { ConditionsList } from 'pages/ConditionsList'
 import { CookiePolicy } from 'pages/CookiePolicy'
@@ -19,25 +20,7 @@ import { TermsAndConditions } from 'pages/TermsAndConditions'
 const ProtectedRoute: React.FC<RouteProps> = (props) => {
   const { component, path } = props
   const { status } = useWeb3Context()
-  const [connectingError, setConnectingError] = useState(false)
-  const typeRef = useRef(status._type)
-  typeRef.current = status._type
-
-  useEffect(() => {
-    let timer: Maybe<number> = null
-    if (typeRef.current === Web3ContextStatus.Connecting) {
-      timer = setTimeout(() => {
-        if (typeRef.current === Web3ContextStatus.Connecting) {
-          setConnectingError(true)
-        }
-      }, 2500)
-    } else {
-      setConnectingError(false)
-    }
-    return () => {
-      timer && clearTimeout(timer)
-    }
-  }, [status])
+  const connectingError = useIsStateStalled(status._type, Web3ContextStatus.Connecting, 2500)
 
   return (
     <>
