@@ -81,7 +81,6 @@ export type Web3Status =
 
 export interface ConnectedWeb3Context {
   status: Web3Status
-  connectModalOpen: boolean
   connect: () => void
   disconnect: () => void
   toggleCPK: () => void
@@ -113,11 +112,9 @@ const web3Modal = new Web3Modal({
 const logger = getLogger('Web3Context')
 
 export const Web3ContextProvider = ({ children }: Props) => {
-  const web3StatusDefault: Web3Status = web3Modal.cachedProvider
-    ? { _type: Web3ContextStatus.Connecting }
-    : { _type: Web3ContextStatus.NotAsked }
-  const [web3Status, setWeb3Status] = React.useState<Web3Status>(web3StatusDefault)
-  const [connectModalOpen, setConnectModalOpen] = React.useState(false)
+  const [web3Status, setWeb3Status] = React.useState<Web3Status>({
+    _type: Web3ContextStatus.NotAsked,
+  })
 
   const { getValue, setValue } = useLocalStorage(`isUsingTheCPK`)
 
@@ -222,20 +219,18 @@ export const Web3ContextProvider = ({ children }: Props) => {
   }, [web3Status, resetApp])
 
   const connectWeb3Modal = React.useCallback(async () => {
-    if (web3Status._type === Web3ContextStatus.Connected) {
-      return
-    }
     let web3Provider: Web3Provider
     try {
-      setConnectModalOpen(true)
+      setWeb3Status({ _type: Web3ContextStatus.Connecting })
       web3Provider = await web3Modal.connect()
-      setConnectModalOpen(false)
     } catch (error) {
-      setConnectModalOpen(false)
+      web3Modal.clearCachedProvider()
+
       if (error && error.match(/modal closed/i)) {
+        setWeb3Status({ _type: Web3ContextStatus.NotAsked })
         return
       }
-      web3Modal.clearCachedProvider()
+
       setWeb3Status({ _type: Web3ContextStatus.Error, error } as ErrorWeb3)
       return
     }
@@ -258,6 +253,7 @@ export const Web3ContextProvider = ({ children }: Props) => {
         const CPKService = new CPKServiceClass(cpk, provider, networkConfig)
 
         const address = await signer.getAddress()
+
         setWeb3Status({
           _type: Web3ContextStatus.Connected,
           provider,
@@ -279,13 +275,9 @@ export const Web3ContextProvider = ({ children }: Props) => {
     } catch (error) {
       setWeb3Status({ _type: Web3ContextStatus.Error, error } as ErrorWeb3)
     }
-  }, [web3Status, subscribeProvider])
+  }, [subscribeProvider])
 
   const connectInfura = React.useCallback(async () => {
-    if (web3Status._type === Web3ContextStatus.Infura) {
-      return
-    }
-
     try {
       const provider = new ethers.providers.InfuraProvider(DEFAULT_NETWORK_ID, INFURA_ID)
 
@@ -312,21 +304,26 @@ export const Web3ContextProvider = ({ children }: Props) => {
     } catch (error) {
       setWeb3Status({ _type: Web3ContextStatus.Error, error } as ErrorWeb3)
     }
-  }, [web3Status])
+  }, [])
 
+  // By default try to reach Infura
   React.useEffect(() => {
-    if (web3Modal.cachedProvider) {
-      connectWeb3Modal()
-    } else {
+    if (web3Status._type === Web3ContextStatus.NotAsked) {
       connectInfura()
     }
-  }, [connectWeb3Modal, connectInfura])
+  }, [connectInfura, web3Status._type])
+
+  // If a cachedProvider is present, continue with web3Modal connection
+  React.useEffect(() => {
+    if (web3Modal.cachedProvider && web3Status._type === Web3ContextStatus.Infura) {
+      connectWeb3Modal()
+    }
+  }, [connectWeb3Modal, web3Status._type])
 
   return (
     <Web3Context.Provider
       value={{
         status: web3Status,
-        connectModalOpen,
         connect: connectWeb3Modal,
         disconnect: disconnectWeb3Modal,
         toggleCPK,

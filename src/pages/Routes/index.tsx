@@ -18,13 +18,13 @@ import { TermsAndConditions } from 'pages/TermsAndConditions'
 
 const ProtectedRoute: React.FC<RouteProps> = (props) => {
   const { component, path } = props
-  const { connectModalOpen, status } = useWeb3Context()
+  const { status } = useWeb3Context()
 
-  if (connectModalOpen) {
-    return <InfoCard message="You need to unlock or connect your wallet..." title="Error" />
-  }
   return (
     <>
+      {status._type === Web3ContextStatus.Connecting && (
+        <InfoCard message="You need to unlock or connect your wallet..." title="Error" />
+      )}
       {status._type === Web3ContextStatus.Error && (
         <InfoCard message="Error when trying to connect..." title="Error" />
       )}
