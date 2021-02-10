@@ -95,7 +95,7 @@ export const DateFilter: React.FC<Props> = (props) => {
     (value: string) => {
       checkFromValidity(value)
 
-      const currentMinDate = moment(value).utc().startOf('day').unix()
+      const currentMinDate = moment.utc(value).startOf('day').unix()
 
       const fromTimestamp =
         currentMinDate < minDateUTC
@@ -113,7 +113,7 @@ export const DateFilter: React.FC<Props> = (props) => {
     (value: string) => {
       checkToValidity(value)
 
-      const currentMaxDate = moment(value).utc().endOf('day').unix()
+      const currentMaxDate = moment.utc(value).endOf('day').unix()
 
       const toTimestamp =
         currentMaxDate > maxDateUTC
