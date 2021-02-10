@@ -80,8 +80,8 @@ export const DateFilter: React.FC<Props> = (props) => {
   const [to, setTo] = React.useState<Maybe<number>>(null)
   const [isFromValid, setIsFromValid] = React.useState<undefined | boolean>()
   const [isToValid, setIsToValid] = React.useState<undefined | boolean>()
-  const maxDateUTC = moment(MAX_DATE).utc().endOf('day').unix()
-  const minDateUTC = moment(MIN_DATE).utc().startOf('day').unix()
+  const maxDateUTC = moment.utc(MAX_DATE).endOf('day').unix()
+  const minDateUTC = moment.utc(MIN_DATE).startOf('day').unix()
 
   const checkFromValidity = React.useCallback((value: string) => {
     setIsFromValid(moment(value).isValid())
