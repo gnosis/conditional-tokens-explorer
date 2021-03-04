@@ -7,9 +7,9 @@ import { NetworkConfig } from 'config/networkConfig'
 import { waitForBlockToSync } from 'util/tools'
 
 const wrapper1155Abi = [
-  'function unwrap(address multiToken,uint256 tokenId,uint256 amount,address recipient,bytes data) external',
+  'function unwrap(address multiToken, uint256 tokenId, uint256 amount, address recipient, bytes data) external',
   'function batchUnwrap(address multiToken, uint256[] tokenIds, uint256[] amounts, address recipient, bytes data) external',
-  'function getWrapped1155(address multiToken, uint256 tokenId)',
+  'function getWrapped1155(address multiToken, uint256 tokenId, bytes data)',
   'function setApprovalForAll(address operator, bool approved) external',
   'function isApprovedForAll(address owner, address operator) external view returns (bool)',
 ]
@@ -25,6 +25,7 @@ class Wrapper1155Service {
     signer?: ethers.Signer
   ) {
     const contractAddress = networkConfig.getWrapped1155FactoryAddress()
+    console.log(contractAddress);
     this.networkConfig = networkConfig
     this.provider = provider
     if (signer) {
@@ -42,14 +43,15 @@ class Wrapper1155Service {
     conditionalTokenAddress: string,
     tokenId: string,
     amount: BigNumber,
-    userAddress: string
+    userAddress: string,
+    tokenBytes: string,
   ): Promise<TransactionReceipt> {
     const tx = await this.contract.unwrap(
       conditionalTokenAddress,
       tokenId,
       amount,
       userAddress,
-      '0x'
+      tokenBytes,
     )
     const transaction = await this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
     await waitForBlockToSync(this.networkConfig, tx.blockNumber)
@@ -61,7 +63,8 @@ class Wrapper1155Service {
     conditionalTokenAddress: string,
     tokenId: string,
     amount: BigNumber,
-    userAddress: string
+    userAddress: string,
+    tokenBytes: string
   ): string => {
     const unwrapInterface = new Interface(wrapper1155Abi)
 
@@ -70,7 +73,7 @@ class Wrapper1155Service {
       tokenId,
       amount,
       userAddress,
-      '0x',
+      tokenBytes,
     ])
   }
 
@@ -87,14 +90,15 @@ class Wrapper1155Service {
     conditionalTokenAddress: string,
     tokenIds: string[],
     amounts: BigNumber[],
-    userAddress: string
+    userAddress: string,
+    tokenBytes: string
   ): Promise<TransactionReceipt> {
     const tx = await this.contract.batchUnwrap(
       conditionalTokenAddress,
       tokenIds,
       amounts,
       userAddress,
-      ethers.constants.HashZero
+      tokenBytes
     )
     const transaction = this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
     await waitForBlockToSync(this.networkConfig, tx.blockNumber)
@@ -103,9 +107,10 @@ class Wrapper1155Service {
 
   async getWrapped1155(
     conditionalTokenAddress: string,
-    tokenId: string
+    tokenId: string,
+    tokenBytes: string
   ): Promise<TransactionReceipt> {
-    const tx = await this.contract.getWrapped1155(conditionalTokenAddress, tokenId)
+    const tx = await this.contract.getWrapped1155(conditionalTokenAddress, tokenId, tokenBytes)
     const transaction = this.provider.waitForTransaction(tx.hash, CONFIRMATIONS_TO_WAIT)
     await waitForBlockToSync(this.networkConfig, tx.blockNumber)
     return transaction

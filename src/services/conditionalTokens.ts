@@ -298,15 +298,16 @@ export class ConditionalTokensService {
     addressFrom: string,
     addressTo: string,
     positionIds: Array<string>,
-    outcomeTokensToTransfer: Array<BigNumber>
+    outcomeTokensToTransfer: Array<BigNumber>,
+    tokenBytes: string
   ): Promise<TransactionReceipt> {
     try {
-      const tx = await this.contract.safeTransferFrom(
+      const tx = await this.contract.safeBatchTransferFrom(
         addressFrom,
         addressTo,
         positionIds,
         outcomeTokensToTransfer,
-        ethers.constants.HashZero
+        tokenBytes
       )
       const transaction = tx.wait(CONFIRMATIONS_TO_WAIT)
       logger.log(`Transaction was mined in block`, transaction)
@@ -325,7 +326,8 @@ export class ConditionalTokensService {
     addressFrom: string,
     addressTo: string,
     positionId: string,
-    outcomeTokensToTransfer: BigNumber
+    outcomeTokensToTransfer: BigNumber,
+    tokenBytes: string
   ): Promise<TransactionReceipt> {
     try {
       const tx = await this.contract.safeTransferFrom(
@@ -333,7 +335,7 @@ export class ConditionalTokensService {
         addressTo,
         positionId,
         outcomeTokensToTransfer,
-        '0x'
+        tokenBytes
       )
       const transaction = tx.wait(CONFIRMATIONS_TO_WAIT)
       logger.log(`Transaction was mined in block`, transaction)
@@ -470,30 +472,32 @@ export class ConditionalTokensService {
     ])
   }
 
-  // Method  used to wrapp multiple erc1155
+  // Method used to wrapp multiple erc1155
   static encodeSafeBatchTransferFrom = (
     addressFrom: string,
     addressTo: string,
     positionIds: Array<string>,
-    outcomeTokensToTransfer: Array<BigNumber>
+    outcomeTokensToTransfer: Array<BigNumber>,
+    tokenBytes: string
   ): string => {
     const safeBatchTransferFromInterface = new Interface(conditionalTokensAbi)
 
-    return safeBatchTransferFromInterface.functions.safeTransferFrom.encode([
+    return safeBatchTransferFromInterface.functions.safeBatchTransferFrom.encode([
       addressFrom,
       addressTo,
       positionIds,
       outcomeTokensToTransfer,
-      '0x',
+      tokenBytes,
     ])
   }
 
-  // Method  used to wrapp some erc1155
+  // Method used to wrapp one erc1155
   static encodeSafeTransferFrom = (
     addressFrom: string,
     addressTo: string,
     positionId: string,
-    outcomeTokensToTransfer: BigNumber
+    outcomeTokensToTransfer: BigNumber,
+    tokenBytes: string
   ): string => {
     const safeTransferFromInterface = new Interface(conditionalTokensAbi)
 
@@ -502,7 +506,7 @@ export class ConditionalTokensService {
       addressTo,
       positionId,
       outcomeTokensToTransfer,
-      '0x',
+      tokenBytes,
     ])
   }
 

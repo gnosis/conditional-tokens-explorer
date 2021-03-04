@@ -51,10 +51,12 @@ export const WrapModal: React.FC<Props> = (props) => {
     (
       e: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLInputElement>
     ) => {
+      const tokenBytes = '0x57726170706564204552432d3131353500000000000000000000000000000020574d54000000000000000000000000000000000000000000000000000000000612'
       const wrapValues = {
         amount,
         address: WrapperService.address,
         positionId,
+        tokenBytes,
       }
 
       if (isSubmitDisabled) return

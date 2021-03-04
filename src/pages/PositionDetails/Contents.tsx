@@ -242,7 +242,7 @@ export const Contents = (props: Props) => {
           setTransactionTitle('Wrapping ERC1155')
           setTransfer(Remote.loading())
 
-          const { address: addressTo, amount, positionId } = transferValue
+          const { address: addressTo, amount, positionId, tokenBytes } = transferValue
           let transaction: void | TransactionReceipt
           if (isUsingTheCPKAddress()) {
             transaction = await CPKService.wrapOrTransfer({
@@ -251,13 +251,15 @@ export const Contents = (props: Props) => {
               addressTo, // Is the wrapper service address
               positionId,
               amount,
+              tokenBytes,
             })
           } else {
             transaction = await CTService.safeTransferFrom(
               activeAddress,
               addressTo,
               positionId,
-              amount
+              amount,
+              tokenBytes,
             )
           }
 
@@ -297,7 +299,7 @@ export const Contents = (props: Props) => {
           setTransactionTitle('Unwrapping ERC20')
           setTransfer(Remote.loading())
 
-          const { address: addressFrom, amount, positionId } = transferValue
+          const { address: addressFrom, amount, positionId, tokenBytes } = transferValue
 
           if (isUsingTheCPKAddress()) {
             await CPKService.unwrap({
@@ -307,9 +309,10 @@ export const Contents = (props: Props) => {
               positionId,
               amount,
               addressTo: activeAddress,
+              tokenBytes,
             })
           } else {
-            await WrapperService.unwrap(addressFrom, positionId, amount, activeAddress)
+            await WrapperService.unwrap(addressFrom, positionId, amount, activeAddress, tokenBytes)
           }
 
           refetchBalances()
@@ -344,7 +347,7 @@ export const Contents = (props: Props) => {
           setTransfer(Remote.loading())
           setTransactionTitle('Transfer Tokens')
 
-          const { address: addressTo, amount, positionId } = transferValue
+          const { address: addressTo, amount, positionId, tokenBytes } = transferValue
           let transaction: void | TransactionReceipt
           if (isUsingTheCPKAddress()) {
             transaction = await CPKService.wrapOrTransfer({
@@ -353,13 +356,15 @@ export const Contents = (props: Props) => {
               addressTo, // Is the address entered by the user
               positionId,
               amount,
+              tokenBytes,
             })
           } else {
             transaction = await CTService.safeTransferFrom(
               activeAddress,
               addressTo,
               positionId,
-              amount
+              amount,
+              tokenBytes,
             )
           }
 

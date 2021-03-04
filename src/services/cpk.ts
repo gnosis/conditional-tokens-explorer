@@ -99,6 +99,7 @@ interface CPKWrapParams {
   addressTo: string
   positionId: string
   amount: BigNumber // outcomeTokensToTransfer
+  tokenBytes: string // optional, default 0x
 }
 
 interface CPKUnwrapParams {
@@ -108,6 +109,7 @@ interface CPKUnwrapParams {
   addressTo: string
   positionId: string
   amount: BigNumber
+  tokenBytes: string
 }
 
 const fallbackMultisigTransactionReceipt: TransactionReceipt = {
@@ -510,7 +512,7 @@ class CPKService {
   }
 
   wrapOrTransfer = async (wrapFromParams: CPKWrapParams): Promise<TransactionReceipt | void> => {
-    const { CTService, addressFrom, addressTo, amount, positionId } = wrapFromParams
+    const { CTService, addressFrom, addressTo, amount, positionId, tokenBytes } = wrapFromParams
 
     const transactions = []
 
@@ -530,7 +532,8 @@ class CPKService {
         addressFrom,
         addressTo,
         positionId,
-        amount
+        amount,
+        tokenBytes,
       ),
     })
 
@@ -557,6 +560,7 @@ class CPKService {
       addressTo,
       amount,
       positionId,
+      tokenBytes,
     } = unwrapFromParams
 
     const transactions = []
@@ -573,7 +577,7 @@ class CPKService {
 
     transactions.push({
       to: WrapperService.address,
-      data: Wrapper1155Service.encodeUnwrap(addressFrom, positionId, amount, addressTo),
+      data: Wrapper1155Service.encodeUnwrap(addressFrom, positionId, amount, addressTo, tokenBytes),
     })
 
     const txObject = await this.cpk.execTransactions(transactions)

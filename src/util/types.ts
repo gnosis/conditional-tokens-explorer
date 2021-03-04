@@ -184,6 +184,7 @@ export interface TransferOptions {
   amount: BigNumber
   address: string
   positionId: string
+  tokenBytes: string
 }
 
 export type HashArray = {
