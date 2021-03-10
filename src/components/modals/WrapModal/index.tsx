@@ -13,7 +13,7 @@ import { TransferOptions } from 'util/types'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { ZERO_BN } from 'config/constants'
 
-const { getTokenBytecode, getBatchTokenBytecode } = require('1155-to-20-helper/src');
+const { getTokenBytecode } = require('1155-to-20-helper/src');
 
 const FirstRow = styled(Row)`
   padding-top: 12px;
@@ -46,7 +46,7 @@ export const WrapModal: React.FC<Props> = (props) => {
 
   const [tokenWrappedName, setTokenWrappedName] = useState<string>('Wrapped ERC-1155')
   const [tokenWrappedSymbol, setTokenWrappedSymbol] = useState<string>('WMT')
-  const [tokenWrappedDecimal, setTokenWrappedDecimal] = useState<number>(18)
+  const [tokenWrappedDecimals, setTokenWrappedDecimals] = useState<number>(18)
 
   const useWalletHandler = useCallback(() => {
     if (maxBalance.gt(ZERO_BN)) {
@@ -60,8 +60,8 @@ export const WrapModal: React.FC<Props> = (props) => {
     (
       e: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLInputElement>
     ) => {
-      setTokenWrappedDecimal(decimals);
-      const tokenBytes = getTokenBytecode(tokenWrappedName, tokenWrappedSymbol, tokenWrappedDecimal)
+      setTokenWrappedDecimals(decimals);
+      const tokenBytes = getTokenBytecode(tokenWrappedName, tokenWrappedSymbol, tokenWrappedDecimals)
       const wrapValues = {
         amount,
         address: WrapperService.address,
@@ -75,7 +75,7 @@ export const WrapModal: React.FC<Props> = (props) => {
 
       if (onRequestClose) onRequestClose(e)
     },
-    [WrapperService, amount, isSubmitDisabled, onRequestClose, onWrap, positionId, tokenWrappedName, tokenWrappedSymbol, tokenWrappedDecimal]
+    [WrapperService, amount, isSubmitDisabled, onRequestClose, onWrap, positionId, tokenWrappedName, tokenWrappedSymbol, tokenWrappedDecimals]
   )
 
   const onPressEnter = useCallback(
@@ -97,7 +97,8 @@ export const WrapModal: React.FC<Props> = (props) => {
           amount={amount}
           autoFocus
           balance={maxBalance}
-          decimals={tokenWrappedDecimal}
+          tokenWrappedDecimals={tokenWrappedDecimals}
+          collateralDecimals={decimals}
           isFromAPosition
           max={maxBalance.toString()}
           onAmountChange={amountChangeHandler}
@@ -143,10 +144,10 @@ export const WrapModal: React.FC<Props> = (props) => {
             <Textfield
               autoComplete="off"
               name="tokenDecimals"
-              value={tokenWrappedDecimal.toString()}
+              value={tokenWrappedDecimals.toString()}
               onChange={(e) => { 
                 if (e.target.value !== "" && parseInt(e.target.value)) {
-                  setTokenWrappedDecimal(Number(e.target.value));
+                  setTokenWrappedDecimals(Number(e.target.value));
                 }
               }}
               placeholder="Type in a token decimals..."

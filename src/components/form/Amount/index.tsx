@@ -10,7 +10,8 @@ import { formatBigNumber } from 'util/tools'
 interface Props extends InputHTMLAttributes<HTMLInputElement> {
   amount: BigNumber
   balance: BigNumber
-  decimals: number
+  tokenWrappedDecimals: number
+  collateralDecimals: number
   isFromAPosition?: boolean
   max: string
   onAmountChange: (value: BigNumber) => void
@@ -22,7 +23,8 @@ export const Amount = ({
   amount,
   autoFocus,
   balance,
-  decimals,
+  tokenWrappedDecimals,
+  collateralDecimals,
   disabled,
   isFromAPosition = false,
   max,
@@ -44,14 +46,14 @@ export const Amount = ({
         ) : (
           <TitleControlButton disabled={disabled} onClick={onUseWalletBalance}>
             Use {isFromAPosition ? 'Position' : 'Wallet'} Balance ($
-            {formatBigNumber(balance, decimals)})
+            {formatBigNumber(balance, tokenWrappedDecimals)})
           </TitleControlButton>
         )
       }
       value={
         <BigNumberInputWrapper
           autoFocus={autoFocus}
-          decimals={decimals}
+          decimals={tokenWrappedDecimals}
           disabled={disabled}
           max={max}
           onChange={onAmountChange}

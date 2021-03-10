@@ -96,7 +96,8 @@ export const UnwrapModal: React.FC<Props> = (props) => {
           amount={amount}
           autoFocus
           balance={maxBalance}
-          decimals={decimals}
+          tokenWrappedDecimals={decimals}
+          collateralDecimals={decimals}
           isFromAPosition
           max={maxBalance.toString()}
           onAmountChange={amountChangeHandler}

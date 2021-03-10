@@ -140,7 +140,8 @@ export const TransferOutcomeTokensModal: React.FC<Props> = (props) => {
               <Amount
                 amount={amount}
                 balance={maxBalance}
-                decimals={token.decimals}
+                tokenWrappedDecimals={token.decimals}
+                collateralDecimals={token.decimals}
                 isFromAPosition={true}
                 max={maxBalance.toString()}
                 onAmountChange={amountChangeHandler}

@@ -520,7 +520,8 @@ export const Contents = () => {
         <Amount
           amount={amount}
           balance={maxBalance}
-          decimals={decimals}
+          tokenWrappedDecimals={decimals}
+          collateralDecimals={decimals}
           disabled={!condition || selectedPositions.length <= 1}
           isFromAPosition={true}
           max={maxBalance.toString()}
