@@ -6,7 +6,7 @@
     "node": ">=4.4.7 <=14.15"
   },
   "dependencies": {
-    "1155-to-20-helper": "git@github.com:davidalbela/1155-to-20-helper",
+    "1155-to-20-helper": "https://github.com/davidalbela/1155-to-20-helper",
     "@apollo/react-hooks": "^3.1.5",
     "@apollo/react-testing": "^3.1.4",
     "@gnosis.pm/conditional-tokens-contracts": "^1.0.1",

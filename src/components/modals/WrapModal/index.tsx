@@ -2,14 +2,18 @@ import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
-import { Button } from 'components/buttons'
-import { Modal, ModalProps } from 'components/common/Modal'
 import { Amount } from 'components/form/Amount'
+import { Button } from 'components/buttons'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
+import { Modal, ModalProps } from 'components/common/Modal'
 import { Row } from 'components/pureStyledComponents/Row'
-import { ZERO_BN } from 'config/constants'
-import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { Textfield } from 'components/pureStyledComponents/Textfield'
+import { TitleValue } from 'components/text/TitleValue'
 import { TransferOptions } from 'util/types'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { ZERO_BN } from 'config/constants'
+
+const { getTokenBytecode, getBatchTokenBytecode } = require('1155-to-20-helper/src');
 
 const FirstRow = styled(Row)`
   padding-top: 12px;
@@ -28,6 +32,7 @@ interface Props extends ModalProps {
 }
 
 export const WrapModal: React.FC<Props> = (props) => {
+
   const { WrapperService } = useWeb3ConnectedOrInfura()
 
   const { balance, decimals, onRequestClose, onWrap, positionId, tokenSymbol, ...restProps } = props
@@ -38,6 +43,10 @@ export const WrapModal: React.FC<Props> = (props) => {
   const amountChangeHandler = useCallback((value: BigNumber) => {
     setAmount(value)
   }, [])
+
+  const [tokenWrappedName, setTokenWrappedName] = useState<string>('Wrapped ERC-1155')
+  const [tokenWrappedSymbol, setTokenWrappedSymbol] = useState<string>('WMT')
+  const [tokenWrappedDecimal, setTokenWrappedDecimal] = useState<number>(18)
 
   const useWalletHandler = useCallback(() => {
     if (maxBalance.gt(ZERO_BN)) {
@@ -51,7 +60,8 @@ export const WrapModal: React.FC<Props> = (props) => {
     (
       e: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLInputElement>
     ) => {
-      const tokenBytes = '0x57726170706564204552432d3131353500000000000000000000000000000020574d54000000000000000000000000000000000000000000000000000000000612'
+      setTokenWrappedDecimal(decimals);
+      const tokenBytes = getTokenBytecode(tokenWrappedName, tokenWrappedSymbol, tokenWrappedDecimal)
       const wrapValues = {
         amount,
         address: WrapperService.address,
@@ -65,7 +75,7 @@ export const WrapModal: React.FC<Props> = (props) => {
 
       if (onRequestClose) onRequestClose(e)
     },
-    [WrapperService, amount, isSubmitDisabled, onRequestClose, onWrap, positionId]
+    [WrapperService, amount, isSubmitDisabled, onRequestClose, onWrap, positionId, tokenWrappedName, tokenWrappedSymbol, tokenWrappedDecimal]
   )
 
   const onPressEnter = useCallback(
@@ -87,7 +97,7 @@ export const WrapModal: React.FC<Props> = (props) => {
           amount={amount}
           autoFocus
           balance={maxBalance}
-          decimals={decimals}
+          decimals={tokenWrappedDecimal}
           isFromAPosition
           max={maxBalance.toString()}
           onAmountChange={amountChangeHandler}
@@ -96,6 +106,55 @@ export const WrapModal: React.FC<Props> = (props) => {
           tokenSymbol={tokenSymbol}
         />
       </FirstRow>
+      <Row>
+        <TitleValue
+          title="Token Name"
+          value={
+            <Textfield
+              autoComplete="off"
+              name="tokenWrappedName"
+              value={tokenWrappedName}
+              onChange={(e) => setTokenWrappedName(e.target.value)}
+              placeholder="Type in a token name..."
+              type="text"
+            />
+          }
+        />
+      </Row>
+      <Row>
+        <TitleValue
+          title="Token Symbol"
+          value={
+            <Textfield
+              autoComplete="off"
+              name="tokenSymbol"
+              value={tokenWrappedSymbol}
+              onChange={(e) => setTokenWrappedSymbol(e.target.value)}
+              placeholder="Type in a token symbol..."
+              type="text"
+            />
+          }
+        />
+      </Row>
+      <Row>
+        <TitleValue
+          title="Token decimals"
+          value={
+            <Textfield
+              autoComplete="off"
+              name="tokenDecimals"
+              value={tokenWrappedDecimal.toString()}
+              onChange={(e) => { 
+                if (e.target.value !== "" && parseInt(e.target.value)) {
+                  setTokenWrappedDecimal(Number(e.target.value));
+                }
+              }}
+              placeholder="Type in a token decimals..."
+              type="text"
+            />
+          }
+        />
+      </Row>
       <ButtonContainerStyled>
         <Button disabled={isSubmitDisabled} onClick={wrap}>
           Wrap
