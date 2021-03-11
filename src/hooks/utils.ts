@@ -21,7 +21,7 @@ export interface Position {
   conditionIds: string[]
   createTimestamp: number
   collateralToken: string
-  wrappedToken: Maybe<string>
+  wrappedTokenAddress: Maybe<string>
   userBalanceERC1155: BigNumber
   userBalanceERC20: BigNumber
   conditions: ConditionInformation[]
@@ -41,7 +41,7 @@ export const marshalPositionListData = (
       indexSets: position.indexSets,
       conditionIds: position.conditionIds,
       collateralToken: position.collateralToken.id,
-      wrappedToken: position?.wrappedToken?.id,
+      wrappedTokenAddress: position?.wrappedTokenAddress,
       collection: position?.collection,
       createTimestamp: position.createTimestamp,
       userBalanceERC1155: userPosition ? new BigNumber(userPosition.balance) : ZERO_BN,

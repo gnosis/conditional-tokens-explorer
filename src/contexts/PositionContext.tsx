@@ -113,7 +113,7 @@ export const PositionProvider = (props: Props) => {
     balanceERC1155,
     balanceERC20,
     collateralTokenAddress: position?.collateralToken?.id ?? '',
-    wrappedTokenAddress: position?.wrappedToken?.id ?? '',
+    wrappedTokenAddress: position?.wrappedTokenAddress ?? '',
     refetchBalances,
     refetchPosition,
     errors,

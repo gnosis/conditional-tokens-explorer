@@ -14,7 +14,7 @@ const positions: Positions_positions[] = [
       __typename: 'CollateralToken',
       id: 'token1',
     },
-    wrappedToken: {
+    wrappedTokenAddress: {
       id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
       __typename: 'WrappedToken',
     },
@@ -39,7 +39,7 @@ const positions: Positions_positions[] = [
       __typename: 'CollateralToken',
       id: 'token1',
     },
-    wrappedToken: {
+    wrappedTokenAddress: {
       id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
       __typename: 'WrappedToken',
     },
@@ -86,7 +86,7 @@ test('marshalPositionListData should return the Positions without balances', asy
       userBalanceERC1155: ZERO_BN,
       userBalanceERC20: ZERO_BN,
       conditions: [],
-      wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      wrappedTokenAddress: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
       createTimestamp: '1571930105',
       conditionIds: [],
       indexSets: [],
@@ -105,7 +105,7 @@ test('marshalPositionListData should return the Positions without balances', asy
       userBalanceERC1155: ZERO_BN,
       userBalanceERC20: ZERO_BN,
       conditions: [],
-      wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      wrappedTokenAddress: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
       createTimestamp: '1571930105',
       conditionIds: [],
       indexSets: [],
@@ -131,7 +131,7 @@ test('marshalPositionListData should return the Positions with some balances', a
       userBalanceERC1155: new BigNumber('100'),
       userBalanceERC20: new BigNumber('100'),
       conditions: [],
-      wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      wrappedTokenAddress: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
       createTimestamp: '1571930105',
       conditionIds: [],
       indexSets: [],
@@ -150,7 +150,7 @@ test('marshalPositionListData should return the Positions with some balances', a
       userBalanceERC1155: ZERO_BN,
       userBalanceERC20: ZERO_BN,
       conditions: [],
-      wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      wrappedTokenAddress: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
       createTimestamp: '1571930105',
       conditionIds: [],
       indexSets: [],

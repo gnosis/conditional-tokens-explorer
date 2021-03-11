@@ -46,7 +46,6 @@ export const WrapModal: React.FC<Props> = (props) => {
 
   const [tokenWrappedName, setTokenWrappedName] = useState<string>('Wrapped ERC-1155')
   const [tokenWrappedSymbol, setTokenWrappedSymbol] = useState<string>('WMT')
-  const [tokenWrappedDecimals, setTokenWrappedDecimals] = useState<number>(18)
 
   const useWalletHandler = useCallback(() => {
     if (maxBalance.gt(ZERO_BN)) {
@@ -60,8 +59,7 @@ export const WrapModal: React.FC<Props> = (props) => {
     (
       e: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLInputElement>
     ) => {
-      setTokenWrappedDecimals(decimals);
-      const tokenBytes = getTokenBytecode(tokenWrappedName, tokenWrappedSymbol, tokenWrappedDecimals)
+      const tokenBytes = getTokenBytecode(tokenWrappedName, tokenWrappedSymbol, decimals)
       const wrapValues = {
         amount,
         address: WrapperService.address,
@@ -75,7 +73,7 @@ export const WrapModal: React.FC<Props> = (props) => {
 
       if (onRequestClose) onRequestClose(e)
     },
-    [WrapperService, amount, isSubmitDisabled, onRequestClose, onWrap, positionId, tokenWrappedName, tokenWrappedSymbol, tokenWrappedDecimals]
+    [WrapperService, amount, isSubmitDisabled, onRequestClose, onWrap, positionId, tokenWrappedName, tokenWrappedSymbol, decimals]
   )
 
   const onPressEnter = useCallback(
@@ -93,21 +91,6 @@ export const WrapModal: React.FC<Props> = (props) => {
       {...restProps}
     >
       <FirstRow>
-        <Amount
-          amount={amount}
-          autoFocus
-          balance={maxBalance}
-          tokenWrappedDecimals={tokenWrappedDecimals}
-          collateralDecimals={decimals}
-          isFromAPosition
-          max={maxBalance.toString()}
-          onAmountChange={amountChangeHandler}
-          onKeyUp={onPressEnter}
-          onUseWalletBalance={useWalletHandler}
-          tokenSymbol={tokenSymbol}
-        />
-      </FirstRow>
-      <Row>
         <TitleValue
           title="Token Name"
           value={
@@ -121,7 +104,7 @@ export const WrapModal: React.FC<Props> = (props) => {
             />
           }
         />
-      </Row>
+      </FirstRow>
       <Row>
         <TitleValue
           title="Token Symbol"
@@ -138,22 +121,17 @@ export const WrapModal: React.FC<Props> = (props) => {
         />
       </Row>
       <Row>
-        <TitleValue
-          title="Token decimals"
-          value={
-            <Textfield
-              autoComplete="off"
-              name="tokenDecimals"
-              value={tokenWrappedDecimals.toString()}
-              onChange={(e) => { 
-                if (e.target.value !== "" && parseInt(e.target.value)) {
-                  setTokenWrappedDecimals(Number(e.target.value));
-                }
-              }}
-              placeholder="Type in a token decimals..."
-              type="text"
-            />
-          }
+        <Amount
+          amount={amount}
+          autoFocus
+          balance={maxBalance}
+          decimals={decimals}
+          isFromAPosition
+          max={maxBalance.toString()}
+          onAmountChange={amountChangeHandler}
+          onKeyUp={onPressEnter}
+          onUseWalletBalance={useWalletHandler}
+          tokenSymbol={tokenSymbol}
         />
       </Row>
       <ButtonContainerStyled>
