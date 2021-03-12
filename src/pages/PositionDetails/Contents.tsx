@@ -229,6 +229,11 @@ export const Contents = (props: Props) => {
     [collateralERC20]
   )
 
+  const ERC20Name = useMemo(
+    () => (collateralERC20 && collateralERC20.name ? collateralERC20.name : ''),
+    [collateralERC20]
+  )
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const wtmAddress = useMemo(() => (wrappedTokenAddress ? wrappedTokenAddress : ''), [
     wrappedTokenAddress,
@@ -665,7 +670,7 @@ export const Contents = (props: Props) => {
                         {`${formatBigNumber(balanceERC20, ERC1155Decimals)} ${ERC20Symbol}`}
                         <TooltipStyled
                           id="balanceERC20"
-                          text="Wrapped ERC-1155 (Wrapped Multi Token)"
+                          text={`${ERC20Name} (Wrapped Multi Token)`}
                         />
                       </>
                     )}

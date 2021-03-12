@@ -107,6 +107,7 @@ export type Token = {
   symbol: string
   address: string
   decimals: number
+  name?: string
 }
 
 export type NetworkId = 1 | 4 | 50 | 100

@@ -417,12 +417,13 @@ export const getTokenSummary = async (
   } else {
     try {
       const erc20Service = new ERC20Service(provider, collateralToken)
-      const { address, decimals, symbol } = await erc20Service.getProfileSummary()
+      const { address, decimals, symbol, name } = await erc20Service.getProfileSummary()
 
       return {
         address,
         decimals,
         symbol,
+        name,
       }
     } catch (err) {
       humanizeCollateralMessageError(err)
