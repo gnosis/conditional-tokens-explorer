@@ -463,7 +463,9 @@ export const Contents = (props: Props) => {
         ? '#'
         : networkConfig.networkId === NetworkIds.MAINNET
         ? `https://${etherscanURL}${address}`
-        : `https://rinkeby.${etherscanURL}${address}`
+        : networkConfig.networkId === NetworkIds.RINKEBY
+        ? `https://rinkeby.${etherscanURL}${address}`
+        : `https://blockscout.com/poa/xdai/${address}`
     },
     [networkConfig.networkId]
   )
