@@ -14,10 +14,7 @@ const positions: Positions_positions[] = [
       __typename: 'CollateralToken',
       id: 'token1',
     },
-    wrappedTokenAddress: {
-      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-      __typename: 'WrappedToken',
-    },
+    wrappedTokenAddress: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
     createTimestamp: '1571930105',
     collection: {
       __typename: 'Collection',
@@ -39,10 +36,7 @@ const positions: Positions_positions[] = [
       __typename: 'CollateralToken',
       id: 'token1',
     },
-    wrappedTokenAddress: {
-      id: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-      __typename: 'WrappedToken',
-    },
+    wrappedTokenAddress: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
     createTimestamp: '1571930105',
     collection: {
       __typename: 'Collection',

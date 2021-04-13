@@ -24,6 +24,7 @@ test('positionString should return the rigth Positions string', async () => {
       symbol: 'DAI',
       address: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
       decimals: 18,
+      name: 'Stablecoin Dai',
     } as Token)
   ).toStrictEqual('[DAI C:0x123 O:0 & C:0x345 O:0|2] x10.00')
 })
