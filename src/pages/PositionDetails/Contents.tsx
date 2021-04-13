@@ -229,6 +229,11 @@ export const Contents = (props: Props) => {
     [collateralERC20]
   )
 
+  const ERC20Name = useMemo(
+    () => (collateralERC20 && collateralERC20.name ? collateralERC20.name : ''),
+    [collateralERC20]
+  )
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const wtmAddress = useMemo(() => (wrappedTokenAddress ? wrappedTokenAddress : ''), [
     wrappedTokenAddress,
@@ -242,7 +247,7 @@ export const Contents = (props: Props) => {
           setTransactionTitle('Wrapping ERC1155')
           setTransfer(Remote.loading())
 
-          const { address: addressTo, amount, positionId } = transferValue
+          const { address: addressTo, amount, positionId, tokenBytes } = transferValue
           let transaction: void | TransactionReceipt
           if (isUsingTheCPKAddress()) {
             transaction = await CPKService.wrapOrTransfer({
@@ -251,13 +256,15 @@ export const Contents = (props: Props) => {
               addressTo, // Is the wrapper service address
               positionId,
               amount,
+              tokenBytes,
             })
           } else {
             transaction = await CTService.safeTransferFrom(
               activeAddress,
               addressTo,
               positionId,
-              amount
+              amount,
+              tokenBytes,
             )
           }
 
@@ -297,7 +304,7 @@ export const Contents = (props: Props) => {
           setTransactionTitle('Unwrapping ERC20')
           setTransfer(Remote.loading())
 
-          const { address: addressFrom, amount, positionId } = transferValue
+          const { address: addressFrom, amount, positionId, tokenBytes } = transferValue
 
           if (isUsingTheCPKAddress()) {
             await CPKService.unwrap({
@@ -307,9 +314,10 @@ export const Contents = (props: Props) => {
               positionId,
               amount,
               addressTo: activeAddress,
+              tokenBytes,
             })
           } else {
-            await WrapperService.unwrap(addressFrom, positionId, amount, activeAddress)
+            await WrapperService.unwrap(addressFrom, positionId, amount, activeAddress, tokenBytes)
           }
 
           refetchBalances()
@@ -344,7 +352,7 @@ export const Contents = (props: Props) => {
           setTransfer(Remote.loading())
           setTransactionTitle('Transfer Tokens')
 
-          const { address: addressTo, amount, positionId } = transferValue
+          const { address: addressTo, amount, positionId, tokenBytes } = transferValue
           let transaction: void | TransactionReceipt
           if (isUsingTheCPKAddress()) {
             transaction = await CPKService.wrapOrTransfer({
@@ -353,13 +361,15 @@ export const Contents = (props: Props) => {
               addressTo, // Is the address entered by the user
               positionId,
               amount,
+              tokenBytes,
             })
           } else {
             transaction = await CTService.safeTransferFrom(
               activeAddress,
               addressTo,
               positionId,
-              amount
+              amount,
+              tokenBytes,
             )
           }
 
@@ -458,7 +468,9 @@ export const Contents = (props: Props) => {
         ? '#'
         : networkConfig.networkId === NetworkIds.MAINNET
         ? `https://${etherscanURL}${address}`
-        : `https://rinkeby.${etherscanURL}${address}`
+        : networkConfig.networkId === NetworkIds.RINKEBY
+        ? `https://rinkeby.${etherscanURL}${address}`
+        : `https://blockscout.com/poa/xdai/${address}`
     },
     [networkConfig.networkId]
   )
@@ -658,7 +670,7 @@ export const Contents = (props: Props) => {
                         {`${formatBigNumber(balanceERC20, ERC1155Decimals)} ${ERC20Symbol}`}
                         <TooltipStyled
                           id="balanceERC20"
-                          text="Wrapped ERC-1155 (Wrapped Multi Token)"
+                          text={`${ERC20Name} (Wrapped Multi Token)`}
                         />
                       </>
                     )}

@@ -59,7 +59,8 @@ export const TransferOutcomeTokensModal: React.FC<Props> = (props) => {
     if (typeof onRequestClose === 'function') {
       onRequestClose(e)
     }
-    onSubmit({ amount, address, positionId })
+    const tokenBytes = '0x'
+    onSubmit({ amount, address, positionId, tokenBytes })
   }
 
   const addressChangeHandler = React.useCallback((value: string) => {

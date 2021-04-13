@@ -107,6 +107,7 @@ export type Token = {
   symbol: string
   address: string
   decimals: number
+  name?: string
 }
 
 export type NetworkId = 1 | 4 | 50 | 100
@@ -184,6 +185,7 @@ export interface TransferOptions {
   amount: BigNumber
   address: string
   positionId: string
+  tokenBytes: string
 }
 
 export type HashArray = {

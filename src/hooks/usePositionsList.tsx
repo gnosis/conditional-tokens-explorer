@@ -122,7 +122,7 @@ export const usePositionsList = (
 
       const fetchUserBalanceWithDecimals = async () => {
         const uniqueCollateralTokens = lodashUniqBy(positionListData, 'collateralToken')
-        const uniqueWrappedTokens = lodashUniqBy(positionListData, 'wrappedToken')
+        const uniqueWrappedTokens = lodashUniqBy(positionListData, 'wrappedTokenAddress')
 
         const collateralTokensPromises = uniqueCollateralTokens.map(
           async ({ collateralToken }: Position) => {
@@ -138,16 +138,16 @@ export const usePositionsList = (
           }
         )
         const wrappedTokensPromises = uniqueWrappedTokens.map(
-          async ({ wrappedToken }: Position) => {
+          async ({ wrappedTokenAddress }: Position) => {
             try {
               return await getTokenSummary(
                 networkConfig,
                 provider,
-                wrappedToken || ethers.constants.HashZero
+                wrappedTokenAddress || ethers.constants.HashZero
               )
             } catch (err) {
               return {
-                address: wrappedToken || ethers.constants.HashZero,
+                address: wrappedTokenAddress || ethers.constants.HashZero,
                 decimals: 18,
                 symbol: '',
               }
@@ -158,7 +158,7 @@ export const usePositionsList = (
         const wrappedTokensResolved = await Promise.all(wrappedTokensPromises)
 
         const positionListDataEnhanced = positionListData.map((position: Position) => {
-          const { collateralToken, userBalanceERC20, userBalanceERC1155, wrappedToken } = position
+          const { collateralToken, userBalanceERC20, userBalanceERC1155, wrappedTokenAddress } = position
 
           const collateralTokenFound = collateralTokensResolved.filter(
             (collateralTokenInformation) =>
@@ -168,7 +168,7 @@ export const usePositionsList = (
           const wrappedTokenFound = wrappedTokensResolved.filter(
             (wrappedTokenInformation) =>
               wrappedTokenInformation &&
-              wrappedTokenInformation?.address.toLowerCase() === wrappedToken?.toLowerCase()
+              wrappedTokenInformation?.address.toLowerCase() === wrappedTokenAddress?.toLowerCase()
           )
 
           const userBalanceERC1155WithDecimals =

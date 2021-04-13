@@ -24,6 +24,7 @@ test('positionString should return the rigth Positions string', async () => {
       symbol: 'DAI',
       address: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
       decimals: 18,
+      name: 'Stablecoin Dai',
     } as Token)
   ).toStrictEqual('[DAI C:0x123 O:0 & C:0x345 O:0|2] x10.00')
 })
@@ -35,7 +36,7 @@ const positions: PositionWithUserBalanceWithDecimals[] = [
     conditionIds: ['0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f'],
     createTimestamp: 2,
     collateralToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-    wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+    wrappedTokenAddress: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
     userBalanceERC1155: new BigNumber(1),
     userBalanceERC20: new BigNumber(1),
     conditions: [
@@ -73,7 +74,7 @@ const positions: PositionWithUserBalanceWithDecimals[] = [
     conditionIds: ['0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f'],
     createTimestamp: 2,
     collateralToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-    wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+    wrappedTokenAddress: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
     userBalanceERC1155: new BigNumber(1),
     userBalanceERC20: new BigNumber(1),
     conditions: [
@@ -114,7 +115,7 @@ const positions: PositionWithUserBalanceWithDecimals[] = [
     ],
     createTimestamp: 2,
     collateralToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-    wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+    wrappedTokenAddress: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
     userBalanceERC1155: new BigNumber(1),
     userBalanceERC20: new BigNumber(1),
     conditions: [
@@ -161,7 +162,7 @@ const positions: PositionWithUserBalanceWithDecimals[] = [
     ],
     createTimestamp: 2,
     collateralToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-    wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+    wrappedTokenAddress: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
     userBalanceERC1155: new BigNumber(1),
     userBalanceERC20: new BigNumber(1),
     conditions: [
@@ -208,7 +209,7 @@ const positionsUSDC: PositionWithUserBalanceWithDecimals[] = [
     conditionIds: ['0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f'],
     createTimestamp: 2,
     collateralToken: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
-    wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+    wrappedTokenAddress: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
     userBalanceERC1155: new BigNumber(1),
     userBalanceERC20: new BigNumber(1),
     conditions: [
@@ -246,7 +247,7 @@ const positionsUSDC: PositionWithUserBalanceWithDecimals[] = [
     conditionIds: ['0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f'],
     createTimestamp: 2,
     collateralToken: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
-    wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+    wrappedTokenAddress: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
     userBalanceERC1155: new BigNumber(1),
     userBalanceERC20: new BigNumber(1),
     conditions: [
@@ -284,7 +285,7 @@ const positionsUSDC: PositionWithUserBalanceWithDecimals[] = [
     conditionIds: ['0xf583ac873d83f9db78f7a8fe18a2b8e3d050d8a283c41a014a5b8df45c20856f'],
     createTimestamp: 2,
     collateralToken: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
-    wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+    wrappedTokenAddress: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
     userBalanceERC1155: new BigNumber(1),
     userBalanceERC20: new BigNumber(1),
     conditions: [
@@ -325,7 +326,7 @@ const positionsUSDC: PositionWithUserBalanceWithDecimals[] = [
     ],
     createTimestamp: 2,
     collateralToken: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
-    wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+    wrappedTokenAddress: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
     userBalanceERC1155: new BigNumber(1),
     userBalanceERC20: new BigNumber(1),
     conditions: [
@@ -372,7 +373,7 @@ const positionsUSDC: PositionWithUserBalanceWithDecimals[] = [
     ],
     createTimestamp: 2,
     collateralToken: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
-    wrappedToken: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+    wrappedTokenAddress: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
     userBalanceERC1155: new BigNumber(1),
     userBalanceERC20: new BigNumber(1),
     conditions: [

@@ -593,7 +593,7 @@ export const PositionsList = () => {
           setTransactionTitle('Wrapping ERC1155')
           setTransfer(Remote.loading())
 
-          const { address: addressTo, amount, positionId } = transferValue
+          const { address: addressTo, amount, positionId, tokenBytes } = transferValue
           if (isUsingTheCPKAddress()) {
             await CPKService.wrapOrTransfer({
               CTService,
@@ -601,9 +601,10 @@ export const PositionsList = () => {
               addressTo, // Is the wrapper service address
               positionId,
               amount,
+              tokenBytes,
             })
           } else {
-            await CTService.safeTransferFrom(activeAddress, addressTo, positionId, amount)
+            await CTService.safeTransferFrom(activeAddress, addressTo, positionId, amount, tokenBytes)
           }
 
           refetchPositions()
@@ -637,7 +638,7 @@ export const PositionsList = () => {
           setTransactionTitle('Unwrapping ERC20')
           setTransfer(Remote.loading())
 
-          const { address: addressFrom, amount, positionId } = transferValue
+          const { address: addressFrom, amount, positionId, tokenBytes } = transferValue
           if (isUsingTheCPKAddress()) {
             await CPKService.unwrap({
               CTService,
@@ -646,9 +647,10 @@ export const PositionsList = () => {
               positionId,
               amount,
               addressTo: activeAddress,
+              tokenBytes,
             })
           } else {
-            await WrapperService.unwrap(addressFrom, positionId, amount, activeAddress)
+            await WrapperService.unwrap(addressFrom, positionId, amount, activeAddress, tokenBytes)
           }
 
           refetchPositions()
@@ -683,7 +685,7 @@ export const PositionsList = () => {
           setTransactionTitle('Transfer Tokens')
           setTransfer(Remote.loading())
 
-          const { address: addressTo, amount, positionId } = transferValue
+          const { address: addressTo, amount, positionId, tokenBytes } = transferValue
           if (isUsingTheCPKAddress()) {
             await CPKService.wrapOrTransfer({
               CTService,
@@ -691,9 +693,10 @@ export const PositionsList = () => {
               addressTo, // Is the address entered by the user
               positionId,
               amount,
+              tokenBytes,
             })
           } else {
-            await CTService.safeTransferFrom(activeAddress, addressTo, positionId, amount)
+            await CTService.safeTransferFrom(activeAddress, addressTo, positionId, amount, tokenBytes)
           }
 
           refetchPositions()

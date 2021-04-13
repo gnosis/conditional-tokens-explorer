@@ -221,11 +221,6 @@ export interface Positions_positions_collateralToken {
   id: string;
 }
 
-export interface Positions_positions_wrappedToken {
-  __typename: "WrappedToken";
-  id: string;
-}
-
 export interface Positions_positions_collection_conditions {
   __typename: "Condition";
   id: string;
@@ -268,8 +263,8 @@ export interface Positions_positions {
   indexSets: any[];
   activeValue: any;
   createTimestamp: any;
+  wrappedTokenAddress: string | null;
   collateralToken: Positions_positions_collateralToken;
-  wrappedToken: Positions_positions_wrappedToken | null;
   collection: Positions_positions_collection;
   conditionIds: string[];
   conditions: Positions_positions_conditions[];
@@ -290,11 +285,6 @@ export interface Positions {
 
 export interface PositionsList_positions_collateralToken {
   __typename: "CollateralToken";
-  id: string;
-}
-
-export interface PositionsList_positions_wrappedToken {
-  __typename: "WrappedToken";
   id: string;
 }
 
@@ -340,8 +330,8 @@ export interface PositionsList_positions {
   indexSets: any[];
   activeValue: any;
   createTimestamp: any;
+  wrappedTokenAddress: string | null;
   collateralToken: PositionsList_positions_collateralToken;
-  wrappedToken: PositionsList_positions_wrappedToken | null;
   collection: PositionsList_positions_collection;
   conditionIds: string[];
   conditions: PositionsList_positions_conditions[];
@@ -362,11 +352,6 @@ export interface PositionsList {
 
 export interface GetPosition_position_collateralToken {
   __typename: "CollateralToken";
-  id: string;
-}
-
-export interface GetPosition_position_wrappedToken {
-  __typename: "WrappedToken";
   id: string;
 }
 
@@ -412,8 +397,8 @@ export interface GetPosition_position {
   indexSets: any[];
   activeValue: any;
   createTimestamp: any;
+  wrappedTokenAddress: string | null;
   collateralToken: GetPosition_position_collateralToken;
-  wrappedToken: GetPosition_position_wrappedToken | null;
   collection: GetPosition_position_collection;
   conditionIds: string[];
   conditions: GetPosition_position_conditions[];
@@ -438,11 +423,6 @@ export interface GetPositionVariables {
 
 export interface GetMultiPositions_positions_collateralToken {
   __typename: "CollateralToken";
-  id: string;
-}
-
-export interface GetMultiPositions_positions_wrappedToken {
-  __typename: "WrappedToken";
   id: string;
 }
 
@@ -488,8 +468,8 @@ export interface GetMultiPositions_positions {
   indexSets: any[];
   activeValue: any;
   createTimestamp: any;
+  wrappedTokenAddress: string | null;
   collateralToken: GetMultiPositions_positions_collateralToken;
-  wrappedToken: GetMultiPositions_positions_wrappedToken | null;
   collection: GetMultiPositions_positions_collection;
   conditionIds: string[];
   conditions: GetMultiPositions_positions_conditions[];
@@ -559,16 +539,11 @@ export interface UserPositionBalances_userPositions_position_collateralToken {
   id: string;
 }
 
-export interface UserPositionBalances_userPositions_position_wrappedToken {
-  __typename: "WrappedToken";
-  id: string;
-}
-
 export interface UserPositionBalances_userPositions_position {
   __typename: "Position";
   id: string;
   collateralToken: UserPositionBalances_userPositions_position_collateralToken;
-  wrappedToken: UserPositionBalances_userPositions_position_wrappedToken | null;
+  wrappedTokenAddress: string | null;
 }
 
 export interface UserPositionBalances_userPositions_user {
@@ -681,11 +656,6 @@ export interface PositionData_collateralToken {
   id: string;
 }
 
-export interface PositionData_wrappedToken {
-  __typename: "WrappedToken";
-  id: string;
-}
-
 export interface PositionData_collection_conditions {
   __typename: "Condition";
   id: string;
@@ -728,8 +698,8 @@ export interface PositionData {
   indexSets: any[];
   activeValue: any;
   createTimestamp: any;
+  wrappedTokenAddress: string | null;
   collateralToken: PositionData_collateralToken;
-  wrappedToken: PositionData_wrappedToken | null;
   collection: PositionData_collection;
   conditionIds: string[];
   conditions: PositionData_conditions[];
