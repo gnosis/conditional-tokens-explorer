@@ -12,11 +12,15 @@ import { IconPlus } from 'components/icons/IconPlus'
 import { BaseCard } from 'components/pureStyledComponents/BaseCard'
 import { GetCondition_landing, LandingConditionsCell } from 'components/table/LandingConditionsCell'
 import { GetPosition_landing, LandingPositionsCell } from 'components/table/LandingPositionsCell'
+import { LandingTableFooter } from 'components/table/LandingTableFooter'
 import conditionsData from 'conditions-data.json'
 import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
 import positionsData from 'positions-data.json'
 import { customStyles } from 'theme/tableCustomStyles'
 import { ConditionSearchOptions } from 'util/types'
+
+const ConditionsFooter = () => <LandingTableFooter title="View All Conditions" />
+const PositionsFooter = () => <LandingTableFooter title="View All Positions" />
 
 const LandingContainer = styled.div`
   max-width: 1300px;
@@ -235,6 +239,8 @@ export const Landing: React.FC = () => {
           customStyles={customStyles}
           data={conditionsData}
           noHeader
+          pagination
+          paginationComponent={ConditionsFooter}
         />
         <DataTable
           className="outerTableWrapper"
@@ -242,6 +248,8 @@ export const Landing: React.FC = () => {
           customStyles={customStyles}
           data={positionsData}
           noHeader
+          pagination
+          paginationComponent={PositionsFooter}
         />
       </LandingRow>
     </LandingContainer>
