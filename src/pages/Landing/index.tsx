@@ -78,11 +78,8 @@ const TotalsItemTitle = styled.p`
 `
 
 const TotalsItemValue = styled.p`
-  font-family: 'Averta Semibold', 'Averta', 'Helvetica Neue', 'Arial', 'Segoe UI', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', '-apple-system', 'BlinkMacSystemFont',
-    sans-serif;
   font-style: normal;
-  font-weight: normal;
+  font-weight: 600;
   font-size: 22px;
   line-height: 27px;
   color: #445055;
@@ -102,11 +99,8 @@ const ChartHeader = styled.div`
 `
 
 const ChartTtile = styled.p`
-  font-family: 'Averta Semibold', 'Averta', 'Helvetica Neue', 'Arial', 'Segoe UI', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', '-apple-system', 'BlinkMacSystemFont',
-    sans-serif;
   font-style: normal;
-  font-weight: normal;
+  font-weight: 600;
   font-size: 18px;
   line-height: 22px;
   margin: 0;

@@ -58,22 +58,16 @@ const AmountBlock = styled.div`
 `
 
 const AmountText = styled.p`
-  font-family: 'Averta Semibold', 'Averta', 'Helvetica Neue', 'Arial', 'Segoe UI', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', '-apple-system', 'BlinkMacSystemFont',
-    sans-serif;
   font-style: normal;
-  font-weight: normal;
+  font-weight: 600;
   font-size: 15px;
   // line-height: 19px;
   color: #445055;
 `
 
 const AmountLabel = styled.p`
-  font-family: 'Averta Semibold', 'Averta', 'Helvetica Neue', 'Arial', 'Segoe UI', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', '-apple-system', 'BlinkMacSystemFont',
-    sans-serif;
   font-style: normal;
-  font-weight: normal;
+  font-weight: 600;
   font-size: 11px;
   // line-height: 14px;
   color: #9d9d9d;
