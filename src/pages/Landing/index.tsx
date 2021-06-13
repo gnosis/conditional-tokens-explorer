@@ -1,7 +1,7 @@
 /* eslint-disable react/display-name */
 import { useDebounceCallback } from '@react-hook/debounce'
 import React, { useCallback, useState } from 'react'
-import DataTable from 'react-data-table-component'
+import DataTable, { IDataTableStyles } from 'react-data-table-component'
 import styled from 'styled-components'
 
 import chart from 'chart.svg'
@@ -21,6 +21,15 @@ import { ConditionSearchOptions } from 'util/types'
 
 const ConditionsFooter = () => <LandingTableFooter title="View All Conditions" />
 const PositionsFooter = () => <LandingTableFooter title="View All Positions" />
+
+const LandingTableStyles: IDataTableStyles = {
+  ...customStyles,
+  rows: {
+    style: {
+      minHeight: 'unset',
+    },
+  },
+}
 
 const LandingContainer = styled.div`
   max-width: 1300px;
@@ -236,8 +245,10 @@ export const Landing: React.FC = () => {
         <DataTable
           className="outerTableWrapper"
           columns={conditionsColumns}
-          customStyles={customStyles}
+          customStyles={LandingTableStyles}
           data={conditionsData}
+          fixedHeader
+          fixedHeaderScrollHeight="550px"
           noHeader
           pagination
           paginationComponent={ConditionsFooter}
@@ -245,8 +256,10 @@ export const Landing: React.FC = () => {
         <DataTable
           className="outerTableWrapper"
           columns={positionsColumns}
-          customStyles={customStyles}
+          customStyles={LandingTableStyles}
           data={positionsData}
+          fixedHeader
+          fixedHeaderScrollHeight="550px"
           noHeader
           pagination
           paginationComponent={PositionsFooter}
