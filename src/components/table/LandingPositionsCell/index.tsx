@@ -5,7 +5,7 @@ import { ButtonCopy } from 'components/buttons/ButtonCopy'
 import { Time } from 'components/icons/Time'
 import { Hash } from 'components/text/Hash'
 import daiLogo from 'dai.svg'
-import { formatTS } from 'util/tools'
+import { formatTSAlt } from 'util/tools'
 
 const CellWrapper = styled.div`
   display: flex;
@@ -114,7 +114,7 @@ export const LandingPositionsCell = (props: GetPosition_landing) => {
         </CellRow>
         <CellRow>
           <Time />
-          <TimeText>{formatTS(createTimestamp)}</TimeText>
+          <TimeText>{formatTSAlt(createTimestamp)}</TimeText>
         </CellRow>
       </CellColumn>
       <CellColumn>
