@@ -57,6 +57,7 @@ const Input = styled(Textfield)`
     color: ${(props) => props.theme.colors.mediumGray};
     font-size: 15px;
     font-weight: normal;
+    text-overflow: ellipsis;
   }
 
   &:-webkit-autofill:focus {
