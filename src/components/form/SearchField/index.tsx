@@ -58,6 +58,7 @@ const Input = styled(Textfield)`
     font-size: 15px;
     font-weight: normal;
     text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   &:-webkit-autofill:focus {
