@@ -1,6 +1,6 @@
 /* eslint-disable react/display-name */
 import { useDebounceCallback } from '@react-hook/debounce'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import DataTable, { IDataTableStyles } from 'react-data-table-component'
 import styled from 'styled-components'
 
@@ -10,6 +10,7 @@ import { SearchField } from 'components/form/SearchField'
 import { ChevronDown } from 'components/icons/ChevronDown'
 import { IconPlus } from 'components/icons/IconPlus'
 import { BaseCard } from 'components/pureStyledComponents/BaseCard'
+import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { GetCondition_landing, LandingConditionsCell } from 'components/table/LandingConditionsCell'
 import { GetPosition_landing, LandingPositionsCell } from 'components/table/LandingPositionsCell'
 import { LandingTableFooter } from 'components/table/LandingTableFooter'
@@ -128,6 +129,7 @@ const ChartDropdown = styled.div`
 `
 
 export const Landing: React.FC = () => {
+  const [isLoading, setIsLoading] = useState(false)
   // eslint-disable-next-line
   const [searchBy, setSearchBy] = useState<ConditionSearchOptions>(
     ConditionSearchOptions.ConditionId
@@ -174,6 +176,13 @@ export const Landing: React.FC = () => {
     },
   ]
 
+  useEffect(() => {
+    setIsLoading(true)
+    setInterval(() => {
+      setIsLoading(false)
+    }, 1500)
+  }, [])
+
   const positionsColumns = [
     {
       cell: (row: GetPosition_landing) => (
@@ -211,34 +220,44 @@ export const Landing: React.FC = () => {
       </LandingRow>
       <LandingRow>
         <LandingCard>
-          <TotalsItem>
-            <TotalsItemTitle>Total Collateral Locked</TotalsItemTitle>
-            <TotalsItemValue>$55,808,127</TotalsItemValue>
-          </TotalsItem>
-          <TotalsItem>
-            <TotalsItemTitle>Total Conditions Created</TotalsItemTitle>
-            <TotalsItemValue>999,000,000</TotalsItemValue>
-          </TotalsItem>
-          <TotalsItem>
-            <TotalsItemTitle>Total Collateral Redeemed</TotalsItemTitle>
-            <TotalsItemValue>$28,368,428</TotalsItemValue>
-          </TotalsItem>
-          <TotalsItem>
-            <TotalsItemTitle>Total Positions Created</TotalsItemTitle>
-            <TotalsItemValue>15,568,374</TotalsItemValue>
-          </TotalsItem>
+          {isLoading ? (
+            <InlineLoading />
+          ) : (
+            <>
+              <TotalsItem>
+                <TotalsItemTitle>Total Collateral Locked</TotalsItemTitle>
+                <TotalsItemValue>$55,808,127</TotalsItemValue>
+              </TotalsItem>
+              <TotalsItem>
+                <TotalsItemTitle>Total Conditions Created</TotalsItemTitle>
+                <TotalsItemValue>999,000,000</TotalsItemValue>
+              </TotalsItem>
+              <TotalsItem>
+                <TotalsItemTitle>Total Collateral Redeemed</TotalsItemTitle>
+                <TotalsItemValue>$28,368,428</TotalsItemValue>
+              </TotalsItem>
+              <TotalsItem>
+                <TotalsItemTitle>Total Positions Created</TotalsItemTitle>
+                <TotalsItemValue>15,568,374</TotalsItemValue>
+              </TotalsItem>
+            </>
+          )}
         </LandingCard>
         <LandingCard>
-          <Chart>
-            <ChartHeader>
-              <ChartTtile>Transaction History</ChartTtile>
-              <ChartDropdown>
-                7 days
-                <ChevronDown />
-              </ChartDropdown>
-            </ChartHeader>
-            <img alt="chart" src={chart} width="100%" />
-          </Chart>
+          {isLoading ? (
+            <InlineLoading />
+          ) : (
+            <Chart>
+              <ChartHeader>
+                <ChartTtile>Transaction History</ChartTtile>
+                <ChartDropdown>
+                  7 days
+                  <ChevronDown />
+                </ChartDropdown>
+              </ChartHeader>
+              <img alt="chart" src={chart} width="100%" />
+            </Chart>
+          )}
         </LandingCard>
       </LandingRow>
       <LandingRow>
@@ -246,9 +265,10 @@ export const Landing: React.FC = () => {
           className="outerTableWrapper"
           columns={conditionsColumns}
           customStyles={LandingTableStyles}
-          data={conditionsData}
+          data={isLoading ? [] : conditionsData || []}
           fixedHeader
           fixedHeaderScrollHeight="550px"
+          noDataComponent={isLoading && <InlineLoading />}
           noHeader
           pagination
           paginationComponent={ConditionsFooter}
@@ -257,9 +277,10 @@ export const Landing: React.FC = () => {
           className="outerTableWrapper"
           columns={positionsColumns}
           customStyles={LandingTableStyles}
-          data={positionsData}
+          data={isLoading ? [] : positionsData || []}
           fixedHeader
           fixedHeaderScrollHeight="550px"
+          noDataComponent={isLoading && <InlineLoading />}
           noHeader
           pagination
           paginationComponent={PositionsFooter}
