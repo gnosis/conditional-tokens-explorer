@@ -1,5 +1,4 @@
 /* eslint-disable react/display-name */
-import { useDebounceCallback } from '@react-hook/debounce'
 import React, { useCallback, useEffect, useState } from 'react'
 import DataTable, { IDataTableStyles } from 'react-data-table-component'
 import styled from 'styled-components'
@@ -15,10 +14,10 @@ import { GetCondition_landing, LandingConditionsCell } from 'components/table/La
 import { GetPosition_landing, LandingPositionsCell } from 'components/table/LandingPositionsCell'
 import { LandingTableFooter } from 'components/table/LandingTableFooter'
 import conditionsData from 'conditions-data.json'
-import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
+import { useLandingSearchOptions } from 'hooks/useLandingSearchOptions'
 import positionsData from 'positions-data.json'
 import { customStyles } from 'theme/tableCustomStyles'
-import { ConditionSearchOptions } from 'util/types'
+import { ConditionSearchOptions, LandingSearchOptions, PositionSearchOptions } from 'util/types'
 
 const ConditionsFooter = () => <LandingTableFooter title="View All Conditions" />
 const PositionsFooter = () => <LandingTableFooter title="View All Positions" />
@@ -131,31 +130,21 @@ const ChartDropdown = styled.div`
 export const Landing: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false)
   // eslint-disable-next-line
-  const [searchBy, setSearchBy] = useState<ConditionSearchOptions>(
-    ConditionSearchOptions.ConditionId
-  )
-  // eslint-disable-next-line
-  const [textToSearch, setTextToSearch] = useState<string>('')
-  // eslint-disable-next-line
+  const [searchBy, setSearchBy] = useState<
+    ConditionSearchOptions | PositionSearchOptions | LandingSearchOptions
+  >(LandingSearchOptions.All)
   const [textToShow, setTextToShow] = useState<string>('')
 
-  const dropdownItems = useConditionsSearchOptions(setSearchBy)
+  const dropdownItems = useLandingSearchOptions(setSearchBy)
 
-  const debouncedHandlerTextToSearch = useDebounceCallback((conditionIdToSearch) => {
-    setTextToSearch(conditionIdToSearch)
-  }, 500)
-
-  const onChangeSearch = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const { value } = event.currentTarget
-      debouncedHandlerTextToSearch(value)
-    },
-    [debouncedHandlerTextToSearch]
-  )
+  const onChangeSearch = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.currentTarget
+    setTextToShow(value)
+  }, [])
 
   const onClearSearch = useCallback(() => {
-    debouncedHandlerTextToSearch('')
-  }, [debouncedHandlerTextToSearch])
+    setTextToShow('')
+  }, [])
 
   const conditionsColumns = [
     {
@@ -205,15 +194,13 @@ export const Landing: React.FC = () => {
     <LandingContainer>
       <LandingRow style={{ alignItems: 'center' }}>
         <SearchFieldStyled
+          disabled={isLoading}
           dropdownItems={dropdownItems}
           onChange={onChangeSearch}
           onClear={onClearSearch}
-          placeholder={
-            'Search by condition id, position id, question id, question text, oracle address, creator address, collateral symbol…'
-          }
           value={textToShow}
         />
-        <Button>
+        <Button disabled={isLoading}>
           <IconPlus />
           &nbsp;New Condition
         </Button>
