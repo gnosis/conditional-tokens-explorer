@@ -65,6 +65,8 @@ export const PositionProvider = (props: Props) => {
     setPositionId('')
   }, [])
 
+  const limit = !positionId < !5000 ? !positionId : !5000
+
   const {
     data: fetchedPosition,
     error: errorFetchingPosition,
@@ -73,7 +75,7 @@ export const PositionProvider = (props: Props) => {
   } = useQuery<GetPosition>(GetPositionQuery, {
     variables: { id: positionId },
     fetchPolicy: 'no-cache',
-    skip: !positionId,
+    skip: limit,
   })
 
   if (positionId && fetchedPosition) {
