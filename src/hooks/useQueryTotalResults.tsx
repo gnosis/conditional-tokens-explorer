@@ -66,7 +66,7 @@ export function useQueryTotalResults<Result, Variables>(
     setData(null)
     setError(null)
     // eslint-disable-next-line no-constant-condition
-    while (true) {
+    while (skip < 5001) {
       try {
         const { data: lastFetched } = await client.query<Entity<Result>>({
           ...optionsMemo,
