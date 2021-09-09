@@ -1,0 +1,186 @@
+name: CI
+
+on:
+  # build on PR creation/updates, also when pushing to master/develop, or create a release
+  pull_request:
+    types: [opened, synchronize] 
+  push:
+    branches: [master, develop]
+    tags: [v*]
+
+jobs:
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Set output of cache
+        id: yarn-cache
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - name: Cache yarn cache
+        uses: actions/cache@v2
+        id: cache-yarn-cache
+        with:
+          path: ${{ steps.yarn-cache.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Cache node_modules
+        id: cache-node-modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-${{ matrix.node-version }}-nodemodules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.node-version }}-nodemodules-
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+  test:
+    name: Test
+    needs: setup
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Load dependencies
+        id: cache-node-modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-${{ matrix.node-version }}-nodemodules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.node-version }}-nodemodules-
+
+      - name: Unit Test
+        run: yarn test
+        env:
+          CI: 'true'
+
+  build:
+    name: Build apps
+    needs: setup
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Load dependencies
+        id: cache-node-modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-${{ matrix.node-version }}-nodemodules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.node-version }}-nodemodules-
+
+      - name: Build Web Apps
+        run: yarn build
+        env:
+          REACT_APP_ARBITRATOR_KLEROS_ADDRESS_MAINNET: '0xd47f72a2d1d0E91b0Ec5e5f5d02B2dc26d00A14D'
+          REACT_APP_ARBITRATOR_KLEROS_ADDRESS_RINKEBY: '0xcafa054b1b054581faf65adce667bf1c684b6ef0'
+          REACT_APP_ARBITRATOR_KLEROS_ADDRESS_XDAI: '0xe40DD83a262da3f56976038F1554Fe541Fa75ecd'
+          REACT_APP_CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_MAINNET: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C'
+          REACT_APP_CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_RINKEBY: '0x36bede640D19981A82090519bC1626249984c908'
+          REACT_APP_CONDITIONAL_TOKEN_CONTRACT_ADDRESS_FOR_XDAI: '0xCeAfDD6bc0bEF976fdCd1112955828E00543c0Ce'
+          REACT_APP_CONFIRMATIONS_TO_WAIT: '2'
+          REACT_APP_CTE_GRAPH_HTTP_MAINNET: 'https://api.thegraph.com/subgraphs/name/cag/hg'
+          REACT_APP_CTE_GRAPH_HTTP_RINKEBY: 'https://api.thegraph.com/subgraphs/name/davidalbela/conditional-tokens-rinkeby'
+          REACT_APP_CTE_GRAPH_HTTP_XDAI: 'https://api.thegraph.com/subgraphs/name/davidalbela/conditional-tokens-xdai'
+          REACT_APP_DEFAULT_NETWORK_ID: '1'
+          REACT_APP_EARLIEST_MAINNET_BLOCK_TO_CHECK: '1'
+          REACT_APP_EARLIEST_RINKEBY_BLOCK_TO_CHECK: '1'
+          REACT_APP_EARLIEST_XDAI_BLOCK_TO_CHECK: '1'          
+          REACT_APP_GOOGLE_ANALYTICS_ID: ${{ secrets.REACT_APP_GOOGLE_ANALYTICS_ID }}
+          REACT_APP_ICON_ENDPOINT: ${{ secrets.REACT_APP_ICON_ENDPOINT }}
+          REACT_APP_INFURA_ID: ${{ secrets.REACT_APP_INFURA_ID }}
+          REACT_APP_LOGGER_ID: 'gnosis-conditional-token-explorer'
+          REACT_APP_MAX_OUTCOMES_ALLOWED: '256'
+          REACT_APP_MIN_OUTCOMES_ALLOWED: '2'
+          REACT_APP_OMEN_GRAPH_HTTP_MAINNET: 'https://api.thegraph.com/subgraphs/name/protofire/omen'
+          REACT_APP_OMEN_GRAPH_HTTP_RINKEBY: 'https://api.thegraph.com/subgraphs/name/protofire/omen-rinkeby'
+          REACT_APP_OMEN_GRAPH_HTTP_XDAI: 'https://api.thegraph.com/subgraphs/name/protofire/omen-xdai'
+          REACT_APP_OMEN_URL_DAPP: 'https://omen.eth.link'
+          REACT_APP_REALITY_CONTRACT_ADDRESS_FOR_MAINNET: '0x325a2e0f3cca2ddbaebb4dfc38df8d19ca165b47'
+          REACT_APP_REALITY_CONTRACT_ADDRESS_FOR_RINKEBY: '0x3D00D77ee771405628a4bA4913175EcC095538da'
+          REACT_APP_REALITY_CONTRACT_ADDRESS_FOR_XDAI: '0x79e32aE03fb27B07C89c0c568F80287C01ca2E57'
+          REACT_APP_REALITY_TIMEOUT: '86400'
+          REACT_APP_RPC_XDAI_CHAIN: 'https://rpc.xdaichain.com/'
+          REACT_APP_SC_ATTR: 'avoid-sc-conflicts'
+          REACT_APP_USE_CPK: 'false'
+          REACT_APP_WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_MAINNET: '0xc14f5d2B9d6945EF1BA93f8dB20294b90FA5b5b1'
+          REACT_APP_WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_RINKEBY: '0xc14f5d2B9d6945EF1BA93f8dB20294b90FA5b5b1'
+          REACT_APP_WRAPPED_1155_FACTORY_CONTRACT_ADDRESS_FOR_XDAI: '0xc14f5d2B9d6945EF1BA93f8dB20294b90FA5b5b1'
+
+      - name: Upload websites artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: website
+          path: build
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Download website
+        uses: actions/download-artifact@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: 'Deploy to S3: Develop'
+        if: github.ref == 'refs/heads/develop'
+        run: aws s3 sync website s3://${{ secrets.AWS_DEV_BUCKET_NAME }} --delete
+
+      - name: 'Deploy to S3: Staging'
+        if: github.ref == 'refs/heads/master'
+        run: aws s3 sync website s3://${{ secrets.AWS_STAGING_BUCKET_NAME }}/current --delete
+
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
+
+      - name: 'Production deployment: Upload release build files to be deployed'
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: aws s3 sync website s3://${{ secrets.AWS_STAGING_BUCKET_NAME }}/releases/${{ steps.get_version.outputs.VERSION }} --delete
+
+      - name: 'Production deployment: Enable production deployment'
+        if: success() && startsWith(github.ref, 'refs/tags/v')
+        run: bash ./.github/scripts/prepare_production_deployment.sh
+        env:
+          PROD_DEPLOYMENT_HOOK_TOKEN: ${{ secrets.PROD_DEPLOYMENT_HOOK_TOKEN }}
+          PROD_DEPLOYMENT_HOOK_URL: ${{ secrets.PROD_DEPLOYMENT_HOOK_URL }}
+          VERSION_TAG: ${{ steps.get_version.outputs.VERSION }}

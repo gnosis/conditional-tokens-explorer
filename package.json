@@ -3,7 +3,7 @@
   "version": "0.3.1",
   "private": true,
   "engines": {
-    "node": ">=4.4.7 <=14.15"
+    "node": ">=4.4.7 <=14.20"
   },
   "dependencies": {
     "1155-to-20-helper": "https://github.com/davidalbela/1155-to-20-helper",
