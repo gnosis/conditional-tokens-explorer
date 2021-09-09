@@ -70,9 +70,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-${{ matrix.node-version }}-nodemodules-
 
-      - name: Check linter rules
-        run: yarn lint
-
       - name: Unit Test
         run: yarn test
         env:
