@@ -39,10 +39,8 @@ const positionFragment = gql`
     indexSets
     activeValue
     createTimestamp
+    wrappedTokenAddress
     collateralToken {
-      id
-    }
-    wrappedToken {
       id
     }
     collection {

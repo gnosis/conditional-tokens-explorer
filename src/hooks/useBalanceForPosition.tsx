@@ -1,19 +1,19 @@
 import { useQuery } from '@apollo/react-hooks'
 import { BigNumber } from 'ethers/utils'
 
-import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useActiveAddress } from 'hooks/useActiveAddress'
 import { UserPositionBalancesQuery } from 'queries/CTEUsers'
 import { UserPositionBalances } from 'types/generatedGQLForCTE'
 
 export const useBalanceForPosition = (positionId: string) => {
-  const { address } = useWeb3ConnectedOrInfura()
+  const activeAddress = useActiveAddress()
 
   const { data, error, loading, refetch } = useQuery<UserPositionBalances>(
     UserPositionBalancesQuery,
     {
-      skip: !address || !positionId,
+      skip: !activeAddress || !positionId,
       variables: {
-        account: address && address.toLowerCase(),
+        account: activeAddress && activeAddress.toLowerCase(),
         positionId: positionId,
       },
     }

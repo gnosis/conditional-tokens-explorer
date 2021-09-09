@@ -28,9 +28,7 @@ export const UserPositionBalancesQuery = gql`
         collateralToken {
           id
         }
-        wrappedToken {
-          id
-        }
+        wrappedTokenAddress
       }
       balance
       wrappedBalance

@@ -24,12 +24,14 @@ import {
 import { TitleControlButton } from 'components/pureStyledComponents/TitleControl'
 import { PositionPreview } from 'components/splitPosition/PositionPreview'
 import { FullLoading } from 'components/statusInfo/FullLoading'
+import { InlineLoading } from 'components/statusInfo/InlineLoading'
 import { StatusInfoInline, StatusInfoType } from 'components/statusInfo/StatusInfoInline'
 import { IconTypes } from 'components/statusInfo/common'
 import { SelectableConditionTable } from 'components/table/SelectableConditionTable'
 import { TitleValue } from 'components/text/TitleValue'
 import { NULL_PARENT_ID, ZERO_BN } from 'config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useActiveAddress } from 'hooks/useActiveAddress'
 import { useAllowance } from 'hooks/useAllowance'
 import { useAllowanceState } from 'hooks/useAllowanceState'
 import { useCollateral } from 'hooks/useCollateral'
@@ -63,8 +65,17 @@ interface Props {
 const logger = getLogger('Form')
 
 export const Form = (props: Props) => {
-  const { _type: status, CTService, connect } = useWeb3ConnectedOrInfura()
+  const {
+    _type: status,
+    CPKService,
+    CTService,
+    address: walletAddress,
+    connect,
+    isUsingTheCPKAddress,
+  } = useWeb3ConnectedOrInfura()
   const { tokens } = props
+
+  const activeAddress = useActiveAddress()
 
   const defaultSplitFrom = SplitFromType.collateral
 
@@ -85,7 +96,7 @@ export const Form = (props: Props) => {
   const allowanceMethods = useAllowance(collateralAddress)
   const { collateral } = useCollateral(collateralAddress)
 
-  const { condition } = useCondition(conditionId)
+  const { condition, loading } = useCondition(conditionId)
   const outcomeSlot = useMemo(() => (condition ? condition.outcomeSlotCount : 0), [condition])
   const conditionIdToPreviewShow = useMemo(() => (condition ? condition.id : ''), [condition])
 
@@ -95,10 +106,11 @@ export const Form = (props: Props) => {
 
   useEffect(() => {
     const numberedOutcomesToSet = originalPartition.map((outcome: BigNumber, key: number) => {
-      return [{ value: key, id: outcome.toString() }]
+      const text = condition && condition.outcomes ? condition.outcomes[key] : undefined
+      return [{ value: key, text, id: outcome.toString() }]
     })
     setNumberedOutcomes(numberedOutcomesToSet)
-  }, [originalPartition, setNumberedOutcomes])
+  }, [condition, originalPartition, setNumberedOutcomes])
 
   const partition = useMemo(() => {
     const outcomes = numberedOutcomes.map((collection) => collection.map((c) => c.id))
@@ -125,26 +137,39 @@ export const Form = (props: Props) => {
 
   const onSubmit = useCallback(async () => {
     try {
-      if (status === Web3ContextStatus.Connected) {
+      if (status === Web3ContextStatus.Connected && activeAddress && walletAddress && CPKService) {
         setTransactionStatus(Remote.loading())
 
         let positionIds: PositionIdsArray[]
         let collateralFromSplit: string = collateralAddress
 
         if (isSplittingFromCollateral) {
-          await CTService.splitPosition(
-            collateralFromSplit,
-            NULL_PARENT_ID,
-            conditionId,
-            partition,
-            amount
-          )
+          if (isUsingTheCPKAddress()) {
+            await CPKService.splitPosition({
+              CTService,
+              address: walletAddress,
+              amount,
+              collateralToken: collateralFromSplit,
+              conditionId,
+              parentCollectionId: NULL_PARENT_ID,
+              partition,
+            })
+          } else {
+            await CTService.splitPosition(
+              collateralFromSplit,
+              NULL_PARENT_ID,
+              conditionId,
+              partition,
+              amount
+            )
+          }
 
           positionIds = await CTService.getPositionsFromPartition(
             partition,
             NULL_PARENT_ID,
             conditionId,
-            collateralFromSplit
+            collateralFromSplit,
+            activeAddress
           )
         } else if (
           isSplittingFromPosition &&
@@ -155,19 +180,32 @@ export const Form = (props: Props) => {
           collateralFromSplit = position.collateralToken
           const collectionId = position.collection.id
 
-          await CTService.splitPosition(
-            collateralFromSplit,
-            collectionId,
-            conditionId,
-            partition,
-            amount
-          )
+          if (isUsingTheCPKAddress()) {
+            await CPKService.splitPosition({
+              CTService,
+              address: walletAddress,
+              amount,
+              collateralToken: collateralFromSplit,
+              conditionId,
+              parentCollectionId: collectionId,
+              partition,
+            })
+          } else {
+            await CTService.splitPosition(
+              collateralFromSplit,
+              collectionId,
+              conditionId,
+              partition,
+              amount
+            )
+          }
 
           positionIds = await CTService.getPositionsFromPartition(
             partition,
             collectionId,
             conditionId,
-            collateralFromSplit
+            collateralFromSplit,
+            activeAddress
           )
         } else {
           throw Error('Invalid split origin')
@@ -183,9 +221,13 @@ export const Form = (props: Props) => {
       setTransactionStatus(Remote.failure(err))
     }
   }, [
+    walletAddress,
+    isUsingTheCPKAddress,
     CTService,
     connect,
     status,
+    activeAddress,
+    CPKService,
     partition,
     isSplittingFromCollateral,
     isSplittingFromPosition,
@@ -236,6 +278,14 @@ export const Form = (props: Props) => {
     () => (isSplittingFromCollateral ? isValid && allowanceFinished : isValid),
     [isSplittingFromCollateral, isValid, allowanceFinished]
   )
+
+  const questionTitle = useMemo(() => {
+    if (condition && condition.question) {
+      return condition.question.title
+    } else {
+      return null
+    }
+  }, [condition])
 
   const outcomesByRow = '14'
 
@@ -355,12 +405,18 @@ export const Form = (props: Props) => {
           />
         )}
       </Row>
+      {questionTitle && (
+        <Row>
+          <TitleValue title="Question" value={questionTitle} />
+        </Row>
+      )}
+
       <Row paddingTop>
         <TitleValue
           title="Partition"
           titleControl={
             <TitleControlButton
-              disabled={!conditionIdToPreviewShow}
+              disabled={!conditionIdToPreviewShow || loading}
               onClick={() => setIsEditPartitionModalOpen(true)}
             >
               Edit Partition
@@ -369,30 +425,34 @@ export const Form = (props: Props) => {
           value={
             <>
               <CardTextSm>Outcomes Collections</CardTextSm>
-              <StripedListStyled>
-                {numberedOutcomes && numberedOutcomes.length ? (
-                  numberedOutcomes.map(
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    (outcomeList: OutcomeProps[], outcomeListIndex: number) => {
-                      return (
-                        <StripedListItemLessPadding key={outcomeListIndex}>
-                          <OutcomesContainer columnGap="0" columns={outcomesByRow}>
-                            {outcomeList.map((outcome: OutcomeProps, outcomeIndex: number) => (
-                              <Outcome
-                                key={outcomeIndex}
-                                lastInRow={outcomesByRow}
-                                outcome={outcome}
-                              />
-                            ))}
-                          </OutcomesContainer>
-                        </StripedListItemLessPadding>
-                      )
-                    }
-                  )
-                ) : (
-                  <StripedListEmpty>No Collections.</StripedListEmpty>
-                )}
-              </StripedListStyled>
+              {conditionId && loading ? (
+                <InlineLoading />
+              ) : (
+                <StripedListStyled>
+                  {numberedOutcomes && numberedOutcomes.length ? (
+                    numberedOutcomes.map(
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      (outcomeList: OutcomeProps[], outcomeListIndex: number) => {
+                        return (
+                          <StripedListItemLessPadding key={outcomeListIndex}>
+                            <OutcomesContainer columnGap="0" columns={outcomesByRow}>
+                              {outcomeList.map((outcome: OutcomeProps, outcomeIndex: number) => (
+                                <Outcome
+                                  key={outcomeIndex}
+                                  lastInRow={outcomesByRow}
+                                  outcome={outcome}
+                                />
+                              ))}
+                            </OutcomesContainer>
+                          </StripedListItemLessPadding>
+                        )
+                      }
+                    )
+                  ) : (
+                    <StripedListEmpty>No Collections.</StripedListEmpty>
+                  )}
+                </StripedListStyled>
+              )}
             </>
           }
         />

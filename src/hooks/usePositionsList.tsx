@@ -1,10 +1,11 @@
 import { useQuery } from '@apollo/react-hooks'
 import { ethers } from 'ethers'
 import lodashUniqBy from 'lodash.uniqby'
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import { ApolloError } from 'apollo-client/errors/ApolloError'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useActiveAddress } from 'hooks/useActiveAddress'
 import { useQueryTotalResults } from 'hooks/useQueryTotalResults'
 import { Position, marshalPositionListData } from 'hooks/utils'
 import { buildQueryPositionsList } from 'queries/CTEPositions'
@@ -33,8 +34,13 @@ type Variables = { [k: string]: any }
 /**
  * Return a array of positions, and the user balance if it's connected.
  */
-export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
-  const { address, networkConfig, provider } = useWeb3ConnectedOrInfura()
+export const usePositionsList = (
+  advancedFilter: AdvancedFilterPosition,
+  clientFilter?: (position: PositionWithUserBalanceWithDecimals) => boolean
+) => {
+  const { networkConfig, provider } = useWeb3ConnectedOrInfura()
+
+  const activeAddress = useActiveAddress()
 
   const [data, setData] = useState<Remote<Maybe<PositionWithUserBalanceWithDecimals[]>>>(
     Remote.loading()
@@ -43,6 +49,14 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
   const { CollateralValue, FromCreationDate, TextToSearch, ToCreationDate } = advancedFilter
 
   const query = buildQueryPositionsList(advancedFilter)
+
+  const defaultFilter = useCallback(() => {
+    return true
+  }, [])
+
+  const currentFilter = useMemo(() => {
+    return clientFilter || defaultFilter
+  }, [clientFilter, defaultFilter])
 
   const variables = useMemo(() => {
     const variables: Variables = {}
@@ -84,25 +98,31 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
     entityName: 'positions',
   })
 
-  const { data: userData, error: userError, refetch: refetchUserPositions } = useQuery<
-    UserWithPositions
-  >(UserWithPositionsQuery, {
-    skip: !address,
+  const {
+    data: userData,
+    error: userError,
+    loading: loadingUserData,
+    refetch: refetchUserPositions,
+  } = useQuery<UserWithPositions>(UserWithPositionsQuery, {
+    skip: !activeAddress,
     fetchPolicy: 'no-cache',
     variables: {
-      account: address?.toLowerCase(),
+      account: activeAddress?.toLowerCase(),
     },
   })
 
   React.useEffect(() => {
     // The use of loadingPositions act as a blocker when the useQuery is executing again
-    if (loadingPositions) setData(Remote.loading)
-    else if (positionsData) {
+    if (loadingPositions || loadingUserData) setData(Remote.loading)
+    const existUserData = activeAddress ? userData : true
+    if (positionsData && existUserData) {
+      setData(Remote.loading)
+
       const positionListData = marshalPositionListData(positionsData, userData?.user)
 
       const fetchUserBalanceWithDecimals = async () => {
         const uniqueCollateralTokens = lodashUniqBy(positionListData, 'collateralToken')
-        const uniqueWrappedTokens = lodashUniqBy(positionListData, 'wrappedToken')
+        const uniqueWrappedTokens = lodashUniqBy(positionListData, 'wrappedTokenAddress')
 
         const collateralTokensPromises = uniqueCollateralTokens.map(
           async ({ collateralToken }: Position) => {
@@ -118,16 +138,16 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
           }
         )
         const wrappedTokensPromises = uniqueWrappedTokens.map(
-          async ({ wrappedToken }: Position) => {
+          async ({ wrappedTokenAddress }: Position) => {
             try {
               return await getTokenSummary(
                 networkConfig,
                 provider,
-                wrappedToken || ethers.constants.HashZero
+                wrappedTokenAddress || ethers.constants.HashZero
               )
             } catch (err) {
               return {
-                address: wrappedToken || ethers.constants.HashZero,
+                address: wrappedTokenAddress || ethers.constants.HashZero,
                 decimals: 18,
                 symbol: '',
               }
@@ -138,7 +158,7 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
         const wrappedTokensResolved = await Promise.all(wrappedTokensPromises)
 
         const positionListDataEnhanced = positionListData.map((position: Position) => {
-          const { collateralToken, userBalanceERC20, userBalanceERC1155, wrappedToken } = position
+          const { collateralToken, userBalanceERC20, userBalanceERC1155, wrappedTokenAddress } = position
 
           const collateralTokenFound = collateralTokensResolved.filter(
             (collateralTokenInformation) =>
@@ -148,7 +168,7 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
           const wrappedTokenFound = wrappedTokensResolved.filter(
             (wrappedTokenInformation) =>
               wrappedTokenInformation &&
-              wrappedTokenInformation?.address.toLowerCase() === wrappedToken?.toLowerCase()
+              wrappedTokenInformation?.address.toLowerCase() === wrappedTokenAddress?.toLowerCase()
           )
 
           const userBalanceERC1155WithDecimals =
@@ -181,12 +201,25 @@ export const usePositionsList = (advancedFilter: AdvancedFilterPosition) => {
       }
       fetchUserBalanceWithDecimals()
     }
-  }, [loadingPositions, positionsData, userData, networkConfig, provider])
+  }, [
+    loadingPositions,
+    loadingUserData,
+    activeAddress,
+    positionsData,
+    userData,
+    networkConfig,
+    provider,
+  ])
 
   const error = React.useMemo(() => positionsError || userError, [positionsError, userError])
 
+  const dataFiltered = useMemo(() => {
+    const maybeItems = data.isSuccess() && data.get()
+    return maybeItems && maybeItems.filter(currentFilter)
+  }, [data, currentFilter])
+
   return {
-    data: data.isSuccess() && data.get(),
+    data: dataFiltered,
     error: error as ApolloError,
     loading: data.isLoading(),
     refetchPositions,

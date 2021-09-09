@@ -16,15 +16,15 @@ import { CategoriesDropdown } from 'components/form/CategoriesDropdown'
 import { ConditionTypesDropdown } from 'components/form/ConditionTypesDropdown'
 import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { ErrorContainer, Error as ErrorMessage } from 'components/pureStyledComponents/Error'
-import { PageTitle } from 'components/pureStyledComponents/PageTitle'
 import { Row } from 'components/pureStyledComponents/Row'
 import { SmallNote } from 'components/pureStyledComponents/SmallNote'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
-import { TitleControl } from 'components/pureStyledComponents/TitleControl'
+import { TitleControl, TitleControlButton } from 'components/pureStyledComponents/TitleControl'
 import { FullLoading } from 'components/statusInfo/FullLoading'
 import { StatusInfoInline, StatusInfoType } from 'components/statusInfo/StatusInfoInline'
 import { IconTypes } from 'components/statusInfo/common'
 import { Hash } from 'components/text/Hash'
+import { PageTitle } from 'components/text/PageTitle'
 import { TitleValue } from 'components/text/TitleValue'
 import {
   ADDRESS_REGEX,
@@ -35,11 +35,10 @@ import {
   MAX_OUTCOMES_ALLOWED,
   MIN_OUTCOMES,
   MIN_OUTCOMES_ALLOWED,
-  USE_CPK,
 } from 'config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useActiveAddress } from 'hooks/useActiveAddress'
 import { ConditionalTokensService } from 'services/conditionalTokens'
-import { CPKService } from 'services/cpk'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
 import { isAddress } from 'util/tools'
@@ -78,16 +77,17 @@ interface OmenConditionType {
 export const PrepareCondition = () => {
   const {
     _type: status,
+    CPKService,
     CTService,
     RtyService,
-    address,
     connect,
+    isUsingTheCPKAddress,
     networkConfig,
-    provider,
-    signer,
   } = useWeb3ConnectedOrInfura()
 
   const history = useHistory()
+
+  const activeAddress = useActiveAddress()
 
   const [prepareConditionStatus, setPrepareConditionStatus] = useState<Remote<Maybe<string>>>(
     Remote.notAsked<Maybe<string>>()
@@ -130,6 +130,7 @@ export const PrepareCondition = () => {
   } = formStateCustomCondition
 
   const {
+    clearError: clearErrorOmenCondition,
     control: omenControl,
     errors: errorsOmenCondition,
     formState: formStateOmenCondition,
@@ -161,21 +162,38 @@ export const PrepareCondition = () => {
   const [conditionType, setConditionType] = useState<ConditionType>(ConditionType.custom)
   const [outcomes, setOutcomes] = useState<Array<string>>([])
   const [outcome, setOutcome] = useState<string>('')
+  const [outcomesBeingEdited, setOutcomesBeingEdited] = useState<boolean[]>([])
 
   const addOutcome = useCallback(() => {
     const sanitizedOutcome = outcome.trim()
     const outcomesCloned = lodashClonedeep(outcomes)
     setOutcome('')
     setOutcomes([...outcomesCloned, sanitizedOutcome])
-  }, [outcome, outcomes, setOutcomes])
+    setOutcomesBeingEdited([...outcomesBeingEdited, false])
+  }, [outcome, outcomes, outcomesBeingEdited])
 
   const removeOutcome = useCallback(
     (index: number) => {
       const outcomesCloned = lodashClonedeep(outcomes)
       outcomesCloned.splice(index, 1)
       setOutcomes([...outcomesCloned])
+      setOutcomesBeingEdited([
+        ...outcomesBeingEdited.slice(0, index),
+        ...outcomesBeingEdited.slice(index + 1),
+      ])
     },
-    [outcomes]
+    [outcomes, outcomesBeingEdited]
+  )
+
+  const toggleEditOutcome = useCallback(
+    (value: boolean, index: number) => {
+      setOutcomesBeingEdited([
+        ...outcomesBeingEdited.slice(0, index),
+        value,
+        ...outcomesBeingEdited.slice(index + 1),
+      ])
+    },
+    [outcomesBeingEdited]
   )
 
   const updateOutcome = useCallback(
@@ -190,6 +208,12 @@ export const PrepareCondition = () => {
   const onChangeOutcome = (e: ChangeEvent<HTMLInputElement>) => {
     setOutcome(e.currentTarget.value)
   }
+
+  const clearResolutionDateEnabled = useMemo(() => {
+    const resolutionDateHasError = !!errorsOmenCondition.resolutionDate
+    const resolutionDateNotEmpty = resolutionDate !== null && resolutionDate !== ''
+    return resolutionDateNotEmpty || resolutionDateHasError
+  }, [errorsOmenCondition.resolutionDate, resolutionDate])
 
   useEffect(() => {
     const getConditionIdPreview = async () => {
@@ -214,7 +238,7 @@ export const PrepareCondition = () => {
             oracleOmenCondition &&
             outcomes.length > 0 &&
             resolutionDate &&
-            address &&
+            activeAddress &&
             category
           ) {
             const openingDateMoment = moment(resolutionDate + '')
@@ -225,7 +249,7 @@ export const PrepareCondition = () => {
               outcomes,
               question: questionTitle + '',
               networkConfig,
-              signerAddress: address,
+              signerAddress: activeAddress,
             }
             const questionId = await RtyService.askQuestionConstant(questionOptions)
             setConditionIdPreview(
@@ -250,7 +274,7 @@ export const PrepareCondition = () => {
   }, [
     outcomes,
     RtyService,
-    address,
+    activeAddress,
     networkConfig,
     questionTitle,
     CTService,
@@ -297,15 +321,14 @@ export const PrepareCondition = () => {
 
   const prepareCondition = useCallback(async () => {
     try {
-      if (status === Web3ContextStatus.Connected && address && signer) {
+      if (status === Web3ContextStatus.Connected && activeAddress && CPKService) {
         setPrepareConditionStatus(Remote.loading())
         let conditionIdToUpdate: Maybe<string> = null
-        const cpk = await CPKService.create(networkConfig, provider, signer)
         if (conditionType === ConditionType.custom) {
           const { oracle: oracleCustom, outcomesSlotCount, questionId } = getValuesCustomCondition()
           if (outcomesSlotCount) {
-            if (USE_CPK) {
-              await cpk.prepareCustomCondition({
+            if (isUsingTheCPKAddress()) {
+              await CPKService.prepareCustomCondition({
                 CTService,
                 questionId,
                 oracleAddress: oracleCustom,
@@ -340,13 +363,13 @@ export const PrepareCondition = () => {
               outcomes,
               question: questionTitle + '',
               networkConfig,
-              signerAddress: USE_CPK ? cpk.address : address,
+              signerAddress: activeAddress,
             }
 
             const questionId = await RtyService.askQuestionConstant(questionOptions)
 
-            if (USE_CPK) {
-              await cpk.prepareOmenCondition({
+            if (isUsingTheCPKAddress()) {
+              await CPKService.prepareOmenCondition({
                 CTService,
                 RtyService,
                 arbitrator: (arbitrator as Arbitrator).address,
@@ -380,9 +403,10 @@ export const PrepareCondition = () => {
       setPrepareConditionStatus(Remote.failure(err))
     }
   }, [
+    isUsingTheCPKAddress,
     CTService,
     RtyService,
-    address,
+    activeAddress,
     category,
     conditionType,
     connect,
@@ -391,17 +415,20 @@ export const PrepareCondition = () => {
     networkConfig,
     outcomes,
     status,
-    provider,
-    signer,
+    CPKService,
+  ])
+
+  const areOutcomesBeingEdited = useMemo(() => outcomesBeingEdited.some(Boolean), [
+    outcomesBeingEdited,
   ])
 
   const onClickUseMyWallet = useCallback(() => {
-    if (status === Web3ContextStatus.Connected && address) {
-      setValueCustomCondition('oracle', address, true)
+    if (status === Web3ContextStatus.Connected && activeAddress) {
+      setValueCustomCondition('oracle', activeAddress, true)
     } else if (status === Web3ContextStatus.Infura) {
       connect()
     }
-  }, [address, connect, setValueCustomCondition, status])
+  }, [activeAddress, connect, setValueCustomCondition, status])
 
   const submitDisabled = useMemo(
     () =>
@@ -417,16 +444,18 @@ export const PrepareCondition = () => {
           prepareConditionStatus.isFailure() ||
           checkForExistingCondition.isLoading() ||
           checkForExistingCondition.isFailure() ||
+          areOutcomesBeingEdited ||
           isConditionAlreadyExist ||
           isQuestionAlreadyExist ||
           isOutcomesFromOmenConditionInvalid,
     [
-      isValidCustomCondition,
       conditionType,
-      isValidOmenCondition,
+      isValidCustomCondition,
       prepareConditionStatus,
       checkForExistingCondition,
       isConditionAlreadyExist,
+      isValidOmenCondition,
+      areOutcomesBeingEdited,
       isQuestionAlreadyExist,
       isOutcomesFromOmenConditionInvalid,
     ]
@@ -642,7 +671,16 @@ export const PrepareCondition = () => {
               <TitleValue
                 title="Reporting Address"
                 titleControl={
-                  <TitleControl onClick={onClickUseMyWallet}>Use My Wallet</TitleControl>
+                  <TitleControl
+                    onClick={onClickUseMyWallet}
+                    title={`My active address is ${activeAddress}. ${
+                      isUsingTheCPKAddress()
+                        ? 'The Contract proxy kit is ON to batch transactions.'
+                        : ''
+                    }`}
+                  >
+                    Use My Wallet
+                  </TitleControl>
                 }
                 value={
                   <>
@@ -718,15 +756,28 @@ export const PrepareCondition = () => {
             )}
             <AddOutcome
               addOutcome={addOutcome}
+              areOutcomesBeingEdited={areOutcomesBeingEdited}
               onChange={onChangeOutcome}
               outcome={outcome}
               outcomes={outcomes}
               removeOutcome={removeOutcome}
+              toggleEditOutcome={toggleEditOutcome}
               updateOutcome={updateOutcome}
             />
             <Row>
               <TitleValue
                 title="Resolution Date"
+                titleControl={
+                  <TitleControlButton
+                    disabled={!clearResolutionDateEnabled}
+                    onClick={() => {
+                      setValueOmenCondition('resolutionDate', null)
+                      clearErrorOmenCondition('resolutionDate')
+                    }}
+                  >
+                    Clear
+                  </TitleControlButton>
+                }
                 value={
                   <>
                     <Textfield
@@ -872,6 +923,7 @@ export const PrepareCondition = () => {
               {newCustomConditionStatusInfo.contents}
             </StatusInfoInline>
           )}
+
         <ButtonContainer>
           <Button disabled={submitDisabled} onClick={prepareCondition}>
             Prepare

@@ -1,13 +1,21 @@
 import React, { useCallback } from 'react'
 import DataTable from 'react-data-table-component'
+import styled from 'styled-components'
 
 import { ButtonCopy } from 'components/buttons/ButtonCopy'
 import { ExternalLink } from 'components/navigation/ExternalLink'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
-import { FlexRow } from 'components/pureStyledComponents/FlexRow'
 import { Hash } from 'components/text/Hash'
 import { customStyles } from 'theme/tableCustomStyles'
 import { HashArray } from 'util/types'
+
+const Text = styled.span`
+  display: block;
+  max-width: 90%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`
 
 interface Props {
   callbackOnHistoryPush?: () => void
@@ -24,26 +32,22 @@ export const DisplayTableHashes = (props: Props) => {
       {
         // eslint-disable-next-line react/display-name
         cell: ({ hash, title, url }: HashArray) => {
-          if (title) {
-            return (
-              <FlexRow>
-                {title}
-                <ButtonCopy value={hash} />
-                {url && <ExternalLink href={url} />}
-              </FlexRow>
-            )
-          } else {
-            return (
-              <Hash
-                externalLink
-                {...(url && { href: `${url}` })}
-                onClick={() => {
-                  if (typeof callbackOnHistoryPush === 'function') callbackOnHistoryPush()
-                }}
-                value={hash}
-              />
-            )
-          }
+          return title ? (
+            <>
+              <Text title={title}>{title}</Text>
+              <ButtonCopy value={hash} />
+              {url && <ExternalLink href={url} />}
+            </>
+          ) : (
+            <Hash
+              externalLink
+              {...(url && { href: `${url}` })}
+              onClick={() => {
+                if (typeof callbackOnHistoryPush === 'function') callbackOnHistoryPush()
+              }}
+              value={hash}
+            />
+          )
         },
         name: titleTable,
       },

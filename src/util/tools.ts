@@ -3,6 +3,7 @@ import { Provider } from 'ethers/providers'
 import { BigNumber, formatUnits, getAddress } from 'ethers/utils'
 import moment from 'moment-timezone'
 
+import axios from 'axios'
 import BN from 'bn.js'
 import { BYTES_REGEX, OMEN_URL_DAPP } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
@@ -416,12 +417,13 @@ export const getTokenSummary = async (
   } else {
     try {
       const erc20Service = new ERC20Service(provider, collateralToken)
-      const { address, decimals, symbol } = await erc20Service.getProfileSummary()
+      const { address, decimals, symbol, name } = await erc20Service.getProfileSummary()
 
       return {
         address,
         decimals,
         symbol,
+        name,
       }
     } catch (err) {
       humanizeCollateralMessageError(err)
@@ -464,4 +466,33 @@ export const getParentCollectionId = (
   return newCollectionsSet.length
     ? ConditionalTokensService.getCombinedCollectionId(newCollectionsSet)
     : ethers.constants.HashZero
+}
+
+export const sleep = (milliseconds = 1000) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, milliseconds)
+  })
+
+export const getGraphMeta = async (networkConfig: NetworkConfig) => {
+  const query = `
+    query Meta {
+      _meta {
+        block {
+          hash
+          number
+        }
+      }
+    }
+  `
+  const { CTEhttpUri } = networkConfig.getGraphUris()
+  const result = await axios.post(CTEhttpUri, { query })
+  return result.data.data._meta.block
+}
+
+export const waitForBlockToSync = async (networkConfig: NetworkConfig, blockNum: number) => {
+  let block
+  while (!block || block.number < blockNum + 1) {
+    block = await getGraphMeta(networkConfig)
+    await sleep()
+  }
 }

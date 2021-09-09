@@ -1,8 +1,8 @@
 import React from 'react'
 
-import { PageTitle } from 'components/pureStyledComponents/PageTitle'
 import { InfoCard } from 'components/statusInfo/InfoCard'
 import { InlineLoading } from 'components/statusInfo/InlineLoading'
+import { PageTitle } from 'components/text/PageTitle'
 import { usePositionContext } from 'contexts/PositionContext'
 import { Contents } from 'pages/PositionDetails/Contents'
 import { PositionData_conditions } from 'types/generatedGQLForCTE'
@@ -27,6 +27,7 @@ export const Wrapper = (props: WrapperProps) => {
     loading,
     position,
     refetchBalances,
+    refetchPosition,
     setPositionId,
     wrappedTokenAddress,
   } = usePositionContext()
@@ -68,6 +69,7 @@ export const Wrapper = (props: WrapperProps) => {
           conditions={conditions || []}
           position={position}
           refetchBalances={refetchBalances}
+          refetchPosition={refetchPosition}
           wrappedTokenAddress={wrappedTokenAddress}
         />
       )}

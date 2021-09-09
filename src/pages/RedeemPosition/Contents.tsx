@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useMemo, useState } from 'react'
 import { Prompt } from 'react-router'
 
@@ -9,31 +10,32 @@ import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer
 import { Row } from 'components/pureStyledComponents/Row'
 import { PositionPreview } from 'components/redeemPosition/PositionPreview'
 import { FullLoading } from 'components/statusInfo/FullLoading'
+import { StatusInfoInline, StatusInfoType } from 'components/statusInfo/StatusInfoInline'
 import { IconTypes } from 'components/statusInfo/common'
 import { SelectablePositionTable } from 'components/table/SelectablePositionTable'
-import { USE_CPK } from 'config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useCollateral } from 'hooks/useCollateral'
 import { useCondition } from 'hooks/useCondition'
 import { PositionWithUserBalanceWithDecimals } from 'hooks/usePositionsList'
-import { CPKService } from 'services/cpk'
 import { getLogger } from 'util/logger'
 import { Remote } from 'util/remoteData'
-import { getParentCollectionId } from 'util/tools'
+import { formatBigNumber, getParentCollectionId, getRedeemedBalance } from 'util/tools'
 
 const logger = getLogger('RedeemPosition')
 
 export const Contents = () => {
   const {
     _type: status,
+    CPKService,
     CTService,
+    address: walletAddress,
     connect,
+    isUsingTheCPKAddress,
     networkConfig,
-    provider,
-    signer,
   } = useWeb3ConnectedOrInfura()
 
-  const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<boolean>>>(
-    Remote.notAsked<Maybe<boolean>>()
+  const [transactionStatus, setTransactionStatus] = useState<Remote<Maybe<string>>>(
+    Remote.notAsked<Maybe<string>>()
   )
   const [position, setPosition] = useState<Maybe<PositionWithUserBalanceWithDecimals>>(null)
   const [conditionIds, setConditionIds] = useState<Array<string>>([])
@@ -44,18 +46,41 @@ export const Contents = () => {
     setConditionId(conditionId)
   }, [])
 
-  const { condition } = useCondition(conditionId)
+  const { condition, loading: loadingCondition } = useCondition(conditionId)
 
   const clearComponent = useCallback(() => {
     setPosition(null)
     setConditionIds([])
     setConditionId('')
-    setTransactionStatus(Remote.notAsked<Maybe<boolean>>())
   }, [])
+
+  const redeemedBalance = useMemo(
+    () =>
+      position && condition
+        ? getRedeemedBalance(position, condition, position.userBalanceERC1155)
+        : new BigNumber(0),
+    [condition, position]
+  )
+
+  logger.log(`Balance to redeem`, redeemedBalance.toString())
+
+  const { collateral: token } = useCollateral(position ? position.collateralToken : '')
+
+  const getBalanceRedemeed = useCallback(() => {
+    return redeemedBalance && token
+      ? `${formatBigNumber(redeemedBalance, token.decimals)} ${token.symbol}`
+      : ''
+  }, [redeemedBalance, token])
 
   const onRedeem = useCallback(async () => {
     try {
-      if (position && conditionId && status === Web3ContextStatus.Connected && signer) {
+      if (
+        position &&
+        conditionId &&
+        status === Web3ContextStatus.Connected &&
+        CPKService &&
+        walletAddress
+      ) {
         setTransactionStatus(Remote.loading())
 
         const { collateralToken, conditionIds, indexSets } = position
@@ -73,15 +98,15 @@ export const Contents = () => {
           indexSets[conditionIds.findIndex((condId) => condId === conditionId)],
         ]
 
-        const cpk = await CPKService.create(networkConfig, provider, signer)
-
-        if (USE_CPK) {
-          await cpk.redeemPosition({
+        if (isUsingTheCPKAddress()) {
+          await CPKService.redeemPosition({
             CTService,
             collateralToken,
             parentCollectionId,
             conditionId,
             indexSets: redeemedIndexSet,
+            account: walletAddress,
+            earnedCollateral: redeemedBalance,
           })
         } else {
           await CTService.redeemPositions(
@@ -91,12 +116,8 @@ export const Contents = () => {
             redeemedIndexSet
           )
         }
-
-        setPosition(null)
-        setConditionIds([])
-        setConditionId('')
-
-        setTransactionStatus(Remote.success(true))
+        setTransactionStatus(Remote.success(getBalanceRedemeed()))
+        clearComponent()
       } else if (status === Web3ContextStatus.Infura) {
         connect()
       }
@@ -104,7 +125,19 @@ export const Contents = () => {
       setTransactionStatus(Remote.failure(err))
       logger.error(err)
     }
-  }, [status, CTService, connect, conditionId, position, provider, networkConfig, signer])
+  }, [
+    status,
+    CPKService,
+    CTService,
+    walletAddress,
+    connect,
+    redeemedBalance,
+    isUsingTheCPKAddress,
+    getBalanceRedemeed,
+    clearComponent,
+    conditionId,
+    position,
+  ])
 
   const disabled =
     transactionStatus.isLoading() || !conditionIds.length || !position || !conditionId
@@ -114,19 +147,17 @@ export const Contents = () => {
       transactionStatus.isFailure()
         ? {
             buttonType: ButtonType.danger,
-            onClick: () => setTransactionStatus(Remote.notAsked<Maybe<boolean>>()),
+            onClick: () => setTransactionStatus(Remote.notAsked<Maybe<string>>()),
             text: 'Close',
           }
         : transactionStatus.isSuccess()
         ? {
             buttonType: ButtonType.primary,
-            onClick: () => {
-              clearComponent()
-            },
+            onClick: () => setTransactionStatus(Remote.notAsked<Maybe<string>>()),
             text: 'OK',
           }
         : undefined,
-    [transactionStatus, clearComponent]
+    [transactionStatus]
   )
 
   const fullLoadingMessage = useMemo(
@@ -135,7 +166,7 @@ export const Contents = () => {
         ? transactionStatus.getFailure()
         : transactionStatus.isLoading()
         ? 'Working...'
-        : 'Redeeming finished!',
+        : `Redeeming of ${transactionStatus.get()} finished!`,
     [transactionStatus]
   )
 
@@ -199,8 +230,26 @@ export const Contents = () => {
         />
       </Row>
       <Row>
-        <PositionPreview condition={condition} networkConfig={networkConfig} position={position} />
+        <PositionPreview
+          condition={condition}
+          isLoading={loadingCondition}
+          networkConfig={networkConfig}
+          position={position}
+        />
       </Row>
+      {redeemedBalance &&
+        redeemedBalance.isZero() &&
+        conditionId &&
+        !loadingCondition &&
+        position &&
+        position.conditionIds.length < 2 && (
+          <Row>
+            <StatusInfoInline status={StatusInfoType.warning}>
+              The redeemed balance is 0.00. You will not receive any {token && token.symbol} to your
+              wallet.
+            </StatusInfoInline>
+          </Row>
+        )}
       {isWorking && (
         <FullLoading
           actionButton={fullLoadingActionButton}

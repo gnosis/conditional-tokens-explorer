@@ -22,8 +22,14 @@ const ProtectedRoute: React.FC<RouteProps> = (props) => {
 
   return (
     <>
-      {status._type === 'error' && (
+      {status._type === Web3ContextStatus.Error && (
         <InfoCard message="Error when trying to connect..." title="Error" />
+      )}
+      {status._type === Web3ContextStatus.WrongNetwork && (
+        <InfoCard
+          message="The network you are trying to connect is not supported..."
+          title="Error"
+        />
       )}
       {(status._type === Web3ContextStatus.Connected ||
         status._type === Web3ContextStatus.Infura) && (

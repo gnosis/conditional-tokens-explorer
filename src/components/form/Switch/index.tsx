@@ -10,29 +10,39 @@ const Wrapper = styled.div<{ disabled?: boolean }>`
   pointer-events: ${(props) => (props.disabled ? 'none' : 'all')};
 `
 
-const SwitchWrapper = styled.div<{ active: boolean }>`
+const SwitchWrapper = styled.div<{ active: boolean; small?: boolean }>`
   background-color: ${(props) =>
     props.active ? props.theme.colors.primary : props.theme.colors.mediumGrey};
-  border-radius: 20px;
+  border-radius: ${(props) => (props.small ? '15px' : '20px')};
   cursor: pointer;
-  height: 20px;
+  height: ${(props) => (props.small ? '15px' : '20px')};
   position: relative;
   transition: all 0.1s linear;
-  width: 36px;
+  width: ${(props) => (props.small ? '26px' : '36px')};
 `
 
-const Circle = styled.div<{ active: boolean }>`
+SwitchWrapper.defaultProps = {
+  small: false,
+}
+
+const Circle = styled.div<{ active: boolean; small?: boolean }>`
   background-color: #fff;
   border-radius: 50%;
   box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.16);
   cursor: pointer;
-  height: 16px;
-  left: ${(props) => (props.active ? '18px' : '2px')};
+  height: ${(props) => (props.small ? '11px' : '16px')};
   position: absolute;
   top: 2px;
   transition: all 0.1s linear;
-  width: 16px;
+  width: ${(props) => (props.small ? '11px' : '16px')};
+
+  ${(props) => props.small && `left: ${props.active ? '13px' : '2px'};`}
+  ${(props) => !props.small && `left: ${props.active ? '18px' : '2px'};`}
 `
+
+Circle.defaultProps = {
+  small: false,
+}
 
 const Label = styled.span`
   color: ${(props) => props.theme.colors.darkerGrey};
@@ -48,15 +58,16 @@ interface Props {
   disabled?: boolean
   label?: React.ReactNode
   onClick?: () => void
+  small?: boolean
 }
 
 export const Switch: React.FC<Props> = (props) => {
-  const { active = false, disabled, label, onClick, ...restProps } = props
+  const { active = false, disabled, label, onClick, small, ...restProps } = props
 
   return (
     <Wrapper disabled={disabled} onClick={onClick} {...restProps}>
-      <SwitchWrapper active={active}>
-        <Circle active={active} />
+      <SwitchWrapper active={active} small={small}>
+        <Circle active={active} small={small} />
       </SwitchWrapper>
       {label && <Label>{label}</Label>}
     </Wrapper>

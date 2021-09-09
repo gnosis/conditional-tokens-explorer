@@ -1,9 +1,5 @@
 import { useCallback } from 'react'
 
-import { getLogger } from 'util/logger'
-
-const logger = getLogger('useLocalStorage')
-
 export const useLocalStorage = <T extends string>(key: T) => {
   const getValue = useCallback(
     (removeValue = true) => {
@@ -11,7 +7,6 @@ export const useLocalStorage = <T extends string>(key: T) => {
       if (removeValue) window.localStorage.removeItem(key)
 
       if (t) {
-        logger.log(t)
         return JSON.parse(t)
       } else {
         return ''
@@ -21,7 +16,8 @@ export const useLocalStorage = <T extends string>(key: T) => {
   )
 
   const setValue = useCallback(
-    (value: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (value: any) => {
       window.localStorage.setItem(key, JSON.stringify(value))
     },
     [key]

@@ -34,6 +34,12 @@ export enum WrappedCollateralOptions {
   No = 'no',
 }
 
+export enum WithBalanceOptions {
+  All = 'all',
+  Yes = 'yes',
+  No = 'no',
+}
+
 export enum ValidityOptions {
   All = 'all',
   Invalid = 'invalid',
@@ -101,14 +107,16 @@ export type Token = {
   symbol: string
   address: string
   decimals: number
+  name?: string
 }
 
-export type NetworkId = 1 | 4 | 50
+export type NetworkId = 1 | 4 | 50 | 100
 
 export enum NetworkIds {
   MAINNET = 1,
   RINKEBY = 4,
   GANACHE = 50,
+  XDAI = 100,
 }
 
 export enum Status {
@@ -136,6 +144,7 @@ export type Arbitrator = {
 export interface OutcomeProps {
   id: string
   value: number
+  text?: string
 }
 
 export enum SplitFromType {
@@ -176,6 +185,7 @@ export interface TransferOptions {
   amount: BigNumber
   address: string
   positionId: string
+  tokenBytes: string
 }
 
 export type HashArray = {

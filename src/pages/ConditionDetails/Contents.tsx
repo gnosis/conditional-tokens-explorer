@@ -22,8 +22,9 @@ import { FormatHash } from 'components/text/FormatHash'
 import { TitleValue } from 'components/text/TitleValue'
 import { INFORMATION_NOT_AVAILABLE } from 'config/constants'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useActiveAddress } from 'hooks/useActiveAddress'
 import { useIsConditionFromOmen } from 'hooks/useIsConditionFromOmen'
-import { usePositions } from 'hooks/usePositions'
+import { usePositionsList } from 'hooks/usePositionsList'
 import { useQuestion } from 'hooks/useQuestion'
 import { GetCondition_condition } from 'types/generatedGQLForCTE'
 import {
@@ -32,7 +33,13 @@ import {
   getRealityQuestionUrl,
   truncateStringInTheMiddle,
 } from 'util/tools'
-import { ConditionStatus, ConditionType } from 'util/types'
+import {
+  AdvancedFilterPosition,
+  ConditionStatus,
+  ConditionType,
+  PositionSearchOptions,
+  WrappedCollateralOptions,
+} from 'util/types'
 
 const StripedListStyled = styled(StripedList)`
   margin-top: 6px;
@@ -46,8 +53,14 @@ interface Props {
   condition: GetCondition_condition
 }
 
+const optionsDisplayTable = {
+  showCollectionColumn: true,
+}
+
 export const Contents: React.FC<Props> = ({ condition }) => {
-  const { _type: status, address, networkConfig } = useWeb3ConnectedOrInfura()
+  const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
+
+  const activeAddress = useActiveAddress()
 
   const {
     createTimestamp,
@@ -63,8 +76,8 @@ export const Contents: React.FC<Props> = ({ condition }) => {
 
   const isConnected = useMemo(() => status === Web3ContextStatus.Connected, [status])
   const isAllowedToReport = useMemo(
-    () => address && address.toLowerCase() === oracle.toLowerCase(),
-    [address, oracle]
+    () => activeAddress && activeAddress.toLowerCase() === oracle.toLowerCase(),
+    [activeAddress, oracle]
   )
 
   const dropdownItems = useMemo(() => {
@@ -84,11 +97,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
 
   const { outcomesPrettier, question } = useQuestion(questionId, outcomeSlotCount)
   const isConditionFromOmen = useIsConditionFromOmen([oracle])
-  const {
-    templateId = null,
-    title = INFORMATION_NOT_AVAILABLE,
-    category = INFORMATION_NOT_AVAILABLE,
-  } = question ?? {}
+  const { templateId = null, category = INFORMATION_NOT_AVAILABLE } = question ?? {}
 
   const oracleName = useMemo(
     () =>
@@ -100,9 +109,23 @@ export const Contents: React.FC<Props> = ({ condition }) => {
     [networkConfig, oracle, isConditionFromOmen]
   )
 
-  const { data: positions, loading: loadingPositions } = usePositions({
-    conditionsIds: [conditionId],
-  })
+  const advancedFilters: AdvancedFilterPosition = useMemo(() => {
+    return {
+      CollateralValue: {
+        type: null,
+        value: null,
+      },
+      ToCreationDate: null,
+      FromCreationDate: null,
+      TextToSearch: {
+        type: PositionSearchOptions.ConditionId,
+        value: conditionId,
+      },
+      WrappedCollateral: WrappedCollateralOptions.All,
+    }
+  }, [conditionId])
+
+  const { data: positions, loading: loadingPositions } = usePositionsList(advancedFilters)
 
   const getRealityQuestionUrlMemoized = useCallback(
     (questionId: string): string => getRealityQuestionUrl(questionId, networkConfig),
@@ -169,7 +192,7 @@ export const Contents: React.FC<Props> = ({ condition }) => {
           }
         />
       </Row>
-      <OmenMarketsOrQuestion conditionsIds={[conditionId]} title={title} />
+      <OmenMarketsOrQuestion conditionId={conditionId} />
       {isConditionFromOmen && (
         <Row paddingTop>
           <TitleValue
@@ -207,7 +230,13 @@ export const Contents: React.FC<Props> = ({ condition }) => {
       <Row paddingTop>
         <TitleValue
           title={"Condition's split positions"}
-          value={<DisplayTablePositions isLoading={loadingPositions} positions={positions || []} />}
+          value={
+            <DisplayTablePositions
+              isLoading={loadingPositions}
+              options={optionsDisplayTable}
+              positions={positions || []}
+            />
+          }
         />
       </Row>
     </CenteredCard>

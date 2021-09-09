@@ -12,7 +12,15 @@ const CheckboxSelectedCSS = css`
   }
 `
 
-export const Checkbox = styled.div<{ checked?: boolean }>`
+const CheckboxDisabledCSS = css`
+  &,
+  &:hover {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+`
+
+export const Checkbox = styled.div<{ checked?: boolean; disabled?: boolean }>`
   background-color: #fff;
   border: solid 1px ${(props) => props.theme.colors.primary};
   flex-grow: 0;
@@ -22,4 +30,10 @@ export const Checkbox = styled.div<{ checked?: boolean }>`
   width: 12px;
 
   ${(props) => props.checked && CheckboxSelectedCSS}
+  ${(props) => props.disabled && CheckboxDisabledCSS}
 `
+
+Checkbox.defaultProps = {
+  checked: false,
+  disabled: false,
+}

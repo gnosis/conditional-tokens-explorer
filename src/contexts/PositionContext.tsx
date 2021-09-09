@@ -18,6 +18,7 @@ export interface PositionContext {
   wrappedTokenAddress: string
   errors: PositionErrors[]
   refetchBalances: () => void
+  refetchPosition: () => void
   setPositionId: (positionId: string) => void
   clearPosition: () => void
 }
@@ -33,6 +34,8 @@ export const POSITION_CONTEXT_DEFAULT_VALUE = {
   errors: [],
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   refetchBalances: () => {},
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  refetchPosition: () => {},
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setPositionId: () => {},
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -62,14 +65,18 @@ export const PositionProvider = (props: Props) => {
     setPositionId('')
   }, [])
 
-  const { data: fetchedPosition, error: errorFetchingPosition, loading } = useQuery<GetPosition>(
-    GetPositionQuery,
-    {
-      variables: { id: positionId },
-      fetchPolicy: 'no-cache',
-      skip: !positionId,
-    }
-  )
+  const limit = !positionId < !5000 ? !positionId : !5000
+
+  const {
+    data: fetchedPosition,
+    error: errorFetchingPosition,
+    loading,
+    refetch: refetchPosition,
+  } = useQuery<GetPosition>(GetPositionQuery, {
+    variables: { id: positionId },
+    fetchPolicy: 'no-cache',
+    skip: limit,
+  })
 
   if (positionId && fetchedPosition) {
     position = fetchedPosition?.position
@@ -108,8 +115,9 @@ export const PositionProvider = (props: Props) => {
     balanceERC1155,
     balanceERC20,
     collateralTokenAddress: position?.collateralToken?.id ?? '',
-    wrappedTokenAddress: position?.wrappedToken?.id ?? '',
+    wrappedTokenAddress: position?.wrappedTokenAddress ?? '',
     refetchBalances,
+    refetchPosition,
     errors,
     loading,
     setPositionId: setPositionIdCallback,

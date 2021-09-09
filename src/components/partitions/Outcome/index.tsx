@@ -101,13 +101,15 @@ const BaseOutcome: React.FC<Props> = (props) => {
   } = props
 
   const tooltipInfo = outcome.id
+  const outcomeText = outcome.text ? `<div><strong>Value:</strong> ${outcome.text}</div>` : ''
+  const tooltipText = `<div><div><strong>Id:</strong> ${outcome.id}</div>${outcomeText}</div>`
 
   return (
     <Wrapper
       data-for={`tooltip_${outcome.value}`}
       data-html={true}
       data-multiline={true}
-      data-tip={`id: ${outcome.id}`}
+      data-tip={tooltipText}
       id={id}
       lastInRow={lastInRow}
       onClick={onClick}

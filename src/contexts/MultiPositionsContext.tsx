@@ -109,12 +109,14 @@ export const MultiPositionsProvider = (props: Props) => {
     [clearPositions]
   )
 
+  const limit = !positionIds.length < !5000 ? !positionIds.length : !5000
+
   const { data: fetchedPositions, error: errorFetchingPositions, loading: loadingQuery } = useQuery<
     GetMultiPositions
   >(GetMultiPositionsQuery, {
     variables: { ids: positionIds },
     fetchPolicy: 'no-cache',
-    skip: !positionIds.length,
+    skip: limit,
   })
 
   useEffect(() => {

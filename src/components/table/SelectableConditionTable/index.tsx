@@ -28,6 +28,7 @@ import { TableControls } from 'components/table/TableControls'
 import { FormatHash } from 'components/text/FormatHash'
 import { TitleValue } from 'components/text/TitleValue'
 import { Web3ContextStatus, useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { useActiveAddress } from 'hooks/useActiveAddress'
 import { useConditionsList } from 'hooks/useConditionsList'
 import { useConditionsSearchOptions } from 'hooks/useConditionsSearchOptions'
 import { customStyles } from 'theme/tableCustomStyles'
@@ -68,8 +69,9 @@ interface Params {
 }
 
 const SelectConditionTable: React.FC<Props> = (props) => {
-  const { _type: status, CPKService, address, networkConfig } = useWeb3ConnectedOrInfura()
+  const { _type: status, networkConfig } = useWeb3ConnectedOrInfura()
 
+  const activeAddress = useActiveAddress()
   const {
     allowToDisplayOnlyConditionsToReport = false,
     onClearSelection,
@@ -89,9 +91,7 @@ const SelectConditionTable: React.FC<Props> = (props) => {
   const [resetPagination, setResetPagination] = useState<boolean>(false)
 
   const [selectedOracleFilter, setSelectedOracleFilter] = useState<string[]>(() =>
-    allowToDisplayOnlyConditionsToReport && address && CPKService
-      ? [address.toLowerCase(), CPKService.address.toLowerCase()]
-      : []
+    allowToDisplayOnlyConditionsToReport && activeAddress ? [activeAddress.toLowerCase()] : []
   )
   const [selectedOracleValue, setSelectedOracleValue] = useState<OracleFilterOptions>(() =>
     allowToDisplayOnlyConditionsToReport ? OracleFilterOptions.Current : OracleFilterOptions.All
@@ -146,9 +146,7 @@ const SelectConditionTable: React.FC<Props> = (props) => {
       allowToDisplayOnlyConditionsToReport ? OracleFilterOptions.Current : OracleFilterOptions.All
     )
     setSelectedOracleFilter(
-      allowToDisplayOnlyConditionsToReport && address && CPKService
-        ? [address.toLowerCase(), CPKService.address.toLowerCase()]
-        : []
+      allowToDisplayOnlyConditionsToReport && activeAddress ? [activeAddress.toLowerCase()] : []
     )
     setSelectedConditionTypeValue(ConditionTypeAll.all)
     setSelectedConditionTypeFilter(null)
@@ -158,7 +156,7 @@ const SelectConditionTable: React.FC<Props> = (props) => {
     setSelectedToCreationDate(null)
     setSelectedFromCreationDate(null)
     onClearSelection()
-  }, [resetPagination, CPKService, address, allowToDisplayOnlyConditionsToReport, onClearSelection])
+  }, [resetPagination, activeAddress, allowToDisplayOnlyConditionsToReport, onClearSelection])
 
   useEffect(() => {
     resetFilters()
@@ -232,10 +230,9 @@ const SelectConditionTable: React.FC<Props> = (props) => {
     if (
       selectedOracleValue === OracleFilterOptions.Current &&
       status === Web3ContextStatus.Connected &&
-      address &&
-      CPKService
+      activeAddress
     ) {
-      setSelectedOracleFilter([address.toLowerCase(), CPKService.address.toLowerCase()])
+      setSelectedOracleFilter([activeAddress.toLowerCase()])
     }
 
     if (
@@ -244,7 +241,7 @@ const SelectConditionTable: React.FC<Props> = (props) => {
     ) {
       setSelectedOracleFilter([])
     }
-  }, [status, CPKService, address, selectedOracleValue])
+  }, [status, activeAddress, selectedOracleValue])
 
   const { data, error, loading, refetch: refetchConditionList } = useConditionsList(advancedFilters)
 
@@ -418,9 +415,6 @@ const SelectConditionTable: React.FC<Props> = (props) => {
               </FiltersSwitchWrapper>
             }
           />
-          {error && !isBytes32Error && !isLoading && (
-            <InfoCard message={error.message} title="Error" />
-          )}
           <CompactFiltersLayout isVisible={(!error || !!isBytes32Error) && showFilters}>
             <OraclesFilterDropdown
               onClick={(value: OracleFilterOptions, filter: string[]) => {
@@ -480,6 +474,8 @@ const SelectConditionTable: React.FC<Props> = (props) => {
             noDataComponent={
               showSpinner ? (
                 <InlineLoading size={SpinnerSize.regular} />
+              ) : error && !isBytes32Error && !isLoading ? (
+                <InfoCard message={error.message} title="Error" />
               ) : status === Web3ContextStatus.Infura &&
                 selectedOracleValue === OracleFilterOptions.Current ? (
                 <EmptyContentText>User is not connected to wallet.</EmptyContentText>

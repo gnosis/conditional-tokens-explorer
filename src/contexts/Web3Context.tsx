@@ -4,12 +4,14 @@ import React from 'react'
 import Web3Modal from 'web3modal'
 
 import WalletConnectProvider from '@walletconnect/web3-provider'
-import { DEFAULT_NETWORK_ID, INFURA_ID } from 'config/constants'
+import { DEFAULT_NETWORK_ID, INFURA_ID, RPC_XDAI_CHAIN } from 'config/constants'
 import { NetworkConfig } from 'config/networkConfig'
+import { useLocalStorage } from 'hooks/useLocalStorageValue'
 import { ConditionalTokensService } from 'services/conditionalTokens'
 import { CPKService as CPKServiceClass } from 'services/cpk'
 import { RealityService } from 'services/reality'
 import { Wrapper1155Service } from 'services/wrapper1155'
+import { createCPK } from 'util/cpk'
 import { getLogger } from 'util/logger'
 
 export enum Web3ContextStatus {
@@ -17,6 +19,7 @@ export enum Web3ContextStatus {
   WaitingForUser = 'waitingForUser',
   Connecting = 'connecting',
   Error = 'error',
+  WrongNetwork = 'wrongNetwork',
   Connected = 'connected',
   Infura = 'infura',
 }
@@ -38,10 +41,16 @@ type ErrorWeb3 = {
   error: Error
 }
 
+type WrongNetwork = {
+  _type: Web3ContextStatus.WrongNetwork
+  error: Error
+}
+
 export type Connected = {
   _type: Web3ContextStatus.Connected
   provider: Web3Provider
   address: string
+  cpkAddress: string
   signer: JsonRpcSigner
   networkConfig: NetworkConfig
   CTService: ConditionalTokensService
@@ -61,12 +70,22 @@ export type Infura = {
   connect: () => void
 }
 
-export type Web3Status = NotAsked | WaitingForUser | Connecting | Connected | ErrorWeb3 | Infura
+export type Web3Status =
+  | NotAsked
+  | WaitingForUser
+  | Connecting
+  | Connected
+  | ErrorWeb3
+  | Infura
+  | WrongNetwork
 
 export interface ConnectedWeb3Context {
   status: Web3Status
   connect: () => void
   disconnect: () => void
+  toggleCPK: () => void
+  isUsingTheCPKAddress: () => boolean
+  refresh: boolean
 }
 
 export const Web3Context = React.createContext<Maybe<ConnectedWeb3Context>>(null)
@@ -82,6 +101,9 @@ const web3Modal = new Web3Modal({
       package: WalletConnectProvider,
       options: {
         infuraId: INFURA_ID,
+        rpc: {
+          100: RPC_XDAI_CHAIN,
+        },
       },
     },
   },
@@ -94,6 +116,17 @@ export const Web3ContextProvider = ({ children }: Props) => {
     ? { _type: Web3ContextStatus.Connecting }
     : { _type: Web3ContextStatus.NotAsked }
   const [web3Status, setWeb3Status] = React.useState<Web3Status>(web3StatusDefault)
+
+  const { getValue, setValue } = useLocalStorage(`isUsingTheCPK`)
+
+  const isUsingTheCPKAddress = React.useCallback(() => getValue(false), [getValue])
+
+  const [refresh, setRefresh] = React.useState<boolean>(false)
+
+  const toggleCPK = React.useCallback(() => {
+    setValue(!isUsingTheCPKAddress())
+    setRefresh(!refresh)
+  }, [isUsingTheCPKAddress, refresh, setValue])
 
   const resetApp = React.useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -119,7 +152,7 @@ export const Web3ContextProvider = ({ children }: Props) => {
   const subscribeProvider = React.useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (provider: any) => {
-      logger.log('Subscribing to metamask events...')
+      logger.log('Trying to subscribe to metamask events...', web3Status._type)
 
       provider.once('close', () => {
         logger.log('Provider is closing...')
@@ -160,9 +193,9 @@ export const Web3ContextProvider = ({ children }: Props) => {
           } as Connected)
         } else {
           setWeb3Status({
-            _type: Web3ContextStatus.Error,
-            error: new Error('Unknown network'),
-          } as ErrorWeb3)
+            _type: Web3ContextStatus.WrongNetwork,
+            error: new Error('Wrong network'),
+          } as WrongNetwork)
         }
       })
     },
@@ -181,7 +214,7 @@ export const Web3ContextProvider = ({ children }: Props) => {
       await resetApp(provider)
     } catch (error) {
       setWeb3Status({ _type: Web3ContextStatus.Error, error } as ErrorWeb3)
-      logger.error(`Error reseting provider: ${error}`)
+      logger.error(`Error resetting provider: ${error}`)
       return
     }
   }, [web3Status, resetApp])
@@ -194,6 +227,9 @@ export const Web3ContextProvider = ({ children }: Props) => {
     try {
       web3Provider = await web3Modal.connect()
     } catch (error) {
+      if (error.match(/modal closed/i)) {
+        return
+      }
       web3Modal.clearCachedProvider()
       setWeb3Status({ _type: Web3ContextStatus.Error, error } as ErrorWeb3)
       return
@@ -201,19 +237,20 @@ export const Web3ContextProvider = ({ children }: Props) => {
 
     try {
       const provider = new ethers.providers.Web3Provider(web3Provider)
-      const signer = provider.getSigner()
-
-      subscribeProvider(web3Provider)
-
       const networkId = (await provider.getNetwork()).chainId
+
       if (NetworkConfig.isKnownNetwork(networkId)) {
+        const signer = provider.getSigner()
+        subscribeProvider(web3Provider)
+
         logger.log('Updating connected information...')
 
         const networkConfig = new NetworkConfig(networkId)
         const RtyService = new RealityService(networkConfig, provider, signer)
         const CTService = new ConditionalTokensService(networkConfig, provider, signer)
         const WrapperService = new Wrapper1155Service(networkConfig, provider, signer)
-        const CPKService = await CPKServiceClass.create(networkConfig, provider, signer)
+        const cpk = await createCPK(provider, networkConfig)
+        const CPKService = new CPKServiceClass(cpk, provider, networkConfig)
 
         const address = await signer.getAddress()
         setWeb3Status({
@@ -226,12 +263,13 @@ export const Web3ContextProvider = ({ children }: Props) => {
           WrapperService,
           CPKService,
           address,
+          cpkAddress: CPKService.address,
         } as Connected)
       } else {
         setWeb3Status({
-          _type: Web3ContextStatus.Error,
-          error: new Error('Unknown network'),
-        } as ErrorWeb3)
+          _type: Web3ContextStatus.WrongNetwork,
+          error: new Error('Wrong network'),
+        } as WrongNetwork)
       }
     } catch (error) {
       setWeb3Status({ _type: Web3ContextStatus.Error, error } as ErrorWeb3)
@@ -262,9 +300,9 @@ export const Web3ContextProvider = ({ children }: Props) => {
         } as Infura)
       } else {
         setWeb3Status({
-          _type: Web3ContextStatus.Error,
-          error: new Error('Unknown network'),
-        } as ErrorWeb3)
+          _type: Web3ContextStatus.WrongNetwork,
+          error: new Error('Wrong network'),
+        } as WrongNetwork)
       }
     } catch (error) {
       setWeb3Status({ _type: Web3ContextStatus.Error, error } as ErrorWeb3)
@@ -281,7 +319,14 @@ export const Web3ContextProvider = ({ children }: Props) => {
 
   return (
     <Web3Context.Provider
-      value={{ status: web3Status, connect: connectWeb3Modal, disconnect: disconnectWeb3Modal }}
+      value={{
+        status: web3Status,
+        connect: connectWeb3Modal,
+        disconnect: disconnectWeb3Modal,
+        toggleCPK,
+        isUsingTheCPKAddress,
+        refresh,
+      }}
     >
       {children}
     </Web3Context.Provider>
@@ -297,23 +342,27 @@ export const useWeb3Context = () => {
 }
 
 export const useWeb3Connected = () => {
-  const { disconnect, status } = useWeb3Context()
+  const { disconnect, isUsingTheCPKAddress, refresh, status, toggleCPK } = useWeb3Context()
   if (status._type === Web3ContextStatus.Connected) {
-    return { ...status, disconnect }
+    return { ...status, disconnect, toggleCPK, isUsingTheCPKAddress, refresh }
   }
   throw new Error('[useWeb3Connected] Hook not used under a connected context')
 }
 
 export const useWeb3ConnectedOrInfura = () => {
-  const { connect, disconnect, status } = useWeb3Context()
+  const { connect, disconnect, isUsingTheCPKAddress, refresh, status, toggleCPK } = useWeb3Context()
   if (status._type === Web3ContextStatus.Connected || status._type === Web3ContextStatus.Infura) {
     return {
       ...status,
-      address: status._type === Web3ContextStatus.Connected ? status.address : null,
       CPKService: status._type === Web3ContextStatus.Connected ? status.CPKService : null,
+      address: status._type === Web3ContextStatus.Connected ? status.address : null,
+      cpkAddress: status._type === Web3ContextStatus.Connected ? status.cpkAddress : null,
       signer: status._type === Web3ContextStatus.Connected ? status.signer : null,
       connect,
       disconnect,
+      toggleCPK,
+      isUsingTheCPKAddress,
+      refresh,
     }
   }
 
