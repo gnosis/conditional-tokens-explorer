@@ -1,3 +1,12 @@
+Version 0.3.1 (2021-09-08)
+==========================
+
+- Hotfix Position List skip limit GQL #855 
+-  xDai support #793 
+- Add Wrapper 1155-to-20 #847
+- Fix moment/UTC use #843
+- Add other PR fixed issues #801 #797 #805 #807 #811
+
 Version 0.3.0 (2020-12-03)
 ==========================
 
