@@ -470,7 +470,7 @@ export const Contents = (props: Props) => {
         ? `https://${etherscanURL}${address}`
         : networkConfig.networkId === NetworkIds.RINKEBY
         ? `https://rinkeby.${etherscanURL}${address}`
-        : `https://blockscout.com/poa/xdai/${address}`
+        : `https://blockscout.com/xdai/mainnet/address/${address}`
     },
     [networkConfig.networkId]
   )
@@ -653,7 +653,7 @@ export const Contents = (props: Props) => {
                   </CollateralTextAmount>
                 </CollateralText>
                 <CollateralWrapButton
-                  disabled={!balanceERC1155 || balanceERC1155.isZero()}
+                  disabled={!balanceERC1155 || balanceERC1155.isZero() || (balanceERC20 && !balanceERC20.isZero())}
                   onClick={() => setIsWrapModalOpen(true)}
                 >
                   Wrap
@@ -770,6 +770,8 @@ export const Contents = (props: Props) => {
           onUnWrap={onUnwrap}
           positionId={positionId}
           tokenSymbol={ERC20Symbol}
+          tokenName={ERC20Name}
+          accountTo={activeAddress}
         />
       )}
       {openTransferOutcomeTokensModal && positionId && collateralTokenAddress && (
