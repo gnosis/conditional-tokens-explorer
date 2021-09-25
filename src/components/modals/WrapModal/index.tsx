@@ -2,18 +2,19 @@ import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
-import { Amount } from 'components/form/Amount'
 import { Button } from 'components/buttons'
-import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { Modal, ModalProps } from 'components/common/Modal'
+import { Amount } from 'components/form/Amount'
+import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { Row } from 'components/pureStyledComponents/Row'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { TitleValue } from 'components/text/TitleValue'
-import { TransferOptions } from 'util/types'
-import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { ZERO_BN } from 'config/constants'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { TransferOptions } from 'util/types'
 
-const { getTokenBytecode } = require('1155-to-20-helper/src');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { getTokenBytecode } = require('1155-to-20-helper/src')
 
 const FirstRow = styled(Row)`
   padding-top: 12px;
@@ -32,7 +33,6 @@ interface Props extends ModalProps {
 }
 
 export const WrapModal: React.FC<Props> = (props) => {
-
   const { WrapperService } = useWeb3ConnectedOrInfura()
 
   const { balance, decimals, onRequestClose, onWrap, positionId, tokenSymbol, ...restProps } = props
@@ -73,7 +73,17 @@ export const WrapModal: React.FC<Props> = (props) => {
 
       if (onRequestClose) onRequestClose(e)
     },
-    [WrapperService, amount, isSubmitDisabled, onRequestClose, onWrap, positionId, tokenWrappedName, tokenWrappedSymbol, decimals]
+    [
+      WrapperService,
+      amount,
+      isSubmitDisabled,
+      onRequestClose,
+      onWrap,
+      positionId,
+      tokenWrappedName,
+      tokenWrappedSymbol,
+      decimals,
+    ]
   )
 
   const onPressEnter = useCallback(
@@ -97,10 +107,10 @@ export const WrapModal: React.FC<Props> = (props) => {
             <Textfield
               autoComplete="off"
               name="tokenWrappedName"
-              value={tokenWrappedName}
               onChange={(e) => setTokenWrappedName(e.target.value)}
               placeholder="Type in a token name..."
               type="text"
+              value={tokenWrappedName}
             />
           }
         />
@@ -112,10 +122,10 @@ export const WrapModal: React.FC<Props> = (props) => {
             <Textfield
               autoComplete="off"
               name="tokenSymbol"
-              value={tokenWrappedSymbol}
               onChange={(e) => setTokenWrappedSymbol(e.target.value)}
               placeholder="Type in a token symbol..."
               type="text"
+              value={tokenWrappedSymbol}
             />
           }
         />

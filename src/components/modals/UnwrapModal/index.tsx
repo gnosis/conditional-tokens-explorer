@@ -11,6 +11,7 @@ import { ZERO_BN } from 'config/constants'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { TransferOptions } from 'util/types'
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { getTokenBytecode } = require('1155-to-20-helper/src')
 
 const FirstRow = styled(Row)`
@@ -28,6 +29,7 @@ interface Props extends ModalProps {
   onUnWrap: (transferValue: TransferOptions) => Promise<void>
   tokenSymbol?: string
   tokenName?: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   accountTo?: any
 }
 
@@ -35,14 +37,14 @@ export const UnwrapModal: React.FC<Props> = (props) => {
   const { CTService } = useWeb3ConnectedOrInfura()
 
   const {
+    accountTo,
     balance,
     decimals,
     onRequestClose,
     onUnWrap,
     positionId,
-    tokenSymbol,
     tokenName,
-    accountTo,
+    tokenSymbol,
     ...restProps
   } = props
 
@@ -81,7 +83,18 @@ export const UnwrapModal: React.FC<Props> = (props) => {
 
       if (onRequestClose) onRequestClose(e)
     },
-    [CTService, amount, isSubmitDisabled, onRequestClose, onUnWrap, positionId]
+    [
+      CTService,
+      amount,
+      isSubmitDisabled,
+      onRequestClose,
+      onUnWrap,
+      positionId,
+      tokenName,
+      tokenSymbol,
+      decimals,
+      accountTo,
+    ]
   )
 
   const onPressEnter = useCallback(
@@ -112,14 +125,11 @@ export const UnwrapModal: React.FC<Props> = (props) => {
           tokenSymbol={tokenSymbol}
         />
       </FirstRow>
-      <Row>
-        Note: If you don't unwrap the total amount and wrap again after a new ERC-20 will be created.
-      </Row>
       <ButtonContainerStyled>
         <Button disabled={isSubmitDisabled} onClick={unWrap}>
           Unwrap
         </Button>
-      </ButtonContainerStyled>      
+      </ButtonContainerStyled>
     </Modal>
   )
 }
