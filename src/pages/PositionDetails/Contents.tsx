@@ -264,7 +264,7 @@ export const Contents = (props: Props) => {
               addressTo,
               positionId,
               amount,
-              tokenBytes,
+              tokenBytes
             )
           }
 
@@ -369,7 +369,7 @@ export const Contents = (props: Props) => {
               addressTo,
               positionId,
               amount,
-              tokenBytes,
+              tokenBytes
             )
           }
 
@@ -653,7 +653,7 @@ export const Contents = (props: Props) => {
                   </CollateralTextAmount>
                 </CollateralText>
                 <CollateralWrapButton
-                  disabled={!balanceERC1155 || balanceERC1155.isZero() || (balanceERC20 && !balanceERC20.isZero())}
+                  disabled={!balanceERC1155 || balanceERC1155.isZero()}
                   onClick={() => setIsWrapModalOpen(true)}
                 >
                   Wrap
@@ -753,25 +753,27 @@ export const Contents = (props: Props) => {
       {isWrapModalOpen && (
         <WrapModal
           balance={balanceERC1155}
+          collateralSymbol={ERC1155Symbol}
           decimals={ERC1155Decimals}
           isOpen={isWrapModalOpen}
           onRequestClose={() => setIsWrapModalOpen(false)}
           onWrap={onWrap}
           positionId={positionId}
-          tokenSymbol={ERC1155Symbol}
+          tokenWrappedName={!balanceERC20 || balanceERC20.isZero() ? '' : ERC20Name}
+          tokenWrappedSymbol={!balanceERC20 || balanceERC20.isZero() ? '' : ERC20Symbol}
         />
       )}
       {isUnwrapModalOpen && (
         <UnwrapModal
+          accountTo={activeAddress}
           balance={balanceERC20}
           decimals={ERC1155Decimals}
           isOpen={isUnwrapModalOpen}
           onRequestClose={() => setIsUnwrapModalOpen(false)}
           onUnWrap={onUnwrap}
           positionId={positionId}
-          tokenSymbol={ERC20Symbol}
           tokenName={ERC20Name}
-          accountTo={activeAddress}
+          tokenSymbol={ERC20Symbol}
         />
       )}
       {openTransferOutcomeTokensModal && positionId && collateralTokenAddress && (
