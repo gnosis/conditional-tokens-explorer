@@ -2,18 +2,19 @@ import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
-import { Amount } from 'components/form/Amount'
 import { Button } from 'components/buttons'
-import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { Modal, ModalProps } from 'components/common/Modal'
+import { Amount } from 'components/form/Amount'
+import { ButtonContainer } from 'components/pureStyledComponents/ButtonContainer'
 import { Row } from 'components/pureStyledComponents/Row'
 import { Textfield } from 'components/pureStyledComponents/Textfield'
 import { TitleValue } from 'components/text/TitleValue'
-import { TransferOptions } from 'util/types'
-import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { ZERO_BN } from 'config/constants'
+import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
+import { TransferOptions } from 'util/types'
 
-const { getTokenBytecode } = require('1155-to-20-helper/src');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { getTokenBytecode } = require('1155-to-20-helper/src')
 
 const FirstRow = styled(Row)`
   padding-top: 12px;
@@ -28,14 +29,25 @@ interface Props extends ModalProps {
   balance: BigNumber
   decimals: number
   onWrap: (transferValue: TransferOptions) => Promise<void>
-  tokenSymbol?: string
+  collateralSymbol?: string
+  tokenWrappedSymbol?: string
+  tokenWrappedName?: string
 }
 
 export const WrapModal: React.FC<Props> = (props) => {
-
   const { WrapperService } = useWeb3ConnectedOrInfura()
 
-  const { balance, decimals, onRequestClose, onWrap, positionId, tokenSymbol, ...restProps } = props
+  const {
+    balance,
+    collateralSymbol,
+    decimals,
+    onRequestClose,
+    onWrap,
+    positionId,
+    tokenWrappedName,
+    tokenWrappedSymbol,
+    ...restProps
+  } = props
 
   const maxBalance = useMemo(() => (balance ? balance : ZERO_BN), [balance])
 
@@ -44,8 +56,12 @@ export const WrapModal: React.FC<Props> = (props) => {
     setAmount(value)
   }, [])
 
-  const [tokenWrappedName, setTokenWrappedName] = useState<string>('Wrapped ERC-1155')
-  const [tokenWrappedSymbol, setTokenWrappedSymbol] = useState<string>('WMT')
+  const [tokenName, setTokenName] = useState<string>(
+    tokenWrappedName ? tokenWrappedName : 'Wrapped ERC-1155'
+  )
+  const [tokenSymbol, setTokenSymbol] = useState<string>(
+    tokenWrappedSymbol ? tokenWrappedSymbol : 'WMT'
+  )
 
   const useWalletHandler = useCallback(() => {
     if (maxBalance.gt(ZERO_BN)) {
@@ -59,7 +75,7 @@ export const WrapModal: React.FC<Props> = (props) => {
     (
       e: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLInputElement>
     ) => {
-      const tokenBytes = getTokenBytecode(tokenWrappedName, tokenWrappedSymbol, decimals)
+      const tokenBytes = getTokenBytecode(tokenName, tokenSymbol, decimals)
       const wrapValues = {
         amount,
         address: WrapperService.address,
@@ -73,7 +89,17 @@ export const WrapModal: React.FC<Props> = (props) => {
 
       if (onRequestClose) onRequestClose(e)
     },
-    [WrapperService, amount, isSubmitDisabled, onRequestClose, onWrap, positionId, tokenWrappedName, tokenWrappedSymbol, decimals]
+    [
+      WrapperService,
+      amount,
+      isSubmitDisabled,
+      onRequestClose,
+      onWrap,
+      positionId,
+      tokenName,
+      tokenSymbol,
+      decimals,
+    ]
   )
 
   const onPressEnter = useCallback(
@@ -96,11 +122,12 @@ export const WrapModal: React.FC<Props> = (props) => {
           value={
             <Textfield
               autoComplete="off"
-              name="tokenWrappedName"
-              value={tokenWrappedName}
-              onChange={(e) => setTokenWrappedName(e.target.value)}
+              name="tokenName"
+              onChange={(e) => setTokenName(e.target.value)}
               placeholder="Type in a token name..."
+              readOnly={tokenWrappedName !== undefined && tokenWrappedName !== '' ? true : false}
               type="text"
+              value={tokenName}
             />
           }
         />
@@ -112,10 +139,13 @@ export const WrapModal: React.FC<Props> = (props) => {
             <Textfield
               autoComplete="off"
               name="tokenSymbol"
-              value={tokenWrappedSymbol}
-              onChange={(e) => setTokenWrappedSymbol(e.target.value)}
+              onChange={(e) => setTokenSymbol(e.target.value)}
               placeholder="Type in a token symbol..."
+              readOnly={
+                tokenWrappedSymbol !== undefined && tokenWrappedSymbol !== '' ? true : false
+              }
               type="text"
+              value={tokenSymbol}
             />
           }
         />
@@ -131,7 +161,7 @@ export const WrapModal: React.FC<Props> = (props) => {
           onAmountChange={amountChangeHandler}
           onKeyUp={onPressEnter}
           onUseWalletBalance={useWalletHandler}
-          tokenSymbol={tokenSymbol}
+          tokenSymbol={collateralSymbol}
         />
       </Row>
       <ButtonContainerStyled>

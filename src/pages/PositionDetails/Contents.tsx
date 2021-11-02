@@ -264,7 +264,7 @@ export const Contents = (props: Props) => {
               addressTo,
               positionId,
               amount,
-              tokenBytes,
+              tokenBytes
             )
           }
 
@@ -369,7 +369,7 @@ export const Contents = (props: Props) => {
               addressTo,
               positionId,
               amount,
-              tokenBytes,
+              tokenBytes
             )
           }
 
@@ -470,7 +470,7 @@ export const Contents = (props: Props) => {
         ? `https://${etherscanURL}${address}`
         : networkConfig.networkId === NetworkIds.RINKEBY
         ? `https://rinkeby.${etherscanURL}${address}`
-        : `https://blockscout.com/poa/xdai/${address}`
+        : `https://blockscout.com/xdai/mainnet/address/${address}`
     },
     [networkConfig.networkId]
   )
@@ -753,22 +753,26 @@ export const Contents = (props: Props) => {
       {isWrapModalOpen && (
         <WrapModal
           balance={balanceERC1155}
+          collateralSymbol={ERC1155Symbol}
           decimals={ERC1155Decimals}
           isOpen={isWrapModalOpen}
           onRequestClose={() => setIsWrapModalOpen(false)}
           onWrap={onWrap}
           positionId={positionId}
-          tokenSymbol={ERC1155Symbol}
+          tokenWrappedName={!balanceERC20 || balanceERC20.isZero() ? '' : ERC20Name}
+          tokenWrappedSymbol={!balanceERC20 || balanceERC20.isZero() ? '' : ERC20Symbol}
         />
       )}
       {isUnwrapModalOpen && (
         <UnwrapModal
+          accountTo={activeAddress}
           balance={balanceERC20}
           decimals={ERC1155Decimals}
           isOpen={isUnwrapModalOpen}
           onRequestClose={() => setIsUnwrapModalOpen(false)}
           onUnWrap={onUnwrap}
           positionId={positionId}
+          tokenName={ERC20Name}
           tokenSymbol={ERC20Symbol}
         />
       )}

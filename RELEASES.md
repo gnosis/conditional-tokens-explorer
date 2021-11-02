@@ -1,3 +1,12 @@
+Version 0.3.2 (2021-11-02)
+==========================
+
+- Bump url-parse from 1.5.1 to 1.5.3 #861
+- Enable Wrap button for Position Details #1914d5a
+- Disable Wrap and Unwrapp features from Position list #e7cde29
+- Fix React Hook useCallback has missing dependencies from Unwrap modal #b2db9fc
+- Fix formatBigNumber format check #e364b6d
+
 Version 0.3.1 (2021-09-08)
 ==========================
 

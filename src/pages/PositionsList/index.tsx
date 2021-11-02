@@ -26,8 +26,8 @@ import { SearchField } from 'components/form/SearchField'
 import { Switch } from 'components/form/Switch'
 import { DisplayHashesTableModal } from 'components/modals/DisplayHashesTableModal'
 import { TransferOutcomeTokensModal } from 'components/modals/TransferOutcomeTokensModal'
-import { UnwrapModal } from 'components/modals/UnwrapModal'
-import { WrapModal } from 'components/modals/WrapModal'
+// import { UnwrapModal } from 'components/modals/UnwrapModal'
+// import { WrapModal } from 'components/modals/WrapModal'
 import { ExternalLink } from 'components/navigation/ExternalLink'
 import { EmptyContentText } from 'components/pureStyledComponents/EmptyContentText'
 import {
@@ -81,7 +81,7 @@ export const PositionsList = () => {
     _type: status,
     CPKService,
     CTService,
-    WrapperService,
+    // WrapperService,
     connect,
     isUsingTheCPKAddress,
     networkConfig,
@@ -115,8 +115,8 @@ export const PositionsList = () => {
     Remote.notAsked<TransferOptions>()
   )
   const [transactionTitle, setTransactionTitle] = useState<string>('')
-  const [isWrapModalOpen, setIsWrapModalOpen] = useState(false)
-  const [isUnwrapModalOpen, setIsUnwrapModalOpen] = useState(false)
+  // const [isWrapModalOpen, setIsWrapModalOpen] = useState(false)
+  // const [isUnwrapModalOpen, setIsUnwrapModalOpen] = useState(false)
   const [userBalance, setUserBalance] = useState(new BigNumber(0))
 
   const [searchBy, setSearchBy] = useState<PositionSearchOptions>(PositionSearchOptions.PositionId)
@@ -246,9 +246,9 @@ export const PositionsList = () => {
 
   const buildMenuForRow = useCallback(
     (row: PositionWithUserBalanceWithDecimals) => {
-      const { collateralTokenERC1155, conditions, id, userBalanceERC20, userBalanceERC1155 } = row
+      const { collateralTokenERC1155, conditions, id, userBalanceERC1155 } = row
       const userHasERC1155Balance = userBalanceERC1155 && !userBalanceERC1155.isZero()
-      const userHasERC20Balance = userBalanceERC20 && !userBalanceERC20.isZero()
+      // const userHasERC20Balance = userBalanceERC20 && !userBalanceERC20.isZero()
       const isRedeemable = conditions.some((c) => c.resolved)
 
       const menu = [
@@ -273,29 +273,29 @@ export const PositionsList = () => {
             setIsTransferOutcomeModalOpen(true)
           },
         },
-        {
-          disabled: !userHasERC1155Balance || !isConnected,
-          href: undefined,
-          text: 'Wrap ERC1155',
-          onClick: () => {
-            setSelectedPositionId(id)
-            setSelectedCollateralToken(collateralTokenERC1155)
-            setUserBalance(userBalanceERC1155)
-            setIsWrapModalOpen(true)
-          },
-        },
-        {
-          disabled: !userHasERC20Balance || !isConnected,
-          href: undefined,
-          text: 'Unwrap ERC20',
-          onClick: () => {
-            setSelectedPositionId(id)
-            // Must send the original token, not the ERC20
-            setSelectedCollateralToken(collateralTokenERC1155)
-            setUserBalance(userBalanceERC20)
-            setIsUnwrapModalOpen(true)
-          },
-        },
+        // {
+        //   disabled: !userHasERC1155Balance || !isConnected,
+        //   href: undefined,
+        //   text: 'Wrap ERC1155',
+        //   onClick: () => {
+        //     setSelectedPositionId(id)
+        //     setSelectedCollateralToken(collateralTokenERC1155)
+        //     setUserBalance(userBalanceERC1155)
+        //     setIsWrapModalOpen(true)
+        //   },
+        // },
+        // {
+        //   disabled: !userHasERC20Balance || !isConnected,
+        //   href: undefined,
+        //   text: 'Unwrap ERC20',
+        //   onClick: () => {
+        //     setSelectedPositionId(id)
+        //     // Must send the original token, not the ERC20
+        //     setSelectedCollateralToken(collateralTokenERC1155)
+        //     setUserBalance(userBalanceERC20)
+        //     setIsUnwrapModalOpen(true)
+        //   },
+        // },
       ]
 
       return menu
@@ -586,97 +586,97 @@ export const PositionsList = () => {
     setColumns(columnsDefault)
   }, [buildMenuForRow, status, networkConfig, handleRowClick, getValue, isConnected])
 
-  const onWrap = useCallback(
-    async (transferValue: TransferOptions) => {
-      if (CPKService && activeAddress) {
-        try {
-          setTransactionTitle('Wrapping ERC1155')
-          setTransfer(Remote.loading())
+  // const onWrap = useCallback(
+  //   async (transferValue: TransferOptions) => {
+  //     if (CPKService && activeAddress) {
+  //       try {
+  //         setTransactionTitle('Wrapping ERC1155')
+  //         setTransfer(Remote.loading())
 
-          const { address: addressTo, amount, positionId, tokenBytes } = transferValue
-          if (isUsingTheCPKAddress()) {
-            await CPKService.wrapOrTransfer({
-              CTService,
-              addressFrom: activeAddress,
-              addressTo, // Is the wrapper service address
-              positionId,
-              amount,
-              tokenBytes,
-            })
-          } else {
-            await CTService.safeTransferFrom(activeAddress, addressTo, positionId, amount, tokenBytes)
-          }
+  //         const { address: addressTo, amount, positionId, tokenBytes } = transferValue
+  //         if (isUsingTheCPKAddress()) {
+  //           await CPKService.wrapOrTransfer({
+  //             CTService,
+  //             addressFrom: activeAddress,
+  //             addressTo, // Is the wrapper service address
+  //             positionId,
+  //             amount,
+  //             tokenBytes,
+  //           })
+  //         } else {
+  //           await CTService.safeTransferFrom(activeAddress, addressTo, positionId, amount, tokenBytes)
+  //         }
 
-          refetchPositions()
-          refetchUserPositions()
+  //         refetchPositions()
+  //         refetchUserPositions()
 
-          setTransfer(Remote.success(transferValue))
-        } catch (err) {
-          logger.error(err)
-          setTransfer(Remote.failure(err))
-        }
-      } else {
-        connect()
-      }
-    },
-    [
-      isUsingTheCPKAddress,
-      activeAddress,
-      CPKService,
-      setTransfer,
-      CTService,
-      connect,
-      refetchPositions,
-      refetchUserPositions,
-    ]
-  )
+  //         setTransfer(Remote.success(transferValue))
+  //       } catch (err) {
+  //         logger.error(err)
+  //         setTransfer(Remote.failure(err))
+  //       }
+  //     } else {
+  //       connect()
+  //     }
+  //   },
+  //   [
+  //     isUsingTheCPKAddress,
+  //     activeAddress,
+  //     CPKService,
+  //     setTransfer,
+  //     CTService,
+  //     connect,
+  //     refetchPositions,
+  //     refetchUserPositions,
+  //   ]
+  // )
 
-  const onUnwrap = useCallback(
-    async (transferValue: TransferOptions) => {
-      if (activeAddress && CPKService) {
-        try {
-          setTransactionTitle('Unwrapping ERC20')
-          setTransfer(Remote.loading())
+  // const onUnwrap = useCallback(
+  //   async (transferValue: TransferOptions) => {
+  //     if (activeAddress && CPKService) {
+  //       try {
+  //         setTransactionTitle('Unwrapping ERC20')
+  //         setTransfer(Remote.loading())
 
-          const { address: addressFrom, amount, positionId, tokenBytes } = transferValue
-          if (isUsingTheCPKAddress()) {
-            await CPKService.unwrap({
-              CTService,
-              WrapperService,
-              addressFrom, // Is the conditional token address
-              positionId,
-              amount,
-              addressTo: activeAddress,
-              tokenBytes,
-            })
-          } else {
-            await WrapperService.unwrap(addressFrom, positionId, amount, activeAddress, tokenBytes)
-          }
+  //         const { address: addressFrom, amount, positionId, tokenBytes } = transferValue
+  //         if (isUsingTheCPKAddress()) {
+  //           await CPKService.unwrap({
+  //             CTService,
+  //             WrapperService,
+  //             addressFrom, // Is the conditional token address
+  //             positionId,
+  //             amount,
+  //             addressTo: activeAddress,
+  //             tokenBytes,
+  //           })
+  //         } else {
+  //           await WrapperService.unwrap(addressFrom, positionId, amount, activeAddress, tokenBytes)
+  //         }
 
-          refetchPositions()
-          refetchUserPositions()
+  //         refetchPositions()
+  //         refetchUserPositions()
 
-          setTransfer(Remote.success(transferValue))
-        } catch (err) {
-          logger.error(err)
-          setTransfer(Remote.failure(err))
-        }
-      } else {
-        connect()
-      }
-    },
-    [
-      CTService,
-      isUsingTheCPKAddress,
-      CPKService,
-      WrapperService,
-      connect,
-      activeAddress,
-      setTransfer,
-      refetchPositions,
-      refetchUserPositions,
-    ]
-  )
+  //         setTransfer(Remote.success(transferValue))
+  //       } catch (err) {
+  //         logger.error(err)
+  //         setTransfer(Remote.failure(err))
+  //       }
+  //     } else {
+  //       connect()
+  //     }
+  //   },
+  //   [
+  //     CTService,
+  //     isUsingTheCPKAddress,
+  //     CPKService,
+  //     WrapperService,
+  //     connect,
+  //     activeAddress,
+  //     setTransfer,
+  //     refetchPositions,
+  //     refetchUserPositions,
+  //   ]
+  // )
 
   const onTransferOutcomeTokens = useCallback(
     async (transferValue: TransferOptions) => {
@@ -696,7 +696,13 @@ export const PositionsList = () => {
               tokenBytes,
             })
           } else {
-            await CTService.safeTransferFrom(activeAddress, addressTo, positionId, amount, tokenBytes)
+            await CTService.safeTransferFrom(
+              activeAddress,
+              addressTo,
+              positionId,
+              amount,
+              tokenBytes
+            )
           }
 
           refetchPositions()
@@ -929,7 +935,7 @@ export const PositionsList = () => {
           />
         </TwoColumnsCollapsibleLayout>
       )}
-      {isWrapModalOpen && selectedCollateralToken && (
+      {/* {isWrapModalOpen && selectedCollateralToken && (
         <WrapModal
           balance={userBalance}
           decimals={selectedCollateralToken.decimals}
@@ -937,7 +943,9 @@ export const PositionsList = () => {
           onRequestClose={() => setIsWrapModalOpen(false)}
           onWrap={onWrap}
           positionId={selectedPositionId}
-          tokenSymbol={selectedCollateralToken.symbol}
+          collateralSymbol={selectedCollateralToken.symbol}
+          tokenWrappedSymbol=''
+          tokenWrappedName=''
         />
       )}
       {isUnwrapModalOpen && selectedCollateralToken && (
@@ -948,9 +956,11 @@ export const PositionsList = () => {
           onRequestClose={() => setIsUnwrapModalOpen(false)}
           onUnWrap={onUnwrap}
           positionId={selectedPositionId}
-          tokenSymbol={selectedCollateralToken.symbol}
+          tokenSymbol=''
+          tokenName=''
+          accountTo={activeAddress}
         />
-      )}
+      )} */}
       {isTransferOutcomeModalOpen && selectedPositionId && selectedCollateralToken && (
         <TransferOutcomeTokensModal
           balance={userBalance}

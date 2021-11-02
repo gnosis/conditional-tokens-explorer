@@ -11,6 +11,9 @@ import { ZERO_BN } from 'config/constants'
 import { useWeb3ConnectedOrInfura } from 'contexts/Web3Context'
 import { TransferOptions } from 'util/types'
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { getTokenBytecode } = require('1155-to-20-helper/src')
+
 const FirstRow = styled(Row)`
   padding-top: 12px;
 `
@@ -25,17 +28,22 @@ interface Props extends ModalProps {
   decimals: number
   onUnWrap: (transferValue: TransferOptions) => Promise<void>
   tokenSymbol?: string
+  tokenName?: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  accountTo?: any
 }
 
 export const UnwrapModal: React.FC<Props> = (props) => {
   const { CTService } = useWeb3ConnectedOrInfura()
 
   const {
+    accountTo,
     balance,
     decimals,
     onRequestClose,
     onUnWrap,
     positionId,
+    tokenName,
     tokenSymbol,
     ...restProps
   } = props
@@ -55,16 +63,17 @@ export const UnwrapModal: React.FC<Props> = (props) => {
 
   const isSubmitDisabled = amount.isZero()
 
-  const tokenBytes = '0x'
-
   const unWrap = useCallback(
     (
       e: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLInputElement>
     ) => {
+      const tokenBytes = getTokenBytecode(tokenName, tokenSymbol, decimals)
+
       const unWrapValues = {
-        amount,
         address: CTService.address,
         positionId,
+        amount,
+        accountTo,
         tokenBytes,
       }
 
@@ -74,7 +83,18 @@ export const UnwrapModal: React.FC<Props> = (props) => {
 
       if (onRequestClose) onRequestClose(e)
     },
-    [CTService, amount, isSubmitDisabled, onRequestClose, onUnWrap, positionId]
+    [
+      CTService,
+      amount,
+      isSubmitDisabled,
+      onRequestClose,
+      onUnWrap,
+      positionId,
+      tokenName,
+      tokenSymbol,
+      decimals,
+      accountTo,
+    ]
   )
 
   const onPressEnter = useCallback(

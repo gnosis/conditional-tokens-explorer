@@ -46,8 +46,12 @@ export const trivialPartition = (size: number) => {
   }, [])
 }
 
-export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2): string =>
-  Number(formatUnits(value, decimals)).toFixed(precision)
+export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2): string => {
+  if (value < new BigNumber(1).div(precision)) {
+    precision = precision + 1
+  }
+  return Number(formatUnits(value, decimals)).toFixed(precision)
+}
 
 export const isBytes32String = (s: string): boolean => BYTES_REGEX.test(s)
 
@@ -408,16 +412,17 @@ export const getTokenSummary = async (
   const token = networkConfig.getTokenFromAddress(collateralToken)
 
   if (token) {
-    const { address, decimals, symbol } = token
+    const { address, decimals, name, symbol } = token
     return {
       address,
       decimals,
       symbol,
+      name,
     }
   } else {
     try {
       const erc20Service = new ERC20Service(provider, collateralToken)
-      const { address, decimals, symbol, name } = await erc20Service.getProfileSummary()
+      const { address, decimals, name, symbol } = await erc20Service.getProfileSummary()
 
       return {
         address,

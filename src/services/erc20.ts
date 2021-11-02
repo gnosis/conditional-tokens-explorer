@@ -74,18 +74,23 @@ class ERC20Service {
   getProfileSummary = async (): Promise<Token> => {
     const decimals = await this.contract.decimals()
     let symbol = ''
+    let name = ''
 
     try {
       symbol = await this.contract.symbol()
+      name = await this.contract.name()
     } catch (err) {
-      const hexString = await this.contractBytes32.symbol()
-      symbol = toUtf8String(hexString)
+      const hexStringSymbol = await this.contractBytes32.symbol()
+      const hexStringName = await this.contractBytes32.name()
+      symbol = toUtf8String(hexStringSymbol)
+      symbol = toUtf8String(hexStringName)
     }
 
     return {
       address: this.contract.address,
       decimals,
       symbol,
+      name,
     }
   }
 
