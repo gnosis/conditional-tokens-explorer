@@ -92,6 +92,10 @@ export const formatTS = (timestamp: number): string => {
   return moment.unix(timestamp).utc().format('YYYY-MM-DD - HH:mm [UTC]')
 }
 
+export const formatTSAlt = (timestamp: number): string => {
+  return moment.unix(timestamp).utc().format('MMM D, YYYY - HH:mm')
+}
+
 export const formatTSSimple = (timestamp: number): string => {
   return moment.unix(timestamp).utc().format('YYYY-MM-DD')
 }
